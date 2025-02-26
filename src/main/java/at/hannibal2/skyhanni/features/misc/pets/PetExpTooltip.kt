@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc.pets
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -20,8 +20,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PetExpTooltip {
@@ -31,9 +29,8 @@ object PetExpTooltip {
     private const val LEVEL_100_LEGENDARY = 25_353_230
     private const val LEVEL_200_LEGENDARY = 210_255_385
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onItemTooltipLow(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
+    fun onTooltip(event: ToolTipEvent) {
         if (!config.petDisplay) return
         if (!KeyboardManager.isShiftKeyDown() && !config.showAlways) return
 
@@ -41,24 +38,37 @@ object PetExpTooltip {
         val petExperience = itemStack.getPetExp()?.roundTo(1) ?: return
         val name = itemStack.name
         try {
-
             val index = findIndex(event.toolTip) ?: return
+            val fixedIndex = if (index > event.toolTip.size) {
+                ErrorManager.logErrorStateWithData(
+                    "Error in Pet Exp Tooltip",
+                    "index is out of bounds of item tooltip",
+                    "index" to index,
+                    "event.toolTip.size" to event.toolTip.size,
+                    "name" to name,
+                    "event.toolTip" to event.toolTip,
+                    betaOnly = true,
+                )
+                event.toolTip.size
+            } else {
+                index
+            }
 
-            val (maxLevel, maxXp) = getMaxValues(name, petExperience)
+            val (maxLevel, maxXP) = getMaxValues(name, petExperience)
 
-            val percentage = petExperience / maxXp
+            val percentage = petExperience / maxXP
             val percentageFormat = LorenzUtils.formatPercentage(percentage)
 
             if (percentage < 1) {
-                event.toolTip.add(index, " ")
-                val progressBar = StringUtils.progressBar(percentage)
                 val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
                 val addLegendaryColor = if (isBelowLegendary) "§6" else ""
-                event.toolTip.add(
-                    index,
-                    "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXp.shortFormat()}"
-                )
-                event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
+                val progressTextLine = "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat"
+
+                val progressBar = StringUtils.progressBar(percentage)
+                val progressBarLine = "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXP.shortFormat()}"
+
+                event.toolTip.addAll(fixedIndex, listOf(progressTextLine, progressBarLine, " "))
+
             }
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
@@ -106,14 +116,14 @@ object PetExpTooltip {
 
         val maxLevel = if (useGoldenDragonLevels) 200 else 100
 
-        val maxXp = when {
+        val maxXP = when {
             useGoldenDragonLevels -> LEVEL_200_LEGENDARY
             petName.contains("Bingo") -> LEVEL_100_COMMON
 
             else -> LEVEL_100_LEGENDARY
         }
 
-        return Pair(maxLevel, maxXp)
+        return Pair(maxLevel, maxXP)
     }
 
     @HandleEvent
@@ -123,7 +133,7 @@ object PetExpTooltip {
         event.move(
             3,
             "misc.petExperienceToolTip.showGoldenDragonEgg",
-            "misc.pets.petExperienceToolTip.showGoldenDragonEgg"
+            "misc.pets.petExperienceToolTip.showGoldenDragonEgg",
         )
     }
 }

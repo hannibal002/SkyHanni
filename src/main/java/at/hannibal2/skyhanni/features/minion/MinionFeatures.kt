@@ -12,17 +12,16 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -55,7 +54,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
@@ -151,8 +149,8 @@ object MinionFeatures {
         lastStorage = event.position
     }
 
-    @SubscribeEvent
-    fun onRenderLastClickedMinion(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderLastClickedMinion(event: SkyHanniRenderWorldEvent) {
         if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
@@ -178,20 +176,7 @@ object MinionFeatures {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!enableWithHub()) return
         val inventoryName = event.inventoryName
-        if (!minionTitlePattern.find(inventoryName)) {
-            // This should never happen, but somehow it still does. Therefore the workaround
-            if (minionInventoryOpen) {
-                minionInventoryOpen = false
-                MinionCloseEvent().post()
-                ErrorManager.logErrorStateWithData(
-                    "Detected unexpected minion menu closing",
-                    "minionInventoryOpen = true without minion title in InventoryFullyOpenedEvent()",
-                    "current inventoryName" to inventoryName,
-                    betaOnly = true,
-                )
-            }
-            return
-        }
+        if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
             if (minionCollectItemPattern.matches(it.name)) {
@@ -281,6 +266,7 @@ object MinionFeatures {
         coinsPerDay = ""
         lastInventoryClosed = System.currentTimeMillis()
 
+        MinionCloseEvent().post()
         if (IslandType.PRIVATE_ISLAND.isInIsland()) {
             val location = lastMinion ?: return
 
@@ -288,11 +274,10 @@ object MinionFeatures {
                 minions[location]?.lastClicked = SimpleTimeMark.farPast()
             }
         }
-        MinionCloseEvent().post()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (coinsPerDay != "") return
 
@@ -335,8 +320,8 @@ object MinionFeatures {
         return "§7Coins/day with ${stack.name}§7: §6$format coins"
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastClickedEntity = null
         lastMinion = null
         lastMinionOpened = 0L
@@ -344,8 +329,8 @@ object MinionFeatures {
         minionStorageInventoryOpen = false
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -380,8 +365,8 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderLastEmptied(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderLastEmptied(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         val playerLocation = LocationUtils.playerLocation()
@@ -410,12 +395,11 @@ object MinionFeatures {
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
         if (!isEnabled()) return
         if (!config.hideMobsNametagNearby) return
 
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
         val minions = minions ?: return
@@ -432,9 +416,8 @@ object MinionFeatures {
 
     private fun enableWithHub() = isEnabled() || IslandType.HUB.isInIsland()
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!minionInventoryOpen) return
 
         if (config.hopperProfitDisplay) {

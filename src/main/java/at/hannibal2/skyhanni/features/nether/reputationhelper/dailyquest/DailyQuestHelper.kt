@@ -4,15 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
@@ -28,9 +28,12 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.R
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -39,23 +42,24 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
-class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
+@SkyHanniModule
+object DailyQuestHelper {
 
     private val townBoardMage = LorenzVec(-138, 92, -755)
     private val townBoardBarbarian = LorenzVec(-572, 100, -687)
 
-    private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     var greatSpook = false
 
@@ -80,31 +84,30 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         "(?:§.)*COMPLETE",
     )
 
-
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        questLoader.checkInventory(event)
+        QuestLoader.checkInventory(event)
     }
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
-                questLoader.loadFromTabList()
+                QuestLoader.loadFromTabList()
             }
         }
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
         if (!isEnabled()) return
 
-        questLoader.loadFromTabList()
+        QuestLoader.loadFromTabList()
     }
 
     @HandleEvent
@@ -117,10 +120,10 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     fun update() {
-        reputationHelper.update()
+        CrimsonIsleReputationHelper.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
@@ -141,8 +144,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -194,10 +197,10 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         update()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        if (!reputationHelper.showLocations()) return
+        if (!CrimsonIsleReputationHelper.showLocations()) return
 
         for (quest in quests) {
             if (quest is MiniBossQuest) continue
@@ -211,39 +214,37 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         renderTownBoard(event)
     }
 
-    private fun renderTownBoard(event: LorenzRenderWorldEvent) {
+    private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
-        val location = when (reputationHelper.factionType) {
+        val location = when (CrimsonIsleReputationHelper.factionType ?: return) {
             FactionType.BARBARIAN -> townBoardBarbarian
             FactionType.MAGE -> townBoardMage
-
-            FactionType.NONE -> return
         }
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)
     }
 
-    private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
-        state == QuestState.READY_TO_COLLECT || (this is RescueMissionQuest && state == QuestState.ACCEPTED)
-    }
+    private fun Quest.needsTownBoardLocation() =
+        state == QuestState.READY_TO_COLLECT ||
+            (state == QuestState.ACCEPTED && (this is FetchQuest || this is RescueMissionQuest))
 
-    fun render(display: MutableList<List<Any>>) {
+    fun MutableList<Renderable>.addQuests() {
         if (greatSpook) {
-            display.addAsSingletonList("")
-            display.addAsSingletonList("§7Daily Quests (§cdisabled§7)")
-            display.addAsSingletonList(" §5§lThe Great Spook §7happened :O")
+            addString("")
+            addString("§7Daily Quests (§cdisabled§7)")
+            addString(" §5§lThe Great Spook §7happened :O")
             return
         }
         val done = quests.count { it.state == QuestState.COLLECTED }
-        display.addAsSingletonList("")
-        display.addAsSingletonList("§7Daily Quests (§e$done§8/§e5 collected§7)")
+        addString("")
+        addString("§7Daily Quests (§e$done§8/§e5 collected§7)")
         if (done != 5) {
             val filteredQuests = quests.filter { !config.hideComplete.get() || it.state != QuestState.COLLECTED }
-            filteredQuests.mapTo(display) { renderQuest(it) }
+            addAll(filteredQuests.map { renderQuest(it) })
         }
     }
 
-    private fun renderQuest(quest: Quest): List<Any> {
+    private fun renderQuest(quest: Quest): Renderable {
         val category = quest.category
         val state = quest.state.displayName
         val stateColor = quest.state.color
@@ -275,7 +276,6 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             ""
         }
 
-        val result = mutableListOf<Any>()
         val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
@@ -287,16 +287,43 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val categoryName = category.displayName
 
-        result.add("  $stateText$categoryName: ")
-        result.add(item)
-        result.add("§f$displayName$progressText$sacksText")
-        return result
+        return Renderable.line {
+            addString("  $stateText$categoryName: ")
+            addItemStack(item)
+            addString("§f$displayName$progressText$sacksText")
+        }
     }
 
     fun finishMiniBoss(miniBoss: CrimsonMiniBoss) {
         val miniBossQuest = getQuest<MiniBossQuest>() ?: return
         if (miniBossQuest.miniBoss == miniBoss && miniBossQuest.state == QuestState.ACCEPTED) {
             updateProcessQuest(miniBossQuest, miniBossQuest.haveAmount + 1)
+            if (miniBossQuest.haveAmount == 1) {
+                fixMiniBossByTabWidget(miniBossQuest)
+            }
+        }
+    }
+
+    private fun fixMiniBossByTabWidget(oldQuest: MiniBossQuest) {
+        oldQuest.state = QuestState.ACCEPTED
+        DelayedRun.runDelayed(5.seconds) {
+            if (oldQuest.state == QuestState.ACCEPTED) {
+                ChatUtils.debug(
+                    "Daily Minibosss Quest is still not ready to accept even though we have one miniboss kill," +
+                        "we now assume there are two to kill.",
+                )
+                val newQuest = MiniBossQuest(oldQuest.miniBoss, oldQuest.state, 2)
+                newQuest.haveAmount = oldQuest.haveAmount
+                DelayedRun.runNextTick {
+                    quests.remove(oldQuest)
+                    quests.add(newQuest)
+                    ChatUtils.chat("Fixed wrong miniboss amount from Tab Widget.")
+                    update()
+                }
+            } else {
+                oldQuest.state = QuestState.READY_TO_COLLECT
+            }
+            CrimsonIsleReputationHelper.update()
         }
     }
 
@@ -314,7 +341,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun load(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         reset()
-        questLoader.loadConfig(storage)
+        QuestLoader.loadConfig(storage)
     }
 
     fun saveConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {

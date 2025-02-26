@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.CollectionAPI
-import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.CollectionApi
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.ENCHANTING_EXP
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.KUUDRA_KEY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.LARVA_HOOK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.MASTER_SKULL_TIER
@@ -25,10 +24,10 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKYBLOCK_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.TIME_POCKET_ITEMS
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
-import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -41,7 +40,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -112,15 +111,6 @@ object ItemDisplayOverlayFeatures {
     private val bestiaryStackPattern by patternGroup.pattern(
         "bestiarystack",
         "§7Progress to Tier (?<tier>[\\dIVXC]+): §b[\\d.]+%",
-    )
-
-    /**
-     * REGEX-TEST: 5k Enchanting Exp
-     * REGEX-TEST: 5.5k Enchanting Exp
-     */
-    private val enchantingExpPattern by patternGroup.pattern(
-        "enchantingexp",
-        "(?<exp>.*)k Enchanting Exp",
     )
 
     @HandleEvent
@@ -204,7 +194,7 @@ object ItemDisplayOverlayFeatures {
             InventoryUtils.openInventoryName() == "Your Skills" &&
             lore.any { it.contains("Click to view!") }
         ) {
-            if (CollectionAPI.isCollectionTier0(lore)) return "0"
+            if (CollectionApi.isCollectionTier0(lore)) return "0"
             val split = itemName.split(" ")
             if (!itemName.contains("Dungeon")) {
                 val skillName = split.first()
@@ -212,7 +202,7 @@ object ItemDisplayOverlayFeatures {
                 if (split.size < 2) return "0"
                 val level = "" + text.romanToDecimalIfNecessary()
                 val skill = SkillType.getByNameOrNull(skillName) ?: return level
-                val skillInfo = SkillAPI.storage?.get(skill) ?: return level
+                val skillInfo = SkillApi.storage?.get(skill) ?: return level
                 return if (SkillProgress.config.overflowConfig.enableInSkillMenuAsStackSize)
                     "" + skillInfo.overflowLevel else level
             }
@@ -220,7 +210,7 @@ object ItemDisplayOverlayFeatures {
 
         if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
             if (lore.any { it.contains("Click to view!") }) {
-                if (CollectionAPI.isCollectionTier0(lore)) return "0"
+                if (CollectionApi.isCollectionTier0(lore)) return "0"
                 val name = item.name
                 if (name.startsWith("§e")) {
                     val text = name.split(" ").last()
@@ -231,12 +221,12 @@ object ItemDisplayOverlayFeatures {
 
         if (RANCHERS_BOOTS_SPEED.isSelected() && internalName == "RANCHERS_BOOTS".toInternalName()) {
             item.getRanchersSpeed()?.let {
-                val isUsingBlackCat = PetAPI.isCurrentPet("Black Cat")
+                val isUsingBlackCat = PetApi.isCurrentPet("Black Cat")
                 val helmet = InventoryUtils.getHelmet()?.getInternalName()
                 val hand = InventoryUtils.getItemInHand()?.getInternalName()
                 val racingHelmet = "RACING_HELMET".toInternalName()
                 val cactusKnife = "CACTUS_KNIFE".toInternalName()
-                val is500 = isUsingBlackCat || helmet == racingHelmet || (GardenAPI.inGarden() && hand == cactusKnife)
+                val is500 = isUsingBlackCat || helmet == racingHelmet || (GardenApi.inGarden() && hand == cactusKnife)
                 val effectiveSpeedCap = if (is500) 500 else 400
                 val text = if (it > 999) "1k" else "$it"
                 return if (it > effectiveSpeedCap) "§c$text" else "§a$text"
@@ -265,7 +255,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnItem(lore)) {
+        if (VACUUM_GARDEN.isSelected() && internalName in PestApi.vacuumVariants && isOwnItem(lore)) {
             gardenVacuumPattern.firstMatcher(lore) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
@@ -322,13 +312,6 @@ object ItemDisplayOverlayFeatures {
                 val tier = itemName.split(" ")
 
                 return tier.last().romanToDecimalIfNecessary().toString()
-            }
-        }
-
-        if (ENCHANTING_EXP.isSelected() && chestName.startsWith("Superpairs")) {
-            enchantingExpPattern.matchMatcher(item.cleanName()) {
-                val exp = group("exp").formatLong()
-                return "§b${exp.shortFormat()}"
             }
         }
 

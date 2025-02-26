@@ -3,23 +3,21 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
 @SkyHanniModule
@@ -30,16 +28,15 @@ object HoppityEggDisplayManager {
 
     var display = listOf<Renderable>()
 
-    private fun canChangeOpacity(entity: EntityLivingBase): Boolean {
+    private fun canChangeOpacity(entity: EntityPlayer): Boolean {
         if (!HoppityEggLocator.isEnabled()) return false
-        if (entity !is EntityPlayer) return false
         if (entity == LorenzUtils.getPlayer()) return false
         if (!entity.isRealPlayer()) return false
         return config.playerOpacity < 100
     }
 
     @HandleEvent
-    fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityLivingBase>) {
+    fun onPreRenderPlayer(event: SkyHanniRenderEntityEvent.Pre<EntityPlayer>) {
         if (!canChangeOpacity(event.entity)) return
 
         shouldHidePlayer = HoppityEggLocator.sharedEggLocation?.let { event.entity.distanceTo(it) < 4.0 }
@@ -54,7 +51,7 @@ object HoppityEggDisplayManager {
     }
 
     @HandleEvent
-    fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityLivingBase>) {
+    fun onPostRenderPlayer(event: SkyHanniRenderEntityEvent.Post<EntityPlayer>) {
         if (!canChangeOpacity(event.entity)) return
 
         GlStateManager.color(1f, 1f, 1f, 1f)
@@ -62,7 +59,7 @@ object HoppityEggDisplayManager {
     }
 
     @HandleEvent
-    fun onRenderPlayerLayers(event: EntityRenderLayersEvent.Pre<EntityLivingBase>) {
+    fun onRenderPlayerLayers(event: EntityRenderLayersEvent.Pre<EntityPlayer>) {
         if (!canChangeOpacity(event.entity)) return
         if (!shouldHidePlayer) return
         event.cancel()
@@ -81,11 +78,19 @@ object HoppityEggDisplayManager {
         val displayList: List<String> = buildList {
             add("§bUnclaimed Eggs:")
             HoppityEggType.resettingEntries.filter {
-                it.hasRemainingSpawns() // Only show eggs that have future spawns
+                it.hasRemainingSpawns() || // Only show eggs that have future spawns
+                    !it.isClaimed() // Or eggs that have not been claimed
             }.let { entries ->
                 if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
                 else entries
-            }.forEach { add("§7 - ${it.formattedName} ${it.timeUntil().format()}") }
+            }.forEach {
+                val (color, timeFormat) = if (it.hasRemainingSpawns()) {
+                    it.mealColor to it.timeUntil().format()
+                } else {
+                    "§c" to (HoppityApi.getEventEndMark()?.timeUntil()?.format() ?: "???")
+                }
+                add("§7 - ${it.formattedName}$color $timeFormat")
+            }
 
             if (!config.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
 
@@ -101,19 +106,23 @@ object HoppityEggDisplayManager {
 
         val container = Renderable.verticalContainer(displayList.map(Renderable::string))
         return listOf(
-            if (config.warpUnclaimedEggs) Renderable.clickAndHover(
+            if (config.warpUnclaimedEggs) Renderable.clickable(
                 container,
                 tips = listOf("§eClick to ${"/warp ${config.warpDestination}".trim()}!"),
-                onClick = { HypixelCommands.warp(config.warpDestination) },
-            ) else container
+                onLeftClick = { HypixelCommands.warp(config.warpDestination) },
+            ) else container,
         )
     }
 
-
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!HoppityEggsManager.isActive()) return
-        config.position.renderRenderables(display, posLabel = "Hoppity Eggs")
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { HoppityEggsManager.isActive() },
+            onRender = {
+                config.position.renderRenderables(display, posLabel = "Hoppity Eggs")
+            },
+        )
     }
 
     private fun formatEggsCollected(collectedEggs: Int): String =

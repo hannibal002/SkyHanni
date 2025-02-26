@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.test.graph
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceSqToPlayer
+import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceToPlayer
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -32,7 +32,7 @@ object GraphNodeEditor {
     private var lastUpdate = SimpleTimeMark.farPast()
     private val tagsToShow: MutableList<GraphNodeTag> = GraphNodeTag.entries.toMutableList()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
@@ -56,10 +56,10 @@ object GraphNodeEditor {
             val total = GraphEditor.nodes.count { it.name?.isNotBlank() ?: false }
             val shown = list.size
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§eGraph Nodes: $shown/$total",
-                    listOf("§eClick to toggle node tags!"),
-                    onClick = {
+                    tips = listOf("§eClick to toggle node tags!"),
+                    onLeftClick = {
                         updateToggleTags()
                     },
                 ),
@@ -86,10 +86,10 @@ object GraphNodeEditor {
                 val visibilityText = if (isVisible) " §aVisible" else " §7Invisible"
                 val name = " - ${tag.displayName} §8($nodes nodes) $visibilityText"
                 add(
-                    Renderable.clickAndHover(
+                    Renderable.clickable(
                         name,
-                        listOf("§eClick to " + (if (isVisible) "hide" else "show") + " nodes with this tag!"),
-                        onClick = {
+                        tips = listOf("§eClick to " + (if (isVisible) "hide" else "show") + " nodes with this tag!"),
+                        onLeftClick = {
                             toggleTag(tag)
                             updateToggleTags()
                         },
@@ -98,10 +98,10 @@ object GraphNodeEditor {
             }
             addString("")
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§cGo Back!",
                     tips = listOf("§eClick to go back to the node list!"),
-                    onClick = {
+                    onLeftClick = {
                         updateNodeNames()
                     },
                 ),
@@ -142,10 +142,10 @@ object GraphNodeEditor {
         }
         addString("")
         add(
-            Renderable.clickAndHover(
+            Renderable.clickable(
                 "§cGo Back!",
                 tips = listOf("§eClick to go back to the node list!"),
-                onClick = {
+                onLeftClick = {
                     updateNodeNames()
                 },
             ),
@@ -167,7 +167,7 @@ object GraphNodeEditor {
         name: String,
         tag: GraphNodeTag,
         node: GraphingNode,
-    ) = Renderable.clickAndHover(
+    ) = Renderable.clickable(
         name,
         tips = listOf(
             "Tag ${tag.name}",
@@ -175,7 +175,7 @@ object GraphNodeEditor {
             "",
             "§eClick to set tag for ${node.name} to ${tag.name}!",
         ),
-        onClick = {
+        onLeftClick = {
             if (tag in node.tags) {
                 node.tags.remove(tag)
             } else {
@@ -187,7 +187,7 @@ object GraphNodeEditor {
 
     private fun drawNodeNames(): List<Searchable> = buildList {
         for ((node, distance: Double) in GraphEditor.nodes.map {
-            it to it.position.distanceSqToPlayer()
+            it to distanceToPlayer(it.position)
         }.sortedBy { it.second }) {
             if (node.tags.isNotEmpty()) {
                 if (!node.tags.any { it in tagsToShow }) continue
@@ -213,7 +213,7 @@ object GraphNodeEditor {
         text: String,
         name: String,
         node: GraphingNode,
-    ): Searchable = Renderable.clickAndHover(
+    ): Searchable = Renderable.clickable(
         text,
         tips = buildList {
             add("Node '$name'")
@@ -231,7 +231,7 @@ object GraphNodeEditor {
             add("§eControl-Click to edit the tags for this node!")
 
         },
-        onClick = {
+        onLeftClick = {
             if (KeyboardManager.isModifierKeyDown()) {
                 updateTagView(node)
             } else {

@@ -2,12 +2,13 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.StashCompact.StashType.Companion.fromGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
+import at.hannibal2.skyhanni.utils.ChatUtils.message
+import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -16,12 +17,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object StashCompact {
+    private const val REASON = "stash_compact"
 
     // <editor-fold desc="Patterns">
     private val patternGroup = RepoPattern.group("stash.compact")
@@ -72,12 +73,10 @@ object StashCompact {
     // </editor-fold>
 
     private val config get() = SkyHanniMod.feature.chat.filterType.stashMessages
-    private val filterConfig get() = SkyHanniMod.feature.chat.filterType
 
     private var currentType: StashType? = null
     private val currentMessages: MutableMap<StashType, StashMessage?> = mutableMapOf()
     private val lastMessages: MutableMap<StashType, StashMessage?> = mutableMapOf()
-    private var emptyLineWarned = false
     private var joinedProfileAt: SimpleTimeMark? = null
 
     enum class StashType(val displayName: String, val colorCodePair: Pair<String, String>) {
@@ -100,42 +99,30 @@ object StashCompact {
         joinedProfileAt = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         // TODO make a system for detecting message "groups" (multiple consecutive messages)
         materialCountPattern.matchMatcher(event.message) {
-
-            // If the user does not have hideEmptyLines enabled, and disableEmptyWarnings is false, warn them
-            val emptyEnabled = filterConfig.empty
-            val hideWarnings = config.disableEmptyWarnings
-            val tenSecPassed = (joinedProfileAt?.passedSince() ?: 0.seconds) > 10.seconds
-            if (!emptyEnabled && !hideWarnings && !emptyLineWarned && tenSecPassed) {
-                ChatUtils.clickToActionOrDisable(
-                    "Above empty lines were left behind by §6/sh stash compact§e." +
-                        "This can be prevented with §6/sh empty messages§e.",
-                    config::disableEmptyWarnings,
-                    actionName = "hide empty lines",
-                    action = { filterConfig::empty.jumpToEditor() }
-                )
-                emptyLineWarned = true
-            }
-
             currentType = fromGroup() ?: return@matchMatcher
             val currentType = currentType ?: return@matchMatcher
             currentMessages[currentType] = StashMessage(group("count").formatInt(), group("type"))
-            event.blockedReason = "stash_compact"
+            event.blockedReason = REASON
+            ChatUtils.deleteMessage(REASON, 2) {
+                StringUtils.isEmpty(it.message) && it.passedSinceSent() < 500.milliseconds
+            }
         }
 
         differingMaterialsCountPattern.matchMatcher(event.message) {
             currentType = fromGroup() ?: return@matchMatcher
             currentMessages[currentType]?.differingMaterialsCount = group("count").formatInt()
-            event.blockedReason = "stash_compact"
+            event.blockedReason = REASON
         }
 
         pickupStashPattern.matchMatcher(event.message) {
-            event.blockedReason = "stash_compact"
+            event.blockedReason = REASON
+            ChatUtils.deleteNextMessage(REASON) { StringUtils.isEmpty(it) }
             val currentType = currentType ?: return@matchMatcher
 
             val currentMessage = currentMessages[currentType] ?: return@matchMatcher
@@ -149,7 +136,8 @@ object StashCompact {
 
         if (!config.hideAddedMessages) return
         genericAddedToStashPattern.matchMatcher(event.message) {
-            event.blockedReason = "stash_compact"
+            event.blockedReason = REASON
+            ChatUtils.deleteNextMessage(REASON) { StringUtils.isEmpty(it) }
         }
     }
 

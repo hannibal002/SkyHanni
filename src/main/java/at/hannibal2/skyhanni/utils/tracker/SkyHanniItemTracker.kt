@@ -1,43 +1,49 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.ItemPriceSource
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("SpreadOperator")
-class SkyHanniItemTracker<Data : ItemTrackerData>(
+open class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
+    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+) : SkyHanniTracker<Data>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
 
     companion object {
-        val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
+        private val config get() = SkyHanniMod.feature.misc.tracker
     }
 
-    fun addCoins(amount: Int, command: Boolean) {
+    private var scrollValue = ScrollValue()
+
+    open fun addCoins(amount: Int, command: Boolean) {
         addItem(SKYBLOCK_COIN, amount, command)
     }
 
-    fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         modify {
             it.addItem(internalName, amount, command)
         }
@@ -56,38 +62,48 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
             return
         }
-        // TODO move the function to common
-        val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.chat && price >= config.warnings.minimumChat) {
-            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
-        }
-        if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
-        }
+        handlePossibleRareDrop(internalName, amount)
     }
 
-    fun addPriceFromButton(lists: MutableList<Searchable>) {
-        if (isInventoryOpen()) {
-            lists.addSearchableSelector<ItemPriceSource>(
-                "",
-                getName = { type -> type.sellName },
-                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
-                onChange = {
-                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
-                    update()
-                },
-            )
-        }
+    private fun NeuInternalName.getCleanName(
+        items: Map<NeuInternalName, ItemTrackerData.TrackedItem>,
+        getCoinName: (ItemTrackerData.TrackedItem) -> String,
+    ): String {
+        val item = items[this] ?: error("Item not found for $this")
+        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.itemName
     }
 
-    fun drawItems(
+    open fun drawItems(
         data: Data,
-        filter: (NEUInternalName) -> Boolean,
+        filter: (NeuInternalName) -> Boolean,
         lists: MutableList<Searchable>,
+        /**
+         * Extensions to allow for BucketedTrackers to re-use this code block.
+         * The default values are for any 'normal' item tracker, but can in theory
+         * be overridden by any tracker that needs to.
+         */
+        itemsAccessor: () -> Map<NeuInternalName, ItemTrackerData.TrackedItem> = { data.items },
+        getCoinName: (ItemTrackerData.TrackedItem) -> String = { item -> data.getCoinName(item) },
+        itemRemover: (NeuInternalName, String) -> Unit = { item, cleanName ->
+            modify {
+                it.items.remove(item)
+            }
+            ChatUtils.chat("Removed $cleanName §efrom $name.")
+        },
+        itemHider: (NeuInternalName, Boolean) -> Unit = { item, currentlyHidden ->
+            modify {
+                it.items[item]?.hidden = !currentlyHidden
+            }
+        },
+        getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String> = { internalName, item ->
+            if (internalName == SKYBLOCK_COIN) data.getCoinDescription(item)
+            else data.getDescription(item.timesGained)
+        },
     ): Double {
         var profit = 0.0
-        val items = mutableMapOf<NEUInternalName, Long>()
-        for ((internalName, itemProfit) in data.items) {
+        val items = mutableMapOf<NeuInternalName, Long>()
+        val dataItems = itemsAccessor.invoke()
+        for ((internalName, itemProfit) in dataItems) {
             if (!filter(internalName)) continue
 
             val amount = itemProfit.totalAmount
@@ -103,81 +119,84 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
         }
 
-        val limitList = config.hideCheapItems
-        var pos = 0
-        val hiddenItemTexts = mutableListOf<String>()
+        val table = mutableMapOf<List<Renderable>, String>()
+
         for ((internalName, price) in items.sortedDesc()) {
-            val itemProfit = data.items[internalName] ?: error("Item not found for $internalName")
+            val itemProfit = dataItems[internalName] ?: error("Item not found for $internalName")
 
             val amount = itemProfit.totalAmount
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
 
-            val cleanName = if (internalName == SKYBLOCK_COIN) {
-                data.getCoinName(itemProfit)
-            } else {
-                internalName.itemName
-            }
+            val cleanName = internalName.getCleanName(dataItems, getCoinName)
 
-            val priceFormat = price.shortFormat()
             val hidden = itemProfit.hidden
+            val priceFormat = price.formatCoin(gray = hidden)
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
 
             val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
-            var displayName = if (hidden) {
-                "§8§m$formattedName"
-            } else cleanName
-            displayName = " $numberColor${displayAmount.addSeparators()}x $displayName§7: §6$priceFormat"
+            val displayName = if (hidden) "§8§m$formattedName" else cleanName
 
-            pos++
-            if (limitList.enabled.get()) {
-                if (pos > limitList.alwaysShowBest.get()) {
-                    if (price < limitList.minPrice.get() * 1000) {
-                        hiddenItemTexts += displayName
-                        continue
-                    }
-                }
+            val loreText = getLoreList.invoke(internalName, itemProfit)
+            val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
+
+            // TODO add row abstraction to api, with common click+hover behaviour
+            fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickable(
+                string,
+                tips = lore,
+                onLeftClick = {
+                    if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
+                    else itemHider.invoke(internalName, hidden)
+                    update()
+                },
+            ) else Renderable.string(string)
+
+            val row = mutableMapOf<TextPart, Renderable>()
+            row[TextPart.NAME] = string(" $displayName")
+
+            val itemStackOrNull = if (internalName == SKYBLOCK_COIN) {
+                ItemUtils.getCoinItemStack(amount)
+            } else {
+                internalName.getItemStackOrNull()
+            }
+            itemStackOrNull?.let {
+                row[TextPart.ICON] = Renderable.itemStack(it)
             }
 
-            val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(
-                displayName, lore,
-                onClick = {
-                    if (KeyboardManager.isModifierKeyDown()) {
-                        data.items.remove(internalName)
-                        ChatUtils.chat("Removed $cleanName §efrom $name.")
-                    } else {
-                        modify {
-                            it.items[internalName]?.hidden = !hidden
-                        }
-                    }
-                    update()
+            row[TextPart.TOTAL_PRICE] = string(" $priceFormat")
+            row[TextPart.AMOUNT] = string(" $numberColor${displayAmount.addSeparators()}x")
 
-                },
-            ) else Renderable.string(displayName)
+            val line = config.textOrder.get().mapNotNull { row[it] }
+            table[line] = cleanName
+        }
 
-            lists.add(renderable.toSearchable(formattedName))
+        val scrollValue = (data as? BucketedItemTrackerData<*>)?.selectedScrollValue ?: scrollValue
+        Renderable.searchableScrollable(
+            table,
+            key = 99,
+            lines = min(items.size, config.itemsShown.get()),
+            velocity = 5.0,
+            textInput = textInput,
+            scrollValue = scrollValue,
+            asTable = config.showTable.get(),
+            showScrollableTipsInList = isInventoryOpen(),
+        )?.let {
+            lists.add(it.toSearchable())
         }
-        if (hiddenItemTexts.size > 0) {
-            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
-            lists.add(text)
-        }
+
 
         return profit
     }
 
     private fun buildLore(
-        data: Data,
-        item: ItemTrackerData.TrackedItem,
+        loreFormat: List<String>,
         hidden: Boolean,
         newDrop: Boolean,
-        internalName: NEUInternalName,
+        internalName: NeuInternalName,
     ) = buildList {
-        if (internalName == SKYBLOCK_COIN) {
-            addAll(data.getCoinDescription(item))
-        } else {
-            addAll(data.getDescription(item.timesGained))
-        }
+        add(internalName.itemName)
+        add("")
+        addAll(loreFormat)
         add("")
         if (newDrop) {
             add("§aYou obtained this item recently.")
