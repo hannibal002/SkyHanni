@@ -35,6 +35,9 @@ object RenderableTestSuit {
             category = CommandCategory.DEVELOPER_DEBUG
             callback {
                 val input = it.joinToString(" ")
+                if (input.isBlank()) {
+                    ChatUtils.userError("No Argument provided")
+                }
                 val test = register[input]
                 if (test == null) {
                     ChatUtils.userError("Unknown Test '${input}'")
@@ -56,6 +59,15 @@ object RenderableTestSuit {
         }
     }
 
+    /**
+     * How to use:
+     * Declare an object with [RenderableTestSuit.TestRenderable] as supertype
+     * Annotate the object with "@SkyHanniModule(devOnly = true)"
+     * Give it a lowercase [name] (this is used to call it via the command later on)
+     * Define your test with [renderable] function
+     *
+     * Ingame call it with "\shrenderable [name]" to show it (calling it again will disable it)
+     */
     abstract class TestRenderable(val name: String) {
 
         abstract fun renderable(): Renderable?
