@@ -12,7 +12,7 @@ import net.minecraft.util.BlockPos
 data class ComplexCommand<O : CommandContextAwareObject>(
     val name: String,
     val specifiers: Collection<CommandArgument<O>>,
-    val context: () -> O,
+    val context: (ComplexCommand<O>) -> O,
     val aliases: List<String>,
 ) : CommandBase() {
 
@@ -55,7 +55,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
     }
 
     private fun handleCommand(args: Array<String>) {
-        val context = context()
+        val context = context(this)
         var index = 0
         var amountNoPrefixArguments = 0
 
@@ -75,7 +75,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
     }
 
     private fun tabParse(args: Array<String>, partial: String?): List<String> {
-        val context = context()
+        val context = context(this)
 
         var index = 0
         var amountNoPrefixArguments = 0
