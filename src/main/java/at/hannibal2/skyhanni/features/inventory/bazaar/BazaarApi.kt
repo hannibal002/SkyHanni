@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -50,7 +51,7 @@ object BazaarApi {
 
     var currentlyOpenedProduct: NeuInternalName? = null
     private var lastOpenedProduct: NeuInternalName? = null
-    private var orderOptionProduct: NeuInternalName? = null
+    var orderOptionProduct: NeuInternalName? = null
 
     private val patternGroup = RepoPattern.group("inventory.bazaar")
 
@@ -140,11 +141,14 @@ object BazaarApi {
             } else if (itemName.contains("BUY")) {
                 // pickup items from bazaar order
                 OwnInventoryData.ignoreItem(1.seconds) { it == internalName }
+                // prepare for cancel buy order as well
+                orderOptionProduct = internalName
             }
         }
         if (InventoryUtils.openInventoryName() == "Order options" && itemName == "§cCancel Order") {
             // pickup items from own bazaar order
             OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
+
         }
 
         if (inBazaarInventory) {
@@ -166,6 +170,7 @@ object BazaarApi {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
+        if (ApiUtils.isHypixelItemsDisabled()) return
 
         if (!loadedNpcPriceData) {
             loadedNpcPriceData = true

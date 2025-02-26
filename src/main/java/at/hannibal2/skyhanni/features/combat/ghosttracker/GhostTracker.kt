@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -190,7 +192,7 @@ object GhostTracker {
         if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoWidgetWarningTime = SimpleTimeMark.now()
             ChatUtils.clickableChat(
-                "§cYou do not have the Bestiary Tab Widget enabled! Ghost Tracker will not work properly without it.",
+                "§cYou do not have the Bestiary Tab Widget enabled! Ghost Tracker needs this information to work properly.",
                 onClick = HypixelCommands::widget,
                 "§eClick to run /widget!",
                 replaceSameMessage = true,
@@ -199,12 +201,19 @@ object GhostTracker {
         if (TabWidget.BESTIARY.isActive && !foundGhostBestiary && lastNoGhostBestiaryWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoGhostBestiaryWidgetWarningTime = SimpleTimeMark.now()
             ChatUtils.clickableChat(
-                "§cGhost bestiary not found in Bestiary Tab Widget! Ghost Tracker will not work properly without it.",
+                "§cGhost Bestiary not found in Bestiary Tab Widget! Ghost Tracker needs this information to work properly.",
                 onClick = HypixelCommands::widget,
                 "§eClick to run /widget!",
                 replaceSameMessage = true,
             )
         }
+    }
+
+    @HandleEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+
+        tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @HandleEvent
@@ -309,13 +318,12 @@ object GhostTracker {
     private fun getAverageMagicFind(mf: Long, kills: Long) =
         if (mf == 0L || kills == 0L) 0.0 else mf / (kills).toDouble()
 
-
     private fun isEnabled() = inArea && config.enabled
 
     enum class GhostTrackerLines(private val display: String, val line: Data.() -> String) {
         KILLS(
             "§7Kills: §e7,813",
-            { "§7Kills: §e${kills.addSeparators()}" }
+            { "§7Kills: §e${kills.addSeparators()}" },
         ),
         GHOSTS_SINCE_SORROW(
             "§7Ghosts Since Sorrow: §e71",

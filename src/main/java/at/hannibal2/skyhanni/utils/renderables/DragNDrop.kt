@@ -49,7 +49,7 @@ object DragNDrop {
         condition: () -> Boolean = { true },
     ) = Renderable.clickable(
         display,
-        onClick = { currentDrag = item() },
+        onLeftClick = { currentDrag = item() },
         bypassChecks = bypassChecks,
         condition = condition,
     )

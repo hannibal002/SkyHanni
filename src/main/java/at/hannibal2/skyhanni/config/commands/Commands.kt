@@ -53,7 +53,6 @@ import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -249,11 +248,6 @@ object Commands {
             description = "Download the SkyHanni repo again"
             category = CommandCategory.USERS_BUG_FIX
             callback { RepoManager.updateRepo() }
-        }
-        event.register("shtogglehypixelapierrors") {
-            description = "Show/hide hypixel api error messages in chat"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { ApiUtils.toggleApiErrorMessages() }
         }
         event.register("shfixminions") {
             description = "Removed bugged minion locations from your private island"

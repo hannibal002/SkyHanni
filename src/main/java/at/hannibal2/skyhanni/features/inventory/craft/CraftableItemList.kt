@@ -124,10 +124,10 @@ object CraftableItemList {
             add("")
             add("§eClick to craft!")
         }
-        return Renderable.clickAndHover(
+        return Renderable.clickable(
             "§8x$amountFormat $itemName",
             tips = tooltip,
-            onClick = {
+            onLeftClick = {
                 HypixelCommands.viewRecipe(internalName.asString())
             },
         ).toSearchable(itemName)
