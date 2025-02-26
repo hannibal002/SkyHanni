@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.config.storage
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.misc.reminders.Reminder
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
-import java.util.*
+import java.util.UUID
 
 class Storage {
     @Expose
@@ -23,7 +24,7 @@ class Storage {
 
     @Deprecated(
         message = "Use SkyHanniMod.visualWordsData.modifiedWords instead.",
-        replaceWith = ReplaceWith("SkyHanniMod.visualWordsData.modifiedWords")
+        replaceWith = ReplaceWith("SkyHanniMod.visualWordsData.modifiedWords"),
     )
     @Expose
     var modifiedWords: List<VisualWord> = listOf()
@@ -52,4 +53,7 @@ class Storage {
 
     @Expose
     var reminders: MutableMap<String, Reminder> = mutableMapOf()
+
+    @Expose
+    var testRenderablePositions: MutableMap<String, Position> = mutableMapOf()
 }

@@ -44,11 +44,12 @@ object RenderData {
 
         if (GuiEditManager.isInGui()) {
             GlStateManager.translate(0f, 0f, -3f)
-            renderOverlay()
+            renderOverlay(true)
             GlStateManager.translate(0f, 0f, 3f)
         }
 
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().post()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent.post()
+        GuiRenderEvent.GuiOnTopRenderEvent.post()
 
         GlStateManager.popMatrix()
     }
@@ -65,9 +66,10 @@ object RenderData {
 
     var outsideInventory = false
 
-    fun renderOverlay() {
+    fun renderOverlay(inventoryPresent: Boolean = false) {
         outsideInventory = true
-        GuiRenderEvent.GuiOverlayRenderEvent().post()
+        GuiRenderEvent.GuiOverlayRenderEvent.post()
+        if (!inventoryPresent) GuiRenderEvent.GuiOnTopRenderEvent.post()
         outsideInventory = false
     }
 }

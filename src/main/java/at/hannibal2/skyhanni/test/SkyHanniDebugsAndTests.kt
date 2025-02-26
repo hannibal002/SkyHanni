@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -51,21 +50,12 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.renderables.DragNDrop
-import at.hannibal2.skyhanni.utils.renderables.Droppable
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Blocks
-import net.minecraft.init.Items
-import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import java.io.File
@@ -467,10 +457,6 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(onlyOnSkyblock = true)
     @Suppress("ConstantConditionIf")
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (false) {
-            itemRenderDebug()
-        }
-
         if (Minecraft.getMinecraft().gameSettings.showDebugInfo) {
             if (debugConfig.currentAreaDebug) {
                 config.debugLocationPos.renderString(
@@ -498,75 +484,6 @@ object SkyHanniDebugsAndTests {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
-    }
-
-    @HandleEvent
-    @Suppress("ConstantConditionIf")
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (false) {
-            dragAbleTest()
-        }
-    }
-
-    private fun dragAbleTest() {
-        val bone = ItemStack(Items.bone, 1).toDragItem()
-        val leaf = ItemStack(Blocks.leaves, 1).toDragItem()
-
-        config.debugItemPos.renderRenderables(
-            listOf(
-                DragNDrop.draggable(Renderable.string("A Bone"), { bone }),
-                Renderable.placeholder(0, 30),
-                DragNDrop.draggable(Renderable.string("A Leaf"), { leaf }),
-                Renderable.placeholder(0, 30),
-                DragNDrop.droppable(
-                    Renderable.string("Feed Dog"),
-                    object : Droppable {
-                        override fun handle(drop: Any?) {
-                            val unit = drop as ItemStack
-                            if (unit.item == Items.bone) {
-                                LorenzDebug.chatAndLog("Oh, a bone!")
-                            } else {
-                                LorenzDebug.chatAndLog("Disgusting that is not a bone!")
-                            }
-                        }
-
-                        override fun validTarget(item: Any?) = item is ItemStack
-
-                    },
-                ),
-            ),
-            posLabel = "Item Debug",
-        )
-    }
-
-    private fun itemRenderDebug() {
-        val scale = 0.1
-        val renderables = listOf(
-            ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
-            ItemStack(Blocks.melon_block),
-        ).map { item ->
-            generateSequence(scale) { it + 0.1 }.take(25).map {
-                Renderable.itemStack(item, it, xSpacing = 0).renderBounds()
-            }.toList()
-        }.editCopy {
-            this.add(
-                0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }.toList(),
-            )
-        }
-        config.debugItemPos.renderRenderables(
-            listOf(
-                Renderable.table(renderables),
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.string("Test:").renderBounds(),
-                        Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
-                    ),
-                    spacing = 1,
-                ),
-            ),
-            posLabel = "Item Debug",
-        )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
