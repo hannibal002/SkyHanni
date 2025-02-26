@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
 open class GuiRenderEvent : SkyHanniEvent() {
     /**
-    Renders only while inside an inventory
+     * Renders only while inside an inventory
      */
     object ChestGuiOverlayRenderEvent : GuiRenderEvent()
 
     /**
-    Renders always, and while in an inventory it renders a bit darker, gray
+     * Renders always, and while in an inventory it renders a bit darker, gray
      */
     object GuiOverlayRenderEvent : GuiRenderEvent()
 

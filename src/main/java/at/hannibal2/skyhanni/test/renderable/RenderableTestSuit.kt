@@ -40,20 +40,20 @@ object RenderableTestSuit {
                 }
                 val test = register[input]
                 if (test == null) {
-                    ChatUtils.userError("Unknown Test '${input}'")
+                    ChatUtils.userError("Unknown Test '$input'")
                     return@callback
                 }
                 if (active.contains(test)) {
-                    ChatUtils.chat("Test '${input}' is now §cdisabled§e.")
+                    ChatUtils.chat("Test '$input' is now §cdisabled§e.")
                     active.remove(test)
                     return@callback
                 }
-                ChatUtils.chat("Test '${input}' is now §aactive§e.")
+                ChatUtils.chat("Test '$input' is now §aactive§e.")
                 active.add(test)
                 return@callback
             }
-            autoComplete {
-                val input = it.joinToString(" ")
+            autoComplete { args ->
+                val input = args.joinToString(" ")
                 register.keys.filter { it.startsWith(input) }
             }
         }
