@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.client.resources.I18n
 import net.minecraft.entity.IMerchant
@@ -34,13 +33,24 @@ object InventoryUtils {
     private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
 
     fun getItemsInOpenChest(): List<Slot> {
-        val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList()
-        return guiChest.inventorySlots.inventorySlots
-            .filter { it.inventory !is InventoryPlayer && it.stack != null }
+        return getItemsInOpenChestWithNull().filter { it.stack != null }
     }
 
+    fun getItemsInOpenChestWithNull(): List<Slot> {
+        val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList()
+        return guiChest.inventorySlots.inventorySlots
+            .filter { it.inventory !is InventoryPlayer }
+    }
+
+//     fun getItemsInLowerChestWithNull(): List<Slot> {
+//         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList()
+//         return guiChest.inventorySlots.inventorySlots
+//             .filter { it.inventory is InventoryPlayer }
+//     }
+
+    // only works while not in an inventory
     fun getSlotsInOwnInventory(): List<Slot> {
-        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiInventory ?: return emptyList()
+        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return emptyList()
         return guiInventory.inventorySlots.inventorySlots
             .filter { it.inventory is InventoryPlayer && it.stack != null }
     }
@@ -158,6 +168,10 @@ object InventoryUtils {
     }
 
     fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
+
+    fun getItemsAtSlots(vararg slotIndexes: Int): List<ItemStack> {
+        return slotIndexes.toList().mapNotNull(::getItemAtSlotIndex)
+    }
 
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -70,7 +71,7 @@ object ExperimentsDryStreakDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HIGH)
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (didJustFind || ExperimentationTableApi.currentExperiment == null) return
 
