@@ -23,10 +23,8 @@ import java.io.StringWriter
 import java.net.URI
 import java.net.URISyntaxException
 import java.nio.file.Files
-import java.util.Locale
 import java.util.jar.JarFile
 import java.util.regex.Pattern
-import java.util.zip.ZipEntry
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 import javax.swing.JButton
@@ -41,6 +39,7 @@ import javax.swing.JTextField
 import javax.swing.SwingConstants
 import javax.swing.UIManager
 import javax.swing.WindowConstants
+import kotlin.system.exitProcess
 
 class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
 
@@ -123,8 +122,8 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         val ta = JTextArea().apply {
             name = "TextArea"
             setStandardFormatting(compHeight)
-            text =
-                ("This installer will copy SkyHanni into your forge mods folder for you, " + "and replace any old versions that already exist. Close this if you prefer to do this yourself!")
+            text = "This installer will copy SkyHanni into your forge mods folder for you, " +
+                "and replace any old versions that already exist. Close this if you prefer to do this yourself!"
             wrapStyleWord = true
         }
         rowY += compHeight
@@ -136,8 +135,8 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         val ta = JTextArea().apply {
             name = "TextAreaForge"
             setStandardFormatting(compHeight)
-            text =
-                ("However, you still need to install Forge client in order to be able to run this mod. " + "Click here to visit the download page for Forge 1.8.9!")
+            text = "However, you still need to install Forge client in order to be able to run this mod. " +
+                "Click here to visit the download page for Forge 1.8.9!"
             foreground = Color.BLUE.darker()
             cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
             wrapStyleWord = true
@@ -185,7 +184,7 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
     }
 
     private val panelCenter: JPanel by lazy {
-        rowY = 0  // reset rowY for panel center layout
+        rowY = 0 // reset rowY for panel center layout
         JPanel(null).apply {
             name = "PanelCenter"
             add(logo)
@@ -281,7 +280,7 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         when (e.source) {
             buttonClose -> {
                 dispose()
-                System.exit(0)
+                exitProcess(0)
             }
 
             buttonChooseFolder -> onFolderSelect()
@@ -302,7 +301,7 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         }
     }
 
-    fun onFolderSelect() {
+    private fun onFolderSelect() {
         val currentDirectory = File(textFieldFolderLocation.text)
         val jFileChooser = JFileChooser(currentDirectory).apply {
             fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
@@ -313,7 +312,7 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         }
     }
 
-    fun onInstall() {
+    private fun onInstall() {
         try {
             val modsFolder = File(textFieldFolderLocation.text)
             when {
@@ -339,17 +338,17 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         var deletingFailure = false
 
         if (modsFolder.isDirectory) {
-            if (findSkyHanniAndDelete(modsFolder.listFiles()) == true) deletingFailure = true
+            if (findSkyHanniAndDelete(modsFolder.listFiles())) deletingFailure = true
         }
         if (inSubFolder) {
             val parent = modsFolder.parentFile
             if (parent.isDirectory) {
-                if (findSkyHanniAndDelete(parent.listFiles()) == true) deletingFailure = true
+                if (findSkyHanniAndDelete(parent.listFiles())) deletingFailure = true
             }
         } else {
             val subFolder = File(modsFolder, "1.8.9")
             if (subFolder.exists() && subFolder.isDirectory) {
-                if (findSkyHanniAndDelete(subFolder.listFiles()) == true) deletingFailure = true
+                if (findSkyHanniAndDelete(subFolder.listFiles())) deletingFailure = true
             }
         }
         if (deletingFailure) return
@@ -366,39 +365,36 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         }
         showMessage("SkyHanni has been successfully installed into your mods folder.")
         dispose()
-        System.exit(0)
+        exitProcess(0)
     }
 
-    private fun findSkyHanniAndDelete(files: Array<File>?): Boolean? {
+    private fun findSkyHanniAndDelete(files: Array<File>?): Boolean {
         if (files == null) return false
         for (file in files) {
-            if (!file.isDirectory && file.path.endsWith(".jar")) {
-                try {
-                    JarFile(file).use { jarFile ->
-                        val mcModInfo: ZipEntry? = jarFile.getEntry("mcmod.info")
-                        if (mcModInfo != null) {
-                            jarFile.getInputStream(mcModInfo).use { inputStream ->
-                                val modID = getModIDFromInputStream(inputStream)
-                                if (modID == "SkyHanni") {
-                                    if (!file.delete()) {
-                                        showErrorMessage(
-                                            "Was not able to delete the other SkyHanni files found in your mods folder!" + System.lineSeparator() + "Please make sure that your minecraft is currently closed and try again, or feel" + System.lineSeparator() + "free to open your mods folder and delete those files manually.",
-                                        )
-                                        return true
-                                    }
-                                }
-                            }
-                        }
+            if (file.isDirectory || !file.path.endsWith(".jar")) continue
+            try {
+                JarFile(file).use { jarFile ->
+                    val mcModInfo = jarFile.getEntry("mcmod.info") ?: continue
+                    jarFile.getInputStream(mcModInfo).use { inputStream ->
+                        val modID = getModIDFromInputStream(inputStream)
+                        if (modID != "SkyHanni" || file.delete()) continue
+                        val newLine = System.lineSeparator()
+                        showErrorMessage(
+                            "Was not able to delete the other SkyHanni files found in your mods folder!" + newLine +
+                                "Please make sure that your minecraft is currently closed and try again, or feel" + newLine +
+                                "free to open your mods folder and delete those files manually.",
+                        )
+                        return true
                     }
-                } catch (ex: Exception) {
-                    // Skip file
                 }
+            } catch (ex: Exception) {
+                // Skip file
             }
         }
         return false
     }
 
-    fun onOpenFolder() {
+    private fun onOpenFolder() {
         try {
             Desktop.getDesktop().open(getModsFolder())
         } catch (e: Exception) {
@@ -406,7 +402,7 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         }
     }
 
-    fun getModsFolder(): File {
+    private fun getModsFolder(): File {
         val userHome = System.getProperty("user.home", ".")
         var modsFolder = getFile(userHome, "minecraft/mods/1.8.9")
         if (!modsFolder.exists()) {
@@ -418,7 +414,7 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         return modsFolder
     }
 
-    fun getFile(userHome: String, minecraftPath: String): File {
+    private fun getFile(userHome: String, minecraftPath: String): File {
         val workingDirectory: File = when (getOperatingSystem()) {
             OperatingSystem.LINUX, OperatingSystem.SOLARIS -> File(userHome, ".$minecraftPath/")
 
@@ -434,8 +430,8 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         return workingDirectory
     }
 
-    fun getOperatingSystem(): OperatingSystem {
-        val osName = System.getProperty("os.name").toLowerCase(Locale.US)
+    private fun getOperatingSystem(): OperatingSystem {
+        val osName = System.getProperty("os.name").lowercase()
         return when {
             osName.contains("win") -> OperatingSystem.WINDOWS
             osName.contains("mac") -> OperatingSystem.MACOS
@@ -456,11 +452,11 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         frame.setBounds(newX, newY, rectangle.width, rectangle.height)
     }
 
-    fun showMessage(message: String) {
+    private fun showMessage(message: String) {
         JOptionPane.showMessageDialog(null, message, "SkyHanni", JOptionPane.INFORMATION_MESSAGE)
     }
 
-    fun showErrorMessage(message: String) {
+    private fun showErrorMessage(message: String) {
         JOptionPane.showMessageDialog(null, message, "SkyHanni - Error", JOptionPane.ERROR_MESSAGE)
     }
 
