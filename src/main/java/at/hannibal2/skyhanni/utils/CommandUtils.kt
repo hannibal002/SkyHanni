@@ -23,7 +23,7 @@ object CommandUtils {
         args: Iterable<String>,
         context: CommandContextAwareObject,
         validItems: (NeuInternalName) -> Boolean = { true },
-        aliases: Map<String, NeuInternalName> = NeuItems.commonItemAliases,
+        aliases: Map<String, NeuInternalName> = NeuItems.commonItemAliases.global,
     ): Pair<Int, Any?> {
         // This replacement does not work for iterable interface. Therefore, the suppression.
         @Suppress("ReplaceSizeZeroCheckWithIsEmpty")
@@ -76,7 +76,7 @@ object CommandUtils {
     fun itemTabComplete(
         start: String,
         validItems: (NeuInternalName) -> Boolean = { true },
-        aliases: Map<String, NeuInternalName> = NeuItems.commonItemAliases,
+        aliases: Map<String, NeuInternalName> = NeuItems.commonItemAliases.global,
     ): List<String> = buildList {
         if (start.isEmpty()) return@buildList
         val expected = when {

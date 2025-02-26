@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemAliases
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -54,7 +55,7 @@ object NeuItems {
     val allInternalNames: NavigableMap<String, NeuInternalName> = TreeMap()
     val ignoreItemsFilter = MultiFilter()
 
-    var commonItemAliases: Map<String, NeuInternalName> = emptyMap()
+    var commonItemAliases: ItemAliases = ItemAliases()
 
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
@@ -68,7 +69,7 @@ object NeuItems {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
         ignoreItemsFilter.load(ignoredItems)
-        val aliases = event.getConstant<Map<String, NeuInternalName>>("CommonItemAliases")
+        val aliases = event.getConstant<ItemAliases>("ItemAliases")
         commonItemAliases = aliases
     }
 
