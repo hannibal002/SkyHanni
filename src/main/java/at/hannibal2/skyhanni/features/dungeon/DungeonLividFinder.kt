@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
@@ -33,11 +35,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.init.Blocks
+import net.minecraft.item.EnumDyeColor
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -57,6 +61,11 @@ object DungeonLividFinder {
 
     private var color: LorenzColor? = null
 
+    private val lividKillPattern by RepoPattern.pattern(
+        "dungeon.f5.lividkill",
+        "§c\\[BOSS](?:[\\w ]+)? Livid§r§f: Impossible! How did you figure out which one I was\\?!"
+    )
+
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!inLividBossRoom()) return
@@ -65,7 +74,7 @@ object DungeonLividFinder {
         if (mob.baseEntity !is EntityOtherPlayerMP) return
 
         val lividColor = color
-        val isCorrectLivid = if (lividColor == null) false else mob.isLividColor(lividColor)
+        val isCorrectLivid = lividColor != null && mob.isLividColor(lividColor)
 
         if (lividColor == null) {
             fakeLivids += mob
@@ -78,7 +87,7 @@ object DungeonLividFinder {
             // When the real livid dies at the same time as a fake livid, Hypixel despawns the player entity,
             // and makes it impossible to get the mob of the real livid again.
 
-            ChatUtils.debug("Livid found: $lividColor§7 | $lividArmorStandId")
+            ChatUtils.debug("Livid found: $lividColor§7 | $lividArmorStandId (direct spawn)")
             if (config.enabled.get()) mob.highlight(lividColor.toColor())
         } else fakeLivids += mob
     }
@@ -106,32 +115,31 @@ object DungeonLividFinder {
         if (event.location != blockLocation) return
         if (event.location.getBlockAt() != Blocks.wool) return
 
-        val newColor = event.newState.getValue(BlockStainedGlass.COLOR).toLorenzColor()
+        val newColor = event.newState.getValue(BlockStainedGlass.COLOR).getColor() ?: run {
+            ChatUtils.userError("bad color found! ${event.newState.getValue(BlockStainedGlass.COLOR)}")
+            event.newState.getValue(BlockStainedGlass.COLOR).toLorenzColor()
+        }
         color = newColor
         ChatUtils.debug("newColor! $newColor")
 
         val lividSet = fakeLivids + livid
+        fakeLivids.clear()
+        livid = null
+        lividArmorStandId = null
 
         for (mob in lividSet) {
             if (mob == null) continue
-            if (mob.isLividColor(LorenzColor.RED) && newColor != LorenzColor.RED) {
-                if (mob == livid) {
-                    livid = null
-                    lividArmorStandId = null
-                }
-                mob.highlight(null)
-                fakeLivids += mob
-                continue
-            }
+            mob.highlight(null)
 
             if (mob.isLividColor(newColor)) {
                 livid = mob
                 lividArmorStandId = mob.armorStand?.entityId
-                ChatUtils.debug("Livid found: $newColor§7 | $lividArmorStandId")
+                ChatUtils.debug("Livid found: $newColor§7 | $lividArmorStandId (color switch)")
                 if (config.enabled.get()) mob.highlight(newColor.toColor())
-                fakeLivids -= mob
                 continue
             }
+
+            fakeLivids.add(mob)
         }
     }
 
@@ -143,10 +151,7 @@ object DungeonLividFinder {
 
     @HandleEvent
     fun onBossEnd(event: DungeonCompleteEvent) {
-        color = null
-        livid = null
-        lividArmorStandId = null
-        fakeLivids.clear()
+        reset()
     }
 
     @HandleEvent
@@ -223,4 +228,46 @@ object DungeonLividFinder {
             add("color: ${color?.name}")
         }
     }
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!inLividBossRoom()) return
+        if (!lividKillPattern.matches(event.message)) return
+
+        reset()
+    }
+
+    private fun reset() {
+        color = null
+        livid = null
+        lividArmorStandId = null
+        fakeLivids.clear()
+    }
+
+    private fun EnumDyeColor.getColor(): LorenzColor? =
+        when (this) {
+            EnumDyeColor.WHITE -> LorenzColor.WHITE
+
+            EnumDyeColor.GRAY -> LorenzColor.GRAY
+
+            EnumDyeColor.MAGENTA -> LorenzColor.LIGHT_PURPLE
+            EnumDyeColor.PURPLE -> LorenzColor.DARK_PURPLE
+
+            EnumDyeColor.BLUE -> LorenzColor.BLUE
+            EnumDyeColor.RED -> LorenzColor.RED
+            EnumDyeColor.YELLOW -> LorenzColor.YELLOW
+
+            EnumDyeColor.LIME -> LorenzColor.GREEN
+            EnumDyeColor.GREEN -> LorenzColor.DARK_GREEN
+
+            else -> null
+            // these don't exist (for now?)
+//             EnumDyeColor.ORANGE
+//             EnumDyeColor.LIGHT_BLUE
+//             EnumDyeColor.PINK
+//             EnumDyeColor.SILVER
+//             EnumDyeColor.CYAN
+//             EnumDyeColor.BROWN
+//             EnumDyeColor.BLACK
+        }
 }
