@@ -1,31 +1,43 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("SpreadOperator")
 open class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
+    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+) : SkyHanniTracker<Data>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
+
+    companion object {
+        private val config get() = SkyHanniMod.feature.misc.tracker
+    }
+
+    private var scrollValue = ScrollValue()
 
     open fun addCoins(amount: Int, command: Boolean) {
         addItem(SKYBLOCK_COIN, amount, command)
@@ -107,9 +119,8 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
         }
 
-        val limitList = config.hideCheapItems
-        var pos = 0
-        val hiddenItemTexts = mutableListOf<String>()
+        val table = mutableMapOf<List<Renderable>, String>()
+
         for ((internalName, price) in items.sortedDesc()) {
             val itemProfit = dataItems[internalName] ?: error("Item not found for $internalName")
 
@@ -118,42 +129,61 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
 
             val cleanName = internalName.getCleanName(dataItems, getCoinName)
 
-            val priceFormat = price.shortFormat()
             val hidden = itemProfit.hidden
+            val priceFormat = price.formatCoin(gray = hidden)
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
 
             val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             val displayName = if (hidden) "§8§m$formattedName" else cleanName
-            val listFormat = " $numberColor${displayAmount.addSeparators()}x $displayName§7: §6$priceFormat"
-
-            pos++
-            if (limitList.enabled.get()) {
-                if (pos > limitList.alwaysShowBest.get()) {
-                    if (price < limitList.minPrice.get() * 1000) {
-                        hiddenItemTexts += listFormat
-                        continue
-                    }
-                }
-            }
 
             val loreText = getLoreList.invoke(internalName, itemProfit)
-            val lore = buildLore(loreText, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(
-                listFormat, lore,
-                onClick = {
+            val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
+
+            // TODO add row abstraction to api, with common click+hover behaviour
+            fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickable(
+                string,
+                tips = lore,
+                onLeftClick = {
                     if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)
                     update()
                 },
-            ) else Renderable.string(listFormat)
+            ) else Renderable.string(string)
 
-            lists.add(renderable.toSearchable(formattedName))
+            val row = mutableMapOf<TextPart, Renderable>()
+            row[TextPart.NAME] = string(" $displayName")
+
+            val itemStackOrNull = if (internalName == SKYBLOCK_COIN) {
+                ItemUtils.getCoinItemStack(amount)
+            } else {
+                internalName.getItemStackOrNull()
+            }
+            itemStackOrNull?.let {
+                row[TextPart.ICON] = Renderable.itemStack(it)
+            }
+
+            row[TextPart.TOTAL_PRICE] = string(" $priceFormat")
+            row[TextPart.AMOUNT] = string(" $numberColor${displayAmount.addSeparators()}x")
+
+            val line = config.textOrder.get().mapNotNull { row[it] }
+            table[line] = cleanName
         }
-        if (hiddenItemTexts.size > 0) {
-            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
-            lists.add(text)
+
+        val scrollValue = (data as? BucketedItemTrackerData<*>)?.selectedScrollValue ?: scrollValue
+        Renderable.searchableScrollable(
+            table,
+            key = 99,
+            lines = min(items.size, config.itemsShown.get()),
+            velocity = 5.0,
+            textInput = textInput,
+            scrollValue = scrollValue,
+            asTable = config.showTable.get(),
+            showScrollableTipsInList = isInventoryOpen(),
+        )?.let {
+            lists.add(it.toSearchable())
         }
+
 
         return profit
     }
@@ -164,6 +194,8 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         newDrop: Boolean,
         internalName: NeuInternalName,
     ) = buildList {
+        add(internalName.itemName)
+        add("")
         addAll(loreFormat)
         add("")
         if (newDrop) {
