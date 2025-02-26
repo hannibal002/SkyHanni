@@ -44,7 +44,7 @@ object CustomWardrobeKeybinds {
         if (!isEnabled()) return false
         val slots = WardrobeApi.slots.filter { it.isInCurrentPage() }
             .filterNot { config.onlyFavorites && !it.favorite }
-            .filterNot { config.hideEmptySlots && it.armor.all { it == null } }
+            .filterNot { config.hideEmptySlots && it.armor.all { piece -> piece == null } }
 
         for ((index, key) in keybinds.withIndex()) {
             if (!key.isKeyHeld()) continue
