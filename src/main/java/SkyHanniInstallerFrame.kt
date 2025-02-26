@@ -399,6 +399,7 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
                 dispose()
                 System.exit(0)
             }
+
             getButtonFolder() -> onFolderSelect()
             getButtonInstall() -> onInstall()
             getButtonOpenFolder() -> onOpenFolder()
@@ -425,6 +426,7 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
                     showErrorMessage("Folder not found: ${modsFolder.path}")
                     return
                 }
+
                 !modsFolder.isDirectory -> {
                     showErrorMessage("Not a folder: ${modsFolder.path}")
                     return
@@ -489,10 +491,10 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
                                     if (!file.delete()) {
                                         showErrorMessage(
                                             "Was not able to delete the other SkyHanni files found in your mods folder!" +
-                                                System.lineSeparator() +
-                                                "Please make sure that your minecraft is currently closed and try again, or feel" +
-                                                System.lineSeparator() +
-                                                "free to open your mods folder and delete those files manually."
+                                                    System.lineSeparator() +
+                                                    "Please make sure that your minecraft is currently closed and try again, or feel" +
+                                                    System.lineSeparator() +
+                                                    "free to open your mods folder and delete those files manually.",
                                         )
                                         return true
                                     }
@@ -532,12 +534,15 @@ class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
         val workingDirectory: File = when (getOperatingSystem()) {
             OperatingSystem.LINUX, OperatingSystem.SOLARIS ->
                 File(userHome, ".$minecraftPath/")
+
             OperatingSystem.WINDOWS -> {
                 val appData = System.getenv("APPDATA")
                 if (appData != null) File(appData, ".$minecraftPath/") else File(userHome, ".$minecraftPath/")
             }
+
             OperatingSystem.MACOS ->
                 File(userHome, "Library/Application Support/$minecraftPath")
+
             else -> File(userHome, "$minecraftPath/")
         }
         return workingDirectory
