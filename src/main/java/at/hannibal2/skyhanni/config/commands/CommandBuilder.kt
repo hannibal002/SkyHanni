@@ -32,7 +32,7 @@ abstract class CommandBuilderBase(val name: String) {
 class ComplexCommandBuilder<O : CommandContextAwareObject, A : CommandArgument<O>>(name: String) : CommandBuilderBase(name) {
     lateinit var specifiers: Collection<A>
     var excludedSpecifiersFromDescription: Set<A> = emptySet()
-    lateinit var context: () -> O
+    lateinit var context: (ComplexCommand<O>) -> O
 
     private var realDescription: String = ""
 
