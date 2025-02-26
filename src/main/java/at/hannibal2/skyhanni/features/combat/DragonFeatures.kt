@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -210,8 +209,8 @@ object DragonFeatures {
             yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
             ) + if (zealots > 100) 100 else zealots
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!enable()) return
         val message = event.message
         if (!config.chat && !config.display && !config.superiorNotify && !configProtector) return
@@ -334,7 +333,7 @@ object DragonFeatures {
 
     private val widgetErrorGUI = listOf(Renderable.string("§cDragon Widget is disabled!"))
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: GuiRenderEvent) {
         if (!(enableDisplay() && dragonSpawned)) return
         config.displayPosition.renderRenderables(
