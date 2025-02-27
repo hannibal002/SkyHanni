@@ -247,6 +247,32 @@ object DungeonLividFinder {
             add("lividArmorStandID: $lividArmorStandId")
             add("color: ${color?.name}")
         }
+
+        fakeLivids.clear()
+        livid = null
+        lividArmorStandId = null
+        val color = color ?: return
+        logger.log("reloading livids")
+
+        for (mob in MobData.currentMobs) {
+            if (mob.name != "Livid" && mob.name != "Real Livid") continue
+
+            mob.highlight(null)
+            if (mob.isLividColor(color)) {
+                livid = mob
+                lividArmorStandId = mob.armorStand?.entityId
+
+                val message = "Livid found: ${color}§7 | $lividArmorStandId (color switch)"
+                ChatUtils.debug(message)
+                logger.log(message)
+
+                if (config.enabled.get()) mob.highlight(color.toColor())
+                continue
+            }
+
+            fakeLivids.add(mob)
+        }
+        ChatUtils.chat("reloaded livids!")
     }
 
     @HandleEvent
