@@ -82,9 +82,9 @@ object CityProjectFeatures {
         ChatUtils.clickToActionOrDisable(
             "Daily City Project Reminder!",
             config::dailyReminder,
-            actionName = "warp to Hub",
+            actionName = "warp to Elizabeth",
             action = {
-                HypixelCommands.warp("hub")
+                HypixelCommands.warp("elizabeth")
                 EntityMovementData.onNextTeleport(IslandType.HUB) {
                     IslandGraphs.pathFind(
                         LorenzVec(9.3, 72.0, -103.4),
