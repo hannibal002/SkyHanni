@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 
 @SkyHanniModule
-object ShortenedWarpCommand {
+object ShortenWarpCommand {
 
     private var warps = listOf<String>()
 

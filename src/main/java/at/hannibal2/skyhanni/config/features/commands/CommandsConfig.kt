@@ -43,7 +43,7 @@ class CommandsConfig {
 
     @ConfigOption(
         name = "Shorten §e/warp",
-        desc = "Enables warping without the need for the §ewarp §7prefix.\n§7(/warp wiazrd -> /wizard)"
+        desc = "Allows warping without the need for the §ewarp §7prefix.\n§7(/warp wizard -> /wizard)"
     )
     @Expose
     @ConfigEditorBoolean
