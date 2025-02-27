@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
@@ -66,6 +68,8 @@ object DungeonLividFinder {
         "§c\\[BOSS](?:[\\w ]+)? Livid§r§f: Impossible! How did you figure out which one I was\\?!"
     )
 
+    private val logger = LorenzLogger("livid_finder")
+
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!inLividBossRoom()) return
@@ -87,7 +91,10 @@ object DungeonLividFinder {
             // When the real livid dies at the same time as a fake livid, Hypixel despawns the player entity,
             // and makes it impossible to get the mob of the real livid again.
 
-            ChatUtils.debug("Livid found: $lividColor§7 | $lividArmorStandId (direct spawn)")
+            val message = "Livid found: $lividColor§7 | $lividArmorStandId (direct spawn)"
+            logger.log(message)
+            ChatUtils.debug(message)
+
             if (config.enabled.get()) mob.highlight(lividColor.toColor())
         } else fakeLivids += mob
     }
@@ -116,25 +123,33 @@ object DungeonLividFinder {
         if (event.location.getBlockAt() != Blocks.wool) return
 
         val newColor = event.newState.getValue(BlockStainedGlass.COLOR).getColor() ?: run {
-            ChatUtils.userError("bad color found! ${event.newState.getValue(BlockStainedGlass.COLOR)}")
+            val message = "bad color found! ${event.newState.getValue(BlockStainedGlass.COLOR)}"
+            ChatUtils.userError(message)
+            logger.log(message)
             event.newState.getValue(BlockStainedGlass.COLOR).toLorenzColor()
         }
         color = newColor
-        ChatUtils.debug("newColor! $newColor")
 
-        val lividSet = fakeLivids + livid
+        val colorMessage = "newColor! $newColor"
+        ChatUtils.debug(colorMessage)
+        logger.log(colorMessage)
+
         fakeLivids.clear()
         livid = null
         lividArmorStandId = null
 
-        for (mob in lividSet) {
-            if (mob == null) continue
-            mob.highlight(null)
+        for (mob in MobData.currentMobs) {
+            if (mob.name != "Livid" && mob.name != "Real Livid") continue
 
+            mob.highlight(null)
             if (mob.isLividColor(newColor)) {
                 livid = mob
                 lividArmorStandId = mob.armorStand?.entityId
-                ChatUtils.debug("Livid found: $newColor§7 | $lividArmorStandId (color switch)")
+
+                val message = "Livid found: $newColor§7 | $lividArmorStandId (color switch)"
+                ChatUtils.debug(message)
+                logger.log(message)
+
                 if (config.enabled.get()) mob.highlight(newColor.toColor())
                 continue
             }
@@ -143,10 +158,15 @@ object DungeonLividFinder {
         }
     }
 
+    var bossCount = 1
+
     @HandleEvent
     fun onBossStart(event: DungeonBossRoomEnterEvent) {
         if (DungeonApi.getCurrentBoss() != DungeonFloor.F5) return
         color = LorenzColor.RED
+        logger.log("-----")
+        logger.log("start boss $bossCount\n")
+        bossCount += 1
     }
 
     @HandleEvent
