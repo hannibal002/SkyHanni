@@ -27,7 +27,7 @@ object ShortenWarpCommand {
 
         val message = event.message.lowercase()
         val command = message.removePrefix("/")
-        if(command == "barn" && IslandType.GARDEN.isInIsland()) return
+        if (command == "barn" && IslandType.GARDEN.isInIsland()) return
 
         if (command in warps) {
             event.cancel()
