@@ -29,11 +29,10 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         }
     }
 
-    fun constructHelp(description: String, excludedSpecifiersFromDescription: Set<CommandArgument<O>>): String = buildString {
+    fun constructHelp(description: String): String = buildString {
         appendLine(name)
         appendLine(description)
         specifiers
-            .filter { !excludedSpecifiersFromDescription.contains(it) }
             .sortedBy {
                 when (it.defaultPosition) {
                     -1 -> Int.MAX_VALUE
@@ -100,12 +99,18 @@ data class ComplexCommand<O : CommandContextAwareObject>(
 
         if (rest.isEmpty()) {
             result.addAll(validSpecifier.mapNotNull { it.prefix.takeIf { i -> i.isNotEmpty() } })
-            result.addAll(validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete("") }.flatten())
+            result.addAll(
+                validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete("", context) }
+                    .flatten(),
+            )
         } else {
             result.addAll(
                 validSpecifier.filter { it.prefix.startsWith(rest) }.mapNotNull { it.prefix.takeIf { i -> i.isNotEmpty() } },
             )
-            result.addAll(validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete(rest) }.flatten())
+            result.addAll(
+                validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete(rest, context) }
+                    .flatten(),
+            )
         }
 
         return result

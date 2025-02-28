@@ -172,6 +172,10 @@ object NeuItems {
         return Item.itemRegistry.getObject(ResourceLocation(vanillaName)) != null
     }
 
+    private val generatorPattern = "GENERATOR_\\d+".toPattern()
+
+    fun NeuInternalName.isGenerator(): Boolean = generatorPattern.matches(this.asString())
+
     fun NeuInternalName.removePrefix(prefix: String): NeuInternalName {
         if (prefix.isEmpty()) return this
         val string = asString()

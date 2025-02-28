@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.commands.ComplexCommand
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuItems.isGenerator
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
 object CommandUtils {
@@ -24,6 +25,7 @@ object CommandUtils {
         context: CommandContextAwareObject,
         validItems: (NeuInternalName) -> Boolean = { true },
         aliases: Map<String, NeuInternalName> = NeuItems.commonItemAliases.global,
+        notFoundResponse: (String) -> String = { "Could not find a valid item for: '$it'" },
     ): Pair<Int, Any?> {
         // This replacement does not work for iterable interface. Therefore, the suppression.
         @Suppress("ReplaceSizeZeroCheckWithIsEmpty")
@@ -67,7 +69,7 @@ object CommandUtils {
         }
 
         if (item?.getItemStackOrNull() == null) {
-            context.errorMessage = "Could not find a valid item for: '$collected'"
+            context.errorMessage = notFoundResponse(collected)
         }
 
         return grabbed.size to item
@@ -75,10 +77,11 @@ object CommandUtils {
 
     fun itemTabComplete(
         start: String,
-        validItems: (NeuInternalName) -> Boolean = { true },
+        validItems: (NeuInternalName) -> Boolean = { !it.isGenerator() },
         aliases: Map<String, NeuInternalName> = NeuItems.commonItemAliases.global,
+        suggestAtEmpty: Boolean = false,
     ): List<String> = buildList {
-        if (start.isEmpty()) return@buildList
+        if (!suggestAtEmpty && start.isEmpty()) return@buildList
         val expected = when {
             namePattern.matches(start) -> NameSource.ITEM_NAME
             internalPattern.matches(start) -> NameSource.INTERNAL_NAME
@@ -197,22 +200,9 @@ data class CommandArgument<T : CommandContextAwareObject>(
     val prefix: String = "",
     val defaultPosition: Int = -1,
     val validity: (T) -> Boolean = { true },
-    val tabComplete: (String) -> Collection<String> = { emptyList() },
+    val tabComplete: (String, T) -> Collection<String> = { _, _ -> emptyList() },
     val handler: (Iterable<String>, T) -> Int,
 ) {
-
-    constructor(
-        documentation: String,
-        prefix: String = "",
-        defaultPosition: Int = -1,
-        validity: (T) -> Boolean = { true },
-        tabComplete: (String) -> Collection<String> = { emptyList() },
-        /** Used to declare that this argument shouldn't be used for creating a certain help call. Used for polymorphic commands*/
-        noDocumentationFor: List<MutableSet<CommandArgument<T>>> = emptyList(),
-        handler: (Iterable<String>, T) -> Int,
-    ) : this(documentation, prefix, defaultPosition, validity, tabComplete, handler) {
-        noDocumentationFor.forEach { it.add(this) }
-    }
 
     override fun toString(): String = documentation
 

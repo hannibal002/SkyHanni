@@ -31,13 +31,12 @@ abstract class CommandBuilderBase(val name: String) {
 
 class ComplexCommandBuilder<O : CommandContextAwareObject, A : CommandArgument<O>>(name: String) : CommandBuilderBase(name) {
     lateinit var specifiers: Collection<A>
-    var excludedSpecifiersFromDescription: Set<A> = emptySet()
     lateinit var context: (ComplexCommand<O>) -> O
 
     private var realDescription: String = ""
 
     override fun toCommand() = ComplexCommand(name.lowercase(), specifiers, context, aliases).also {
-        realDescription = it.constructHelp(description, excludedSpecifiersFromDescription)
+        realDescription = it.constructHelp(description)
     }
 
     override val descriptor get() = realDescription
