@@ -45,6 +45,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -135,7 +136,9 @@ object CityProjectFeatures {
                         // idk what soon means, lets assume one minute
                         1.minutes
                     } else {
-                        TimeUtils.getDuration(rawTime)
+                        val d = TimeUtils.getDuration(rawTime)
+                        // hypixel rounds down to the next full minute, it shows "1m" when it is in fact 1-2 minutes, and "0m" for the last 60s
+                        if (d < 1.hours) d + 1.minutes else d
                     }
                     val endTime = now + duration
                     if (endTime < nextTime) {
