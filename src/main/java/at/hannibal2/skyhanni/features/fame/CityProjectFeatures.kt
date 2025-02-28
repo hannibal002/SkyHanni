@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -44,6 +45,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -71,7 +73,7 @@ object CityProjectFeatures {
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (ReminderUtils.isBusy()) return
 
-        if (LorenzUtils.skyBlockArea == "Community Center") return
+        if (IslandAreas.currentAreaName == "Community Center") return
 
         playerSpecific.nextCityProjectParticipationTime.let {
             if (it.isFarPast() || it.isInFuture()) return
@@ -87,7 +89,7 @@ object CityProjectFeatures {
                 HypixelCommands.warp("elizabeth")
                 EntityMovementData.onNextTeleport(IslandType.HUB) {
                     IslandGraphs.pathFind(
-                        LorenzVec(9.3, 72.0, -103.4),
+                        LorenzVec(-1.7, 72.0, -102.0),
                         "§aCity Project",
                         condition = { config.dailyReminder },
                     )
@@ -129,8 +131,12 @@ object CityProjectFeatures {
                 if (completed) continue
                 contributeAgainPattern.firstMatcher(lore) {
                     val rawTime = group("time")
-                    if (!rawTime.contains("Soon!")) return
-                    val duration = TimeUtils.getDuration(rawTime)
+                    val duration = if (rawTime.contains("Soon!")) {
+                        // idk what soon means, lets assume one minute
+                        1.minutes
+                    } else {
+                        TimeUtils.getDuration(rawTime)
+                    }
                     val endTime = now + duration
                     if (endTime < nextTime) {
                         nextTime = endTime
