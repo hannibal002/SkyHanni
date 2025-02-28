@@ -93,7 +93,7 @@ object ChatManager {
         val hoverInfo = listOf(
             "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
             "§7Mod id: §a${originatingModContainer?.id}",
-            "§7Mod name: §a${originatingModContainer?.name}"
+            "§7Mod name: §a${originatingModContainer?.name}",
         )
         val stackTrace =
             Thread.currentThread().stackTrace.map {
@@ -103,7 +103,7 @@ object ChatManager {
         val result = MessageFilteringResult(
             component, ActionKind.OUTGOING, null, null,
             hoverInfo = hoverInfo,
-            hoverExtraInfo = hoverInfo + listOf("") + stackTrace
+            hoverExtraInfo = hoverInfo + listOf("") + stackTrace,
         )
 
         messageHistory[IdentityCharacteristics(component)] = result
@@ -111,7 +111,7 @@ object ChatManager {
         if (MessageSendToServerEvent(
                 trimmedMessage,
                 trimmedMessage.split(" "),
-                originatingModContainer
+                originatingModContainer,
             ).post()
         ) {
             event.cancel()
@@ -200,7 +200,7 @@ object ChatManager {
     fun MutableList<ChatLine>.editChatLine(
         component: (IChatComponent) -> IChatComponent,
         predicate: (ChatLine) -> Boolean,
-        reason: String? = null
+        reason: String? = null,
     ) {
         indexOfFirst {
             predicate(it)
@@ -225,7 +225,6 @@ object ChatManager {
         }
     }
 
-    // TODO FOR hannibal, very important before full version 2.0.0: use this function for sack message hide empty lines
     fun MutableList<ChatLine>.deleteChatLine(
         amount: Int,
         reason: String? = null,
@@ -235,6 +234,11 @@ object ChatManager {
         var removed = 0
         while (iterator.hasNext() && removed < amount) {
             val chatLine = iterator.next()
+
+            // chatLine can be null. maybe bc of other mods?
+            @Suppress("SENSELESS_COMPARISON")
+            if (chatLine == null) continue
+
             if (predicate(chatLine)) {
                 iterator.remove()
                 removed++
