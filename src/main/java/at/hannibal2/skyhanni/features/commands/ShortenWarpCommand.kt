@@ -26,6 +26,8 @@ object ShortenWarpCommand {
         if (!SkyHanniMod.feature.misc.commands.shortenWarp) return
 
         val message = event.message.lowercase()
+        if (!message.startsWith("/")) return
+
         val command = message.removePrefix("/")
         if (command == "barn" && IslandType.GARDEN.isInIsland()) return
 
