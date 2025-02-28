@@ -156,6 +156,10 @@ object DungeonLividFinder {
 
             fakeLivids.add(mob)
         }
+
+        if (livid == null || lividArmorStandId == null) {
+            logger.log(MobData.currentMobs.filter { it.name == "Livid" || it.name == "Real Livid" }.joinToString(" | "))
+        }
     }
 
     var bossCount = 1
