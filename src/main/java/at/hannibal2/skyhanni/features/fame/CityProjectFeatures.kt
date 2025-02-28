@@ -133,8 +133,7 @@ object CityProjectFeatures {
                 contributeAgainPattern.firstMatcher(lore) {
                     val rawTime = group("time")
                     val duration = if (rawTime.contains("Soon!")) {
-                        // idk what soon means, lets assume one minute
-                        1.minutes
+                        5.seconds
                     } else {
                         val d = TimeUtils.getDuration(rawTime)
                         // hypixel rounds down to the next full minute, it shows "1m" when it is in fact 1-2 minutes, and "0m" for the last 60s
