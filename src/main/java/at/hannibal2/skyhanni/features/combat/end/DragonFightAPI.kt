@@ -97,20 +97,6 @@ object DragonFightAPI {
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {
-        chatEyePlacedPattern.matchMatcher(event.message.removeColor()) {
-            yourEyesPlaced += 1
-            ChatUtils.chat("You placed a Summoning Eye! ($yourEyesPlaced/8)")
-        }
-        chatEyePlacedFinalPattern.matchMatcher(event.message.removeColor()) {
-            yourEyesPlaced += 1
-            ChatUtils.chat("You placed a Summoning Eye! Brace Yourselves! ($yourEyesPlaced/8)")
-        }
-
-        chatEyeRecoveredPattern.matchMatcher(event.message.removeColor()) {
-            yourEyesPlaced -= 1
-            ChatUtils.chat("You recovered a Summoning Eye! ($yourEyesPlaced/8)")
-        }
-
         chatSpawnPattern.matchMatcher(event.message.removeColor()) {
             currentType = group("type")
             DragonProfitTracker.BucketData().eyesPlaced += yourEyesPlaced

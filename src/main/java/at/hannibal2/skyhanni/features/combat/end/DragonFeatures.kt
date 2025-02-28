@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.combat
+package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
