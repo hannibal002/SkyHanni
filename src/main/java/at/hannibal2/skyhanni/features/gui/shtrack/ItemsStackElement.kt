@@ -58,7 +58,7 @@ class ItemsStackElement(
 
     override val icon get() = Renderable.itemStack(main.getItemStack())
     override val percentText get() = if (showPercent && target != null) mappedCurrent.percentWithColorCode(target, 1) else ""
-    override val amount get() = Renderable.string(mappedCurrent.toString() + ((target?.let { " / $it" }).orEmpty()))
+    override val amount get() = Renderable.string(formatedNum(mappedCurrent) + ((target?.let { " / ${formatedNum(it)}" }).orEmpty()))
 
     override fun itemChange(item: PrimitiveItemStack) {
         val multiple = map[item.internalName] ?: throw IllegalStateException("You should not be here!")

@@ -239,7 +239,7 @@ object CollectionTracker {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtrackcollection") {
+        event.register("shtrackcollection2") {
             description = "Tracks your collection gain over time"
             callback { command(it) }
         }

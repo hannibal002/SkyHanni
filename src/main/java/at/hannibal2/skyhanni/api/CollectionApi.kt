@@ -56,6 +56,10 @@ object CollectionApi {
 
     val collectionValue get() = ProfileStorageData.profileSpecific?.collection
 
+    private val YOUNGITE = "YOUNGITE".toInternalName()
+    private val OBSOLITE = "OBSOLITE".toInternalName()
+    private val TIMITE = "TIMITE".toInternalName()
+
     // TODO repo
     private val incorrectCollectionNames = mapOf(
         "Mushroom" to "RED_MUSHROOM".toInternalName(),

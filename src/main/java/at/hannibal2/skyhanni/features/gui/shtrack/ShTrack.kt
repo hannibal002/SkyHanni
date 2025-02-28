@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.ComplexCommand
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ProfileLeaveEvent
 import at.hannibal2.skyhanni.events.mining.PowderEvent
-import at.hannibal2.skyhanni.features.gui.shtrack.ShTrack.DocumentationExcludes.itemTrack
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.move
@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.CommandUtils
 import at.hannibal2.skyhanni.utils.CommandUtils.ItemGroup
-import at.hannibal2.skyhanni.utils.CommandUtils.itemCheck
 import at.hannibal2.skyhanni.utils.CommandUtils.numberCalculate
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -50,67 +49,32 @@ object ShTrack {
         event.registerComplex<ContextObject>("shtrack") {
             description = "Track any quantity"
             category = CommandCategory.USERS_ACTIVE
-            specifiers = arguments
-            context = { ContextObject() }
+            specifiers = shTrackSpecifiers + shTrackItemsSpecifiers + globalSpecifiers
+            context = { ContextObject(it) }
         }
         event.registerComplex<ContextObject>("shtrackitem") {
             description = "Track any item"
             category = CommandCategory.USERS_ACTIVE
-            specifiers = arguments
+            specifiers = shTrackItemsSpecifiers + globalSpecifiers
             aliases = listOf("shtrackitems")
-            context = { ContextObject() }
-            excludedSpecifiersFromDescription = itemTrack
-            context = { ContextObject().apply { state = ContextObject.StateType.ITEM } }
+            context = { ContextObject(it).apply { state = ContextObject.StateType.ITEM } }
+        }
+        event.registerComplex<ContextObject>("shtrackcollection") {
+            description = "Tracks your collection gain over time"
+            category = CommandCategory.MAIN
+            specifiers = globalSpecifiers
+            aliases = listOf("shtrackcollections")
+            context = {
+                ContextObject(it).apply {
+                    state = ContextObject.StateType.ITEM
+                    currentFetch = ContextObject.CurrentFetch.COLLECTION
+                    multiItem = true
+                }
+            }
         }
     }
 
-    val arguments = listOf<CommandArgument<ContextObject>>(
-        CommandArgument("<> - Does save the tracker on game close", "-t") { _, c ->
-            c.shouldSave = true
-            0
-        },
-        CommandArgument(
-            "<> - Sets the tracking type to items",
-            "-i",
-            noDocumentationFor = listOf(itemTrack),
-        ) { _, c ->
-            c.state = ContextObject.StateType.ITEM
-            0
-        },
-        CommandArgument(
-            "<> - Sets the tracking type to powder",
-            "-p",
-            noDocumentationFor = listOf(itemTrack),
-        ) { _, c ->
-            c.state = ContextObject.StateType.POWDER
-            0
-        },
-        CommandArgument("<number/calculation> - Sets the target amount", defaultPosition = 1) { a, c ->
-            numberCalculate(
-                a,
-                c,
-            ) { context, number -> context.targetAmount = number }
-        },
-        CommandArgument(
-            "<item> - Item to be tracked",
-            defaultPosition = 0,
-            validity = ShTrack::validIfItemState,
-            tabComplete = CommandUtils::itemTabComplete,
-        ) { a, c ->
-            val r = itemCheck(a, c)
-            r.second?.let { c.item = it }
-            r.first
-        },
-        CommandArgument(
-            "<powder> - Powder to be tracked.",
-            defaultPosition = 0, validity = { it.state == ContextObject.StateType.POWDER },
-            tabComplete = { s -> HotmApi.PowderType.entries.filter { it.name.startsWith(s.uppercase()) }.map { it.name } },
-            noDocumentationFor = listOf(itemTrack),
-        ) { a, c ->
-            val entry = HotmApi.PowderType.getValue(a.first())
-            c.item = entry
-            1
-        },
+    val shTrackItemsSpecifiers = listOf<CommandArgument<ContextObject>>(
         CommandArgument("<number/calculation> - Sets the current amount", "-c", defaultPosition = -2) { a, c ->
             numberCalculate(a, c) { context, number ->
                 context.currentAmount = number
@@ -124,7 +88,10 @@ object ShTrack {
             c.currentFetch = ContextObject.CurrentFetch.SACKS
             0
         },
-        CommandArgument("<> - Sets the current amount from inventory", "-v", validity = ShTrack::validIfItemState) { _, c ->
+        CommandArgument(
+            "<> - Sets the current amount from inventory", "-v",
+            validity = ShTrack::validIfItemState,
+        ) { _, c ->
             c.currentFetch = ContextObject.CurrentFetch.INVENTORY
             0
         },
@@ -135,6 +102,71 @@ object ShTrack {
             c.currentFetch = ContextObject.CurrentFetch.COLLECTION
             c.multiItem = true
             0
+        },
+        CommandArgument(
+            "<> - Uses all tiers of an item", "-m",
+            validity = ShTrack::validIfItemState,
+        ) { _, c ->
+            c.multiItem = true
+            0
+        },
+    )
+
+    val shTrackSpecifiers = listOf<CommandArgument<ContextObject>>(
+        CommandArgument(
+            "<> - Sets the tracking type to items",
+            "-i",
+        ) { _, c ->
+            c.state = ContextObject.StateType.ITEM
+            0
+        },
+        CommandArgument(
+            "<> - Sets the tracking type to powder",
+            "-p",
+        ) { _, c ->
+            c.state = ContextObject.StateType.POWDER
+            0
+        },
+        CommandArgument(
+            "<powder> - Powder to be tracked.",
+            defaultPosition = 0, validity = { it.state == ContextObject.StateType.POWDER },
+            tabComplete = { s, _ -> HotmApi.PowderType.entries.filter { it.name.startsWith(s.uppercase()) }.map { it.name } },
+        ) { a, c ->
+            val entry = HotmApi.PowderType.getValue(a.first())
+            c.item = entry
+            1
+        },
+    )
+
+    val globalSpecifiers = listOf<CommandArgument<ContextObject>>(
+        CommandArgument("<> - Does save the tracker on game close", "-t") { _, c ->
+            c.shouldSave = true
+            0
+        },
+        CommandArgument("<number/calculation> - Sets the target amount", defaultPosition = 1) { a, c ->
+            numberCalculate(
+                a,
+                c,
+            ) { context, number -> context.targetAmount = number }
+        },
+        CommandArgument(
+            "<item> - Item to be tracked",
+            defaultPosition = 0,
+            validity = ShTrack::validIfItemState,
+            tabComplete = { s, c ->
+                if (c.initializedBy.commandName != "shtrackcollection") CommandUtils.itemTabComplete(s)
+                else CommandUtils.itemTabComplete(s, validItems = { CollectionApi.collectionValue?.get(it) != null }, suggestAtEmpty = true)
+            },
+        ) { a, c ->
+            val r = if (c.initializedBy.commandName != "shtrackcollection") CommandUtils.itemCheck(a, c)
+            else CommandUtils.itemCheck(
+                a,
+                c,
+                validItems = { CollectionApi.collectionValue?.get(it) != null },
+                notFoundResponse = { "$it collection not found. Try to open the collection inventory" },
+            )
+            r.second?.let { c.item = it }
+            r.first
         },
         CommandArgument("<> - Does not replace the last equivalent tracking instance", "-d") { _, c ->
             c.allowDupe = true
@@ -148,10 +180,6 @@ object ShTrack {
             c.notify = true
             0
         },
-        CommandArgument("<> - Uses all tiers of an item", "-m", validity = ShTrack::validIfItemState) { _, c ->
-            c.multiItem = true
-            0
-        },
         CommandArgument("<> - Removes the percent value", "-np") { _, c ->
             c.showPercent = false
             0
@@ -162,13 +190,9 @@ object ShTrack {
         },
     )
 
-    object DocumentationExcludes {
-        val itemTrack = mutableSetOf<CommandArgument<ContextObject>>()
-    }
-
     private fun validIfItemState(context: ContextObject) = context.state == ContextObject.StateType.ITEM
 
-    class ContextObject : CommandContextAwareObject {
+    class ContextObject(val initializedBy: ComplexCommand<ContextObject>) : CommandContextAwareObject {
 
         var allowDupe = false
         var autoDelete = true
@@ -234,74 +258,7 @@ object ShTrack {
         }
 
         override fun post() {
-            val result: TrackingElement<*>
-            when (state) {
-                StateType.ITEM -> {
-                    val current: Long
-                    val item = item
-                    val currentSelector: (NeuInternalName) -> Long = when (currentFetch) {
-                        CurrentFetch.INVENTORY -> {
-                            { it.getAmountInInventory().toLong() }
-                        }
-
-                        CurrentFetch.SACKS -> {
-                            { it.getAmountInInventory().toLong() + it.getAmountInSacks().toLong() }
-                        }
-
-                        CurrentFetch.COLLECTION -> {
-                            {
-                                fetchCollection(it)
-                            }
-                        }
-
-                        else -> {
-                            { 0L }
-                        }
-                    }
-                    when (item) {
-                        is ItemGroup -> {
-                            current = currentAmount
-                                ?: if (currentFetch == CurrentFetch.COLLECTION) fetchCollection(item.collection.toInternalName())
-                                else item.items.keys.sumOf(currentSelector)
-                            result = ItemGroupElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
-                        }
-
-                        is NeuInternalName -> {
-                            if (multiItem) {
-                                val base = NeuItems.getPrimitiveMultiplier(item)
-                                current =
-                                    currentAmount?.let { it * base.amount } ?: if (currentFetch == CurrentFetch.COLLECTION) fetchCollection(
-                                        base.internalName,
-                                    )
-                                    else base.internalName.getMultipleMap().entries.sumOf { currentSelector(it.key) * it.value }
-                                result = ItemsStackElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
-                            } else {
-                                current = currentAmount ?: currentSelector(item)
-                                result = ItemTrackingElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
-                            }
-                        }
-
-                        else -> {
-                            errorMessage = "No item specified"
-                            return
-                        }
-                    }
-                }
-
-                StateType.POWDER -> {
-                    val type = item as? HotmApi.PowderType ?: run {
-                        errorMessage = "No powder specified"
-                        return
-                    }
-                    val current = currentAmount ?: type.current
-                    result = PowderTrackingElement(type, current, targetAmount)
-                }
-
-                else -> {
-                    errorMessage = "No tracking type specified"
-                    return
-                }
-            }
+            val result: TrackingElement<*> = compileState() ?: return
             result.shouldNotify = notify
             result.shouldAutoDelete = autoDelete
             result.shouldSave = shouldSave
@@ -320,6 +277,76 @@ object ShTrack {
                 }
             }
             tracker.add(result)
+        }
+
+        private fun compileState(): TrackingElement<*>? = when (state) {
+            StateType.ITEM -> {
+                val current: Long
+                val item = item
+                val currentSelector: (NeuInternalName) -> Long = when (currentFetch) {
+                    CurrentFetch.INVENTORY -> {
+                        { it.getAmountInInventory().toLong() }
+                    }
+
+                    CurrentFetch.SACKS -> {
+                        { it.getAmountInInventory().toLong() + it.getAmountInSacks().toLong() }
+                    }
+
+                    CurrentFetch.COLLECTION -> {
+                        {
+                            fetchCollection(it)
+                        }
+                    }
+
+                    else -> {
+                        { 0L }
+                    }
+                }
+                val result: TrackingElement<*>?
+                when (item) {
+                    is ItemGroup -> {
+                        current = currentAmount
+                            ?: if (currentFetch == CurrentFetch.COLLECTION) fetchCollection(item.collection.toInternalName())
+                            else item.items.keys.sumOf(currentSelector)
+                        result = ItemGroupElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
+                    }
+
+                    is NeuInternalName -> {
+                        if (multiItem) {
+                            val base = NeuItems.getPrimitiveMultiplier(item)
+                            current =
+                                currentAmount?.let { it * base.amount } ?: if (currentFetch == CurrentFetch.COLLECTION) fetchCollection(
+                                    base.internalName,
+                                )
+                                else base.internalName.getMultipleMap().entries.sumOf { currentSelector(it.key) * it.value }
+                            result = ItemsStackElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
+                        } else {
+                            current = currentAmount ?: currentSelector(item)
+                            result = ItemTrackingElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
+                        }
+                    }
+
+                    else -> {
+                        errorMessage = "No item specified"
+                        result = null
+                    }
+                }
+                result
+            }
+
+            StateType.POWDER -> {
+                val type = item as? HotmApi.PowderType ?: run {
+                    errorMessage = "No powder specified"
+                    return null
+                }
+                val current = currentAmount ?: type.current
+                PowderTrackingElement(type, current, targetAmount)
+            }
+
+            else -> {
+                errorMessage = "No tracking type specified"
+                null
+            }
         }
 
         enum class StateType {

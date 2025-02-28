@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.shtrack
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.getZero
 import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.NumberUtil.plus
@@ -76,8 +77,10 @@ abstract class TrackingElement<T : Number> {
 
     abstract val icon: Renderable
     open val nameText: Renderable get() = Renderable.string(name)
-    open val amount: Renderable get() = Renderable.string(current.toString() + ((target?.let { " / $it" }).orEmpty()))
+    open val amount: Renderable get() = Renderable.string(formatedNum(current) + ((target?.let { " / ${formatedNum(it)}" }).orEmpty()))
     open val percentText get() = if (showPercent && target != null) current.percentWithColorCode(target ?: current, 1) else ""
+
+    protected fun formatedNum(number: T): String = number.addSeparators()
 
     fun generateLine(): List<Renderable> = listOf(
         icon, nameText, amount, Renderable.string(percentText), gainText,
