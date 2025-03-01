@@ -74,7 +74,7 @@ object DungeonLividFinder {
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!inLividBossRoom()) return
         val mob = event.mob
-        if (mob.name != "Livid" && mob.name != "Real Livid") return
+        if (!mob.name.contains("Livid")) return
         if (mob.baseEntity !is EntityOtherPlayerMP) return
 
         val lividColor = color
@@ -139,7 +139,7 @@ object DungeonLividFinder {
         lividArmorStandId = null
 
         for (mob in MobData.currentMobs) {
-            if (mob.name != "Livid" && mob.name != "Real Livid") continue
+            if (!mob.name.contains("Livid")) continue
 
             mob.highlight(null)
             if (mob.isLividColor(newColor)) {
@@ -202,6 +202,7 @@ object DungeonLividFinder {
     private fun isCurrentlyBlind() = (Minecraft.getMinecraft().thePlayer?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
 
     private fun Mob.isLividColor(color: LorenzColor): Boolean {
+        logger.log("Checking Livid ${this.armorStand?.name} against $color")
         val chatColor = color.getChatColor()
         return armorStand?.name?.startsWith("$chatColor﴾ $chatColor§lLivid") == true
     }
@@ -259,7 +260,7 @@ object DungeonLividFinder {
         logger.log("reloading livids")
 
         for (mob in MobData.currentMobs) {
-            if (mob.name != "Livid" && mob.name != "Real Livid") continue
+            if (!mob.name.contains("Livid")) continue
 
             mob.highlight(null)
             if (mob.isLividColor(color)) {
