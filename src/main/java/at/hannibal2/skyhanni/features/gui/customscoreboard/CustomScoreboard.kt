@@ -119,7 +119,7 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 5.seconds)
+        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 7.seconds)
             UnknownLinesHandler.handleUnknownLines()
     }
 
@@ -231,7 +231,7 @@ object CustomScoreboard {
                 add("Custom Scoreboard Events:")
                 addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }, currentIslandEvents))
 
-                add("Active Patterns:")
+                add("Active Patterns (${activePatterns.size}):")
                 activePatterns.forEach { add("   $it") }
 
                 allUnknownLines.takeIfNotEmpty()?.let { set ->
