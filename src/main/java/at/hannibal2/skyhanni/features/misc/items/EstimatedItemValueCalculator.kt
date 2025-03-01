@@ -170,7 +170,7 @@ object EstimatedItemValueCalculator {
             return 0.0
         }
         if (attributes.size != 2) return 0.0
-        val basePrice = internalName.getPrice()
+        val basePrice = internalNameString.toInternalName().getPrice()
         var subTotal = 0.0
         val combo = ("$internalNameString+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
         val comboPrice = combo.toInternalName().getPriceOrNull()
