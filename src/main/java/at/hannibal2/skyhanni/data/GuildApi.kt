@@ -24,7 +24,7 @@ object GuildApi {
             list.clear()
             return
         }
-        if (inGuildMessage && message == "§b§m-----------------------------------------------------§r") {
+        if (inGuildMessage && message == "§b§m-----------------------------------------------------") {
             inGuildMessage = false
             ProfileStorageData.playerSpecific?.guildMembers?.let {
                 it.clear()
