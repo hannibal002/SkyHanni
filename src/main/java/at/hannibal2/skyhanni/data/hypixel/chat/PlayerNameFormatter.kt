@@ -149,7 +149,7 @@ object PlayerNameFormatter {
                 appendSibling(
                     nameFormat(
                         event.authorComponent,
-                        levelColor = event.levelComponent?.sampleStyleAtStart()?.color?.toString(),
+                        levelColor = event.levelComponent?.getText()?.substring(0, 2),
                         level = event.levelComponent,
                     ),
                 )
