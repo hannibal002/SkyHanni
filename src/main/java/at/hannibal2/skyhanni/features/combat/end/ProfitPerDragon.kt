@@ -13,8 +13,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ProfitPerDragon {
-    private var scannedLootUUIDs = mutableSetOf<UUID>()
-    private var dragonLoot = mutableSetOf<NeuInternalName>()
+    private val scannedLootUUIDs = mutableSetOf<UUID>()
+    private val dragonLoot = mutableSetOf<NeuInternalName>()
 
     private fun scanForLoot() {
         val entities = EntityUtils.getEntities<EntityArmorStand>()
