@@ -132,7 +132,7 @@ object ExperimentsProfitTracker {
         blockedReason = when {
             enchantingExpPattern.matches(reward) && ExperimentMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
             experienceBottleChatPattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
-            listOf("Metaphysical Serum", "Experiment The Fish").contains(reward) && ExperimentMessages.MISC.isSelected() -> "MISC_DROP"
+            listOf("Metaphysical Serum", "ExperimentTier The Fish").contains(reward) && ExperimentMessages.MISC.isSelected() -> "MISC_DROP"
             ExperimentMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
             else -> ""
         }

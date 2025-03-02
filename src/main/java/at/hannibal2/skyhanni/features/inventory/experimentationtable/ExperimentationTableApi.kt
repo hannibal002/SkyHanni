@@ -23,15 +23,16 @@ import net.minecraft.entity.item.EntityArmorStand
 object ExperimentationTableApi {
 
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
-    private val patternGroup = RepoPattern.group("enchanting.experiments")
 
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val inTable get() = inventoriesPattern.matches(openInventoryName())
-    var currentExperiment: Experiment? = null
+
+    val patternGroup = RepoPattern.group("enchanting.experiments")
+    var currentExperiment: ExperimentTier? = null
     val superpairInventory = InventoryDetector(
         openInventory = { name ->
             currentExperiment = superpairsPattern.matchMatcher(name) {
-                Experiment.entries.find { it.nameString == group("experiment") }
+                ExperimentTier.byNameOrNone(group("experiment"))
             }
         },
     ) { name -> inventoriesPattern.matches(name) }
@@ -59,7 +60,7 @@ object ExperimentationTableApi {
      */
     val rewardPattern by patternGroup.pattern(
         "rewards",
-        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment the Fish",
+        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|ExperimentTier the Fish",
     )
 
     /**
@@ -157,7 +158,7 @@ object ExperimentationTableApi {
      * REGEX-TEST: §dGuardian
      * REGEX-TEST: §9Guardian§e
      */
-    private val petNamePattern by patternGroup.pattern(
+    private val guardianPetNamePattern by patternGroup.pattern(
         "guardianpet",
         "§[956d]Guardian.*",
     )
@@ -185,5 +186,5 @@ object ExperimentationTableApi {
         }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
     }
 
-    fun hasGuardianPet(): Boolean = petNamePattern.matches(PetApi.currentPet)
+    fun hasGuardianPet(): Boolean = guardianPetNamePattern.matches(PetApi.currentPet)
 }
