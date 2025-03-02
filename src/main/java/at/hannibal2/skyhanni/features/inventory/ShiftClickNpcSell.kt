@@ -17,7 +17,7 @@ object ShiftClickNpcSell {
 
     private val config get() = SkyHanniMod.feature.inventory.shiftClickNPCSell
 
-    private val sellSlot = -4
+    private const val sellSlot = -4
 
     /**
      * REGEX-TEST: §eClick to buyback!
