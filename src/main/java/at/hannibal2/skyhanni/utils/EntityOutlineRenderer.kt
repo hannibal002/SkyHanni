@@ -142,7 +142,7 @@ object EntityOutlineRenderer {
                 copyBuffers(mc.framebuffer, swapBuffer, GL11.GL_DEPTH_BUFFER_BIT)
                 swapBuffer.bindFramebuffer(false)
 
-                // Copy terrain + other entities depth into outline frame buffer to now switch to no-xray outlines
+                // Copy terrain and other entities depth into outline frame buffer to now switch to no-xray outlines
                 entityRenderCache.noOutlineCache?.forEach { entity ->
                     // Test if the entity should render, given the player's instantaneous camera position
                     if (!shouldRender(camera, entity, vector)) return@forEach
