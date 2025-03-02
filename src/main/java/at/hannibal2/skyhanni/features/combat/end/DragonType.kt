@@ -7,14 +7,12 @@ enum class DragonType(
     val displayName: String,
 ) {
     PROTECTOR("Protector Dragon"),
-    Old("Old Dragon"),
-    Unstable("Unstable Dragon"),
-    Young("Young Dragon"),
-    Strong("Strong Dragon"),
-    Wise("Wise Dragon"),
-    Superior("Superior Dragon"),
-    // For use in the Pest Profit Tracker, in cases where an item cannot have an identified PestType
-    // Display name intentionally omitted to aid in filtering out this entry.
+    OLD("Old Dragon"),
+    UNSTABLE("Unstable Dragon"),
+    YOUNG("Young Dragon"),
+    STRONG("Strong Dragon"),
+    WISE("Wise Dragon"),
+    SUPERIOR("Superior Dragon"),
     UNKNOWN(
         "",
     ),

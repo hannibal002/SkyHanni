@@ -147,6 +147,7 @@ object DragonFeatures {
     private var currentPlace: Int? = null
     private var widgetActive = false
     private var egg = true
+    private var currentDragonType: DragonType? = null
 
     private fun resetEnd() {
         endType = null
@@ -163,6 +164,7 @@ object DragonFeatures {
         currentPlace = null
         widgetActive = false
         yourEyes = 0
+        currentDragonType = null
     }
 
     private fun enable() = LorenzUtils.inSkyBlock && IslandType.THE_END.isInIsland()
@@ -216,9 +218,13 @@ object DragonFeatures {
         if (!config.chat && !config.display && !config.superiorNotify && !configProtector) return
         dragonSpawn.matchMatcher(message) {
             dragonSpawned = true
+
+            currentDragonType = DragonType.valueOf(this.group("Dragon").uppercase())
+
             if (config.superiorNotify && this.group("Dragon") == "Superior") {
                 LorenzUtils.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
             }
+            DragonProfitTracker.addEyes(yourEyes)
             return
         }
         if (!config.chat && !config.display && !configProtector) return
@@ -265,7 +271,10 @@ object DragonFeatures {
                                 yourEyes, endPlace, endTopDamage, endDamage,
                             )
 
+                            DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
+
                             printWeight(weight)
+
                             DragonFeatures.reset() // love name collisions
                         }
 

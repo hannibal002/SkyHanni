@@ -1,7 +1,15 @@
 package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemsJson
+import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.add
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,6 +30,8 @@ object DragonProfitTracker {
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
 
     var dragonType: String? = null
+
+    private var lootDetected = false
 
     private val tracker = SkyHanniBucketedItemTracker(
         "Dragon Profit Tracker",
@@ -59,7 +69,7 @@ object DragonProfitTracker {
         var eyesPlaced: Long = 0
     }
 
-    private fun drawDisplay(bucketData: DragonProfitTracker.BucketData): List<Searchable> = buildList {
+    private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
         addSearchString("§b§lDragon Profit Tracker")
         tracker.addBucketSelector(this, bucketData, "Dragon Type")
 
@@ -71,13 +81,11 @@ object DragonProfitTracker {
         val eyePrice = NeuInternalName.fromItemNameOrNull("Summoning Eye")?.getPrice()
         if (eyePrice != null) {
             totalEyePrice = eyePrice * bucketData.eyesPlaced
-            if (totalEyePrice > 0) {
-                profit -= totalEyePrice
-                val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §7- §e${totalEyePrice.shortFormat()}"
-                add(
-                    Renderable.string(eyeFormat).toSearchable()
-                )
-            }
+            profit -= totalEyePrice
+            val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §7- §e${totalEyePrice.shortFormat()}"
+            add(
+                Renderable.string(eyeFormat).toSearchable()
+            )
         }
 
         add(tracker.addTotalProfit(profit, bucketData.getTotalDragonCount(), "loot"))
@@ -85,10 +93,38 @@ object DragonProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
+    var allowedItems = emptyList<NeuInternalName>()
+    var lastDragonKill: DragonType? = null
+
+    @HandleEvent
+    fun onRepoReload(e: RepositoryReloadEvent) {
+        allowedItems = e.getConstant<DragonProfitTrackerItemsJson>("DragonProfitTrackerItems").items
+        println("Allowed items: $allowedItems")
+    }
+
+    @HandleEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!config.enabled || event.source != ItemAddManager.Source.COMMAND) return
+        with(tracker) { event.addItemFromEvent() }
+    }
+
     init {
         tracker.initRenderer({ config.position }) { isEnabled() }
     }
 
-    fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && DragonFightAPI.inNestArea()
+    fun addEyes(amount: Int) {
+        tracker.modify { it.eyesPlaced += amount }
+    }
+
+    fun addDragonKill(type: DragonType) {
+        tracker.modify { it.dragonKills.addOrPut(type, 1) }
+        lastDragonKill = type
+    }
+
+    fun addDragonLoot(type: DragonType, item: NeuInternalName, amount: Int) {
+        tracker.addItem(type, item, amount)
+    }
+
+    fun isEnabled() = true
+        //LorenzUtils.inSkyBlock && config.enabled && DragonFightAPI.inNestArea()
 }
