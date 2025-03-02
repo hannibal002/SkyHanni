@@ -24,13 +24,13 @@ enum class ExperimentTier(
     overInclusiveSlotRange: IntRange, // Filtered 'later' to remove side spaces
     private val sideSpace: Int = 1
 ) {
-    NONE("",  0..0, sideSpace = 0),
+    NONE("", 0..0, sideSpace = 0),
     BEGINNER("Beginner", 18..35),
     HIGH("High", 10..43, sideSpace = 2),
-    GRAND("Grand",  10..43, sideSpace = 2),
-    SUPREME("Supreme",  9..44),
-    TRANSCENDENT("Transcendent",  9..44),
-    METAPHYSICAL("Metaphysical",  9..44),
+    GRAND("Grand", 10..43, sideSpace = 2),
+    SUPREME("Supreme", 9..44),
+    TRANSCENDENT("Transcendent", 9..44),
+    METAPHYSICAL("Metaphysical", 9..44),
     ;
 
     val slotRange = overInclusiveSlotRange.filter {
