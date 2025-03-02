@@ -8,9 +8,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.Mod.EventHandler
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,7 +32,11 @@ object ProfitPerDragon {
 
                 ChatUtils.chat("Found loot: $entityName, ${entity.uniqueID}, $internalNameFromEntityName")
 
-                DragonProfitTracker.addDragonLoot(DragonProfitTracker.lastDragonKill ?: DragonType.UNKNOWN, internalNameFromEntityName, amount)
+                DragonProfitTracker.addDragonLoot(
+                    DragonProfitTracker.lastDragonKill ?: DragonType.UNKNOWN,
+                    internalNameFromEntityName,
+                    amount
+                )
 
                 scannedLootUUIDs.add(entity.uniqueID)
             }

@@ -6,14 +6,11 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -30,8 +27,6 @@ object DragonProfitTracker {
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
 
     var dragonType: String? = null
-
-    private var lootDetected = false
 
     private val tracker = SkyHanniBucketedItemTracker(
         "Dragon Profit Tracker",
@@ -125,6 +120,6 @@ object DragonProfitTracker {
         tracker.addItem(type, item, amount)
     }
 
-    fun isEnabled() = true
-        //LorenzUtils.inSkyBlock && config.enabled && DragonFightAPI.inNestArea()
+    fun isEnabled() =
+        LorenzUtils.inSkyBlock && config.enabled && DragonFightAPI.inNestArea()
 }

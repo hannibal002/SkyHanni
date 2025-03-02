@@ -211,6 +211,7 @@ object DragonFeatures {
             yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
             ) + if (zealots > 100) 100 else zealots
 
+    @Suppress("CyclomaticComplexMethod")
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!enable()) return
@@ -224,6 +225,7 @@ object DragonFeatures {
             if (config.superiorNotify && this.group("Dragon") == "Superior") {
                 LorenzUtils.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
             }
+
             DragonProfitTracker.addEyes(yourEyes)
             return
         }

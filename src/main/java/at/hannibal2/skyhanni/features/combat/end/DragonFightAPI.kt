@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -21,42 +20,8 @@ object DragonFightAPI {
     var currentType: String? = null
     var currentHp: Int? = null
     private var yourDamage: Int? = null
-    var yourEyesPlaced: Int = 0
 
     private val group = RepoPattern.group("combat.end-dragon-fight")
-
-    /**
-     * REGEX-TEST: ☬ You placed a Summoning Eye! (1/8)
-     * REGEX-TEST: §r§5☬ §r§dYou placed a Summoning Eye! §r§7(§r§e1§r§7/§r§a8§r§7)§r
-     */
-    private val chatEyePlacedPattern by group.pattern(
-        "chat.eye-placed",
-        "§r§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e(?<placed>.*)§r§7/§r§a8§r§7\\)§r",
-    )
-
-    /**
-     * §r§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7(§r§a8§r§7/§r§a8§r§7)§r
-     */
-    private val chatEyePlacedFinalPattern by group.pattern(
-        "chat.eye-placed-final",
-        "§r§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7/§r§a8§r§7\\)§r",
-    )
-
-    /**
-     * REGEX-TEST: §r§5You recovered a Summoning Eye!§r
-     */
-    private val chatEyeRecoveredPattern by group.pattern(
-        "chat.eye-recovered",
-        "§r§5You recovered a Summoning Eye!§r"
-    )
-
-    /**
-     * REGEX-TEST: §r§5Your Sleeping Eyes have been awoken by the magic of the Dragon. They are now Remnants of the Eye!§r
-     */
-    private val chatEyeAwokenPattern by group.pattern(
-        "chat.eye-awoken",
-        "Your Sleeping Eyes have been awoken by the magic of the Dragon. They are now Remnants of the Eye!",
-    )
 
     /**
      * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lOld Dragon§r§d§l has spawned!§r
@@ -67,7 +32,6 @@ object DragonFightAPI {
     )
 
     /**
-     * REGEX-TEST:                           YOUNG DRAGON DOWN!
      * REGEX-TEST: §r§f                           §r§6§lOLD DRAGON DOWN!§r
      */
     private val chatDeath by group.pattern(
@@ -99,7 +63,6 @@ object DragonFightAPI {
     fun onChat(event: SystemMessageEvent) {
         chatSpawnPattern.matchMatcher(event.message.removeColor()) {
             currentType = group("type")
-            DragonProfitTracker.BucketData().eyesPlaced += yourEyesPlaced
         }
         chatDeath.matchMatcher(event.message.removeColor()) {
             reset()
@@ -110,7 +73,6 @@ object DragonFightAPI {
         currentType = null
         currentHp = null
         yourDamage = null
-        yourEyesPlaced = 0
     }
 
     @HandleEvent
