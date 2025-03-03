@@ -146,7 +146,7 @@ object DragonFeatures {
     private var currentTopDamage = 0.0
     private var currentPlace: Int? = null
     private var widgetActive = false
-    private var egg = true
+    var egg = true
     private var currentDragonType: DragonType? = null
 
     private fun resetEnd() {

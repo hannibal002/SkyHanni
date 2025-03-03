@@ -7,9 +7,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -27,6 +30,7 @@ object DragonProfitTracker {
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
 
     var dragonType: String? = null
+    var lastPlaced: Int = 0
 
     private val tracker = SkyHanniBucketedItemTracker(
         "Dragon Profit Tracker",
@@ -109,6 +113,7 @@ object DragonProfitTracker {
 
     fun addEyes(amount: Int) {
         tracker.modify { it.eyesPlaced += amount }
+        lastPlaced = amount
     }
 
     fun addDragonKill(type: DragonType) {
@@ -118,6 +123,37 @@ object DragonProfitTracker {
 
     fun addDragonLoot(type: DragonType, item: NeuInternalName, amount: Int) {
         tracker.addItem(type, item, amount)
+    }
+
+    fun addDragonLootFromList(type: DragonType, items: List<Pair<NeuInternalName, Int>>) {
+        items.forEach { (item, amount) -> addDragonLoot(type, item, amount) }
+
+        val lootMap = mutableMapOf<String, Double>()
+        var totalProfit = 0.0
+        items.forEach { (internalName, amount) ->
+            internalName.getPrice().takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
+                val profit: Double = amount * pricePer
+                val nameFormat = internalName.itemName
+                val text = "§eFound $nameFormat §8${amount}x §7(§6$profit§7)"
+                lootMap.addOrPut(text, profit)
+                totalProfit += profit
+            }
+        }
+
+        val eyePrice = NeuInternalName.fromItemNameOrNull("Summoning Eye")?.getPrice()
+        if (eyePrice != null) {
+            totalProfit -= eyePrice * lastPlaced
+        }
+
+        val hover = lootMap.sortedDesc().keys.toMutableList()
+
+        val profitPrefix = if (totalProfit < 0) "§c" else "§6"
+        val totalMessage = "Profit for Dragon§e: $profitPrefix${totalProfit.shortFormat()}"
+
+        hover.add("§cUsed §5Summoning Eye§7: §c-${eyePrice?.times(lastPlaced)?.shortFormat()}")
+        hover.add("§e$totalMessage")
+
+        ChatUtils.hoverableChat(totalMessage, hover)
     }
 
     fun isEnabled() =
