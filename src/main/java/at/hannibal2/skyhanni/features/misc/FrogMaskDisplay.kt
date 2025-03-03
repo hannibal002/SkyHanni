@@ -32,12 +32,19 @@ object FrogMaskDisplay {
     private val config get() = SkyHanniMod.feature.misc
     private var display: Renderable? = null
     private val patternGroup = RepoPattern.group("misc.frogmask")
-    private val activeRegionPattern by patternGroup.pattern("description.active", "§7Today's region: (?<region>.+)")
 
     private val frogMask by lazy { internalMaskName.getItemStack() }
     private val internalMaskName = "FROG_MASK".toInternalName()
 
     private var playerInventory: List<ItemStack> = listOf()
+
+    /**
+     * REGEX-TEST: §7Today's region: §aDark Thicket
+     */
+    private val activeRegionPattern by patternGroup.pattern(
+        "description.active",
+        "§7Today's region: (?<region>.+)",
+    )
 
     private fun isEnabled(): Boolean = when (config.frogMaskDisplay) {
         FrogMaskCondition.DISABLED -> false
