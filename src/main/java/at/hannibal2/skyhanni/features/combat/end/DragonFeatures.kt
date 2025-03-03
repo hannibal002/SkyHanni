@@ -171,20 +171,7 @@ object DragonFeatures {
 
     private fun enableDisplay() = enable() && config.display
 
-    private fun dragonWeightMap(place: Int) = when (place) {
-        -1 -> 10
-        1 -> 300
-        2 -> 250
-        3 -> 200
-        4 -> 125
-        5 -> 110
-        6, 7, 8 -> 100
-        9, 10 -> 90
-        11, 12 -> 80
-        else -> 70
-    }
-
-    private fun protectorWeightMap(place: Int) = when (place) {
+    private fun weightMap(place: Int) = when(place) {
         -1 -> 10
         1 -> 200
         2 -> 175
@@ -198,14 +185,14 @@ object DragonFeatures {
     }
 
     private fun calculateDragonWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double) =
-        dragonWeightMap(
+        weightMap(
             if (yourDamage == 0.0) -1 else place,
         ) + 100 * (
             eyes + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
             )
 
     private fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double) =
-        protectorWeightMap(
+        weightMap(
             if (yourDamage == 0.0) -1 else place,
         ) + 50 * (
             yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
