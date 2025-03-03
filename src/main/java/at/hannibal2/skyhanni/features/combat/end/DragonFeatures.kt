@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object DragonFeatures {
 
-    private val config get() = SkyHanniMod.feature.combat.dragon
+    private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
     private val configProtector get() = SkyHanniMod.feature.combat.endstoneProtectorChat
 
     private val dragonNames = listOf("Protector", "Old", "Wise", "Unstable", "Young", "Strong", "Superior")
