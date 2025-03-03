@@ -171,7 +171,7 @@ object DragonFeatures {
 
     private fun enableDisplay() = enable() && config.display
 
-    private fun weightMap(place: Int) = when(place) {
+    private fun weightMap(place: Int) = when (place) {
         -1 -> 10
         1 -> 200
         2 -> 175
