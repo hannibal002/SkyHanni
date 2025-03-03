@@ -7,17 +7,17 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.item.EntityArmorStand
 import java.util.UUID
+import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ProfitPerDragon {
     private val scannedLootUUIDs = mutableSetOf<UUID>()
     private val dragonLoot = mutableMapOf<NeuInternalName, Int>()
-
-    private var scannedForLoot: Int = 0
 
     private fun scanForLoot() {
         val entities = EntityUtils.getEntities<EntityArmorStand>()
@@ -33,7 +33,7 @@ object ProfitPerDragon {
             val amount: Int = entityName.split("§8x").last().toIntOrNull() ?: 1
             val internalNameFromEntityName = NeuInternalName.fromItemNameOrNull(entityName)
 
-            if (internalNameFromEntityName in DragonProfitTracker.allowedItems) {
+            if (internalNameFromEntityName in DragonProfitTracker.allowedItems.keys) {
                 if (internalNameFromEntityName == null) {
                     ChatUtils.debug("Could not find internal name for entity name: $entityName")
                     return@forEach
@@ -49,15 +49,39 @@ object ProfitPerDragon {
                 dragonLoot.addOrPut(internalNameFromEntityName, amount)
 
                 scannedLootUUIDs.add(entity.uniqueID)
-                scannedForLoot += 1
             }
         }
 
         // Time for all armor stands to spawn
-        if (dragonLoot.isNotEmpty() && scannedForLoot >= 4) {
-            DragonProfitTracker.addDragonLootFromList(DragonProfitTracker.lastDragonKill ?: DragonType.UNKNOWN, dragonLoot.toList())
+        if (dragonLoot.isNotEmpty()) {
+            var weight = DragonFeatures.weight
+            ChatUtils.debug("Weight: $weight")
 
-            scannedForLoot = 0
+            weight -= DragonProfitTracker.allowedItems[dragonLoot.keys.first()] ?: 0
+            ChatUtils.debug("Weight: $weight after main drop")
+
+            val dragType = DragonProfitTracker.lastDragonKill ?: DragonType.UNKNOWN
+
+            val fragAmount = floor(weight / 22)
+            weight -= fragAmount * 22
+            ChatUtils.debug("Weight: $weight after frags")
+
+            dragonLoot.addOrPut("${dragType}_FRAGMENT".toInternalName(), fragAmount.toInt())
+
+            val enchantedEnderPearlAmount = floor(weight / 15)
+            weight -= enchantedEnderPearlAmount * 15
+            ChatUtils.debug("Weight: $weight after enchanted ender pearls")
+
+            dragonLoot.addOrPut("ENCHANTED_ENDER_PEARL".toInternalName(), enchantedEnderPearlAmount.toInt())
+
+            val enderPearlAmount = floor(weight / 5)
+            weight -= enderPearlAmount * 5
+            ChatUtils.debug("Weight: $weight after ender pearls")
+
+            dragonLoot.addOrPut("ENDER_PEARL".toInternalName(), enderPearlAmount.toInt())
+
+            DragonProfitTracker.addDragonLootFromList(dragType, dragonLoot.toList())
+
             dragonLoot.clear()
         }
     }
@@ -65,7 +89,6 @@ object ProfitPerDragon {
     fun reset() {
         scannedLootUUIDs.clear()
         dragonLoot.clear()
-        scannedForLoot = 0
     }
 
     private var lastScanned = SimpleTimeMark.farPast()

@@ -147,6 +147,7 @@ object DragonFeatures {
     private var currentPlace: Int? = null
     private var widgetActive = false
     var egg = true
+    var weight = 0.0
     private var currentDragonType: DragonType? = null
 
     private fun resetEnd() {
@@ -256,7 +257,7 @@ object DragonFeatures {
                     endDamage = this.group("Damage").replace(",", "").toDouble()
                     when (endType) {
                         Type.DRAGON -> {
-                            val weight = calculateDragonWeight(
+                            weight = calculateDragonWeight(
                                 yourEyes, endPlace, endTopDamage, endDamage,
                             )
 

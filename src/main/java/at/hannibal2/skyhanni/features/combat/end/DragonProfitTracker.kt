@@ -92,7 +92,7 @@ object DragonProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    var allowedItems = emptyList<NeuInternalName>()
+    var allowedItems = emptyMap<NeuInternalName, Int>()
     var lastDragonKill: DragonType? = null
 
     @HandleEvent
