@@ -13,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
@@ -247,11 +248,30 @@ public class MiscConfig {
     @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
 
+
     @Expose
-    @ConfigOption(name = "Frog Mask Display", desc = "Displays information about the §5Frog Mask§7.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean frogMaskDisplay = false;
+    @ConfigOption(name = "Frog Mask Display", desc = "Displays information about the active §5Frog Mask§7 region.")
+    @ConfigEditorDropdown
+    public FrogMaskCondition frogMaskDisplay = FrogMaskCondition.DISABLED;
+
+    public enum FrogMaskCondition {
+        DISABLED("Off"),
+        INVENTORY("In Inventory"),
+        PARK("In The Park"),
+        WORN("While Worn"),
+        WORN_IN_PARK("While Worn in The Park")
+        ;
+        private final String displayName;
+
+        FrogMaskCondition(String name) {
+            this.displayName = name;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
 
     @Expose
     @ConfigLink(owner = MiscConfig.class, field = "frogMaskDisplay")
