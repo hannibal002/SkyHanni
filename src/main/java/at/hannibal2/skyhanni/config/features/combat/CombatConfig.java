@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.combat.broodmother.BroodmotherConfig;
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig;
+import at.hannibal2.skyhanni.config.features.combat.end.DragonConfig;
 import at.hannibal2.skyhanni.config.features.combat.end.EndIslandConfig;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostProfitTrackerConfig;
 import com.google.gson.annotations.Expose;
@@ -66,12 +67,7 @@ public class CombatConfig {
     @ConfigOption(name = "Flare", desc = "")
     @Accordion
     public FlareConfig flare = new FlareConfig();
-
-    @Expose
-    @ConfigOption(name = "Dragon Features", desc = "")
-    @Accordion
-    public DragonConfig dragon = new DragonConfig();
-
+    
     @Expose
     @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after the it died.")
     @ConfigEditorBoolean
