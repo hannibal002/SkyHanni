@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat.end
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -43,7 +44,7 @@ object DragonProfitTracker {
         override fun getCoinName(bucket: DragonType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: DragonType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
-        override fun DragonType.isBucketSelectable(): Boolean = true
+        override fun DragonType.isBucketSelectable(): Boolean = this.selectable
 
         override fun resetItems() {
             dragonKills.clear()
@@ -59,7 +60,13 @@ object DragonProfitTracker {
             )
         }
 
-        fun getTotalDragonCount(): Long = selectedBucket?.let { dragonKills[it] } ?: dragonKills.values.sum()
+        fun getTotalDragonCount(): Long {
+            return if (selectedBucket == null || selectedBucket !in DragonType.values()) {
+                dragonKills.values.sum()
+            } else {
+                dragonKills[selectedBucket] ?: 0
+            }
+        }
 
         @Expose
         var dragonKills: MutableMap<DragonType, Long> = EnumMap(DragonType::class.java)
@@ -81,19 +88,28 @@ object DragonProfitTracker {
         if (eyePrice != null) {
             totalEyePrice = eyePrice * bucketData.eyesPlaced
             profit -= totalEyePrice
-            val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §7- §e${totalEyePrice.shortFormat()}"
+            val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §c-${totalEyePrice.shortFormat()}"
             add(
                 Renderable.string(eyeFormat).toSearchable()
             )
         }
 
-        add(tracker.addTotalProfit(profit, bucketData.getTotalDragonCount(), "loot"))
+        val colorCode = bucketData.selectedBucket?.colorCode ?: "§b"
+        val displayName = bucketData.selectedBucket?.displayName ?: "Total Dragon"
+        val killAmount = bucketData.getTotalDragonCount()
+        val dragonString = "$colorCode$displayName §r§bkills: $killAmount"
+        add(
+            Renderable.string(dragonString).toSearchable()
+        )
+
+        add(tracker.addTotalProfit(profit, bucketData.getTotalDragonCount(), "Dragon"))
 
         tracker.addPriceFromButton(this)
     }
 
-    var allowedItems = emptyMap<NeuInternalName, Int>()
+    var allowedItems = emptyMap<NeuInternalName, DragonProfitTrackerItemDataJson>()
     var lastDragonKill: DragonType? = null
+    var lastDragonPlacement: Int? = null
 
     @HandleEvent
     fun onRepoReload(e: RepositoryReloadEvent) {

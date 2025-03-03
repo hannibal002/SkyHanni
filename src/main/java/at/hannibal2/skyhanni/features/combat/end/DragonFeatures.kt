@@ -262,6 +262,7 @@ object DragonFeatures {
                             )
 
                             DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
+                            DragonProfitTracker.lastDragonPlacement = endPlace
 
                             printWeight(weight)
 
