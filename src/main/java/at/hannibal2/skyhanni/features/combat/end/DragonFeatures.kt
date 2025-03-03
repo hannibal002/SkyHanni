@@ -263,17 +263,19 @@ object DragonFeatures {
                                 yourEyes, endPlace, endTopDamage, endDamage,
                             )
 
-                            DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
+                            if (endDamage > 0) {
+                                DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
+                                DragonProfitTracker.addDragonLoot(
+                                    currentDragonType ?: DragonType.UNKNOWN,
+                                    "ESSENCE_DRAGON".toInternalName(),
+                                    if (currentDragonType == DragonType.SUPERIOR) 10 else 5
+                                )
+                            }
+                            
                             DragonProfitTracker.lastDragonPlacement = endPlace
                             ChatUtils.debug(
                                 "Dragon type: $currentDragonType," +
                                     " placement: ${DragonProfitTracker.lastDragonPlacement}"
-                            )
-
-                            DragonProfitTracker.addDragonLoot(
-                                currentDragonType ?: DragonType.UNKNOWN,
-                                "ESSENCE_DRAGON".toInternalName(),
-                                if (currentDragonType == DragonType.SUPERIOR) 10 else 5
                             )
 
                             printWeight(weight)
