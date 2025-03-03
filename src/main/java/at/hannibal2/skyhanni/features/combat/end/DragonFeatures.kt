@@ -272,7 +272,7 @@ object DragonFeatures {
 
                             DragonProfitTracker.addDragonLoot(
                                 currentDragonType ?: DragonType.UNKNOWN,
-                                "DRAGON_ESSENCE".toInternalName(),
+                                "ESSENCE_DRAGON".toInternalName(),
                                 if (currentDragonType == DragonType.SUPERIOR) 10 else 5
                             )
 
