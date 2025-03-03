@@ -33,7 +33,7 @@ object DragonProfitTracker {
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
 
     var dragonType: String? = null
-    var lastPlaced: Int = 0
+    private var lastPlaced: Int = 0
 
     private val tracker = SkyHanniBucketedItemTracker(
         "Dragon Profit Tracker",
@@ -116,13 +116,13 @@ object DragonProfitTracker {
     @HandleEvent
     fun onRepoReload(e: RepositoryReloadEvent) {
         allowedItems = e.getConstant<DragonProfitTrackerItemsJson>("DragonProfitTrackerItems").items
-        println("Allowed items: $allowedItems")
     }
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!config.enabled || event.source != ItemAddManager.Source.COMMAND) return
         with(tracker) { event.addItemFromEvent() }
+        ChatUtils.debug("Added item to tracker: ${event.internalName} (amount: ${event.amount})")
     }
 
     init {
@@ -131,16 +131,19 @@ object DragonProfitTracker {
 
     fun addEyes(amount: Int) {
         tracker.modify { it.eyesPlaced += amount }
+        ChatUtils.debug("Added $amount eyes to tracker")
         lastPlaced = amount
     }
 
     fun addDragonKill(type: DragonType) {
         tracker.modify { it.dragonKills.addOrPut(type, 1) }
         lastDragonKill = type
+        ChatUtils.debug("Added $type to tracker, lastDragonKill: $lastDragonKill")
     }
 
     fun addDragonLoot(type: DragonType, item: NeuInternalName, amount: Int) {
         tracker.addItem(type, item, amount)
+        ChatUtils.debug("Added $item to tracker (amount: $amount, type: $type)")
     }
 
     fun addDragonLootFromList(type: DragonType, items: List<Pair<NeuInternalName, Int>>) {

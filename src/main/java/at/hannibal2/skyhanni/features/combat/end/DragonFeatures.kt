@@ -209,6 +209,7 @@ object DragonFeatures {
             dragonSpawned = true
 
             currentDragonType = DragonType.valueOf(this.group("Dragon").uppercase())
+            ChatUtils.debug("Dragon Type: $currentDragonType")
 
             if (config.superiorNotify && this.group("Dragon") == "Superior") {
                 LorenzUtils.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
@@ -263,6 +264,10 @@ object DragonFeatures {
 
                             DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
                             DragonProfitTracker.lastDragonPlacement = endPlace
+                            ChatUtils.debug(
+                                "Dragon type: $currentDragonType," +
+                                    " placement: ${DragonProfitTracker.lastDragonPlacement}"
+                            )
 
                             printWeight(weight)
 

@@ -40,12 +40,6 @@ object ProfitPerDragon {
                 }
                 if (entity.uniqueID in scannedLootUUIDs) return@forEach
 
-                DragonProfitTracker.addDragonLoot(
-                    DragonProfitTracker.lastDragonKill ?: DragonType.UNKNOWN,
-                    internalNameFromEntityName,
-                    amount
-                )
-
                 ChatUtils.debug("Adding $internalNameFromEntityName x$amount to dragon loot")
 
                 dragonLoot.addOrPut(internalNameFromEntityName, amount)
