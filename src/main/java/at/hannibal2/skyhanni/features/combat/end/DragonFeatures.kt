@@ -271,7 +271,6 @@ object DragonFeatures {
                                     if (currentDragonType == DragonType.SUPERIOR) 10 else 5
                                 )
                             }
-                            
                             DragonProfitTracker.lastDragonPlacement = endPlace
                             ChatUtils.debug(
                                 "Dragon type: $currentDragonType," +
