@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatPercentage
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -267,6 +268,12 @@ object DragonFeatures {
                             ChatUtils.debug(
                                 "Dragon type: $currentDragonType," +
                                     " placement: ${DragonProfitTracker.lastDragonPlacement}"
+                            )
+
+                            DragonProfitTracker.addDragonLoot(
+                                currentDragonType ?: DragonType.UNKNOWN,
+                                "DRAGON_ESSENCE".toInternalName(),
+                                if (currentDragonType == DragonType.SUPERIOR) 10 else 5
                             )
 
                             printWeight(weight)

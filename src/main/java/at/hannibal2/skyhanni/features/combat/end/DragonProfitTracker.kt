@@ -155,7 +155,7 @@ object DragonProfitTracker {
             internalName.getPrice().takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
                 val profit: Double = amount * pricePer
                 val nameFormat = internalName.itemName
-                val text = "§eFound $nameFormat §8${amount}x §7(§6$profit§7)"
+                val text = "§eFound $nameFormat §8${amount}x §7(§6${profit.shortFormat()}§7)"
                 lootMap.addOrPut(text, profit)
                 totalProfit += profit
             }
