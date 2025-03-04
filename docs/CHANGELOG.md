@@ -129,6 +129,8 @@
 + Pest Profit Tracker now tracks the sprays that you use. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2987)
 + Disabled "Block Refusing New Visitors" on Bingo. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3391)
 + Added clickable chat to copy crop milestone overflow level-up message. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3433)
++ Jungle Key is now a trackable Garden Visitor reward. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3500)
+    + You can now block Odawa refusals.
 
 #### Event Improvements
 
@@ -178,6 +180,8 @@
     + This especially improved Diana Warp keybind responsiveness.
 + Separated Enchanted Book Name feature into two. - Empa (https://github.com/hannibal002/SkyHanni/pull/3490)
     + Added separate toggles for editing and sending chat messages.
++ Changed /warp target for City Project Reminder from Hub to Elizabeth. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3513)
++ Faster area detection for City Project Reminder. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3513)
 
 ### Bug Fixes
 
@@ -217,6 +221,7 @@
     + Prevented burrow guesses from being added when the player is within 6 blocks of the guess.
 + Fixed burrows sometimes persisting after being dug. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3480)
 + Fixed incorrect burrow guesses under certain circumstances. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3469)
++ Fixed contribution detection for City Project Reminder not working. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3513)
 
 #### Inventory Bug Fixes
 
@@ -257,6 +262,7 @@
 + Fixed error in UserLuckBreakdown GUI. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3437)
 + Fixed Attribute Shard Names in Chest Storage Value. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/3496)
 + Fixed Experimentation Dry-Streak not incrementing. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3494)
++ Fixed Experiment Tracker not counting completed Superpairs sessions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3506)
 
 #### Custom Scoreboard Bug Fixes
 
@@ -268,6 +274,7 @@
 + Fixed Custom Scoreboard error with the Century Raffle. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3352)
 + Fixed Custom Scoreboard not displaying Mineshaft Room ID. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3425)
 + Fixed Custom Scoreboard issue when the world is laggy. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3493)
++ Fixed Custom Scoreboard error when joining a laggy server or experiencing poor internet connection. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3508)
 
 #### Garden Bug Fixes
 
@@ -293,6 +300,7 @@
 
 + Fixed /shcarry tracker not working when reusing the same customer name. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3221)
 + Fixed Damage Indicator not showing HP and type during Ender Dragon fights. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3376)
++ Fixed Ghost Tracker Kill Combo not saving for combos over 1,000 kills. - jani (https://github.com/hannibal002/SkyHanni/pull/3514)
 
 #### Crimson Isle Bug Fixes
 
@@ -374,6 +382,9 @@
 + Fixed Enchanted Book Drop Message appearing after closing the anvil. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3498)
 + Fixed potential "Bazaar cancel buy order clipboard" error. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3497)
 + Fixed user luck displaying in rare drop messages when disabled. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3487)
++ Fixed bug with last element rendering in scrolling tables (Trackers) within other text. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3501)
++ Fixed Skill ETA reset on display click. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3515)
++ Fixed Wardrobe Keys and Hide Empty Slots option conflict. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3505)
 
 ### Technical Details
 
