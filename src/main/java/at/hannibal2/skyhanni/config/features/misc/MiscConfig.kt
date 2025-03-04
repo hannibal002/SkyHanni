@@ -44,16 +44,16 @@ class MiscConfig {
     @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
     var areaNavigation: AreaNavigationConfig = AreaNavigationConfig()
 
-    @Expose
     // TODO maybe we can migrate this already
+    @Expose
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     var hideArmor2: HideArmorConfig = HideArmorConfig()
 
+    // TODO rename nonGodPotEffect
     @Expose
     @ConfigOption(name = "Non-God Pot Effects", desc = "")
     @Accordion
-    // TODO rename nonGodPotEffect
     var potionEffect: PotionEffectsConfig = PotionEffectsConfig()
 
     @JvmField
@@ -154,6 +154,7 @@ class MiscConfig {
     @FeatureToggle
     var hideExpBottles: Boolean = false
 
+    // TODO rename to hideTemporaryArmorStands
     @Expose
     @ConfigOption(
         name = "Armor Stands",
@@ -161,7 +162,6 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to hideTemporaryArmorStands
     var hideTemporaryArmorstands: Boolean = true
 
     @Expose
@@ -181,6 +181,7 @@ class MiscConfig {
     @ConfigEditorBoolean
     var crashOnDeath: Boolean = false
 
+    // TODO rename to skyblockXPBar
     @Expose
     @ConfigOption(
         name = "SkyBlock XP Bar",
@@ -189,7 +190,6 @@ class MiscConfig {
     @SearchTag("skyblockxp")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to skyblockXPBar
     var skyblockXpBar: Boolean = false
 
     @Expose
