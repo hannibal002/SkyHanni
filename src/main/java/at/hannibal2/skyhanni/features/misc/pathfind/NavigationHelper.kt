@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.GraphUtils
+import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
@@ -34,6 +36,17 @@ object NavigationHelper {
     )
 
     fun onCommand(args: Array<String>) {
+        if (args.size == 3) {
+            args.map { it.toDoubleOrNull() }.takeIfAllNotNull()?.let {
+                val location = it.toLorenzVec()
+                pathFind(location.add(-1, -1, -1), "Custom Goal", condition = { true })
+                with(location) {
+                    ChatUtils.chat("Started Navigating to custom goal at §f$x $y $z", messageId = messageId)
+                }
+                return
+            }
+        }
+
         SkyHanniMod.coroutineScope.launch {
             doCommandAsync(args)
         }
