@@ -999,6 +999,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows what item to purchase with your hard-earned Fishy Treat.
 + Added Gift Profit Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3072)
     + Does NOT auto-track used gifts - see `/shaddusedgifts`.
++ Added precise Diana burrow prediction. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3249)
 
 ### Hoppity and Chocolate Factory
 
