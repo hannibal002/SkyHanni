@@ -25,19 +25,27 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
+import kotlin.time.Duration
 
 @SkyHanniModule
 object FrogMaskDisplay {
     private val config get() = SkyHanniMod.feature.misc
     private var display: Renderable? = null
     private val patternGroup = RepoPattern.group("misc.frogmask")
-    private val activeRegionPattern by patternGroup.pattern("description.active", "§7Today's region: (?<region>.+)")
 
     private val frogMask by lazy { internalMaskName.getItemStack() }
     private val internalMaskName = "FROG_MASK".toInternalName()
 
-    private var playerInventory: List<ItemStack> = listOf()
+    /**
+     * REGEX-TEST: §7Today's region: §aDark Thicket
+     */
+    private val activeRegionPattern by patternGroup.pattern(
+        "description.active",
+        "§7Today's region: (?<region>.+)",
+    )
+
+    private var lastUpdate: SimpleTimeMark? = null
+    private var activeRegion: String = ""
 
     private fun isEnabled(): Boolean = when (config.frogMaskDisplay) {
         FrogMaskCondition.DISABLED -> false
@@ -48,8 +56,6 @@ object FrogMaskDisplay {
         FrogMaskCondition.WORN -> InventoryUtils.getHelmet()?.getInternalName() == internalMaskName
         FrogMaskCondition.WORN_IN_PARK -> InventoryUtils.getHelmet()
             ?.getInternalName() == internalMaskName && IslandType.THE_PARK.isInIsland()
-
-        else -> false
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -65,32 +71,34 @@ object FrogMaskDisplay {
             return
         }
 
-        playerInventory = InventoryUtils.getItemsInOwnInventory()
+        val now = SkyBlockTime.now()
+        if (lastUpdate == null || (lastUpdate?.timeUntil() ?: -Duration.INFINITE) < Duration.ZERO || activeRegion.isEmpty()) {
+            lastUpdate = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
+            val helmet = InventoryUtils.getHelmet()
+            val mask = helmet?.takeIf { it.getInternalNameOrNull() == internalMaskName } ?: InventoryUtils.getItemsInOwnInventory()
+                .find { it.getInternalName() == internalMaskName } ?: return
 
-        val helmet = InventoryUtils.getHelmet()
-        val mask = helmet?.takeIf { it.getInternalNameOrNull() == internalMaskName }
-            ?: playerInventory.find { it.getInternalName() == internalMaskName } ?: return
-
-        val lore = mask.getLore()
-
-        activeRegionPattern.firstMatcher(lore) {
-            val currentRegion = group("region")
-            val now = SkyBlockTime.now()
-            val timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
-            val newDisplay = updateDisplay(currentRegion, timeRemaining)
-
-            if (display != newDisplay) display = newDisplay
+            val lore = mask.getLore()
+            activeRegionPattern.firstMatcher(lore) {
+                activeRegion = group("region")
+            }
         }
+
+        val timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
+        val newDisplay = updateDisplay(timeRemaining)
+
+        if (display != newDisplay) display = newDisplay
     }
 
-    private fun updateDisplay(currentRegion: String, timeRemaining: SimpleTimeMark): Renderable {
+
+    private fun updateDisplay(timeRemaining: SimpleTimeMark): Renderable {
         val until = timeRemaining.timeUntil()
         val timeString = until.format()
 
         return Renderable.horizontalContainer(
             listOf(
                 Renderable.itemStack(frogMask),
-                Renderable.string("§5Frog Mask§6 - $currentRegion §6for §b$timeString"),
+                Renderable.string("§5Frog Mask§6 - $activeRegion §6for §b$timeString"),
             ),
             spacing = 1,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -99,7 +107,7 @@ object FrogMaskDisplay {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(73, "misc.frogmask.frogMaskDisplay") {
+        event.transform(75, "misc.frogmask.frogMaskDisplay") {
             ConfigUtils.migrateBooleanToEnum(it, FrogMaskCondition.DISABLED, FrogMaskCondition.WORN_IN_PARK)
         }
     }
