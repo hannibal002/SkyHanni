@@ -44,9 +44,9 @@ class MiscConfig {
     @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
     var areaNavigation: AreaNavigationConfig = AreaNavigationConfig()
 
+    @Expose // TODO maybe we can migrate this already
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
-    @Expose // TODO maybe we can migrate this already
     var hideArmor2: HideArmorConfig = HideArmorConfig()
 
     @Expose
@@ -60,19 +60,19 @@ class MiscConfig {
     @Accordion
     var particleHiders: ParticleHiderConfig = ParticleHiderConfig()
 
+    @Expose
     @ConfigOption(name = "Trevor The Trapper", desc = "")
     @Accordion
-    @Expose
     var trevorTheTrapper: TrevorTheTrapperConfig = TrevorTheTrapperConfig()
 
+    @Expose
     @ConfigOption(name = "Teleport Pads On Private Island", desc = "")
     @Accordion
-    @Expose
     var teleportPad: TeleportPadConfig = TeleportPadConfig()
 
+    @Expose
     @ConfigOption(name = "Quick Mod Menu Switch", desc = "")
     @Accordion
-    @Expose
     var quickModMenuSwitch: QuickModMenuSwitchConfig = QuickModMenuSwitchConfig()
 
     @Expose
@@ -125,9 +125,9 @@ class MiscConfig {
     @Accordion
     var enchantedClock: EnchantedClockConfig = EnchantedClockConfig()
 
+    @Expose
     @ConfigOption(name = "Century Party Invitation", desc = "Features for the Century Party Invitation")
     @Accordion
-    @Expose
     var centuryPartyInvitation: CenturyPartyInvitationConfig = CenturyPartyInvitationConfig()
 
     @Expose
@@ -430,7 +430,8 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Computer Time Offset Warning",
-        desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" + "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly.",
+        desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" +
+            "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
