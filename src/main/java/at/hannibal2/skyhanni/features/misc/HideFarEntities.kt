@@ -37,6 +37,7 @@ object HideFarEntities {
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         val entity = event.entity
+        // Always show boss bar
         if (entity is EntityWither && entity.entityId < 0) return
         if (entity.entityId in ignored) {
             event.cancel()
