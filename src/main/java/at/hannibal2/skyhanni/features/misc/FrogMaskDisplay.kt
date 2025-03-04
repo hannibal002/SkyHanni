@@ -47,6 +47,14 @@ object FrogMaskDisplay {
     private var lastUpdate: SimpleTimeMark? = null
     private var activeRegion: String = ""
 
+    /**
+     * REGEX-TEST: §7Today's region: §aDark Thicket
+     */
+    private val activeRegionPattern by patternGroup.pattern(
+        "description.active",
+        "§7Today's region: (?<region>.+)",
+    )
+
     private fun isEnabled(): Boolean = when (config.frogMaskDisplay) {
         FrogMaskCondition.DISABLED -> false
         FrogMaskCondition.INVENTORY -> InventoryUtils.isItemInInventory(internalMaskName) || InventoryUtils.getHelmet()
