@@ -219,17 +219,17 @@ object GardenVisitorFeatures {
             list.add(itemStack)
 
             list.add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "$name §ex${amount.addSeparators()}",
-                    onClick = {
-                        if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickAndHover
+                    tips = internalName.createBuyTip(),
+                    onLeftClick = {
+                        if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickable
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
                             internalName.buy(amount)
                         }
                     },
-                    tips = internalName.createBuyTip(),
                 ),
             )
 
