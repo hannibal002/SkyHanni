@@ -51,7 +51,7 @@ object BazaarApi {
 
     var currentlyOpenedProduct: NeuInternalName? = null
     private var lastOpenedProduct: NeuInternalName? = null
-    private var orderOptionProduct: NeuInternalName? = null
+    var orderOptionProduct: NeuInternalName? = null
 
     private val patternGroup = RepoPattern.group("inventory.bazaar")
 
@@ -141,11 +141,14 @@ object BazaarApi {
             } else if (itemName.contains("BUY")) {
                 // pickup items from bazaar order
                 OwnInventoryData.ignoreItem(1.seconds) { it == internalName }
+                // prepare for cancel buy order as well
+                orderOptionProduct = internalName
             }
         }
         if (InventoryUtils.openInventoryName() == "Order options" && itemName == "§cCancel Order") {
             // pickup items from own bazaar order
             OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
+
         }
 
         if (inBazaarInventory) {
