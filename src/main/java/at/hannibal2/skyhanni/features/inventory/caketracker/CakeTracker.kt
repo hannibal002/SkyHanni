@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -33,14 +33,19 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
+import org.lwjgl.input.Keyboard.KEY_DOWN
+import org.lwjgl.input.Keyboard.KEY_LEFT
+import org.lwjgl.input.Keyboard.KEY_RIGHT
+import org.lwjgl.input.Keyboard.KEY_UP
 import java.awt.Color
-import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -114,6 +119,11 @@ object CakeTracker {
     private val storage get() = ProfileStorageData.profileSpecific?.cakeData
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
     private val maxTrackerHeight: Float get() = config.maxHeight.get()
+    private val cakeScrollValue = ScrollValue().apply { init(0.0) }
+    private val cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
+    private val searchOverrideCache: TimeLimitedCache<Pair<Int, Int>, Int> = TimeLimitedCache(5.minutes)
+    private val unobtainedHighlightColor: Color get() = config.unobtainedAuctionHighlightColor.toSpecialColor()
+    private val obtainedHighlightColor: Color get() = config.obtainedAuctionHighlightColor.toSpecialColor()
 
     private var currentYear = 0
     private var inCakeInventory = false
@@ -122,13 +132,14 @@ object CakeTracker {
     private var slotHighlightCache = mapOf<Int, Color>()
     private var searchingForCakes = false
     private var knownCakesInCurrentInventory = listOf<Int>()
-    private val cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
-
     private var cakeRenderables = listOf<Renderable>()
     private var lastKnownCakeDataHash = 0
 
-    private val unobtainedHighlightColor: Color get() = config.unobtainedAuctionHighlightColor.toSpecialColor()
-    private val obtainedHighlightColor: Color get() = config.obtainedAuctionHighlightColor.toSpecialColor()
+    private fun invalidateCakeCache() {
+        lastKnownCakeDataHash = 0
+    }
+
+    private fun getSelectedCake(start: Int, end: Int) = if (start == end) start else searchOverrideCache[start to end]
 
     private fun addCake(cakeYear: Int) {
         val storage = storage ?: return
@@ -141,8 +152,6 @@ object CakeTracker {
         val changed = storage.ownedCakes.remove(cakeYear)
         if (changed) recalculateMissingCakes()
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -158,9 +167,9 @@ object CakeTracker {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         cakePurchasedPattern.matchMatcher(event.message) {
             val year = group("year").formatInt()
             addCake(year)
@@ -172,24 +181,27 @@ object CakeTracker {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.maxHeight) {
-            lastKnownCakeDataHash = 0
-        }
+        ConditionalUtils.onToggle(
+            config.maxHeight,
+            config.displayType,
+            config.displayOrderType,
+        ) { invalidateCakeCache() }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
+
         val inInvWithCakes = inCakeInventory && knownCakesInCurrentInventory.any()
         val inAuctionWithCakes = inAuctionHouse && (slotHighlightCache.isNotEmpty() || searchingForCakes)
-        if (inInvWithCakes || inAuctionWithCakes) {
-            reRenderDisplay()
-        }
+        if (!inInvWithCakes && !inAuctionWithCakes) return
+
+        reRenderDisplay()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (inCakeInventory) checkInventoryCakes()
         if (!inAuctionHouse) return
 
@@ -200,9 +212,9 @@ object CakeTracker {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         knownCakesInCurrentInventory = listOf()
         checkCakeContainer(event)
         inAuctionHouse = checkAuctionCakes(event)
@@ -250,9 +262,9 @@ object CakeTracker {
         searchingForCakes = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         val sbTimeNow = SkyBlockTime.now()
         if (currentYear == sbTimeNow.year) return
         if (sbTimeNow.month == 12 && sbTimeNow.day >= 29) {
@@ -297,27 +309,67 @@ object CakeTracker {
     }
 
     private data class CakeRange(var start: Int, var end: Int = 0) {
-        val isSingular = (start == end || end == 0)
+        // When end is 0 or equal to start, we consider the range singular.
+        private val isSingular = (start == end || end == 0)
 
-        fun getRenderable(displayType: DisplayType): Renderable {
-            val colorCode = if (displayType == DisplayType.OWNED_CAKES) "§a" else "§c"
-            val baseRenderable = getHoverable(displayType, colorCode)
-            return if (displayType == DisplayType.MISSING_CAKES && config.priceOnHover) Renderable.link(
-                baseRenderable,
-                { HypixelCommands.auctionSearch("New Year Cake (Year $start)") },
-            ) else baseRenderable
+        // Create the list of valid values in the intended order.
+        // If start < end, it’s an ascending range; otherwise, descending.
+        private val values: List<Int> = if (start < end) (start..end).toList() else (start downTo end).toList()
+
+        var selectedSingular: Int = getSelectedCake(start, end)
+            ?.takeIf { it in values }
+            ?: start
+
+        /**
+         * Changes the currently selected number by a given delta.
+         *
+         * The change moves along the list of valid values (which will be ascending or descending
+         * depending on the input order) and wraps around at the ends.
+         *
+         * @param delta The amount to change by (e.g. +1 for "next", -1 for "previous").
+         */
+        private fun changeSelectedSingular(delta: Int) {
+            // If the range is singular, there's nothing to change.
+            if (isSingular) return
+
+            // Find the current index in the ordered list.
+            val currentIndex = values.indexOf(selectedSingular)
+            // Compute the new index and wrap around (the mod operator might yield negative values,
+            // so we adjust accordingly).
+            val newIndex = ((currentIndex + delta) % values.size + values.size) % values.size
+            selectedSingular = values[newIndex]
+
+            searchOverrideCache[start to end] = selectedSingular
+            invalidateCakeCache()
+            SoundUtils.playClickSound()
         }
 
-        fun getHoverable(displayType: DisplayType, colorCode: String): Renderable {
+        fun getRenderable(displayType: DisplayType): Renderable {
+            val colorCode: String = if (displayType == DisplayType.OWNED_CAKES) "§a" else "§c"
             val displayString =
                 if (isSingular) "§fYear $colorCode$start"
                 else "§fYears $colorCode$start§f-$colorCode$end"
+            var renderable = Renderable.string(displayString)
+            if (displayType == DisplayType.MISSING_CAKES && config.priceOnHover) {
+                renderable = Renderable.clickable(
+                    renderable,
+                    tips = getPriceHoverTooltip(displayType, colorCode),
+                    onAnyClick = mapOf(
+                        KEY_LEFT to { changeSelectedSingular(-1) },
+                        KEY_UP to { changeSelectedSingular(-1) },
+                        KEY_RIGHT to { changeSelectedSingular(1) },
+                        KEY_DOWN to { changeSelectedSingular(1) },
+                        LEFT_MOUSE to { HypixelCommands.auctionSearch("New Year Cake (Year $selectedSingular)") },
+                    ),
+                )
+            }
+            return renderable
+        }
 
-            return if (!config.priceOnHover) Renderable.string(displayString)
-            else Renderable.hoverTips(
-                displayString,
-                getPriceHoverTooltip(displayType, colorCode),
-            )
+        private fun Int.getYearString(colorCode: String): String {
+            val baseString = "${colorCode}Year $this§7: ${getCakePriceString(this)}"
+            val preAmbleString = if (this == selectedSingular && !isSingular) "§e▶ " else "  "
+            return "$preAmbleString$baseString"
         }
 
         fun getPriceHoverTooltip(displayType: DisplayType, colorCode: String): List<String> {
@@ -329,21 +381,56 @@ object CakeTracker {
             } else buildList {
                 val largerNumber = if (start > end) start else end
                 val smallerNumber = if (start < end) start else end
-                val numericalRange = smallerNumber..largerNumber
-                val rangeLength = abs(end - start) + 1
+                val allYears = (smallerNumber..largerNumber).toList()
+                val totalCount = allYears.size
 
-                numericalRange.take(5).forEach { year ->
-                    add("${colorCode}Year $year§7: ${getCakePriceString(year)}")
+                val subList = if (totalCount <= 5) allYears
+                else {
+                    val selectedIndex = allYears.indexOf(selectedSingular)
+                    val windowStart = when {
+                        selectedIndex < 2 -> 0
+                        selectedIndex > totalCount - 3 -> totalCount - 5
+                        else -> selectedIndex - 2
+                    }
+                    allYears.subList(windowStart, windowStart + 5)
                 }
-                if (rangeLength >= 5) add("§7§o... and ${rangeLength - 5} more")
+
+                val isWindowLow = subList.first() != allYears.first()
+                val isWindowHigh = subList.last() != allYears.last()
+
+                if (isWindowLow) add("  §7§oMore above...")
+                subList.forEach { add(it.getYearString(colorCode)) }
+                if (isWindowHigh) add("  §7§oMore below...")
+
+                val anyIndeterminate = subList.any { getCakePrice(it) == 0.0 }
+                val addendum = if (anyIndeterminate) "§7*" else ""
+                val priceSum = allYears.sumOf(::getCakePrice)
+                val totalString = "§aTotal§7: §6${priceSum.addSeparators()}$addendum"
+
                 add("")
-                add("§aTotal§7: §6${numericalRange.sumOf(::getCakePrice).addSeparators()}")
+                if (priceSum != 0.0) add(totalString)
+                else add("§cNo auctions found")
                 if (displayType == DisplayType.MISSING_CAKES) {
-                    add("§eClick to search auction house")
+                    add("§eClick to search auction house!")
+                    add("§8Use arrow keys to change year!")
                 }
             }
         }
     }
+
+    private fun MutableList<Renderable>.addDisplayTypeToggle() = addRenderableButton<CakeTrackerDisplayType>(
+        label = "Display",
+        current = config.displayType.get(),
+        onChange = { config.displayType.set(it) },
+        getName = { it.toString() },
+    )
+
+    private fun MutableList<Renderable>.addOrderTypeToggle() = addRenderableButton<CakeTrackerDisplayOrderType>(
+        label = "Order",
+        current = config.displayOrderType.get(),
+        onChange = { config.displayOrderType.set(it) },
+        getName = { it.toString() },
+    )
 
     private fun drawDisplay(data: CakeData): List<Renderable> = buildList {
         val dataHash = data.hashCode()
@@ -372,48 +459,36 @@ object CakeTracker {
 
     private fun buildCakeRenderables(data: CakeData) = buildList {
         add(Renderable.hoverTips("§c§lNew §f§lYear §c§lCake §f§lTracker", getHeaderTips(data)))
+        addDisplayTypeToggle()
+        addOrderTypeToggle()
 
-        addRenderableButton<DisplayType>(
-            label = "Show",
-            current = config.displayType,
-            onChange = {
-                config.displayType = it
-                lastKnownCakeDataHash = 0
-            },
-        )
-        addRenderableButton<DisplayOrder>(
-            label = "Order",
-            current = config.displayOrderType,
-            onChange = {
-                config.displayOrderType = it
-                lastKnownCakeDataHash = 0
-            },
-        )
+        val displayType = config.displayType.get() ?: return@buildList
+        val displayOrderType = config.displayOrderType.get() ?: return@buildList
 
-        val cakeList = when (config.displayType) {
+        val cakeList = when (displayType) {
             DisplayType.OWNED_CAKES -> data.ownedCakes
             DisplayType.MISSING_CAKES -> data.missingCakes
-            null -> data.missingCakes
         }
 
         if (cakeList.isEmpty()) {
-            val colorCode = if (config.displayType == DisplayType.OWNED_CAKES) "§c" else "§a"
-            val verbiage = if (config.displayType == DisplayType.OWNED_CAKES) "missing" else "owned"
+            val colorCode = if (displayType == DisplayType.OWNED_CAKES) "§c" else "§a"
+            val verbiage = if (displayType == DisplayType.OWNED_CAKES) "missing" else "owned"
             add(Renderable.string("$colorCode§lAll cakes $verbiage!"))
         } else add(
             Renderable.scrollList(
-                getCakeRanges(cakeList, config.displayOrderType, config.displayType),
+                getCakeRanges(cakeList, displayType, displayOrderType),
                 height = maxTrackerHeight.toInt() + 2, // +2 to account for tips
                 velocity = 20.0,
                 showScrollableTipsInList = true,
+                scrollValue = cakeScrollValue,
             ),
         )
     }
 
     private fun getCakeRanges(
         cakeList: Set<Int>,
-        orderType: DisplayOrder,
         displayType: DisplayType,
+        orderType: DisplayOrder,
     ): List<Renderable> = buildList {
         val sortedCakes = when (orderType) {
             DisplayOrder.OLDEST_FIRST -> cakeList.sorted()

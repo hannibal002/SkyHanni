@@ -51,7 +51,7 @@ object TabListData {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Tab List")
+        event.title("Tab List Debug Cache")
         debugCache?.let {
             event.addData {
                 add("debug active!")
