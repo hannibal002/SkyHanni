@@ -59,7 +59,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 drawString(
                     fontRenderer(),
                     "§e§lNEW TEXT",
-                    0, size * 10, -1,
+                    0, 0, -1,
                 )
                 size += drawMultiLineText(
                     it,
