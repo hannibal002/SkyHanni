@@ -53,6 +53,7 @@ object LorenzUtils {
      */
     val skyBlockIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
 
+    @Deprecated("Scoreboard data is updating delayed while moving", ReplaceWith("IslandAreas.currentAreaName"))
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
     val inKuudraFight get() = inSkyBlock && KuudraApi.inKuudra()
