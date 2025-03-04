@@ -115,7 +115,7 @@ object OwnInventoryData {
     fun onInventoryClose(event: InventoryCloseEvent) {
         val item = Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
-        ignoreItem(500.milliseconds) { it == internalNameOrNull }
+        ignoreItem(500.milliseconds, internalNameOrNull)
     }
 
     @HandleEvent
@@ -134,7 +134,7 @@ object OwnInventoryData {
             if (itemName == "§cCancel Auction") {
                 val item = InventoryUtils.getItemAtSlotIndex(13)
                 val internalName = item?.getInternalNameOrNull() ?: return
-                OwnInventoryData.ignoreItem(5.seconds, { it == internalName })
+                ignoreItem(5.seconds, internalName)
             }
         }
 
@@ -142,14 +142,14 @@ object OwnInventoryData {
         if (inventoryName == "Confirm Purchase" && itemName == "§aConfirm") {
             val item = InventoryUtils.getItemAtSlotIndex(13)
             val internalName = item?.getInternalNameOrNull() ?: return
-            OwnInventoryData.ignoreItem(5.seconds, { it == internalName })
+            ignoreItem(5.seconds, internalName)
         }
 
         // bought item from normal ah
         if (inventoryName == "Auction View" && itemName == "§6Collect Auction") {
             val item = InventoryUtils.getItemAtSlotIndex(13)
             val internalName = item?.getInternalNameOrNull() ?: return
-            OwnInventoryData.ignoreItem(5.seconds, { it == internalName })
+            ignoreItem(5.seconds, internalName)
         }
 
         // collected all items in "own bins"
@@ -157,8 +157,16 @@ object OwnInventoryData {
             for (stack in InventoryUtils.getItemsInOpenChest().map { it.stack }) {
                 if (stack.getLore().any { it == "§7Status: §aSold!" || it == "7Status: §aEnded!" }) {
                     val internalName = stack.getInternalNameOrNull() ?: return
-                    OwnInventoryData.ignoreItem(5.seconds, { it == internalName })
+                    ignoreItem(5.seconds, internalName)
                 }
+            }
+        }
+
+        // items in anvil
+        if (inventoryName == "Anvil") {
+            for (stack in InventoryUtils.getItemsAtSlots(13, 29, 33)) {
+                val internalName = stack.getInternalNameOrNull() ?: continue
+                ignoreItem(5.seconds, internalName)
             }
         }
     }
@@ -169,6 +177,10 @@ object OwnInventoryData {
             val name = group("name")
             ignoreItem(500.milliseconds) { it.itemName.contains(name) }
         }
+    }
+
+    fun ignoreItem(duration: Duration, internalName: NeuInternalName) {
+        ignoreItem(duration) { it == internalName }
     }
 
     fun ignoreItem(duration: Duration, condition: (NeuInternalName) -> Boolean) {
