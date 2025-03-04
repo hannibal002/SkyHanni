@@ -3,8 +3,14 @@ package at.hannibal2.skyhanni.utils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.time.Duration
 
 object LocationUtils {
@@ -176,5 +182,29 @@ object LocationUtils {
             bottomRightBack to topRightBack,
             bottomRightFront to topRightFront,
         )
+    }
+
+    fun computePitchWeight(derivative: LorenzVec) = sqrt(24 * sin(getPitchFromDerivative(derivative) - PI) + 25)
+
+    private fun getPitchFromDerivative(derivative: LorenzVec): Double {
+        val xzLength = sqrt(derivative.x.pow(2) + derivative.z.pow(2))
+        val pitchRadians = -atan2(derivative.y, xzLength)
+        // Solve y = atan2(sin(x) - 0.75, cos(x)) for x from y
+        var guessPitch = pitchRadians
+        var resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
+        var windowMax = PI / 2
+        var windowMin = -PI / 2
+        repeat(100) {
+            if (resultPitch < pitchRadians) {
+                windowMin = guessPitch
+                guessPitch = (windowMin + windowMax) / 2
+            } else {
+                windowMax = guessPitch
+                guessPitch = (windowMin + windowMax) / 2
+            }
+            resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
+            if (resultPitch == pitchRadians) return guessPitch
+        }
+        return guessPitch
     }
 }

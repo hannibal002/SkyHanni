@@ -522,4 +522,6 @@ object IslandGraphs {
 
         return locations.map { GraphNode(index++, it) }
     }
+
+    fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == label
 }
