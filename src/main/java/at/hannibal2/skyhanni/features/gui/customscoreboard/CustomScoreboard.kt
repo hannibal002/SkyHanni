@@ -12,7 +12,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -120,7 +119,7 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 5.seconds)
+        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 7.seconds)
             UnknownLinesHandler.handleUnknownLines()
     }
 
@@ -205,7 +204,7 @@ object CustomScoreboard {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.NONE) updateIslandEntries()
+        updateIslandEntries()
     }
 
     private fun updateIslandEntries() {
@@ -232,7 +231,7 @@ object CustomScoreboard {
                 add("Custom Scoreboard Events:")
                 addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }, currentIslandEvents))
 
-                add("Active Patterns:")
+                add("Active Patterns (${activePatterns.size}):")
                 activePatterns.forEach { add("   $it") }
 
                 allUnknownLines.takeIfNotEmpty()?.let { set ->
