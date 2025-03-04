@@ -138,9 +138,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
-    var showOutsideSB: Property<MutableList<OutsideSBFeature?>?> = Property.of<MutableList<OutsideSBFeature?>?>(
-        ArrayList<OutsideSBFeature?>(),
-    )
+    var showOutsideSB: Property<MutableList<OutsideSBFeature>> = Property.of(mutableListOf())
 
     @Expose
     @ConfigOption(name = "Auto Join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
@@ -369,7 +367,7 @@ class MiscConfig {
     @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals on any item.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var replaceRomanNumerals: Property<Boolean?> = Property.of<Boolean?>(false)
+    var replaceRomanNumerals: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
