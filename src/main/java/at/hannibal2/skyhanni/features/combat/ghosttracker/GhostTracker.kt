@@ -139,10 +139,11 @@ object GhostTracker {
 
     /**
      * REGEX-TEST: §cYour Kill Combo has expired! You reached a 32 Kill Combo!
+     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 1,187 Kill Combo!
      */
     private val killComboEndPattern by patternGroup.pattern(
         "killcombo.end",
-        "§cYour Kill Combo has expired! You reached a (?<kill>\\d+) Kill Combo!",
+        "§cYour Kill Combo has expired! You reached a (?<kill>[\\d,.]+) Kill Combo!",
     )
     private val bagOfCashPattern by patternGroup.pattern(
         "bagofcash",
