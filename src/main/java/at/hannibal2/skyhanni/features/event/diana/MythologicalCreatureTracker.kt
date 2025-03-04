@@ -61,11 +61,13 @@ object MythologicalCreatureTracker {
 
     private val tracker = SkyHanniTracker(
         "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
-        SkyHanniTracker.DisplayMode.MAYOR to {
-            it.diana.mythologicalMobTrackerPerElection.getOrPut(
-                SkyBlockTime.now().getElectionYear(), ::Data,
-            )
-        },
+        extraDisplayModes = mapOf(
+            SkyHanniTracker.DisplayMode.MAYOR to {
+                it.diana.mythologicalMobTrackerPerElection.getOrPut(
+                    SkyBlockTime.now().getElectionYear(), ::Data,
+                )
+            },
+        ),
     ) { drawDisplay(it) }
 
     class Data : TrackerData() {

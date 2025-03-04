@@ -34,11 +34,10 @@ open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
+    private val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     private val drawDisplay: (Data) -> List<Searchable>,
 ) {
 
-    private val extraDisplayModes = extraStorage.toMap()
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
@@ -138,14 +137,14 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    private fun buildSessionResetButton() = Renderable.clickAndHover(
+    private fun buildSessionResetButton() = Renderable.clickable(
         "§cReset session!",
-        listOf(
+        tips = listOf(
             "§cThis will reset your",
             "§ccurrent session of",
             "§c$name",
         ),
-        onClick = {
+        onLeftClick = {
             if (sessionResetTime.passedSince() > 3.seconds) {
                 reset(DisplayMode.SESSION, "Reset this session of $name!")
                 sessionResetTime = SimpleTimeMark.now()

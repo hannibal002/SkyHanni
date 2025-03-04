@@ -257,7 +257,8 @@ object ItemUtils {
 
     }
 
-    fun NBTTagCompound.getSkullTexture(): String = getCompoundTag("Properties").getCompoundList("textures")[0].getString("Value")
+    fun NBTTagCompound.getSkullTexture(): String? =
+        getCompoundTag("Properties").getCompoundList("textures").firstOrNull()?.getString("Value")
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
@@ -533,7 +534,7 @@ object ItemUtils {
         }
 
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
-        if (getInternalName().asString() != "ATTRIBUTE_SHARD") return null
+        if (!(getInternalName().asString().startsWith("ATTRIBUTE_SHARD"))) return null
         val attributes = getAttributes() ?: return null
         return attributes.firstOrNull()
     }
