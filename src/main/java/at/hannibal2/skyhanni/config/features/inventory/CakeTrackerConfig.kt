@@ -19,7 +19,6 @@ class CakeTrackerConfig {
     @FeatureToggle
     var enabled: Boolean = false
 
-    @Expose
     @ConfigOption(
         name = "Note",
         desc = "This feature is not compatible with the NEU Storage Overlay." +
