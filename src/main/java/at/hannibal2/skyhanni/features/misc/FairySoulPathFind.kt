@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -35,18 +37,37 @@ object FairySoulPathFind {
     }
 
     private var missing = setOf<LorenzVec>()
-    private var lastMissing: Int? = null
+    private var lastMissing = 0
     private var found = 0
     private var total = 0
     private var foundButNotClickedSoul: LorenzVec? = null
+    var goodRoute = emptyList<LorenzVec>()
+    var currentIndex = 0
+
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        missing = emptySet()
+        lastMissing = 0
+        found = 0
+        total = 0
+
+        foundButNotClickedSoul = null
+        goodRoute = emptyList()
+        currentIndex = 0
+    }
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        foundButNotClickedSoul?.let {
-            if (it.distanceToPlayer() > 5) {
-                pathTo(it)
-                foundButNotClickedSoul = null
-            }
+        val lastSoul = foundButNotClickedSoul ?: return
+
+        // disabled or last soul found
+        if (lastRender.passedSince() > 300.milliseconds) {
+            foundButNotClickedSoul = null
+        }
+
+        if (lastSoul.distanceToPlayer() > 5) {
+            pathTo(lastSoul)
+            foundButNotClickedSoul = null
         }
     }
 
@@ -105,10 +126,13 @@ object FairySoulPathFind {
     }
 
     private fun tryRunBetter() {
-        if (lastMissing != missing.size) {
-            lastMissing = missing.size
-            testCoolNewPath()
+        if (missing.size > lastMissing) {
+            // when new souls are enabled, e.g. the user runs /neusouls unclear, we want to recalculate
+            testCoolNewPath(forceUpdate = true)
+        } else if (lastMissing > missing.size) {
+            testCoolNewPath(forceUpdate = false)
         }
+        lastMissing = missing.size
     }
 
     // Step 1: Preload the 50×50 Distance Matrix
@@ -200,27 +224,20 @@ object FairySoulPathFind {
         return route
     }
 
-    // TODO cache
-    private fun testCoolNewPath() {
-//         foundButNotClickedSoul?.let {
-//             if (found == total) {
-//                 IslandGraphs.pathFind(
-//                     LocationUtils.playerLocation(),
-//                     "§5NEU Souls $found/$total",
-//                     condition = { true },
-//                 )
-//             }
-//         }
+    private fun testCoolNewPath(forceUpdate: Boolean) {
         foundButNotClickedSoul = null
+        if (goodRoute.isNotEmpty() && !forceUpdate) {
+            currentIndex++
+            pathTo(goodRoute[currentIndex])
+            return
+        }
         val allNodes = IslandGraphs.currentIslandGraph ?: return
 
-        val current = LorenzUtils.skyBlockIsland
         // 1. Retrieve target nodes.
         var targetNodes: List<GraphNode>
         val targetNodesTime = measureTimeMillis {
             targetNodes = getTargetNodes(allNodes)
         }
-        ChatUtils.chat("targetNodes in $current: ${targetNodes.size}")
         println("getTargetNodes took $targetNodesTime ms.")
 
         if (targetNodes.isEmpty()) {
@@ -255,16 +272,27 @@ object FairySoulPathFind {
             adjustedRoute = adjustRouteForCurrentLocation(tspRoute, currentPosition)
         }
         println("adjustRouteForCurrentLocation took $adjustRouteTime ms.")
-        ChatUtils.chat("adjustedRoute in $current: ${adjustedRoute.size}")
 
-        pathTo(adjustedRoute.map { it.position }.first())
+        goodRoute = adjustedRoute.map { it.position }
+        currentIndex = 0
+        if (found == 0) {
+            if (total != goodRoute.size) {
+                ErrorManager.skyHanniError(
+                    "Advanced route planning could not find one path between all goals",
+                    "total" to total,
+                    "goodRoute size" to goodRoute.size,
+                    "island" to LorenzUtils.skyBlockIsland,
+                )
+            }
+        }
+        pathTo(goodRoute.first())
     }
 
     private fun pathTo(loc: LorenzVec) {
-        ChatUtils.chat("pathTo")
+        if (found == total) return
         IslandGraphs.pathFind(
             loc,
-            "§5NEU Souls ${found + 1}/$total",
+            "§5NEU Souls $found/$total",
             LorenzColor.DARK_PURPLE.toColor(),
             onFound = {
                 foundButNotClickedSoul = loc

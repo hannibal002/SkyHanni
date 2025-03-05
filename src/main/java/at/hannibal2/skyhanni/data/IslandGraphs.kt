@@ -207,8 +207,13 @@ object IslandGraphs {
     }
 
     fun setNewGraph(graph: Graph) {
-        reset()
         currentIslandGraph = graph
+        if (currentTarget != null) {
+            DelayedRun.runDelayed(500.milliseconds) {
+                handleTick()
+                checkMoved()
+            }
+        }
 
         // calling various update functions to make swtiching between deep caverns and glacite tunnels bareable
         handleTick()
