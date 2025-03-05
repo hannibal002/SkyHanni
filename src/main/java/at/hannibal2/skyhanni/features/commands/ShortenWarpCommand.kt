@@ -29,7 +29,7 @@ object ShortenWarpCommand {
         if (!message.startsWith("/")) return
 
         val command = message.removePrefix("/")
-        if (command == "barn" && IslandType.GARDEN.isInIsland()) return
+        if (command == "barn" && IslandType.GARDEN.isInIsland() && SkyHanniMod.feature.garden.gardenCommands.warpCommands) return
 
         if (command in warps) {
             event.cancel()
