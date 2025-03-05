@@ -45,6 +45,15 @@ class CrimsonIsleConfig {
     var pabloHelper: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Sirih NPC Helper",
+        desc = "Show a clickable message that grabs sulphur from your sacks."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var sirihHelper: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Volcano Explosivity", desc = "Show a HUD of the current volcano explosivity level.")
     @ConfigEditorBoolean
     var volcanoExplosivity: Boolean = false
