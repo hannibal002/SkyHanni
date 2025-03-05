@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlin.time.Duration.Companion.minutes
 
-// https://wiki.hypixel.net/Pablo
+// https://wiki.hypixel.net/Sirih
 @SkyHanniModule
 object SirihHelper {
 
