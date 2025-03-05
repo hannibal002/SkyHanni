@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -185,11 +186,13 @@ object FairySoulPathFind {
     private fun testCoolNewPath() {
         val allNodes = IslandGraphs.currentIslandGraph ?: return
 
+        val current = LorenzUtils.skyBlockIsland
         // 1. Retrieve target nodes.
         var targetNodes: List<GraphNode>
         val targetNodesTime = measureTimeMillis {
             targetNodes = getTargetNodes(allNodes)
         }
+        ChatUtils.chat("targetNodes in $current: ${targetNodes.size}")
         println("getTargetNodes took $targetNodesTime ms.")
 
         if (targetNodes.isEmpty()) {
@@ -224,6 +227,7 @@ object FairySoulPathFind {
             adjustedRoute = adjustRouteForCurrentLocation(tspRoute, currentPosition)
         }
         println("adjustRouteForCurrentLocation took $adjustRouteTime ms.")
+        ChatUtils.chat("adjustedRoute in $current: ${adjustedRoute.size}")
 
         pathTo(adjustedRoute.map { it.position }, 0)
     }
@@ -238,7 +242,8 @@ object FairySoulPathFind {
         // TODO only start path once the fairy soul is clicked
         IslandGraphs.pathFind(
             lorenzVec,
-            "${index + 1}/$totalSize",
+            "§5NEU Souls ${index + 1}/$totalSize",
+            LorenzColor.DARK_PURPLE.toColor(),
             onFound = {
                 pathTo(adjustedRoute, index + 1)
             },
