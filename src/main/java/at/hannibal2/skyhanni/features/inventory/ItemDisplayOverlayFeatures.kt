@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.ENCHANTING_EXP
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.KUUDRA_KEY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.LARVA_HOOK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.MASTER_SKULL_TIER
@@ -112,15 +111,6 @@ object ItemDisplayOverlayFeatures {
     private val bestiaryStackPattern by patternGroup.pattern(
         "bestiarystack",
         "§7Progress to Tier (?<tier>[\\dIVXC]+): §b[\\d.]+%",
-    )
-
-    /**
-     * REGEX-TEST: 5k Enchanting Exp
-     * REGEX-TEST: 5.5k Enchanting Exp
-     */
-    private val enchantingExpPattern by patternGroup.pattern(
-        "enchantingexp",
-        "(?<exp>.*)k Enchanting Exp",
     )
 
     @HandleEvent
@@ -322,13 +312,6 @@ object ItemDisplayOverlayFeatures {
                 val tier = itemName.split(" ")
 
                 return tier.last().romanToDecimalIfNecessary().toString()
-            }
-        }
-
-        if (ENCHANTING_EXP.isSelected() && chestName.startsWith("Superpairs")) {
-            enchantingExpPattern.matchMatcher(item.cleanName()) {
-                val exp = group("exp").formatLong()
-                return "§b${exp.shortFormat()}"
             }
         }
 

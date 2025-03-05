@@ -376,12 +376,6 @@ public class MiscConfig {
     public boolean maintainGameVolume = false;
 
     @Expose
-    @ConfigOption(name = "NEU Soul Path Find", desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean neuSoulsPathFind = true;
-
-    @Expose
     @ConfigOption(name = "Soul Find Better", desc = "When NEU Fairy Soul Pathfind is enabled, plan one route to catch all missing souls.")
     @ConfigEditorBoolean
     public boolean neuSoulsPathFindBetter = false;

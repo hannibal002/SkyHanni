@@ -167,9 +167,10 @@ object ChocolateFactoryCustomReminder {
         display = mutableListOf<Renderable>().also { list ->
             getTargetDescription()?.let {
                 list.add(
-                    Renderable.clickAndHover(
-                        it, listOf("§eClick to remove the goal!"),
-                        onClick = {
+                    Renderable.clickable(
+                        it,
+                        tips = listOf("§eClick to remove the goal!"),
+                        onLeftClick = {
                             reset()
                         },
                     ),

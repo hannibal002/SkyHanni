@@ -2,19 +2,16 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.ShortenCoins.formatChatCoins
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -46,16 +43,7 @@ object BazaarCancelledBuyOrderClipboard {
         "Order options",
     )
 
-    /**
-     * REGEX-TEST: §a§lBUY §5Giant Killer VII
-     */
-    private val lastItemClickedPattern by patternGroup.pattern(
-        "lastitemclicked",
-        "§a§lBUY (?<name>.*)",
-    )
-
     private var latestAmount: Int? = null
-    private var lastClickedItem: NeuInternalName? = null
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -83,17 +71,6 @@ object BazaarCancelledBuyOrderClipboard {
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!BazaarApi.isBazaarOrderInventory(InventoryUtils.openInventoryName())) return
-        val item = event.slot?.stack ?: return
-
-        val name = lastItemClickedPattern.matchMatcher(item.name) {
-            group("name")
-        } ?: return
-        lastClickedItem = NeuInternalName.fromItemName(name)
-    }
-
-    @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val coins = cancelledMessagePattern.matchMatcher(event.message) {
@@ -102,7 +79,8 @@ object BazaarCancelledBuyOrderClipboard {
 
         val latestAmount = latestAmount ?: return
         event.blockedReason = "bazaar cancelled buy order clipboard"
-        val lastClicked = lastClickedItem ?: error("last clicked bz item is null")
+        val lastClicked = BazaarApi.orderOptionProduct
+            ?: ErrorManager.skyHanniError("Cancel buy order clipboard could not detect the last bazaar product.")
 
         val message = "Bazaar buy order cancelled. Click to re-order.\n" +
             "§e(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e for ${coins.formatChatCoins()} coins§e)"
