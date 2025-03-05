@@ -49,8 +49,6 @@ public class MixinFairySouls {
 
     @Inject(method = "refreshMissingSoulInfo", at = @At(value = "TAIL"))
     public void refreshMissingSoulInfo_skyhanni(CallbackInfo ci) {
-        int found = foundSoulsInLocation.size();
-        int total = allSoulsInCurrentLocation.size();
-        FairySoulPathFind.updateList(closestMissingSouls, found, total, missingSoulsDistanceSqMap);
+        FairySoulPathFind.updateList(allSoulsInCurrentLocation, missingSoulsDistanceSqMap);
     }
 }

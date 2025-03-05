@@ -1,13 +1,17 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -19,6 +23,7 @@ import java.util.TreeMap
 import kotlin.system.measureTimeMillis
 import kotlin.time.Duration.Companion.milliseconds
 
+@SkyHanniModule
 object FairySoulPathFind {
     val config get() = SkyHanniMod.feature.misc
 
@@ -29,46 +34,59 @@ object FairySoulPathFind {
         lastRender = SimpleTimeMark.now()
     }
 
-    var missing = setOf<LorenzVec>()
-    var lastMissing: Int? = null
+    private var missing = setOf<LorenzVec>()
+    private var lastMissing: Int? = null
+    private var found = 0
+    private var total = 0
+    private var foundButNotClickedSoul: LorenzVec? = null
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        foundButNotClickedSoul?.let {
+            if (it.distanceToPlayer() > 5) {
+                pathTo(it)
+                foundButNotClickedSoul = null
+            }
+        }
+    }
 
     @JvmStatic
-    fun updateList(
-        list: MutableList<BlockPos>,
-        found: Int,
-        total: Int,
-        missingSoulsDistanceSqMap: TreeMap<Double, BlockPos>,
-    ) {
-        missing = missingSoulsDistanceSqMap.values.map { it.toLorenzVec() }.toSet()
+    fun updateList(allSouls: List<BlockPos>, missingSouls: TreeMap<Double, BlockPos>) {
         val graph = IslandGraphs.currentIslandGraph ?: return
         if (lastRender.passedSince() > 300.milliseconds) return
         if (!config.neuSoulsPathFind) return
+
+        val missingLocally = mutableMapOf<LorenzVec, GraphNode>()
+        var foundLocally = 0
+        for (pos in allSouls) {
+            val vec = pos.toLorenzVec()
+            val node = graph.minBy { it.position.distance(vec) }
+            val distance = node.position.distance(vec)
+            // we skip some souls that are too far away from the closest node, especially for dwarven mines/glacite tunnels
+            if (distance < 15) {
+                if (pos in missingSouls.values) {
+                    missingLocally[vec] = node
+                } else {
+                    foundLocally++
+                }
+            }
+        }
+        missing = missingLocally.keys.toSet()
+        found = foundLocally
+        total = missing.size + found
+
         if (config.neuSoulsPathFindBetter) {
             tryRunBetter()
             return
         }
 
-        val souls = mutableMapOf<LorenzVec, GraphNode>()
-
-        var skipped = 0
-        for (pos in list) {
-            val vec = pos.toLorenzVec()
-            val node = graph.minBy { it.position.distance(vec) }
-            val distance = node.position.distance(vec)
-            if (distance > 15) {
-                // we skip some souls that are too far away from the closest node, especially for dwarven mines/glacite tunnels
-                skipped++
-            } else {
-                souls[vec] = node
-            }
-        }
         // stopped bc we are done already
-        if (souls.isEmpty()) return
+        if (missing.isEmpty()) return
 
         val playerNode = graph.minBy { it.position.distanceSqToPlayer() }
 
         val distances = mutableMapOf<LorenzVec, Double>()
-        for ((location, node) in souls) {
+        for ((location, node) in missingLocally) {
             val lastDistance = node.position.distance(location)
             val (_, distance) = GraphUtils.findShortestPathAsGraphWithDistance(playerNode, node)
             distances[location] = distance + lastDistance
@@ -184,6 +202,16 @@ object FairySoulPathFind {
 
     // TODO cache
     private fun testCoolNewPath() {
+//         foundButNotClickedSoul?.let {
+//             if (found == total) {
+//                 IslandGraphs.pathFind(
+//                     LocationUtils.playerLocation(),
+//                     "§5NEU Souls $found/$total",
+//                     condition = { true },
+//                 )
+//             }
+//         }
+        foundButNotClickedSoul = null
         val allNodes = IslandGraphs.currentIslandGraph ?: return
 
         val current = LorenzUtils.skyBlockIsland
@@ -229,23 +257,17 @@ object FairySoulPathFind {
         println("adjustRouteForCurrentLocation took $adjustRouteTime ms.")
         ChatUtils.chat("adjustedRoute in $current: ${adjustedRoute.size}")
 
-        pathTo(adjustedRoute.map { it.position }, 0)
+        pathTo(adjustedRoute.map { it.position }.first())
     }
 
-    private fun pathTo(adjustedRoute: List<LorenzVec>, index: Int) {
-        val totalSize = adjustedRoute.size
-        if (index == totalSize) {
-            ChatUtils.chat("done")
-            return
-        }
-        val lorenzVec = adjustedRoute[index]
-        // TODO only start path once the fairy soul is clicked
+    private fun pathTo(loc: LorenzVec) {
+        ChatUtils.chat("pathTo")
         IslandGraphs.pathFind(
-            lorenzVec,
-            "§5NEU Souls ${index + 1}/$totalSize",
+            loc,
+            "§5NEU Souls ${found + 1}/$total",
             LorenzColor.DARK_PURPLE.toColor(),
             onFound = {
-                pathTo(adjustedRoute, index + 1)
+                foundButNotClickedSoul = loc
             },
             condition = { true },
         )
