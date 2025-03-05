@@ -167,8 +167,10 @@ object FairySoulPathFind {
                 // Limit j to a smaller neighborhood.
                 val jMax = (i + neighborhoodSize).coerceAtMost(route.size)
                 for (j in i + 1 until jMax) {
-                    val costCurrent = distanceMap[route[i - 1]]!![route[i]]!! + distanceMap[route[j - 1]]!![route[j]]!!
-                    val costNew = distanceMap[route[i - 1]]!![route[j]]!! + distanceMap[route[j - 1]]!![route[i]]!!
+                    val costCurrent = distanceMap.getValue(route[i - 1]).getValue(route[i]) +
+                        distanceMap.getValue(route[j - 1]).getValue(route[j])
+                    val costNew = distanceMap.getValue(route[i - 1]).getValue(route[j]) +
+                        distanceMap.getValue(route[j - 1]).getValue(route[i])
                     if (costNew < costCurrent) {
                         route.subList(i, j).reverse()
                         improved = true
