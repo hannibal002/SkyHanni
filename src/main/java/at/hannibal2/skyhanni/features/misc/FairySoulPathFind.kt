@@ -235,7 +235,6 @@ object FairySoulPathFind {
         }
         val allNodes = IslandGraphs.currentIslandGraph ?: return
 
-        // 1. Retrieve target nodes.
         var targetNodes: List<GraphNode>
         val targetNodesTime = measureTimeMillis {
             targetNodes = getTargetNodes(allNodes)
@@ -247,47 +246,45 @@ object FairySoulPathFind {
             return
         }
 
-        // 2. Precompute the 50x50 distance map.
+        goodRoute = getRoute(targetNodes)
+        currentIndex = 0
+        if (found == 0 && total != goodRoute.size) {
+            ErrorManager.skyHanniError(
+                "Advanced route planning could not find one path between all goals",
+                "total" to total,
+                "goodRoute size" to goodRoute.size,
+                "island" to LorenzUtils.skyBlockIsland,
+            )
+        }
+        pathTo(goodRoute.first())
+    }
+
+    private fun getRoute(targetNodes: List<GraphNode>): List<LorenzVec> {
         var distanceMap: Map<GraphNode, Map<GraphNode, Double>>
         val distanceMapTime = measureTimeMillis {
             distanceMap = computeDistanceMap(targetNodes)
         }
         println("computeDistanceMap took $distanceMapTime ms.")
 
-        // 3. Run the Greedy TSP algorithm.
         var tspRoute: List<GraphNode>
         val tspRouteTime = measureTimeMillis {
             tspRoute = improvedTSP(distanceMap)
         }
         println("improvedTSP took $tspRouteTime ms.")
 
-        // 4. Retrieve the player's current location.
         var currentPosition: LorenzVec
         val currentPositionTime = measureTimeMillis {
             currentPosition = LocationUtils.playerLocation()
         }
         println("LocationUtils.playerLocation took $currentPositionTime ms.")
 
-        // 5. Adjust the route so that it starts with the node closest to the current position.
         var adjustedRoute: List<GraphNode>
         val adjustRouteTime = measureTimeMillis {
             adjustedRoute = adjustRouteForCurrentLocation(tspRoute, currentPosition)
         }
         println("adjustRouteForCurrentLocation took $adjustRouteTime ms.")
 
-        goodRoute = adjustedRoute.map { it.position }
-        currentIndex = 0
-        if (found == 0) {
-            if (total != goodRoute.size) {
-                ErrorManager.skyHanniError(
-                    "Advanced route planning could not find one path between all goals",
-                    "total" to total,
-                    "goodRoute size" to goodRoute.size,
-                    "island" to LorenzUtils.skyBlockIsland,
-                )
-            }
-        }
-        pathTo(goodRoute.first())
+        return adjustedRoute.map { it.position }
     }
 
     private fun pathTo(loc: LorenzVec) {
