@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -54,8 +55,8 @@ object FrogMaskDisplay {
 
         FrogMaskCondition.PARK -> IslandType.THE_PARK.isInIsland()
         FrogMaskCondition.WORN -> InventoryUtils.getHelmet()?.getInternalName() == internalMaskName
-        FrogMaskCondition.WORN_IN_PARK -> InventoryUtils.getHelmet()
-            ?.getInternalName() == internalMaskName && IslandType.THE_PARK.isInIsland()
+        FrogMaskCondition.WORN_IN_PARK -> IslandType.THE_PARK.isInIsland() && InventoryUtils.getHelmet()
+            ?.getInternalName() == internalMaskName
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -72,7 +73,7 @@ object FrogMaskDisplay {
         }
 
         val now = SkyBlockTime.now()
-        if (lastUpdate == null || (lastUpdate?.timeUntil() ?: -Duration.INFINITE) < Duration.ZERO || activeRegion.isEmpty()) {
+        if (lastUpdate == null || activeRegion.isEmpty() || (lastUpdate?.timeUntil() ?: -Duration.INFINITE) < Duration.ZERO) {
             lastUpdate = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
             val helmet = InventoryUtils.getHelmet()
             val mask = helmet?.takeIf { it.getInternalNameOrNull() == internalMaskName } ?: InventoryUtils.getItemsInOwnInventory()
