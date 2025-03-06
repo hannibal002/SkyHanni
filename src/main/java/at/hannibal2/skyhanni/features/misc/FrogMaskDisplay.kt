@@ -51,7 +51,6 @@ object FrogMaskDisplay {
         FrogMaskCondition.DISABLED -> false
         FrogMaskCondition.INVENTORY -> InventoryUtils.isItemInInventory(internalMaskName) || InventoryUtils.getHelmet()
             ?.getInternalName() == internalMaskName
-
         FrogMaskCondition.PARK -> IslandType.THE_PARK.isInIsland()
         FrogMaskCondition.WORN -> InventoryUtils.getHelmet()?.getInternalName() == internalMaskName
         FrogMaskCondition.WORN_IN_PARK -> IslandType.THE_PARK.isInIsland() && InventoryUtils.getHelmet()
@@ -72,6 +71,7 @@ object FrogMaskDisplay {
         }
 
         val now = SkyBlockTime.now()
+
         if (lastUpdate == null || activeRegion.isEmpty() || (lastUpdate?.timeUntil() ?: -Duration.INFINITE) < Duration.ZERO) {
             lastUpdate = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
             val helmet = InventoryUtils.getHelmet()
