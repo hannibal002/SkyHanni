@@ -26,7 +26,7 @@ object SirihHelper {
 
     private var lastSentMessage = SimpleTimeMark.farPast()
 
-    private val sulphurInternalId = "SULPHUR_ORE".toInternalName()
+    private val SULPHUR_ORE = "SULPHUR_ORE".toInternalName()
 
 
     /**
@@ -43,11 +43,11 @@ object SirihHelper {
         if (lastSentMessage.passedSince() < 1.minutes) return
         if (!sirihLine.matches(event.message)) return
 
-        if (InventoryUtils.countItemsInLowerInventory { it.getInternalNameOrNull() == sulphurInternalId } > 0) return
+        if (InventoryUtils.countItemsInLowerInventory { it.getInternalNameOrNull() == SULPHUR_ORE } > 0) return
 
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(
-                sulphurInternalId.makePrimitiveStack(),
+                SULPHUR_ORE.makePrimitiveStack(),
                 "Click here to grab Sulphur from sacks!",
             )
         }
