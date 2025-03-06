@@ -55,5 +55,5 @@ object SirihHelper {
         lastSentMessage = SimpleTimeMark.now()
     }
 
-    fun isEnabled() = config.sirihHelper && CrimsonIsleReputationHelper.factionType == FactionType.MAGE
+    fun isEnabled() = config.sirihHelper && CrimsonIsleReputationHelper.factionType == FactionType.BARBARIAN
 }
