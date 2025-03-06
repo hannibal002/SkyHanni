@@ -95,7 +95,7 @@ object GardenOptimalSpeed {
                     ),
                     spacing = 2,
                 )
-                Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { LorenzUtils.setTextIntoSign("$speed") })
+                Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })
             }
         } else {
             crops.map { (crop, speed) ->
@@ -107,7 +107,7 @@ object GardenOptimalSpeed {
                     ),
                     spacing = 2,
                 )
-                Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { LorenzUtils.setTextIntoSign("$speed") })
+                Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })
             }
         }
     }
