@@ -82,7 +82,7 @@ object IslandExceptions {
         baseEntity is EntityOtherPlayerMP &&
             baseEntity.isNpc() &&
             (nextEntity is EntityGiantZombie || nextEntity == null) &&
-            baseEntity.name.contains("Livid") -> MobUtils.getClosestArmorStandWithName(baseEntity, 5.0, "﴾ Livid")
+            baseEntity.name.contains("Livid") -> MobUtils.getArmorStand(baseEntity, 10)
             ?.takeIf { getNextEntity(it, -1)?.takeIf { it.name.contains("Livid") } == null }
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
