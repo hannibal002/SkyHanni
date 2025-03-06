@@ -42,7 +42,7 @@ class CrimsonIsleConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var pabloHelper: Boolean = false
+    var pabloHelper: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -51,7 +51,7 @@ class CrimsonIsleConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var sirihHelper: Boolean = false
+    var sirihHelper: Boolean = true
 
     @Expose
     @ConfigOption(name = "Volcano Explosivity", desc = "Show a HUD of the current volcano explosivity level.")
