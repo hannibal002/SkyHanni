@@ -40,7 +40,7 @@ object SirihHelper {
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(
                 sulphurInternalId.makePrimitiveStack(),
-                "Click here to grab an ${sulphurInternalId.itemName.removeColor()} from sacks!",
+                "Click here to grab Sulphur from sacks!",
             )
         }
 
