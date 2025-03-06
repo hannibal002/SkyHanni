@@ -212,8 +212,13 @@ object DungeonLividFinder {
         if (!inLividBossRoom() || !config.enabled.get()) return
         if (isBlind) return
 
+        val colorOverride = config.colorOverride
         val entity = lividEntityOrArmorstand ?: return
-        val lorenzColor = color ?: return
+        val lorenzColor =
+            if (colorOverride != LividColorHighlight.DEFAULT)
+                colorOverride.color ?: return
+            else
+                color ?: return
 
         val location = event.exactLocation(entity)
         val boundingBox = event.exactBoundingBox(entity)
@@ -321,4 +326,27 @@ object DungeonLividFinder {
 //             EnumDyeColor.BROWN
 //             EnumDyeColor.BLACK
         }
+
+    enum class LividColorHighlight(val color: LorenzColor?, val prettyName: String = color?.toString() ?: "Disabled") {
+        DEFAULT(null),
+        BLACK(LorenzColor.BLACK),
+        DARK_BLUE(LorenzColor.DARK_BLUE),
+        DARK_GREEN(LorenzColor.DARK_GREEN),
+        DARK_AQUA(LorenzColor.DARK_AQUA),
+        DARK_RED(LorenzColor.DARK_RED),
+        DARK_PURPLE(LorenzColor.DARK_PURPLE),
+        GOLD(LorenzColor.GOLD),
+        GRAY(LorenzColor.GRAY),
+        DARK_GRAY(LorenzColor.DARK_GRAY),
+        BLUE(LorenzColor.BLUE),
+        GREEN(LorenzColor.GREEN),
+        AQUA(LorenzColor.AQUA),
+        RED(LorenzColor.RED),
+        LIGHT_PURPLE(LorenzColor.LIGHT_PURPLE),
+        YELLOW(LorenzColor.YELLOW),
+        WHITE(LorenzColor.WHITE),
+        ;
+
+        override fun toString() = prettyName
+    }
 }
