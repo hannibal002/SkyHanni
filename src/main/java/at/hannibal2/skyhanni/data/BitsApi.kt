@@ -217,7 +217,7 @@ object BitsApi {
 
             bitsScoreboardPattern.matchMatcher(message) {
                 val amount = group("amount").formatInt()
-                updateBits(amount, cause = "Scoreboard update")
+                updateBits(amount, cause = "Scoreboard update, $message")
             }
         }
     }
