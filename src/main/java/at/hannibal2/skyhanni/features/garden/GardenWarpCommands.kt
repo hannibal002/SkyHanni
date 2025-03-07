@@ -67,6 +67,7 @@ object GardenWarpCommands {
         when (event.keyCode) {
             config.homeHotkey -> {
                 HypixelCommands.warp("garden")
+                lastWarpTime = SimpleTimeMark.now()
             }
 
             config.sethomeHotkey -> {
@@ -76,10 +77,10 @@ object GardenWarpCommands {
             config.barnHotkey -> {
                 LockMouseLook.autoDisable()
                 HypixelCommands.teleportToPlot("barn")
+                lastWarpTime = SimpleTimeMark.now()
             }
 
             else -> return
         }
-        lastWarpTime = SimpleTimeMark.now()
     }
 }
