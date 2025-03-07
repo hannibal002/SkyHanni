@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -31,6 +30,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -46,6 +47,7 @@ object ChestValue {
     private var chestItems = mapOf<String, Item>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
+    private val scrollValue = ScrollValue()
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -145,33 +147,36 @@ object ChestValue {
         else -> chestItems.values.sortedByDescending { it.total }
     }
 
-    // TODO: Avoid Ordinal
     private fun MutableList<Renderable>.addButton() {
-        addButton(
-            prefix = "§7Sorted By: ",
-            getName = SortType.entries[config.sortingType.ordinal].longName,
+        addRenderableButton<SortingTypeEntry>(
+            label = "Price Sorting",
+            current = config.sortingType,
             onChange = {
-                config.sortingType = SortingTypeEntry.entries[(config.sortingType.ordinal + 1) % 2]
+                config.sortingType = it
                 update()
             },
+            scrollValue = scrollValue,
         )
 
-        addButton(
-            prefix = "§7Value format: ",
-            getName = FormatType.entries[config.formatType.ordinal].type,
+        addRenderableButton<NumberFormatEntry>(
+            label = "Value Format",
+            current = config.formatType,
             onChange = {
-                config.formatType = NumberFormatEntry.entries[(config.formatType.ordinal + 1) % 2]
+                config.formatType = it
                 update()
             },
+            scrollValue = scrollValue,
         )
 
-        addButton(
-            prefix = "§7Display Type: ",
-            getName = DisplayType.entries[if (config.alignedDisplay) 1 else 0].type,
+        addRenderableButton(
+            label = "Display Type",
+            config = config::alignedDisplay,
+            enabled = "Aligned",
+            disabled = "Normal",
             onChange = {
-                config.alignedDisplay = !config.alignedDisplay
                 update()
             },
+            scrollValue = scrollValue,
         )
     }
 
@@ -221,21 +226,6 @@ object ChestValue {
         }
     }
 
-    enum class SortType(val shortName: String, val longName: String) {
-        PRICE_DESC("Price D", "Price Descending"),
-        PRICE_ASC("Price A", "Price Ascending"),
-    }
-
-    enum class FormatType(val type: String) {
-        SHORT("Formatted"),
-        LONG("Unformatted"),
-    }
-
-    enum class DisplayType(val type: String) {
-        NORMAL("Normal"),
-        COMPACT("Aligned")
-    }
-
     private fun isValidStorage(): Boolean {
         if (inOwnInventory) return true
         val name = InventoryUtils.openInventoryName().removeColor()
@@ -253,8 +243,7 @@ object ChestValue {
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         // TODO: Use repo for this
-        return name == "Chest" || name == "Large Chest" || inMinion ||
-            name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
+        return InventoryUtils.isInNormalChest() || inMinion || name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {

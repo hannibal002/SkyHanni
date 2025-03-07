@@ -3,8 +3,15 @@ package at.hannibal2.skyhanni.utils
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
+import kotlin.time.Duration
 
 object LocationUtils {
 
@@ -129,5 +136,75 @@ object LocationUtils {
             yaw < 315 -> LorenzVec(-1, 0, 0)
             else -> LorenzVec(0, 0, -1)
         }
+    }
+
+    fun interpolateOverTime(
+        startTime: SimpleTimeMark,
+        maxTime: Duration,
+        from: LorenzVec,
+        to: LorenzVec,
+    ): LorenzVec {
+        if (startTime == SimpleTimeMark.farPast()) return from
+        val now = SimpleTimeMark.now()
+
+        val diff = now - startTime
+        val location = if (diff < maxTime) {
+            val percentage = diff / maxTime
+            from.interpolate(to, percentage)
+        } else to
+        return location
+    }
+
+    fun AxisAlignedBB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
+        val bottomLeftFront = LorenzVec(minX, minY, minZ)
+        val bottomLeftBack = LorenzVec(minX, minY, maxZ)
+        val topLeftFront = LorenzVec(minX, maxY, minZ)
+        val topLeftBack = LorenzVec(minX, maxY, maxZ)
+        val bottomRightFront = LorenzVec(maxX, minY, minZ)
+        val bottomRightBack = LorenzVec(maxX, minY, maxZ)
+        val topRightFront = LorenzVec(maxX, maxY, minZ)
+        val topRightBack = LorenzVec(maxX, maxY, maxZ)
+
+        return setOf(
+            // Bottom face
+            bottomLeftFront to bottomLeftBack,
+            bottomLeftBack to bottomRightBack,
+            bottomRightBack to bottomRightFront,
+            bottomRightFront to bottomLeftFront,
+            // Top face
+            topLeftFront to topLeftBack,
+            topLeftBack to topRightBack,
+            topRightBack to topRightFront,
+            topRightFront to topLeftFront,
+            // Vertical edges
+            bottomLeftFront to topLeftFront,
+            bottomLeftBack to topLeftBack,
+            bottomRightBack to topRightBack,
+            bottomRightFront to topRightFront,
+        )
+    }
+
+    fun computePitchWeight(derivative: LorenzVec) = sqrt(24 * sin(getPitchFromDerivative(derivative) - PI) + 25)
+
+    private fun getPitchFromDerivative(derivative: LorenzVec): Double {
+        val xzLength = sqrt(derivative.x.pow(2) + derivative.z.pow(2))
+        val pitchRadians = -atan2(derivative.y, xzLength)
+        // Solve y = atan2(sin(x) - 0.75, cos(x)) for x from y
+        var guessPitch = pitchRadians
+        var resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
+        var windowMax = PI / 2
+        var windowMin = -PI / 2
+        repeat(100) {
+            if (resultPitch < pitchRadians) {
+                windowMin = guessPitch
+                guessPitch = (windowMin + windowMax) / 2
+            } else {
+                windowMax = guessPitch
+                guessPitch = (windowMin + windowMax) / 2
+            }
+            resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
+            if (resultPitch == pitchRadians) return guessPitch
+        }
+        return guessPitch
     }
 }

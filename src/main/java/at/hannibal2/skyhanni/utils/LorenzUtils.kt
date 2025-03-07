@@ -53,6 +53,7 @@ object LorenzUtils {
      */
     val skyBlockIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
 
+    @Deprecated("Scoreboard data is updating delayed while moving", ReplaceWith("IslandAreas.currentAreaName"))
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
     val inKuudraFight get() = inSkyBlock && KuudraApi.inKuudra()
@@ -189,7 +190,7 @@ object LorenzUtils {
         }
     }
 
-    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
+    @Deprecated("Use List<Renderable>.addButton() instead", ReplaceWith(""))
     inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
         prefix: String,
         getName: (T) -> String,
@@ -199,7 +200,7 @@ object LorenzUtils {
         add(buildSelector<T>(prefix, getName, isCurrent, onChange))
     }
 
-    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
+    @Deprecated("do not use", ReplaceWith(""))
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,

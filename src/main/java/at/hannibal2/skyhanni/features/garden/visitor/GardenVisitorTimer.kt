@@ -179,10 +179,10 @@ object GardenVisitorTimer {
         display = createDisplayText("§b$visitorsAmount $visitorLabel §7($next§7)")
     }
 
-    private fun createDisplayText(text: String) = Renderable.clickAndHover(
+    private fun createDisplayText(text: String) = Renderable.clickable(
         text,
-        listOf("§eClick to teleport to the barn!"),
-        onClick = { HypixelCommands.teleportToPlot("barn") },
+        tips = listOf("§eClick to teleport to the barn!"),
+        onLeftClick = { HypixelCommands.teleportToPlot("barn") },
     )
 
     init {
