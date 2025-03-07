@@ -61,6 +61,6 @@ object OdgerTotalCaught {
 
         val totalFishCaught = TrophyFishManager.fish?.get(trophyFishKey)?.values?.sum() ?: return
 
-        event.toolTip[0] = "${event.toolTip[0]} §7($totalFishCaught)"
+        event.toolTip[0] += " §7($totalFishCaught)"
     }
 }
