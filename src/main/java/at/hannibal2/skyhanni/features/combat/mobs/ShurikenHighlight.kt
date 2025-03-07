@@ -15,8 +15,8 @@ object ShurikenHighlight {
     fun onMobHurt(event: MobEvent.Hurt.SkyblockMob) {
         if (!config.shurikenHighlight) return
         DelayedRun.runNextTick { // mob.shurikenUsed isn't updated yet, so wait a tick before checking
-            if (config.shurikenHighlight && event.mob.shurikenUsed) {
-                event.mob.highlight(config.shurikenHighlightColour.toSpecialColor())
+            if (event.mob.shurikenUsed) {
+                event.mob.highlight(config.shurikenHighlightColour.toSpecialColor()) { config.shurikenHighlight }
             }
         }
     }
