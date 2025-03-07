@@ -62,12 +62,12 @@ object GardenWarpCommands {
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NeuItems.neuHasFocus()) return
 
-        if (lastWarpTime.passedSince() < 2.seconds) return
-
         when (event.keyCode) {
             config.homeHotkey -> {
-                HypixelCommands.warp("garden")
+                if (lastWarpTime.passedSince() < 2.seconds) return
                 lastWarpTime = SimpleTimeMark.now()
+
+                HypixelCommands.warp("garden")
             }
 
             config.sethomeHotkey -> {
@@ -75,9 +75,11 @@ object GardenWarpCommands {
             }
 
             config.barnHotkey -> {
+                if (lastWarpTime.passedSince() < 2.seconds) return
+                lastWarpTime = SimpleTimeMark.now()
+
                 LockMouseLook.autoDisable()
                 HypixelCommands.teleportToPlot("barn")
-                lastWarpTime = SimpleTimeMark.now()
             }
 
             else -> return
