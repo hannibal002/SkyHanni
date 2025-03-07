@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
@@ -11,22 +13,18 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
-import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
-import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.relauncher.ReflectionHelper
-import java.lang.invoke.MethodHandles
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -58,6 +56,7 @@ object ChatManager {
         BLOCKED(EnumChatFormatting.RED.toString() + EnumChatFormatting.BOLD),
         RETRACTED(EnumChatFormatting.DARK_PURPLE.toString() + EnumChatFormatting.BOLD),
         MODIFIED(EnumChatFormatting.YELLOW.toString() + EnumChatFormatting.BOLD),
+        EDITED(EnumChatFormatting.GOLD.toString() + EnumChatFormatting.BOLD),
         ALLOWED(EnumChatFormatting.GREEN),
         OUTGOING(EnumChatFormatting.BLUE),
         OUTGOING_BLOCKED(EnumChatFormatting.BLUE.toString() + EnumChatFormatting.BOLD),
@@ -77,7 +76,7 @@ object ChatManager {
         val message: IChatComponent,
         var actionKind: ActionKind,
         var actionReason: String?,
-        val modified: IChatComponent?,
+        var modified: IChatComponent?,
         val hoverInfo: List<String> = listOf(),
         val hoverExtraInfo: List<String> = listOf(),
     )
@@ -93,7 +92,7 @@ object ChatManager {
         val hoverInfo = listOf(
             "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
             "§7Mod id: §a${originatingModContainer?.id}",
-            "§7Mod name: §a${originatingModContainer?.name}"
+            "§7Mod name: §a${originatingModContainer?.name}",
         )
         val stackTrace =
             Thread.currentThread().stackTrace.map {
@@ -103,7 +102,7 @@ object ChatManager {
         val result = MessageFilteringResult(
             component, ActionKind.OUTGOING, null, null,
             hoverInfo = hoverInfo,
-            hoverExtraInfo = hoverInfo + listOf("") + stackTrace
+            hoverExtraInfo = hoverInfo + listOf("") + stackTrace,
         )
 
         messageHistory[IdentityCharacteristics(component)] = result
@@ -111,7 +110,7 @@ object ChatManager {
         if (MessageSendToServerEvent(
                 trimmedMessage,
                 trimmedMessage.split(" "),
-                originatingModContainer
+                originatingModContainer,
             ).post()
         ) {
             event.cancel()
@@ -172,7 +171,7 @@ object ChatManager {
         }
     }
 
-    fun openChatFilterGUI(args: Array<String>) {
+    private fun openChatFilterGUI(args: Array<String>) {
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
             ChatFilterGui(getRecentMessageHistory())
         } else {
@@ -186,24 +185,70 @@ object ChatManager {
         }
     }
 
-    private val chatLinesField by lazy {
-        MethodHandles.publicLookup().unreflectGetter(
-            ReflectionHelper.findField(GuiNewChat::class.java, "chatLines", "field_146252_h", "h")
-                .makeAccessible()
-        )
+    // TODO: Add another predicate to stop searching after a certain amount of lines have been searched
+    //  or if the lines were sent too long ago. Same thing for the deleteChatLine function.
+    fun MutableList<ChatLine>.editChatLine(
+        component: (IChatComponent) -> IChatComponent,
+        predicate: (ChatLine) -> Boolean,
+        reason: String? = null,
+    ) {
+        indexOfFirst {
+            predicate(it)
+        }.takeIf { it != -1 }?.let {
+            val chatLine = this[it]
+            val counter = chatLine.updatedCounter
+            val id = chatLine.chatLineID
+            val oldComponent = chatLine.chatComponent
+            val newComponent = component(chatLine.chatComponent)
+
+            val key = IdentityCharacteristics(oldComponent)
+
+            reason?.let { reason ->
+                messageHistory[key]?.let { history ->
+                    history.modified = newComponent
+                    history.actionKind = ActionKind.EDITED
+                    history.actionReason = reason.uppercase()
+                }
+            }
+
+            this[it] = ChatLine(counter, newComponent, id)
+        }
     }
 
-    fun retractMessage(message: IChatComponent?, reason: String) {
-        if (message == null) return
-        val chatGUI = Minecraft.getMinecraft().ingameGUI.chatGUI
+    fun MutableList<ChatLine>.deleteChatLine(
+        amount: Int,
+        reason: String? = null,
+        predicate: (ChatLine) -> Boolean,
+    ) {
+        val iterator = iterator()
+        var removed = 0
+        while (iterator.hasNext() && removed < amount) {
+            val chatLine = iterator.next()
 
-        @Suppress("UNCHECKED_CAST")
-        val chatLines = chatLinesField.invokeExact(chatGUI) as MutableList<ChatLine?>? ?: return
-        if (!chatLines.removeIf { it?.chatComponent === message }) return
-        chatGUI.refreshChat()
+            // chatLine can be null. maybe bc of other mods?
+            @Suppress("SENSELESS_COMPARISON")
+            if (chatLine == null) continue
 
-        val history = messageHistory[IdentityCharacteristics(message)] ?: return
-        history.actionKind = ActionKind.RETRACTED
-        history.actionReason = reason.uppercase()
+            if (predicate(chatLine)) {
+                iterator.remove()
+                removed++
+                val key = IdentityCharacteristics(chatLine.chatComponent)
+                reason?.let {
+                    messageHistory[key]?.let { history ->
+                        history.actionKind = ActionKind.RETRACTED
+                        history.actionReason = it.uppercase()
+                    }
+                }
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shchathistory") {
+            description = "Show the unfiltered chat history"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { openChatFilterGUI(it) }
+        }
     }
 }

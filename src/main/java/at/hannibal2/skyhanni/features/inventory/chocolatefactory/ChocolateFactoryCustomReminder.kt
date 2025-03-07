@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -143,6 +145,11 @@ object ChocolateFactoryCustomReminder {
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")
     }
 
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(72, "inventory.chocolateFactory.customReminder.position", Position::migrate)
+    }
+
     private fun inChocolateMenu() = ChocolateShopPrice.inInventory || ChocolateFactoryApi.inChocolateFactory ||
         ChocolateFactoryApi.chocolateFactoryPaused
 
@@ -160,9 +167,10 @@ object ChocolateFactoryCustomReminder {
         display = mutableListOf<Renderable>().also { list ->
             getTargetDescription()?.let {
                 list.add(
-                    Renderable.clickAndHover(
-                        it, listOf("§eClick to remove the goal!"),
-                        onClick = {
+                    Renderable.clickable(
+                        it,
+                        tips = listOf("§eClick to remove the goal!"),
+                        onLeftClick = {
                             reset()
                         },
                     ),

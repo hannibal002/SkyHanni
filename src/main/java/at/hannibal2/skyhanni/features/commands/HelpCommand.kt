@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.commands
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandBuilder
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.Commands.commandList
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
@@ -15,7 +15,7 @@ import net.minecraft.util.IChatComponent
 object HelpCommand {
 
     private const val COMMANDS_PER_PAGE = 15
-    private const val HELP_ID = -6457563
+    private val messageId = ChatUtils.getUniqueMessageId()
 
     private fun createCommandEntry(command: CommandBuilder): IChatComponent {
         val category = command.category
@@ -49,14 +49,14 @@ object HelpCommand {
         Text.displayPaginatedList(
             title,
             filtered,
-            chatLineId = HELP_ID,
+            chatLineId = messageId,
             emptyMessage = "No commands found.",
             currentPage = page,
             maxPerPage = COMMANDS_PER_PAGE,
         ) { createCommandEntry(it) }
     }
 
-    private fun onCommand(args: Array<String>) {
+    private fun onCommand(args: Array<String>, commands: List<CommandBuilder>) {
         val page: Int
         val search: String
         if (args.firstOrNull() == "-p") {
@@ -66,7 +66,7 @@ object HelpCommand {
             page = 1
             search = args.joinToString(" ")
         }
-        showPage(page, search, commandList.sortedWith(compareBy({ it.category.ordinal }, { it.name })))
+        showPage(page, search, commands.sortedWith(compareBy({ it.category.ordinal }, { it.name })))
     }
 
     @HandleEvent
@@ -74,7 +74,7 @@ object HelpCommand {
         event.register("shcommands") {
             description = "Shows this list"
             aliases = listOf("shhelp", "shcommand", "shcmd", "shc")
-            callback { onCommand(it) }
+            callback { onCommand(it, event.commands) }
         }
     }
 }

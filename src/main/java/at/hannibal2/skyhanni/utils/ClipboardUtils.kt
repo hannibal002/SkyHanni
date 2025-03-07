@@ -15,7 +15,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 object ClipboardUtils {
 
-    private val dispatcher = Dispatchers.IO
     private var lastClipboardAccessTime = SimpleTimeMark.farPast()
 
     private fun canAccessClipboard(): Boolean {
@@ -34,11 +33,10 @@ object ClipboardUtils {
     } else {
         ErrorManager.logErrorStateWithData(
             "can not read clipboard",
-            "clipboard can not be accessed after 20 retries"
+            "clipboard can not be accessed after 20 retries",
         )
         null
     }
-
 
     fun copyToClipboard(text: String, step: Int = 0) {
         SkyHanniMod.coroutineScope.launch {
@@ -57,7 +55,7 @@ object ClipboardUtils {
     suspend fun readFromClipboard(step: Int = 0): String? {
         try {
             return try {
-                withContext(dispatcher) {
+                withContext(Dispatchers.IO) {
                     getClipboard()?.getData(DataFlavor.stringFlavor)?.toString()
                 }
             } catch (e: UnsupportedFlavorException) {

@@ -34,6 +34,7 @@ object SkippingTypeAdapterFactory : TypeAdapterFactory {
                 if (!reader.hasNext()) return null
                 // reader skip value seems to have an infinite loop if you dont have another element
                 reader.skipValue()
+
                 null
             }
         }

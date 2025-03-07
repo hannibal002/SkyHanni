@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils
 //#if MC < 1.12
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -49,7 +51,7 @@ object TabListData {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Tab List")
+        event.title("Tab List Debug Cache")
         debugCache?.let {
             event.addData {
                 add("debug active!")
@@ -63,7 +65,7 @@ object TabListData {
         }
     }
 
-    fun toggleDebug() {
+    private fun toggleDebug() {
         if (debugCache != null) {
             ChatUtils.chat("Disabled tab list debug.")
             debugCache = null
@@ -187,6 +189,15 @@ object TabListData {
                 println("workaroundDelayedTabListUpdateAgain")
                 TabListUpdateEvent(getTabList()).post()
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtesttablist") {
+            description = "Set your clipboard as a fake tab list."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { toggleDebug() }
         }
     }
 }
