@@ -259,9 +259,10 @@ object ReforgeHelper {
             { hoveredReforge = reforge }
         }
 
-        Renderable.clickAndHover(
-            text, tips,
-            onClick = {
+        Renderable.clickable(
+            text,
+            tips = tips,
+            onLeftClick = {
                 SoundUtils.playClickSound()
                 reforgeToSearch = reforge
                 updateDisplay()
@@ -277,12 +278,12 @@ object ReforgeHelper {
         val stats: List<Renderable>
         val removedEffect: List<Renderable>
         val addEffectText: String
-        val click: List<Renderable>
+        val clickToApply: List<Renderable>
         if (currentReforge == reforge) {
             stats = currentReforge?.stats?.get(itemRarity)?.print().orEmpty()
             removedEffect = emptyList()
             addEffectText = "§aEffect:"
-            click = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
+            clickToApply = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
         } else {
             stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)).orEmpty()
             removedEffect = getReforgeEffect(
@@ -290,7 +291,7 @@ object ReforgeHelper {
                 itemRarity,
             )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff }.orEmpty()
             addEffectText = "§aAdds Effect:"
-            click = if (reforgeToSearch != reforge) {
+            clickToApply = if (reforgeToSearch != reforge) {
                 listOf(renderableString(""), renderableString("§eClick to select!"))
             } else emptyList()
         }
@@ -299,7 +300,7 @@ object ReforgeHelper {
             listOf(renderableString(addEffectText)) + it
         }.orEmpty()
 
-        return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + click
+        return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + clickToApply
     }
 
     private fun getReforgeEffect(reforge: ReforgeApi.Reforge?, rarity: LorenzRarity) =

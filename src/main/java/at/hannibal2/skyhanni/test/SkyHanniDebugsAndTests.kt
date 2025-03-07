@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -27,7 +29,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -43,9 +44,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -183,7 +182,7 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    fun resetConfigCommand() {
+    private fun resetConfigCommand() {
         ChatUtils.clickableChat(
             "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
             onClick = { resetConfig() },
@@ -273,10 +272,8 @@ object SkyHanniDebugsAndTests {
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
-                val module = javaClass.newInstance()
-                modules.add(module)
-
-                MinecraftForge.EVENT_BUS.register(module)
+                modules.add(javaClass)
+                MinecraftForge.EVENT_BUS.register(javaClass)
                 println("Registered listener $simpleName")
             } else {
                 println("Skipped registering listener $simpleName")
@@ -364,41 +361,6 @@ object SkyHanniDebugsAndTests {
         } else {
             ChatUtils.chat("§cDisabled global renderer! Run this command again to show SkyHanni rendering again.")
         }
-    }
-
-    fun testItemCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
-            return
-        }
-
-        val input = args.joinToString(" ")
-        val result = buildList {
-            add("")
-            add("§bSkyHanni Test Item")
-            add("§einput: '§f$input§e'")
-
-            NeuInternalName.fromItemNameOrNull(input)?.let { internalName ->
-                add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
-                add("  §eitemName: '${internalName.itemName}§e'")
-                val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6$price§e'")
-                return@buildList
-            }
-
-            input.toInternalName().getItemStackOrNull()?.let { item ->
-                val itemName = item.itemName
-                val internalName = item.getInternalName()
-                add("§einternal name: §7${internalName.asString()}")
-                add("§einternal name -> item name: '$itemName§e'")
-                val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6$price§e'")
-                return@buildList
-            }
-
-            add("§cNothing found!")
-        }
-        ChatUtils.chat(result.joinToString("\n"), prefix = false)
     }
 
     @HandleEvent
@@ -648,5 +610,16 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetconfig") {
+            description = "Reloads the config manager and rendering processors of MoulConfig. " +
+                "This §cWILL RESET §7your config, but also update the config files " +
+                "(names, description, orderings and stuff)."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { resetConfigCommand() }
+        }
     }
 }

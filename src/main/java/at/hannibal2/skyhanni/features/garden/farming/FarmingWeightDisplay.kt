@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -143,27 +145,17 @@ object FarmingWeightDisplay {
 
     private val errorMessage by lazy {
         listOf(
-            Renderable.clickAndHover(
-                "§cFarming Weight error: Cannot load",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-            Renderable.clickAndHover(
-                "§cdata from Elite Farmers!",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-            Renderable.clickAndHover(
-                "§eRejoin the garden or",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-            Renderable.clickAndHover(
-                "§eclick here to fix it.",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-        )
+            "§cFarming Weight error: Cannot load",
+            "§cdata from Elite Farmers!",
+            "§eRejoin the garden or",
+            "§eclick here to fix it.",
+        ).map {
+            Renderable.clickable(
+                it,
+                tips = listOf("§eClick here to reload the data right now!"),
+                onLeftClick = ::resetData,
+            )
+        }
     }
 
     private var lastOpenWebsite = SimpleTimeMark.farPast()
@@ -198,10 +190,10 @@ object FarmingWeightDisplay {
 
         val list = mutableListOf<Renderable>()
         list.add(
-            Renderable.clickAndHover(
+            Renderable.clickable(
                 "§6Farming Weight§7: $weight$leaderboard",
-                listOf("§eClick to open your Farming Profile."),
-                onClick = { openWebsite(LorenzUtils.getPlayerName()) },
+                tips = listOf("§eClick to open your Farming Profile."),
+                onLeftClick = { openWebsite(LorenzUtils.getPlayerName()) },
             ),
         )
 
@@ -270,10 +262,10 @@ object FarmingWeightDisplay {
     private fun getETA(): Renderable? {
         if (weight < 0) return null
 
-        val nextPlayer = nextPlayer ?: return Renderable.clickAndHover(
+        val nextPlayer = nextPlayer ?: return Renderable.clickable(
             "§cWaiting for leaderboard update...",
-            listOf("§eClick here to load new data right now!"),
-            onClick = ::resetData,
+            tips = listOf("§eClick here to load new data right now!"),
+            onLeftClick = ::resetData,
         )
         val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
         var nextName =
@@ -306,10 +298,10 @@ object FarmingWeightDisplay {
         }
 
         if (nextPlayer.weight == 0.0) {
-            return Renderable.clickAndHover(
+            return Renderable.clickable(
                 "§cRejoin the garden to show ETA!",
-                listOf("Click here to calculate the data right now!"),
-                onClick = ::resetData,
+                tips = listOf("Click here to calculate the data right now!"),
+                onLeftClick = ::resetData,
             )
         }
 
@@ -336,10 +328,10 @@ object FarmingWeightDisplay {
         return if (showRankGoal) {
             Renderable.string(text)
         } else {
-            Renderable.clickAndHover(
+            Renderable.clickable(
                 text,
-                listOf("§eClick to open the Farming Profile of §b$nextName."),
-                onClick = { openWebsite(nextName) },
+                tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
+                onLeftClick = { openWebsite(nextName) },
             )
         }
     }
@@ -453,7 +445,7 @@ object FarmingWeightDisplay {
         val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
 
         val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-        val apiResponse = ApiUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Leaderboard")
 
         try {
             val apiData = toEliteLeaderboardJson(apiResponse).data
@@ -483,7 +475,7 @@ object FarmingWeightDisplay {
     private fun loadWeight(localProfile: String) {
         val uuid = LorenzUtils.getPlayerUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
-        val apiResponse = ApiUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elite Farming Weight")
 
         var error: Throwable? = null
 
@@ -555,7 +547,7 @@ object FarmingWeightDisplay {
         return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
     }
 
-    fun lookUpCommand(it: Array<String>) {
+    private fun lookUpCommand(it: Array<String>) {
         val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
         openWebsite(name, ignoreCooldown = true)
     }
@@ -579,7 +571,7 @@ object FarmingWeightDisplay {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
         val url = "https://api.elitebot.dev/weights/all"
-        val apiResponse = ApiUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Weight")
 
         try {
             val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
@@ -611,5 +603,14 @@ object FarmingWeightDisplay {
             CropType.COCOA_BEANS to 267_174.04,
             CropType.CACTUS to 177_254.45,
         )
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shfarmingprofile") {
+            description = "Look up the farming profile from yourself or another player on elitebot.dev"
+            category = CommandCategory.USERS_ACTIVE
+            callback { lookUpCommand(it) }
+        }
     }
 }
