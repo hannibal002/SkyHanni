@@ -61,7 +61,7 @@ object SuperpairDataDisplay {
             // Render here so they can move it around.
             config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
         }
-        if (ExperimentationTableApi.getCurrentExperiment() == null) return
+        if (ExperimentationTableApi.currentExperiment == null) return
 
         if (display.isEmpty()) display = drawDisplay()
 
@@ -71,9 +71,9 @@ object SuperpairDataDisplay {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-        if (ExperimentationTableApi.getCurrentExperiment() == null) return
+        if (ExperimentationTableApi.currentExperiment == null) return
 
-        val currentExperiment = ExperimentationTableApi.getCurrentExperiment() ?: return
+        val currentExperiment = ExperimentationTableApi.currentExperiment ?: return
 
         val item = event.item ?: return
         if (isOutOfBounds(event.slotId, currentExperiment) || item.displayName.removeColor() == "?") return
@@ -138,8 +138,6 @@ object SuperpairDataDisplay {
             hasFoundMatch(items, item) -> handleFoundMatch(items, item)
             else -> handleNormalReward(item)
         }
-
-        println(found)
     }
 
     private fun handleInstantFind(items: MutableMap<Int, SuperpairItem>, item: SuperpairItem, uncovered: Int) {
@@ -219,7 +217,7 @@ object SuperpairDataDisplay {
     }
 
     private fun drawDisplay() = buildList {
-        val currentExperiment = ExperimentationTableApi.getCurrentExperiment() ?: return emptyList<String>()
+        val currentExperiment = ExperimentationTableApi.currentExperiment ?: return emptyList<String>()
 
         add("§6Superpair Experimentation Data")
         add("")

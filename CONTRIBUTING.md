@@ -136,7 +136,7 @@ format like "- #821" to illustrate the dependency.
     - (We plan to remove NEU as a dependency in the future.)
 - We try not to use Forge-specific methods if possible.
     - (We plan to switch to Fabric and Minecraft 1.20 in the future.)
-- Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
+- Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
 - Try to avoid using Kotlin's `!!` (catch if not null) feature.
@@ -389,7 +389,7 @@ private fun ClientLevel.getAllEntities(): Iterable<Entity> =
 //#if MC < 1.14
 //$$         loadedEntityList
 //#else
-   entitiesForRendering()
+    entitiesForRendering()
 //#endif
 ```
 
@@ -403,7 +403,7 @@ private fun ClientWorld.getAllEntities(): Iterable<Entity> =
 //#if MC < 1.14
 //$$         loadedEntityList
 //#else
-   entities
+    entities
 //#endif
 ```
 
@@ -414,7 +414,7 @@ private fun ClientWorld.getAllEntities(): Iterable<Entity> =
 //#if MC < 1.14
 //$$         loadedEntityList
 //#else
-   entities
+    entities
 //#endif
 ```
 

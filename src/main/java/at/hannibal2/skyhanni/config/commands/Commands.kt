@@ -53,7 +53,6 @@ import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -250,11 +249,6 @@ object Commands {
             category = CommandCategory.USERS_BUG_FIX
             callback { RepoManager.updateRepo() }
         }
-        event.register("shtogglehypixelapierrors") {
-            description = "Show/hide hypixel api error messages in chat"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { ApiUtils.toggleApiErrorMessages() }
-        }
         event.register("shfixminions") {
             description = "Removed bugged minion locations from your private island"
             category = CommandCategory.USERS_BUG_FIX
@@ -439,11 +433,6 @@ object Commands {
             description = "See where regexes are loaded from"
             category = CommandCategory.DEVELOPER_TEST
             callback { RepoPatternGui.open() }
-        }
-        event.register("shtestitem") {
-            description = "test item internal name resolving"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { SkyHanniDebugsAndTests.testItemCommand(it) }
         }
         event.register("shfindnullconfig") {
             description = "Find config elements that are null and prints them into the console"

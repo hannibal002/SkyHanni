@@ -30,6 +30,8 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -270,38 +272,21 @@ object TunnelsMaps {
             condition = { isEnabled() },
             inOwnInventory = true,
         ) {
-            val display = buildList<Renderable> {
+            val display = buildList {
                 if (active.isNotEmpty()) {
                     if (goal == campfire && active != campfire.name) {
                         add(Renderable.string("§6Override for ${campfire.name}"))
-                        add(
-                            Renderable.clickable(
-                                Renderable.string("§eMake §f$active §eactive"),
-                                onClick = {
-                                    goal = getNext()
-                                },
-                            ),
-                        )
+                        add(Renderable.clickable("§eMake §f$active §eactive", onLeftClick = ::setNextGoal))
                     } else {
                         add(
-                            Renderable.clickAndHover(
-                                Renderable.string("§6Active: §f$active"),
-                                listOf("§eClick to disable current Waypoint"),
-                                onClick = ::clearPath,
+                            Renderable.clickable(
+                                "§6Active: §f$active",
+                                tips = listOf("§eClick to disable current Waypoint"),
+                                onLeftClick = ::clearPath,
                             ),
                         )
-                        if (hasNext()) {
-                            add(
-                                Renderable.clickable(
-                                    Renderable.string("§eNext Spot"),
-                                    onClick = {
-                                        goal = getNext()
-                                    },
-                                ),
-                            )
-                        } else {
-                            addString("")
-                        }
+                        if (hasNext()) add(Renderable.clickable("§eNext Spot", onLeftClick = ::setNextGoal))
+                        else addString("")
                     }
                 } else {
                     addString("")
@@ -314,15 +299,18 @@ object TunnelsMaps {
     }
 
     private fun generateLocationsDisplay() = buildList {
+        val campfireName = campfire.name ?: return@buildList
         add(Renderable.string("§6Locations:"))
         add(
-            Renderable.multiClickAndHover(
-                campfire.name!!,
-                listOf(
-                    "§eLeft Click to set active", "§eRight Click for override",
+            Renderable.clickable(
+                campfireName,
+                tips = listOf(
+                    "§eLeft Click to set active",
+                    "§eRight Click for override",
                 ),
-                click = mapOf(
-                    0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride,
+                onAnyClick = mapOf(
+                    LEFT_MOUSE to guiSetActive(campfireName),
+                    RIGHT_MOUSE to ::campfireOverride,
                 ),
             ),
         )
@@ -332,7 +320,7 @@ object TunnelsMaps {
                     Renderable.horizontalContainer(
                         listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[$name]"), onClick = guiSetActive(it.key))
+                            Renderable.clickable(Renderable.string("§d[$name]"), onLeftClick = guiSetActive(it.key))
                         },
                     ),
                     Renderable.string("§dFairy Souls"),
@@ -350,23 +338,23 @@ object TunnelsMaps {
         } else {
             addAll(
                 newGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                    Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
                 },
             )
             addAll(
                 oldGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                    Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
                 },
             )
         }
         addAll(
             normalLocations.map {
-                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
             },
         )
     }
 
-    private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
+    private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickable(
         Renderable.string(
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
@@ -376,7 +364,7 @@ object TunnelsMaps {
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
         tips = listOf(it.key),
-        onClick = guiSetActive(it.key),
+        onLeftClick = guiSetActive(it.key),
     )
 
     private fun campfireOverride() {
@@ -432,7 +420,7 @@ object TunnelsMaps {
         }
         if (goalReached) {
             if (goal == campfire && active != campfire.name) {
-                this.goal = getNext()
+                setNextGoal()
             } else {
                 cooldowns[goal] = 60.0.seconds.fromNow()
                 clearPath()
@@ -445,6 +433,10 @@ object TunnelsMaps {
     private fun clearPath() {
         path = null
         goal = null
+    }
+
+    private fun setNextGoal() {
+        goal = getNext()
     }
 
     @HandleEvent
@@ -505,12 +497,8 @@ object TunnelsMaps {
 
     @HandleEvent
     fun onWarp(event: SkyHanniWarpEvent) {
-        if (!isEnabled()) return
-        if (goal != null) {
-            DelayedRun.runNextTick {
-                goal = getNext()
-            }
-        }
+        if (!isEnabled() || goal == null) return
+        DelayedRun.runNextTick { setNextGoal() }
     }
 
     @HandleEvent
@@ -532,7 +520,7 @@ object TunnelsMaps {
     private fun nextSpot() {
         if (!nextSpotDelay.isInPast()) return
         nextSpotDelay = 0.5.seconds.fromNow()
-        goal = getNext()
+        setNextGoal()
     }
 
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
