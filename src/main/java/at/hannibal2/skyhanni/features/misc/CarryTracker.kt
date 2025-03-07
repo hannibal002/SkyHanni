@@ -223,8 +223,8 @@ object CarryTracker {
         }
         val cost = formatCost(type.pricePer?.let { it * requested })
         val text = "$color$done§8/$color$requested $cost"
-        return Renderable.clickAndHover(
-            Renderable.string("  $type $text"),
+        return Renderable.clickable(
+            "  $type $text",
             tips = buildList<String> {
                 add("§b${customer.name}' $type §cCarry")
                 add("")
@@ -244,7 +244,7 @@ object CarryTracker {
                 add("§eClick to send current progress in the party chat!")
                 add("§eControl-click to remove this carry!")
             },
-            onClick = {
+            onLeftClick = {
                 if (KeyboardManager.isModifierKeyDown()) {
                     carries.remove(carry)
                     update()
@@ -283,8 +283,8 @@ object CarryTracker {
         val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
         val missingFormat = formatCost(totalCost - customer.alreadyPaid)
         add(
-            Renderable.clickAndHover(
-                Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
+            Renderable.clickable(
+                "§b$customerName $paidFormat§8/$totalCostFormat",
                 tips = listOf(
                     "§7Carries for §b$customerName",
                     "",
@@ -294,7 +294,7 @@ object CarryTracker {
                     "",
                     "§eClick to send missing coins in party chat!",
                 ),
-                onClick = {
+                onLeftClick = {
                     HypixelCommands.partyChat(
                         "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
                     )

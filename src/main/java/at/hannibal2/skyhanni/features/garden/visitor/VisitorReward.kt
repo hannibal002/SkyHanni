@@ -20,6 +20,7 @@ enum class VisitorReward(
     REPLENISH("REPLENISH;1", "§9Replenish I", legacyId = 7),
     DELICATE("DELICATE;5", "§9Delicate V"),
     COPPER_DYE("DYE_COPPER", "§8Copper Dye"),
+    JUNGLE_KEY("JUNGLE_KEY", "§5Jungle Key"),
     ;
 
     private val internalName = rawInternalName.toInternalName()
