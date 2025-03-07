@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -109,4 +110,15 @@ public class MobsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideNameTagArachneMinis = true;
+
+    @Expose
+    @ConfigOption(name = "Shuriken Highlight", desc = "Highlights mobs if an Extremely Real Shuriken has been used on them.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean shurikenHighlight = false;
+
+    @Expose
+    @ConfigOption(name = "Shuriken Highlight Colour", desc = "Colour of the shuriken highlight.")
+    @ConfigEditorColour
+    public String shurikenHighlightColour = "0:153:159:0:5";
 }

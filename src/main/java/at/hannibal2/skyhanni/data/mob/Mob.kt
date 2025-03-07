@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.compat.getNameAsString
 import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -63,6 +64,8 @@ import java.util.UUID
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
  * @property uniqueId Unique identifier for each Mob instance
+ *
+ * @property shurikenUsed can change
  */
 @Suppress("TooManyFunctions")
 class Mob(
@@ -115,6 +118,7 @@ class Mob(
 
     val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted() // Can change
     val isRunic = !RiftApi.inRift() && baseEntity.isRunic() // Does not Change
+    val shurikenUsed get() = mobType != Type.DUNGEON && armorStand?.getNameAsString()?.endsWith("§b✯") == true
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
