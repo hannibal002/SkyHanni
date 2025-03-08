@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
@@ -92,8 +94,17 @@ object FairySoulPathFind {
                 }
             }
         }
+        if (missing.size != missingLocally.keys.toSet().size) {
+            ChatUtils.chat("NEU update: missing changed ${missing.size} -> ${missingLocally.keys.toSet().size}")
+        }
         missing = missingLocally.keys.toSet()
+        if (found != foundLocally) {
+            ChatUtils.chat("NEU update: found changed $found -> $foundLocally")
+        }
         found = foundLocally
+        if (total != missing.size + found) {
+            ChatUtils.chat("NEU update: total changed $total -> ${missing.size + found}")
+        }
         total = missing.size + found
 
         if (config.neuSoulsPathFindBetter) {
@@ -135,7 +146,7 @@ object FairySoulPathFind {
         lastMissing = missing.size
     }
 
-    private fun testCoolNewPath(forceUpdate: Boolean) {
+    fun testCoolNewPath(forceUpdate: Boolean) {
         foundButNotClickedSoul = null
         if (goodRoute.isNotEmpty() && !forceUpdate) {
             currentIndex++
@@ -155,7 +166,18 @@ object FairySoulPathFind {
             return
         }
 
-        goodRoute = NavigationUtils.getRoute(targetNodes)
+        val maxIterations = SkyHanniDebugsAndTests.a.toInt()
+        val neighborhoodSize = SkyHanniDebugsAndTests.b.toInt()
+
+        val routeTime = measureTimeMillis {
+            goodRoute = NavigationUtils.getRoute(targetNodes, maxIterations, neighborhoodSize)
+        }
+        val length = GraphUtils.calculatePathLength(goodRoute)
+
+        val ms = routeTime.milliseconds
+        val distance = length.roundTo(0).addSeparators()
+        ChatUtils.chat("route ${targetNodes.size}n ($maxIterations/$neighborhoodSize) took $ms/${distance}m")
+
         currentIndex = 0
         if (found == 0 && total != goodRoute.size) {
             ErrorManager.skyHanniError(
