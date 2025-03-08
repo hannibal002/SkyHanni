@@ -1,13 +1,13 @@
-package at.hannibal2.skyhanni.config.features.mining.nucleus;
+package at.hannibal2.skyhanni.config.features.mining.nucleus
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.Accordion;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.FeatureToggle
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class CrystalHighlighterConfig {
-
+class CrystalHighlighterConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Nucleus Barriers",
@@ -15,18 +15,27 @@ public class CrystalHighlighterConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    var enabled: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Box Style", desc = "Choose the style of the bounding box around the crystal barrier blocks.")
+    @ConfigEditorDropdown
+    var boxStyle: BoundingBoxType = BoundingBoxType.FILLED
+
+    enum class BoundingBoxType(private val displayName: String) {
+        FILLED("Filled"),
+        OUTLINE("Outline");
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @Accordion
     @ConfigOption(name = "Highlight Colors", desc = "")
-    public CrystalHighlighterColorConfig colors = new CrystalHighlighterColorConfig();
+    var colors: CrystalHighlighterColorConfig = CrystalHighlighterColorConfig()
 
     @Expose
-    @ConfigOption(
-        name = "Only Show During Hoppity's",
-        desc = "Only show the highlighted boxes during Hoppity's Hunt."
-    )
+    @ConfigOption(name = "Only Show During Hoppity's", desc = "Only show the highlighted boxes during Hoppity's Hunt.")
     @ConfigEditorBoolean
-    public boolean onlyDuringHoppity = false;
+    var onlyDuringHoppity: Boolean = false
 }
