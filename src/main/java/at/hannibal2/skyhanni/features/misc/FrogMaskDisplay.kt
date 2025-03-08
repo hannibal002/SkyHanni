@@ -33,8 +33,8 @@ object FrogMaskDisplay {
     private var display: Renderable? = null
     private val patternGroup = RepoPattern.group("misc.frogmask")
 
-    private val frogMask by lazy { internalMaskName.getItemStack() }
-    private val internalMaskName = "FROG_MASK".toInternalName()
+    private val FROG_MASK = "FROG_MASK".toInternalName()
+    private val frogMaskItem by lazy { FROG_MASK.getItemStack() }
 
     /**
      * REGEX-TEST: §7Today's region: §aDark Thicket
@@ -65,8 +65,8 @@ object FrogMaskDisplay {
         if (lastUpdate == null || activeRegion.isEmpty() || (lastUpdate?.timeUntil() ?: -Duration.INFINITE) < Duration.ZERO) {
             lastUpdate = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
             val helmet = InventoryUtils.getHelmet()
-            val mask = helmet?.takeIf { it.getInternalNameOrNull() == internalMaskName } ?: InventoryUtils.getItemsInOwnInventory()
-                .find { it.getInternalName() == internalMaskName } ?: return
+            val mask = helmet?.takeIf { it.getInternalNameOrNull() == FROG_MASK } ?: InventoryUtils.getItemsInOwnInventory()
+                .find { it.getInternalName() == FROG_MASK } ?: return
 
             val lore = mask.getLore()
             activeRegionPattern.firstMatcher(lore) {
@@ -86,7 +86,7 @@ object FrogMaskDisplay {
 
         return Renderable.horizontalContainer(
             listOf(
-                Renderable.itemStack(frogMask),
+                Renderable.itemStack(frogMaskItem),
                 Renderable.string("§5Frog Mask§6 - $activeRegion §6for §b$timeString"),
             ),
             spacing = 1,
@@ -105,8 +105,8 @@ object FrogMaskDisplay {
         FrogMaskCondition.DISABLED -> false
         FrogMaskCondition.ALWAYS -> true
         FrogMaskCondition.PARK -> IslandType.THE_PARK.isInIsland()
-        FrogMaskCondition.WORN -> InventoryUtils.getHelmet()?.getInternalName() == internalMaskName
+        FrogMaskCondition.WORN -> InventoryUtils.getHelmet()?.getInternalName() == FROG_MASK
         FrogMaskCondition.WORN_IN_PARK -> IslandType.THE_PARK.isInIsland() && InventoryUtils.getHelmet()
-            ?.getInternalName() == internalMaskName
+            ?.getInternalName() == FROG_MASK
     }
 }
