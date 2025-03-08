@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig;
+import at.hannibal2.skyhanni.config.features.mining.nucleus.MetalDetectorConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -54,6 +55,11 @@ public class MiningConfig {
     @ConfigOption(name = "Crystal Nucleus Tracker", desc = "")
     @Accordion
     public CrystalNucleusTrackerConfig crystalNucleusTracker = new CrystalNucleusTrackerConfig();
+
+    @Expose
+    @ConfigOption(name = "Metal Detector", desc = "Metal Detector Settings (credit to Ninjune and Soopy)")
+    @Accordion
+    public MetalDetectorConfig metalDetector = new MetalDetectorConfig();
 
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
