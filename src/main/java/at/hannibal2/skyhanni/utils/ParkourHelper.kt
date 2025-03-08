@@ -42,11 +42,12 @@ class ParkourHelper(
         visible = false
     }
 
+    @Suppress("HandleEventInspection")
     fun render(event: SkyHanniRenderWorldEvent) {
         if (locations.isEmpty()) {
             ErrorManager.logErrorWithData(
                 IllegalArgumentException("locations is empty"),
-                "Trying to render an empty parkour"
+                "Trying to render an empty parkour",
             )
             return
         }
@@ -91,42 +92,51 @@ class ParkourHelper(
                     next.value.offsetCenter(),
                     colorForIndex(prev.index),
                     5,
-                    false
+                    false,
                 )
             }
-            val nextShortcuts = current until current + lookAhead
-            for (shortCut in shortCuts) {
-                if (shortCut.from in nextShortcuts && shortCut.to in locations.indices) {
-                    val from = locations[shortCut.from].offsetCenter()
-                    val to = locations[shortCut.to].offsetCenter()
-                    event.draw3DLineNea(from, to, Color.RED, 3, false)
-                    val textLocation = from + (to - from).normalize()
-                    event.drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
-
-                    val aabb = axisAlignedBB(locations[shortCut.to])
-                    event.drawFilledBoundingBoxNea(aabb, Color.RED, 1f)
-                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, depth)
-                }
-            }
-
-            for ((index, location) in locations.asSequence().withIndex().drop(current)
-                .take(lookAhead) + inProgressVec.map { it.second }) {
-                val isMovingPlatform = location !in locations
-                if (isMovingPlatform && showEverything) continue
-                if (isMovingPlatform) {
-                    val aabb = axisAlignedBB(location).expandBlock()
-                    event.drawFilledBoundingBoxNea(aabb, colorForIndex(index), .6f)
-                } else {
-                    val aabb = axisAlignedBB(location)
-                    event.drawFilledBoundingBoxNea(aabb, colorForIndex(index), 1f)
-                    if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, depth)
-                }
-                if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
-                    event.drawString(location.offsetCenter().up(1), "§a§l$index", seeThroughBlocks = true)
-                }
-            }
+            event.renderShortCuts()
+            event.renderSteps(inProgressVec)
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(e, "Error while rendering a parkour")
+        }
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderShortCuts() {
+        val nextShortcuts = current until current + lookAhead
+        for (shortCut in shortCuts) {
+            if (shortCut.from in nextShortcuts && shortCut.to in locations.indices) {
+                val from = locations[shortCut.from].offsetCenter()
+                val to = locations[shortCut.to].offsetCenter()
+                draw3DLineNea(from, to, Color.RED, 3, false)
+                val textLocation = from + (to - from).normalize()
+                drawDynamicText(textLocation.add(-0.5, 1.0, -0.5), "§cShortcut", 1.8)
+
+                val aabb = axisAlignedBB(locations[shortCut.to])
+                drawFilledBoundingBoxNea(aabb, Color.RED, 1f)
+                if (outline) outlineTopFace(aabb, 2, Color.BLACK, depth)
+            }
+        }
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderSteps(
+        inProgressVec: List<Pair<IndexedValue<LorenzVec>, IndexedValue<LorenzVec>>>,
+    ) {
+        for ((index, location) in locations.asSequence().withIndex().drop(current)
+            .take(lookAhead) + inProgressVec.map { it.second }) {
+            val isMovingPlatform = location !in locations
+            if (isMovingPlatform && showEverything) continue
+            if (isMovingPlatform) {
+                val aabb = axisAlignedBB(location).expandBlock()
+                drawFilledBoundingBoxNea(aabb, colorForIndex(index), .6f)
+            } else {
+                val aabb = axisAlignedBB(location)
+                drawFilledBoundingBoxNea(aabb, colorForIndex(index), 1f)
+                if (outline) outlineTopFace(aabb, 2, Color.BLACK, depth)
+            }
+            if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
+                drawString(location.offsetCenter().up(1), "§a§l$index", seeThroughBlocks = true)
+            }
         }
     }
 
@@ -145,7 +155,7 @@ class ParkourHelper(
         val slopeLocation = lookAheadStart.slope(lookAheadEnd, factor)
         return Pair(
             IndexedValue(current + lookAhead - 1, lookAheadStart),
-            IndexedValue(current + lookAhead, slopeLocation)
+            IndexedValue(current + lookAhead, slopeLocation),
         )
     }
 

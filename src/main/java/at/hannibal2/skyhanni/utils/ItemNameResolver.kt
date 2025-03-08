@@ -116,8 +116,8 @@ object ItemNameResolver {
             return it
         }
 
-        if (NeuItems.allItemsCache.isEmpty()) {
-            NeuItems.allItemsCache = NeuItems.readAllNeuItems()
+        if (NeuItems.allInternalNames.isEmpty()) {
+            NeuItems.readAllNeuItems()
         }
 
         // supports colored names, rarities

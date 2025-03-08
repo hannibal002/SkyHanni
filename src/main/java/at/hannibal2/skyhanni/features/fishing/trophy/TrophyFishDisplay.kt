@@ -86,6 +86,7 @@ object TrophyFishDisplay {
                 showCross,
                 showCheckmark,
                 onlyShowMissing,
+                showCaughtHigher,
             ) {
                 update()
             }
@@ -97,7 +98,6 @@ object TrophyFishDisplay {
         val list = mutableListOf<Renderable>()
         list.addString("§e§lTrophy Fish Display")
         list.add(Renderable.table(createTable(), yPadding = config.extraSpace.get()))
-
         display = list
     }
 
@@ -132,8 +132,8 @@ object TrophyFishDisplay {
         table: MutableList<List<Renderable>>,
     ) {
         get(config.onlyShowMissing.get())?.let { atLeast ->
-            val list = TrophyRarity.entries.filter { it == atLeast }
-            if (list.all { (data[it] ?: 0) > 0 }) {
+            val list = TrophyRarity.entries.filter { it == atLeast || (!config.showCaughtHigher.get() && it > atLeast) }
+            if (list.any { (data[it] ?: 0) > 0 }) {
                 return
             }
         }
