@@ -262,13 +262,16 @@ class MiscConfig {
 
 
     @Expose
-    @ConfigOption(name = "Frog Mask Display", desc = "Displays information about the active §5Frog Mask§7 region.")
+    @ConfigOption(
+        name = "Frog Mask Display",
+        desc = "Displays information about the active §2Frog Mask§7 region. §eRequires a Frog Mask in inventory."
+    )
     @ConfigEditorDropdown
     var frogMaskDisplay: FrogMaskCondition = FrogMaskCondition.DISABLED
 
     enum class FrogMaskCondition(private val displayName: String) {
         DISABLED("Off"),
-        INVENTORY("In Inventory"),
+        ALWAYS("Always"),
         PARK("In The Park"),
         WORN("While Worn"),
         WORN_IN_PARK("While Worn in The Park");

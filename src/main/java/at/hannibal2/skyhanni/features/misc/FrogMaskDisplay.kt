@@ -47,19 +47,9 @@ object FrogMaskDisplay {
     private var lastUpdate: SimpleTimeMark? = null
     private var activeRegion: String = ""
 
-    private fun isEnabled(): Boolean = when (config.frogMaskDisplay) {
-        FrogMaskCondition.DISABLED -> false
-        FrogMaskCondition.INVENTORY -> InventoryUtils.isItemInInventory(internalMaskName) || InventoryUtils.getHelmet()
-            ?.getInternalName() == internalMaskName
-        FrogMaskCondition.PARK -> IslandType.THE_PARK.isInIsland()
-        FrogMaskCondition.WORN -> InventoryUtils.getHelmet()?.getInternalName() == internalMaskName
-        FrogMaskCondition.WORN_IN_PARK -> IslandType.THE_PARK.isInIsland() && InventoryUtils.getHelmet()
-            ?.getInternalName() == internalMaskName
-    }
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (config.frogMaskDisplay == FrogMaskCondition.DISABLED) return
+        if (!isEnabled()) return
         config.frogMaskDisplayPosition.renderRenderable(display, posLabel = "Frog Mask Display")
     }
 
@@ -85,9 +75,8 @@ object FrogMaskDisplay {
         }
 
         val timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
-        val newDisplay = updateDisplay(timeRemaining)
 
-        if (display != newDisplay) display = newDisplay
+        display = updateDisplay(timeRemaining)
     }
 
 
@@ -108,7 +97,16 @@ object FrogMaskDisplay {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(75, "misc.frogmask.frogMaskDisplay") {
-            ConfigUtils.migrateBooleanToEnum(it, FrogMaskCondition.DISABLED, FrogMaskCondition.WORN_IN_PARK)
+            ConfigUtils.migrateBooleanToEnum(it, FrogMaskCondition.WORN_IN_PARK, FrogMaskCondition.DISABLED)
         }
+    }
+
+    private fun isEnabled(): Boolean = when (config.frogMaskDisplay) {
+        FrogMaskCondition.DISABLED -> false
+        FrogMaskCondition.ALWAYS -> true
+        FrogMaskCondition.PARK -> IslandType.THE_PARK.isInIsland()
+        FrogMaskCondition.WORN -> InventoryUtils.getHelmet()?.getInternalName() == internalMaskName
+        FrogMaskCondition.WORN_IN_PARK -> IslandType.THE_PARK.isInIsland() && InventoryUtils.getHelmet()
+            ?.getInternalName() == internalMaskName
     }
 }
