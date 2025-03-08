@@ -136,4 +136,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightPrecisionMiningParticles = false;
+
+    @Expose
+    @ConfigOption(name = "Metal Detector Solver", desc = "Enables the solver for the metal detector.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean metalDetectorSolver = false;
 }
