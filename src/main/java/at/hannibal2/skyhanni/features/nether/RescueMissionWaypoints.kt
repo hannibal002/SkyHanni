@@ -32,10 +32,16 @@ object RescueMissionWaypoints {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper.rescueMissionConfig
     private val patternGroup = RepoPattern.group("crimson.rescue")
+    /**
+     * REGEX-TEST: [NPC] Undercover Agent: Here's what you need to do.
+     */
     private val agentDialoguePattern by patternGroup.pattern(
         "start",
         "\\[NPC] Undercover Agent: Here's what you need to do."
     )
+    /**
+     * REGEX-TEST: §aⒸ §eRescue Mission
+     */
     private val questTierPattern by RepoPattern.pattern(
         "tier",
         "§\\w(?<tier>.) §[\\w ]+"
@@ -77,44 +83,48 @@ object RescueMissionWaypoints {
             }
 
             // will get data["S1"] or data["S2"]
-            parkourHelper = data!!.barb["S${config.variant}"]?.let {
-                ParkourHelper(
-                    it,
-                    listOf(),
-                    platformSize = 1.0,
-                    detectionRange = 3.5,
-                    onEndReach = {
-                        show = false
-                    }
-                )
+            parkourHelper = data?.let { data ->
+                data.barb["S${config.variant}"]?.let {
+                    ParkourHelper(
+                        it,
+                        listOf(),
+                        platformSize = 1.0,
+                        detectionRange = 3.5,
+                        onEndReach = {
+                            show = false
+                        }
+                    )
+                }
             }
             return
         }
 
-        parkourHelper = when (CrimsonIsleReputationHelper.factionType) {
-            FactionType.MAGE -> data!!.mage[tier]?.let {
-                ParkourHelper(
-                    it,
-                    listOf(),
-                    platformSize = 1.0,
-                    detectionRange = 3.5,
-                    onEndReach = {
-                        show = false
-                    }
-                )
+        parkourHelper = data?. let { data ->
+            when (CrimsonIsleReputationHelper.factionType) {
+                FactionType.MAGE -> data.mage[tier]?.let {
+                    ParkourHelper(
+                        it,
+                        listOf(),
+                        platformSize = 1.0,
+                        detectionRange = 3.5,
+                        onEndReach = {
+                            show = false
+                        }
+                    )
+                }
+                FactionType.BARBARIAN -> data.barb[tier]?.let {
+                    ParkourHelper(
+                        it,
+                        listOf(),
+                        platformSize = 1.0,
+                        detectionRange = 3.5,
+                        onEndReach = {
+                            show = false
+                        }
+                    )
+                }
+                null -> null
             }
-            FactionType.BARBARIAN -> data!!.barb[tier]?.let {
-                ParkourHelper(
-                    it,
-                    listOf(),
-                    platformSize = 1.0,
-                    detectionRange = 3.5,
-                    onEndReach = {
-                        show = false
-                    }
-                )
-            }
-            null -> null
         }
     }
 
