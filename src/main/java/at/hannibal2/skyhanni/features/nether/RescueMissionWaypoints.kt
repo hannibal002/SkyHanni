@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -60,10 +59,9 @@ object RescueMissionWaypoints {
         parkourHelper?.reset()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         if (parkourHelper != null) return
         if (data == null) return
 
