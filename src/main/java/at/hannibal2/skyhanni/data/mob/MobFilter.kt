@@ -123,7 +123,7 @@ object MobFilter {
 
     /** REGEX-TEST: SHINY PIG
      * */
-    val shinyPig by repoGroup.pattern(
+    val shinyPig by patternGroup.pattern(
         "pattern.shiny",
         "SHINY PIG",
     )
