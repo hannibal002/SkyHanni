@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining
+package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -22,12 +24,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -40,16 +42,18 @@ object MetalDetectorSolver {
 
     private val treasureFoundPattern by RepoPattern.pattern(
         "sjakdlfsa",
-        "§r§aYou found .* with your §r§cMetal Detector§r§a!"
+        "§aYou found .*with your §r§cMetal Detector§r§a!"
     )
 
-    private val config get() = SkyHanniMod.feature.mining.metalDetectorSolver
+    private val config get() = SkyHanniMod.feature.mining.metalDetector.metalDetectorSolver
 
     private var chestLocations: List<LorenzVec> = emptyList()
     private var predictedChestLocations: MutableList<LorenzVec> = mutableListOf()
     private var baseCoordinates: LorenzVec? = null
     private var ignoreLocation: LorenzVec? = null
     private var lastSearchedForBase: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastLoc: LorenzVec? = null
+    private var playedPling = false
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -60,31 +64,37 @@ object MetalDetectorSolver {
     @HandleEvent(onlyOnSkyblock = true)
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
+        if (predictedChestLocations.size == 1) return
+
+        val player = Minecraft.getMinecraft().thePlayer.getLorenzVec()
+        if (lastLoc != player) {
+            lastLoc = player
+            playedPling = false
+        }
 
         metalDetectorDistancePattern.matchMatcher(event.actionBar) {
             val distance = group("distance").toDoubleOrNull() ?: return
-            if (false) ChatUtils.debug(distance.toString(), true)
             if (baseCoordinates == null) findBaseCoordinates()
-            ChatUtils.debug(baseCoordinates.toString(), true)
-            if (false) ChatUtils.debug(baseCoordinates.toString(), true)
             val baseCoordinatesNonNull = baseCoordinates ?: return
             predictedChestLocations.clear()
+            val start = SimpleTimeMark.now()
             chestLocations.forEach {
                 val loc = baseCoordinatesNonNull.plus(it.negated())
-                if (false) ChatUtils.debug(loc.add(0, 1, 0).distanceSqToPlayer().roundTo(1).toString(), true)
                 if (loc.add(0, 1, 0).distanceToPlayer().roundTo(1) == distance) {
                     if (loc == ignoreLocation) {
-                        ignoreLocation = null
+                        if (false) ignoreLocation = null
                         return
                     }
 
-                    if (predictedChestLocations.size == 0) {
-                        // TODO: add note pling
+                    if (predictedChestLocations.size == 0 && !playedPling) {
+                        SoundUtils.plingSound.playSound()
+                        playedPling = true
                     }
                     ChatUtils.debug("pushed $loc", true)
                     predictedChestLocations.add(loc)
                 }
             }
+            ChatUtils.debug("Searching for chests took ${start.passedSince().inWholeMilliseconds}", true)
         }
 
     }
@@ -94,7 +104,7 @@ object MetalDetectorSolver {
         if (!isEnabled()) return
         if (!treasureFoundPattern.matches(event.message)) return
 
-        if (predictedChestLocations.size != 0) ignoreLocation = predictedChestLocations[0]
+        if (predictedChestLocations.size == 1) ignoreLocation = null
         predictedChestLocations.clear()
     }
 
@@ -105,7 +115,28 @@ object MetalDetectorSolver {
             event.drawColor(it, LorenzColor.GOLD)
             event.drawLineToEye(it.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toColor(), 3, false)
             event.drawWaypointFilled(it, LorenzColor.RED.toColor(), true, true)
-            event.drawString(it, "possible location")
+            event.drawString(it, "Treasure: ${it.distanceToPlayer().roundTo(0)}m", true)
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onWorldSwap(event: WorldChangeEvent) {
+        baseCoordinates = null
+        lastSearchedForBase = SimpleTimeMark.farPast()
+        predictedChestLocations.clear()
+        ignoreLocation = null
+        lastLoc = null
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
+        if (predictedChestLocations.size == 1) {
+            val distanceSq = predictedChestLocations[0].distanceSqToPlayer()
+            if (distanceSq <= 25) {
+                ignoreLocation = predictedChestLocations[0]
+                predictedChestLocations.clear()
+            }
         }
     }
 

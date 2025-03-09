@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig;
+import at.hannibal2.skyhanni.config.features.mining.nucleus.MetalDetectorConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig;
+import at.hannibal2.skyhanni.config.features.mining.orderedwaypoints.OrderedWaypointConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -54,6 +56,16 @@ public class MiningConfig {
     @ConfigOption(name = "Crystal Nucleus Tracker", desc = "")
     @Accordion
     public CrystalNucleusTrackerConfig crystalNucleusTracker = new CrystalNucleusTrackerConfig();
+
+    @Expose
+    @ConfigOption(name = "Metal Detector", desc = "")
+    @Accordion
+    public MetalDetectorConfig metalDetector = new MetalDetectorConfig();
+
+    @Expose
+    @ConfigOption(name = "Ordered Waypoints", desc = "")
+    @Accordion
+    public OrderedWaypointConfig orderedWaypoints = new OrderedWaypointConfig();
 
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
@@ -136,10 +148,4 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightPrecisionMiningParticles = false;
-
-    @Expose
-    @ConfigOption(name = "Metal Detector Solver", desc = "Enables the solver for the metal detector.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean metalDetectorSolver = false;
 }
