@@ -8,23 +8,21 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -32,27 +30,30 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -154,11 +155,11 @@ object TunnelsMaps {
 
     private var clickTranslate = mapOf<Int, String>()
 
-    private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".asInternalName() }
+    private val ROYAL_PIGEON = "ROYAL_PIGEON".toInternalName()
 
     private var isCommission = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         clickTranslate = mapOf()
@@ -167,7 +168,7 @@ object TunnelsMaps {
             val lore = item.getLore()
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
             if (completedPattern.anyMatches(lore)) return@mapNotNull null
-            val type = lore.matchFirst(collectorCommissionPattern) {
+            val type = collectorCommissionPattern.firstMatcher(lore) {
                 group("what")
             } ?: return@mapNotNull null
             if (invalidGoalPattern.matches(type)) return@mapNotNull null
@@ -198,21 +199,21 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clickTranslate = mapOf()
     }
 
-    @SubscribeEvent
-    fun onRenderItemTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
         clickTranslate[event.slot.slotIndex]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
         }
     }
 
-    @SubscribeEvent
-    fun onGuiContainerSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.clickedButton != 1) return
         clickTranslate[event.slotId]?.let {
@@ -221,7 +222,7 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
@@ -256,7 +257,7 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             config.compactGemstone,
@@ -266,62 +267,50 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderDisplay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        val display = buildList<Renderable> {
-            if (active.isNotEmpty()) {
-                if (goal == campfire && active != campfire.name) {
-                    add(Renderable.string("§6Override for ${campfire.name}"))
-                    add(
-                        Renderable.clickable(
-                            Renderable.string("§eMake §f$active §eactive"),
-                            onClick = {
-                                goal = getNext()
-                            },
-                        ),
-                    )
-                } else {
-                    add(
-                        Renderable.clickAndHover(
-                            Renderable.string("§6Active: §f$active"),
-                            listOf("§eClick to disable current Waypoint"),
-                            onClick = ::clearPath,
-                        ),
-                    )
-                    if (hasNext()) {
+    init {
+        RenderDisplayHelper(
+            condition = { isEnabled() },
+            inOwnInventory = true,
+        ) {
+            val display = buildList {
+                if (active.isNotEmpty()) {
+                    if (goal == campfire && active != campfire.name) {
+                        add(Renderable.string("§6Override for ${campfire.name}"))
+                        add(Renderable.clickable("§eMake §f$active §eactive", onLeftClick = ::setNextGoal))
+                    } else {
                         add(
                             Renderable.clickable(
-                                Renderable.string("§eNext Spot"),
-                                onClick = {
-                                    goal = getNext()
-                                },
+                                "§6Active: §f$active",
+                                tips = listOf("§eClick to disable current Waypoint"),
+                                onLeftClick = ::clearPath,
                             ),
                         )
-                    } else {
-                        addString("")
+                        if (hasNext()) add(Renderable.clickable("§eNext Spot", onLeftClick = ::setNextGoal))
+                        else addString("")
                     }
+                } else {
+                    addString("")
+                    addString("")
                 }
-            } else {
-                addString("")
-                addString("")
+                addAll(locationDisplay)
             }
-            addAll(locationDisplay)
+            config.position.renderRenderables(display, posLabel = "Tunnels Maps")
         }
-        config.position.renderRenderables(display, posLabel = "Tunnels Maps")
-
     }
 
     private fun generateLocationsDisplay() = buildList {
+        val campfireName = campfire.name ?: return@buildList
         add(Renderable.string("§6Locations:"))
         add(
-            Renderable.multiClickAndHover(
-                campfire.name!!,
-                listOf(
-                    "§eLeft Click to set active", "§eRight Click for override",
+            Renderable.clickable(
+                campfireName,
+                tips = listOf(
+                    "§eLeft Click to set active",
+                    "§eRight Click for override",
                 ),
-                click = mapOf(
-                    0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride,
+                onAnyClick = mapOf(
+                    LEFT_MOUSE to guiSetActive(campfireName),
+                    RIGHT_MOUSE to ::campfireOverride,
                 ),
             ),
         )
@@ -331,7 +320,7 @@ object TunnelsMaps {
                     Renderable.horizontalContainer(
                         listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[$name]"), onClick = guiSetActive(it.key))
+                            Renderable.clickable(Renderable.string("§d[$name]"), onLeftClick = guiSetActive(it.key))
                         },
                     ),
                     Renderable.string("§dFairy Souls"),
@@ -349,33 +338,33 @@ object TunnelsMaps {
         } else {
             addAll(
                 newGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                    Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
                 },
             )
             addAll(
                 oldGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                    Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
                 },
             )
         }
         addAll(
             normalLocations.map {
-                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
             },
         )
     }
 
-    private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
+    private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickable(
         Renderable.string(
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),
-                ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()
+                ).toInternalName().itemName.takeWhile { it != ' ' }.removeColor()
                 ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
         tips = listOf(it.key),
-        onClick = guiSetActive(it.key),
+        onLeftClick = guiSetActive(it.key),
     )
 
     private fun campfireOverride() {
@@ -393,8 +382,8 @@ object TunnelsMaps {
         setActiveAndGoal(it)
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevclosest = closestNode
@@ -431,7 +420,7 @@ object TunnelsMaps {
         }
         if (goalReached) {
             if (goal == campfire && active != campfire.name) {
-                this.goal = getNext()
+                setNextGoal()
             } else {
                 cooldowns[goal] = 60.0.seconds.fromNow()
                 clearPath()
@@ -446,8 +435,12 @@ object TunnelsMaps {
         goal = null
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    private fun setNextGoal() {
+        goal = getNext()
+    }
+
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val path = path?.takeIf { it.first.isNotEmpty() } ?: return
         event.draw3DPathWithWaypoint(
@@ -475,10 +468,10 @@ object TunnelsMaps {
         goal?.name?.getFirstColorCode()?.toLorenzColor()?.takeIf { it != LorenzColor.WHITE }?.toColor()
     } else {
         null
-    } ?: config.pathColour.toChromaColor()
+    } ?: config.pathColour.toSpecialColor()
 
-    @SubscribeEvent
-    fun onKeyPress(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         campfireKey(event)
@@ -493,7 +486,7 @@ object TunnelsMaps {
         nextSpot()
     }
 
-    private fun campfireKey(event: LorenzKeyPressEvent) {
+    private fun campfireKey(event: KeyPressEvent) {
         if (event.keyCode != config.campfireKey) return
         if (config.travelScroll) {
             HypixelCommands.warp("basecamp")
@@ -504,15 +497,11 @@ object TunnelsMaps {
 
     @HandleEvent
     fun onWarp(event: SkyHanniWarpEvent) {
-        if (!isEnabled()) return
-        if (goal != null) {
-            DelayedRun.runNextTick {
-                goal = getNext()
-            }
-        }
+        if (!isEnabled() || goal == null) return
+        DelayedRun.runNextTick { setNextGoal() }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (closestNode == null) return // Value that must be none null if it was active
         closestNode = null
@@ -523,7 +512,7 @@ object TunnelsMaps {
 
     private var nextSpotDelay = SimpleTimeMark.farPast()
 
-    private fun nextSpotKey(event: LorenzKeyPressEvent) {
+    private fun nextSpotKey(event: KeyPressEvent) {
         if (event.keyCode != config.nextSpotHotkey) return
         nextSpot()
     }
@@ -531,7 +520,7 @@ object TunnelsMaps {
     private fun nextSpot() {
         if (!nextSpotDelay.isInPast()) return
         nextSpotDelay = 0.5.seconds.fromNow()
-        goal = getNext()
+        setNextGoal()
     }
 
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")

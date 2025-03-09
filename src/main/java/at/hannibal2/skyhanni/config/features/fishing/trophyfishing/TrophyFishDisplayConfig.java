@@ -40,15 +40,15 @@ public class TrophyFishDisplayConfig {
         ONLY_WITH_KEYBIND("On keybind"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        WhenToShow(String str) {
-            this.str = str;
+        WhenToShow(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -97,15 +97,15 @@ public class TrophyFishDisplayConfig {
         NAME("Name Alphabetical"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        TrophySorting(String str) {
-            this.str = str;
+        TrophySorting(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -143,15 +143,15 @@ public class TrophyFishDisplayConfig {
         TOTAL("Amount Total"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        TextPart(String str) {
-            this.str = str;
+        TextPart(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -172,9 +172,17 @@ public class TrophyFishDisplayConfig {
     public Property<Boolean> showCheckmark = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fishes that are still missing at this rarity.")
+    @ConfigOption(name = "Only Show Missing", desc = "Only show Trophy Fish that are still missing at this tier.")
     @ConfigEditorDropdown
     public Property<HideCaught> onlyShowMissing = Property.of(HideCaught.NONE);
+
+    @Expose
+    @ConfigOption(
+        name = "Show If Caught Higher Tier",
+        desc = "Show Trophy Fish missing at the chosen tier even if a higher tier has already been caught."
+    )
+    @ConfigEditorBoolean
+    public Property<Boolean> showCaughtHigher = Property.of(false);
 
     public enum HideCaught {
         NONE("Show All"),
@@ -184,15 +192,15 @@ public class TrophyFishDisplayConfig {
         DIAMOND("Diamond"),
         ;
 
-        private final String str;
+        private final String displayName;
 
-        HideCaught(String str) {
-            this.str = str;
+        HideCaught(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

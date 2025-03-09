@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
+//#if MC < 1.12
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
@@ -13,18 +17,18 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.world.WorldSettings
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-//#if MC<1.12
-import net.minecraft.world.WorldSettings
+
 //#else
 //$$ import net.minecraft.world.GameType
 //#endif
@@ -45,7 +49,23 @@ object TabListData {
     fun getHeader() = header
     fun getFooter() = footer
 
-    fun toggleDebug() {
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Tab List Debug Cache")
+        debugCache?.let {
+            event.addData {
+                add("debug active!")
+                add("lines: (${it.size})")
+                for (line in it) {
+                    add(" '$line'")
+                }
+            }
+        } ?: run {
+            event.addIrrelevant("not active.")
+        }
+    }
+
+    private fun toggleDebug() {
         if (debugCache != null) {
             ChatUtils.chat("Disabled tab list debug.")
             debugCache = null
@@ -63,7 +83,7 @@ object TabListData {
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
                 onClick = { toggleDebug() },
-                "§eClick to disable!"
+                "§eClick to disable!",
             )
             return
         }
@@ -98,10 +118,10 @@ object TabListData {
             return ComparisonChain.start().compareTrueFirst(
                 //#if MC<1.12
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
-                o2.gameType != WorldSettings.GameType.SPECTATOR
+                o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
                 //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR
+                //$$ o2.gameType != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(
@@ -123,10 +143,11 @@ object TabListData {
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
-            result.add(LorenzUtils.stripVanillaMessage(name))
+            result.add(name.stripHypixelMessage())
         }
         tabListGuard = false
-        return result.dropLast(1)
+        return if (result.size < 80) result.dropLast(1)
+        else result.subList(0, 80)
     }
 
     var dirty = false
@@ -138,15 +159,15 @@ object TabListData {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!dirty) return
         dirty = false
 
         val tabList = readTabList() ?: return
         if (tablistCache != tabList) {
             tablistCache = tabList
-            TabListUpdateEvent(getTabList()).postAndCatch()
+            TabListUpdateEvent(getTabList()).post()
             if (!LorenzUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
@@ -157,7 +178,7 @@ object TabListData {
 
         val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
         if (tabFooter != footer && tabFooter != "") {
-            TablistFooterUpdateEvent(tabFooter).postAndCatch()
+            TablistFooterUpdateEvent(tabFooter).post()
         }
         footer = tabFooter
     }
@@ -166,8 +187,17 @@ object TabListData {
         DelayedRun.runDelayed(2.seconds) {
             if (LorenzUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateEvent(getTabList()).postAndCatch()
+                TabListUpdateEvent(getTabList()).post()
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtesttablist") {
+            description = "Set your clipboard as a fake tab list."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { toggleDebug() }
         }
     }
 }

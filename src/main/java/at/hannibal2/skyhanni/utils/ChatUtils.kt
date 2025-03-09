@@ -1,10 +1,17 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
+import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.command
@@ -15,10 +22,10 @@ import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.chat.Text.url
 import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.reflect.KMutableProperty0
@@ -82,23 +89,35 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
         replaceSameMessage: Boolean = false,
+        onlySendOnce: Boolean = false,
+        messageId: Int? = null,
     ) {
 
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce, messageId = messageId)
         } else {
-            internalChat(message, replaceSameMessage)
+            internalChat(message, replaceSameMessage, onlySendOnce, messageId = messageId)
         }
     }
+
+    private val messagesThatAreOnlySentOnce = mutableListOf<String>()
 
     private fun internalChat(
         message: String,
         replaceSameMessage: Boolean,
+        onlySendOnce: Boolean = false,
+        messageId: Int? = null,
     ): Boolean {
         val text = ChatComponentText(message)
+        if (onlySendOnce) {
+            if (message in messagesThatAreOnlySentOnce) {
+                return false
+            }
+            messagesThatAreOnlySentOnce.add(message)
+        }
 
-        return if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(message))
+        return if (replaceSameMessage || messageId != null) {
+            text.send(messageId ?: getUniqueMessageIdForString(message))
             chat(text, false)
         } else {
             chat(text)
@@ -161,11 +180,14 @@ object ChatUtils {
         }
     }
 
-    val uniqueMessageIdStorage = mutableMapOf<String, Int>()
+    private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
 
-    fun getUniqueMessageIdForString(string: String) = uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
+    private fun getUniqueMessageIdForString(string: String): Int {
+        return uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+    }
 
-    var lastUniqueMessageId = 123242
+    private var lastUniqueMessageId = 123242
 
     fun getUniqueMessageId() = lastUniqueMessageId++
 
@@ -194,7 +216,7 @@ object ChatUtils {
                 if (command != null) {
                     this.command = command
                 }
-            }
+            },
         )
     }
 
@@ -222,7 +244,7 @@ object ChatUtils {
             Text.text(msgPrefix + message) {
                 this.url = url
                 this.hover = "$prefixColor$hover".asComponent()
-            }
+            },
         )
         if (autoOpen) OSUtils.openBrowser(url)
     }
@@ -244,6 +266,61 @@ object ChatUtils {
         chat(Text.join(components).prefix(msgPrefix))
     }
 
+    private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
+
+    var chatLines: MutableList<ChatLine>
+        get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
+        set(value) {
+            (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni = value
+        }
+
+    var drawnChatLines: MutableList<ChatLine>
+        get() = (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni
+        set(value) {
+            (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
+        }
+
+    /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
+    fun editFirstMessage(
+        component: (IChatComponent) -> IChatComponent,
+        reason: String,
+        predicate: (ChatLine) -> Boolean,
+    ) {
+        chatLines.editChatLine(component, predicate, reason)
+        chatGui.refreshChat()
+    }
+
+    /**
+     * Deletes a maximum of [amount] messages in chat that match the given [predicate].
+     */
+    fun deleteMessage(
+        reason: String,
+        amount: Int = 1,
+        predicate: (ChatLine) -> Boolean,
+    ) {
+        chatLines.deleteChatLine(amount, reason, predicate)
+        chatGui.refreshChat()
+    }
+
+    private var deleteNext: Pair<String, (String) -> Boolean>? = null
+
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onChat(event: SkyHanniChatEvent) {
+        val (reason, predicate) = deleteNext ?: return
+        this.deleteNext = null
+
+        if (predicate(event.message)) {
+            event.blockedReason = reason
+        }
+    }
+
+    fun deleteNextMessage(
+        reason: String,
+        predicate: (String) -> Boolean,
+    ) {
+        deleteNext = reason to predicate
+    }
+
     private var lastMessageSent = SimpleTimeMark.farPast()
     private val sendQueue: Queue<String> = LinkedList()
     private val messageDelay = 300.milliseconds
@@ -251,8 +328,8 @@ object ChatUtils {
     fun getTimeWhenNewlyQueuedMessageGetsExecuted() =
         (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
             sendQueue.clear()
@@ -265,19 +342,21 @@ object ChatUtils {
     }
 
     fun sendMessageToServer(message: String) {
+        if (canSendInstantly()) {
+            Minecraft.getMinecraft().thePlayer?.let {
+                it.sendChatMessage(message)
+                lastMessageSent = SimpleTimeMark.now()
+                return
+            }
+        }
         sendQueue.add(message)
     }
 
-    @Deprecated("use HypixelCommands instead", ReplaceWith(""))
-    fun sendCommandToServer(command: String) {
-        if (command.startsWith("/")) {
-            debug("Sending wrong command to server? ($command)")
-        }
-        sendMessageToServer("/$command")
-    }
+    private fun canSendInstantly() = sendQueue.isEmpty() && lastMessageSent.passedSince() > messageDelay
 
-    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) =
-        splitMessage.takeIf { it.isNotEmpty() }?.get(0) == commandWithSlash
+    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
+        it.isNotEmpty()
+    }?.get(0) == commandWithSlash
 
     fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
         splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
@@ -291,7 +370,7 @@ object ChatUtils {
         clickableChat(
             message,
             onClick = { property.jumpToEditor() },
-            "§eClick to find setting in the config!"
+            "§eClick to find setting in the config!",
         )
     }
 
@@ -302,8 +381,13 @@ object ChatUtils {
         return this
     }
 
-
-    fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
+    fun clickToActionOrDisable(
+        message: String,
+        option: KMutableProperty0<*>,
+        actionName: String,
+        action: () -> Unit,
+        oneTimeClick: Boolean = false,
+    ) {
         clickableChat(
             "$message\n§e[CLICK to $actionName or disable this feature]",
             onClick = {
@@ -313,9 +397,14 @@ object ChatUtils {
                     action()
                 }
             },
-            hover = "§eClick to $actionName!\n" +
-                "§eShift-Click or Control-Click to disable this feature!",
+            hover = "§eClick to $actionName!\n§eShift-Click or Control-Click to disable this feature!",
+            oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
         )
     }
+
+    val ChatLine.message get() = chatComponent.formattedText.stripHypixelMessage()
+
+    fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
+
 }

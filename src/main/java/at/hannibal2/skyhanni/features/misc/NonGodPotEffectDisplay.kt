@@ -3,16 +3,19 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,10 +33,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @SkyHanniModule
 object NonGodPotEffectDisplay {
@@ -60,9 +64,10 @@ object NonGodPotEffectDisplay {
         REV("§cZombie Brain Mixin", true),
         TARA("§6Spider Egg Mixin", true),
         SVEN("§bWolf Fur Mixin", true),
-        VOID("§6Ender Portal Fumes", true),
+        VOID("§6End Portal Fumes", true),
         BLAZE("§fGabagoey", true),
         GLOWING_MUSH("§2Glowing Mush Mixin", true),
+        HOT_CHOCOLATE("§6Hot Chocolate Mixin", true),
 
         DEEP_TERROR("§4Deepterror", true),
 
@@ -73,6 +78,8 @@ object NonGodPotEffectDisplay {
         PEST_REPELLENT("§6Pest Repellent I§r"),
         PEST_REPELLENT_MAX("§6Pest Repellent II"),
 
+        DOUCE_PLUIE_DE_STINKY_CHEESE("§eDouce Pluie de Stinky Cheese I"),
+
         CURSE_OF_GREED("§4Curse of Greed I"),
 
         COLD_RESISTANCE_4("§bCold Resistance IV"),
@@ -82,68 +89,85 @@ object NonGodPotEffectDisplay {
         CHILLED_PRISTINE_POTATO("§fChilled Pristine Potato I"),
     }
 
+    /**
+     * REGEX-TEST:  Repellent: §r§9MAX §r§7(12s)
+     */
+    private val repellentPattern by RepoPattern.pattern(
+        "misc.nongodpot.repellant",
+        " Repellent: §r§[97a](?<tier>\\w+)?(?: §r§7\\((?<time>\\d)s\\))?",
+    )
+
     private val effectsCountPattern by RepoPattern.pattern(
         "misc.nongodpot.effects",
         "§7You have §e(?<name>\\d+) §7non-god effects\\.",
     )
     private var totalEffectsCount = 0
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         effectDuration.clear()
         display = emptyList()
     }
 
     // todo : cleanup and add support for poison candy I, and add support for splash / other formats
-    @SubscribeEvent
+    @HandleEvent
     @Suppress("MaxLineLength")
-    fun onChat(event: LorenzChatEvent) {
-        if (event.message == "§aYou cleared all of your active effects!") {
-            effectDuration.clear()
-            update()
-        }
+    fun onChat(event: SkyHanniChatEvent) {
+        when (event.message) {
+            "§aYou cleared all of your active effects!" -> {
+                effectDuration.clear()
+                update()
+            }
 
-        if (event.message == "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!") {
-            effectDuration[NonGodPotEffect.SMOLDERING] = Timer(1.hours)
-            update()
-        }
+            "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!" -> {
+                effectDuration[NonGodPotEffect.SMOLDERING] = Timer(1.hours)
+                update()
+            }
 
-        if (event.message == "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!") {
-            effectDuration[NonGodPotEffect.GLOWY] = Timer(1.hours)
-            update()
-        }
+            "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effectDuration[NonGodPotEffect.GLOWY] = Timer(1.hours)
+                update()
+            }
 
-        if (event.message == "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!") {
-            effectDuration[NonGodPotEffect.WISP] = Timer(5.minutes)
-            update()
-        }
+            "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effectDuration[NonGodPotEffect.WISP] = Timer(5.minutes)
+                update()
+            }
 
-        if (event.message == "§eYou consumed a §r§fGreat Spook Potion§r§e!") {
-            effectDuration[NonGodPotEffect.GREAT_SPOOK] = Timer(24.hours)
-            update()
-        }
+            "§eYou consumed a §r§fGreat Spook Potion§r§e!" -> {
+                effectDuration[NonGodPotEffect.GREAT_SPOOK] = Timer(24.hours)
+                update()
+            }
 
-        if (event.message == "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!") {
-            effectDuration[NonGodPotEffect.HARVEST_HARBINGER] = Timer(25.minutes)
-            update()
-        }
+            "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effectDuration[NonGodPotEffect.HARVEST_HARBINGER] = Timer(25.minutes)
+                update()
+            }
 
-        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!") {
-            effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
-        }
+            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+                effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(1.hours)
+                update()
+            }
 
-        if (event.message == "§a§lYUM! §r§6Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!") {
-            effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
-        }
+            "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
+                effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
+                update()
+            }
 
-        if (event.message == "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain.") {
-            effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
-            update()
-        }
+            "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effectDuration[NonGodPotEffect.DOUCE_PLUIE_DE_STINKY_CHEESE] = Timer(1.hours)
+                update()
+            }
 
-        if (event.message == "§cThe Goblin King's §r§afoul stench §r§chas dissipated!") {
-            effectDuration.remove(NonGodPotEffect.GOBLIN)
-            update()
+            "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain." -> {
+                effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
+                update()
+            }
+
+            "§cThe Goblin King's §r§afoul stench §r§chas dissipated!" -> {
+                effectDuration.remove(NonGodPotEffect.GOBLIN)
+                update()
+            }
         }
     }
 
@@ -181,7 +205,7 @@ object NonGodPotEffectDisplay {
         return newDisplay
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
@@ -201,14 +225,13 @@ object NonGodPotEffectDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         checkFooter = true
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!event.inventoryName.endsWith("Active Effects")) return
 
         for (stack in event.inventoryItems.values) {
@@ -229,6 +252,25 @@ object NonGodPotEffectDisplay {
                     effectDuration[effect] = Timer(duration)
                     update()
                 }
+            }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PESTS)) return
+
+        event.lines.firstNotNullOfOrNull {
+            repellentPattern.matchMatcher(it) {
+                // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
+                val time = group("time")?.toIntOrNull() ?: return@matchMatcher
+                val tier = group("tier")
+                val duration = time.toDuration(DurationUnit.SECONDS)
+                when (tier) {
+                    "MAX" -> effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(duration)
+                    "REGULAR" -> effectDuration[NonGodPotEffect.PEST_REPELLENT] = Timer(duration)
+                }
+                update()
             }
         }
     }
@@ -269,10 +311,10 @@ object NonGodPotEffectDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !config.nonGodPotEffectDisplay) return
-        if (RiftAPI.inRift()) return
+        if (RiftApi.inRift()) return
 
         config.nonGodPotEffectPos.renderStrings(
             display,
@@ -281,12 +323,12 @@ object NonGodPotEffectDisplay {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
         event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
 }

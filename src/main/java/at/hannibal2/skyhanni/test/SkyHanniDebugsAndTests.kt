@@ -6,15 +6,17 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
@@ -26,11 +28,13 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getRawBaseStats
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -39,12 +43,8 @@ import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -68,7 +68,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -102,8 +101,8 @@ object SkyHanniDebugsAndTests {
 
     private var testLocation: LorenzVec? = null
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
             event.drawDynamicText(it, "Test", 1.5)
@@ -183,7 +182,7 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    fun resetConfigCommand() {
+    private fun resetConfigCommand() {
         ChatUtils.clickableChat(
             "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
             onClick = { resetConfig() },
@@ -204,7 +203,7 @@ object SkyHanniDebugsAndTests {
             // initializing a new config manager, calling firstLoad, and setting it as the config manager in use.
             val configManager = ConfigManager()
             configManager.firstLoad()
-            SkyHanniMod.Companion::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
+            SkyHanniMod::class.java.enclosingClass.getDeclaredField("configManager").makeAccessible()
                 .set(SkyHanniMod, configManager)
 
             // resetting the MoulConfigProcessor in use
@@ -236,7 +235,7 @@ object SkyHanniDebugsAndTests {
             list.add("$coloredName§7 (")
             for (itemName in item.value) {
                 try {
-                    val internalName = NEUInternalName.fromItemName(itemName)
+                    val internalName = NeuInternalName.fromItemName(itemName)
                     list.add(internalName.getItemStack())
                 } catch (e: Error) {
                     ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
@@ -273,10 +272,8 @@ object SkyHanniDebugsAndTests {
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
-                val module = javaClass.newInstance()
-                modules.add(module)
-
-                MinecraftForge.EVENT_BUS.register(module)
+                modules.add(javaClass)
+                MinecraftForge.EVENT_BUS.register(javaClass)
                 println("Registered listener $simpleName")
             } else {
                 println("Skipped registering listener $simpleName")
@@ -340,7 +337,7 @@ object SkyHanniDebugsAndTests {
     }
 
     fun debugVersion() {
-        val name = "SkyHanni ${SkyHanniMod.version}"
+        val name = "SkyHanni ${SkyHanniMod.VERSION}"
         ChatUtils.chat("§eYou are using $name")
         OSUtils.copyToClipboard(name)
     }
@@ -366,42 +363,7 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    fun testItemCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
-            return
-        }
-
-        val input = args.joinToString(" ")
-        val result = buildList {
-            add("")
-            add("§bSkyHanni Test Item")
-            add("§einput: '§f$input§e'")
-
-            NEUInternalName.fromItemNameOrNull(input)?.let { internalName ->
-                add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
-                add("  §eitemName: '${internalName.itemName}§e'")
-                val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6$price§e'")
-                return@buildList
-            }
-
-            input.asInternalName().getItemStackOrNull()?.let { item ->
-                val itemName = item.itemName
-                val internalName = item.getInternalName()
-                add("§einternal name: §7${internalName.asString()}")
-                add("§einternal name -> item name: '$itemName§e'")
-                val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6$price§e'")
-                return@buildList
-            }
-
-            add("§cNothing found!")
-        }
-        ChatUtils.chat(result.joinToString("\n"), prefix = false)
-    }
-
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
         val focussedSlot = event.guiContainer.slotUnderMouse ?: return
@@ -412,19 +374,17 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
-    @SubscribeEvent
-    fun onShowInternalName(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onShowInternalName(event: ToolTipEvent) {
         if (!debugConfig.showInternalName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
-        if ((internalName == NEUInternalName.NONE) && !debugConfig.showEmptyNames) return
+        if ((internalName == NeuInternalName.NONE) && !debugConfig.showEmptyNames) return
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
     }
 
-    @SubscribeEvent
-    fun showItemRarity(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun showItemRarity(event: ToolTipEvent) {
         if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack
 
@@ -432,9 +392,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item rarity: $rarity")
     }
 
-    @SubscribeEvent
-    fun showItemCategory(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun showItemCategory(event: ToolTipEvent) {
         if (!debugConfig.showItemCategory) return
         val itemStack = event.itemStack
 
@@ -442,9 +401,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item category: $category")
     }
 
-    @SubscribeEvent
-    fun onShowNpcPrice(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onShowNpcPrice(event: ToolTipEvent) {
         if (!debugConfig.showNpcPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -452,18 +410,31 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("§7NPC price: ${npcPrice.addSeparators()}")
     }
 
-    @SubscribeEvent
-    fun onShowCraftPrice(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onShowBaseStats(event: ToolTipEvent) {
+        if (!debugConfig.showBaseValues) return
+        val internalName = event.itemStack.getInternalNameOrNull() ?: return
+
+        val stats = internalName.getRawBaseStats()
+        if (stats.isEmpty()) return
+
+        event.toolTip.add("§7Base stats:")
+        for ((name, value) in stats) {
+
+            event.toolTip.add("§7$name: $value")
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onShowCraftPrice(event: ToolTipEvent) {
         if (!debugConfig.showCraftPrice) return
         val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
 
         event.toolTip.add("§7Craft price: ${price.addSeparators()}")
     }
 
-    @SubscribeEvent
-    fun onShowBzPrice(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onShowBzPrice(event: ToolTipEvent) {
         if (!debugConfig.showBZPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
@@ -475,13 +446,12 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("§7BZ sellOfferPrice: ${sellOfferPrice.addSeparators()}")
     }
 
-    @SubscribeEvent
-    fun onShowItemName(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onShowItemName(event: ToolTipEvent) {
         if (!debugConfig.showItemName) return
         val itemStack = event.itemStack
         val internalName = itemStack.getInternalName()
-        if (internalName == NEUInternalName.NONE) {
+        if (internalName == NeuInternalName.NONE) {
             event.toolTip.add("Item name: no item.")
             return
         }
@@ -489,16 +459,14 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     @Suppress("EmptyFunctionBlock")
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
+    @Suppress("ConstantConditionIf")
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
-        @Suppress("ConstantConditionIf")
         if (false) {
             itemRenderDebug()
         }
@@ -532,9 +500,9 @@ object SkyHanniDebugsAndTests {
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
     }
 
-    @SubscribeEvent
-    fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf")
+    @HandleEvent
+    @Suppress("ConstantConditionIf")
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (false) {
             dragAbleTest()
         }
@@ -604,12 +572,12 @@ object SkyHanniDebugsAndTests {
     @HandleEvent(onlyOnSkyblock = true)
     fun onOreMined(event: OreMinedEvent) {
         if (!debugConfig.oreEventMessages) return
-        val originalOre = event.originalOre?.let { "$it " } ?: ""
+        val originalOre = event.originalOre?.let { "$it " }.orEmpty()
         val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
 //        val particleType = event.type
 //        val distance = LocationUtils.playerLocation().distance(event.location).roundTo(2)
@@ -634,7 +602,7 @@ object SkyHanniDebugsAndTests {
 //        println("offset: $offset")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.debugEnabled", "dev.debug.enabled")
         event.move(3, "dev.showInternalName", "dev.debug.showInternalName")
@@ -642,5 +610,16 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetconfig") {
+            description = "Reloads the config manager and rendering processors of MoulConfig. " +
+                "This §cWILL RESET §7your config, but also update the config files " +
+                "(names, description, orderings and stuff)."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { resetConfigCommand() }
+        }
     }
 }

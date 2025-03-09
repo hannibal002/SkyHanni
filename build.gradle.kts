@@ -160,7 +160,7 @@ dependencies {
 
     headlessLwjgl(libs.headlessLwjgl)
 
-    compileOnly(ksp(project(":annotation-processors"))!!)
+    ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
     val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
 
@@ -175,8 +175,8 @@ dependencies {
         modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
         modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
-        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
-        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.10")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
     }
 
     implementation(kotlin("stdlib-jdk8"))
@@ -191,9 +191,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // October 3, 2024, 11:43 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.4.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all") {
+    // December 29, 2024, 07:30 PM EST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.5.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.5.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -212,10 +212,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.12.5")
 
-    implementation("net.hypixel:mod-api:0.3.1")
+    if (target.minecraftVersion == MinecraftVersion.MC189) {
+        compileOnly(libs.hypixelmodapi)
+        shadowImpl(libs.hypixelmodapitweaker)
+    }
 
     // getting clock offset
-    shadowImpl("commons-net:commons-net:3.8.0")
+    shadowImpl("commons-net:commons-net:3.11.1")
 
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
@@ -312,6 +315,7 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
+    archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
@@ -346,6 +350,7 @@ tasks.shadowJar {
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
     relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
+    relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
@@ -384,6 +389,7 @@ preprocess {
 
 blossom {
     replaceToken("@MOD_VERSION@", version)
+    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
@@ -421,8 +427,10 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        target == ProjectTarget.MAIN && System.getenv("SKIP_DETEKT") != "true"
+        target == ProjectTarget.MAIN && project.findProperty("skipDetekt") != "true"
     }
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
 
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
@@ -432,10 +440,6 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
-tasks.withType<Detekt>().configureEach {
-    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-    outputs.cacheIf { false } // Custom rules won't work if cached
-}
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached

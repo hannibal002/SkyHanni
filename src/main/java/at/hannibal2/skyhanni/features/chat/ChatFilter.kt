@@ -1,14 +1,16 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilter.messagesMap
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.features.garden.pests.PestFinder
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
+import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
@@ -18,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -289,6 +290,7 @@ object ChatFilter {
         "§e[NPC] Jacob§f: §rMy contest has started!",
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
+        "§3[SBE] §a§cUnable to download bin data. This may result in certain features not working!",
     )
 
     private val skymallMessages = listOf(
@@ -304,43 +306,28 @@ object ChatFilter {
         "§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}☘ .+ Fortune §fduring the contest!",
     )
 
+    /**
+     * REGEX-TEST: §eNew buff§r§r§r: §r§fGain §r§6+50☘ Mining Fortune§r§f.
+     */
     private val skymallPerkPattern by RepoPattern.pattern(
         "chat.skymall.perk",
-        "§eNew buff§r§r§r:(.*)",
+        "§eNew buff§r§r§r:.*",
     )
 
     // Winter Gift
-    private val winterGiftPatterns = listOf(
-        // winter gifts useless
-        "§f§lCOMMON! §r§3.* XP §r§egift with §r.*§r§e!".toPattern(),
-        "(§f§lCOMMON|§9§lRARE)! §r.* XP Boost .* Potion §r.*§r§e!".toPattern(),
-        "(§f§lCOMMON|§9§lRARE)! §r§6.* coins §r§egift with §r.*§r§e!".toPattern(),
-
-        // enchanted book
-        "§9§lRARE! §r§9Scavenger IV §r§egift with §r.*§r§e!".toPattern(),
-        "§9§lRARE! §r§9Looting IV §r§egift with §r.*§r§e!".toPattern(),
-        "§9§lRARE! §r§9Luck VI §r§egift with §r.*§r§e!".toPattern(),
-
-        // minion skin
-        "§e§lSWEET! §r§f(Grinch|Santa|Gingerbread Man) Minion Skin §r§egift with §r.*§r§e!".toPattern(),
-
-        // rune
-        "§9§lRARE! §r§f◆ Ice Rune §r§egift with §r.*§r§e!".toPattern(),
-
-        // furniture
-        "§e§lSWEET! §r§fTall Holiday Tree §r§egift with §r.*§r§e!".toPattern(),
-        "§e§lSWEET! §r§fNutcracker §r§egift with §r.*§r§e!".toPattern(),
-        "§e§lSWEET! §r§fPresent Stack §r§egift with §r.*§r§e!".toPattern(),
-
-        "§e§lSWEET! §r§9(Winter|Battle) Disc §r§egift with §r.*§r§e!".toPattern(),
-
-        // winter gifts a bit useful
-        "§e§lSWEET! §r§9Winter Sack §r§egift with §r.*§r§e!".toPattern(),
-        "§e§lSWEET! §r§5Snow Suit .* §r§egift with §r.*§r§e!".toPattern(),
-
-        // winter gifts not your gifts
-        "§cThis gift is for §r.*§r§c, sorry!".toPattern(),
-    )
+    private val winterGiftPatterns = buildList {
+        GiftProfitTracker.run {
+            listOf(
+                xpGainedPattern,
+                coinsGainedPattern,
+                northStarsPattern,
+                boostPotionPattern,
+                enchantmentBookPattern,
+                genericRewardPattern
+            ).forEach { add(it) }
+        }
+        addAll(GiftProfitTracker.spamPatterns)
+    }
 
     private val fireSalePattern by RepoPattern.pattern(
         "chat.firesale",
@@ -514,10 +501,11 @@ object ChatFilter {
     )
     // </editor-fold>
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         var blockReason = block(event.message)
-        if (blockReason == null && config.powderMiningFilter.enabled) blockReason = powderMiningBlock(event)
+        if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
+        if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
 
         event.blockedReason = blockReason ?: return
     }
@@ -551,13 +539,13 @@ object ChatFilter {
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
-        generalConfig.hideJacob && !GardenAPI.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
+        generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
-        dungeonConfig.soloClass && DungeonAPI.inDungeon() && message.isPresent("solo_class") -> "solo_class"
-        dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
-        dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
-        config.gardenNoPest && GardenAPI.inGarden() && PestFinder.noPestsChatPattern.matches(message) -> "garden_pest"
+        dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
+        dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
+        dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
+        config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
 
         else -> null
     }
@@ -569,7 +557,7 @@ object ChatFilter {
      * @return Block reason if applicable
      * @see block
      */
-    private fun powderMiningBlock(event: LorenzChatEvent): String? {
+    private fun powderMiningBlock(event: SkyHanniChatEvent): String? {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
         if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {
@@ -582,6 +570,20 @@ object ChatFilter {
             return null
         }
         return powderMiningMatchResult
+    }
+
+    /**
+     * Checks if the message is a blocked Crystal Nucleus Run message, as defined in CrystalNucleusChatFilter.
+     * Will conditionally modify/compact messages in some cases, or return a blocking code
+     * @param event The event to check
+     * @return Block reason if applicable
+     * @see block
+     */
+    private fun crystalNucleusBlock(event: SkyHanniChatEvent): String? {
+        val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
+        newMessage?.let { event.chatComponent = ChatComponentText(it) }
+        blockCode?.let { return it }
+        return null
     }
 
     private var othersMsg: String? = null
@@ -628,7 +630,7 @@ object ChatFilter {
         (messagesContainsMap[key].orEmpty()).any { this.contains(it) } ||
         (messagesStartsWithMap[key].orEmpty()).any { this.startsWith(it) }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.hypixelHub", "chat.filterType.hypixelHub")
         event.move(3, "chat.empty", "chat.filterType.empty")
@@ -648,5 +650,7 @@ object ChatFilter {
                 }
             }
         }
+        event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
+        event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
     }
 }
