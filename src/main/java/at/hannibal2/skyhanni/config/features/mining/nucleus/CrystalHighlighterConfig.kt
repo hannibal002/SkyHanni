@@ -18,7 +18,7 @@ class CrystalHighlighterConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Box Style", desc = "Choose the style of the bounding box around the crystal barrier blocks.")
+    @ConfigOption(name = "Bounding Box Design", desc = "Choose the design of the bounding box around the crystal barrier blocks.")
     @ConfigEditorDropdown
     var boxStyle: BoundingBoxType = BoundingBoxType.FILLED
 
