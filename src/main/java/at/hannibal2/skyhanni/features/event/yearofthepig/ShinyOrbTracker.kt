@@ -109,7 +109,9 @@ object ShinyOrbTracker {
             event.coins != null -> tracker.addCoins(event.coins, command = false)
             event.skillXp != null -> tracker.modify {
                 val (skill, amount) = event.skillXp.first to event.skillXp.second
-                it.skillXpGained.addOrPut(skill, amount)
+                tracker.modify {
+                    it.skillXpGained.addOrPut(skill, amount)
+                }
             }
         }
     }
@@ -121,15 +123,7 @@ object ShinyOrbTracker {
 
         val orbPrice = SHINY_ORB_ITEM.getPrice()
         profit -= data.orbsUsed * orbPrice
-        add(
-            Renderable.hoverTips(
-                "§7${data.orbsUsed}x §6Shiny Orb§7: §c-${orbPrice.shortFormat()} coins",
-                listOf(
-                    "§7You used §6${data.orbsUsed}x §6Shiny Orb§7, worth",
-                    "§6~§${(data.orbsUsed * orbPrice).addSeparators()} coins",
-                )
-            ).toSearchable()
-        )
+        add(Renderable.string("§7${data.orbsUsed}x §6Shiny Orb§7: §c-${orbPrice.shortFormat()} coins").toSearchable())
 
         // Skill XP gains
         addSkillXpInfo(data.skillXpGained)
