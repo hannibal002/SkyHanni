@@ -27,7 +27,7 @@ object PigFeatures {
         event.tryRenderLinePigToOrb(dataSet)
     }
 
-    private fun SkyHanniRenderWorldEvent.tryRenderLineToPig(dataSet: PigFeaturesApi.ShinyOrbDataSet, ) {
+    private fun SkyHanniRenderWorldEvent.tryRenderLineToPig(dataSet: PigFeaturesApi.ShinyOrbDataSet) {
         val pigEntity = dataSet.pigEntityId?.let { EntityUtils.getEntityByID(it) } ?: return
         val nearPig = pigEntity.distanceToPlayer() < 5
         val lineToPigEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_PIG) && !nearPig
