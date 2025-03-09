@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.HotmData.Companion.inInventory
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -21,28 +20,24 @@ object OdgerTotalCaught {
 
     private val inventoryPattern by patternGroup.pattern(
         "inventory",
-        "Trophy Fishing"
+        "Trophy Fishing",
     )
 
     private val discoveredPattern by patternGroup.pattern(
         "discovered",
-        "§aDiscovered"
+        "§aDiscovered",
     )
 
-    private var inventoryOpened = false
+    private var inInventory = false
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.totalFishCaught) return
         inInventory = inventoryPattern.matches(event.inventoryName)
-        if (!inInventory) return
-        inventoryOpened = true
     }
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!inInventory) return
-        if (!config.totalFishCaught) return
         inInventory = false
     }
 
