@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig.BoundingBoxType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,6 +22,8 @@ import net.minecraft.util.BlockPos
 object NucleusBarriersBox {
     private val config get() = SkyHanniMod.feature.mining.crystalHighlighter
     private val colorConfig get() = config.colors
+
+    private var inNucleus = false
 
     private enum class Crystal(
         val boundingBox: AxisAlignedBB,
@@ -64,6 +67,11 @@ object NucleusBarriersBox {
     }
 
     @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        inNucleus = event.area == "Crystal Nucleus"
+    }
+
+    @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
@@ -89,7 +97,7 @@ object NucleusBarriersBox {
     }
 
     private fun isEnabled(): Boolean {
-        return IslandType.CRYSTAL_HOLLOWS.isInIsland() && IslandAreas.currentAreaName == "Crystal Nucleus" &&
+        return IslandType.CRYSTAL_HOLLOWS.isInIsland() && inNucleus &&
             (HoppityApi.isHoppityEvent() || !config.onlyDuringHoppity) && config.enabled
     }
 }
