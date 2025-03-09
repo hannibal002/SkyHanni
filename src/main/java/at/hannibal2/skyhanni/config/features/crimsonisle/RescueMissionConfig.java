@@ -4,16 +4,22 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class RescueMissionConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show a path to the hostage based on your quest rank. (You must hover over the book that gives you the quest and stand near the agent for the solver to work). §cDoes not work with S rank!")
+    @ConfigOption(name = "Enabled", desc = "Show a path to the hostage based on your quest rank. You must hover over the book that gives you the quest and stand near the agent for the solver to work. §cDoes not work with Mage S rank!")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigOption(name = "Path Variant", desc = "For Barbarian S-tier, there are two variants. If your path seems wrong, change it to the other one.")
+    @ConfigEditorDropdown
+    public PathVariant variant = PathVariant.ONE;
 
     @Expose
     @ConfigOption(name = "Look Ahead", desc = "Change how many waypoints should be shown in front of you.")
@@ -29,4 +35,14 @@ public class RescueMissionConfig {
     @ConfigOption(name = "Single Color", desc = "Make the waypoints an unchanging color for slow computers.")
     @ConfigEditorColour
     public Property<String> solidColor = Property.of("0:60:0:0:255");
+
+    public enum PathVariant {
+        ONE,
+        TWO;
+
+        @Override
+        public String toString() {
+            return String.valueOf(this.ordinal() + 1);
+        }
+    }
 }
