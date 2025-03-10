@@ -39,7 +39,7 @@ enum class ChunkedStatsLine(
         configLine = "§6Purse",
     ),
     MOTES(
-        displayPair = { "§b${getMotes()}" },
+        displayPair = { "§d${getMotes()}" },
         showWhen = { !(hideEmptyLines && getMotes() == "0") && ScoreboardElementMotes.showWhen() },
         showIsland = { ScoreboardElementMotes.showIsland() },
         configLine = "§dMotes",
