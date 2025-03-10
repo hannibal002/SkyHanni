@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.client.Minecraft
-import org.lwjgl.input.Mouse
 //#if MC < 1.16
+import at.hannibal2.skyhanni.utils.MouseCompat
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
+
 //#endif
 
 object GuiScreenUtils {
@@ -42,8 +43,8 @@ object GuiScreenUtils {
 //$$            mc.window.height
 //#endif
 
-    private val globalMouseX get() = Mouse.getX()
-    private val globalMouseY get() = Mouse.getY()
+    private val globalMouseX get() = MouseCompat.getX()
+    private val globalMouseY get() = MouseCompat.getY()
 
     val mouseX get() = globalMouseX * scaledWindowWidth / displayWidth
 
