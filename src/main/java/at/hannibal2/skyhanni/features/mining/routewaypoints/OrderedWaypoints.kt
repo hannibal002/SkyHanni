@@ -198,9 +198,13 @@ object OrderedWaypoints {
         SkyHanniMod.coroutineScope.launch {
             val res = if (args.isEmpty()) WaypointLoader.getWaypoints(ClipboardUtils.readFromClipboard() ?: "", "soopy")
             else {
+                ChatUtils.chat(ProfileStorageData.playerSpecific!!.routes::class.java.toString())
                 ProfileStorageData.playerSpecific?.routes?.get(args[0])?.let {
                     WaypointLoader.getWaypoints(it.toJson(), "soopy")
-                } ?: return@launch ChatUtils.chat("Route ${args[0]} doesn't exist.")
+                } ?: run {
+                    ChatUtils.chat("Route ${args[0]} doesn't exist.")
+                    return@launch
+                }
             }
 
             if (res.success) {
@@ -209,7 +213,8 @@ object OrderedWaypoints {
                 renderWaypoints.clear()
                 ChatUtils.chat("Loaded ordered waypoints!")
             } else {
-                return@launch ChatUtils.chat("There was an error parsing waypoints! ${res.message}")
+                ChatUtils.chat("There was an error parsing waypoints! ${res.message}")
+                return@launch
             }
 
             orderedWaypoints.let {
@@ -346,12 +351,17 @@ object OrderedWaypoints {
         if (args.isEmpty()) {
             return ChatUtils.chat("Usage: /shorderedsave (name).")
         }
-        ProfileStorageData.playerSpecific
-            ?.routes
-            ?.put(
-                args[0],
-                SoopyWaypointList(orderedWaypoints.toList())
-            )
+        val waypoints = SoopyWaypointList(orderedWaypoints)
+        ChatUtils.debug(waypoints::class.java.toString())
+        ChatUtils.debug(waypoints.toJson())
+        try {
+            ProfileStorageData.playerSpecific
+                ?.routes!![args[0]] = waypoints
+        } catch (e: Exception) {
+            e.message?.let { ChatUtils.debug(it) }
+            ChatUtils.debug(e.stackTraceToString())
+            return
+        }
         ChatUtils.chat("Route saved as ${args[0]}. Do /shorderedimport ${args[0]} to import it.")
     }
 

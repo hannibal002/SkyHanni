@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.model
 
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
@@ -8,11 +7,9 @@ import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 
-@JvmInline
-value class SoopyWaypointList(
-    @Expose val waypoints: List<SoopyWaypoint>,
+class SoopyWaypointList(
+    @Expose val waypoints: List<SoopyWaypoint> = listOf(),
 ) : List<SoopyWaypoint> by waypoints {
-
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<SoopyWaypointList>(
             { out, value ->
@@ -50,9 +47,9 @@ value class SoopyWaypointList(
                     val options = mutableMapOf<String, String>()
                     while (reader.hasNext()) {
                         when (reader.nextName()) {
-                            "x" -> x = reader.nextDouble().toInt()
-                            "y" -> y = reader.nextDouble().toInt()
-                            "z" -> z = reader.nextDouble().toInt()
+                            "x" -> x = reader.nextInt()
+                            "y" -> y = reader.nextInt()
+                            "z" -> z = reader.nextInt()
                             "r" -> r = reader.nextInt()
                             "g" -> g = reader.nextInt()
                             "b" -> b = reader.nextInt()
@@ -66,11 +63,12 @@ value class SoopyWaypointList(
                             else -> reader.skipValue()
                         }
                     }
-                    waypoints.add(SoopyWaypoint(x, y, z, r, g, b, options))
+                    val waypoint = SoopyWaypoint(x, y, z, r, g, b, options)
+                    waypoints.add(waypoint)
                     reader.endObject()
                 }
                 reader.endArray()
-                SoopyWaypointList(waypoints.toList())
+                SoopyWaypointList(waypoints)
             },
         ).create()
 
@@ -81,14 +79,14 @@ value class SoopyWaypointList(
     fun toJson(): String = gson.toJson(this)
 }
 
-data class SoopyWaypoint(
-    val x: Int,
-    val y: Int,
-    val z: Int,
-    val r: Int = 0,
-    val g: Int = 1,
-    val b: Int = 0,
-    val options: MutableMap<String, String> = mutableMapOf("name" to ""),
+class SoopyWaypoint(
+    @Expose val x: Int,
+    @Expose val y: Int,
+    @Expose val z: Int,
+    @Expose val r: Int = 0,
+    @Expose val g: Int = 1,
+    @Expose val b: Int = 0,
+    @Expose val options: MutableMap<String, String> = mutableMapOf("name" to ""),
 )
 
 fun SoopyWaypoint.toLorenzVec() = LorenzVec(x, y, z)
