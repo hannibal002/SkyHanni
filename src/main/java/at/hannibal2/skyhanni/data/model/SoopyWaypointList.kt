@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
@@ -24,11 +25,13 @@ value class SoopyWaypointList(
                     out.name("r").value(waypoint.r)
                     out.name("g").value(waypoint.g)
                     out.name("b").value(waypoint.b)
+
                     out.name("options").beginObject()
                     waypoint.options.forEach { (key, value) ->
                         out.name(key).value(value)
                     }
                     out.endObject()
+
                     out.endObject()
                 }
                 out.endArray()
@@ -67,7 +70,7 @@ value class SoopyWaypointList(
                     reader.endObject()
                 }
                 reader.endArray()
-                SoopyWaypointList(waypoints)
+                SoopyWaypointList(waypoints.toList())
             },
         ).create()
 

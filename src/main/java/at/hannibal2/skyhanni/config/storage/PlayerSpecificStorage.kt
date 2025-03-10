@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.storage
 
+import at.hannibal2.skyhanni.data.model.SoopyWaypointList
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -67,4 +68,7 @@ class PlayerSpecificStorage {
         @Expose
         var userLuck: Float = 0f
     }
+
+    @Expose
+    var routes: MutableMap<String, SoopyWaypointList> = mutableMapOf()
 }

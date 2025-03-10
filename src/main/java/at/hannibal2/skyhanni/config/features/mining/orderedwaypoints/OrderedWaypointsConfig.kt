@@ -45,6 +45,12 @@ class OrderedWaypointConfig {
     var traceLineThickness: Float = 1.0f
 
     @Expose
+    @ConfigOption(name = "Show Text", desc = "Whether the distance and name for ordered waypoints should be shown.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var showText: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Setup mode", desc = "Setup mode for route clearing.")
     @ConfigEditorBoolean
     @FeatureToggle

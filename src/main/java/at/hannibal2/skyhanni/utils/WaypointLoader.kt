@@ -54,7 +54,7 @@ object WaypointLoader {
                 "soopy" -> {
                     Result(true, waypoints = SoopyWaypointList.fromJson(data))
                 }
-                else -> Result(false)
+                else -> Result(false, "Invalid format?")
             }
         } catch (e: Exception) {
             ChatUtils.debug(e.stackTraceToString(), true)
