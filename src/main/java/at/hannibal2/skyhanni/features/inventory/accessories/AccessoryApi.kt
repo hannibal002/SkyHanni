@@ -182,7 +182,6 @@ object AccessoryApi {
         }
     }
 
-    private val pageCache: TimeLimitedCache<Int, Int> = TimeLimitedCache(10.minutes)
     private var lateRepoLoad = false
     private var inventoryHashCache: Int = 0
     private val pageHashCache: TimeLimitedCache<Int, Int> = TimeLimitedCache(10.minutes)

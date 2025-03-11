@@ -786,6 +786,7 @@ class ProfileSpecificStorage {
         var museumMilestone: Int? = null
     }
 
+    @Expose
     var stats: StatsStorage = StatsStorage()
 
     class StatsStorage {
