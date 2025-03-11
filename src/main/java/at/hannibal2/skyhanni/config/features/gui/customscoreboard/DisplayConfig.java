@@ -128,7 +128,7 @@ public class DisplayConfig {
     @Expose
     @ConfigOption(name = "Number Display Format", desc = "Select how numbers with their prefix and color should be formatted.")
     @ConfigEditorDropdown
-    public CustomScoreboardUtils.ScoreboardNumberDisplayFormat numberDisplayFormat = CustomScoreboardUtils.ScoreboardNumberDisplayFormat.TEXT_COLOR_NUMBER;
+    public CustomScoreboardUtils.NumberDisplayFormat numberDisplayFormat = CustomScoreboardUtils.NumberDisplayFormat.TEXT_COLOR_NUMBER;
 
     @Expose
     @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.")

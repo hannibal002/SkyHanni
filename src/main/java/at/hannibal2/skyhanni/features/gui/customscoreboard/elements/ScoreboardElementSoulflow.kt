@@ -12,7 +12,7 @@ object ScoreboardElementSoulflow : ScoreboardElement() {
         val soulflow = getSoulflow()
         if (informationFilteringConfig.hideEmptyLines && soulflow == "0") return null
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Soulflow", soulflow, "§3")
+        return CustomScoreboardUtils.formatNumberDisplay("Soulflow", soulflow, "§3")
     }
 
     override val configLine = "Soulflow: §3761"

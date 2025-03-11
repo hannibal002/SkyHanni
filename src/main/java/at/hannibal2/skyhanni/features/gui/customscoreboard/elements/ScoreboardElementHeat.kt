@@ -13,7 +13,7 @@ object ScoreboardElementHeat : ScoreboardElement() {
         val heat = getHeat() ?: return null
         if (informationFilteringConfig.hideEmptyLines && heat == "§c♨ 0") return null
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Heat", heat, "§c")
+        return CustomScoreboardUtils.formatNumberDisplay("Heat", heat, "§c")
     }
 
     override val configLine = "Heat: §c♨ 14"

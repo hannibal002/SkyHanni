@@ -11,7 +11,7 @@ object ScoreboardElementCold : ScoreboardElement() {
         val cold = -MiningApi.cold
         if (informationFilteringConfig.hideEmptyLines && cold == 0) return null
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Cold", "$cold❄", "§b")
+        return CustomScoreboardUtils.formatNumberDisplay("Cold", "$cold❄", "§b")
     }
 
     override val configLine = "Cold: §b0❄"

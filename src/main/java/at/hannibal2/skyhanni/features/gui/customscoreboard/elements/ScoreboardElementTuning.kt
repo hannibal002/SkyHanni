@@ -18,15 +18,15 @@ object ScoreboardElementTuning : ScoreboardElement() {
         return if (maxwellConfig.compactTuning) {
             val tuningDisplay = tunings.take(3).joinToString("§7, ") { tuning ->
                 with(tuning) {
-                    CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(value, icon, color)
+                    CustomScoreboardUtils.formatNumberDisplay(value, icon, color)
                 }
             }
-            CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(title, tuningDisplay, "§f")
+            CustomScoreboardUtils.formatNumberDisplay(title, tuningDisplay, "§f")
         } else {
             val tuningAmount = maxwellConfig.tuningAmount.coerceAtLeast(1)
             val tuningList = tunings.take(tuningAmount).map { tuning ->
                 with(tuning) {
-                    " §7- §f" + CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(value, icon, color)
+                    " §7- §f" + CustomScoreboardUtils.formatNumberDisplay(value, icon, color)
                 }
             }
             listOf("$title:") + tuningList

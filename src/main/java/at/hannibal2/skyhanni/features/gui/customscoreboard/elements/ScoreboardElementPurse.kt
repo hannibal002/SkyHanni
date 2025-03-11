@@ -19,7 +19,7 @@ object ScoreboardElementPurse : ScoreboardElement() {
             purse += getPurseEarned().orEmpty()
         }
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Purse", purse, "§6")
+        return CustomScoreboardUtils.formatNumberDisplay("Purse", purse, "§6")
     }
 
     override val configLine = "Purse: §652,763,737"

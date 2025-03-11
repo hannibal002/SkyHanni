@@ -31,7 +31,7 @@ object ScoreboardElementQuiver : ScoreboardElement() {
 
         val amountString = colorPrefix + amountDisplay
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(
+        return CustomScoreboardUtils.formatNumberDisplay(
             currentArrow.arrow,
             amountString,
             "§f",

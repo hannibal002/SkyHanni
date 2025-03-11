@@ -25,15 +25,15 @@ object ScoreboardElementPowder : ScoreboardElement() {
 
             when (displayConfig.powderDisplay) {
                 PowderDisplay.AVAILABLE -> {
-                    add(" §7- ${CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(name, current, color)}")
+                    add(" §7- ${CustomScoreboardUtils.formatNumberDisplay(name, current, color)}")
                 }
 
                 PowderDisplay.TOTAL -> {
-                    add(" §7- ${CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(name, total, color)}")
+                    add(" §7- ${CustomScoreboardUtils.formatNumberDisplay(name, total, color)}")
                 }
 
                 PowderDisplay.BOTH -> {
-                    add(" §7- ${CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay(name, "$current/$total", color)}")
+                    add(" §7- ${CustomScoreboardUtils.formatNumberDisplay(name, "$current/$total", color)}")
                 }
 
                 null -> {}

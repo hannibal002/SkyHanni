@@ -14,7 +14,7 @@ object ScoreboardElementMotes : ScoreboardElement() {
         val motes = formatStringNum(getMotes())
         if (informationFilteringConfig.hideEmptyLines && motes == "0") return null
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Motes", motes, "§d")
+        return CustomScoreboardUtils.formatNumberDisplay("Motes", motes, "§d")
     }
 
     override val configLine = "Motes: §d64,647"

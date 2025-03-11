@@ -12,7 +12,7 @@ object ScoreboardElementBank : ScoreboardElement() {
         val bank = getBank()
         if (informationFilteringConfig.hideEmptyLines && (bank == "0" || bank == "0§7 / §60")) return null
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Bank", bank, "§6")
+        return CustomScoreboardUtils.formatNumberDisplay("Bank", bank, "§6")
     }
 
     override val configLine = "Bank: §6249M"

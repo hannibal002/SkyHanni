@@ -15,7 +15,7 @@ object ScoreboardElementCopper : ScoreboardElement() {
         val copper = formatStringNum(getCopper())
         if (informationFilteringConfig.hideEmptyLines && copper == "0") return null
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Copper", copper, "§c")
+        return CustomScoreboardUtils.formatNumberDisplay("Copper", copper, "§c")
     }
 
     override val configLine = "Copper: §c23,495"

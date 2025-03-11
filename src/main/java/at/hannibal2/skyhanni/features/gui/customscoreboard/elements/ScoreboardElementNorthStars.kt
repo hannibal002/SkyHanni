@@ -14,7 +14,7 @@ object ScoreboardElementNorthStars : ScoreboardElement() {
         val northStars = formatStringNum(getNorthStars())
         if (informationFilteringConfig.hideEmptyLines && northStars == "0") return null
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("North Stars", northStars, "§d")
+        return CustomScoreboardUtils.formatNumberDisplay("North Stars", northStars, "§d")
     }
 
     override val configLine = "North Stars: §d756"

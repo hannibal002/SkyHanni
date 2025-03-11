@@ -22,28 +22,28 @@ import java.util.regex.Pattern
 @Suppress("TooManyFunctions")
 object CustomScoreboardUtils {
 
-    fun formatScoreboardNumberDisplayDisplay(text: String, number: String, color: String): String {
+    fun formatNumberDisplay(text: String, number: String, color: String): String {
         val formattedNumber = if (LorenzUtils.isAprilFoolsDay) {
             "-$number"
         } else {
             number
         }
         return when (displayConfig.numberDisplayFormat) {
-            ScoreboardNumberDisplayFormat.TEXT_COLOR_NUMBER -> "§f$text: $color$formattedNumber"
-            ScoreboardNumberDisplayFormat.COLOR_TEXT_NUMBER -> "$color$text: $formattedNumber"
-            ScoreboardNumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$formattedNumber $color$text"
-            ScoreboardNumberDisplayFormat.COLOR_NUMBER_RESET_TEXT -> "$color$formattedNumber §f$text"
+            NumberDisplayFormat.TEXT_COLOR_NUMBER -> "§f$text: $color$formattedNumber"
+            NumberDisplayFormat.COLOR_TEXT_NUMBER -> "$color$text: $formattedNumber"
+            NumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$formattedNumber $color$text"
+            NumberDisplayFormat.COLOR_NUMBER_RESET_TEXT -> "$color$formattedNumber §f$text"
         }
     }
 
-    enum class ScoreboardNumberDisplayFormat(val config: String) {
+    enum class NumberDisplayFormat(val displayName: String) {
         TEXT_COLOR_NUMBER("§fPurse: §6123"),
         COLOR_TEXT_NUMBER("§6Purse: 123"),
         COLOR_NUMBER_TEXT("§6123 Purse"),
         COLOR_NUMBER_RESET_TEXT("§6123 §fPurse"),
         ;
 
-        override fun toString() = config
+        override fun toString() = displayName
     }
 
     private fun getGroup(pattern: Pattern, list: List<String>, group: String) =

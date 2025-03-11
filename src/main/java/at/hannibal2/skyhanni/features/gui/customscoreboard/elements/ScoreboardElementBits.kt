@@ -15,7 +15,7 @@ object ScoreboardElementBits : ScoreboardElement() {
         val bitsToClaim = BitsApi.bitsAvailable
         if (informationFilteringConfig.hideEmptyLines && BitsApi.bits == 0 && (bitsToClaim == -1 || bitsToClaim == 0)) return null
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Bits", getBitsLine(), "§b")
+        return CustomScoreboardUtils.formatNumberDisplay("Bits", getBitsLine(), "§b")
     }
 
     override fun showWhen() = !HypixelData.bingo

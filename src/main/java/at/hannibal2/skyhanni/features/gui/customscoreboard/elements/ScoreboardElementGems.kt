@@ -13,7 +13,7 @@ object ScoreboardElementGems : ScoreboardElement() {
         val gems = getGems()
         if (informationFilteringConfig.hideEmptyLines && gems == "0") return null
 
-        return CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("Gems", gems, "§a")
+        return CustomScoreboardUtils.formatNumberDisplay("Gems", gems, "§a")
     }
 
     override val configLine = "Gems: §a57,873"

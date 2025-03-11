@@ -104,8 +104,8 @@ object CustomScoreboardConfigFix {
         }
         event.move(64, "$DISPLAY_PREFIX.displayNumbersFirst", "$DISPLAY_PREFIX.numberDisplayFormat ") {
             JsonPrimitive(
-                if (it.asBoolean) CustomScoreboardUtils.ScoreboardNumberDisplayFormat.COLOR_TEXT_NUMBER.name
-                else CustomScoreboardUtils.ScoreboardNumberDisplayFormat.TEXT_COLOR_NUMBER.name,
+                if (it.asBoolean) CustomScoreboardUtils.NumberDisplayFormat.COLOR_TEXT_NUMBER.name
+                else CustomScoreboardUtils.NumberDisplayFormat.TEXT_COLOR_NUMBER.name,
             )
         }
     }

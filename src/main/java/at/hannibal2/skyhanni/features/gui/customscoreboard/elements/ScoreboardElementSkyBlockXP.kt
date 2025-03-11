@@ -7,8 +7,8 @@ object ScoreboardElementSkyBlockXP : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val (level, xp) = SkyBlockXPApi.levelXPPair ?: return@buildList
         val color = SkyBlockXPApi.getLevelColor().getChatColor()
-        add(CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("SB Level", level.toString(), color))
-        add(CustomScoreboardUtils.formatScoreboardNumberDisplayDisplay("XP", "$xp§3/§b100", "§b"))
+        add(CustomScoreboardUtils.formatNumberDisplay("SB Level", level.toString(), color))
+        add(CustomScoreboardUtils.formatNumberDisplay("XP", "$xp§3/§b100", "§b"))
     }
 
     override fun showWhen() = SkyBlockXPApi.levelXPPair != null
