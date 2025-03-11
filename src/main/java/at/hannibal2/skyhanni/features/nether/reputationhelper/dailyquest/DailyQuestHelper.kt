@@ -225,7 +225,7 @@ object DailyQuestHelper {
 
     private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
-        val location = getQuestBoardLocation() ?: return
+        val location = getQuestBoardLocation()
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)
     }

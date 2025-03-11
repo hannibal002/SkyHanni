@@ -57,7 +57,7 @@ object RescueMissionWaypoints {
      */
     private val cancelTimeoutPattern by RepoPattern.pattern(
         "cancel.timeout",
-        "§cYou took too long and the agents found someone else.",
+        "§cYou took too long and the agents found someone else\\.",
     )
 
     /**
@@ -149,7 +149,6 @@ object RescueMissionWaypoints {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<RescueParkourJson>("RescueMissionWaypoints")
-        updateConfig()
     }
 
     @HandleEvent
@@ -158,6 +157,7 @@ object RescueMissionWaypoints {
             agentDialoguePattern.matchMatcher(event.message.removeColor()) {
                 tier?.let {
                     initParkour()
+                    updateConfig()
                 } ?: run {
                     ChatUtils.userError("Rescue mission tier still not known! Check out the Quest Board first as I told you earlier!")
                     navigateToQuestBoard("forgot to check out tier")
