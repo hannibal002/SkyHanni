@@ -3,7 +3,10 @@ package at.hannibal2.skyhanni.features.rift
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -13,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -52,6 +56,30 @@ object RiftApi {
         inColosseum = event.area == "Colosseum"
     }
 
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!config.temporalPillarDitch) {
+            if (IslandGraphs.tempRemoveReason == "Temporal Pillar") {
+                IslandGraphs.resetTempRemove()
+            }
+            return
+        }
+        val temporalPillar = MobData.skyblockMobs.find { it.name == "Temporal Pillar" }
+
+        IslandGraphs.tempRemoveReason?.let {
+            IslandGraphs.resetTempRemove()
+            if (temporalPillar == null) {
+                IslandGraphs.update(force = true)
+            }
+        }
+        temporalPillar?.let {
+            val location = it.baseEntity.getLorenzVec()
+            IslandGraphs.tempRemove("Temporal Pillar", location, 7.0)
+            IslandGraphs.update(force = true)
+        }
+
+    }
+
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
     fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"
     fun inStillgoreChateau() = LorenzUtils.skyBlockArea.let { it == "Stillgore Château" || it == "Oubliette" }
@@ -60,7 +88,9 @@ object RiftApi {
     fun inWestVillage() = LorenzUtils.skyBlockArea.let { it == "West Village" || it == "Infested House" }
     fun inMountainTop() = when (LorenzUtils.skyBlockArea) {
         "Continuum", "The Mountaintop", "Trial Grounds", "Time-Torn Isles",
-        "Wizardman Bureau", "Wizard Brawl", "Walk of Fame", "Time Chamber" -> true
+        "Wizardman Bureau", "Wizard Brawl", "Walk of Fame", "Time Chamber",
+        -> true
+
         else -> false
     }
 }

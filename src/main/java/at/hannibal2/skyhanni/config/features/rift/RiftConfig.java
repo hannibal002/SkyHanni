@@ -55,4 +55,10 @@ public class RiftConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean horsezookaHider = false;
+
+    @Expose
+    @ConfigOption(name = "Temporal Pillar Ditch", desc = "Avoid paths through or near the big enderman that throws you back in the end credits screen.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean temporalPillarDitch = true;
 }
