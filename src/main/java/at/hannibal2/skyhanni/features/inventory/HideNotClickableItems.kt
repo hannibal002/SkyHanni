@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.isAccessory
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -393,11 +395,11 @@ object HideNotClickableItems {
     }
 
     private fun hideAccessoryBag(chestName: String, stack: ItemStack): Boolean {
-        if (!chestName.startsWith("Accessory Bag") && !chestName.startsWith("Accessory Bag (")) return false
+        if (!AccessoryApi.inAccessoryBag) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
         showGreenLine = true
-        if (stack.getLore().any { it.contains("ACCESSORY") || it.contains("HATCESSORY") }) return false
+        if (!stack.isAccessory()) return false
 
         hideReason = "This item is not an accessory!"
         return true

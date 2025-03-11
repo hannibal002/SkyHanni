@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -802,5 +803,16 @@ class ProfileSpecificStorage {
 
         @Expose
         var museumMilestone: Int? = null
+    }
+
+    @Expose
+    var accessoryPages: MutableMap<Int, List<StorageAccessory>> = mutableMapOf()
+
+    data class StorageAccessory(
+        @Expose val internalName: NeuInternalName,
+        @Expose val rarity: LorenzRarity,
+    ) {
+        override fun toString(): String = internalName.asString()
+        fun toAccessoryOrNull() = AccessoryApi.accessoryLineage.getAccessoryOrNull(internalName)
     }
 }

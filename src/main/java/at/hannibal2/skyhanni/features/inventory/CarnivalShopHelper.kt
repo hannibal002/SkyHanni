@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuCarnivalTokenCostJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuCarnivalShopsJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -113,7 +113,7 @@ object CarnivalShopHelper {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val repoTokenShops = event.readConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
+        val repoTokenShops = event.readConstant<NeuCarnivalShopsJson>("carnivalshops").carnivalTokenShops
         repoEventShops = repoTokenShops.map { (key, value) ->
             EventShop(key.replace("_", " "), value.values.toMutableList())
         }.toMutableList()
