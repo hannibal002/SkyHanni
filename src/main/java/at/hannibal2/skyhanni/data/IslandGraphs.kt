@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -109,7 +110,7 @@ object IslandGraphs {
         }
         copyMap.forEach { (original, copy) ->
             copy.neighbours = original.neighbours.filter { copyMap.containsKey(it.key) }
-                .mapKeys { copyMap[it.key]!! }
+                .mapKeysNotNull { copyMap[it.key] }
         }
         return Graph(copyMap.values.toList())
     }
