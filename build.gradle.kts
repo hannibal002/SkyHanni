@@ -128,6 +128,7 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.prBody = project.findProperty("prBody") as String
 }
 
+// Disabled because it breaks mixins with the minecraft dev plugin
 // file("shots.txt")
 //     .takeIf(File::exists)
 //     ?.readText()
