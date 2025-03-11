@@ -128,15 +128,16 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.prBody = project.findProperty("prBody") as String
 }
 
-file("shots.txt")
-    .takeIf(File::exists)
-    ?.readText()
-    ?.lines()
-    ?.let(ShotParser()::parse)
-    ?.let(::Shots)
-    ?.let {
-        loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
-    }
+// Disabled because it breaks mixins with the minecraft dev plugin
+// file("shots.txt")
+//     .takeIf(File::exists)
+//     ?.readText()
+//     ?.lines()
+//     ?.let(ShotParser()::parse)
+//     ?.let(::Shots)
+//     ?.let {
+//         loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
+//     }
 
 dependencies {
     minecraft("com.mojang:minecraft:${target.minecraftVersion.versionName}")
