@@ -76,6 +76,14 @@ object RescueMissionWaypoints {
         "§a(?<tier>.) §cRescue Mission",
     )
 
+    /**
+     * REGEX-TEST: Rescue
+     */
+    private val menuPattern by RepoPattern.pattern(
+        "menu",
+        "Rescue",
+    )
+
     private var parkourHelper: ParkourHelper? = null
     private var tier: String? = null
     private var tierWasUnknown = false
@@ -88,7 +96,7 @@ object RescueMissionWaypoints {
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Rescue") return
+        if (!menuPattern.matches(event.inventoryName)) return
         val name = event.inventoryItems[22]?.displayName ?: return
 
         tier = questTierPattern.matchMatcher(name) {
