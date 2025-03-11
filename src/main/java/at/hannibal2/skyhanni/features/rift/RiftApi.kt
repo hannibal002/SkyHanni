@@ -58,7 +58,7 @@ object RiftApi {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!config.temporalPillarDitch) {
+        if (!config.temporalPillarDodge) {
             if (IslandGraphs.tempRemoveReason == "Temporal Pillar") {
                 IslandGraphs.resetTempRemove()
             }
