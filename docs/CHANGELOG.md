@@ -84,7 +84,7 @@
     + Using NEU is still recommended.
 + Added Frog Mask Display. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2542)
     + Displays current buffed region and duration until next change.
-+ Added option to display Skyblock XP on the Minecraft XP bar. - j10a1n10 (https://github.com/hannibal002/SkyHanni/pull/2886)
++ Added option to display Skyblock XP on the Minecraft XP bar. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2886)
 + Added SkyBlock Level to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2895)
 + Added NEU-Souls Pathfinder. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3350)
     + When using `/neusouls`, displays a pathfinding line to the nearest missing Fairy Soul.

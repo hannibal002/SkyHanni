@@ -282,6 +282,7 @@ that can be slowly worked on over a long span of time.
 ### Set Up
 
 The modern version variants can be set using `skyhanni.multi-version` in `.gradle/private.properties` to three levels.
+You will have to create this file yourself, for example if you want to set it to compile the file should contain `skyhanni.multi-version=compile` 
 
 `off` completely disables any preprocessor action or alternative versions. There will be only one project (although still at the `:1.8.9`
 subproject path), and alternative version sources will not be generated (although old generated sources **will not be deleted**). To make
