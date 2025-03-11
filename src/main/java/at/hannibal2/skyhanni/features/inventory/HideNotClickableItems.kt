@@ -196,7 +196,7 @@ object HideNotClickableItems {
             hideSalvage(chestName, stack) -> true
             hidePlayerTrade(chestName, stack) -> true
             hideBazaarOrAH(chestName, stack) -> true
-            hideAccessoryBag(chestName, stack) -> true
+            hideAccessoryBag(stack) -> true
             hideBasketOfSeeds(chestName, stack) -> true
             hideNetherWartPouch(chestName, stack) -> true
             hideTrickOrTreatBag(chestName, stack) -> true
@@ -394,7 +394,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideAccessoryBag(chestName: String, stack: ItemStack): Boolean {
+    private fun hideAccessoryBag(stack: ItemStack): Boolean {
         if (!AccessoryApi.inAccessoryBag) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
