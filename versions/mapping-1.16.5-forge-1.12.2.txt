@@ -286,6 +286,7 @@ net.minecraft.world.level.Level getEntity() getEntityByID()
 
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
 net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
+net.minecraft.world.level.block.Blocks DANDELION YELLOW_FLOWER
 
 net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
