@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
@@ -758,26 +759,6 @@ class ProfileSpecificStorage {
     var currentPet: String = ""
 
     @Expose
-    var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()
-
-    @Expose
-    var maxwell: MaxwellPowerStorage = MaxwellPowerStorage()
-
-    class MaxwellPowerStorage {
-        @Expose
-        var currentPower: String? = null
-
-        @Expose
-        var magicalPower: Int = -1
-
-        @Expose
-        var tunings: List<ThaumaturgyPowerTuning> = listOf()
-
-        @Expose
-        var favoritePowers: List<String> = listOf()
-    }
-
-    @Expose
     var arrows: ArrowsStorage = ArrowsStorage()
 
     class ArrowsStorage {
@@ -805,23 +786,44 @@ class ProfileSpecificStorage {
         var museumMilestone: Int? = null
     }
 
-    data class AccessoryStorage(
-        @Expose var accessoryPages: MutableMap<Int, List<StorageAccessory>> = mutableMapOf(),
-        @Expose var looseAccessories: MutableList<StorageAccessory> = mutableListOf(),
-    )
+    var stats: StatsStorage = StatsStorage()
 
-    data class StorageAccessory(
-        @Expose val internalName: NeuInternalName,
-        @Expose val rarity: LorenzRarity,
-        @Expose val enrichment: SkyblockStat? = null,
-    ) {
-        override fun toString(): String = internalName.asString()
-        fun toAccessoryOrNull() = AccessoryApi.accessoryLineage.getAccessoryOrNull(internalName)
+    class StatsStorage {
+        @Expose
+        var currentStats: MutableMap<SkyblockStat, Double?> = enumMapOf()
+
+        @Expose var maxwell: MaxwellPowerStorage = MaxwellPowerStorage()
+
+        class MaxwellPowerStorage {
+            @Expose
+            var currentPower: String? = null
+
+            @Expose
+            var magicalPower: Int = -1
+
+            @Expose
+            var tunings: List<ThaumaturgyPowerTuning> = listOf()
+
+            @Expose
+            var favoritePowers: List<String> = listOf()
+        }
+
+        data class AccessoryStorageSet(
+            @Expose var accessoryPages: MutableMap<Int, List<AccessoryApi.Accessory>> = mutableMapOf(),
+            @Expose var looseAccessories: MutableList<AccessoryApi.Accessory> = mutableListOf(),
+        ) {
+            val accessories get() = looseAccessories + accessoryPages.values.flatten()
+        }
+
+        data class AccessoryStorage(
+            @Expose var mainAccessories: AccessoryStorageSet = AccessoryStorageSet(),
+            @Expose var riftAccessories: AccessoryStorageSet = AccessoryStorageSet(),
+        ) {
+            private val accessorySet = if (IslandType.THE_RIFT.isInIsland()) riftAccessories else mainAccessories
+            val accessories get() = accessorySet.accessories
+        }
+
+        @Expose
+        var accessoryStorage: AccessoryStorage = AccessoryStorage()
     }
-
-    @Expose
-    var accessoryStorage: AccessoryStorage = AccessoryStorage()
-
-    @Expose
-    var riftAccessoryStorage: AccessoryStorage = AccessoryStorage()
 }

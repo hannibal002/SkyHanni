@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.accessories
 
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
@@ -10,11 +10,16 @@ import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.inventory.AccessoriesUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -27,6 +32,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
+import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
 
@@ -34,7 +40,7 @@ import kotlin.time.Duration.Companion.minutes
 object AccessoryApi {
 
     private val patternGroup = RepoPattern.group("data.accessory")
-    private val storage get() = ProfileStorageData.profileSpecific
+    private val storage get() = ProfileStorageData.profileSpecific?.stats?.accessoryStorage
 
     // <editor-fold desc="Patterns">
     /**
@@ -48,7 +54,7 @@ object AccessoryApi {
     /**
      * REGEX-TEST: ABICASE_BLUE_BLUE
      */
-    private val isAbiCasePattern by patternGroup.pattern(
+    val isAbiCasePattern by patternGroup.pattern(
         "is.abicase",
         "ABICASE_.*",
     )
@@ -79,12 +85,14 @@ object AccessoryApi {
     // Acting as the vertex in the graph
     data class Accessory(
         var index: Int = -1,
-        val internalName: NeuInternalName,
+        @Expose var internalName: NeuInternalName,
+        @Expose var rarity: LorenzRarity? = null,
+        @Expose var enrichment: SkyblockStat? = null
     ) {
         override fun toString(): String = internalName.asString()
 
         val successor: Accessory?
-            get() = AccessoryApi.accessoryLineage.getRelatives(this, LineageType.SUCCESSOR, limit = 1).firstOrNull()
+            get() = accessoryLineage.getRelatives(this, LineageType.SUCCESSOR, limit = 1).firstOrNull()
         val siblings: List<Accessory>
             get() = accessoryLineage.getRelatives(this, LineageType.SIBLING, Int.MAX_VALUE)
         val predecessor: Accessory?
@@ -105,7 +113,8 @@ object AccessoryApi {
     // Acting as a pseudo-weight for the graph
     enum class LineageType(private val displayName: String) {
         SUCCESSOR("Successor"), // a greater accessory
-        SIBLING("Sibling"); // an accessory of the same tier
+        SIBLING("Sibling"), // an accessory of the same tier
+        ;
 
         override fun toString(): String = displayName
     }
@@ -214,11 +223,11 @@ object AccessoryApi {
     var inAccessoryBag = false
         private set
 
-    private fun ItemStack.toStorageAccessory(): ProfileSpecificStorage.StorageAccessory? {
+    private fun ItemStack.toStorageAccessory(): Accessory? {
         val internalName = getInternalNameOrNull() ?: return null
         val rarity = getItemRarityOrNull() ?: return null
         val enrichment = SkyblockStat.getValueOrNull(getEnrichment().orEmpty())
-        return ProfileSpecificStorage.StorageAccessory(internalName, rarity, enrichment)
+        return Accessory(internalName = internalName, rarity = rarity, enrichment = enrichment)
     }
 
     fun ItemStack.isAccessory(): Boolean =
@@ -272,9 +281,33 @@ object AccessoryApi {
         val mappedAccessoryItems = accessoryItems.mapNotNull { it.toStorageAccessory() }
 
         val target = when (IslandType.THE_RIFT.isInIsland()) {
-            true -> storage.riftAccessoryStorage
-            false -> storage.accessoryStorage
+            true -> storage.riftAccessories
+            false -> storage.mainAccessories
         }
         target.accessoryPages[pageIndex] = mappedAccessoryItems
+        AccessoriesUpdatedEvent(storage).post()
+    }
+
+    @HandleEvent
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+        val storage = storage ?: return
+        val inventory = InventoryUtils.getItemsInOwnInventory()
+            .filter { it.hasDisplayName() && it.getLore().isNotEmpty() }
+            .filter { it.isAccessory() }
+            .mapNotNull { it.toStorageAccessory() }
+            .toMutableList()
+
+        val target = when (IslandType.THE_RIFT.isInIsland()) {
+            true -> storage.riftAccessories
+            false -> storage.mainAccessories
+        }
+        target.looseAccessories = inventory
+        AccessoriesUpdatedEvent(storage).post()
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(75, "inventory.magicalPower", "inventory.accessories.magicalPower")
+        event.move(75, "inventory.statsTuning", "inventory.accessories.statsTuning")
     }
 }

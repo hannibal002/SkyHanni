@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -25,7 +26,7 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object MagicalPowerDisplay {
-    private val config get() = SkyHanniMod.feature.inventory.magicalPower
+    private val config get() = SkyHanniMod.feature.inventory.accessory.magicalPower
     private var contactAmount: Int?
         get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount
         private set(value) {
@@ -110,7 +111,7 @@ object MagicalPowerDisplay {
         }
     }
 
-    private fun NeuInternalName.isAbicase(): Boolean = this.startsWith("ABICASE_")
+    private fun NeuInternalName.isAbicase(): Boolean = AccessoryApi.isAbiCasePattern.matches(asString())
 
     private fun LorenzRarity.toMP(): Int? = when (this) {
         LorenzRarity.COMMON, LorenzRarity.SPECIAL -> 3

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
+import at.hannibal2.skyhanni.config.features.inventory.accessories.AccessoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig;
@@ -95,11 +96,6 @@ public class InventoryConfig {
     public RngMeterConfig rngMeter = new RngMeterConfig();
 
     @Expose
-    @ConfigOption(name = "Stats Tuning", desc = "")
-    @Accordion
-    public StatsTuningConfig statsTuning = new StatsTuningConfig();
-
-    @Expose
     @ConfigOption(name = "Jacob Farming Contest", desc = "")
     @Accordion
     public JacobFarmingContestConfig jacobFarmingContests = new JacobFarmingContestConfig();
@@ -120,6 +116,11 @@ public class InventoryConfig {
     public ChestValueConfig chestValueConfig = new ChestValueConfig();
 
     @Expose
+    @ConfigOption(name = "Accessories/MP", desc = "")
+    @Accordion
+    public AccessoryConfig accessory = new AccessoryConfig();
+
+    @Expose
     @ConfigOption(name = "Get From Sack", desc = "")
     @Accordion
     public GetFromSackConfig gfs = new GetFromSackConfig();
@@ -138,11 +139,6 @@ public class InventoryConfig {
     @ConfigOption(name = "New Year Cake Tracker", desc = "")
     @Accordion
     public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
-  
-    @Expose
-    @ConfigOption(name = "Magical Power Display", desc = "")
-    @Accordion
-    public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
 
     @Expose
     @ConfigOption(name = "Attribute Overlay", desc = "")
