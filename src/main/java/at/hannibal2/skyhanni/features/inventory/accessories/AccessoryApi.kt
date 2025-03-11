@@ -105,7 +105,7 @@ object AccessoryApi {
     // Acting as a pseudo-weight for the graph
     enum class LineageType(private val displayName: String) {
         SUCCESSOR("Successor"), // a greater accessory
-        SIBLING("Sibling");     // an accessory of the same tier
+        SIBLING("Sibling"); // an accessory of the same tier
 
         override fun toString(): String = displayName
     }
@@ -125,7 +125,7 @@ object AccessoryApi {
         ): List<Accessory> = adjacencyMap[accessory]
             ?.filter { it.type == relationshipType }
             ?.mapNotNull { it.target }
-            ?.take(limit) ?: emptyList()
+            ?.take(limit).orEmpty()
 
         fun getPredecessorOrNull(accessory: Accessory): Accessory? {
             return adjacencyMap.entries.firstOrNull { (_, connections) ->
