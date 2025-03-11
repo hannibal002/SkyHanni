@@ -175,6 +175,8 @@ net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
 net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
 
+net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
+
 net.minecraft.world.entity.Entity getAllSlots() getEquipmentAndArmor()
 net.minecraft.world.entity.Entity getBoundingBox() getEntityBoundingBox()
 net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
@@ -323,6 +325,7 @@ org.lwjgl.glfw.GLFW GLFW_KEY_DOWN KEY_DOWN
 org.lwjgl.glfw.GLFW GLFW_KEY_E KEY_E
 org.lwjgl.glfw.GLFW GLFW_KEY_END KEY_END
 org.lwjgl.glfw.GLFW GLFW_KEY_ENTER KEY_RETURN
+org.lwjgl.glfw.GLFW GLFW_KEY_BACKSPACE KEY_BACK
 org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
 org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
 org.lwjgl.glfw.GLFW GLFW_KEY_F KEY_F
