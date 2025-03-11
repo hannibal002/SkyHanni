@@ -45,9 +45,9 @@ class ReputationHelperConfig {
     var showLocation: ShowLocationEntry = ShowLocationEntry.ONLY_HOTKEY
 
     @Expose
-    @ConfigOption(name = "Rescue Mission Waypoints", desc = "")
+    @ConfigOption(name = "Rescue Mission", desc = "")
     @Accordion
-    var rescueMissionConfig: RescueMissionConfig = RescueMissionConfig()
+    var rescueMission: RescueMissionConfig = RescueMissionConfig()
 
     enum class ShowLocationEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         ALWAYS("Always", 0),
