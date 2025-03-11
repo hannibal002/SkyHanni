@@ -1,4 +1,8 @@
-import at.skyhanni.sharedvariables.*
+import at.skyhanni.sharedvariables.MinecraftVersion
+import at.skyhanni.sharedvariables.MultiVersionStage
+import at.skyhanni.sharedvariables.ProjectTarget
+import at.skyhanni.sharedvariables.SHVersionInfo
+import at.skyhanni.sharedvariables.versionString
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import moe.nea.shot.ShotParser
@@ -124,15 +128,16 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.prBody = project.findProperty("prBody") as String
 }
 
-file("shots.txt")
-    .takeIf(File::exists)
-    ?.readText()
-    ?.lines()
-    ?.let(ShotParser()::parse)
-    ?.let(::Shots)
-    ?.let {
-        loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
-    }
+// Disabled because it breaks mixins with the minecraft dev plugin
+// file("shots.txt")
+//     .takeIf(File::exists)
+//     ?.readText()
+//     ?.lines()
+//     ?.let(ShotParser()::parse)
+//     ?.let(::Shots)
+//     ?.let {
+//         loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
+//     }
 
 dependencies {
     minecraft("com.mojang:minecraft:${target.minecraftVersion.versionName}")
@@ -156,7 +161,7 @@ dependencies {
 
     headlessLwjgl(libs.headlessLwjgl)
 
-    compileOnly(ksp(project(":annotation-processors"))!!)
+    ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
     val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
 
@@ -212,7 +217,6 @@ dependencies {
         compileOnly(libs.hypixelmodapi)
         shadowImpl(libs.hypixelmodapitweaker)
     }
-
 
     // getting clock offset
     shadowImpl("commons-net:commons-net:3.11.1")

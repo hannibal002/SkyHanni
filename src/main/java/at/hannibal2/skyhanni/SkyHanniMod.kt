@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -16,7 +15,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -26,9 +24,11 @@ import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.common.MinecraftForge
@@ -58,12 +58,8 @@ object SkyHanniMod {
 
         LoadedModules.modules.forEach { loadModule(it) }
 
-        loadModule(CrimsonIsleReputationHelper(this))
-
         SkyHanniEvents.init(modules)
         if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
-
-        CommandRegistrationEvent.post()
 
         PreInitFinishedEvent.post()
     }
@@ -76,10 +72,8 @@ object SkyHanniMod {
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
-        repo = RepoManager(ConfigManager.configDirectory)
-        loadModule(repo)
         try {
-            repo.loadRepoInformation()
+            RepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
@@ -124,7 +118,6 @@ object SkyHanniMod {
     lateinit var jacobContestsData: JacobContestsJson
     lateinit var visualWordsData: VisualWordsJson
 
-    lateinit var repo: RepoManager
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
     fun getLogger(name: String): Logger {
@@ -136,6 +129,15 @@ object SkyHanniMod {
     val coroutineScope = CoroutineScope(
         CoroutineName("SkyHanni") + SupervisorJob(globalJob),
     )
+
+    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit) {
+        launchCoroutine {
+            withContext(Dispatchers.IO) {
+                block()
+            }
+        }
+    }
+
     var screenToOpen: GuiScreen? = null
     private var screenTicks = 0
     fun consoleLog(message: String) {
@@ -146,8 +148,11 @@ object SkyHanniMod {
         coroutineScope.launch {
             try {
                 function()
-            } catch (ex: Exception) {
-                ErrorManager.logErrorWithData(ex, "Asynchronous exception caught")
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    e.message ?: "Asynchronous exception caught",
+                )
             }
         }
     }

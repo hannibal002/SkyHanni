@@ -54,14 +54,14 @@ object FarmingContestApi {
         ContestBracket.entries.forEach { it.bracketPattern }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-
         if (internalContest && startTime.passedSince() > 20.minutes) {
             FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
             internalContest = false
         }
 
+        @Suppress("IsInIslandEarlyReturn")
         if (!GardenApi.inGarden()) return
 
         checkActiveContest()
