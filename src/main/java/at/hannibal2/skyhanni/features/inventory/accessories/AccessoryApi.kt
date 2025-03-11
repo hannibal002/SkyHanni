@@ -12,21 +12,22 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
 
@@ -54,19 +55,6 @@ object AccessoryApi {
     )
 
     /**
-     * REGEX-TEST: §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
-     * REGEX-TEST: §6§l§ka§r §6§lLEGENDARY DUNGEON ACCESSORY §6§l§ka
-     * REGEX-TEST: §6§l§ka§r §6§lLEGENDARY ACCESSORY §6§l§ka
-     * REGEX-TEST: §6§lLEGENDARY ACCESSORY
-     * REGEX-TEST: §5§l§ka§r §5§lEPIC ACCESSORY §5§l§ka
-     * REGEX-TEST: §5§lEPIC ACCESSORY
-     */
-    private val isAccessoryLorePattern by patternGroup.pattern(
-        "is.accessory.lore",
-        "(?:§(?:k.|.))* ?(?:§.)*(?<rarity>.*?)(?=\\s(?:DUNGEON\\s)?)\\s(?:DUNGEON\\s)?(?:ACCESSORY|HATCESSORY)(?: §(?:k.|.)*)?",
-    )
-
-    /**
      * REGEX-TEST: Accessory Bag
      * REGEX-TEST: Accessory Bag (1/2)
      */
@@ -84,7 +72,7 @@ object AccessoryApi {
         override fun toString(): String = internalName.asString()
 
         val successor: Accessory?
-            get() = AccessoryApi.accessoryLineage.getRelatives(this, LineageType.SUCCESSOR, limit = 1).firstOrNull()
+            get() = accessoryLineage.getRelatives(this, LineageType.SUCCESSOR, limit = 1).firstOrNull()
         val siblings: List<Accessory>
             get() = accessoryLineage.getRelatives(this, LineageType.SIBLING, Int.MAX_VALUE)
         val predecessor: Accessory?
@@ -105,7 +93,8 @@ object AccessoryApi {
     // Acting as a pseudo-weight for the graph
     enum class LineageType(private val displayName: String) {
         SUCCESSOR("Successor"), // a greater accessory
-        SIBLING("Sibling"); // an accessory of the same tier
+        SIBLING("Sibling"), // an accessory of the same tier (abicases, hats)
+        ;
 
         override fun toString(): String = displayName
     }
@@ -127,11 +116,9 @@ object AccessoryApi {
             ?.mapNotNull { it.target }
             ?.take(limit).orEmpty()
 
-        fun getPredecessorOrNull(accessory: Accessory): Accessory? {
-            return adjacencyMap.entries.firstOrNull { (_, connections) ->
-                connections.any { it.target == accessory && it.type == LineageType.SUCCESSOR }
-            }?.key
-        }
+        fun getPredecessorOrNull(accessory: Accessory): Accessory? = adjacencyMap.entries.firstOrNull { (_, connections) ->
+            connections.any { it.target == accessory && it.type == LineageType.SUCCESSOR }
+        }?.key
 
         fun addAccessory(internalName: NeuInternalName) = addAccessory(Accessory(internalName = internalName))
         private fun addAccessory(accessory: Accessory): Accessory {
@@ -186,16 +173,6 @@ object AccessoryApi {
         }
     }
 
-    private fun JsonObject.shouldProcessAccessory(): Boolean {
-        val internalName = get("internalname")?.asString?.toInternalName() ?: return false
-        if (internalName in ignoredAccessories) return false
-        val lore = when {
-            has("lore") -> get("lore").asJsonArray.map { it.asString }
-            else -> return false
-        }
-        return isAccessory(internalName, lore)
-    }
-
     private val pageCache: TimeLimitedCache<Int, Int> = TimeLimitedCache(10.minutes)
     private var lateRepoLoad = false
     private val ignoredAccessories: MutableList<NeuInternalName> = mutableListOf()
@@ -205,7 +182,7 @@ object AccessoryApi {
         AccessoryLineageTree().apply {
             EnoughUpdatesManager.getItemInformation().entries
                 .map { it.key.toInternalName() to it.value }
-                .filter { it.second.shouldProcessAccessory() }
+                .filter { it.first.isAccessory() }
                 .forEach { addAccessory(it.first) }
             if (accessoryLineageSoT.isEmpty()) lateRepoLoad = true
             else this.rebuildLineageLine()
@@ -221,11 +198,8 @@ object AccessoryApi {
         return ProfileSpecificStorage.StorageAccessory(internalName, rarity, enrichment)
     }
 
-    fun ItemStack.isAccessory(): Boolean =
-        getInternalNameOrNull()?.let { isAccessory(it, getLore()) } ?: false
-
-    private fun isAccessory(internalName: NeuInternalName, lore: List<String>): Boolean =
-        internalName !in ignoredAccessories && !isAccessoryLorePattern.anyMatches(lore)
+    fun NeuInternalName.isAccessory() = this.getItemStackOrNull()?.isAccessory() ?: false
+    fun ItemStack.isAccessory(): Boolean = getItemCategoryOrNull() in ItemCategory.accessories
 
     @HandleEvent
     fun onNeuRepoReloadEvent(event: NeuRepositoryReloadEvent) {
