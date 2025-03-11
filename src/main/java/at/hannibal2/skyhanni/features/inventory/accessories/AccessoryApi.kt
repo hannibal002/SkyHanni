@@ -34,7 +34,6 @@ import kotlin.time.Duration.Companion.minutes
 object AccessoryApi {
 
     private val patternGroup = RepoPattern.group("data.accessory")
-
     private val storage get() = ProfileStorageData.profileSpecific
 
     // <editor-fold desc="Patterns">
@@ -83,6 +82,13 @@ object AccessoryApi {
         val internalName: NeuInternalName,
     ) {
         override fun toString(): String = internalName.asString()
+
+        val successor: Accessory?
+            get() = AccessoryApi.accessoryLineage.getRelatives(this, LineageType.SUCCESSOR, limit = 1).firstOrNull()
+        val siblings: List<Accessory>
+            get() = accessoryLineage.getRelatives(this, LineageType.SIBLING, Int.MAX_VALUE)
+        val predecessor: Accessory?
+            get() = accessoryLineage.getPredecessorOrNull(this)
     }
 
     // Edge in the graph
@@ -99,8 +105,7 @@ object AccessoryApi {
     // Acting as a pseudo-weight for the graph
     enum class LineageType(private val displayName: String) {
         SUCCESSOR("Successor"), // a greater accessory
-        SIBLING("Sibling"), // an accessory of the same tier
-        ;
+        SIBLING("Sibling");     // an accessory of the same tier
 
         override fun toString(): String = displayName
     }
@@ -110,14 +115,8 @@ object AccessoryApi {
 
         fun getByIndexOrNull(index: Int) = adjacencyMap.keys.find { it.index == index }
 
-        fun getAccessoryOrNull(neuInternalName: NeuInternalName) = adjacencyMap.keys.find { it.internalName == neuInternalName }
-
-        fun addAccessory(internalName: NeuInternalName) = addAccessory(Accessory(internalName = internalName))
-        private fun addAccessory(accessory: Accessory): Accessory {
-            accessory.index = adjacencyMap.size
-            adjacencyMap[accessory] = arrayListOf()
-            return accessory
-        }
+        fun getAccessoryOrNull(neuInternalName: NeuInternalName) =
+            adjacencyMap.keys.find { it.internalName == neuInternalName }
 
         fun getRelatives(
             accessory: Accessory,
@@ -127,6 +126,19 @@ object AccessoryApi {
             ?.filter { it.type == relationshipType }
             ?.mapNotNull { it.target }
             ?.take(limit) ?: emptyList()
+
+        fun getPredecessorOrNull(accessory: Accessory): Accessory? {
+            return adjacencyMap.entries.firstOrNull { (_, connections) ->
+                connections.any { it.target == accessory && it.type == LineageType.SUCCESSOR }
+            }?.key
+        }
+
+        fun addAccessory(internalName: NeuInternalName) = addAccessory(Accessory(internalName = internalName))
+        private fun addAccessory(accessory: Accessory): Accessory {
+            accessory.index = adjacencyMap.size
+            adjacencyMap[accessory] = arrayListOf()
+            return accessory
+        }
 
         fun addLineageConnection(source: Accessory, target: Accessory, type: LineageType) {
             val connection = LineageConnection(source.index, target.index, type)
@@ -167,22 +179,19 @@ object AccessoryApi {
                 else -> family.take(1)
             }
 
-            directFamily.mapNotNull {
-                this.getAccessoryOrNull(it.toInternalName())
-            }.forEach { targetAccessory ->
-                // Climb down the lineage tree (or across)
-                this.addLineageConnection(targetAccessory, accessory, lineageType)
-            }
+            directFamily.mapNotNull { this.getAccessoryOrNull(it.toInternalName()) }
+                .forEach { targetAccessory -> // Climb down the lineage tree (or across)
+                    this.addLineageConnection(targetAccessory, accessory, lineageType)
+                }
         }
-
     }
 
     private fun JsonObject.shouldProcessAccessory(): Boolean {
         val internalName = get("internalname")?.asString?.toInternalName() ?: return false
         if (internalName in ignoredAccessories) return false
-        val lore = when (has("lore")) {
-            true -> get("lore").asJsonArray.map { it.asString }
-            false -> return false
+        val lore = when {
+            has("lore") -> get("lore").asJsonArray.map { it.asString }
+            else -> return false
         }
         return isAccessory(internalName, lore)
     }
@@ -191,6 +200,7 @@ object AccessoryApi {
     private var lateRepoLoad = false
     private val ignoredAccessories: MutableList<NeuInternalName> = mutableListOf()
     private val accessoryLineageSoT: MutableMap<String, List<String>> = mutableMapOf()
+
     val accessoryLineage: AccessoryLineageTree by lazy {
         AccessoryLineageTree().apply {
             EnoughUpdatesManager.getItemInformation().entries
@@ -211,7 +221,8 @@ object AccessoryApi {
         return ProfileSpecificStorage.StorageAccessory(internalName, rarity, enrichment)
     }
 
-    fun ItemStack.isAccessory(): Boolean = getInternalNameOrNull()?.let { isAccessory(it, getLore()) } ?: false
+    fun ItemStack.isAccessory(): Boolean =
+        getInternalNameOrNull()?.let { isAccessory(it, getLore()) } ?: false
 
     private fun isAccessory(internalName: NeuInternalName, lore: List<String>): Boolean =
         internalName !in ignoredAccessories && !isAccessoryLorePattern.anyMatches(lore)
@@ -219,12 +230,9 @@ object AccessoryApi {
     @HandleEvent
     fun onNeuRepoReloadEvent(event: NeuRepositoryReloadEvent) {
         val misc = event.getConstant<NeuMiscJson>("misc")
-
-        val newIgnores = misc.ignoredTalismans.map {
-            it.toInternalName()
-        }.filter {
-            it !in ignoredAccessories
-        }.takeIfNotEmpty() ?: return
+        val newIgnores = misc.ignoredTalismans.map { it.toInternalName() }
+            .filter { it !in ignoredAccessories }
+            .takeIfNotEmpty() ?: return
         ignoredAccessories.addAll(newIgnores)
 
         val newLineageLines = misc.talismanUpgrades.filter { it.key !in accessoryLineageSoT.keys }
@@ -244,7 +252,7 @@ object AccessoryApi {
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         val storage = storage ?: return
-        var page: Int = -1
+        var page = -1
         accessoryBagNamePattern.matchMatcher(event.inventoryName) {
             page = when (groupOrNull("page")) {
                 null -> 1
@@ -254,7 +262,8 @@ object AccessoryApi {
         }
         if (!inAccessoryBag || page == -1 || event.inventoryItems.isEmpty()) return
 
-        pageCache[page] = event.inventoryItems.hashCode().takeIf { it != pageCache[page] } ?: return
+        pageCache[page] = event.inventoryItems.hashCode()
+            .takeIf { it != pageCache[page] } ?: return
 
         val pageIndex = page - 1
         val lastRowFiltered = event.inventoryItems.filter { it.key !in 45..53 }
@@ -268,5 +277,4 @@ object AccessoryApi {
         }
         target.accessoryPages[pageIndex] = mappedAccessoryItems
     }
-
 }
