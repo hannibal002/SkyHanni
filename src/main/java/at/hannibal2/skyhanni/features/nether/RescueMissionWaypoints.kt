@@ -192,13 +192,15 @@ object RescueMissionWaypoints {
             }
             navigateToUndercoverAgent()
         }
-        if (config.hostagePath) {
+        parkourHelper?.let {
             if (cancelAfraidPattern.matches(event.message) || cancelRunAwayPattern.matches(event.message)) {
                 parkourHelper = null
             }
             if (cancelTimeoutPattern.matches(event.message)) {
                 parkourHelper = null
-                navigateToQuestBoard("run out of time")
+                if (config.hostagePath) {
+                    navigateToQuestBoard("run out of time")
+                }
             }
         }
     }
