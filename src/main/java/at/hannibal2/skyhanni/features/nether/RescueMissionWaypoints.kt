@@ -47,18 +47,9 @@ object RescueMissionWaypoints {
     /**
      * REGEX-TEST: §e[NPC] §eRescue Recruiter§f: §rYou want to help us rescue a hostage from those filthy brutes over there?
      */
-    private val recruiterMagePattern by RepoPattern.pattern(
-        "recruiter.mage",
+    private val recruiterPattern by RepoPattern.pattern(
+        "recruiter",
         "§e\\[NPC] §eRescue Recruiter§f: §rYou want to help us rescue a hostage from those filthy brutes over there\\?",
-    )
-
-    // TODO fix
-    /**
-     * REGEX-TEST: §e[NPC] §eRescue Recruiter§f:
-     */
-    private val recruiterBarbarianPattern by RepoPattern.pattern(
-        "recruiter.barbarian",
-        "§e\\[NPC] §eRescue Recruiter§f: ",
     )
 
     /**
@@ -173,7 +164,7 @@ object RescueMissionWaypoints {
                 }
             }
         }
-        if (recruiterMagePattern.matches(event.message) || recruiterBarbarianPattern.matches(event.message)) {
+        if (recruiterPattern.matches(event.message)) {
             if (config.hostagePath) {
                 if (tier == null) {
                     DelayedRun.runNextTick {
@@ -199,14 +190,12 @@ object RescueMissionWaypoints {
     private fun navigateToUndercoverAgent() {
         if (!config.agentPath) return
         val factionType = CrimsonIsleReputationHelper.factionType ?: return
-        val location = when (factionType) {
+        val undercoverAgentLocation = when (factionType) {
             FactionType.MAGE -> LorenzVec(-15.5, 93.0, -843.7)
-
-            // TODO fix
-            FactionType.BARBARIAN -> LorenzVec(-15.5, 93.0, -843.7)
+            FactionType.BARBARIAN -> LorenzVec(-626.7, 119.0, -960.0)
         }
         IslandGraphs.pathFind(
-            location,
+            undercoverAgentLocation,
             "§5${factionType.factionName} Undercover Agent",
             LorenzColor.DARK_PURPLE.toColor(),
             condition = { config.agentPath },
