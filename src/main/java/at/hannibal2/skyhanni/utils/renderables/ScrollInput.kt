@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
-import at.hannibal2.skyhanni.utils.MouseCompat
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 
 abstract class ScrollInput(
     private val scrollValue: ScrollValue,

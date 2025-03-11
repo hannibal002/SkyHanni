@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
-//#if MC < 1.16
-import at.hannibal2.skyhanni.utils.MouseCompat
 import net.minecraft.client.Minecraft
+//#if MC < 1.16
 import net.minecraft.client.gui.ScaledResolution
-
 //#endif
 
 object GuiScreenUtils {

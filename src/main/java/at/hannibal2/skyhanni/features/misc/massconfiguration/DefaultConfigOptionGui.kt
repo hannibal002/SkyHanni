@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
-import at.hannibal2.skyhanni.utils.MouseCompat
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
