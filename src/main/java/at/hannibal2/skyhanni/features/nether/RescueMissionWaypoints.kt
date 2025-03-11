@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.RescueParkourJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -96,6 +97,11 @@ object RescueMissionWaypoints {
     private var tier: String? = null
     private var tierWasUnknown = false
     private var data: RescueParkourJson? = null
+
+    @HandleEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        tier = null
+    }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
