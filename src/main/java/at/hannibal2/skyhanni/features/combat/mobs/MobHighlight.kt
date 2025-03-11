@@ -52,7 +52,7 @@ object MobHighlight {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.DARK_BLUE.toColor().addAlpha(127),
-            ) { config.arachneKeeperHighlight }
+        ) { config.arachneKeeperHighlight }
         }
 
         if (
