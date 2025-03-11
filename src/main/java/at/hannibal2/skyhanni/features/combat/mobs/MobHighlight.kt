@@ -39,7 +39,7 @@ object MobHighlight {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.DARK_PURPLE.toColor().addAlpha(127),
-        ) { config.corruptedMobHighlight }
+            ) { config.corruptedMobHighlight }
         }
     }
 
@@ -52,7 +52,7 @@ object MobHighlight {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.DARK_BLUE.toColor().addAlpha(127),
-                ) { config.arachneKeeperHighlight }
+            ) { config.arachneKeeperHighlight }
         }
 
         if (
@@ -60,7 +60,7 @@ object MobHighlight {
             maxHealth == 1_000_000 &&
             entity is EntityOtherPlayerMP &&
             entity.name.getFormattedTextCompat() == "Team Treasurite"
-            ) {
+        ) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.DARK_PURPLE.toColor().addAlpha(127),
