@@ -1,6 +1,5 @@
 
-net.minecraft.client.util.Window getHandle() getWindow()
-
 net.fabricmc.api.EnvType net.minecraftforge.api.distmarker.Dist
 net.fabricmc.api.Environment net.minecraftforge.api.distmarker.OnlyIn
 
+net.minecraft.client.util.Window getHandle() getWindow()

@@ -237,6 +237,7 @@ net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntityS
 net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
 net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
 net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch
+net.minecraft.world.entity.monster.WitherSkeleton net.minecraft.entity.monster.EntityWitherSkeleton
 net.minecraft.world.entity.monster.Zombie net.minecraft.entity.monster.EntityZombie
 net.minecraft.world.entity.monster.ZombifiedPiglin net.minecraft.entity.monster.EntityPigZombie
 
