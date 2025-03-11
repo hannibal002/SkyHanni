@@ -273,7 +273,7 @@ to make mappings translate more easily (more on that later).
 ### Goals
 
 It is the explicit goal of this operation to passively generate a 1.21 version of SH using preprocessor. To this end, contributors are
-encouraged to add mappings and preprocessing directives to their features to make them compile on 1.21. *However*, this is considered a very 
+encouraged to add mappings and preprocessing directives to their features to make them compile on 1.21. *However*, this is considered a very
 low priority. Due to the confusing nature (and the slower initial setup time due to decompiling four versions of Minecraft), this feature
 is disabled by default. Similarly, it is up to each contributor to decide if they want to learn how to use preprocessor mappings and
 directives. An explicit non-goal is to maintain two SH versions continuously; instead, we only want to make the eventual transition to 1.21 a task
@@ -282,7 +282,7 @@ that can be slowly worked on over a long span of time.
 ### Set Up
 
 The modern version variants can be set using `skyhanni.multi-version` in `.gradle/private.properties` to three levels.
-You will have to create this file yourself, example text: `skyhanni.multi-version=compile` 
+You will have to create this file yourself, for example if you want to set it to compile the file should contain `skyhanni.multi-version=compile` 
 
 `off` completely disables any preprocessor action or alternative versions. There will be only one project (although still at the `:1.8.9`
 subproject path), and alternative version sources will not be generated (although old generated sources **will not be deleted**). To make
