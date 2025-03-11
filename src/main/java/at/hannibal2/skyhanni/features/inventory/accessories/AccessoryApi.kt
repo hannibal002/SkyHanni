@@ -3,15 +3,19 @@ package at.hannibal2.skyhanni.features.inventory.accessories
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
@@ -19,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
@@ -93,8 +98,7 @@ object AccessoryApi {
 
     // Acting as a pseudo-weight for the graph
     enum class LineageType(private val displayName: String) {
-        PARENT("Parent"), // a greater accessory
-        CHILD("Child"), // a lesser accessory
+        SUCCESSOR("Successor"), // a greater accessory
         SIBLING("Sibling"), // an accessory of the same tier
         ;
 
@@ -115,6 +119,15 @@ object AccessoryApi {
             return accessory
         }
 
+        fun getRelatives(
+            accessory: Accessory,
+            relationshipType: LineageType,
+            limit: Int = 1,
+        ): List<Accessory> = adjacencyMap[accessory]
+            ?.filter { it.type == relationshipType }
+            ?.mapNotNull { it.target }
+            ?.take(limit) ?: emptyList()
+
         fun addLineageConnection(source: Accessory, target: Accessory, type: LineageType) {
             val connection = LineageConnection(source.index, target.index, type)
             adjacencyMap[source]?.add(connection)
@@ -125,13 +138,11 @@ object AccessoryApi {
             else -> adjacencyMap[accessory]?.clear()
         }
 
-        override fun toString(): String {
-            return buildString {
-                adjacencyMap.forEach { (accessory, edges) ->
-                    if (edges.isEmpty()) append("$accessory -/->\n")
-                    else edges.forEach { append("$it\n") }
-                    appendLine()
-                }
+        override fun toString(): String = buildString {
+            adjacencyMap.forEach { (accessory, edges) ->
+                if (edges.isEmpty()) append("$accessory -/->\n")
+                else edges.forEach { append("$it\n") }
+                appendLine()
             }
         }
     }
@@ -147,18 +158,20 @@ object AccessoryApi {
             val isHat = isHatPattern.matches(internalNameStr)
 
             val lineageType: LineageType = when {
-                (isAbiCase || isHat) -> LineageType.SIBLING
-                else -> LineageType.CHILD
+                isAbiCase || isHat -> LineageType.SIBLING
+                else -> LineageType.SUCCESSOR
             }
 
-            family.mapNotNull { internalNameString ->
-                this.getAccessoryOrNull(internalNameString.toInternalName())
+            val directFamily = when (lineageType) {
+                LineageType.SIBLING -> family
+                else -> family.take(1)
+            }
+
+            directFamily.mapNotNull {
+                this.getAccessoryOrNull(it.toInternalName())
             }.forEach { targetAccessory ->
-                // Register the connection
-                this.addLineageConnection(accessory, targetAccessory, lineageType)
-                // Register the reverse connection
-                val reverseLineageType = if (lineageType == LineageType.CHILD) LineageType.PARENT else lineageType
-                this.addLineageConnection(targetAccessory, accessory, reverseLineageType)
+                // Climb down the lineage tree (or across)
+                this.addLineageConnection(targetAccessory, accessory, lineageType)
             }
         }
 
@@ -191,6 +204,13 @@ object AccessoryApi {
     var inAccessoryBag = false
         private set
 
+    private fun ItemStack.toStorageAccessory(): ProfileSpecificStorage.StorageAccessory? {
+        val internalName = getInternalNameOrNull() ?: return null
+        val rarity = getItemRarityOrNull() ?: return null
+        val enrichment = SkyblockStat.getValueOrNull(getEnrichment().orEmpty())
+        return ProfileSpecificStorage.StorageAccessory(internalName, rarity, enrichment)
+    }
+
     fun ItemStack.isAccessory(): Boolean = getInternalNameOrNull()?.let { isAccessory(it, getLore()) } ?: false
 
     private fun isAccessory(internalName: NeuInternalName, lore: List<String>): Boolean =
@@ -200,14 +220,20 @@ object AccessoryApi {
     fun onNeuRepoReloadEvent(event: NeuRepositoryReloadEvent) {
         val misc = event.getConstant<NeuMiscJson>("misc")
 
-        val newIgnores = misc.ignoredTalismans.map { it.toInternalName() }.filter { it !in ignoredAccessories }
+        val newIgnores = misc.ignoredTalismans.map {
+            it.toInternalName()
+        }.filter {
+            it !in ignoredAccessories
+        }.takeIfNotEmpty() ?: return
         ignoredAccessories.addAll(newIgnores)
 
-        val newLineageLines = misc.talismanUpgrades.filter {
-            it.key !in accessoryLineageSoT.keys
-        }
+        val newLineageLines = misc.talismanUpgrades.filter { it.key !in accessoryLineageSoT.keys }
         accessoryLineageSoT.putAll(newLineageLines)
-        if (lateRepoLoad) accessoryLineage.rebuildLineageLine()
+        if (lateRepoLoad) {
+            accessoryLineage.resetLineageConnections(null)
+            accessoryLineage.rebuildLineageLine()
+        }
+        lateRepoLoad = true // Always re-trigger building the lineage line after initial load
     }
 
     @HandleEvent
@@ -234,14 +260,13 @@ object AccessoryApi {
         val lastRowFiltered = event.inventoryItems.filter { it.key !in 45..53 }
         val emptyFiltered = lastRowFiltered.values.filter { it.hasDisplayName() && it.getLore().isNotEmpty() }
         val accessoryItems = emptyFiltered.filter { it.isAccessory() }
+        val mappedAccessoryItems = accessoryItems.mapNotNull { it.toStorageAccessory() }
 
-        val mappedAccessoryItems = accessoryItems.mapNotNull {
-            val internalName = it.getInternalNameOrNull() ?: return@mapNotNull null
-            val rarity = it.getItemRarityOrNull() ?: return@mapNotNull null
-            ProfileSpecificStorage.StorageAccessory(internalName, rarity)
+        val target = when (IslandType.THE_RIFT.isInIsland()) {
+            true -> storage.riftAccessoryStorage
+            false -> storage.accessoryStorage
         }
-
-        storage.accessoryPages[pageIndex] = mappedAccessoryItems
+        target.accessoryPages[pageIndex] = mappedAccessoryItems
     }
 
 }

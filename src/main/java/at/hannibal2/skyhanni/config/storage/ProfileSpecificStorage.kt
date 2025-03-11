@@ -805,14 +805,23 @@ class ProfileSpecificStorage {
         var museumMilestone: Int? = null
     }
 
-    @Expose
-    var accessoryPages: MutableMap<Int, List<StorageAccessory>> = mutableMapOf()
+    data class AccessoryStorage(
+        @Expose var accessoryPages: MutableMap<Int, List<StorageAccessory>> = mutableMapOf(),
+        @Expose var looseAccessories: MutableList<StorageAccessory> = mutableListOf(),
+    )
 
     data class StorageAccessory(
         @Expose val internalName: NeuInternalName,
         @Expose val rarity: LorenzRarity,
+        @Expose val enrichment: SkyblockStat? = null,
     ) {
         override fun toString(): String = internalName.asString()
         fun toAccessoryOrNull() = AccessoryApi.accessoryLineage.getAccessoryOrNull(internalName)
     }
+
+    @Expose
+    var accessoryStorage: AccessoryStorage = AccessoryStorage()
+
+    @Expose
+    var riftAccessoryStorage: AccessoryStorage = AccessoryStorage()
 }
