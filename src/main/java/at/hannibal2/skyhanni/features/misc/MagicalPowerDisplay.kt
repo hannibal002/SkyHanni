@@ -26,7 +26,7 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object MagicalPowerDisplay {
-    private val config get() = SkyHanniMod.feature.inventory.accessory.magicalPower
+    private val config get() = SkyHanniMod.feature.inventory.stats.magicalPower
     private var contactAmount: Int?
         get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount
         private set(value) {

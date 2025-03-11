@@ -20,7 +20,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object StatsTuning {
 
-    private val config get() = SkyHanniMod.feature.inventory.statsTuning
+    private val config get() = SkyHanniMod.feature.inventory.stats.statsTuning
 
     /**
      * REGEX-TEST: §7Stat has: §e3 points

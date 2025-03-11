@@ -133,9 +133,9 @@ enum class SkyblockStat(
     ;
 
     var lastKnownValue: Double?
-        get() = ProfileStorageData.profileSpecific?.stats?.get(this)
+        get() = ProfileStorageData.profileSpecific?.stats?.currentStats?.get(this)
         set(value) {
-            ProfileStorageData.profileSpecific?.stats?.set(this, value)
+            ProfileStorageData.profileSpecific?.stats?.currentStats?.set(this, value)
         }
 
     var lastSource: StatSourceType = StatSourceType.UNKNOWN

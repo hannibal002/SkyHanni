@@ -30,7 +30,7 @@ import java.util.regex.Pattern
 @SkyHanniModule
 object MaxwellApi {
 
-    private val storage get() = ProfileStorageData.profileSpecific
+    private val storage get() = ProfileStorageData.profileSpecific?.stats
 
     var currentPower: String?
         get() = storage?.maxwell?.currentPower

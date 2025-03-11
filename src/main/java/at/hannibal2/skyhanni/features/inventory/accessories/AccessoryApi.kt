@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.inventory.AccessoriesUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -87,7 +87,8 @@ object AccessoryApi {
         var index: Int = -1,
         @Expose var internalName: NeuInternalName,
         @Expose var rarity: LorenzRarity? = null,
-        @Expose var enrichment: SkyblockStat? = null
+        @Expose var enrichment: SkyblockStat? = null,
+        @Expose var totalStats: Map<SkyblockStat, Double> = enumMapOf()
     ) {
         override fun toString(): String = internalName.asString()
 
@@ -205,8 +206,9 @@ object AccessoryApi {
         return isAccessory(internalName, lore)
     }
 
-    private val pageCache: TimeLimitedCache<Int, Int> = TimeLimitedCache(10.minutes)
     private var lateRepoLoad = false
+    private var inventoryHashCache: Int = 0
+    private val pageHashCache: TimeLimitedCache<Int, Int> = TimeLimitedCache(10.minutes)
     private val ignoredAccessories: MutableList<NeuInternalName> = mutableListOf()
     private val accessoryLineageSoT: MutableMap<String, List<String>> = mutableMapOf()
 
@@ -271,8 +273,8 @@ object AccessoryApi {
         }
         if (!inAccessoryBag || page == -1 || event.inventoryItems.isEmpty()) return
 
-        pageCache[page] = event.inventoryItems.hashCode()
-            .takeIf { it != pageCache[page] } ?: return
+        pageHashCache[page] = event.inventoryItems.hashCode()
+            .takeIf { it != pageHashCache[page] } ?: return
 
         val pageIndex = page - 1
         val lastRowFiltered = event.inventoryItems.filter { it.key !in 45..53 }
@@ -291,7 +293,13 @@ object AccessoryApi {
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         val storage = storage ?: return
-        val inventory = InventoryUtils.getItemsInOwnInventory()
+
+        val ownInventoryItems = InventoryUtils.getItemsInOwnInventory().takeIf {
+            it.hashCode() != inventoryHashCache
+        } ?: return
+        inventoryHashCache = ownInventoryItems.hashCode()
+
+        val accessoriesInOwnInventory = ownInventoryItems
             .filter { it.hasDisplayName() && it.getLore().isNotEmpty() }
             .filter { it.isAccessory() }
             .mapNotNull { it.toStorageAccessory() }
@@ -301,14 +309,14 @@ object AccessoryApi {
             true -> storage.riftAccessories
             false -> storage.mainAccessories
         }
-        target.looseAccessories = inventory
+        target.looseAccessories = accessoriesInOwnInventory
         AccessoriesUpdatedEvent(storage).post()
     }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(75, "inventory.magicalPower", "inventory.accessories.magicalPower")
-        event.move(75, "inventory.statsTuning", "inventory.accessories.statsTuning")
+        event.move(75, "inventory.magicalPower", "inventory.stats.magicalPower")
+        event.move(75, "inventory.statsTuning", "inventory.stats.statsTuning")
         event.move(75, "#profile.stats", "#profile.stats.currentStats")
         event.move(75, "#profile.maxwell", "#profile.stats.maxwell")
     }

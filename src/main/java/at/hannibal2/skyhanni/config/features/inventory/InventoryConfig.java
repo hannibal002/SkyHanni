@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.features.inventory.accessories.AccessoryConfig;
+import at.hannibal2.skyhanni.config.features.inventory.accessories.StatsConfig;
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig;
@@ -116,9 +116,9 @@ public class InventoryConfig {
     public ChestValueConfig chestValueConfig = new ChestValueConfig();
 
     @Expose
-    @ConfigOption(name = "Accessories/MP", desc = "")
+    @ConfigOption(name = "Stats/Accessories", desc = "")
     @Accordion
-    public AccessoryConfig accessory = new AccessoryConfig();
+    public StatsConfig stats = new StatsConfig();
 
     @Expose
     @ConfigOption(name = "Get From Sack", desc = "")

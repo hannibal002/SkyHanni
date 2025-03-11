@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class AccessoryConfig {
+class StatsConfig {
 
     @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
@@ -17,7 +17,7 @@ class AccessoryConfig {
     var statsTuning: StatsTuningConfig = StatsTuningConfig()
 
     @Expose
-    @ConfigOption(name = "Overview Display", desc = "")
+    @ConfigOption(name = "Acessory Display", desc = "")
     @Accordion
     var overviewDisplay: AccessoryOverviewDisplayConfig = AccessoryOverviewDisplayConfig()
 }
