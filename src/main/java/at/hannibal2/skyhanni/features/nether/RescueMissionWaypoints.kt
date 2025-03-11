@@ -88,10 +88,11 @@ object RescueMissionWaypoints {
 
     /**
      * REGEX-TEST: §aⒸ §eRescue Mission
+     * REGEX-TEST: §5Ⓐ §cRescue Mission
      */
     private val questTierPattern by RepoPattern.pattern(
         "tier",
-        "§a(?<tier>.) §cRescue Mission",
+        "§.(?<tier>.) §.Rescue Mission",
     )
 
     /**
@@ -114,6 +115,13 @@ object RescueMissionWaypoints {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
+        stopParkour()
+    }
+
+    private fun stopParkour() {
+        if (parkourHelper != null) {
+            IslandGraphs.resetTempRemove()
+        }
         parkourHelper = null
     }
 
@@ -173,7 +181,7 @@ object RescueMissionWaypoints {
         platformSize = 1.0,
         detectionRange = 3.5,
         onEndReach = {
-            parkourHelper = null
+            stopParkour()
         },
     )
 
@@ -207,16 +215,17 @@ object RescueMissionWaypoints {
                 navigateToUndercoverAgent()
             }
             if (caughtPattern.matches(event.message)) {
+                parkourHelper?.reset()
                 navigateToParkourStart()
             }
         }
         parkourHelper?.let {
             if (cancelAfraidPattern.matches(event.message) || cancelRunAwayPattern.matches(event.message)) {
-                parkourHelper = null
+                stopParkour()
                 tryRestart()
             }
             if (cancelTimeoutPattern.matches(event.message)) {
-                parkourHelper = null
+                stopParkour()
                 if (config.hostagePath) {
                     navigateToQuestBoard("run out of time")
                 }
@@ -239,7 +248,23 @@ object RescueMissionWaypoints {
         parkourHelper?.reset()
         initParkour()
         updateConfig()
+        tweakGraphNetwork()
         navigateToParkourStart()
+    }
+
+    // navigation would lead the player from agent to parkour start
+    // through an area where the rescue mission would fail
+    // or where guards are located.
+    // therefore we remove some nodes from the network to only show the correct path
+    private fun tweakGraphNetwork() {
+        val reason = "rescue mission"
+        // outside cathedral
+        IslandGraphs.tempRemove(reason, LorenzVec(6.9, 105.0, -852.0), 3.0)
+
+        // in cathedral
+        IslandGraphs.tempRemove(reason, LorenzVec(-9.2, 114.1, -882.1), 3.0)
+        IslandGraphs.tempRemove(reason, LorenzVec(-30.9, 114.0, -884.1), 3.0)
+        IslandGraphs.tempRemove(reason, LorenzVec(-37.4, 114.1, -888.5), 3.0)
     }
 
     private fun navigateToParkourStart() {

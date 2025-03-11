@@ -99,6 +99,40 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object IslandGraphs {
     var currentIslandGraph: Graph? = null
+    private var backup: Graph? = null
+    var tempRemoveReason: String? = null
+        private set
+
+    private fun Graph.deepCopy(): Graph {
+        val copyMap = nodes.associateWith {
+            GraphNode(it.id, it.position, it.name, it.tagNames)
+        }
+        copyMap.forEach { (original, copy) ->
+            copy.neighbours = original.neighbours.filter { copyMap.containsKey(it.key) }
+                .mapKeys { copyMap[it.key]!! }
+        }
+        return Graph(copyMap.values.toList())
+    }
+
+    fun tempRemove(reason: String, center: LorenzVec, radius: Double) {
+        val graph = currentIslandGraph ?: return
+        tempRemoveReason = reason
+        if (backup == null) {
+            backup = graph.deepCopy()
+        }
+        val copiedGraph = graph.deepCopy()
+        val removedNodes = copiedGraph.nodes.filter { it.position.distance(center) < radius }.toSet()
+        val filteredNodes = copiedGraph.nodes.filter { it !in removedNodes }
+        filteredNodes.forEach { node ->
+            node.neighbours = node.neighbours.filter { it.key !in removedNodes }
+        }
+        currentIslandGraph = Graph(filteredNodes)
+    }
+
+    fun resetTempRemove() {
+        currentIslandGraph = backup
+        backup = null
+    }
 
     private var pathfindClosestNode: GraphNode? = null
     var closestNode: GraphNode? = null
@@ -142,6 +176,8 @@ object IslandGraphs {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
+        backup = null
+        tempRemoveReason = null
         if (currentIslandGraph != null) return
         if (event.newIsland == IslandType.NONE) return
         loadIsland(event.newIsland)
@@ -228,9 +264,16 @@ object IslandGraphs {
     fun onTick(event: SkyHanniTickEvent) {
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
-            handleTick()
-            checkMoved()
+            update()
         }
+    }
+
+    fun update(force: Boolean = false) {
+        if (force) {
+            pathfindClosestNode = null
+        }
+        handleTick()
+        checkMoved()
     }
 
     private fun handleTick() {

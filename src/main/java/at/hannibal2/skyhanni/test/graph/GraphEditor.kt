@@ -35,6 +35,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
@@ -367,11 +369,25 @@ object GraphEditor {
         }
     }
 
+    private var bypassTempRemoveTimer = SimpleTimeMark.farPast()
+
     private fun loadThisIsland() {
         val graph = IslandGraphs.currentIslandGraph
         if (graph == null) {
             ChatUtils.userError("This island does not have graph data!")
             return
+        }
+
+        IslandGraphs.tempRemoveReason?.let {
+            if (bypassTempRemoveTimer.isInPast()) {
+                IslandGraphs.resetTempRemove()
+                ChatUtils.chat("Reset temp remove!")
+            } else {
+                ChatUtils.chat("§cParts of the island graph are currently temp removed: $it")
+                ChatUtils.chat("Run this command again in the next 5 seconds to remove the temp remove logic and copy the current island!")
+                bypassTempRemoveTimer = 5.seconds.fromNow()
+                return
+            }
         }
         if (!config.enabled) {
             config.enabled = true
