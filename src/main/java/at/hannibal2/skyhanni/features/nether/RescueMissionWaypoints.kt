@@ -65,7 +65,7 @@ object RescueMissionWaypoints {
      */
     private val cancelAfraid by RepoPattern.pattern(
         "cancel.afraid",
-        "§e[NPC] §eUndercover Agent§f: §rIt's too dangerous for you?",
+        "§e\\[NPC] §eUndercover Agent§f: §rIt's too dangerous for you\\?",
     )
 
     /**
