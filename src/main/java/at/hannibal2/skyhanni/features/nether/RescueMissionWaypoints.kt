@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RescueParkourJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -51,6 +52,14 @@ object RescueMissionWaypoints {
     private val recruiterPattern by RepoPattern.pattern(
         "recruiter",
         "§e\\[NPC] §eRescue Recruiter§f: §rYou want to help us rescue a hostage from those filthy brutes over there\\?",
+    )
+
+    /**
+     * REGEX-TEST: §cThe guards captured you and threw you out.
+     */
+    private val caughtPattern by RepoPattern.pattern(
+        "caught",
+        "§cThe guards captured you and threw you out.",
     )
 
     /**
@@ -139,7 +148,7 @@ object RescueMissionWaypoints {
 
             // will get data["S1"] or data["S2"]
             parkourHelper = data?.let { data ->
-                data.barb["S${config.variant}"]?.let {
+                data.barb["S${config.variant.get()}"]?.let {
                     createParkour(it)
                 }
             }
@@ -171,6 +180,9 @@ object RescueMissionWaypoints {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<RescueParkourJson>("RescueMissionWaypoints")
+        parkourHelper?.let {
+            startParkour()
+        }
     }
 
     @HandleEvent
@@ -178,16 +190,13 @@ object RescueMissionWaypoints {
         if (config.hostagePath) {
             agentDialoguePattern.matchMatcher(event.message.removeColor()) {
                 tier?.let {
-                    initParkour()
-                    updateConfig()
+                    startParkour()
                 } ?: run {
                     ChatUtils.userError("Rescue mission tier still not known! Check out the Quest Board first as I told you earlier!")
                     navigateToQuestBoard("forgot to check out tier")
                 }
             }
-        }
-        if (recruiterPattern.matches(event.message)) {
-            if (config.hostagePath) {
+            if (recruiterPattern.matches(event.message)) {
                 if (tier == null) {
                     DelayedRun.runNextTick {
                         ChatUtils.userError("Rescue mission tier not known! Check out the Quest Board first!")
@@ -195,12 +204,16 @@ object RescueMissionWaypoints {
                     tierWasUnknown = true
                     return
                 }
+                navigateToUndercoverAgent()
             }
-            navigateToUndercoverAgent()
+            if (caughtPattern.matches(event.message)) {
+                navigateToParkourStart()
+            }
         }
         parkourHelper?.let {
             if (cancelAfraidPattern.matches(event.message) || cancelRunAwayPattern.matches(event.message)) {
                 parkourHelper = null
+                tryRestart()
             }
             if (cancelTimeoutPattern.matches(event.message)) {
                 parkourHelper = null
@@ -211,12 +224,40 @@ object RescueMissionWaypoints {
         }
     }
 
+    private fun tryRestart() {
+        if (config.hostagePath) {
+            ChatUtils.clickableChat(
+                "Wanna retry the rescue mission quest? Click here!",
+                onClick = {
+                    navigateToQuestBoard("try again")
+                },
+            )
+        }
+    }
+
+    private fun startParkour() {
+        parkourHelper?.reset()
+        initParkour()
+        updateConfig()
+        navigateToParkourStart()
+    }
+
+    private fun navigateToParkourStart() {
+        val location = parkourHelper?.getStartLocation() ?: return
+        IslandGraphs.pathFind(
+            location,
+            "§estart of parkour",
+            LorenzColor.YELLOW.toColor(),
+            condition = { config.hostagePath && parkourHelper != null },
+        )
+    }
+
     private fun navigateToUndercoverAgent() {
         if (!config.agentPath) return
         val factionType = CrimsonIsleReputationHelper.factionType ?: return
         val undercoverAgentLocation = when (factionType) {
-            FactionType.MAGE -> LorenzVec(-15.5, 93.0, -843.7)
-            FactionType.BARBARIAN -> LorenzVec(-626.7, 119.0, -960.0)
+            FactionType.MAGE -> LorenzVec(-626.7, 119.0, -960.0)
+            FactionType.BARBARIAN -> LorenzVec(-15.5, 93.0, -843.7)
         }
         IslandGraphs.pathFind(
             undercoverAgentLocation,
@@ -232,7 +273,7 @@ object RescueMissionWaypoints {
             location,
             "Head back to Quest board, $reason",
             LorenzColor.WHITE.toColor(),
-            condition = { config.agentPath },
+            condition = { (config.agentPath || config.hostagePath) },
         )
     }
 
@@ -245,8 +286,15 @@ object RescueMissionWaypoints {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.chroma, config.solidColor, config.lookAhead) {
-            updateConfig()
+        with(config) {
+            ConditionalUtils.onToggle(variant) {
+                parkourHelper?.let {
+                    startParkour()
+                }
+            }
+            ConditionalUtils.onToggle(chroma, solidColor, lookAhead) {
+                updateConfig()
+            }
         }
     }
 
@@ -267,4 +315,20 @@ object RescueMissionWaypoints {
         }
     }
 
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Rescue Mission Waypoints")
+
+        parkourHelper ?: run {
+            event.addIrrelevant("no parkour loaded")
+            return
+        }
+
+        event.addData {
+            add("parkour is loaded")
+            add("tier: $tier")
+            add("tierWasUnknown: $tierWasUnknown")
+            add("factionType: ${CrimsonIsleReputationHelper.factionType}")
+        }
+    }
 }

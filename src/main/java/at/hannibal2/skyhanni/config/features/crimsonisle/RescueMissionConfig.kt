@@ -36,7 +36,7 @@ class RescueMissionConfig {
         desc = "For Barbarian S-tier, there are two variants. If your path seems wrong, change it to the other one.",
     )
     @ConfigEditorDropdown
-    var variant: PathVariant = PathVariant.ONE
+    var variant: Property<PathVariant> = Property.of(PathVariant.ONE)
 
     @Expose
     @ConfigOption(name = "Look Ahead", desc = "Change how many waypoints should be shown in front of you.")
