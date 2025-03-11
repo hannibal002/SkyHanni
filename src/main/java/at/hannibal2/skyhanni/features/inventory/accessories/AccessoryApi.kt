@@ -309,5 +309,7 @@ object AccessoryApi {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(75, "inventory.magicalPower", "inventory.accessories.magicalPower")
         event.move(75, "inventory.statsTuning", "inventory.accessories.statsTuning")
+        event.move(75, "#profile.stats", "#profile.stats.currentStats")
+        event.move(75, "#profile.maxwell", "#profile.stats.maxwell")
     }
 }

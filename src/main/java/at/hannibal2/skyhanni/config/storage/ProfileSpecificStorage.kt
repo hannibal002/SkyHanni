@@ -792,28 +792,18 @@ class ProfileSpecificStorage {
         @Expose
         var currentStats: MutableMap<SkyblockStat, Double?> = enumMapOf()
 
-        @Expose var maxwell: MaxwellPowerStorage = MaxwellPowerStorage()
+        @Expose
+        var maxwell: MaxwellPowerStorage = MaxwellPowerStorage()
 
         class MaxwellPowerStorage {
-            @Expose
-            var currentPower: String? = null
-
-            @Expose
-            var magicalPower: Int = -1
-
-            @Expose
-            var tunings: List<ThaumaturgyPowerTuning> = listOf()
-
-            @Expose
-            var favoritePowers: List<String> = listOf()
+            @Expose var currentPower: String? = null
+            @Expose var magicalPower: Int = -1
+            @Expose var tunings: List<ThaumaturgyPowerTuning> = listOf()
+            @Expose var favoritePowers: List<String> = listOf()
         }
 
-        data class AccessoryStorageSet(
-            @Expose var accessoryPages: MutableMap<Int, List<AccessoryApi.Accessory>> = mutableMapOf(),
-            @Expose var looseAccessories: MutableList<AccessoryApi.Accessory> = mutableListOf(),
-        ) {
-            val accessories get() = looseAccessories + accessoryPages.values.flatten()
-        }
+        @Expose
+        var accessoryStorage: AccessoryStorage = AccessoryStorage()
 
         data class AccessoryStorage(
             @Expose var mainAccessories: AccessoryStorageSet = AccessoryStorageSet(),
@@ -823,7 +813,11 @@ class ProfileSpecificStorage {
             val accessories get() = accessorySet.accessories
         }
 
-        @Expose
-        var accessoryStorage: AccessoryStorage = AccessoryStorage()
+        data class AccessoryStorageSet(
+            @Expose var accessoryPages: MutableMap<Int, List<AccessoryApi.Accessory>> = mutableMapOf(),
+            @Expose var looseAccessories: MutableList<AccessoryApi.Accessory> = mutableListOf(),
+        ) {
+            val accessories get() = looseAccessories + accessoryPages.values.flatten()
+        }
     }
 }
