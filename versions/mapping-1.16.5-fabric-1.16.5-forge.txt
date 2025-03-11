@@ -9,3 +9,6 @@ net.minecraft.entity.passive.VillagerEntity net.minecraft.world.entity.npc.Villa
 net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.decoration.ArmorStand
 
 net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.ServerPlayer
+
+net.minecraft.client.render.WorldRenderer reload() allChanged()
+

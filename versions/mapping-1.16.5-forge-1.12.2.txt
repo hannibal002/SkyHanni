@@ -20,6 +20,9 @@ net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
 
 net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
 
+net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
+net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
+
 net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiChest
 net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
 
