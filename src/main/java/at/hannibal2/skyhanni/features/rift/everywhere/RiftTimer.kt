@@ -71,7 +71,7 @@ object RiftTimer {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !RiftApi.inRiftRace) return
         if (!event.isMod(5)) return
-        val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")
+        val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer?.experienceLevel.toString() + " s")
         currentTime = newTime
         update()
     }

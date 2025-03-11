@@ -67,6 +67,7 @@ net.minecraft.nbt.CompoundTag getList() getTagList()
 net.minecraft.nbt.CompoundTag put() setTag()
 net.minecraft.nbt.CompoundTag putBoolean() setBoolean()
 net.minecraft.nbt.CompoundTag putInt() setInteger()
+net.minecraft.nbt.CompoundTag getInt() getInteger()
 net.minecraft.nbt.CompoundTag putString() setString()
 net.minecraft.nbt.CompoundTag remove() removeTag()
 
@@ -162,6 +163,8 @@ net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEnt
 
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
+net.minecraft.server.level.ServerPlayer net.minecraft.entity.player.EntityPlayerMP
+
 net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
 net.minecraft.world.effect.MobEffectInstance net.minecraft.potion.PotionEffect
 net.minecraft.world.effect.MobEffects net.minecraft.init.MobEffects
@@ -237,6 +240,7 @@ net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntityS
 net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
 net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
 net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch
+net.minecraft.world.entity.monster.WitherSkeleton net.minecraft.entity.monster.EntityWitherSkeleton
 net.minecraft.world.entity.monster.Zombie net.minecraft.entity.monster.EntityZombie
 net.minecraft.world.entity.monster.ZombifiedPiglin net.minecraft.entity.monster.EntityPigZombie
 
@@ -269,6 +273,8 @@ net.minecraft.world.inventory.Slot index slotNumber
 
 net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
+net.minecraft.world.item.Items PLAYER_HEAD SKULL
+net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 
 net.minecraft.world.item.enchantment.Enchantments net.minecraft.init.Enchantments
 
@@ -277,6 +283,9 @@ net.minecraft.world.item.enchantment.Enchantments ALL_DAMAGE_PROTECTION PROTECTI
 net.minecraft.world.level.Level getEntity() getEntityByID()
 
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
+net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
+
+net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
 net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
 

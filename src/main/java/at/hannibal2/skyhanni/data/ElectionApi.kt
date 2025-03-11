@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -162,7 +163,7 @@ object ElectionApi {
         if (!calendarGuiPattern.matches(event.inventoryName)) return
 
         val stack: ItemStack = event.inventoryItems.values.firstOrNull {
-            mayorHeadPattern.matchMatcher(it.displayName) {
+            mayorHeadPattern.matchMatcher(it.displayName.getFormattedTextCompat()) {
                 group("name") == "Jerry"
             } ?: false
         } ?: return

@@ -45,7 +45,7 @@ object CrystalHollowsWalls {
     private const val MIDDLE_Z = 513.0
     private const val MAX_Z = 1024.0
 
-    private val yViewOffset get() = -Minecraft.getMinecraft().thePlayer.getEyeHeight().toDouble()
+    private val yViewOffset get() = -(Minecraft.getMinecraft().thePlayer?.getEyeHeight()?.toDouble() ?: 0.0)
 
     // Yes Hypixel has misaligned the nucleus
     private val nucleusBB = AxisAlignedBB(

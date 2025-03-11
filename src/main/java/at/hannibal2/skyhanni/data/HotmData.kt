@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import kotlin.math.pow
@@ -575,7 +576,7 @@ enum class HotmData(
 
             if (this.handlePowder()) return
 
-            val entry = entries.firstOrNull { it.guiNamePattern.matches(item.name) } ?: return
+            val entry = entries.firstOrNull { it.guiNamePattern.matches(item.name.getFormattedTextCompat()) } ?: return
             entry.slot = this
 
             val lore = item.getLore().takeIf { it.isNotEmpty() } ?: return
@@ -616,8 +617,8 @@ enum class HotmData(
             val item = this.stack ?: return false
 
             val isHeartItem = when {
-                heartItemPattern.matches(item.name) -> true
-                resetItemPattern.matches(item.name) -> false
+                heartItemPattern.matches(item.name.getFormattedTextCompat()) -> true
+                resetItemPattern.matches(item.name.getFormattedTextCompat()) -> false
                 else -> return false
             }
 

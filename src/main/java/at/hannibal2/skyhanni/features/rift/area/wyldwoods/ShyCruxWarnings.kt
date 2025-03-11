@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -24,7 +25,7 @@ object ShyCruxWarnings {
     }
 
     private fun checkForShy() {
-        if (EntityUtils.getAllEntities().any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
+        if (EntityUtils.getAllEntities().any { it.name.getFormattedTextCompat() in shyNames && it.distanceToPlayer() < 8 }) {
             LorenzUtils.sendTitle("§eLook away!", 150.milliseconds)
         }
     }

@@ -49,7 +49,7 @@ object MobDebug {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (config.showRayHit || config.showInvisible) {
-            lastRayHit = MobUtils.rayTraceForMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)
+            lastRayHit = MobUtils.rayTraceForMobs(Minecraft.getMinecraft().thePlayer ?: return, event.partialTicks)
                 ?.firstOrNull { it.canBeSeen() && (!config.showInvisible || !it.isInvisible()) }
         }
 
