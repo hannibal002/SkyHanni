@@ -56,10 +56,10 @@ object MobHighlight {
         }
 
         if (
-            config.corleoneHighlighter
-            && maxHealth == 1_000_000
-            && entity is EntityOtherPlayerMP
-            && entity.name.getFormattedTextCompat() == "Team Treasurite"
+            config.corleoneHighlighter &&
+            maxHealth == 1_000_000 &&
+            entity is EntityOtherPlayerMP &&
+            entity.name.getFormattedTextCompat() == "Team Treasurite"
             ) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
