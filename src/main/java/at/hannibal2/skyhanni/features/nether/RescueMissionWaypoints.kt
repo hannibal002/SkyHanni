@@ -63,9 +63,17 @@ object RescueMissionWaypoints {
     /**
      * REGEX-TEST: §e[NPC] §eUndercover Agent§f: §rIt's too dangerous for you?
      */
-    private val cancelAfraid by RepoPattern.pattern(
+    private val cancelAfraidPattern by RepoPattern.pattern(
         "cancel.afraid",
         "§e\\[NPC] §eUndercover Agent§f: §rIt's too dangerous for you\\?",
+    )
+
+    /**
+     * REGEX-TEST: §cYou left the area and failed your rescue mission.
+     */
+    private val cancelRunAwayPattern by RepoPattern.pattern(
+        "cancel.run-away",
+        "§cYou left the area and failed your rescue mission\\.",
     )
 
     /**
@@ -185,7 +193,7 @@ object RescueMissionWaypoints {
             navigateToUndercoverAgent()
         }
         if (config.hostagePath) {
-            if (cancelAfraid.matches(event.message)) {
+            if (cancelAfraidPattern.matches(event.message) || cancelRunAwayPattern.matches(event.message)) {
                 parkourHelper = null
             }
             if (cancelTimeoutPattern.matches(event.message)) {
