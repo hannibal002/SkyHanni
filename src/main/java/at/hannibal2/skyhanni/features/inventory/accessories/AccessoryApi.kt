@@ -68,6 +68,46 @@ object AccessoryApi {
         "bagname",
         "Accessory Bag(?: \\((?<page>\\d)\\/\\d\\))?",
     )
+
+    /**
+     * REGEX-TEST: §7Bonus Pest Chance: §a+60%
+     * REGEX-TEST: §7Combat Wisdom: §a+5
+     * REGEX-TEST: §7Crit Damage: §c+6% §d(+6%)
+     * REGEX-TEST: §7Defense: §a+15 §d(+15)
+     * REGEX-TEST: §7Farming Fortune: §a+5 §d(+5)
+     * REGEX-TEST: §7Fear: §a+6
+     * REGEX-TEST: §7Fishing Speed: §a+1
+     * REGEX-TEST: §7Fishing Wisdom: §a+1
+     * REGEX-TEST: §7Foraging Fortune: §a+5 §d(+5)
+     * REGEX-TEST: §7Foraging Fortune: §a+25
+     * REGEX-TEST: §7Foraging Wisdom: §a+1
+     * REGEX-TEST: §7Gemstone Fortune: §a+10
+     * REGEX-TEST: §7Health: §a+5
+     * REGEX-TEST: §7Health: §a+15 §d(+15)
+     * REGEX-TEST: §7Health Regen: §a+3
+     * REGEX-TEST: §7Intelligence: §a+3
+     * REGEX-TEST: §7Intelligence: §a+15 §d(+15)
+     * REGEX-TEST: §7Magic Find: §a+0.5
+     * REGEX-TEST: §7Magic Find: §a+0.5 §8(+0.5)
+     * REGEX-TEST: §7Mana Regen: §a+10%
+     * REGEX-TEST: §7Mining Fortune: §a+25 §d(+25)
+     * REGEX-TEST: §7Mining Speed: §a+50 §d(+50)
+     * REGEX-TEST: §7Pet Luck: §a+1
+     * REGEX-TEST: §7Pristine: §a+1 §d(+1)
+     * REGEX-TEST: §7Runecrafting Wisdom: §a+2
+     * REGEX-TEST: §7Sea Creature Chance: §c+1.5%
+     * REGEX-TEST: §7Sea Creature Chance: §c+1% §d(+1%)
+     * REGEX-TEST: §7Speed: §a+3
+     * REGEX-TEST: §7Strength: §c+8 §d(+8)
+     * REGEX-TEST: §7Trophy Fish Chance: §a+3%
+     * REGEX-TEST: §7True Defense: §a+3
+     * REGEX-TEST: §7True Defense: §a+6.5 §d(+6.5)
+     * REGEX-TEST: §7Vitality: §a+10
+     */
+    private val accessoryStatsLorePattern by RepoPattern.pattern(
+        "lore.stats",
+        "§7(?<stat>[\\w ]+): (?:§.)+\\+(?<value>[\\d.]+)%?(?: (?:§.)+\\(.*\\))?"
+    )
     // </editor-fold>
 
     // Acting as the vertex in the graph
@@ -205,8 +245,23 @@ object AccessoryApi {
         val internalName = getInternalNameOrNull() ?: return null
         val rarity = getItemRarityOrNull() ?: return null
         val enrichment = SkyblockStat.getValueOrNull(getEnrichment().orEmpty())
-        return Accessory(internalName = internalName, rarity = rarity, enrichment = enrichment)
+        return Accessory(
+            internalName = internalName,
+            rarity = rarity,
+            enrichment = enrichment,
+            totalStats = getAccessoryStatsOrEmpty(),
+        )
     }
+
+    private fun ItemStack.getAccessoryStatsOrEmpty(): Map<SkyblockStat, Double> =
+        if (!this.isAccessory() || this.getLore().isEmpty()) emptyMap()
+        else this.getLore().mapNotNull { line ->
+            accessoryStatsLorePattern.matchMatcher(line) {
+                val stat = SkyblockStat.getValueOrNull(group("stat")) ?: return@matchMatcher null
+                val value = groupOrNull("value")?.toDoubleOrNull() ?: return@matchMatcher null
+                stat to value
+            }
+        }.toMap()
 
     fun NeuInternalName.isAccessory() = this.getItemStackOrNull()?.isAccessory() ?: false
     fun ItemStack.isAccessory(): Boolean = getItemCategoryOrNull() in ItemCategory.accessories
