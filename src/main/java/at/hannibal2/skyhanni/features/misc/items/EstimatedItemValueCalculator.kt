@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeApi
+import at.hannibal2.skyhanni.data.KuudraPrestigeCostData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -105,6 +107,7 @@ object EstimatedItemValueCalculator {
         ::addMithrilInfusion,
 
         // counted
+        ::addKuudraTier,
         ::addStars, // crimson, dungeon
         ::addMasterStars,
         ::addHotPotatoBooks,
@@ -483,6 +486,31 @@ object EstimatedItemValueCalculator {
 
     private fun formatProgress(label: String, have: Int, max: Int, price: Number): String {
         return "§7$label: §e$have§7/§e$max ${price.formatCoinWithBrackets()}"
+    }
+
+    private fun addKuudraTier(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getInternalNameOrNull() ?: return 0.0
+        if (!internalName.isKuudraArmor()) return 0.0
+        val tierIndex = internalName.getKuudraTier()?.takeIf { it > 1 } ?: return 0.0
+        val armorTier = kuudraTiers.getOrNull(tierIndex - 1) ?: return 0.0
+        val countedTiers = kuudraTiers.subList(1, tierIndex)
+
+        val allTiersCost = mutableMapOf<NeuInternalName, Double>()
+
+        countedTiers.forEach { tier ->
+            val costMap = KuudraPrestigeCostData.getPrestigeCostByNameOrNull(tier)?.asCostMap ?: return@forEach
+            costMap.forEach { (item, cost) ->
+                allTiersCost[item] = allTiersCost.getOrDefault(item, 0.0) + cost.toDouble()
+            }
+        }
+
+        val (totalPrice, names) = getTotalAndNames(allTiersCost)
+
+
+        list.add("§7Tier: ${armorTier.lowercase().allLettersFirstUppercase()} ${totalPrice.formatCoinWithBrackets()}")
+        list.addAll(names)
+
+        return totalPrice
     }
 
     private fun addStars(stack: ItemStack, list: MutableList<String>): Double {
