@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.features.inventory.accessories
 
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
@@ -11,7 +9,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -41,7 +38,7 @@ object AccessoryApi {
      */
     private val isHatPattern by patternGroup.pattern(
         "is.hat",
-        "(PARTY|BALLOON)_HAT_.*",
+        "(?:PARTY|BALLOON)_HAT_.*",
     )
 
     /**
@@ -62,7 +59,7 @@ object AccessoryApi {
      */
     private val isAccessoryLorePattern by patternGroup.pattern(
         "is.accessory.lore",
-        "(?:§(?:k.|.))* (?:§.)*(?<rarity>.*?)(?=\\s(?:DUNGEON\\s)?)\\s(?:DUNGEON\\s)?(?:ACCESSORY|HATCESSORY)(?: §(?:k.|.)*)?",
+        "(?:§(?:k.|.))* ?(?:§.)*(?<rarity>.*?)(?=\\s(?:DUNGEON\\s)?)\\s(?:DUNGEON\\s)?(?:ACCESSORY|HATCESSORY)(?: §(?:k.|.)*)?",
     )
 
     /**
@@ -71,7 +68,7 @@ object AccessoryApi {
      */
     private val accessoryBagNamePattern by RepoPattern.pattern(
         "bagname",
-        "Accessory Bag(?: \\((?<page>\\d)\\/\\d)?",
+        "Accessory Bag(?: \\((?<page>\\d)\\/\\d\\))?",
     )
     // </editor-fold>
 
@@ -91,7 +88,7 @@ object AccessoryApi {
     ) {
         val source: Accessory? get() = accessoryLineage.getByIndexOrNull(sourceIndex)
         val target: Accessory? get() = accessoryLineage.getByIndexOrNull(targetIndex)
-        override fun toString(): String = "$source -[${type}]-> $target"
+        override fun toString(): String = "$source -[$type]-> $target"
     }
 
     // Acting as a pseudo-weight for the graph
@@ -177,9 +174,6 @@ object AccessoryApi {
         return isAccessory(internalName, lore)
     }
 
-    private fun isAccessory(internalName: NeuInternalName, lore: List<String>): Boolean =
-        internalName !in ignoredAccessories && !isAccessoryLorePattern.anyMatches(lore)
-
     private val pageCache: TimeLimitedCache<Int, Int> = TimeLimitedCache(10.minutes)
     private var lateRepoLoad = false
     private val ignoredAccessories: MutableList<NeuInternalName> = mutableListOf()
@@ -199,27 +193,8 @@ object AccessoryApi {
 
     fun ItemStack.isAccessory(): Boolean = getInternalNameOrNull()?.let { isAccessory(it, getLore()) } ?: false
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("debugaccessorylineage") {
-            description = "prints the entire accessory lineage tree"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback {
-                val shortened = accessoryLineage.toString().take(1000)
-                ChatUtils.chat(shortened)
-            }
-        }
-
-        event.register("shrebuildaccessorylineage") {
-            description = "resets the accessory lineage tree"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback {
-                accessoryLineage.resetLineageConnections(null)
-                accessoryLineage.rebuildLineageLine()
-                ChatUtils.chat("Accessory lineage tree has been rebuilt.")
-            }
-        }
-    }
+    private fun isAccessory(internalName: NeuInternalName, lore: List<String>): Boolean =
+        internalName !in ignoredAccessories && !isAccessoryLorePattern.anyMatches(lore)
 
     @HandleEvent
     fun onNeuRepoReloadEvent(event: NeuRepositoryReloadEvent) {
@@ -251,7 +226,7 @@ object AccessoryApi {
             }
             inAccessoryBag = true
         }
-        if (!inAccessoryBag || page == -1) return
+        if (!inAccessoryBag || page == -1 || event.inventoryItems.isEmpty()) return
 
         pageCache[page] = event.inventoryItems.hashCode().takeIf { it != pageCache[page] } ?: return
 
