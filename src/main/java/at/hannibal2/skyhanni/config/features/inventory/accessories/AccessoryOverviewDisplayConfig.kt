@@ -27,7 +27,7 @@ class AccessoryOverviewDisplayConfig {
     var position: Position = Position(250, 250)
 
     enum class AccessoryDisplayTab(private val displayName: String) {
-        OVERVIEW("§fOverview"),
+        SUMMARY("§fSummary"),
         STATS("§bStats"),
         MISSING("§cMissing"),
         DUPLICATES("§6Duplicates"),
@@ -37,5 +37,5 @@ class AccessoryOverviewDisplayConfig {
     }
 
     @Expose
-    var selectedTab: AccessoryDisplayTab = AccessoryDisplayTab.OVERVIEW
+    var selectedTab: Property<AccessoryDisplayTab> = Property.of(AccessoryDisplayTab.SUMMARY)
 }

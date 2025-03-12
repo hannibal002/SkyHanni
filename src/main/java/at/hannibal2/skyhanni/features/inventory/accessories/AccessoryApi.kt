@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -120,6 +121,7 @@ object AccessoryApi {
     ) {
         override fun toString(): String = internalName.asString()
 
+        val magicPower: Int get() = if (rarity == null) 0 else getMagicalPower()
         val successor: Accessory?
             get() = accessoryLineage.getRelatives(this, LineageType.SUCCESSOR, limit = 1).firstOrNull()
         val siblings: List<Accessory>
@@ -146,6 +148,12 @@ object AccessoryApi {
         ;
 
         override fun toString(): String = displayName
+    }
+
+    // Todo
+    private fun Accessory.getMagicalPower(): Int = when (rarity) {
+        LorenzRarity.LEGENDARY -> 6
+        else -> 0
     }
 
     class AccessoryLineageTree {
@@ -258,7 +266,7 @@ object AccessoryApi {
         else this.getLore().mapNotNull { line ->
             accessoryStatsLorePattern.matchMatcher(line) {
                 val stat = SkyblockStat.getValueOrNull(group("stat")) ?: return@matchMatcher null
-                val value = groupOrNull("value")?.toDoubleOrNull() ?: return@matchMatcher null
+                val value = groupOrNull("value")?.formatDoubleOrNull() ?: return@matchMatcher null
                 stat to value
             }
         }.toMap()

@@ -422,14 +422,12 @@ object CakeTracker {
         label = "Display",
         current = config.displayType.get(),
         onChange = { config.displayType.set(it) },
-        getName = { it.toString() },
     )
 
     private fun MutableList<Renderable>.addOrderTypeToggle() = addRenderableButton<CakeTrackerDisplayOrderType>(
         label = "Order",
         current = config.displayOrderType.get(),
         onChange = { config.displayOrderType.set(it) },
-        getName = { it.toString() },
     )
 
     private fun drawDisplay(data: CakeData): List<Renderable> = buildList {
