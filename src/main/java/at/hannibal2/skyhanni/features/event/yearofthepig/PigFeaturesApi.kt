@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
@@ -91,6 +92,7 @@ object PigFeaturesApi {
      * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§5Farming for Dummies §r§efrom the piglet's orb!
      * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§3+1,000 Alchemy XP §r§efrom the piglet's orb!
      * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§9Harvesting VI §r§efrom the piglet's orb!
+     * REGEX-TEST: §6§lSHINY! §r§eYou extracted §r§a8x Enchanted Pork §r§efrom the piglet's orb!
      */
     private val orbLootedChatPattern by patternGroup.pattern(
         "chat.orb.looted",
@@ -98,20 +100,20 @@ object PigFeaturesApi {
     )
 
     /**
-     * REGEX-TEST: §r§6+9,721 Coins
+     * REGEX-TEST: +9,721 Coins
      */
     private val coinsRewardPattern by patternGroup.pattern(
         "orb.reward.coins",
-        "(?:§r)?§6\\+(?<amount>[\\d,]+) Coins"
+        "\\+(?<amount>[\\d,]+) Coins"
     )
 
     /**
-     * REGEX-TEST: §r§3+1,000 Mining XP
-     * REGEX-TEST: §r§3+1,000 Alchemy XP
+     * REGEX-TEST: +1,000 Mining XP
+     * REGEX-TEST: +1,000 Alchemy XP
      */
     private val skillXpRewardPattern by patternGroup.pattern(
         "orb.reward.skillxp",
-        "(?:§r)?§.\\+(?<amount>[\\d,]+) (?<skill>.*) XP"
+        "\\+(?<amount>[\\d,]+) (?<skill>.*) XP"
     )
     // </editor-fold>
 
@@ -164,21 +166,22 @@ object PigFeaturesApi {
         coinsRewardPattern.matchMatcher(reward) {
             val amount = group("amount").formatIntOrNull() ?: return@matchMatcher
             ShinyOrbLootedEvent(shinyOrbLocation, coins = amount).post()
-            return
+            return dataSet.reset()
         }
 
         skillXpRewardPattern.matchMatcher(reward) {
             val amount = group("amount").formatIntOrNull() ?: return@matchMatcher
             val skill = SkillType.getByNameOrNull(group("skill")) ?: return@matchMatcher
             ShinyOrbLootedEvent(shinyOrbLocation, skillXp = skill to amount.toLong()).post()
-            return
+            return dataSet.reset()
         }
 
-        val (lootName, lootAmount) = ItemUtils.readItemAmount(reward) ?: return
+        val (lootName, lootAmount) = ItemUtils.readItemAmount(reward.removeColor()) ?: return
         val lootInternalName = NeuInternalName.fromItemNameOrNull(lootName) ?: run {
             ErrorManager.skyHanniError("Could not find internal name for §c\"$lootName§c\"")
         }
         ShinyOrbLootedEvent(shinyOrbLocation, loot = lootInternalName to lootAmount).post()
+        dataSet.reset()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
@@ -190,9 +193,9 @@ object PigFeaturesApi {
     }
 
     private fun EntityPig.handlePigClick() {
-        if (dataSet.pigEntityId == this.entityId) return
         val pigStartingLocation = this.getLorenzVec()
         DelayedRun.runDelayed(1.seconds) {
+            if (dataSet.pigEntityId == this.entityId) return@runDelayed
             val orbEntity = tryFindPlayerOrb(pigStartingLocation) ?: return@runDelayed
             dataSet.reset()
             dataSet.shinyOrbEntityId = orbEntity.entityId
