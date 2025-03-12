@@ -107,11 +107,9 @@ object ShinyOrbTracker {
                 tracker.addItem(internalName, amount, command = false)
             }
             event.coins != null -> tracker.addCoins(event.coins, command = false)
-            event.skillXp != null -> tracker.modify {
+            event.skillXp != null -> tracker.modify { tracker ->
                 val (skill, amount) = event.skillXp.first to event.skillXp.second
-                tracker.modify { tracker ->
-                    tracker.skillXpGained.addOrPut(skill, amount)
-                }
+                tracker.skillXpGained.addOrPut(skill, amount)
             }
         }
     }
