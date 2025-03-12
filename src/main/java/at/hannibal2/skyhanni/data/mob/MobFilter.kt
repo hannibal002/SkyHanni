@@ -203,6 +203,7 @@ object MobFilter {
             (this is EntityVillager && this.maxHealth == 20.0f) || // Villager NPCs in the Village
             (this is EntityWitch && this.entityId <= 500) || // Alchemist NPC
             (this is EntityCow && this.entityId <= 500) || // Shania NPC (in Rift and Outside)
+            (this is EntityPig && this.entityId <= 600) || // Pig Shop
             (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
 
     fun createDisplayNpc(entity: EntityLivingBase): Boolean {
