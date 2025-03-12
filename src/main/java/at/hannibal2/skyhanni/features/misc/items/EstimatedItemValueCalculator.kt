@@ -495,17 +495,13 @@ object EstimatedItemValueCalculator {
         val armorTier = kuudraTiers.getOrNull(tierIndex - 1) ?: return 0.0
         val countedTiers = kuudraTiers.subList(1, tierIndex)
 
-        val allTiersCost = mutableMapOf<NeuInternalName, Double>()
-
-        countedTiers.forEach { tier ->
-            val costMap = KuudraPrestigeCostData.getPrestigeCostByNameOrNull(tier)?.asCostMap ?: return@forEach
-            costMap.forEach { (item, cost) ->
-                allTiersCost[item] = allTiersCost.getOrDefault(item, 0.0) + cost.toDouble()
-            }
-        }
+        val allTiersCost = countedTiers
+            .mapNotNull { tierName -> KuudraPrestigeCostData.getPrestigeCostByNameOrNull(tierName) }
+            .flatMap { costMap -> costMap.entries }
+            .groupingBy { (material, _) -> material }
+            .fold(0.0) { total, (_, cost) -> total + cost.toDouble() }
 
         val (totalPrice, names) = getTotalAndNames(allTiersCost)
-
 
         list.add("§7Tier: ${armorTier.lowercase().allLettersFirstUppercase()} ${totalPrice.formatCoinWithBrackets()}")
         list.addAll(names)
