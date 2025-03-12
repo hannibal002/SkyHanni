@@ -47,6 +47,6 @@ jobs:
             -   name: Enable preprocessor
                 run: |
                     mkdir -p .gradle
-                    echo skyhanni.multi-version=compile > .gradle/private.properties
+                    echo skyhanni.multi-version=preprocess-only > .gradle/private.properties
             -   name: Build with Gradle
                 run: ./gradlew build --stacktrace -PskipDetekt=true
