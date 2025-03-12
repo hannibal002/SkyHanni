@@ -141,8 +141,9 @@ object PigFeaturesApi {
         }
 
         orbExpiredChatPattern.matchMatcher(message) {
-            // Always remove the "oldest" dataset
-            dataSet.reset()
+            val pigId = dataSet.pigEntityId ?: return@matchMatcher
+            val pigEntity = EntityUtils.getEntityByID(pigId)
+            if (pigEntity == null) dataSet.reset()
         }
     }
 
