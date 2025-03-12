@@ -90,6 +90,7 @@ object EstimatedItemValueCalculator {
         get() = if (LorenzUtils.debug) field else 0
 
     private val additionalCostFunctions = listOf(
+        ::addKuudraTier,
         ::addAttributeCost,
         ::addReforgeStone,
 
@@ -107,7 +108,6 @@ object EstimatedItemValueCalculator {
         ::addMithrilInfusion,
 
         // counted
-        ::addKuudraTier,
         ::addStars, // crimson, dungeon
         ::addMasterStars,
         ::addHotPotatoBooks,
@@ -159,6 +159,28 @@ object EstimatedItemValueCalculator {
         val basePrice = addBaseItem(stack, list)
         val totalPrice = additionalCostFunctions.fold(basePrice) { total, function -> total + function(stack, list) }
         return totalPrice to basePrice
+    }
+
+    private fun addKuudraTier(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getInternalNameOrNull() ?: return 0.0
+        if (!internalName.isKuudraArmor()) return 0.0
+        val tierIndex = internalName.getKuudraTier()?.takeIf { it > 1 } ?: return 0.0
+        val armorTier = kuudraTiers.getOrNull(tierIndex - 1) ?: return 0.0
+
+        val countedTiers = kuudraTiers.subList(1, tierIndex)
+
+        val allTiersCost = countedTiers
+            .mapNotNull { tierName -> KuudraPrestigeCostData.getPrestigeCostByNameOrNull(tierName) }
+            .flatMap { costMap -> costMap.entries }
+            .groupingBy { (material, _) -> material }
+            .fold(0.0) { total, (_, cost) -> total + cost.toDouble() }
+
+        val (totalPrice, names) = getTotalAndNames(allTiersCost)
+
+        list.add("§7Tier: ${armorTier.lowercase().allLettersFirstUppercase()} ${totalPrice.formatCoinWithBrackets()}")
+        list.addAll(names)
+
+        return totalPrice
     }
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
@@ -486,27 +508,6 @@ object EstimatedItemValueCalculator {
 
     private fun formatProgress(label: String, have: Int, max: Int, price: Number): String {
         return "§7$label: §e$have§7/§e$max ${price.formatCoinWithBrackets()}"
-    }
-
-    private fun addKuudraTier(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = stack.getInternalNameOrNull() ?: return 0.0
-        if (!internalName.isKuudraArmor()) return 0.0
-        val tierIndex = internalName.getKuudraTier()?.takeIf { it > 1 } ?: return 0.0
-        val armorTier = kuudraTiers.getOrNull(tierIndex - 1) ?: return 0.0
-        val countedTiers = kuudraTiers.subList(1, tierIndex)
-
-        val allTiersCost = countedTiers
-            .mapNotNull { tierName -> KuudraPrestigeCostData.getPrestigeCostByNameOrNull(tierName) }
-            .flatMap { costMap -> costMap.entries }
-            .groupingBy { (material, _) -> material }
-            .fold(0.0) { total, (_, cost) -> total + cost.toDouble() }
-
-        val (totalPrice, names) = getTotalAndNames(allTiersCost)
-
-        list.add("§7Tier: ${armorTier.lowercase().allLettersFirstUppercase()} ${totalPrice.formatCoinWithBrackets()}")
-        list.addAll(names)
-
-        return totalPrice
     }
 
     private fun addStars(stack: ItemStack, list: MutableList<String>): Double {
