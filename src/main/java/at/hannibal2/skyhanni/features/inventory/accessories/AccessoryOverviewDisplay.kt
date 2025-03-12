@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.inventory.AccessoriesUpdatedEvent
-import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryOverviewDisplay.constructCaches
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -42,16 +40,12 @@ object AccessoryOverviewDisplay {
     private val tabSearchInputs = enumMapOf<DisplayTab, SearchTextInput>()
     private fun getSearchInputForTab(tab: DisplayTab) = tabSearchInputs.getOrPut(tab) { SearchTextInput() }
 
-    // <editor-fold desc="Event Handlers">
     @HandleEvent
     fun onAccessoriesUpdated(event: AccessoriesUpdatedEvent) {
         val newAccessories = event.accessories.takeIf { it.hashCode() != lastBuiltAccHash } ?: return
         lastBuiltAccHash = newAccessories.hashCode()
         newAccessories.constructCaches()
     }
-
-    private const val DEBUG = true
-    private val flatCacheSet get() = renderCache.values.flatten()
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -80,12 +74,11 @@ object AccessoryOverviewDisplay {
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.overviewDisplay.selectedTab.onToggle { renderCache.clear() }
     }
-    // </editor-fold>
 
-    // <editor-fold desc="Main Builder">
     private fun AccStorage.constructCaches() {
         renderCache.clear()
         renderCache[DisplayTab.SUMMARY] = buildSummaryTab()
+        renderCache[DisplayTab.STATS] = buildStatsTab()
     }
 
     private fun AccStorage.buildMainDisplay(): List<Renderable> = buildList {
@@ -93,13 +86,10 @@ object AccessoryOverviewDisplay {
         add(Renderable.string("§e§lAccessories Summary"))
         addTabToggle()
         addTabSpecificToggles()
-        addEmptyLine()
         val mainContent = renderCache[currentTab] ?: listOf(getNoDataWarning())
         addAll(mainContent)
     }
-    // </editor-fold>
 
-    // <editor-fold desc="Helpers">
     private fun MutableList<Renderable>.addEmptyLine() = add(Renderable.string(""))
 
     private fun MutableList<Renderable>.addTabToggle() =
@@ -125,10 +115,9 @@ object AccessoryOverviewDisplay {
 
     private const val NO_DATA_TEXT = """
         §c§lNo Accessory Data
-        §7You have no accessories in your accessory bag.
-        §7Accessories are items that can be equipped in the accessory bag.
-        §7They provide various stats and abilities.
-        §7You can obtain accessories from various sources, such as dungeons, slayers, and events.
+        §7You have no accessory data stored.
+        §7Once you start collecting accessories,
+        §7this display will show you a summary.
     """
 
     private fun getNoDataWarning(): Renderable = Renderable.verticalContainer(
@@ -139,15 +128,8 @@ object AccessoryOverviewDisplay {
         },
         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
     )
-    // </editor-fold>
 
-    // <editor-fold desc="Summary Tab">
-    private fun AccStorage.buildSummaryTab(): MutableList<Renderable> = buildList {
-        addAll(buildRaritySummaryRows())
-        add(getNoDataWarning())
-    }.toMutableList()
-
-    private fun AccStorage.buildRaritySummaryRows(): List<Renderable> = buildList {
+    private fun AccStorage.buildSummaryTab(): List<Renderable> = buildList {
         add(Renderable.underlined(Renderable.string("§eCount by Rarity")))
         val table = SearchableRenderableTable { getSearchInputForTab(currentTab) }.apply {
             // Header for the table
@@ -159,9 +141,6 @@ object AccessoryOverviewDisplay {
                 acc.rarity == rarity
             }
         }
-
-        ChatUtils.chat("accessories.size: ${accessories.size}")
-        ChatUtils.chat("rarities: " + rarities.joinToString(", "))
 
         rarities.forEach { rarity ->
             val properName = rarity.name.replace("_", " ")
@@ -183,5 +162,36 @@ object AccessoryOverviewDisplay {
         }
         add(table.renderable)
     }
-    // </editor-fold>
+
+    private fun AccStorage.buildStatsTab(): List<Renderable> = buildList {
+        add(Renderable.underlined(Renderable.string("§eAccessory Stats")))
+        val table = SearchableRenderableTable { getSearchInputForTab(currentTab) }.apply {
+            // Header for the table
+            val headers = listOf("§7Stat", "§7Accessory Bonus")
+            addRow(headers.map { Renderable.string(it) }.toList(), "")
+        }
+        // merge all .totalStats together from accessories
+        val stats = accessories.flatMap { it.totalStats.entries }
+            .groupBy({ it.key }, { it.value })
+            .mapValues { (_, values) -> values.sum() }
+
+        stats.forEach { (stat, value) ->
+            val statRenderable = Renderable.string(stat.iconWithName)
+            val valueRenderable = Renderable.string("§f$value")
+            table.addRow(
+                listOf(
+                    statRenderable,
+                    valueRenderable,
+                ),
+                stat.capitalizedName
+            )
+        }
+        add(table.renderable)
+    }
+
+    private fun AccStorage.buildMissingTab(): List<Renderable> = buildList {
+        add(Renderable.underlined(Renderable.string("§eMissing Accessories")))
+
+        val missing = AccessoryApi.repoAccessoryLineage
+    }
 }

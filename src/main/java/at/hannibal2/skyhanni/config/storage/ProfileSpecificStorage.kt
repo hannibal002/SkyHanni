@@ -810,8 +810,9 @@ class ProfileSpecificStorage {
             @Expose var mainAccessories: AccessoryStorageSet = AccessoryStorageSet(),
             @Expose var riftAccessories: AccessoryStorageSet = AccessoryStorageSet(),
         ) {
-            private val accessorySet = if (IslandType.THE_RIFT.isInIsland()) riftAccessories else mainAccessories
-            val accessories get() = accessorySet.accessories
+            val accessories: List<AccessoryApi.Accessory> get() =
+                if (IslandType.THE_RIFT.isInIsland()) riftAccessories.accessories
+                else mainAccessories.accessories
         }
 
         data class AccessoryStorageSet(

@@ -132,26 +132,21 @@ enum class SkyblockStat(
     UNKNOWN("§c?", "", "")
     ;
 
+    var lastSource: StatSourceType = StatSourceType.UNKNOWN
+        private set
     var lastKnownValue: Double?
         get() = ProfileStorageData.profileSpecific?.stats?.currentStats?.get(this)
         set(value) {
             ProfileStorageData.profileSpecific?.stats?.currentStats?.set(this, value)
         }
+    val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
 
-    var lastSource: StatSourceType = StatSourceType.UNKNOWN
-
-    private val capitalizedName = name.lowercase().allLettersFirstUppercase()
-
+    val capitalizedName = name.lowercase().allLettersFirstUppercase()
     val iconWithName = "$icon $capitalizedName"
 
     private val keyName = name.lowercase().replace('_', '.')
-
-    val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
-
     val tablistPattern by RepoPattern.pattern("stats.tablist.$keyName", tabListPatternS)
     val menuPattern by RepoPattern.pattern("stats.menu.$keyName", menuPatternS)
-
-    fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
 
     @SkyHanniModule
     companion object {

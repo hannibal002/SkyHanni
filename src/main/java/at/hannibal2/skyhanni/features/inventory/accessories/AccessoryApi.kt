@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.accessories
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
@@ -123,11 +124,11 @@ object AccessoryApi {
 
         val magicPower: Int get() = if (rarity == null) 0 else getMagicalPower()
         val successor: Accessory?
-            get() = accessoryLineage.getRelatives(this, LineageType.SUCCESSOR, limit = 1).firstOrNull()
+            get() = repoAccessoryLineage.getRelatives(this, LineageType.SUCCESSOR, limit = 1).firstOrNull()
         val siblings: List<Accessory>
-            get() = accessoryLineage.getRelatives(this, LineageType.SIBLING, Int.MAX_VALUE)
+            get() = repoAccessoryLineage.getRelatives(this, LineageType.SIBLING, Int.MAX_VALUE)
         val predecessor: Accessory?
-            get() = accessoryLineage.getPredecessorOrNull(this)
+            get() = repoAccessoryLineage.getPredecessorOrNull(this)
     }
 
     // Edge in the graph
@@ -136,8 +137,8 @@ object AccessoryApi {
         private val targetIndex: Int,
         val type: LineageType,
     ) {
-        val source: Accessory? get() = accessoryLineage.getByIndexOrNull(sourceIndex)
-        val target: Accessory? get() = accessoryLineage.getByIndexOrNull(targetIndex)
+        val source: Accessory? get() = repoAccessoryLineage.getByIndexOrNull(sourceIndex)
+        val target: Accessory? get() = repoAccessoryLineage.getByIndexOrNull(targetIndex)
         override fun toString(): String = "$source -[$type]-> $target"
     }
 
@@ -158,6 +159,7 @@ object AccessoryApi {
 
     class AccessoryLineageTree {
         private val adjacencyMap = mutableMapOf<Accessory, ArrayList<LineageConnection>>()
+        val accessorySet get() = adjacencyMap.keys
 
         fun getByIndexOrNull(index: Int) = adjacencyMap.keys.find { it.index == index }
 
@@ -204,7 +206,7 @@ object AccessoryApi {
     }
 
     private fun AccessoryLineageTree.rebuildLineageLine() {
-        accessoryLineageSoT.mapNotNull {
+        repoAccessoryLineageSoT.mapNotNull {
             val accessoryInternalName = it.key.toInternalName()
             val accessory = this.getAccessoryOrNull(accessoryInternalName) ?: return@mapNotNull null
             accessory to it.value
@@ -234,15 +236,18 @@ object AccessoryApi {
     private var inventoryHashCache: Int = 0
     private val pageHashCache: TimeLimitedCache<Int, Int> = TimeLimitedCache(10.minutes)
     private val ignoredAccessories: MutableList<NeuInternalName> = mutableListOf()
-    private val accessoryLineageSoT: MutableMap<String, List<String>> = mutableMapOf()
+    private val repoAccessoryLineageSoT: MutableMap<String, List<String>> = mutableMapOf()
 
-    val accessoryLineage: AccessoryLineageTree by lazy {
+    fun getMissingAccessories(storage: ProfileSpecificStorage.StatsStorage.AccessoryStorage) =
+        repoAccessoryLineageSoT
+
+    val repoAccessoryLineage: AccessoryLineageTree by lazy {
         AccessoryLineageTree().apply {
             EnoughUpdatesManager.getItemInformation().entries
                 .map { it.key.toInternalName() to it.value }
                 .filter { it.first.isAccessory() }
                 .forEach { addAccessory(it.first) }
-            if (accessoryLineageSoT.isEmpty()) lateRepoLoad = true
+            if (repoAccessoryLineageSoT.isEmpty()) lateRepoLoad = true
             else this.rebuildLineageLine()
         }
     }
@@ -265,7 +270,8 @@ object AccessoryApi {
         if (!this.isAccessory() || this.getLore().isEmpty()) emptyMap()
         else this.getLore().mapNotNull { line ->
             accessoryStatsLorePattern.matchMatcher(line) {
-                val stat = SkyblockStat.getValueOrNull(group("stat")) ?: return@matchMatcher null
+                val fixedStat = group("stat").replace(" ", "_").uppercase()
+                val stat = SkyblockStat.getValueOrNull(fixedStat) ?: return@matchMatcher null
                 val value = groupOrNull("value")?.formatDoubleOrNull() ?: return@matchMatcher null
                 stat to value
             }
@@ -282,11 +288,11 @@ object AccessoryApi {
             .takeIfNotEmpty() ?: return
         ignoredAccessories.addAll(newIgnores)
 
-        val newLineageLines = misc.talismanUpgrades.filter { it.key !in accessoryLineageSoT.keys }
-        accessoryLineageSoT.putAll(newLineageLines)
+        val newLineageLines = misc.talismanUpgrades.filter { it.key !in repoAccessoryLineageSoT.keys }
+        repoAccessoryLineageSoT.putAll(newLineageLines)
         if (lateRepoLoad) {
-            accessoryLineage.resetLineageConnections(null)
-            accessoryLineage.rebuildLineageLine()
+            repoAccessoryLineage.resetLineageConnections(null)
+            repoAccessoryLineage.rebuildLineageLine()
         }
         lateRepoLoad = true // Always re-trigger building the lineage line after initial load
     }
