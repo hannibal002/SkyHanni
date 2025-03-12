@@ -40,6 +40,10 @@ net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOther
 
 net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
 
+net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
+
+net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
+
 net.minecraft.client.renderer.texture.AbstractTexture getId() getGlTextureId()
 net.minecraft.client.renderer.texture.AbstractTexture load() loadTexture()
 net.minecraft.client.renderer.texture.AbstractTexture releaseId() deleteGlTexture()
@@ -289,6 +293,7 @@ net.minecraft.world.level.Level getBlockEntity() getTileEntity()
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
 
 net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
+net.minecraft.world.level.block.Blocks DANDELION YELLOW_FLOWER
 
 net.minecraft.world.level.block.entity.SkullBlockEntity net.minecraft.tileentity.TileEntitySkull
 
