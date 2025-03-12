@@ -37,7 +37,7 @@ object PigFeatures {
         drawLineToEye(
             pigEntityLocation.up(0.54),
             Color.PINK,
-            1,
+            2,
             true
         )
     }
@@ -47,8 +47,9 @@ object PigFeatures {
     ): Boolean {
         val orbEntity = dataSet.shinyOrbEntityId?.let { EntityUtils.getEntityByID(it) } ?: return false
         val pigEntity = dataSet.pigEntityId?.let { EntityUtils.getEntityByID(it) } ?: return false
+        val nearPig = pigEntity.distanceToPlayer() < 5
 
-        val lineToOrbEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_ORB)
+        val lineToOrbEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_ORB) && nearPig
         if (!lineToOrbEnabled) return false
 
         val orbEntityLocation = exactLocation(orbEntity)
@@ -58,7 +59,7 @@ object PigFeatures {
             pigEntityLocation,
             orbEntityLocation,
             Color.YELLOW,
-            1,
+            2,
             true
         )
         return true

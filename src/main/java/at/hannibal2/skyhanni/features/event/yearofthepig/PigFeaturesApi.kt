@@ -37,16 +37,11 @@ object PigFeaturesApi {
     class ShinyOrbDataSet(
         var pigEntityId: Int? = null,
         var shinyOrbEntityId: Int? = null,
+        private var shinyOrbLocationCache: LorenzVec? = null
     ) : ResettableStorageSet() {
-        override fun reset() {
-            super.reset()
-            shinyOrbLocationCache = null
-        }
-
         private val shinyOrbEntity get() = shinyOrbEntityId?.let {
             EntityUtils.getEntityByID(it) as EntityArmorStand?
         }
-        private var shinyOrbLocationCache: LorenzVec? = null
         val shinyOrbLocation get() = shinyOrbLocationCache ?: shinyOrbEntity?.getLorenzVec()?.let {
             shinyOrbLocationCache = it
             it
