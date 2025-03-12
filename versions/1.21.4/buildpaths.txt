@@ -10,6 +10,3 @@ at/hannibal2/skyhanni/utils/compat/ItemCompat.kt
 at/hannibal2/skyhanni/utils/compat/MouseCompat.kt
 at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 at/hannibal2/skyhanni/utils/compat/TextCompat.kt
-at/hannibal2/skyhanni/utils/compat/WorldCompat.kt
-at/hannibal2/skyhanni/skyhannimodule/SkyhanniModule.kt
-
