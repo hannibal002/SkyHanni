@@ -12,3 +12,4 @@ net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.Serve
 
 net.minecraft.client.render.WorldRenderer reload() allChanged()
 
+net.minecraft.client.util.Window getHandle() getWindow()
