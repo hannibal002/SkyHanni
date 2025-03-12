@@ -96,7 +96,7 @@ object PigFeaturesApi {
      */
     private val orbLootedChatPattern by patternGroup.pattern(
         "chat.orb.looted",
-        "§6§lSHINY! §r§eYou extracted (?:§r)?(?<reward>.*) §r§efrom the piglet's orb!"
+        "§6§lSHINY! §r§eYou extracted (?:§.)+(?<reward>.*) §r§efrom the piglet's orb!"
     )
 
     /**
@@ -176,7 +176,7 @@ object PigFeaturesApi {
             return dataSet.reset()
         }
 
-        val (lootName, lootAmount) = ItemUtils.readItemAmount(reward.removeColor()) ?: return
+        val (lootName, lootAmount) = ItemUtils.readItemAmount(reward) ?: return
         val lootInternalName = NeuInternalName.fromItemNameOrNull(lootName) ?: run {
             ErrorManager.skyHanniError("Could not find internal name for §c\"$lootName§c\"")
         }
