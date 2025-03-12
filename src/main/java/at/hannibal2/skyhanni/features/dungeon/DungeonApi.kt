@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -297,7 +296,7 @@ object DungeonApi {
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
-            if (item.name.getFormattedTextCompat() == "§aGo Back") {
+            if (item.name == "§aGo Back") {
                 item.getLore().getOrNull(0)?.let { firstLine ->
                     if (firstLine == "§7To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")

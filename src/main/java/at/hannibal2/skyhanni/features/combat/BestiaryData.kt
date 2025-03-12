@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -166,9 +165,9 @@ object BestiaryData {
 
     private fun inCategory() {
         for ((index, stack) in stackList) {
-            if (stack.displayName.getFormattedTextCompat() == " ") continue
+            if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            val name = stack.displayName.getFormattedTextCompat()
+            val name = stack.displayName
             var familiesFound: Long = 0
             var totalFamilies: Long = 0
             var familiesCompleted: Long = 0
@@ -194,10 +193,10 @@ object BestiaryData {
 
     private fun notInCategory() {
         for ((index, stack) in stackList) {
-            if (stack.displayName.getFormattedTextCompat() == " ") continue
+            if (stack.displayName == " ") continue
             if (!indexes.contains(index)) continue
-            val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName.getFormattedTextCompat()).replaceFirst("")
-            val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName.getFormattedTextCompat())?.groupValues?.get(1) ?: "0"
+            val name = " [IVX0-9]+$".toPattern().matcher(stack.displayName).replaceFirst("")
+            val level = " ([IVX0-9]+$)".toRegex().find(stack.displayName)?.groupValues?.get(1) ?: "0"
             var totalKillToMax: Long = 0
             var currentTotalKill: Long = 0
             var totalKillToTier: Long = 0

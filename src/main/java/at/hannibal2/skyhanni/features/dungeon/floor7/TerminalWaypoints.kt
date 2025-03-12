@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.player.EntityPlayerMP
 
@@ -46,7 +45,7 @@ object TerminalWaypoints {
             group("playerName")
         } ?: return
 
-        val playerEntity = EntityUtils.getEntities<EntityPlayerMP>().find { it.name.getFormattedTextCompat() == playerName } ?: return
+        val playerEntity = EntityUtils.getEntities<EntityPlayerMP>().find { it.name == playerName } ?: return
         val terminal = TerminalInfo.getClosestTerminal(playerEntity.getLorenzVec())
         terminal?.highlight = false
     }

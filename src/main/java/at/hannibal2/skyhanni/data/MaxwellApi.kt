@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
-import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -204,7 +203,7 @@ object MaxwellApi {
 
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
             for (stack in event.inventoryItems.values) {
-                if (accessoryBagStack.matches(stack.displayName.getFormattedTextCompat())) processStack(stack)
+                if (accessoryBagStack.matches(stack.displayName)) processStack(stack)
             }
         }
         if (statsTuningGuiPattern.matches(event.inventoryName)) {
@@ -246,7 +245,7 @@ object MaxwellApi {
             inventoryItems.values.find {
                 powerSelectedPattern.matches(it.getLore().lastOrNull())
             } ?: return
-        val displayName = selectedPowerStack.displayName.getFormattedTextCompat().removeColor().trim()
+        val displayName = selectedPowerStack.displayName.removeColor().trim()
 
         currentPower = getPowerByNameOrNull(displayName) ?: run {
             ErrorManager.logErrorWithData(

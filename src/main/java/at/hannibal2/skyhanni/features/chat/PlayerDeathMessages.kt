@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 
@@ -54,7 +53,7 @@ object PlayerDeathMessages {
         val entities = EntityUtils.getEntities<EntityOtherPlayerMP>()
             .filter { it.getLorenzVec().distance(LocationUtils.playerLocation()) < 25 }
         for (otherPlayer in entities) {
-            lastTimePlayerSeen[otherPlayer.name.getFormattedTextCompat()] = System.currentTimeMillis()
+            lastTimePlayerSeen[otherPlayer.name] = System.currentTimeMillis()
         }
     }
 

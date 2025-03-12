@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 
 @SkyHanniModule
 object GardenComposterUpgradesData {
@@ -17,7 +16,7 @@ object GardenComposterUpgradesData {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Composter Upgrades") return
         for (item in event.inventoryItems.values) {
-            ComposterUpgrade.regex.matchMatcher(item.name.getFormattedTextCompat()) {
+            ComposterUpgrade.regex.matchMatcher(item.name) {
                 val name = group("name")
                 val level = group("level")?.romanToDecimalIfNecessary() ?: 0
                 val composterUpgrade = ComposterUpgrade.getByName(name)!!

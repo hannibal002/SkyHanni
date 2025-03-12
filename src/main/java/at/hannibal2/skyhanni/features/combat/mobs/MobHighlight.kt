@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
@@ -59,7 +58,7 @@ object MobHighlight {
             config.corleoneHighlighter &&
             maxHealth == 1_000_000 &&
             entity is EntityOtherPlayerMP &&
-            entity.name.getFormattedTextCompat() == "Team Treasurite"
+            entity.name == "Team Treasurite"
         ) {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
