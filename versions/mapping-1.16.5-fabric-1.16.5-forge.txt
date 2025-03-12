@@ -10,6 +10,8 @@ net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.deco
 
 net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.ServerPlayer
 
+net.minecraft.client.option.Perspective isFrontView() isMirrored()
+
 net.minecraft.client.render.WorldRenderer reload() allChanged()
 
 net.minecraft.client.util.Window getHandle() getWindow()

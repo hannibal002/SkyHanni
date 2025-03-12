@@ -1,2 +1,12 @@
+# at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
+at/hannibal2/skyhanni/utils/CircularList.kt
+at/hannibal2/skyhanni/utils/OtherModsSettings.kt
+at/hannibal2/skyhanni/utils/compat/ArrayNormalization.kt
+at/hannibal2/skyhanni/utils/compat/EffectsCompat.kt
+at/hannibal2/skyhanni/utils/compat/EnchantmentsCompat.kt
+at/hannibal2/skyhanni/utils/compat/EntityCompat.kt
+at/hannibal2/skyhanni/utils/compat/GuiScreenUtils.kt
+at/hannibal2/skyhanni/utils/compat/ItemCompat.kt
+at/hannibal2/skyhanni/utils/compat/MouseCompat.kt
+at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 at/hannibal2/skyhanni/utils/compat/TextCompat.kt
-at/hannibal2/skyhanni/utils/compat/MosueCompat.kt

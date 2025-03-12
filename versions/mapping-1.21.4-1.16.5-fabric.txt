@@ -1,2 +1,3 @@
 
 net.minecraft.entity.Entity getId() getEntityId()
+net.minecraft.entity.Entity getEquippedItems() getItemsEquipped()
