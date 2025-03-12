@@ -63,6 +63,7 @@ net.minecraft.core.particles.ParticleTypes ENCHANTED_HIT CRIT_MAGIC
 net.minecraft.core.particles.ParticleTypes HAPPY_VILLAGER VILLAGER_HAPPY
 net.minecraft.core.particles.ParticleTypes LARGE_SMOKE SMOKE_LARGE
 net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
+net.minecraft.core.particles.ParticleTypes SPELL_MOB ENTITY_EFFECT
 
 net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
 net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
@@ -203,6 +204,7 @@ net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItemMainhand()
 net.minecraft.world.entity.LivingEntity getOffhandItem() getHeldItemOffhand()
 net.minecraft.world.entity.LivingEntity hasEffect() isPotionActive()
 net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
+net.minecraft.world.entity.LivingEntity isBaby() isChild()
 
 net.minecraft.world.entity.ambient.Bat net.minecraft.entity.passive.EntityBat
 
