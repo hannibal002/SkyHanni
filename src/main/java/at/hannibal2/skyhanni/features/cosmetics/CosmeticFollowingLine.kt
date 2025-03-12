@@ -42,7 +42,7 @@ object CosmeticFollowingLine {
 
         updateClose(event)
 
-        //#if MC <= 1.16
+        //#if MC < 1.16
         val firstPerson = Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
         //#else
         //$$ val firstPerson = Minecraft.getInstance().options.cameraType.isFirstPerson

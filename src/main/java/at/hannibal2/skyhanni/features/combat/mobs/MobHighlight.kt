@@ -54,12 +54,7 @@ object MobHighlight {
             ) { config.arachneKeeperHighlight }
         }
 
-        if (
-            config.corleoneHighlighter &&
-            maxHealth == 1_000_000 &&
-            entity is EntityOtherPlayerMP &&
-            entity.name == "Team Treasurite"
-        ) {
+        if (config.corleoneHighlighter && maxHealth == 1_000_000 && entity is EntityOtherPlayerMP && entity.name == "Team Treasurite") {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.DARK_PURPLE.toColor().addAlpha(127),
