@@ -89,6 +89,7 @@ If you are not very familiar with git, you might want to try this out: https://l
 
 Proposed changes are best made in their own branch, as this makes development easier for both you and the maintainers of this repository.
 You can do this by following the instructions within the IntelliJ window in the open SkyHanni project:
+
 - Click the beta dropdown at the top of IntelliJ.
 - Click **New branch**.
 - Give the branch a name related to the changes you plan to make.
@@ -99,7 +100,8 @@ _A more in-depth explanation of how to use IntelliJ and branches will follow som
 
 Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, etc.).
 
-When writing the PR description, ensure you fill out the template with all the necessary information, including the "WHAT" section and the changelog entries.
+When writing the PR description, ensure you fill out the template with all the necessary information, including the "WHAT" section and the
+changelog entries.
 
 If your PR relies on another PR, please include this information at the beginning of the description. Consider using a
 format like "- #821" to illustrate the dependency.
@@ -115,29 +117,45 @@ Here is an explanation of which changes belong to each category:
 
 #### New Features
 
-New standalone features that are independent of existing features. Additional settings for existing features belong in the **Improvements** category.
+New standalone features that are independent of existing features. Additional settings for existing features belong in the **Improvements**
+category.
 
 #### Improvements
 
-Changes that improve or expand the code's logic and have a visible impact on users. This category is for enhancements, not for fixing incorrect logic.
-The line between bug fixes and improvements is sometimes not clear.If you are unsure whether a change is an improvement or a bug fix, ask for guidance.
+Changes that improve or expand the code's logic and have a visible impact on users. This category is for enhancements, not for fixing
+incorrect logic.
+The line between bug fixes and improvements is sometimes not clear.If you are unsure whether a change is an improvement or a bug fix, ask
+for guidance.
+
 #### Fixes
 
-Bug fixes, including typos (only those visible to the user, e.g., in config or chat messages), missing checks that cause incorrect behavior under specific conditions, or logic errors.
-Only significant performance issues are considered bugs; otherwise, they fall under **Technical Details**. If the code does not behave as intended by the original developer, it is a bug. If the original code had logical errors, it is a bug. If the original code lacks nuance but is not incorrect, it is not a bug.
+Bug fixes, including typos (only those visible to the user, e.g., in config or chat messages), missing checks that cause incorrect behavior
+under specific conditions, or logic errors.
+Only significant performance issues are considered bugs; otherwise, they fall under **Technical Details**. If the code does not behave as
+intended by the original developer, it is a bug. If the original code had logical errors, it is a bug. If the original code lacks nuance but
+is not incorrect, it is not a bug.
 
 #### Technical Details
 
 Internal changes that do not impact the end user. Examples include:
+
 - Refactoring (renaming or moving members, functions, classes, files or packages)
 - Typos in object names (which the end user will not see)
 - API updates
 - Minor performance improvements
 - Preparations for 1.21
+- Documentation changes to markdown files. E.g. in `/docs` or this file.
 
 #### Removed Features
 
-Features that have merged with existing features (in the config) or have become obsolete (e.g., if Hypixel implements them on the server side).
+Features that have merged with existing features (in the config) or have become obsolete (e.g., if Hypixel implements them on the server
+side).
+
+#### No category
+
+Some changes don't fit any categories.
+E.g. when reverting pull requests or doing quick fixes to prs merged immediately beforehand but not yet released in a beta.
+To tell the changelog build this, write either `exclude_from_changelog` or `ignore_from_changelog` in one line.
 
 ## Coding Styles and Conventions
 
@@ -312,7 +330,8 @@ to make mappings translate more easily (more on that later).
 
 ## Discord Bot
 
-While not directly part of the Minecraft mod, it is useful to know that we have a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
+While not directly part of the Minecraft mod, it is useful to know that we have
+a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
 
 ### Goals
 
