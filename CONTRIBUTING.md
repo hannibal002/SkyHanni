@@ -103,8 +103,8 @@ Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, e
 When writing the PR description, ensure you fill out the template with all the necessary information, including the "WHAT" section and the
 changelog entries.
 
-If your PR relies on another PR, please include this information at the beginning of the description. Consider using a
-format like "- #821" to illustrate the dependency.
+If your PR relies on another PR, please include this information at the beginning of the description. Please use the format `- #<pr number>` for the
+dependency, or `- <url>` for REPO dependencies.
 
 ### Changelog Builder
 
