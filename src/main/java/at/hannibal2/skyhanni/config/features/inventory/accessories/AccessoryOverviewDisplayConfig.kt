@@ -38,4 +38,29 @@ class AccessoryOverviewDisplayConfig {
 
     @Expose
     var selectedTab: Property<AccessoryDisplayTab> = Property.of(AccessoryDisplayTab.SUMMARY)
+
+    // Not exposed to the user, configured within the UI
+    //
+    @Expose
+    var missingTabSortType: Property<MissingSortType> = Property.of(MissingSortType.BEST_RATIO)
+
+    enum class MissingSortType(private val displayName: String) {
+        CHEAPEST("Cheapest overall"),
+        RAW_MP("Most Raw MP"),
+        BEST_RATIO("Next best first"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    var missingTabShowType: Property<MissingShowType> = Property.of(MissingShowType.SHOW_ALL_MISSING)
+
+    enum class MissingShowType(private val displayName: String) {
+        SHOW_ALL_MISSING("Show all missing"),
+        MAX_EACH_FAMILY("Max of each family"),
+        ;
+
+        override fun toString() = displayName
+    }
 }

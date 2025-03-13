@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.inventory.accessories
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -121,6 +122,8 @@ object AccessoryApi {
         @Expose var totalStats: Map<SkyblockStat, Double> = enumMapOf(),
     ) {
         override fun toString(): String = internalName.asString()
+        val isAbiCase = isAbiCasePattern.matches(toString())
+        val isHat = isHatPattern.matches(toString())
 
         val magicPower: Int get() = if (rarity == null) 0 else getMagicalPower()
         val successor: Accessory?
@@ -151,15 +154,72 @@ object AccessoryApi {
         override fun toString(): String = displayName
     }
 
-    // Todo
-    private fun Accessory.getMagicalPower(): Int = when (rarity) {
-        LorenzRarity.LEGENDARY -> 6
+    private val HEGEMONY_ARTIFACT = "HEGEMONY_ARTIFACT".toInternalName()
+    private fun Accessory.magicalPowerOutlierHandler(
+        basePower: Int
+    ): Int? = when {
+        internalName == HEGEMONY_ARTIFACT -> basePower * 2
+        isAbiCase -> {
+            val contactCount = ProfileStorageData.profileSpecific?.abiphoneContactAmount ?: 0
+            contactCount / 2
+        }
+        else -> null
+    }
+
+    private fun Accessory.getMagicalPower(): Int {
+        val basePower = getBaseMagicalPower()
+        return magicalPowerOutlierHandler(basePower) ?: basePower
+    }
+
+    private fun Accessory.getBaseMagicalPower(): Int = when (rarity) {
+        LorenzRarity.COMMON -> 3
+        LorenzRarity.UNCOMMON -> 5
+        LorenzRarity.RARE -> 8
+        LorenzRarity.EPIC -> 12
+        LorenzRarity.LEGENDARY -> 16
+        LorenzRarity.MYTHIC -> 22
+        LorenzRarity.SPECIAL -> 3
+        LorenzRarity.VERY_SPECIAL -> 5
         else -> 0
+    }
+
+    private fun Accessory.isSiblingFulfilled(storage: AccStorage) = storage.accessories.any { storageAcc ->
+        repoAccessoryLineage.getRelatives(this, LineageType.SIBLING).any { relative ->
+            relative == storageAcc
+        }
+    }
+
+    private fun Accessory.isSuccessorFulfilled(storage: AccStorage, visited: MutableSet<Accessory> = mutableSetOf()): Boolean {
+        if (!visited.add(this)) return false
+
+        return storage.accessories.any { storageAcc ->
+            repoAccessoryLineage.getRelatives(this, LineageType.SUCCESSOR).any { relative ->
+                relative == storageAcc || relative.isSuccessorFulfilled(storage, visited)
+            }
+        }
+    }
+
+    fun Accessory.isFulfilled(storage: AccStorage): Boolean =
+        isSiblingFulfilled(storage) || isSuccessorFulfilled(storage)
+
+    // Todo: Add support here for different types of calcualting cost.
+    //  i.e., we're currently just subtracting current acc price from the
+    //  lbin, but this won't help ironman players.
+    fun Accessory.getUpgradeCost(from: Accessory? = null): Double {
+        val thisCost = this.internalName.getPrice()
+        val fromCost = from?.internalName?.getPrice() ?: 0.0
+        return thisCost - fromCost
     }
 
     class AccessoryLineageTree {
         private val adjacencyMap = mutableMapOf<Accessory, ArrayList<LineageConnection>>()
-        val accessorySet get() = adjacencyMap.keys
+
+        fun getMissing(storage: AccStorage): List<Accessory> =
+            adjacencyMap.keys.filter { acc ->
+                storage.accessories.none { storageAcc ->
+                    storageAcc.internalName == acc.internalName
+                }
+            }
 
         fun getByIndexOrNull(index: Int) = adjacencyMap.keys.find { it.index == index }
 
@@ -211,12 +271,8 @@ object AccessoryApi {
             val accessory = this.getAccessoryOrNull(accessoryInternalName) ?: return@mapNotNull null
             accessory to it.value
         }.forEach { (accessory, family) ->
-            val internalNameStr = accessory.internalName.asString()
-            val isAbiCase = isAbiCasePattern.matches(internalNameStr)
-            val isHat = isHatPattern.matches(internalNameStr)
-
             val lineageType: LineageType = when {
-                isAbiCase || isHat -> LineageType.SIBLING
+                accessory.isAbiCase || accessory.isHat -> LineageType.SIBLING
                 else -> LineageType.SUCCESSOR
             }
 
@@ -237,9 +293,6 @@ object AccessoryApi {
     private val pageHashCache: TimeLimitedCache<Int, Int> = TimeLimitedCache(10.minutes)
     private val ignoredAccessories: MutableList<NeuInternalName> = mutableListOf()
     private val repoAccessoryLineageSoT: MutableMap<String, List<String>> = mutableMapOf()
-
-    fun getMissingAccessories(storage: ProfileSpecificStorage.StatsStorage.AccessoryStorage) =
-        repoAccessoryLineageSoT
 
     val repoAccessoryLineage: AccessoryLineageTree by lazy {
         AccessoryLineageTree().apply {
