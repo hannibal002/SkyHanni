@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -173,7 +172,7 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
         when {
             it == "pitchin" -> "pitchin_koi"
-            it == "warped" && name.removeColor().startsWith("Hyper ") -> "endstone_geode"
+            it == "warped" && displayName.removeColor().startsWith("Hyper ") -> "endstone_geode"
 
             else -> it
         }
@@ -255,7 +254,7 @@ object SkyBlockItemModifierUtils {
 
                 val quality = GemstoneQuality.getByNameOrNull(value)
                 if (quality == null) {
-                    ChatUtils.debug("Gemstone quality is null for item $name§7: ('$key' = '$value')")
+                    ChatUtils.debug("Gemstone quality is null for item $displayName§7: ('$key' = '$value')")
                     continue
                 }
                 if (type != null) {
@@ -264,7 +263,7 @@ object SkyBlockItemModifierUtils {
                     val newKey = gemstones.getString(key + "_gem")
                     val newType = GemstoneType.getByNameOrNull(newKey)
                     if (newType == null) {
-                        ChatUtils.debug("Gemstone type is null for item $name§7: ('$newKey' with '$key' = '$value')")
+                        ChatUtils.debug("Gemstone type is null for item $displayName§7: ('$newKey' with '$key' = '$value')")
                         continue
                     }
                     list.add(GemstoneSlot(newType, quality))

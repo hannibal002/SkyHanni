@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -103,7 +102,7 @@ object CollectionTracker {
                 ChatUtils.userError("Item / Dungeon Boss '$rawName' does not exist!")
                 return
             }
-            setNewCollection(foundInternalName, stack.name.removeColor())
+            setNewCollection(foundInternalName, stack.displayName.removeColor())
         }
     }
 
