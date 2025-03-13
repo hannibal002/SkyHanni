@@ -6,23 +6,20 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.HEGEMONY_ARTIFACT
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.RIFT_PRISM
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.getAccessoryRarityOrNull
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.getBaseMagicalPower
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object MagicalPowerDisplay {
@@ -32,9 +29,6 @@ object MagicalPowerDisplay {
         private set(value) {
             ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
         }
-
-    private val hegemonyArtifact = "HEGEMONY_ARTIFACT".toInternalName()
-    private val riftPrism = "RIFT_PRISM".toInternalName()
 
     /**
      * REGEX-TEST: Accessory Bag
@@ -75,31 +69,33 @@ object MagicalPowerDisplay {
         "Your contacts: (?<contacts>\\d+)\\/\\d+",
     )
 
-    @HandleEvent
+    // Todo:
+    //  A lot of this data collection should either get merged with or moved to AccessoryApi
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (!acceptedInvPattern.matches(InventoryUtils.openInventoryName().removeColor())) return
 
         val item = event.stack
         val rarity = item.getAccessoryRarityOrNull() ?: return
         val internalName = item.getInternalNameOrNull() ?: return
 
-        var endMP = rarity.toMP() ?: ErrorManager.skyHanniError(
+        var endMP = rarity.getBaseMagicalPower() ?: ErrorManager.skyHanniError(
             "Unknown rarity '$rarity' for item '${item.displayName}§7'",
         )
 
         when (internalName) {
-            hegemonyArtifact -> endMP *= 2
-            riftPrism -> endMP = 11
+            HEGEMONY_ARTIFACT -> endMP *= 2
+            RIFT_PRISM -> endMP = 11
             else -> if (internalName.isAbicase()) endMP += (contactAmount ?: 0) / 2
         }
 
         event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}$endMP"
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (!abiphoneNamePattern.matches(event.inventoryName)) return
 
         val theBookLore = event.inventoryItems[51]?.getLore() ?: return
@@ -112,22 +108,4 @@ object MagicalPowerDisplay {
     }
 
     private fun NeuInternalName.isAbicase(): Boolean = AccessoryApi.isAbiCasePattern.matches(asString())
-
-    private fun LorenzRarity.toMP(): Int? = when (this) {
-        LorenzRarity.COMMON, LorenzRarity.SPECIAL -> 3
-        LorenzRarity.UNCOMMON, LorenzRarity.VERY_SPECIAL -> 5
-        LorenzRarity.RARE -> 8
-        LorenzRarity.EPIC -> 12
-        LorenzRarity.LEGENDARY -> 16
-        LorenzRarity.MYTHIC -> 22
-        else -> null
-    }
-
-    private fun ItemStack.getAccessoryRarityOrNull(): LorenzRarity? {
-        val category = this.getItemCategoryOrNull() ?: return null
-        if (category != ItemCategory.ACCESSORY && category != ItemCategory.HATCESSORY) return null
-        return this.getItemRarityOrNull()
-    }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }

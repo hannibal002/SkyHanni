@@ -34,7 +34,11 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+import at.hannibal2.skyhanni.features.inventory.accessories.Accessory
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.repoAccessoryLineage
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryLineageTree
+import at.hannibal2.skyhanni.features.inventory.accessories.LineageType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -810,14 +814,35 @@ class ProfileSpecificStorage {
             @Expose var mainAccessories: AccessoryStorageSet = AccessoryStorageSet(),
             @Expose var riftAccessories: AccessoryStorageSet = AccessoryStorageSet(),
         ) {
-            val accessories: List<AccessoryApi.Accessory> get() =
+            val accessories: List<Accessory> get() =
                 if (IslandType.THE_RIFT.isInIsland()) riftAccessories.accessories
                 else mainAccessories.accessories
+
+            fun hasAccessory(accessoryName: NeuInternalName) =
+                accessories.any { it.internalName == accessoryName }
+
+            fun isFulfilled(accessoryName: NeuInternalName): Boolean =
+                hasAccessory(accessoryName) ||
+                    isLineageFulfilled(accessoryName, LineageType.SUCCESSOR) ||
+                    isLineageFulfilled(accessoryName, LineageType.SIBLING)
+
+            private fun isLineageFulfilled(
+                accessoryName: NeuInternalName,
+                lineageType: LineageType,
+                visited: MutableSet<NeuInternalName> = mutableSetOf(),
+            ): Boolean {
+                if (!visited.add(accessoryName)) return false
+                val relatives = repoAccessoryLineage.getRelatives(accessoryName, lineageType)
+                return relatives.any { relative ->
+                    hasAccessory(relative.internalName) ||
+                        isLineageFulfilled(relative.internalName, lineageType, visited)
+                }
+            }
         }
 
         data class AccessoryStorageSet(
-            @Expose var accessoryPages: MutableMap<Int, List<AccessoryApi.Accessory>> = mutableMapOf(),
-            @Expose var looseAccessories: MutableList<AccessoryApi.Accessory> = mutableListOf(),
+            @Expose var accessoryPages: MutableMap<Int, List<Accessory>> = mutableMapOf(),
+            @Expose var looseAccessories: MutableList<Accessory> = mutableListOf(),
         ) {
             val accessories get() = looseAccessories + accessoryPages.values.flatten()
         }

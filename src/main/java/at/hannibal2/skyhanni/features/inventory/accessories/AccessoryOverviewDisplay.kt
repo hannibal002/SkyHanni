@@ -2,16 +2,12 @@ package at.hannibal2.skyhanni.features.inventory.accessories
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.inventory.accessories.AccessoryOverviewDisplayConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.inventory.AccessoriesUpdatedEvent
-import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.getUpgradeCost
-import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.isFulfilled
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
@@ -41,6 +37,22 @@ object AccessoryOverviewDisplay {
     private val renderCache: MutableMap<DisplayTab, List<Renderable>> = enumMapOf()
     private var fullRenderCache: List<Renderable>? = null
 
+    private const val NO_DATA_TEXT = """
+        §c§lNo Accessory Data
+        §7You have no accessory data stored.
+        §7Once you start collecting accessories,
+        §7this display will show you a summary.
+    """
+
+    private val noDataWarning by lazy {
+        Renderable.verticalContainer(
+            NO_DATA_TEXT.split("\n").map {
+                Renderable.string(it)
+            },
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        )
+    }
+
     private var currentTab
         get() = config.selectedTab.get()
         set(value) {
@@ -64,20 +76,32 @@ object AccessoryOverviewDisplay {
     private val tabSearchInputs = enumMapOf<DisplayTab, SearchTextInput>()
     private fun getSearchInputForTab(tab: DisplayTab) = tabSearchInputs.getOrPut(tab) { SearchTextInput() }
 
+    private fun rebuildCaches(): List<Renderable> {
+        val storage = storage?.accessoryStorage ?: return listOf()
+        renderCache[DisplayTab.SUMMARY] = storage.buildSummaryTab()
+        renderCache[DisplayTab.STATS] = storage.buildStatsTab()
+        renderCache[DisplayTab.MISSING] = storage.buildMissingTab()
+        return buildMainDisplay().also {
+            fullRenderCache = it
+        }
+    }
+
     @HandleEvent
     fun onAccessoriesUpdated(event: AccessoriesUpdatedEvent) {
         val newAccessories = event.accessories.takeIf { it.hashCode() != lastBuiltAccHash } ?: return
+        rebuildCaches()
         lastBuiltAccHash = newAccessories.hashCode()
-        newAccessories.constructCaches()
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.enabled || !inAccBag) return
-        val storage = storage?.accessoryStorage ?: return
 
-        if (renderCache.isEmpty()) storage.constructCaches()
-        val fullRenderCache = fullRenderCache ?: storage.buildMainDisplay().also { fullRenderCache = it }
+        val storage = storage?.accessoryStorage ?: return
+        val fullRenderCache = fullRenderCache ?: run {
+            rebuildCaches()
+            fullRenderCache
+        } ?: return
 
         config.position.renderRenderables(
             fullRenderCache,
@@ -87,40 +111,20 @@ object AccessoryOverviewDisplay {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shrebuildaccscache") {
-            description = "Forcefully rebuild the accessory cache."
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { storage?.accessoryStorage?.constructCaches() }
-        }
-
-    }
-
-    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             config.selectedTab,
-        ) { fullRenderCache = null }
-        onToggle(
             config.missingTabShowType,
             config.missingTabSortType,
             config.maxHeight,
-        ) { renderCache.clear() }
+        ) { rebuildCaches() }
     }
 
-    private fun AccStorage.constructCaches() {
-        renderCache.clear()
-        renderCache[DisplayTab.SUMMARY] = buildSummaryTab()
-        renderCache[DisplayTab.STATS] = buildStatsTab()
-        renderCache[DisplayTab.MISSING] = buildMissingTab()
-    }
-
-    private fun AccStorage.buildMainDisplay(): List<Renderable> = buildList {
-        constructCaches()
+    private fun buildMainDisplay(): List<Renderable> = buildList {
         add(Renderable.string("§e§lAccessories Summary"))
         addTabToggle()
         addTabSpecificToggles()
-        val mainContent = renderCache[currentTab] ?: listOf(getNoDataWarning())
+        val mainContent = renderCache[currentTab] ?: listOf(noDataWarning)
         addAll(mainContent)
     }
 
@@ -149,31 +153,14 @@ object AccessoryOverviewDisplay {
             else -> {}
         }
 
-    private const val NO_DATA_TEXT = """
-        §c§lNo Accessory Data
-        §7You have no accessory data stored.
-        §7Once you start collecting accessories,
-        §7this display will show you a summary.
-    """
-
-    private fun getNoDataWarning(): Renderable = Renderable.verticalContainer(
-        buildList {
-            NO_DATA_TEXT.split("\n").forEach { line ->
-                add(Renderable.string(line))
-            }
-        },
-        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-    )
-
     private fun AccStorage.buildSummaryTab(): List<Renderable> = buildList {
         add(Renderable.underlined(Renderable.string("§eCount by Rarity")))
         val table = SearchableRenderableTable { getSearchInputForTab(currentTab) }.apply {
-            // Header for the table
             val headers = listOf("§7Rarity", "§7Count", "§7MP")
             addRow(headers.map { Renderable.string(it) }.toList(), "")
         }
         val rarities = LorenzRarity.entries.reversed().filter { rarity ->
-            accessories.any { acc ->
+            accessories.any { acc: Accessory ->
                 acc.rarity == rarity
             }
         }
@@ -205,7 +192,7 @@ object AccessoryOverviewDisplay {
             val headers = listOf("§7Stat", "§7Accessory Bonus")
             addRow(headers.map { Renderable.string(it) }.toList(), "")
         }
-        // merge all .totalStats together from accessories
+
         val stats = accessories.flatMap { it.totalStats.entries }
             .groupBy({ it.key }, { it.value })
             .mapValues { (_, values) -> values.sum() }
@@ -227,20 +214,16 @@ object AccessoryOverviewDisplay {
     private fun AccStorage.buildMissingTab(): List<Renderable> = buildList {
         add(Renderable.underlined(Renderable.string("§eMissing Accessories")))
         val missingTable = SearchableRenderableTable { getSearchInputForTab(currentTab) }.apply {
-            val headers = listOf("§7Acessory", "§7Cost", "§7Magical Power")
+            val headers = listOf("§7Accessory", "§7Cost", "§7Magical Power")
             addRow(headers.map { Renderable.string(it) }.toList(), "")
         }
 
         val showType = config.missingTabShowType.get()
-        val initMissing = AccessoryApi.repoAccessoryLineage.getMissing(this@buildMissingTab)
-        ChatUtils.chat("initMissing size: ${initMissing.size}")
-        val missing = initMissing.filter { acc ->
-            if (acc.isFulfilled(this@buildMissingTab)) return@filter false
+        val missing = AccessoryApi.getMissing(this@buildMissingTab).filter { acc ->
             if (showType == MissingShowType.MAX_EACH_FAMILY) {
                 acc.successor == null
             } else true
         }
-        ChatUtils.chat("missing size: ${missing.size}")
 
         val sortType = config.missingTabSortType.get()
         val sortedList = when (sortType) {
@@ -249,9 +232,9 @@ object AccessoryOverviewDisplay {
             MissingSortType.BEST_RATIO -> missing.sortedByDescending {
                 it.magicPower / it.getUpgradeCost()
             }
+
             else -> missing
         }
-        ChatUtils.chat("sortedList size: ${sortedList.size}")
 
         sortedList.forEach { missingAcc ->
             missingTable.addRow(missingAcc.buildRow(), missingAcc.internalName.itemName)
@@ -260,7 +243,7 @@ object AccessoryOverviewDisplay {
         add(missingTable.renderable)
     }
 
-    private fun AccessoryApi.Accessory.buildRow() = buildList {
+    private fun Accessory.buildRow() = buildList {
         val itemStack = this@buildRow.internalName.getItemStackOrNull() ?: run {
             ChatUtils.chat("Item stack for $internalName is null")
             return@buildList
