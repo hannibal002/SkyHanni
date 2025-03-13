@@ -427,22 +427,6 @@ object ItemUtils {
 
     private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
 
-    /**
-     * Use when comparing the name (e.g. regex), not for showing to the user
-     * Member that provides the item name, is null save or throws visual error
-     */
-    @Deprecated("use the normal display name value instead")
-    var ItemStack.displayNameOld: String
-        get() = this.displayName ?: ErrorManager.skyHanniError(
-            "Could not get name of ItemStack",
-            "itemStack" to this,
-            "displayName" to displayName,
-            "internal name" to getInternalNameOrNull(),
-        )
-        set(value) {
-            setStackDisplayName(value)
-        }
-
     // Taken from NEU
     fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
         val tag = this.tagCompound ?: NBTTagCompound()
