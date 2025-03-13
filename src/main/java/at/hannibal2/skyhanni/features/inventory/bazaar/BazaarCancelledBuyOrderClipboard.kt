@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -50,7 +49,7 @@ object BazaarCancelledBuyOrderClipboard {
         if (!isEnabled()) return
         if (!inventoryTitlePattern.matches(event.inventoryName)) return
         val stack = event.inventoryItems[11] ?: return
-        if (!stack.name.contains("Cancel Order")) return
+        if (!stack.displayName.contains("Cancel Order")) return
 
         val lore = stack.getLore()
         lastAmountPattern.firstMatcher(lore) {
