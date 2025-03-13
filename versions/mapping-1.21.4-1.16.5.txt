@@ -1,2 +1,0 @@
-
-net.minecraft.entity.Entity getId() getEntityId()

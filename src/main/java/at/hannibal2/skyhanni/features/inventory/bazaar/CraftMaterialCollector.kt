@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -41,8 +40,8 @@ object CraftMaterialCollector {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
-        val correctItem = items[23]?.name == "§aCrafting Table"
-        val correctSuperCraftItem = items[32]?.name == "§aSupercraft"
+        val correctItem = items[23]?.displayName == "§aCrafting Table"
+        val correctSuperCraftItem = items[32]?.displayName == "§aSupercraft"
 
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
