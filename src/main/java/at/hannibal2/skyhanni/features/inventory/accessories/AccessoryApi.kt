@@ -42,21 +42,69 @@ object AccessoryApi {
     private val storage get() = ProfileStorageData.profileSpecific?.stats?.accessoryStorage
 
     // <editor-fold desc="Patterns">
+    /**
+     * REGEX-TEST: ABICASE
+     * REGEX-TEST: ABICASE_REZAR
+     */
     val isAbiCasePattern by patternGroup.pattern(
         "is.abicase",
-        "ABICASE_.*",
+        "ABICASE(?:_.*)?",
     )
 
+    /**
+     * REGEX-TEST: PARTY_HAT_CRAB_BLACK_ANIMATED
+     */
     val isHatPattern by patternGroup.pattern(
         "is.hat",
         "(?:PARTY|BALLOON)_HAT_.*",
     )
 
+    /**
+     * REGEX-TEST: Accessory Bag
+     * REGEX-TEST: Accessory Bag (1/2)
+     * REGEX-TEST: Accessory Bag (2/3)
+     * REGEX-TEST: Accessory Bag (3/3)
+     */
     private val accessoryBagNamePattern by RepoPattern.pattern(
         "bagname",
         "Accessory Bag(?: \\((?<page>\\d)\\/\\d\\))?",
     )
 
+    /**
+     * REGEX-TEST: §7Bonus Pest Chance: §a+60%
+     * REGEX-TEST: §7Combat Wisdom: §a+5
+     * REGEX-TEST: §7Crit Damage: §c+6% §d(+6%)
+     * REGEX-TEST: §7Defense: §a+15 §d(+15)
+     * REGEX-TEST: §7Farming Fortune: §a+5 §d(+5)
+     * REGEX-TEST: §7Fear: §a+6
+     * REGEX-TEST: §7Fishing Speed: §a+1
+     * REGEX-TEST: §7Fishing Wisdom: §a+1
+     * REGEX-TEST: §7Foraging Fortune: §a+5 §d(+5)
+     * REGEX-TEST: §7Foraging Fortune: §a+25
+     * REGEX-TEST: §7Foraging Wisdom: §a+1
+     * REGEX-TEST: §7Gemstone Fortune: §a+10
+     * REGEX-TEST: §7Health: §a+5
+     * REGEX-TEST: §7Health: §a+15 §d(+15)
+     * REGEX-TEST: §7Health Regen: §a+3
+     * REGEX-TEST: §7Intelligence: §a+3
+     * REGEX-TEST: §7Intelligence: §a+15 §d(+15)
+     * REGEX-TEST: §7Magic Find: §a+0.5
+     * REGEX-TEST: §7Magic Find: §a+0.5 §8(+0.5)
+     * REGEX-TEST: §7Mana Regen: §a+10%
+     * REGEX-TEST: §7Mining Fortune: §a+25 §d(+25)
+     * REGEX-TEST: §7Mining Speed: §a+50 §d(+50)
+     * REGEX-TEST: §7Pet Luck: §a+1
+     * REGEX-TEST: §7Pristine: §a+1 §d(+1)
+     * REGEX-TEST: §7Runecrafting Wisdom: §a+2
+     * REGEX-TEST: §7Sea Creature Chance: §c+1.5%
+     * REGEX-TEST: §7Sea Creature Chance: §c+1% §d(+1%)
+     * REGEX-TEST: §7Speed: §a+3
+     * REGEX-TEST: §7Strength: §c+8 §d(+8)
+     * REGEX-TEST: §7Trophy Fish Chance: §a+3%
+     * REGEX-TEST: §7True Defense: §a+3
+     * REGEX-TEST: §7True Defense: §a+6.5 §d(+6.5)
+     * REGEX-TEST: §7Vitality: §a+10
+     */
     private val accessoryStatsLorePattern by RepoPattern.pattern(
         "lore.stats",
         "§7(?<stat>[\\w ]+): (?:§.)+\\+(?<value>[\\d.]+)%?(?: (?:§.)+\\(.*\\))?",

@@ -35,9 +35,7 @@ import at.hannibal2.skyhanni.features.garden.pests.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.inventory.accessories.Accessory
-import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.repoAccessoryLineage
-import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryLineageTree
 import at.hannibal2.skyhanni.features.inventory.accessories.LineageType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
@@ -801,10 +799,14 @@ class ProfileSpecificStorage {
         var maxwell: MaxwellPowerStorage = MaxwellPowerStorage()
 
         class MaxwellPowerStorage {
-            @Expose var currentPower: String? = null
-            @Expose var magicalPower: Int = -1
-            @Expose var tunings: List<ThaumaturgyPowerTuning> = listOf()
-            @Expose var favoritePowers: List<String> = listOf()
+            @Expose
+            var currentPower: String? = null
+            @Expose
+            var magicalPower: Int = -1
+            @Expose
+            var tunings: List<ThaumaturgyPowerTuning> = listOf()
+            @Expose
+            var favoritePowers: List<String> = listOf()
         }
 
         @Expose
@@ -814,9 +816,10 @@ class ProfileSpecificStorage {
             @Expose var mainAccessories: AccessoryStorageSet = AccessoryStorageSet(),
             @Expose var riftAccessories: AccessoryStorageSet = AccessoryStorageSet(),
         ) {
-            val accessories: List<Accessory> get() =
-                if (IslandType.THE_RIFT.isInIsland()) riftAccessories.accessories
-                else mainAccessories.accessories
+            val accessories: List<Accessory>
+                get() =
+                    if (IslandType.THE_RIFT.isInIsland()) riftAccessories.accessories
+                    else mainAccessories.accessories
 
             fun hasAccessory(accessoryName: NeuInternalName) =
                 accessories.any { it.internalName == accessoryName }
