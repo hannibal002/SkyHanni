@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
@@ -28,7 +27,7 @@ object ToolTipData {
                 "slotNumber" to slot.slotNumber,
                 "slotIndex" to slot.slotIndex,
                 "itemStack" to itemStack,
-                "name" to itemStack.name,
+                "name" to itemStack.displayName,
                 "internal name" to itemStack.getInternalName(),
                 "lore" to itemStack.getLore(),
             )

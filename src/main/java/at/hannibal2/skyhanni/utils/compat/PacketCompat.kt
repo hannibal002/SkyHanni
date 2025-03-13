@@ -12,8 +12,10 @@ import net.minecraft.util.EnumFacing
 fun C08PacketPlayerBlockPlacement.getFacing(): EnumFacing =
     //#if MC < 1.12
     EnumFacing.getFront(placedBlockDirection)
-//#else
+//#elseif MC < 1.16
 //$$ direction
+//#else
+//$$ hitResult.direction
 //#endif
 
 fun C08PacketPlayerBlockPlacement.getUsedItem(): ItemStack? =

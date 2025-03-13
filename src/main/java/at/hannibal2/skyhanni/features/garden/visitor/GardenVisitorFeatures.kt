@@ -43,7 +43,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -219,17 +218,17 @@ object GardenVisitorFeatures {
             list.add(itemStack)
 
             list.add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "$name §ex${amount.addSeparators()}",
-                    onClick = {
-                        if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickAndHover
+                    tips = internalName.createBuyTip(),
+                    onLeftClick = {
+                        if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickable
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
                             internalName.buy(amount)
                         }
                     },
-                    tips = internalName.createBuyTip(),
                 ),
             )
 
@@ -391,7 +390,7 @@ object GardenVisitorFeatures {
     }
 
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.name != "§aAccept Offer") return
+        if (itemStack.displayName != "§aAccept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)

@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -39,9 +38,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
@@ -59,7 +56,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenNextJacobContest {
 
-    private val dispatcher = Dispatchers.IO
     private var display: Renderable? = null
     private var simpleDisplay = emptyList<String>()
     var contests = mutableMapOf<SimpleTimeMark, FarmingContest>()
@@ -242,7 +238,7 @@ object GardenNextJacobContest {
             val lore = item.getLore()
             if (!lore.any { it.contains("§6§eJacob's Farming Contest") }) continue
 
-            val day = dayPattern.matchMatcher(item.name) { group("day").toInt() } ?: continue
+            val day = dayPattern.matchMatcher(item.displayName) { group("day").toInt() } ?: continue
 
             val startTime = SkyBlockTime(year, month, day).asTimeMark()
 
@@ -382,7 +378,6 @@ object GardenNextJacobContest {
         fetchedFromElite = false
         contests.clear()
     }
-
 
     private fun drawNextContest(nextContest: FarmingContest) = buildList {
         var duration = nextContest.endTime.timeUntil()
@@ -538,24 +533,24 @@ object GardenNextJacobContest {
 
         isFetchingContests = true
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             fetchUpcomingContests()
             lastFetchAttempted = System.currentTimeMillis()
             isFetchingContests = false
         }
     }
 
-    suspend fun fetchUpcomingContests() {
+    fun fetchUpcomingContests() {
         try {
             val url = "https://api.elitebot.dev/contests/at/now"
-            val result = withContext(dispatcher) { ApiUtils.getJSONResponse(url) }.asJsonObject
+            val result = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Contests").asJsonObject
 
             val newContests = mutableMapOf<SimpleTimeMark, FarmingContest>()
 
             val complete = result["complete"].asBoolean
             if (complete) {
                 for (entry in result["contests"].asJsonObject.entrySet()) {
-                    var timestamp = entry.key.toLongOrNull() ?: continue
+                    var timestamp = entry.key?.toLongOrNull() ?: continue
                     val timeMark = (timestamp * 1000).asTimeMark()
                     timestamp *= 1_000 // Seconds to milliseconds
 
@@ -594,7 +589,6 @@ object GardenNextJacobContest {
                 e,
                 "Failed to fetch upcoming contests. Please report this error if it continues to occur",
             )
-
         }
     }
 
@@ -603,13 +597,13 @@ object GardenNextJacobContest {
 
         isSendingContests = true
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             submitContestsToElite()
             isSendingContests = false
         }
     }
 
-    private suspend fun submitContestsToElite() = try {
+    private fun submitContestsToElite() = try {
         val formatted = mutableMapOf<Long, List<String>>()
 
         for ((endTime, contest) in contests) {
@@ -621,7 +615,7 @@ object GardenNextJacobContest {
         val url = "https://api.elitebot.dev/contests/at/now"
         val body = Gson().toJson(formatted)
 
-        val result = withContext(dispatcher) { ApiUtils.postJSONIsSuccessful(url, body) }
+        val result = ApiUtils.postJSONIsSuccessful(url, body, apiName = "Elitebot Farming Contests")
 
         if (result) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")

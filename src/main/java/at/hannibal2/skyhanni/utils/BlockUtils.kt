@@ -18,7 +18,7 @@ object BlockUtils {
     fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
 
     fun getTextureFromSkull(position: LorenzVec?): String? {
-        val entity = world.getTileEntity(position?.toBlockPos()) as? TileEntitySkull ?: return null
+        val entity = world?.getTileEntity(position?.toBlockPos()) as? TileEntitySkull ?: return null
         return entity.serializeNBT().getCompoundTag("Owner").getSkullTexture()
     }
 

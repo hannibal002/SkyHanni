@@ -35,7 +35,7 @@ enum class ProjectTarget(
         "BRIDGE116FABRIC",
     ),
     BRIDGE116FABRIC(
-        "1.16.5",
+        "1.16.5-fabric",
         MinecraftVersion.MC11605,
         yarn("1.16.5+build.10"),
         MappingStyle.YARN,

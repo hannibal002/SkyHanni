@@ -23,7 +23,10 @@ class HypixelItemApi {
 
     private fun loadNpcPrices(): MutableMap<NeuInternalName, Double> {
         val list = mutableMapOf<NeuInternalName, Double>()
-        val apiResponse = ApiUtils.getJSONResponse("https://api.hypixel.net/v2/resources/skyblock/items")
+        val apiResponse = ApiUtils.getJSONResponse(
+            "https://api.hypixel.net/v2/resources/skyblock/items",
+            apiName = "Hypixel SkyBlock Items",
+        )
         try {
             val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponse)
 

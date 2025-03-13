@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.inventory.ChestValue.ChestItem
 import at.hannibal2.skyhanni.features.inventory.ChestValue.addToList
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,14 +18,14 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object TradeValue {
-    val config get() = SkyHanniMod.feature.inventory.trade
+    private val config get() = SkyHanniMod.feature.inventory.trade
 
     // other person's trade slots
-    val otherList = (5..8).flatMap { x ->
+    private val otherList = (5..8).flatMap { x ->
         (0..3).map { y -> x + 9 * y }
     }.toSet()
 
-    val yourList = (0..3).flatMap { x ->
+    private val yourList = (0..3).flatMap { x ->
         (0..3).map { y -> x + 9 * y }
     }.toSet()
 
@@ -94,7 +95,7 @@ object TradeValue {
     }
 
     // Display trade value breakdown
-    private fun update(items: Map<String, ChestValue.Item>, indicator: Int = 0) {
+    private fun update(items: Map<String, ChestItem>, indicator: Int = 0) {
         if (indicator == 0) {
             yourDisplay = buildList {
                 addToList(items.values, "§eTrade Value")
