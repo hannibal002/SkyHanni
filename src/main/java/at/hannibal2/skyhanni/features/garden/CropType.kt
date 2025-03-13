@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 
 enum class CropType(
@@ -44,7 +44,7 @@ enum class CropType(
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
-        { ItemStack(Items.dye, 1, EnumDyeColor.BROWN.dyeDamage) }, "cocoa", FarmingItems.COCOA_BEANS, replenish = true
+        { DyeCompat.BROWN.createStack() }, "cocoa", FarmingItems.COCOA_BEANS, replenish = true
     ),
     SUGAR_CANE(
         "Sugar Cane", "THEORETICAL_HOE_CANE", "FERMENTO", 2.0,
