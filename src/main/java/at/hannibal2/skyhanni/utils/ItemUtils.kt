@@ -34,11 +34,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.onClick
-import at.hannibal2.skyhanni.utils.chat.Text.onHover
-import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
@@ -228,7 +228,7 @@ object ItemUtils {
     }
 
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
-        if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
+        if (displayName == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
         val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
@@ -352,20 +352,21 @@ object ItemUtils {
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         if (this.isPet()) return getPetRarity(this) to ItemCategory.PET
 
+        val cleanName = this.cleanName()
         for (line in this.getLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
 
-            val itemCategory = getItemCategory(category)
+            val itemCategory = getItemCategory(category, displayName, cleanName)
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
                 ErrorManager.logErrorStateWithData(
-                    "Could not read category for item $name",
+                    "Could not read category for item $displayName",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to name,
+                    "item name" to displayName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
                     "lore" to getLore(),
@@ -375,10 +376,10 @@ object ItemUtils {
             }
             if (itemRarity == null) {
                 ErrorManager.logErrorStateWithData(
-                    "Could not read rarity for item $name",
+                    "Could not read rarity for item $displayName",
                     "Failed to read rarity from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to name,
+                    "item name" to displayName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to rarity,
                     "lore" to getLore(),
@@ -392,11 +393,10 @@ object ItemUtils {
         return null to null
     }
 
-    private fun ItemStack.getItemCategory(itemCategory: String) =
+    private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
         if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
-            isPet() -> ItemCategory.PET
-            UtilsPatterns.baitPattern.matches(cleanName()) -> ItemCategory.FISHING_BAIT
+            UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
             UtilsPatterns.sackPattern.matches(name) -> ItemCategory.SACK
@@ -436,21 +436,6 @@ object ItemUtils {
     }
 
     private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
-
-    /**
-     * Use when comparing the name (e.g. regex), not for showing to the user
-     * Member that provides the item name, is null save or throws visual error
-     */
-    var ItemStack.name: String
-        get() = this.displayName ?: ErrorManager.skyHanniError(
-            "Could not get name of ItemStack",
-            "itemStack" to this,
-            "displayName" to displayName,
-            "internal name" to getInternalNameOrNull(),
-        )
-        set(value) {
-            setStackDisplayName(value)
-        }
 
     // Taken from NEU
     fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
@@ -518,7 +503,7 @@ object ItemUtils {
     private fun getPetRarity(pet: ItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
-        val name = pet.name
+        val name = pet.displayName
         if (rarity == null) {
             ErrorManager.logErrorStateWithData(
                 "Could not read rarity for pet $name",
@@ -578,7 +563,7 @@ object ItemUtils {
 
         // We do not use NeuItems.allItemsCache here since we need itemStack below
         val itemStack = getItemStackOrNull()
-        val name = itemStack?.name ?: run {
+        val name = itemStack?.displayName ?: run {
             val name = toString()
             addMissingRepoItem(name, "Could not find item name for $name")
             return "§c$name"
@@ -659,7 +644,7 @@ object ItemUtils {
         }
 
         val input = args.joinToString(" ")
-        Text.text("§eProcessing..").send(testItemMessageId)
+        TextHelper.text("§eProcessing..").send(testItemMessageId)
 
         // running .getPrice() on thousands of items may take ~500ms
         SkyHanniMod.coroutineScope.launch {
@@ -814,15 +799,13 @@ object ItemUtils {
                 "ewogICJ0aW1lc3RhbXAiIDogMTYzNTk1NzQ4ODQxNywKICAicHJvZmlsZUlkIiA6ICJmNThkZWJkNTlmNTA0MjIyOGY2MDIyMjExZDRjMTQwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJ1bnZlbnRpdmV0YWxlbnQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I5NTFmZWQ2YTdiMmNiYzIwMzY5MTZkZWM3YTQ2YzRhNTY0ODE1NjRkMTRmOTQ1YjZlYmMwMzM4Mjc2NmQzYiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
         }
 
-        val skull = ItemUtils.createSkull(
+        val skull = createSkull(
             amount.formatCoin() + " Coins",
             uuid,
             texture,
         )
 
-        val extraAttributes = skull.tagCompound.getCompoundTag("ExtraAttributes")
-        extraAttributes.setString("id", "SKYBLOCK_COIN")
-        skull.tagCompound.setTag("ExtraAttributes", extraAttributes)
+        skull.extraAttributes = skull.extraAttributes.apply { setString("id", "SKYBLOCK_COIN") }
 
         return skull
     }

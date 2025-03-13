@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
@@ -40,7 +39,7 @@ object ItemStars {
         val stack = event.itemStack
         if (stack.stackSize != 1) return
         val stars = stack.grabStarCount() ?: return
-        starPattern.findMatcher(stack.name) {
+        starPattern.findMatcher(stack.displayName) {
             val name = group("name")
             event.toolTip[0] = "$name §c$stars✪"
         }
