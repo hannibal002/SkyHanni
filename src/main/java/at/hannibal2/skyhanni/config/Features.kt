@@ -55,10 +55,7 @@ class Features : Config() {
     }
 
     override fun getTitle(): String {
-        // Minecraft does not render RTL strings very nicely, so we reverse the string here. Not authentic, but close enough.
-        val modName = if (isAprilFoolsDay) StringBuilder().append("اسکای هانی").reverse().toString()
-        else "SkyHanni"
-
+        val modName = if (isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
         return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
     }
 
