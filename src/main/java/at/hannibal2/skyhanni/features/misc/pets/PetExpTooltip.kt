@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -36,7 +35,7 @@ object PetExpTooltip {
 
         val itemStack = event.itemStack
         val petExperience = itemStack.getPetExp()?.roundTo(1) ?: return
-        val name = itemStack.name
+        val name = itemStack.displayName
         try {
             val index = findIndex(event.toolTip) ?: return
             val fixedIndex = if (index > event.toolTip.size) {
