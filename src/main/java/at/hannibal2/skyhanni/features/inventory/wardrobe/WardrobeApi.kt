@@ -15,10 +15,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.compat.DyeCompat
+import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.init.Blocks
-import net.minecraft.init.Items
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
@@ -156,7 +157,7 @@ object WardrobeApi {
                 currentSlot = slot.id
                 foundCurrentSlot = true
             }
-            slot.locked = (itemsList[slot.inventorySlot] == ItemStack(Items.dye, EnumDyeColor.RED.dyeDamage))
+            slot.locked = (itemsList[slot.inventorySlot]?.isDye(DyeCompat.RED) == true)
             if (slot.locked) slots.forEach { if (it.id > slot.id) it.locked = true }
         }
 
