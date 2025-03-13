@@ -804,15 +804,13 @@ object ItemUtils {
                 "ewogICJ0aW1lc3RhbXAiIDogMTYzNTk1NzQ4ODQxNywKICAicHJvZmlsZUlkIiA6ICJmNThkZWJkNTlmNTA0MjIyOGY2MDIyMjExZDRjMTQwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJ1bnZlbnRpdmV0YWxlbnQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I5NTFmZWQ2YTdiMmNiYzIwMzY5MTZkZWM3YTQ2YzRhNTY0ODE1NjRkMTRmOTQ1YjZlYmMwMzM4Mjc2NmQzYiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
         }
 
-        val skull = ItemUtils.createSkull(
+        val skull = createSkull(
             amount.formatCoin() + " Coins",
             uuid,
             texture,
         )
 
-        val extraAttributes = skull.tagCompound.getCompoundTag("ExtraAttributes")
-        extraAttributes.setString("id", "SKYBLOCK_COIN")
-        skull.tagCompound.setTag("ExtraAttributes", extraAttributes)
+        skull.extraAttributes = skull.extraAttributes.apply { setString("id", "SKYBLOCK_COIN") }
 
         return skull
     }

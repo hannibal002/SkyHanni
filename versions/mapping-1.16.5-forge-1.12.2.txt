@@ -189,7 +189,6 @@ net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
 
 net.minecraft.world.entity.Entity getAllSlots() getEquipmentAndArmor()
 net.minecraft.world.entity.Entity getBoundingBox() getEntityBoundingBox()
-net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
 net.minecraft.world.entity.Entity getId() getEntityId()
 net.minecraft.world.entity.Entity getLookAngle() getLookVec()
 net.minecraft.world.entity.Entity getUUID() getUniqueID()
@@ -289,7 +288,7 @@ net.minecraft.world.inventory.Slot index slotNumber
 net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
-net.minecraft.world.item.Items PLAYER_HEAD SKULL
+net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
 net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 
 net.minecraft.world.item.Items PLAYER_HEAD SKULL
