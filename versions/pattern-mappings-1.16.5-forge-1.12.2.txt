@@ -1,0 +1,5 @@
+
+net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack displayName.getFormattedTextCompat() getDisplayName() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
+net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer name.getFormattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.getFormattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.getFormattedTextCompat() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
