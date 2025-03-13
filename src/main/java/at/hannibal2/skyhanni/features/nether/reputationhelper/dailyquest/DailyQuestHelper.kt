@@ -37,7 +37,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -137,7 +136,7 @@ object DailyQuestHelper {
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
             for ((slot, stack) in chest.getUpperItems()) {
-                if (stack.name.contains(dojoQuest.dojoName)) {
+                if (stack.displayName.contains(dojoQuest.dojoName)) {
                     slot highlight LorenzColor.AQUA
                 }
             }
@@ -179,7 +178,7 @@ object DailyQuestHelper {
 
         val itemName = fetchQuest.itemName
 
-        val count = InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) }
+        val count = InventoryUtils.countItemsInLowerInventory { it.displayName.contains(itemName) }
         updateProcessQuest(fetchQuest, count)
     }
 
@@ -279,7 +278,7 @@ object DailyQuestHelper {
         val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
-            val name = item.name
+            val name = item.displayName
             if (category == QuestCategory.FISHING) {
                 name.removeWordsAtEnd(1)
             } else name
