@@ -131,6 +131,6 @@ object DungeonCleanEnd {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.cleanEndToggle", "dungeon.cleanEnd.enabled")
         event.move(3, "dungeon.cleanEndF3IgnoreGuardians", "dungeon.cleanEnd.F3IgnoreGuardians")
-        event.move(71, "dungeon.cleanEnd.F3IgnoreGuardians", "dungeon.cleanEnd.f3IgnoreGuardians")
+        event.move(75, "dungeon.cleanEnd.F3IgnoreGuardians", "dungeon.cleanEnd.f3IgnoreGuardians")
     }
 }
