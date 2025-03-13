@@ -6,8 +6,17 @@ import net.minecraft.potion.PotionEffect
 //#if MC > 1.12
 //$$ import net.minecraft.init.MobEffects
 //#endif
+//#if MC > 1.21
+//$$ import net.minecraft.registry.entry.RegistryEntry
+//#endif
 
-enum class EffectsCompat(val potion: Potion) {
+enum class EffectsCompat(
+    //#if MC < 1.21
+    val potion: Potion,
+    //#else
+    //$$ val potion: RegistryEntry<StatusEffect>,
+    //#endif
+) {
     INVISIBILITY(
         //#if MC < 1.12
         Potion.invisibility
