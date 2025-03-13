@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.chat
 
-import at.hannibal2.skyhanni.features.inventory.ChestValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
