@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -64,8 +63,8 @@ object JacobFarmingContestsInventory {
         for ((slot, item) in event.inventoryItems) {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
-            foundEvents.add(item.name)
-            val time = FarmingContestApi.getSBTimeFor(item.name) ?: continue
+            foundEvents.add(item.displayName)
+            val time = FarmingContestApi.getSBTimeFor(item.displayName) ?: continue
             FarmingContestApi.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
@@ -87,7 +86,7 @@ object JacobFarmingContestsInventory {
         if (!config.openOnElite.isKeyHeld()) return
 
         val slot = event.slot ?: return
-        val itemName = slot.stack.name
+        val itemName = slot.stack.displayName
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {

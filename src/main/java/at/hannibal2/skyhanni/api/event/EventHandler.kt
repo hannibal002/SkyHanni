@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
@@ -49,7 +49,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         if (errors > 3) {
             val hiddenErrors = errors - 3
             ChatUtils.chat(
-                Text.text(
+                TextHelper.text(
                     "§c[SkyHanni/${SkyHanniMod.VERSION}] $hiddenErrors more errors in $name are hidden!",
                 ),
             )

@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -575,7 +574,7 @@ enum class HotmData(
 
             if (this.handlePowder()) return
 
-            val entry = entries.firstOrNull { it.guiNamePattern.matches(item.name) } ?: return
+            val entry = entries.firstOrNull { it.guiNamePattern.matches(item.displayName) } ?: return
             entry.slot = this
 
             val lore = item.getLore().takeIf { it.isNotEmpty() } ?: return
@@ -616,8 +615,8 @@ enum class HotmData(
             val item = this.stack ?: return false
 
             val isHeartItem = when {
-                heartItemPattern.matches(item.name) -> true
-                resetItemPattern.matches(item.name) -> false
+                heartItemPattern.matches(item.displayName) -> true
+                resetItemPattern.matches(item.displayName) -> false
                 else -> return false
             }
 
