@@ -46,7 +46,7 @@ object PigFeatures {
         dataSet: PigFeaturesApi.ShinyOrbDataSet
     ) {
         val pigEntity = dataSet.pigEntityId?.let { EntityUtils.getEntityByID(it) } ?: return
-        val nearPig = pigEntity.distanceToPlayer() < 5
+        val nearPig = pigEntity.distanceToPlayer() < 10
 
         val lineToOrbEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_ORB) && nearPig
         if (!lineToOrbEnabled) return

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbUsedEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -200,8 +199,6 @@ object PigFeaturesApi {
             writableDataSet.reset()
             writableDataSet.shinyOrbEntityId = orbEntity.entityId
             writableDataSet.pigEntityId = this.entityId
-            ChatUtils.chat("Set shinyOrbEntityId to ${writableDataSet.shinyOrbEntityId}")
-            ChatUtils.chat("Set pigEntityId to ${writableDataSet.pigEntityId}")
         }
     }
 }
