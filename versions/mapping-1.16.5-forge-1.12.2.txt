@@ -6,6 +6,8 @@ com.mojang.blaze3d.systems.RenderSystem color4f() color()
 com.mojang.math.Matrix3f org.lwjgl.util.vector.Matrix3f
 com.mojang.math.Matrix4f org.lwjgl.util.vector.Matrix4f
 
+net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
+
 net.minecraft.client.Options net.minecraft.client.settings.GameSettings
 
 net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
@@ -38,6 +40,10 @@ net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOther
 
 net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
 
+net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
+
+net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
+
 net.minecraft.client.renderer.texture.AbstractTexture getId() getGlTextureId()
 net.minecraft.client.renderer.texture.AbstractTexture load() loadTexture()
 net.minecraft.client.renderer.texture.AbstractTexture releaseId() deleteGlTexture()
@@ -57,6 +63,7 @@ net.minecraft.core.particles.ParticleTypes ENCHANTED_HIT CRIT_MAGIC
 net.minecraft.core.particles.ParticleTypes HAPPY_VILLAGER VILLAGER_HAPPY
 net.minecraft.core.particles.ParticleTypes LARGE_SMOKE SMOKE_LARGE
 net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
+net.minecraft.core.particles.ParticleTypes SPELL_MOB ENTITY_EFFECT
 
 net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
 net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
@@ -67,6 +74,7 @@ net.minecraft.nbt.CompoundTag getList() getTagList()
 net.minecraft.nbt.CompoundTag put() setTag()
 net.minecraft.nbt.CompoundTag putBoolean() setBoolean()
 net.minecraft.nbt.CompoundTag putInt() setInteger()
+net.minecraft.nbt.CompoundTag getInt() getInteger()
 net.minecraft.nbt.CompoundTag putString() setString()
 net.minecraft.nbt.CompoundTag remove() removeTag()
 
@@ -176,6 +184,7 @@ net.minecraft.world.entity.Entity getAllSlots() getEquipmentAndArmor()
 net.minecraft.world.entity.Entity getBoundingBox() getEntityBoundingBox()
 net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
 net.minecraft.world.entity.Entity getId() getEntityId()
+net.minecraft.world.entity.Entity getLookAngle() getLookVec()
 net.minecraft.world.entity.Entity getUUID() getUniqueID()
 net.minecraft.world.entity.Entity level world
 net.minecraft.world.entity.Entity removed isDead
@@ -194,6 +203,8 @@ net.minecraft.world.entity.LivingEntity getItemInHand() getHeldItem()
 net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItemMainhand()
 net.minecraft.world.entity.LivingEntity getOffhandItem() getHeldItemOffhand()
 net.minecraft.world.entity.LivingEntity hasEffect() isPotionActive()
+net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
+net.minecraft.world.entity.LivingEntity isBaby() isChild()
 
 net.minecraft.world.entity.ambient.Bat net.minecraft.entity.passive.EntityBat
 
@@ -237,6 +248,7 @@ net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntityS
 net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
 net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
 net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch
+net.minecraft.world.entity.monster.WitherSkeleton net.minecraft.entity.monster.EntityWitherSkeleton
 net.minecraft.world.entity.monster.Zombie net.minecraft.entity.monster.EntityZombie
 net.minecraft.world.entity.monster.ZombifiedPiglin net.minecraft.entity.monster.EntityPigZombie
 
@@ -267,16 +279,25 @@ net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 net.minecraft.world.inventory.Slot getItem() getStack()
 net.minecraft.world.inventory.Slot index slotNumber
 
+net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
+
+net.minecraft.world.item.Items PLAYER_HEAD SKULL
 
 net.minecraft.world.item.enchantment.Enchantments net.minecraft.init.Enchantments
 
 net.minecraft.world.item.enchantment.Enchantments ALL_DAMAGE_PROTECTION PROTECTION
 
 net.minecraft.world.level.Level getEntity() getEntityByID()
+net.minecraft.world.level.Level getBlockEntity() getTileEntity()
 
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
+
+net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
+net.minecraft.world.level.block.Blocks DANDELION YELLOW_FLOWER
+
+net.minecraft.world.level.block.entity.SkullBlockEntity net.minecraft.tileentity.TileEntitySkull
 
 net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
 
@@ -308,6 +329,7 @@ org.lwjgl.glfw.GLFW GLFW_KEY_8 KEY_8
 org.lwjgl.glfw.GLFW GLFW_KEY_9 KEY_9
 org.lwjgl.glfw.GLFW GLFW_KEY_A KEY_A
 org.lwjgl.glfw.GLFW GLFW_KEY_B KEY_B
+org.lwjgl.glfw.GLFW GLFW_KEY_BACKSPACE KEY_BACK
 org.lwjgl.glfw.GLFW GLFW_KEY_C KEY_C
 org.lwjgl.glfw.GLFW GLFW_KEY_D KEY_D
 org.lwjgl.glfw.GLFW GLFW_KEY_DOWN KEY_DOWN
