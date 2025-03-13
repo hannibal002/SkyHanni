@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -99,7 +98,7 @@ object WardrobeApi {
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             val price = EstimatedItemValueCalculator.getTotalPrice(stack)
-            add("  §7- ${stack.name}: §6${price.shortFormat()}")
+            add("  §7- ${stack.displayName}: §6${price.shortFormat()}")
             totalPrice += price
         }
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
@@ -153,7 +152,7 @@ object WardrobeApi {
                 getWardrobeItem(itemsList[slot.leggingsSlot]),
                 getWardrobeItem(itemsList[slot.bootsSlot]),
             )
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.name)) {
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.displayName)) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
             }
@@ -191,7 +190,7 @@ object WardrobeApi {
                 } else {
                     add(slotInfo)
                     setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armorName ->
-                        slot.getData()?.armor?.get(id)?.name?.let { name ->
+                        slot.getData()?.armor?.get(id)?.displayName?.let { name ->
                             add("   $armorName: $name")
                         }
                     }
