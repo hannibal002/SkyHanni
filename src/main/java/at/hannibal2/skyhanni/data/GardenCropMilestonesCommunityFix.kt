@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -88,7 +87,7 @@ object GardenCropMilestonesCommunityFix {
         crop: CropType,
         wrongData: MutableList<String>,
     ) {
-        val rawNumber = stack.name.removeColor().replace(crop.cropName, "").trim()
+        val rawNumber = stack.displayName.removeColor().replace(crop.cropName, "").trim()
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()

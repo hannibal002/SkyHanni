@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
-import net.minecraft.client.Minecraft
 
 abstract class RoundedShader(vertex: String, fragment: String) : Shader(vertex, fragment) {
 
@@ -12,7 +12,7 @@ abstract class RoundedShader(vertex: String, fragment: String) : Shader(vertex, 
     var halfSize: FloatArray = floatArrayOf(0f, 0f)
     var centerPos: FloatArray = floatArrayOf(0f, 0f)
         set(value) {
-            field = floatArrayOf(value[0], Minecraft.getMinecraft().displayHeight - value[1])
+            field = floatArrayOf(value[0], GuiScreenUtils.displayHeight - value[1])
         }
 
     override fun registerUniforms() {

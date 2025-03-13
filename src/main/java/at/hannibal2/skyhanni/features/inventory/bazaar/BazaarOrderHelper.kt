@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -58,7 +57,7 @@ object BazaarOrderHelper {
         if (!BazaarApi.isBazaarOrderInventory(inventoryName)) return
 
         for ((slot, stack) in chest.getUpperItems()) {
-            bazaarItemNamePattern.matchMatcher(stack.name) {
+            bazaarItemNamePattern.matchMatcher(stack.displayName) {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
                 if (buyOrSell.let { !it.first && !it.second }) return
 

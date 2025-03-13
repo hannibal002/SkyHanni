@@ -11,11 +11,8 @@ import net.minecraft.world.World
 //$$ import net.minecraft.entity.monster.EntityWitherSkeleton
 //$$ import net.minecraft.inventory.EntityEquipmentSlot
 //#endif
-
-fun Entity.getNameAsString(): String =
-    this.name
-//#if MC >= 1.14
-//$$ .string
+//#if MC > 1.16
+//$$ import net.minecraft.world.entity.EntityType
 //#endif
 
 fun EntityArmorStand.getStandHelmet(): ItemStack? =
@@ -32,7 +29,7 @@ fun EntityLiving.getEntityHelmet(): ItemStack? =
 //$$ this.getItemStackFromSlot(EntityEquipmentSlot.HEAD)
 //#endif
 
-fun EntityLivingBase.getWholeInventory() =
+fun EntityLivingBase.getAllEquipment() =
 //#if MC < 1.12
     this.inventory
 //#else
@@ -63,6 +60,8 @@ fun Entity.getEntityLevel(): World =
 fun createWitherSkeleton(world: World?): EntityLivingBase =
 //#if MC < 1.12
     EntitySkeleton(world).also { it.skeletonType = 1 }
-//#else
+//#elseif MC < 1.16
 //$$ EntityWitherSkeleton(world)
+//#else
+//$$ WitherSkeleton(EntityType.WITHER_SKELETON, world)
 //#endif
