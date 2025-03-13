@@ -74,6 +74,8 @@ net.minecraft.nbt.StringTag net.minecraft.nbt.NBTTagString
 
 net.minecraft.nbt.CompoundTag getCompound() getCompoundTag()
 net.minecraft.nbt.CompoundTag getList() getTagList()
+net.minecraft.nbt.CompoundTag getKeys() getKeySet()
+net.minecraft.nbt.CompoundTag contains() hasKey()
 net.minecraft.nbt.CompoundTag put() setTag()
 net.minecraft.nbt.CompoundTag putBoolean() setBoolean()
 net.minecraft.nbt.CompoundTag putInt() setInteger()
@@ -237,6 +239,7 @@ net.minecraft.world.entity.animal.horse.Horse net.minecraft.entity.passive.Entit
 net.minecraft.world.entity.boss.enderdragon.EnderDragon net.minecraft.entity.boss.EntityDragon
 
 net.minecraft.world.entity.boss.wither.WitherBoss net.minecraft.entity.boss.EntityWither
+net.minecraft.world.entity.boss.wither.WitherBoss getInvulnerableTicks() getInvulTime()
 
 net.minecraft.world.entity.decoration.ArmorStand net.minecraft.entity.item.EntityArmorStand
 net.minecraft.world.entity.decoration.ItemFrame net.minecraft.entity.item.EntityItemFrame
