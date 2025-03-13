@@ -9,7 +9,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 
-object Text {
+object TextHelper {
 
     val NEWLINE = "\n".asComponent()
     val HYPHEN = "-".asComponent()

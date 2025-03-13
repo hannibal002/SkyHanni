@@ -270,7 +270,7 @@
     <ID>SpacingAroundCurly:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$}</ID>
     <ID>SpreadOperator:ItemUtils.kt$ItemUtils$(tag, displayName, *lore.toTypedArray())</ID>
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
-    <ID>SpreadOperator:Text.kt$Text$(*component.toTypedArray(), separator = separator)</ID>
+    <ID>SpreadOperator:TextHelper.kt$TextHelper$(*component.toTypedArray(), separator = separator)</ID>
     <ID>TooManyFunctions:CollectionUtils.kt$CollectionUtils</ID>
     <ID>TooManyFunctions:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator</ID>
     <ID>TooManyFunctions:HypixelCommands.kt$HypixelCommands</ID>
