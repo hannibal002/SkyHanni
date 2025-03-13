@@ -2,7 +2,7 @@ import at.skyhanni.sharedvariables.ProjectTarget
 import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("dev.deftu.gradle.preprocess") version "0.7.1"
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "487f8f1a46"
     id("net.kyori.blossom") version "1.3.2" apply false
     id("gg.essential.loom") version "1.6.+" apply false
     kotlin("jvm") version "2.0.0" apply false
@@ -55,6 +55,15 @@ preprocess {
             p.extra.set("loom.platform", "forge")
         }
     }
+
+    fun File.ifExists(modifier: String = ""): File? = if (exists()) {
+        println("Loading ${modifier}mappings from $this")
+        this
+    } else {
+        println("Skipped loading ${modifier}mappings from $this")
+        null
+    }
+
     ProjectTarget.activeVersions().forEach { child ->
         val parent = child.linkTo ?: return@forEach
         val pNode = nodes[parent]
@@ -62,13 +71,9 @@ preprocess {
             println("Parent target to ${child.projectName} not available in this multi version stage. Not setting parent.")
             return@forEach
         }
-        val mappingFile = file("versions/mapping-${parent.projectName}-${child.projectName}.txt")
-        if (mappingFile.exists()) {
-            pNode.link(nodes[child]!!, mappingFile)
-            println("Loading mappings from $mappingFile")
-        } else {
-            pNode.link(nodes[child]!!)
-            println("Skipped loading mappings from $mappingFile")
-        }
+        val mappingFile = file("versions/mapping-${parent.projectName}-${child.projectName}.txt").ifExists()
+        val patternMappingsFile = file("versions/pattern-mappings-${parent.projectName}-${child.projectName}.txt").ifExists("pattern ")
+
+        pNode.link(nodes[child]!!, mappingFile, patternMappingsFile)
     }
 }

@@ -15,12 +15,6 @@ import net.minecraft.world.World
 //$$ import net.minecraft.world.entity.EntityType
 //#endif
 
-fun Entity.getNameAsString(): String =
-    this.name
-//#if MC >= 1.14
-//$$ .string
-//#endif
-
 fun EntityArmorStand.getStandHelmet(): ItemStack? =
 //#if MC < 1.12
     this.getEquipmentInSlot(4)

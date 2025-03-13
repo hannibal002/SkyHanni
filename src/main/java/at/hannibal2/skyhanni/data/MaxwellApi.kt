@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -216,11 +215,11 @@ object MaxwellApi {
         for (stack in inventoryItems.values) {
             for (line in stack.getLore()) {
                 statsTuningDataPattern.readTuningFromLine(line)?.let {
-                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.name) {
+                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.displayName) {
                         group("name")
                     } ?: ErrorManager.skyHanniError(
                         "found no name in thaumaturgy",
-                        "stack name" to stack.name,
+                        "stack name" to stack.displayName,
                         "line" to line,
                     )
                     map.add(it)

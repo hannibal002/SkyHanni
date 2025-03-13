@@ -351,6 +351,25 @@ files, so you might be fixing issues in files you didn't even look at. It will e
 (consider using the method descriptor instead of just the method name for your mixin). However, if something aside from the name changed,
 this will not suffice.
 
+#### Custom mappings
+
+If you need to do a bit more advanced remapping that requires an import to be added to the file, you can add a custom mapping. This is
+done by creating/editing a pattern mappings file which can be found at `versions/pattern-mapping-<newVersion>-<oldVersion>.txt`.
+
+```
+# You can use # to comment lines
+
+# here is the format of these files
+# newClass oldClass newMethod oldMethod neededImport
+
+# heres an example mapping
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.getFormattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
+```
+
+This will change all calls of Entity.name to be Entity.name.getFormattedTextCompat(). The import will also be added to the file. This is
+helpful for places where the return type may have changed across minecraft versions, and then you need to call a compat method to get the
+same result as on previous versions.
+
 #### Conditional compilation
 
 In addition to the built-in remapping, there is also the more complicated art of preprocessor directives. Directives allow you to comment or
