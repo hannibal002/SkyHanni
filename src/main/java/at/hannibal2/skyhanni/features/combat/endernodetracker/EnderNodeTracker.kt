@@ -164,7 +164,7 @@ object EnderNodeTracker {
         if (!ProfileStorageData.loaded) return
 
         val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter {
-            it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
+            it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
         }.sumOf { it.stackSize }
         val change = newMiteGelInInventory - miteGelInInventory
         if (change > 0) {
