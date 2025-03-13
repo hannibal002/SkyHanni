@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -28,7 +29,7 @@ object FishingHotspotRadar {
     private val bezierFitter = ParticlePathBezierFitter(3)
     private var hotspotLocation: LorenzVec? = null
 
-    @HandleEvent(receiveCancelled = true)
+    @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val type = event.type
@@ -37,7 +38,8 @@ object FishingHotspotRadar {
 
         lastParticle = SimpleTimeMark.now()
         val currLoc = event.location
-        if (lastAbilityUse.passedSince() > 2.seconds) return
+
+        if (lastAbilityUse.passedSince() > 1.seconds) return
         if (bezierFitter.isEmpty()) {
             bezierFitter.addPoint(currLoc)
             return
@@ -51,14 +53,14 @@ object FishingHotspotRadar {
         hotspotLocation = bezierFitter.solve() ?: return
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val location = hotspotLocation ?: return
         val distance = location.distance(event.exactPlayerEyeLocation())
         if (distance > 10) {
             val formattedDistance = distance.toInt().addSeparators()
             event.drawDynamicText(location.add(-0.5,1.7,-0.5), "§d§lHOTSPOT", 1.7)
-            event.drawDynamicText(location.add(-0.5, 1.7, -0.5), " §r§e${formattedDistance}m", 1.7, -1.7f)
+            event.drawDynamicText(location.add(-0.5, 1.6 - distance / (12 * 1.7), -0.5), " §r§e${formattedDistance}m", 1.0)
         } else {
             hotspotLocation = null
         }
@@ -66,7 +68,7 @@ object FishingHotspotRadar {
 
     private val HOTSPOT_RADAR = "HOTSPOT_RADAR".toInternalName()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onUseAbility(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -80,12 +82,12 @@ object FishingHotspotRadar {
         lastAbilityUse = SimpleTimeMark.now()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onWorldChange(event: WorldChangeEvent) {
         hotspotLocation = null
         bezierFitter.reset()
         lastAbilityUse = SimpleTimeMark.farPast()
     }
 
-    private fun isEnabled() = config.guessHotspotRadar
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.guessHotspotRadar
 }
