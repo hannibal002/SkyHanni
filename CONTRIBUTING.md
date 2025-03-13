@@ -100,11 +100,12 @@ _A more in-depth explanation of how to use IntelliJ and branches will follow som
 
 Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, etc.).
 
-When writing the PR description, ensure you fill out the template with all the necessary information, including the "WHAT" section and the
-changelog entries.
+When writing the PR description, ensure you fill out the template with all the necessary information.
+In the `## What` section, write technical details or explanations that don't belong in the changelog.
+Including that field is optional for small changes.
 
-If your PR relies on another PR, please include this information at the beginning of the description. Please use the format `- #<pr number>` for the
-dependency, or `- <url>` for REPO dependencies.
+If your PR relies on another PR, please include this information at the beginning of the description. Use the format `- #<pr number>`
+for the dependency, or `- <url>` for REPO dependencies.
 
 ### Changelog Builder
 
@@ -124,7 +125,7 @@ category.
 
 Changes that improve or expand the code's logic and have a visible impact on users. This category is for enhancements, not for fixing
 incorrect logic.
-The line between bug fixes and improvements is sometimes not clear.If you are unsure whether a change is an improvement or a bug fix, ask
+The line between bug fixes and improvements is sometimes not clear. If you are unsure whether a change is an improvement or a bug fix, ask
 for guidance.
 
 #### Fixes
@@ -144,7 +145,7 @@ Internal changes that do not impact the end user. Examples include:
 - API updates
 - Minor performance improvements
 - Preparations for 1.21
-- Documentation changes to markdown files. E.g. in `/docs` or this file.
+- Documentation changes to markdown files, e.g., in `/docs` or this file.
 
 #### Removed Features
 
@@ -154,7 +155,7 @@ side).
 #### No category
 
 Some changes don't fit any categories.
-E.g. when reverting pull requests or doing quick fixes to prs merged immediately beforehand but not yet released in a beta.
+E.g. when reverting pull requests or doing quick fixes to PRs merged immediately beforehand but not yet released in a beta.
 To tell the changelog build this, write either `exclude_from_changelog` or `ignore_from_changelog` in one line.
 
 ## Coding Styles and Conventions
