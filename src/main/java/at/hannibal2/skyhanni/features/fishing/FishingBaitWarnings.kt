@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -29,7 +28,7 @@ object FishingBaitWarnings {
 
     private data class Bait(
         private val entity: EntityItem,
-        val name: String = entity.entityItem.name,
+        val name: String = entity.entityItem.displayName,
         val location: LorenzVec = entity.getLorenzVec(),
     ) {
         fun distanceTo(bobber: EntityFishHook) = location.distance(bobber.getLorenzVec())

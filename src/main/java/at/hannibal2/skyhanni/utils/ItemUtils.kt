@@ -227,7 +227,7 @@ object ItemUtils {
     }
 
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
-        if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
+        if (displayName == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
         val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
@@ -347,15 +347,15 @@ object ItemUtils {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
 
-            val itemCategory = getItemCategory(category, name, cleanName)
+            val itemCategory = getItemCategory(category, displayName, cleanName)
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
                 ErrorManager.logErrorStateWithData(
-                    "Could not read category for item $name",
+                    "Could not read category for item $displayName",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to name,
+                    "item name" to displayName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
                     "lore" to getLore(),
@@ -365,10 +365,10 @@ object ItemUtils {
             }
             if (itemRarity == null) {
                 ErrorManager.logErrorStateWithData(
-                    "Could not read rarity for item $name",
+                    "Could not read rarity for item $displayName",
                     "Failed to read rarity from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to name,
+                    "item name" to displayName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to rarity,
                     "lore" to getLore(),
@@ -426,21 +426,6 @@ object ItemUtils {
     }
 
     private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
-
-    /**
-     * Use when comparing the name (e.g. regex), not for showing to the user
-     * Member that provides the item name, is null save or throws visual error
-     */
-    var ItemStack.name: String
-        get() = this.displayName ?: ErrorManager.skyHanniError(
-            "Could not get name of ItemStack",
-            "itemStack" to this,
-            "displayName" to displayName,
-            "internal name" to getInternalNameOrNull(),
-        )
-        set(value) {
-            setStackDisplayName(value)
-        }
 
     // Taken from NEU
     fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
@@ -508,7 +493,7 @@ object ItemUtils {
     private fun getPetRarity(pet: ItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
-        val name = pet.name
+        val name = pet.displayName
         if (rarity == null) {
             ErrorManager.logErrorStateWithData(
                 "Could not read rarity for pet $name",
@@ -568,7 +553,7 @@ object ItemUtils {
 
         // We do not use NeuItems.allItemsCache here since we need itemStack below
         val itemStack = getItemStackOrNull()
-        val name = itemStack?.name ?: run {
+        val name = itemStack?.displayName ?: run {
             val name = toString()
             addMissingRepoItem(name, "Could not find item name for $name")
             return "§c$name"

@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -115,7 +114,7 @@ object CityProjectFeatures {
             // internal name -> amount
             val materials = mutableMapOf<NeuInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
-                if (item.name != "§eContribute this component!") continue
+                if (item.displayName != "§eContribute this component!") continue
                 fetchMaterials(item, materials)
             }
 
@@ -145,7 +144,7 @@ object CityProjectFeatures {
                         nextTime = endTime
                     }
                 }
-                if (item.name != "§eContribute this component!") continue
+                if (item.displayName != "§eContribute this component!") continue
                 nextTime = now
             }
             ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
