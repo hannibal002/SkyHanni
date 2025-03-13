@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.inventory.AccessoriesUpdatedEvent
+import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -109,6 +110,27 @@ object AccessoryApi {
         "lore.stats",
         "§7(?<stat>[\\w ]+): (?:§.)+\\+(?<value>[\\d.]+)%?(?: (?:§.)+\\(.*\\))?",
     )
+
+    /**
+     * REGEX-TEST: §7§4☠ §cRequires §5Vampire Slayer 1§c.
+     * REGEX-TEST: §7§4☠ §cRequires §5Enderman Slayer 6§c.
+     * REGEX-TEST: §7§4☠ §cRequires §5Blaze Slayer 7§c.
+     */
+    private val accessorySlayerRequirementLorePattern by RepoPattern.pattern(
+        "lore.slayer-req",
+        "§7§4☠ §cRequires §5(?<slayer>.*) Slayer (?<level>\\d+)§c.",
+    )
+
+    /**
+     * this has to be the worst purpose i've used regex for, it feels unclean
+     *
+     * REGEX-TEST: Requires: Wolf Slayer 8
+     * REGEX-TEST: Requires: Vampire Slayer 3
+     */
+    val neuCraftTextSlayerCraftReqPattern by RepoPattern.pattern(
+        "lore.slayer-craft-req",
+        "Requires: (?<slayer>.*) Slayer (?<level>\\d+)",
+    )
     // </editor-fold>
 
     val HEGEMONY_ARTIFACT = "HEGEMONY_ARTIFACT".toInternalName()
@@ -130,10 +152,9 @@ object AccessoryApi {
 
     val repoAccessoryLineage: AccessoryLineageTree by lazy {
         AccessoryLineageTree().apply {
-            EnoughUpdatesManager.getItemInformation().entries
-                .map { it.key.toInternalName() to it.value }
-                .filter { it.first.isAccessory() }
-                .forEach { addAccessory(it.first) }
+            EnoughUpdatesManager.getItemInformation().entries.forEach {
+                tryAddAccessory(it)
+            }
             if (repoAccessoryLineageSoT.isEmpty()) lateRepoLoad = true
             else this.rebuildLineageLine(repoAccessoryLineageSoT)
         }
@@ -150,7 +171,9 @@ object AccessoryApi {
             rarity = rarity,
             enrichment = enrichment,
             totalStats = getAccessoryStatsOrEmpty(),
-        )
+        ).apply {
+            usageSlayerRequirement = getAccessoryUsageSlayerRequirementOrNull()
+        }
     }
 
     private fun ItemStack.getAccessoryStatsOrEmpty(): Map<SkyblockStat, Double> =
@@ -163,6 +186,16 @@ object AccessoryApi {
                 stat to value
             }
         }.toMap()
+
+    private fun ItemStack.getAccessoryUsageSlayerRequirementOrNull(): Pair<SlayerType, Int>? =
+        if (!this.isAccessory() || this.getLore().isEmpty()) null
+        else this.getLore().mapNotNull { line ->
+            accessorySlayerRequirementLorePattern.matchMatcher(line) {
+                val slayer = groupOrNull("slayer")?.let { SlayerType.getByName(it) } ?: return@matchMatcher null
+                val level = groupOrNull("level")?.formatIntOrNull() ?: return@matchMatcher null
+                slayer to level
+            }
+        }.firstOrNull()
 
     fun NeuInternalName.isAccessory() = this.getItemStackOrNull()?.isAccessory() ?: false
     fun ItemStack.isAccessory(): Boolean = getItemCategoryOrNull() in ItemCategory.accessories

@@ -1,9 +1,15 @@
 package at.hannibal2.skyhanni.features.inventory.accessories
 
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.isAccessory
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.neuCraftTextSlayerCraftReqPattern
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.repoAccessoryLineage
+import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import com.google.gson.JsonObject
 
 class LineageConnection(
     private val sourceIndex: Int,
@@ -51,21 +57,34 @@ class AccessoryLineageTree {
         getRelatives(it, relationshipType, limit)
     }.orEmpty()
 
-    fun getPredecessorOrNull(accessory: Accessory): Accessory? =
-        adjacencyMap.entries.firstOrNull { (_, connections) ->
-            connections.any { it.target?.internalName == accessory.internalName && it.type == LineageType.SUCCESSOR }
-        }?.key
-
     private fun addLineageConnection(source: Accessory, target: Accessory, type: LineageType) {
         val connection = LineageConnection(source.index, target.index, type)
         adjacencyMap[source]?.add(connection)
     }
 
-    fun addAccessory(internalName: NeuInternalName): Accessory = addAccessory(Accessory(internalName = internalName))
     private fun addAccessory(accessory: Accessory): Accessory {
         accessory.index = adjacencyMap.size
         adjacencyMap[accessory] = arrayListOf()
         return accessory
+    }
+
+    fun tryAddAccessory(repoData: MutableMap.MutableEntry<String, JsonObject>) {
+        val internalName = repoData.key.toInternalName().takeIf { it.isAccessory() } ?: return
+        val accessory = addAccessory(Accessory(internalName = internalName))
+        val craftText = repoData.value.get("craftText")?.asString ?: return
+        neuCraftTextSlayerCraftReqPattern.matchMatcher(craftText) {
+            val slayerType = when (group("slayer")) {
+                "Wolf" -> SlayerType.SVEN
+                "Vampire" -> SlayerType.VAMPIRE
+                "Blaze" -> SlayerType.INFERNO
+                "Enderman" -> SlayerType.VOID
+                "Spider" -> SlayerType.TARANTULA
+                "Zombie" -> SlayerType.REVENANT
+                else -> null
+            } ?: return
+            val level = group("level").formatIntOrNull() ?: return
+            accessory.craftSlayerRequirement = slayerType to level
+        }
     }
 
     fun rebuildLineageLine(sourceMap: Map<String, List<String>>) = sourceMap.mapNotNull {

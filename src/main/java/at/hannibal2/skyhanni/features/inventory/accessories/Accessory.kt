@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.getBase
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.isAbiCasePattern
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.isHatPattern
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.repoAccessoryLineage
+import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -21,6 +22,8 @@ class Accessory(
     @Expose val totalStats: Map<SkyblockStat, Double> = enumMapOf(),
 ) {
     var index: Int = -1
+    var usageSlayerRequirement: Pair<SlayerType, Int>? = null
+    var craftSlayerRequirement: Pair<SlayerType, Int>? = null
 
     override fun toString(): String = internalName.asString()
 
@@ -31,8 +34,6 @@ class Accessory(
         get() = repoAccessoryLineage.getRelatives(this, LineageType.SUCCESSOR, limit = 1).firstOrNull()
     val siblings: List<Accessory>
         get() = repoAccessoryLineage.getRelatives(this, LineageType.SIBLING, Int.MAX_VALUE)
-    val predecessor: Accessory?
-        get() = repoAccessoryLineage.getPredecessorOrNull(this)
 
     override fun equals(other: Any?): Boolean =
         (other as? Accessory)?.internalName == this.internalName
