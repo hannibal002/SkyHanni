@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory.accessories
 
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -34,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
-import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -110,7 +108,7 @@ object AccessoryApi {
      */
     private val accessoryStatsLorePattern by RepoPattern.pattern(
         "lore.stats",
-        "§7(?<stat>[\\w ]+): (?:§.)+\\+(?<value>[\\d.]+)%?(?: (?:§.)+\\(.*\\))?"
+        "§7(?<stat>[\\w ]+): (?:§.)+\\+(?<value>[\\d.]+)%?(?: (?:§.)+\\(.*\\))?",
     )
     // </editor-fold>
 
@@ -157,13 +155,14 @@ object AccessoryApi {
 
     private val HEGEMONY_ARTIFACT = "HEGEMONY_ARTIFACT".toInternalName()
     private fun Accessory.magicalPowerOutlierHandler(
-        basePower: Int
+        basePower: Int,
     ): Int? = when {
         internalName == HEGEMONY_ARTIFACT -> basePower * 2
         isAbiCase -> {
             val contactCount = ProfileStorageData.profileSpecific?.abiphoneContactAmount ?: 0
             contactCount / 2
         }
+
         else -> null
     }
 
