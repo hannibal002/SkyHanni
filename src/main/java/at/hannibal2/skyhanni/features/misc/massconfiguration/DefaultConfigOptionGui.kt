@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
@@ -8,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
-import org.lwjgl.input.Mouse
 import kotlin.math.max
 import kotlin.math.min
 
@@ -51,7 +51,7 @@ class DefaultConfigOptionGui(
         val scaledResolution = ScaledResolution(mc)
         var hoveringTextToDraw: List<String>? = null
         val x = mouseX - ((width - xSize) / 2) - padding
-        val isMouseDown = Mouse.isButtonDown(0)
+        val isMouseDown = MouseCompat.isButtonDown(0)
         val shouldClick = isMouseDown && !wasMouseDown
         wasMouseDown = isMouseDown
         val isMouseInScrollArea =
@@ -203,7 +203,7 @@ class DefaultConfigOptionGui(
 
     override fun handleMouseInput() {
         super.handleMouseInput()
-        if (Mouse.getEventDWheel() != 0)
-            scroll(currentScrollOffset - Mouse.getEventDWheel())
+        if (MouseCompat.getScrollDelta() != 0)
+            scroll(currentScrollOffset - MouseCompat.getScrollDelta())
     }
 }
