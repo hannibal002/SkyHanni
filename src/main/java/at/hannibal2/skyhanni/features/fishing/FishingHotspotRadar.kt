@@ -59,7 +59,7 @@ object FishingHotspotRadar {
         val distance = location.distance(event.exactPlayerEyeLocation())
         if (distance > 10) {
             val formattedDistance = distance.toInt().addSeparators()
-            event.drawDynamicText(location.add(-0.5,1.7,-0.5), "§d§lHOTSPOT", 1.7)
+            event.drawDynamicText(location.add(-0.5, 1.7, -0.5), "§d§lHOTSPOT", 1.7)
             event.drawDynamicText(location.add(-0.5, 1.6 - distance / (12 * 1.7), -0.5), " §r§e${formattedDistance}m", 1.0)
         } else {
             hotspotLocation = null
