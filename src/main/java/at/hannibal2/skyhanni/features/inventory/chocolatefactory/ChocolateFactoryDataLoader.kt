@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -318,7 +317,7 @@ object ChocolateFactoryDataLoader {
     private fun processChocolateItem(item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        ChocolateFactoryApi.chocolateAmountPattern.matchMatcher(item.name.removeColor()) {
+        ChocolateFactoryApi.chocolateAmountPattern.matchMatcher(item.displayName.removeColor()) {
             profileStorage.currentChocolate = group("amount").formatLong()
         }
         for (line in item.getLore()) {
@@ -334,7 +333,7 @@ object ChocolateFactoryDataLoader {
     private fun processPrestigeItem(list: MutableList<ChocolateFactoryUpgrade>, item: ItemStack) {
         val profileStorage = profileStorage ?: return
 
-        prestigeLevelPattern.matchMatcher(item.name) {
+        prestigeLevelPattern.matchMatcher(item.displayName) {
             ChocolateFactoryApi.currentPrestige = group("prestige").romanToDecimal()
         }
         var prestigeCost: Long? = null
@@ -463,7 +462,7 @@ object ChocolateFactoryDataLoader {
 
         if (slotIndex !in ChocolateFactoryApi.otherUpgradeSlots && slotIndex !in ChocolateFactoryApi.rabbitSlots) return
 
-        val itemName = item.name.removeColor()
+        val itemName = item.displayName.removeColor()
         val lore = item.getLore()
         val upgradeCost = ChocolateFactoryApi.getChocolateBuyCost(lore)
         val averageChocolate = ChocolateAmount.averageChocPerSecond().roundTo(2)

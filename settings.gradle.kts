@@ -22,11 +22,15 @@ pluginManagement {
             }
         }
     }
-    resolutionStrategy {
-        eachPlugin {
-            when (requested.id.id) {
-                "gg.essential.loom" -> useModule("gg.essential:architectury-loom:${requested.version}")
+    resolutionStrategy.eachPlugin {
+        requested.apply {
+            if ("$id".startsWith("com.github.")) {
+                val (_, _, user, name) = "$id".split(".", limit = 4)
+                useModule("com.github.$user:$name:$version")
             }
+        }
+        when (requested.id.id) {
+            "gg.essential.loom" -> useModule("gg.essential:architectury-loom:${requested.version}")
         }
     }
 }
