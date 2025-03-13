@@ -27,7 +27,7 @@ plugins {
     java
     id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
-    id("studios.skyhanni.preprocess")
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
