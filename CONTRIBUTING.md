@@ -103,7 +103,7 @@ _A more in-depth explanation of how to use IntelliJ and branches will follow som
 Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, etc.).
 
 When writing the PR description, ensure you fill out the template with all the necessary information.
-In the `## What` section, write technical details or explanations that don't belong in the changelog.
+In the **What** section, write technical details or explanations that don't belong in the changelog.
 Including that field is optional for small changes.
 
 If your PR relies on another PR, please include this information at the beginning of the description. Use the format `- #<pr number>`
@@ -159,6 +159,7 @@ side).
 Some changes don't fit any categories.
 E.g. when reverting pull requests or doing quick fixes to PRs merged immediately beforehand but not yet released in a beta.
 To tell the changelog build this, write either `exclude_from_changelog` or `ignore_from_changelog` in one line.
+Make sure such pull requests have a good explanation in the **What** section.
 
 ## Coding Styles and Conventions
 
