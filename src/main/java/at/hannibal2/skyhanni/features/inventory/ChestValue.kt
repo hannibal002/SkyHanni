@@ -48,7 +48,7 @@ object ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<Renderable>()
-    private var chestItems = mapOf<String, Item>()
+    private var chestItems = mapOf<String, ChestItem>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
     private val scrollValue = ScrollValue()
@@ -111,7 +111,7 @@ object ChestValue {
         addButton()
     }
 
-    fun MutableList<Renderable>.addToList(values: Collection<Item>, featureName: String) {
+    fun MutableList<Renderable>.addToList(values: Collection<ChestItem>, featureName: String) {
         val sortedList = sortedList(values)
         var totalPrice = 0.0
         var rendered = 0
@@ -144,7 +144,7 @@ object ChestValue {
         addString("§aTotal value: §6${totalPrice.formatPrice()} coins")
     }
 
-    private fun sortedList(values: Collection<Item>): List<Item> = when (config.sortingType) {
+    private fun sortedList(values: Collection<ChestItem>): List<ChestItem> = when (config.sortingType) {
         SortingTypeEntry.DESCENDING -> values.sortedByDescending { it.total }
         SortingTypeEntry.ASCENDING -> values.sortedBy { it.total }
         else -> values.sortedByDescending { it.total }
@@ -201,7 +201,7 @@ object ChestValue {
         chestItems = createItems(stacks)
     }
 
-    fun createItems(stacks: Map<Int, ItemStack>) = buildMap<String, Item> {
+    fun createItems(stacks: Map<Int, ItemStack>) = buildMap<String, ChestItem> {
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
@@ -218,7 +218,7 @@ object ChestValue {
             list.add("§aTotal: §6§l${total.formatPrice()} coins")
             if (total == 0.0) continue
             val item = getOrPut(key) {
-                Item(mutableListOf(), 0, stack, 0.0, list)
+                ChestItem(mutableListOf(), 0, stack, 0.0, list)
             }
             item.index.add(i)
             item.amount += stack.stackSize
@@ -279,7 +279,7 @@ object ChestValue {
         return currentString
     }
 
-    data class Item(
+    data class ChestItem(
         val index: MutableList<Int>,
         var amount: Int,
         val stack: ItemStack,

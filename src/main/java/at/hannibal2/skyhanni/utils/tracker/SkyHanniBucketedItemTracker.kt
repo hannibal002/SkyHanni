@@ -17,8 +17,8 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     createNewSession: () -> BucketedData,
     getStorage: (ProfileSpecificStorage) -> BucketedData,
     drawDisplay: (BucketedData) -> List<Searchable>,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> BucketedData>,
-) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> BucketedData> = emptyMap(),
+) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
 
     @Deprecated("Use addCoins(bucket, coins) instead", ReplaceWith("addCoins(bucket, coins)"))
     override fun addCoins(amount: Int, command: Boolean) =
@@ -28,6 +28,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         addItem(bucket, SKYBLOCK_COIN, coins)
     }
 
+    // TODO impl in normal item tracker as well
     fun ItemAddEvent.addItemFromEvent() {
         var bucket: E? = null
         modify { data ->
@@ -64,10 +65,10 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             it.addItem(bucket, internalName, amount)
         }
         getSharedTracker()?.let {
-            val totalProp = it.get(DisplayMode.TOTAL).getSelectedBucketItems().getOrPut(internalName) {
+            val totalProp = it.get(DisplayMode.TOTAL).selectedBucketItems.getOrPut(internalName) {
                 ItemTrackerData.TrackedItem()
             }
-            val sessionProp = it.get(DisplayMode.SESSION).getSelectedBucketItems().getOrPut(internalName) {
+            val sessionProp = it.get(DisplayMode.SESSION).selectedBucketItems.getOrPut(internalName) {
                 ItemTrackerData.TrackedItem()
             }
             sessionProp.hidden = totalProp.hidden
@@ -110,7 +111,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         data = data,
         filter = filter,
         lists = lists,
-        itemsAccessor = { data.getSelectedBucketItems() },
+        itemsAccessor = { data.selectedBucketItems },
         getCoinName = { item ->
             data.getCoinName(data.selectedBucket, item)
         },

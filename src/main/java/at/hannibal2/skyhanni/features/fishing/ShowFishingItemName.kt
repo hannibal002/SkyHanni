@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -41,7 +40,7 @@ object ShowFishingItemName {
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
             val itemStack = entityItem.entityItem
             // Hypixel sometimes replaces the bait item midair with a stone
-            if (itemStack.name.removeColor() == "Stone") continue
+            if (itemStack.displayName.removeColor() == "Stone") continue
             var text = ""
 
             val isBait = itemStack.isBait()
@@ -50,7 +49,7 @@ object ShowFishingItemName {
             if (itemStack.getSkullTexture() in cheapCoins) {
                 text = "§6Coins"
             } else {
-                val name = itemStack.name.transformIf({ isBait }) { "§7" + this.removeColor() }
+                val name = itemStack.displayName.transformIf({ isBait }) { "§7" + this.removeColor() }
                 text += if (isBait) "§c§l- §r" else "§a§l+ §r"
 
                 val size = itemStack.stackSize

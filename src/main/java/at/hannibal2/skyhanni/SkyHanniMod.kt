@@ -24,9 +24,11 @@ import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.common.MinecraftForge
@@ -71,7 +73,7 @@ object SkyHanniMod {
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
         try {
-            RepoManager.loadRepoInformation()
+            RepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
@@ -127,6 +129,15 @@ object SkyHanniMod {
     val coroutineScope = CoroutineScope(
         CoroutineName("SkyHanni") + SupervisorJob(globalJob),
     )
+
+    fun launchIOCoroutine(block: suspend CoroutineScope.() -> Unit) {
+        launchCoroutine {
+            withContext(Dispatchers.IO) {
+                block()
+            }
+        }
+    }
+
     var screenToOpen: GuiScreen? = null
     private var screenTicks = 0
     fun consoleLog(message: String) {
@@ -137,8 +148,11 @@ object SkyHanniMod {
         coroutineScope.launch {
             try {
                 function()
-            } catch (ex: Exception) {
-                ErrorManager.logErrorWithData(ex, "Asynchronous exception caught")
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    e.message ?: "Asynchronous exception caught",
+                )
             }
         }
     }
