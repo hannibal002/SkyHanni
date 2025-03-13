@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.init.Items
 
 @SkyHanniModule
 object ExperimentationXPOverlay {
@@ -37,7 +37,7 @@ object ExperimentationXPOverlay {
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!isEnabled()) return
         event.stack ?: return
-        if (event.stack.item != Items.dye) return
+        if (event.stack.isDye()) return
         enchantingXPPattern.matchMatcher(event.stack.displayName) {
             val text = "${group("xp")}k"
             val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)

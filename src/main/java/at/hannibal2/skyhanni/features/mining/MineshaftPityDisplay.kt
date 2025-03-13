@@ -23,8 +23,8 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.hover
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.annotations.Expose
 import net.minecraft.block.BlockStone
@@ -141,8 +141,8 @@ object MineshaftPityDisplay {
 
             resetCounter()
 
-            val newComponent = Text.text(message) {
-                hover = Text.multiline(hoverText)
+            val newComponent = TextHelper.text(message) {
+                hover = TextHelper.multiline(hoverText)
             }
 
             if (config.modifyChatMessage) event.chatComponent = newComponent

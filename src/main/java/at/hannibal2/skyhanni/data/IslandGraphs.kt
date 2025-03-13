@@ -29,10 +29,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.hover
-import at.hannibal2.skyhanni.utils.chat.Text.onClick
-import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP

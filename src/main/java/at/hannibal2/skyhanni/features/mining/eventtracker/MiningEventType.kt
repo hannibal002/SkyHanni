@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
 import net.minecraft.client.renderer.GlStateManager
@@ -57,8 +58,8 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val dyeGreen = Renderable.itemStack(Items.dye.toItemStack(10), 0.45)
-            val dyePink = Renderable.itemStack(Items.dye.toItemStack(9), 0.45)
+            val dyeGreen = Renderable.itemStack(DyeCompat.LIME.createStack(), 0.45)
+            val dyePink = Renderable.itemStack(DyeCompat.PINK.createStack(), 0.45)
 
             override fun render(posX: Int, posY: Int) {
                 GlStateManager.translate(1f, 0f, 0f)
@@ -119,7 +120,7 @@ enum class MiningEventType(
         "Gourmand", 10.minutes,
         color = LorenzColor.AQUA,
         dwarvenSpecific = true,
-        iconInput = Items.dye.toItemStack(6).overrideId("MITHRIL_GOURMAND")
+        iconInput = DyeCompat.CYAN.createStack().overrideId("MITHRIL_GOURMAND")
     ),
     ;
 
