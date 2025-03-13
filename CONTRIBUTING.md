@@ -83,6 +83,8 @@ out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/mast
 
 ## Pull Requests
 
+General infos about Pull Request can be found on [Github Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
+
 ### Creating a Pull Request
 
 If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
@@ -96,7 +98,7 @@ You can do this by following the instructions within the IntelliJ window in the 
 
 _A more in-depth explanation of how to use IntelliJ and branches will follow someday._
 
-### General Guidelines for Pull Requests
+### Guidelines for Pull Requests
 
 Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, etc.).
 
