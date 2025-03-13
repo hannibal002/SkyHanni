@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.yearofthepig.ShinyOrbUsedEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -50,9 +51,8 @@ object PigFeaturesApi {
 
     private val patternGroup = RepoPattern.group("event.year-of-the-pig")
     private val armorStands get() = EntityUtils.getEntities<EntityArmorStand>()
-    private val dataSet: ShinyOrbDataSet = ShinyOrbDataSet()
-
-    fun getData() = dataSet
+    private val writableDataSet: ShinyOrbDataSet = ShinyOrbDataSet()
+    val dataSet get() = writableDataSet
 
     // <editor-fold desc="Patterns">
     private val orbUsedChatPattern by patternGroup.pattern(
@@ -118,7 +118,7 @@ object PigFeaturesApi {
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        dataSet.reset()
+        writableDataSet.reset()
     }
 
     @HandleEvent
@@ -126,29 +126,29 @@ object PigFeaturesApi {
         val playerVec = LocationUtils.playerLocation()
         val message = event.message
         orbUsedChatPattern.matchMatcher(message) {
-            ShinyOrbUsedEvent(dataSet).post()
+            ShinyOrbUsedEvent(writableDataSet).post()
         }
 
         orbChargedChatPattern.matchMatcher(message) {
             val orbEntity = tryFindPlayerOrb(playerVec)
-            ShinyOrbChargedEvent(dataSet.shinyOrbLocation, orbEntity?.entityId).post()
+            ShinyOrbChargedEvent(writableDataSet.shinyOrbLocation, orbEntity?.entityId).post()
         }
 
         orbLootedChatPattern.matchMatcher(message) {
             handleLootedOrb(group("reward"))
-            dataSet.reset()
+            writableDataSet.reset()
         }
 
         orbExpiredChatPattern.matchMatcher(message) {
-            val pigId = dataSet.pigEntityId ?: return@matchMatcher
+            val pigId = writableDataSet.pigEntityId ?: return@matchMatcher
             val pigEntity = EntityUtils.getEntityByID(pigId)
-            if (pigEntity == null) dataSet.reset()
+            if (pigEntity == null) writableDataSet.reset()
         }
     }
 
     private fun tryFindPlayerOrb(
         location: LorenzVec
-    ): EntityArmorStand? = dataSet.shinyOrbEntityId?.let {
+    ): EntityArmorStand? = writableDataSet.shinyOrbEntityId?.let {
         EntityUtils.getEntityByID(it) as EntityArmorStand?
     } ?: armorStands.firstOrNull {
         it.distanceTo(location) <= 3.0 && armorStands.any { labelArmorStand ->
@@ -161,19 +161,19 @@ object PigFeaturesApi {
     }
 
     private fun handleLootedOrb(reward: String) {
-        val shinyOrbLocation = dataSet.shinyOrbLocation ?: return
+        val shinyOrbLocation = writableDataSet.shinyOrbLocation ?: return
 
         coinsRewardPattern.matchMatcher(reward) {
             val amount = group("amount").formatIntOrNull() ?: return@matchMatcher
             ShinyOrbLootedEvent(shinyOrbLocation, coins = amount).post()
-            return dataSet.reset()
+            return writableDataSet.reset()
         }
 
         skillXpRewardPattern.matchMatcher(reward) {
             val amount = group("amount").formatIntOrNull() ?: return@matchMatcher
             val skill = SkillType.getByNameOrNull(group("skill")) ?: return@matchMatcher
             ShinyOrbLootedEvent(shinyOrbLocation, skillXp = skill to amount.toLong()).post()
-            return dataSet.reset()
+            return writableDataSet.reset()
         }
 
         val (lootName, lootAmount) = ItemUtils.readItemAmount(reward) ?: return
@@ -181,7 +181,7 @@ object PigFeaturesApi {
             ErrorManager.skyHanniError("Could not find internal name for §c\"$lootName§c\"")
         }
         ShinyOrbLootedEvent(shinyOrbLocation, loot = lootInternalName to lootAmount).post()
-        dataSet.reset()
+        writableDataSet.reset()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
@@ -195,11 +195,13 @@ object PigFeaturesApi {
     private fun EntityPig.handlePigClick() {
         val pigStartingLocation = this.getLorenzVec()
         DelayedRun.runDelayed(1.seconds) {
-            if (dataSet.pigEntityId == this.entityId) return@runDelayed
+            if (writableDataSet.pigEntityId == this.entityId) return@runDelayed
             val orbEntity = tryFindPlayerOrb(pigStartingLocation) ?: return@runDelayed
-            dataSet.reset()
-            dataSet.shinyOrbEntityId = orbEntity.entityId
-            dataSet.pigEntityId = this.entityId
+            writableDataSet.reset()
+            writableDataSet.shinyOrbEntityId = orbEntity.entityId
+            writableDataSet.pigEntityId = this.entityId
+            ChatUtils.chat("Set shinyOrbEntityId to ${writableDataSet.shinyOrbEntityId}")
+            ChatUtils.chat("Set pigEntityId to ${writableDataSet.pigEntityId}")
         }
     }
 }

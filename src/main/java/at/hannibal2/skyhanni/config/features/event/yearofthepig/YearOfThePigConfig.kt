@@ -15,7 +15,10 @@ class YearOfThePigConfig {
     @Expose
     @ConfigOption(name = "Lines to Draw", desc = "Which helper lines to draw.")
     @ConfigEditorDraggableList
-    var linesToDraw: MutableList<ShinyOrbLineType> = mutableListOf()
+    var linesToDraw: MutableList<ShinyOrbLineType> = mutableListOf(
+        ShinyOrbLineType.TO_PIG,
+        ShinyOrbLineType.TO_ORB,
+    )
 
     enum class ShinyOrbLineType(private val displayName: String) {
         TO_PIG("§dYou to Pig"),

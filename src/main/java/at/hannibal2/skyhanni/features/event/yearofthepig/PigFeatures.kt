@@ -16,8 +16,7 @@ import java.awt.Color
 object PigFeatures {
 
     private val config get() = SkyHanniMod.feature.event.yearOfThePig
-
-    private val dataSet get() = PigFeaturesApi.getData()
+    private val dataSet get() = PigFeaturesApi.dataSet
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
@@ -29,6 +28,7 @@ object PigFeatures {
 
     private fun SkyHanniRenderWorldEvent.tryRenderLineToPig(dataSet: PigFeaturesApi.ShinyOrbDataSet) {
         val pigEntity = dataSet.pigEntityId?.let { EntityUtils.getEntityByID(it) } ?: return
+
         val nearPig = pigEntity.distanceToPlayer() < 5
         val lineToPigEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_PIG) && !nearPig
         if (!lineToPigEnabled) return
@@ -37,32 +37,31 @@ object PigFeatures {
         drawLineToEye(
             pigEntityLocation.up(0.54),
             Color.PINK,
-            2,
+            3,
             true
         )
     }
 
     private fun SkyHanniRenderWorldEvent.tryRenderLinePigToOrb(
         dataSet: PigFeaturesApi.ShinyOrbDataSet
-    ): Boolean {
-        val orbEntity = dataSet.shinyOrbEntityId?.let { EntityUtils.getEntityByID(it) } ?: return false
-        val pigEntity = dataSet.pigEntityId?.let { EntityUtils.getEntityByID(it) } ?: return false
+    ) {
+        val pigEntity = dataSet.pigEntityId?.let { EntityUtils.getEntityByID(it) } ?: return
         val nearPig = pigEntity.distanceToPlayer() < 5
 
         val lineToOrbEnabled = config.linesToDraw.contains(YearOfThePigConfig.ShinyOrbLineType.TO_ORB) && nearPig
-        if (!lineToOrbEnabled) return false
+        if (!lineToOrbEnabled) return
 
-        val orbEntityLocation = exactLocation(orbEntity)
+        val orbEntityLocation = dataSet.shinyOrbLocation ?: return
         val pigEntityLocation = exactLocation(pigEntity)
 
         draw3DLine(
-            pigEntityLocation,
-            orbEntityLocation,
+            pigEntityLocation.up(0.54),
+            orbEntityLocation.down(0.5),
             Color.YELLOW,
-            2,
+            3,
             true
         )
-        return true
+        return
     }
 
 }
