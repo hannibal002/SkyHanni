@@ -125,7 +125,7 @@ data class SkyBlockTime(
             return fromInstant(Instant.ofEpochMilli(millis))
         }
 
-        fun isDay(): Boolean = (Minecraft.getMinecraft().theWorld?.worldTime ?: 0) % 24000 in 1..12000
+        fun isDay(): Boolean = Minecraft.getMinecraft().theWorld.worldTime % 24000 in 1..12000
     }
 }
 

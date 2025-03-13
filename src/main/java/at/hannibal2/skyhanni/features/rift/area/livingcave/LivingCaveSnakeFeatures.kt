@@ -113,7 +113,7 @@ object LivingCaveSnakeFeatures {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
-        if (LorenzUtils.debug && Minecraft.getMinecraft().thePlayer?.isSneaking == true && snakes.isNotEmpty()) {
+        if (LorenzUtils.debug && Minecraft.getMinecraft().thePlayer.isSneaking && snakes.isNotEmpty()) {
             snakes.clear()
             ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
             return

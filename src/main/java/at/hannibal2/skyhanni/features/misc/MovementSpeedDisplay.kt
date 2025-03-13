@@ -40,7 +40,7 @@ object MovementSpeedDisplay {
     private fun checkSpeed() {
         if (!LorenzUtils.onHypixel) return
 
-        speed = with(Minecraft.getMinecraft().thePlayer ?: return) {
+        speed = with(Minecraft.getMinecraft().thePlayer) {
             val oldPos = LorenzVec(prevPosX, prevPosY, prevPosZ)
             val newPos = LorenzVec(posX, posY, posZ)
 
