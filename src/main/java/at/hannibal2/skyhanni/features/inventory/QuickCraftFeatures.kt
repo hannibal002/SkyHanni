@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -64,7 +63,7 @@ object QuickCraftFeatures {
 
         for ((slot, stack) in chest.getAllItems()) {
             if (inventoryType.ignoreSlot(slot.slotNumber)) continue
-            if (stack.name == "§cQuick Crafting Slot") continue
+            if (stack.displayName == "§cQuick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
                 slot highlight LorenzColor.DARK_GRAY.addOpacity(180)
             }

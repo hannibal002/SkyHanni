@@ -27,7 +27,7 @@ plugins {
     java
     id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
-    id("dev.deftu.gradle.preprocess")
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
@@ -385,7 +385,6 @@ preprocess {
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
-    patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
 
 blossom {
