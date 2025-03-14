@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
@@ -221,7 +221,7 @@ object BlockStrengthGuide {
             gemstone = (
                 HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0
                 ) + (
-                itemInHand?.getEnchantments()?.get("lapidary")?.times(20.0) ?: 0.0
+                itemInHand?.getHypixelEnchantments()?.get("lapidary")?.times(20.0) ?: 0.0
                 ) + when (itemInHand?.getInternalNameOrNull()?.asString()) {
                 "GEMSTONE_DRILL_1", "GEMSTONE_DRILL_2", "GEMSTONE_DRILL_3", "GEMSTONE_DRILL_4" -> 800.0
                 else -> 0.0
