@@ -8,6 +8,8 @@ import net.minecraftforge.fml.common.ModContainer
 import kotlin.time.Duration.Companion.INFINITE
 //#if MC < 1.16
 import net.minecraft.launchwrapper.Launch
+//#elseif FORGE
+//$$ import net.minecraftforge.fml.loading.FMLEnvironment
 //#else
 //$$ import net.fabricmc.loader.api.FabricLoader
 //#endif
