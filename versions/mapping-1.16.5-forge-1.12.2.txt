@@ -97,8 +97,8 @@ net.minecraft.nbt.ListTag getSize() tagCount()
 net.minecraft.nbt.ListTag getString() getStringTagAt()
 
 net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent
-net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
 net.minecraft.network.chat.Style net.minecraft.util.text.Style
+net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
 
 net.minecraft.network.chat.Component copy() createCopy()
 
