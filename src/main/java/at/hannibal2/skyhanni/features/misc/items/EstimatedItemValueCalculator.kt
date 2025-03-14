@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -48,7 +48,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBookwormBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
@@ -629,7 +629,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun ItemStack.getEnchantmentItems(): Pair<Double, List<String>>? {
-        val enchantments = getEnchantments() ?: return null
+        val enchantments = getHypixelEnchantments() ?: return null
         val data = EstimatedItemValue.itemValueCalculationData ?: return null
         val items = fetchEnchantmentItems(enchantments, getInternalName(), data)
         return getTotalAndNames(items)
@@ -797,7 +797,7 @@ object EstimatedItemValueCalculator {
         shouldIgnorePrice: Property<Boolean>,
     ): Double {
         val price = internalName.getPrice()
-        val name = internalName.getItemStackOrNull()?.itemName
+        val name = internalName.getItemStackOrNull()?.repoItemName
         val displayName = name ?: "§c${internalName.asString()}"
         val gray = shouldIgnorePrice.get()
 

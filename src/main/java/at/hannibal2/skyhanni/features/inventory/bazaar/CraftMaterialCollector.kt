@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -46,7 +46,7 @@ object CraftMaterialCollector {
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
 
-        val recipeName = items[25]?.itemName ?: return
+        val recipeName = items[25]?.repoItemName ?: return
         showRecipe(calculateMaterialsNeeded(event.inventoryItemsPrimitive), recipeName)
     }
 

@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils.message
 import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull

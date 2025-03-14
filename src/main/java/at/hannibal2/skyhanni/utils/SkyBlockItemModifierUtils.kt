@@ -41,7 +41,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
 
-    fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
+    fun ItemStack.getSilexCount() = getHypixelEnchantments()?.get("efficiency")?.let {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
 
@@ -216,7 +216,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPersonalCompactorActive() = getAttributeByte("PERSONAL_DELETOR_ACTIVE") == 1.toByte()
 
-    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()
+    fun ItemStack.getHypixelEnchantments(): Map<String, Int>? = getExtraAttributes()
         ?.takeIf { it.hasKey("enchantments") }
         ?.run {
             val enchantments = this.getCompoundTag("enchantments")
