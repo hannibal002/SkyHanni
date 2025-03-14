@@ -22,6 +22,9 @@ net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
 
 net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
 
+net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
+net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
+
 net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiChest
 net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
 
@@ -71,6 +74,8 @@ net.minecraft.nbt.StringTag net.minecraft.nbt.NBTTagString
 
 net.minecraft.nbt.CompoundTag getCompound() getCompoundTag()
 net.minecraft.nbt.CompoundTag getList() getTagList()
+net.minecraft.nbt.CompoundTag getKeys() getKeySet()
+net.minecraft.nbt.CompoundTag contains() hasKey()
 net.minecraft.nbt.CompoundTag put() setTag()
 net.minecraft.nbt.CompoundTag putBoolean() setBoolean()
 net.minecraft.nbt.CompoundTag putInt() setInteger()
@@ -162,6 +167,8 @@ net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket getId() get
 
 net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket getEntity() getEntityID()
 
+net.minecraft.network.protocol.game.ClientboundSetObjectivePacket getRenderType() getRenderType()
+
 net.minecraft.network.protocol.game.ClientboundSetTitlesPacket getText() getMessage()
 
 net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getEntityId()
@@ -169,6 +176,8 @@ net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getE
 net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEntityFromWorld()
 
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
+
+net.minecraft.server.level.ServerPlayer net.minecraft.entity.player.EntityPlayerMP
 
 net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
 net.minecraft.world.effect.MobEffectInstance net.minecraft.potion.PotionEffect
@@ -180,13 +189,18 @@ net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
 net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
 
+net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
+
+net.minecraft.world.entity.Entity customName setCustomNameTag()
 net.minecraft.world.entity.Entity getAllSlots() getEquipmentAndArmor()
 net.minecraft.world.entity.Entity getBoundingBox() getEntityBoundingBox()
+net.minecraft.world.entity.Entity getEyePosition() getPositionEyes()
 net.minecraft.world.entity.Entity getId() getEntityId()
 net.minecraft.world.entity.Entity getLookAngle() getLookVec()
 net.minecraft.world.entity.Entity getUUID() getUniqueID()
 net.minecraft.world.entity.Entity level world
 net.minecraft.world.entity.Entity removed isDead
+net.minecraft.world.entity.Entity isOnFire() isBurning()
 net.minecraft.world.entity.Entity xOld prevPosX
 net.minecraft.world.entity.Entity xRot rotationPitch
 net.minecraft.world.entity.Entity xo posX
@@ -225,6 +239,7 @@ net.minecraft.world.entity.animal.horse.Horse net.minecraft.entity.passive.Entit
 net.minecraft.world.entity.boss.enderdragon.EnderDragon net.minecraft.entity.boss.EntityDragon
 
 net.minecraft.world.entity.boss.wither.WitherBoss net.minecraft.entity.boss.EntityWither
+net.minecraft.world.entity.boss.wither.WitherBoss getInvulnerableTicks() getInvulTime()
 
 net.minecraft.world.entity.decoration.ArmorStand net.minecraft.entity.item.EntityArmorStand
 net.minecraft.world.entity.decoration.ItemFrame net.minecraft.entity.item.EntityItemFrame
@@ -282,8 +297,15 @@ net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
 net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
+net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
+
+net.minecraft.world.item.Item byBlock() getItemFromBlock()
+
+net.minecraft.world.item.DyeColor net.minecraft.item.EnumDyeColor
+net.minecraft.world.item.DyeColor LIGHT_GRAY SILVER
 
 net.minecraft.world.item.Items PLAYER_HEAD SKULL
+net.minecraft.world.item.Items COD FISH
 
 net.minecraft.world.item.enchantment.Enchantments net.minecraft.init.Enchantments
 
@@ -293,15 +315,25 @@ net.minecraft.world.level.Level getEntity() getEntityByID()
 net.minecraft.world.level.Level getBlockEntity() getTileEntity()
 
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
+net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
+net.minecraft.world.level.block.Blocks DANDELION YELLOW_FLOWER
+
+net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
 net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
 net.minecraft.world.level.block.Blocks DANDELION YELLOW_FLOWER
+net.minecraft.world.level.block.Blocks NETHER_QUARTZ_ORE QUARTZ_ORE
 
 net.minecraft.world.level.block.entity.SkullBlockEntity net.minecraft.tileentity.TileEntitySkull
 
 net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
 
 net.minecraft.world.phys.Vec3 net.minecraft.util.math.Vec3d
+
+net.minecraft.world.scores.criteria.ObjectiveCriteria net.minecraft.scoreboard.IScoreCriteria
+net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType net.minecraft.scoreboard.IScoreCriteria$EnumRenderType
+
+net.minecraft.world.scores.Team net.minecraft.scoreboard.Team
 
 net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
 
@@ -336,7 +368,6 @@ org.lwjgl.glfw.GLFW GLFW_KEY_DOWN KEY_DOWN
 org.lwjgl.glfw.GLFW GLFW_KEY_E KEY_E
 org.lwjgl.glfw.GLFW GLFW_KEY_END KEY_END
 org.lwjgl.glfw.GLFW GLFW_KEY_ENTER KEY_RETURN
-org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
 org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
 org.lwjgl.glfw.GLFW GLFW_KEY_F KEY_F
 org.lwjgl.glfw.GLFW GLFW_KEY_F3 KEY_F3

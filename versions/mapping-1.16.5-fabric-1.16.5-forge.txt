@@ -3,9 +3,17 @@ net.fabricmc.api.EnvType net.minecraftforge.api.distmarker.Dist
 net.fabricmc.api.Environment net.minecraftforge.api.distmarker.OnlyIn
 
 net.minecraft.client.option.Perspective net.minecraft.client.CameraType
-
 net.minecraft.client.option.Perspective isFrontView() isMirrored()
 
 net.minecraft.client.render.WorldRenderer reload() allChanged()
 
 net.minecraft.client.util.Window getHandle() getWindow()
+
+net.minecraft.item.ItemStack net.minecraft.world.item.ItemsStack
+net.minecraft.item.ItemStack getName() getDisplayName()
+
+net.minecraft.entity.passive.VillagerEntity net.minecraft.world.entity.npc.Villager
+net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.decoration.ArmorStand
+
+net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.ServerPlayer
+
