@@ -48,7 +48,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
-import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.common.util.Constants
 import java.util.LinkedList
 import java.util.regex.Matcher
@@ -701,7 +701,7 @@ object ItemUtils {
         }
     }
 
-    private fun MutableList<ChatComponentText>.formatTestItem(internalName: NeuInternalName, price: Double) {
+    private fun MutableList<IChatComponent>.formatTestItem(internalName: NeuInternalName, price: Double) {
         val priceColor = if (price > 0) "§6" else "§7"
         val name = internalName.repoItemName
         val priceFormat = "$priceColor${price.shortFormat()}"
