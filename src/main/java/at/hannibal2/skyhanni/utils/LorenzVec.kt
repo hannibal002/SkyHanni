@@ -209,6 +209,22 @@ data class LorenzVec(
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
+    private val normX = if (x == 0.0) 0.0 else x
+    private val normY = if (y == 0.0) 0.0 else y
+    private val normZ = if (z == 0.0) 0.0 else z
+
+    override fun equals(other: Any?): Boolean {
+        if (other is LorenzVec) {
+            val v2: LorenzVec = other
+            if (this.x == v2.x && this.y == v2.y && this.z == v2.z) {
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun hashCode() = 31 * (31 * normX.hashCode() + normY.hashCode()) + normZ.hashCode()
+
     companion object {
 
         val directions = setOf(
@@ -236,6 +252,12 @@ data class LorenzVec(
             return LorenzVec(x, y, z)
         }
 
+        fun List<Double>.toLorenzVec(): LorenzVec {
+            if (size != 3) error("Can not transform a list of size $size to LorenzVec")
+
+            return LorenzVec(this[0], this[1], this[2])
+        }
+
         fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().down()
 
         val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
@@ -246,8 +268,14 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
-fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
 fun Entity.getServerLorenzVec(): LorenzVec = LorenzVec(serverPosX, serverPosY, serverPosZ)
+
+//#if MC < 1.16
+fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
+=======
+//#else
+//$$ fun Entity.getMotionLorenzVec(): LorenzVec = deltaMovement.toLorenzVec()
+//#endif
 fun Entity.getPositionLog() = PositionLog(
     tick = ticksExisted,
     position = getLorenzVec(),

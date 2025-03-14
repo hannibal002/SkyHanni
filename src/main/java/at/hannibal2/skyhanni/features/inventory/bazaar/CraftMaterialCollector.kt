@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -41,8 +40,8 @@ object CraftMaterialCollector {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
-        val correctItem = items[23]?.name == "§aCrafting Table"
-        val correctSuperCraftItem = items[32]?.name == "§aSupercraft"
+        val correctItem = items[23]?.displayName == "§aCrafting Table"
+        val correctSuperCraftItem = items[32]?.displayName == "§aSupercraft"
 
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
@@ -71,10 +70,10 @@ object CraftMaterialCollector {
             }
             if (neededMaterials.isNotEmpty()) {
                 add(
-                    Renderable.clickAndHover(
+                    Renderable.clickable(
                         "§eAdd to craft material collector!",
-                        listOf("§eClick here to help purchasing the items!"),
-                        onClick = {
+                        tips = listOf("§eClick here to help purchasing the items!"),
+                        onLeftClick = {
                             addToPurchasing(neededMaterials)
                         },
                     ),
@@ -110,18 +109,18 @@ object CraftMaterialCollector {
                     (material.getPrice() * priceMultiplier).shortFormat(false)
                 }"
                 add(
-                    Renderable.clickAndHover(
-                        text = text,
-                        onClick = { material.buy(priceMultiplier) },
+                    Renderable.clickable(
+                        text,
                         tips = material.createBuyTip(),
+                        onLeftClick = { material.buy(priceMultiplier) },
                     ),
                 )
             }
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§eStop!",
-                    listOf("§eClick here to stop this view!"),
-                    onClick = {
+                    tips = listOf("§eClick here to stop this view!"),
+                    onLeftClick = {
                         purchasing = false
                         display = emptyList()
                     },
@@ -140,10 +139,10 @@ object CraftMaterialCollector {
             val text = "${nameColor}Mulitply x$m $price"
             if (!isThisMultiply) {
                 add(
-                    Renderable.clickAndHover(
+                    Renderable.clickable(
                         text,
-                        listOf("§eClick here to multiply the items needed times $m!"),
-                        onClick = {
+                        tips = listOf("§eClick here to multiply the items needed times $m!"),
+                        onLeftClick = {
                             multiplier = m
                             updateDisplay()
                         },

@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -51,7 +50,7 @@ object BazaarApi {
 
     var currentlyOpenedProduct: NeuInternalName? = null
     private var lastOpenedProduct: NeuInternalName? = null
-    private var orderOptionProduct: NeuInternalName? = null
+    var orderOptionProduct: NeuInternalName? = null
 
     private val patternGroup = RepoPattern.group("inventory.bazaar")
 
@@ -133,7 +132,7 @@ object BazaarApi {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val item = event.item ?: return
-        val itemName = item.name
+        val itemName = item.displayName
         if (isBazaarOrderInventory(InventoryUtils.openInventoryName())) {
             val internalName = item.getInternalNameOrNull() ?: return
             if (itemName.contains("SELL")) {
@@ -141,11 +140,14 @@ object BazaarApi {
             } else if (itemName.contains("BUY")) {
                 // pickup items from bazaar order
                 OwnInventoryData.ignoreItem(1.seconds) { it == internalName }
+                // prepare for cancel buy order as well
+                orderOptionProduct = internalName
             }
         }
         if (InventoryUtils.openInventoryName() == "Order options" && itemName == "§cCancel Order") {
             // pickup items from own bazaar order
             OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
+
         }
 
         if (inBazaarInventory) {
@@ -211,13 +213,13 @@ object BazaarApi {
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
-        if (items.any { it.name.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
+        if (items.any { it.displayName.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
             return true
         }
 
         // check for Buy Instantly
         event.inventoryItems[16]?.let {
-            if (it.name == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
+            if (it.displayName == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
                 return true
             }
         }
