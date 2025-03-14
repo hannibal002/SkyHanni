@@ -279,6 +279,7 @@ net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.En
 
 net.minecraft.world.entity.player.Inventory armor armorInventory
 net.minecraft.world.entity.player.Inventory getCarried() getItemStack()
+net.minecraft.world.entity.player.Inventory getSelected() getCurrentItem()
 net.minecraft.world.entity.player.Inventory items mainInventory
 
 net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
