@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -180,7 +180,7 @@ object GardenVisitorDropStatistics {
 
     private fun setRarities(rarity: String) {
         acceptedVisitors += 1
-        val currentRarity = LorenzUtils.enumValueOf<VisitorRarity>(rarity)
+        val currentRarity = EnumUtils.enumValueOf<VisitorRarity>(rarity)
         val visitorRarities = GardenApi.storage?.visitorDrops?.visitorRarities ?: return
         fixRaritiesSize(visitorRarities)
         // TODO, change functionality to use enum rather than ordinals
