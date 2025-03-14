@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.chat.TextHelper.url
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import java.util.LinkedList
@@ -257,7 +256,7 @@ object ChatUtils {
      * @see CHAT_PREFIX
      */
     fun multiComponentMessage(
-        components: List<ChatComponentText>,
+        components: List<IChatComponent>,
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {

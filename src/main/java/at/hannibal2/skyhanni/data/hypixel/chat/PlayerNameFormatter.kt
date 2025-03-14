@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 
@@ -170,7 +169,7 @@ object PlayerNameFormatter {
         guildRank: ComponentSpan? = null,
         privateIslandRank: ComponentSpan? = null,
         privateIslandGuest: ComponentSpan? = null,
-    ): ChatComponentText {
+    ): IChatComponent {
         var cleanAuthor = cleanAuthor(author)
 
         var emblemFormat: IChatComponent? = null
