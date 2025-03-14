@@ -636,7 +636,7 @@ object GardenVisitorFeatures {
         return ready
     }
 
-    fun renderDisplay() = config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
+    private fun renderDisplay() = config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
 
     @SubscribeEvent
     fun onRenderInSigns(event: DrawScreenEvent.Post) {
