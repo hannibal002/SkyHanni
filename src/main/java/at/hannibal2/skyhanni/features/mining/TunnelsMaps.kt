@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -359,7 +359,7 @@ object TunnelsMaps {
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),
-                ).toInternalName().itemName.takeWhile { it != ' ' }.removeColor()
+                ).toInternalName().repoItemName.takeWhile { it != ' ' }.removeColor()
                 ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -38,7 +38,7 @@ object ProfitPerMineshaftCorpse {
         val name = corpseType.displayName
 
         corpseType.key?.let {
-            val keyName = it.itemName
+            val keyName = it.repoItemName
             val price = it.getPrice()
 
             map["§cCost: $keyName §7(§c-${price.shortFormat()}§7)"] = -price

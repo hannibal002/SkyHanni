@@ -29,8 +29,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -48,13 +48,13 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBookwormBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getGemstones
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHelmetSkin
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getManaDisintegrators
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
@@ -244,7 +244,7 @@ object EstimatedItemValueCalculator {
         } ?: return 0.0
         val internalName = reforge.reforgeStone ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()
-        val reforgeStoneName = internalName.itemName
+        val reforgeStoneName = internalName.repoItemName
         val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.name}")
@@ -629,7 +629,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun ItemStack.getEnchantmentItems(): Pair<Double, List<String>>? {
-        val enchantments = getEnchantments() ?: return null
+        val enchantments = getHypixelEnchantments() ?: return null
         val data = EstimatedItemValue.itemValueCalculationData ?: return null
         val items = fetchEnchantmentItems(enchantments, getInternalName(), data)
         return getTotalAndNames(items)
@@ -654,7 +654,7 @@ object EstimatedItemValueCalculator {
                 }
             } catch (e: NullPointerException) {
                 ErrorManager.logErrorWithData(
-                    e, "Estimated Item value failed to properly show ${internalName.itemName}",
+                    e, "Estimated Item value failed to properly show ${internalName.repoItemName}",
                     "openInventoryName" to InventoryUtils.openInventoryName(),
                     "internalName" to internalName,
                     "rawName" to rawName,
@@ -797,7 +797,7 @@ object EstimatedItemValueCalculator {
         shouldIgnorePrice: Property<Boolean>,
     ): Double {
         val price = internalName.getPrice()
-        val name = internalName.getItemStackOrNull()?.itemName
+        val name = internalName.getItemStackOrNull()?.repoItemName
         val displayName = name ?: "§c${internalName.asString()}"
         val gray = shouldIgnorePrice.get()
 
@@ -814,7 +814,7 @@ object EstimatedItemValueCalculator {
         val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".toInternalName()
 
         val price = internalName.getPrice()
-        val name = internalName.itemName
+        val name = internalName.repoItemName
         list.add("§7Enrichment: $name ${price.formatCoinWithBrackets()}")
         return price
     }
@@ -847,7 +847,7 @@ object EstimatedItemValueCalculator {
             }
         }
 
-        val name = internalName.itemName
+        val name = internalName.repoItemName
         if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
             list.add("§7Base item: $name")
             return 0.0

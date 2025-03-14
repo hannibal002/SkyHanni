@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -145,7 +145,7 @@ object ExcavatorProfitTracker {
         if (timesExcavated <= 0) return profit
         // TODO use same price source as profit tracker
         val scrapPrice = timesExcavated * scrapItem.getPrice()
-        val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.itemName)
+        val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
         add(
             Renderable.hoverTips(
                 "$name §7price: §c-${scrapPrice.shortFormat()}",
