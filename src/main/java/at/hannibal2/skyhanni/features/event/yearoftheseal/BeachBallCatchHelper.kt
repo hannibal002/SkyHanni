@@ -105,7 +105,7 @@ object BeachBallCatchHelper {
             counter < 51 -> "§6" to "IMPRESSIVE"
             else -> "§d" to "INSANE"
         }
-        val qualityString = quality?.let { " §8- $qualityColor§l$it!" } ?: ""
+        val qualityString = quality?.let { " §8- $qualityColor§l$it!" }.orEmpty()
         drawString(location.add(y = 0.7), "$qualityColor§l$counter$qualityString")
     }
 
