@@ -150,15 +150,14 @@ object AnitaMedalProfit {
         }
     }
 
-    private fun isInvalidItemName(itemName: String): Boolean = when (itemName) {
+    private val invalidItemNames = listOf(
         " ",
         "§cClose",
         "§eUnique Gold Medals",
         "§aMedal Trades",
-        -> true
+    )
 
-        else -> false
-    }
+    private fun isInvalidItemName(itemName: String): Boolean = itemName in invalidItemNames
 
     private fun getItemName(item: ItemStack): String {
         val name = item.displayName
