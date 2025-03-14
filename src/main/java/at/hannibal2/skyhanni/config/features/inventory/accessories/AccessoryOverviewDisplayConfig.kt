@@ -21,7 +21,7 @@ class AccessoryOverviewDisplayConfig {
     @Expose
     @ConfigOption(name = "Max Height", desc = "Maximum height of the display.")
     @ConfigEditorSlider(minValue = 50f, maxValue = 500f, minStep = 10f)
-    var maxHeight: Property<Float> = Property.of(250f)
+    var maxHeight: Property<Int> = Property.of(250)
 
     @Expose
     @ConfigLink(owner = AccessoryOverviewDisplayConfig::class, field = "enabled")

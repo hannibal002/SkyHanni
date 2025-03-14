@@ -42,21 +42,46 @@ open class RenderableTable(
     override fun render(posX: Int, posY: Int) = renderable.render(posX, posY)
 }
 
-class SearchableRenderableTable(
+open class SearchableRenderableTable(
     initialRows: List<TableRow> = emptyList(),
     xPadding: Int = 1,
     yPadding: Int = 0,
     useEmptySpace: Boolean = false,
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+    private val header: List<Renderable> = emptyList(),
     private val searchInputGetter: () -> SearchTextInput,
 ) : RenderableTable(initialRows, xPadding, yPadding, useEmptySpace, horizontalAlign, verticalAlign) {
 
     override val renderable: Renderable
         get() = rows.associate { it.cells to it.searchKey }
-            .buildSearchableTable(searchInputGetter.invoke())
+            .buildSearchableTable(searchInputGetter, header)
 
     fun addRow(cells: Collection<Renderable>, search: String = "") {
         rows.add(TableRow(cells.toList(), search))
     }
 }
+
+class SearchableScrollableRenderableTable(
+    initialRows: List<TableRow> = emptyList(),
+    xPadding: Int = 1,
+    yPadding: Int = 0,
+    useEmptySpace: Boolean = false,
+    horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+    verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+    private val header: List<Renderable> = emptyList(),
+    private val searchInputGetter: () -> SearchTextInput,
+    private val scrollValueGetter: () -> ScrollValue = { ScrollValue() },
+    private val maxHeightGetter: () -> Int = { 200 },
+) : SearchableRenderableTable(initialRows, xPadding, yPadding, useEmptySpace, horizontalAlign, verticalAlign, header, searchInputGetter) {
+
+    override val renderable: Renderable
+        get() = rows.associate { it.cells to it.searchKey }
+            .buildSearchableTable(
+                searchInputGetter,
+                header,
+                scrollValueGetter,
+                maxHeight = maxHeightGetter.invoke(),
+            )
+}
+

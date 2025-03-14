@@ -171,7 +171,7 @@ object SackDisplay {
             }
         }
 
-        add(table.buildSearchableTable(getSackTextInput(InventoryUtils.openInventoryName())))
+        add(table.buildSearchableTable(textInputGetter = { getSackTextInput(InventoryUtils.openInventoryName()) }))
 
         if (SackApi.isTrophySack) addString("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
         return totalPrice

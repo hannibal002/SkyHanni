@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.events.inventory.AccessoriesUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -24,8 +24,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
-import at.hannibal2.skyhanni.utils.renderables.SearchableRenderableTable
+import at.hannibal2.skyhanni.utils.renderables.SearchableScrollableRenderableTable
 import kotlin.time.Duration.Companion.minutes
 
 typealias AccStorage = ProfileSpecificStorage.StatsStorage.AccessoryStorage
@@ -81,6 +82,9 @@ object AccessoryOverviewDisplay {
     private val tabSearchInputs = enumMapOf<DisplayTab, SearchTextInput>()
     private fun getSearchInputForTab(tab: DisplayTab) = tabSearchInputs.getOrPut(tab) { SearchTextInput() }
 
+    private val tabScrollValues = enumMapOf<DisplayTab, ScrollValue>()
+    private fun getScrollValueForTab(tab: DisplayTab) = tabScrollValues.getOrPut(tab) { ScrollValue() }
+
     private fun rebuildCaches(): List<Renderable> {
         val storage = storage?.accessoryStorage ?: return listOf()
         renderCache[DisplayTab.SUMMARY] = storage.buildSummaryTab()
@@ -126,6 +130,13 @@ object AccessoryOverviewDisplay {
         ) { rebuildCaches() }
     }
 
+    private fun getBaseTable(headerStrings: List<String> = listOf()) = SearchableScrollableRenderableTable(
+        maxHeightGetter = { config.maxHeight.get() },
+        scrollValueGetter = { getScrollValueForTab(currentTab) },
+        searchInputGetter = { getSearchInputForTab(currentTab) },
+        header = headerStrings.map { Renderable.string(it) }.toList()
+    )
+
     private fun buildMainDisplay(): List<Renderable> = buildList {
         add(Renderable.string("§e§lAccessories Summary"))
         addTabToggle()
@@ -161,10 +172,8 @@ object AccessoryOverviewDisplay {
 
     private fun AccStorage.buildSummaryTab(): List<Renderable> = buildList {
         add(Renderable.underlined(Renderable.string("§eCount by Rarity")))
-        val table = SearchableRenderableTable { getSearchInputForTab(currentTab) }.apply {
-            val headers = listOf("§7Rarity", "§7Count", "§7MP")
-            addRow(headers.map { Renderable.string(it) }.toList(), "")
-        }
+        val table = getBaseTable(listOf("§7Rarity", "§7Count", "§7MP"))
+
         val rarities = LorenzRarity.entries.reversed().filter { rarity ->
             accessories.any { acc: Accessory ->
                 acc.rarity == rarity
@@ -194,10 +203,7 @@ object AccessoryOverviewDisplay {
 
     private fun AccStorage.buildStatsTab(): List<Renderable> = buildList {
         add(Renderable.underlined(Renderable.string("§eAccessory Stats")))
-        val statsTable = SearchableRenderableTable { getSearchInputForTab(currentTab) }.apply {
-            val headers = listOf("§7Stat", "§7Accessory Bonus")
-            addRow(headers.map { Renderable.string(it) }.toList(), "")
-        }
+        val statsTable = getBaseTable(listOf("§7Stat", "§7Accessory Bonus"))
 
         val stats = accessories.flatMap { it.totalStats.entries }
             .groupBy({ it.key }, { it.value })
@@ -219,10 +225,7 @@ object AccessoryOverviewDisplay {
 
     private fun AccStorage.buildMissingTab(): List<Renderable> = buildList {
         add(Renderable.underlined(Renderable.string("§eMissing Accessories")))
-        val missingTable = SearchableRenderableTable { getSearchInputForTab(currentTab) }.apply {
-            val headers = listOf("§7Accessory", "§7Cost", "§7Magical Power")
-            addRow(headers.map { Renderable.string(it) }.toList(), "")
-        }
+        val missingTable = getBaseTable(listOf("§7Accessory", "§7Cost", "§7Magical Power"))
 
         val showType = config.missingTabShowType.get()
         val missing = AccessoryApi.getMissing(this@buildMissingTab).filter { acc ->
@@ -251,15 +254,16 @@ object AccessoryOverviewDisplay {
         add(missingTable.renderable)
     }
 
-    private fun Accessory.buildTips(): List<Renderable>? = buildList {
+    private fun Accessory.buildTips(): List<Renderable> = buildList {
         add(Renderable.string("§7${internalName.itemName}"))
         val otherLines = buildList {
             // Price
             buildString {
                 val doublePrice = internalName.getPriceOrNull()?.takeIf {
                     it > 0
-                } ?: return@buildString
-                append("§7Price: §6${doublePrice.toInt().addSeparators()}")
+                }
+                if (doublePrice != null) append("§7Price: §6${doublePrice.toInt().addSeparators()}")
+                else append("§7Price: §c§lNo price data!")
             }.takeIf { it.isNotEmpty() }?.let { add(Pair(Renderable.string(it), it)) }
 
             // Requirements
@@ -270,7 +274,7 @@ object AccessoryOverviewDisplay {
                 add(Pair(Renderable.string(it), it))
             }
         }
-        val longestLineCount = otherLines.maxOfOrNull { it.second.removeColor().length } ?: return null
+        val longestLineCount = otherLines.maxOfOrNull { it.second.removeColor().length } ?: return this
 
         val dividerLine = "§7${"—".repeat(longestLineCount - 5)}"
         add(Renderable.string(dividerLine))
@@ -290,9 +294,11 @@ object AccessoryOverviewDisplay {
         )
         val clickable = Renderable.clickable(
             render = labelledIcon,
-            onAnyClick = mapOf(), // todo
-            tips = tipCache[this.hashCode()] ?: buildTips().orEmpty().also {
-                tipCache[this.hashCode()] = it
+            onAnyClick = mapOf(
+                LEFT_MOUSE to { ChatUtils.chat("$internalName clicked")}
+            ), // todo
+            tips = tipCache[this@buildRow.hashCode()] ?: buildTips().also {
+                tipCache[this@buildRow.hashCode()] = it
             },
             condition = { AccessoryApi.inAccessoryBag }
         )
