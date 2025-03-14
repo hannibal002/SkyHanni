@@ -15,9 +15,7 @@ object DragNDrop {
 
     private var isInvalidDrop = false
 
-    private const val BUTTON = 0
-
-    private const val BUTTON_MAPPED = BUTTON - 100
+    private const val BUTTON_MAPPED = -100
 
     private val invalidItem = Renderable.itemStack(ItemStack(Blocks.barrier), 1.0)
 
@@ -49,8 +47,7 @@ object DragNDrop {
         condition: () -> Boolean = { true },
     ) = Renderable.clickable(
         display,
-        onClick = { currentDrag = item() },
-        button = BUTTON,
+        onLeftClick = { currentDrag = item() },
         bypassChecks = bypassChecks,
         condition = condition,
     )

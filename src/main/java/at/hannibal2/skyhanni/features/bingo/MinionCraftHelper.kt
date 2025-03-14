@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -65,7 +64,7 @@ object MinionCraftHelper {
         val mainInventory = InventoryUtils.getItemsInOwnInventory()
 
         if (event.isMod(10)) {
-            hasMinionInInventory = mainInventory.map { it.name }.any { isMinionName(it) }
+            hasMinionInInventory = mainInventory.map { it.displayName }.any { isMinionName(it) }
         }
 
         if (event.repeatSeconds(2)) {
@@ -108,7 +107,7 @@ object MinionCraftHelper {
         val otherItems = mutableMapOf<NeuInternalName, Int>()
 
         for (item in mainInventory) {
-            val name = item.name.removeColor()
+            val name = item.displayName.removeColor()
             val rawId = item.getInternalName()
             if (isMinionName(name)) {
                 minions[name] = rawId
@@ -119,19 +118,17 @@ object MinionCraftHelper {
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
         for (item in mainInventory) {
-            val name = item.name.removeColor()
+            val name = item.displayName.removeColor()
+            if (item.hasEnchantments()) continue
             val rawId = item.getInternalName()
+            if (!isMinionName(name)) {
+                if (!allIngredients.contains(rawId)) continue
+                if (!isAllowed(allMinions, rawId)) continue
 
-            if (
-                item.hasEnchantments() ||
-                !isMinionName(name) ||
-                !allIngredients.contains(rawId) ||
-                !isAllowed(allMinions, rawId)
-            ) continue
-
-            val (itemId, multiplier) = NeuItems.getPrimitiveMultiplier(rawId)
-            val old = otherItems.getOrDefault(itemId, 0)
-            otherItems[itemId] = old + item.stackSize * multiplier
+                val (itemId, multiplier) = NeuItems.getPrimitiveMultiplier(rawId)
+                val old = otherItems.getOrDefault(itemId, 0)
+                otherItems[itemId] = old + item.stackSize * multiplier
+            }
         }
 
         FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
@@ -272,7 +269,7 @@ object MinionCraftHelper {
         if (event.inventoryName != "Crafted Minions") return
 
         for ((_, b) in event.inventoryItems) {
-            val name = b.name
+            val name = b.displayName
             if (!name.startsWith("§e")) continue
             val internalName = NeuInternalName.fromItemName("$name I")
                 .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")

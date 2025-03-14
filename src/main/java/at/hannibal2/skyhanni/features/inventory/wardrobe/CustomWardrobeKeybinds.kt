@@ -42,7 +42,9 @@ object CustomWardrobeKeybinds {
 
     private fun handlePress(): Boolean {
         if (!isEnabled()) return false
-        val slots = WardrobeApi.slots.filter { it.isInCurrentPage() }.filterNot { config.onlyFavorites && !it.favorite }
+        val slots = WardrobeApi.slots.filter { it.isInCurrentPage() }
+            .filterNot { config.onlyFavorites && !it.favorite }
+            .filterNot { config.hideEmptySlots && it.armor.all { piece -> piece == null } }
 
         for ((index, key) in keybinds.withIndex()) {
             if (!key.isKeyHeld()) continue

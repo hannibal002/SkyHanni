@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 
 @Suppress("SpreadOperator")
@@ -17,8 +17,8 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     createNewSession: () -> BucketedData,
     getStorage: (ProfileSpecificStorage) -> BucketedData,
     drawDisplay: (BucketedData) -> List<Searchable>,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> BucketedData>,
-) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> BucketedData> = emptyMap(),
+) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
 
     @Deprecated("Use addCoins(bucket, coins) instead", ReplaceWith("addCoins(bucket, coins)"))
     override fun addCoins(amount: Int, command: Boolean) =
@@ -28,6 +28,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         addItem(bucket, SKYBLOCK_COIN, coins)
     }
 
+    // TODO impl in normal item tracker as well
     fun ItemAddEvent.addItemFromEvent() {
         var bucket: E? = null
         modify { data ->
@@ -64,10 +65,10 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             it.addItem(bucket, internalName, amount)
         }
         getSharedTracker()?.let {
-            val totalProp = it.get(DisplayMode.TOTAL).getSelectedBucketItems().getOrPut(internalName) {
+            val totalProp = it.get(DisplayMode.TOTAL).selectedBucketItems.getOrPut(internalName) {
                 ItemTrackerData.TrackedItem()
             }
-            val sessionProp = it.get(DisplayMode.SESSION).getSelectedBucketItems().getOrPut(internalName) {
+            val sessionProp = it.get(DisplayMode.SESSION).selectedBucketItems.getOrPut(internalName) {
                 ItemTrackerData.TrackedItem()
             }
             sessionProp.hidden = totalProp.hidden
@@ -78,18 +79,21 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     fun addBucketSelector(
         lists: MutableList<Searchable>,
         data: BucketedData,
-        sourceStringPrefix: String,
+        sourceLabel: String,
         nullBucketLabel: String = "All",
     ) {
         if (isInventoryOpen()) {
-            lists.addButton(
-                prefix = "§7$sourceStringPrefix: ",
-                getName = data.selectedBucket?.toString() ?: nullBucketLabel,
-                onChange = {
-                    // We need to make sure the selected bucket syncs with the shared tracker
-                    val newBucket: E? = data.selectNextSequentialBucket()
-                    modifyEachMode { it.selectedBucket = newBucket }
+            lists.addNullableButton(
+                label = sourceLabel,
+                current = data.selectedBucket,
+                onChange = { new ->
+                    modifyEachMode {
+                        it.selectedBucket = new
+                    }
+                    update()
                 },
+                universe = data.selectableBuckets,
+                nullLabel = nullBucketLabel,
             )
         }
     }
@@ -107,7 +111,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         data = data,
         filter = filter,
         lists = lists,
-        itemsAccessor = { data.getSelectedBucketItems() },
+        itemsAccessor = { data.selectedBucketItems },
         getCoinName = { item ->
             data.getCoinName(data.selectedBucket, item)
         },

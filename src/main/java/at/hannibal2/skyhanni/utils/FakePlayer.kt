@@ -9,12 +9,12 @@ import net.minecraft.scoreboard.ScorePlayerTeam
 class FakePlayer : EntityOtherPlayerMP(Minecraft.getMinecraft().theWorld, Minecraft.getMinecraft().thePlayer.gameProfile) {
 
     override fun getLocationSkin() =
-        Minecraft.getMinecraft().thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(Minecraft.getMinecraft().thePlayer.uniqueID)
+        Minecraft.getMinecraft().thePlayer?.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(Minecraft.getMinecraft().thePlayer.uniqueID)
 
     override fun getTeam() = object : ScorePlayerTeam(null, null) {
         override fun getNameTagVisibility() = EnumVisible.NEVER
     }
 
     override fun isWearing(part: EnumPlayerModelParts): Boolean =
-        Minecraft.getMinecraft().thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
+        Minecraft.getMinecraft().thePlayer?.isWearing(part) == true && part != EnumPlayerModelParts.CAPE
 }

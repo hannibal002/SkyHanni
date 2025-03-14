@@ -139,14 +139,15 @@ object SeaCreatureTracker {
         }
 
         if (tracker.isInventoryOpen()) {
-            addButton(
-                prefix = "§7Category: ",
-                getName = currentCategory.allLettersFirstUppercase() + " §7(" + amounts[currentCategory] + ")",
+            addButton<String>(
+                label = "Category",
+                current = currentCategory,
+                getName = { it.allLettersFirstUppercase() + " §7(" + amounts[it] + ")" },
                 onChange = {
-                    val id = list.indexOf(currentCategory)
-                    currentCategory = list[(id + 1) % list.size]
+                    currentCategory = it
                     tracker.update()
                 },
+                universe = list,
             )
         }
 

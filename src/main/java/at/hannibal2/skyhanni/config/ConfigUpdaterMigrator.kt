@@ -19,6 +19,7 @@ object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
     val CONFIG_VERSION = "@CONFIG_VERSION@".toInt()
+
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null

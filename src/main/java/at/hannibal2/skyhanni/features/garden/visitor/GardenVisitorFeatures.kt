@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.ItemBuyApi.buy
+import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTip
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
@@ -24,7 +26,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.blockReason
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -37,13 +38,11 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -219,23 +218,18 @@ object GardenVisitorFeatures {
             list.add(itemStack)
 
             list.add(
-                Renderable.optionalLink(
+                Renderable.clickable(
                     "$name §ex${amount.addSeparators()}",
-                    {
+                    tips = internalName.createBuyTip(),
+                    onLeftClick = {
+                        if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickable
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
-                            if (internalName.isBazaarItem()) {
-                                BazaarApi.searchForBazaarItem(name, amount)
-                            } else if (internalName.isAuctionHouseItem()) {
-                                HypixelCommands.auctionSearch(name.removeColor())
-                            } else {
-                                val itemName = internalName.itemName
-                                ChatUtils.chat("Could not find $itemName§e on AH or BZ!", replaceSameMessage = true)
-                            }
+                            internalName.buy(amount)
                         }
                     },
-                ) { GardenApi.inGarden() && !NeuItems.neuHasFocus() },
+                ),
             )
 
             if (config.shoppingList.showPrice) {
@@ -396,7 +390,7 @@ object GardenVisitorFeatures {
     }
 
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.name != "§aAccept Offer") return
+        if (itemStack.displayName != "§aAccept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)

@@ -13,12 +13,12 @@ import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -133,8 +133,7 @@ object AnitaMedalProfit {
 
     private fun MutableList<String>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
         for ((internalName, amount) in additionalMaterials) {
-            val pricePer = internalName.getPrice() * amount
-            add(" " + internalName.itemName + " §8${amount}x §7(§6${pricePer.shortFormat()}§7)")
+            add(internalName.getPriceName(amount))
         }
     }
 
@@ -149,7 +148,7 @@ object AnitaMedalProfit {
     }
 
     private fun getItemName(item: ItemStack): String {
-        val name = item.name
+        val name = item.displayName
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
             item.itemName
@@ -206,7 +205,7 @@ object AnitaMedalProfit {
                     ErrorManager.logErrorStateWithData(
                         "Error in Anita Medal Contest", "Could not read item amount",
                         "rawItemName" to rawItemName,
-                        "name" to item.name,
+                        "name" to item.displayName,
                         "lore" to lore,
                     )
                     continue

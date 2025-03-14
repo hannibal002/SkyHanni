@@ -16,18 +16,21 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoinWithBrackets
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getAttributeFromShard
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -35,9 +38,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.removePrefix
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.intPow
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -168,7 +169,7 @@ object EstimatedItemValueCalculator {
             return 0.0
         }
         if (attributes.size != 2) return 0.0
-        val basePrice = internalName.getPrice()
+        val basePrice = internalNameString.toInternalName().getPrice()
         var subTotal = 0.0
         val combo = ("$internalNameString+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
         val comboPrice = combo.toInternalName().getPriceOrNull()
@@ -176,7 +177,7 @@ object EstimatedItemValueCalculator {
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
             val gray = comboPrice <= basePrice || useless
-            list.add("§7Attribute Combo: ${comboPrice.formatWithBrackets(gray)}")
+            list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(gray)}")
             if (!useless) {
                 subTotal += addAttributePrice(comboPrice, basePrice)
             }
@@ -200,7 +201,7 @@ object EstimatedItemValueCalculator {
             list.add(
                 "  $nameColor${
                     displayName.allLettersFirstUppercase()
-                } ${attr.second}§7: ${price?.format(gray) ?: "Unknown"}",
+                } ${attr.second}§7: ${price?.formatCoin(gray) ?: "Unknown"}",
             )
         }
         // Adding 0.1 so that we always show the estimated item value overlay
@@ -247,8 +248,8 @@ object EstimatedItemValueCalculator {
         val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
 
         list.add("§7Reforge: §9${reforge.name}")
-        list.add(" §7Stone: $reforgeStoneName ${reforgeStonePrice.formatWithBrackets()}")
-        list.add(" §7Apply cost: ${applyCost.formatWithBrackets()}")
+        list.add(" §7Stone: $reforgeStoneName ${reforgeStonePrice.formatCoinWithBrackets()}")
+        list.add(" §7Apply cost: ${applyCost.formatCoinWithBrackets()}")
         return reforgeStonePrice + applyCost
     }
 
@@ -267,11 +268,11 @@ object EstimatedItemValueCalculator {
                 val oneBelow = itemRarity.oneBelow(logError = false)
                 if (oneBelow == null) {
                     ErrorManager.logErrorStateWithData(
-                        "Wrong item rarity detected in estimated item value for item ${stack.name}",
+                        "Wrong item rarity detected in estimated item value for item ${stack.displayName}",
                         "Recombobulated item is common",
                         "internal name" to stack.getInternalName(),
                         "itemRarity" to itemRarity,
-                        "item name" to stack.name,
+                        "item name" to stack.displayName,
                         "item nbt" to stack.readNbtDump(),
                     )
                     return null
@@ -282,12 +283,12 @@ object EstimatedItemValueCalculator {
 
         return reforgeCosts[itemRarity]?.toInt() ?: run {
             ErrorManager.logErrorStateWithData(
-                "Could not calculate reforge cost for item ${stack.name}",
+                "Could not calculate reforge cost for item ${stack.displayName}",
                 "Item not in NEU repo reforge cost",
                 "reforgeCosts" to reforgeCosts,
                 "itemRarity" to itemRarity,
                 "internal name" to stack.getInternalName(),
-                "item name" to stack.name,
+                "item name" to stack.displayName,
                 "reforgeStone" to reforgeStone,
                 "item nbt" to stack.readNbtDump(),
             )
@@ -352,14 +353,14 @@ object EstimatedItemValueCalculator {
 
     private fun MutableList<String>.formatHaving(label: String, internalName: NeuInternalName): Double {
         val price = internalName.getPrice()
-        add("§7$label: §a§l✔ ${price.formatWithBrackets()}")
+        add("§7$label: §a§l✔ ${price.formatCoinWithBrackets()}")
         return price
     }
 
     private fun addEtherwarp(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasEtherwarp()) return 0.0
         val price = ETHERWARP_CONDUIT.getPrice() + ETHERWARP_MERGER.getPrice()
-        list.add("§7Etherwarp: §a§l✔ ${price.formatWithBrackets()}")
+        list.add("§7Etherwarp: §a§l✔ ${price.formatCoinWithBrackets()}")
         return price
     }
 
@@ -480,7 +481,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun formatProgress(label: String, have: Int, max: Int, price: Number): String {
-        return "§7$label: §e$have§7/§e$max ${price.formatWithBrackets()}"
+        return "§7$label: §e$have§7/§e$max ${price.formatCoinWithBrackets()}"
     }
 
     private fun addStars(stack: ItemStack, list: MutableList<String>): Double {
@@ -591,7 +592,7 @@ object EstimatedItemValueCalculator {
 
         val (totalPrice, names) = getTotalAndNames(drillUpgrades)
         if (names.isNotEmpty()) {
-            list.add("§7Drill upgrades: " + totalPrice.format())
+            list.add("§7Drill upgrades: " + totalPrice.formatCoin())
             list += names
         }
         return totalPrice
@@ -602,7 +603,7 @@ object EstimatedItemValueCalculator {
 
         val (totalPrice, names) = getTotalAndNames(abilityScrolls)
         if (names.isNotEmpty()) {
-            list.add("§7Ability Scrolls: " + totalPrice.format())
+            list.add("§7Ability Scrolls: " + totalPrice.formatCoin())
             list += names
         }
         return totalPrice
@@ -613,7 +614,7 @@ object EstimatedItemValueCalculator {
 
         val enchantmentsCap: Int = config.enchantmentsCap.get()
         if (names.isEmpty()) return 0.0
-        list.add("§7Enchantments: " + totalPrice.format())
+        list.add("§7Enchantments: " + totalPrice.formatCoin())
         var i = 0
         for (name in names) {
             if (i == enchantmentsCap) {
@@ -703,7 +704,7 @@ object EstimatedItemValueCalculator {
 
         val (totalPrice, names) = getTotalAndNames(items)
         if (names.isNotEmpty()) {
-            list.add("§7Gemstones Applied: " + totalPrice.format())
+            list.add("§7Gemstones Applied: " + totalPrice.formatCoin())
             list += names
         }
         return totalPrice
@@ -738,7 +739,7 @@ object EstimatedItemValueCalculator {
         if (slotNames.isEmpty()) return 0.0
 
         val (totalPrice, names) = getTotalAndNames(items)
-        list.add("§7Gemstone Slot Unlock Cost: " + totalPrice.format())
+        list.add("§7Gemstone Slot Unlock Cost: " + totalPrice.formatCoin())
 
         list += names
 
@@ -763,34 +764,13 @@ object EstimatedItemValueCalculator {
             val price = internalName.getPriceOrNull()
             if (price != null) {
                 totalPrice += price * amount.toDouble()
-                map[internalName.getPriceName(amount)] = price
+                map[internalName.getPriceName(amount, internalName.getPrice())] = price
             } else {
                 val name = internalName.getNumberedName(amount)
                 map[" $name §cUnknown price!"] = Double.MAX_VALUE
             }
         }
         return totalPrice to map.sortedDesc().keys.toList()
-    }
-
-    private fun NeuInternalName.getPriceName(amount: Number): String {
-        val price = getPrice() * amount.toDouble()
-        if (this == SKYBLOCK_COIN) return " ${price.format()} coins"
-
-        return " ${getNumberedName(amount)} ${price.formatWithBrackets()}"
-    }
-
-    private fun NeuInternalName.getNumberedName(amount: Number): String {
-        val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
-        return "$prefix§r$itemName"
-    }
-
-    private fun Number.formatWithBrackets(gray: Boolean = false): String {
-        return "§7(" + format(gray) + "§7)"
-    }
-
-    private fun Number.format(gray: Boolean = false): String {
-        val color = if (gray) "§7" else "§6"
-        return color + shortFormat()
     }
 
     private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
@@ -821,7 +801,7 @@ object EstimatedItemValueCalculator {
         val displayName = name ?: "§c${internalName.asString()}"
         val gray = shouldIgnorePrice.get()
 
-        list.add("§7$label: $displayName " + price.formatWithBrackets(gray))
+        list.add("§7$label: $displayName " + price.formatCoinWithBrackets(gray))
         if (name == null) {
             list.add("   §8(Not yet in NEU Repo)")
         }
@@ -835,7 +815,7 @@ object EstimatedItemValueCalculator {
 
         val price = internalName.getPrice()
         val name = internalName.itemName
-        list.add("§7Enrichment: $name ${price.formatWithBrackets()}")
+        list.add("§7Enrichment: $name ${price.formatCoinWithBrackets()}")
         return price
     }
 
@@ -846,7 +826,7 @@ object EstimatedItemValueCalculator {
             val price = it.getAttributePrice()
             if (price != null) {
                 val name = it.getAttributeName()
-                list.add("§7Base item: $name ${price.formatWithBrackets()}")
+                list.add("§7Base item: $name ${price.formatCoinWithBrackets()}")
                 return price
             }
         }
@@ -873,7 +853,7 @@ object EstimatedItemValueCalculator {
             return 0.0
         }
 
-        list.add("§7Base item: $name ${price.formatWithBrackets()}")
+        list.add("§7Base item: $name ${price.formatCoinWithBrackets()}")
         return price
     }
 
@@ -892,11 +872,11 @@ object EstimatedItemValueCalculator {
         val internalName = getInternalName()
         if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
             ErrorManager.logErrorStateWithData(
-                "Could not find gemstone slot price for $name",
+                "Could not find gemstone slot price for $displayName",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
-                "item name" to name,
+                "item name" to displayName,
                 "item nbt" to readNbtDump(),
             )
             return null

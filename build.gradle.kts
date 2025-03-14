@@ -27,7 +27,7 @@ plugins {
     java
     id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
-    id("dev.deftu.gradle.preprocess")
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
@@ -47,12 +47,6 @@ java {
     // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
     // IntelliJ run configuration.
     toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
-}
-// We need gradle > 2.2.4 (dependency provided) for the toolchains to work.
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "com.google.code.gson" && requested.name == "gson") useVersion("2.11.0")
-    }
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
@@ -134,15 +128,16 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.prBody = project.findProperty("prBody") as String
 }
 
-file("shots.txt")
-    .takeIf(File::exists)
-    ?.readText()
-    ?.lines()
-    ?.let(ShotParser()::parse)
-    ?.let(::Shots)
-    ?.let {
-        loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
-    }
+// Disabled because it breaks mixins with the minecraft dev plugin
+// file("shots.txt")
+//     .takeIf(File::exists)
+//     ?.readText()
+//     ?.lines()
+//     ?.let(ShotParser()::parse)
+//     ?.let(::Shots)
+//     ?.let {
+//         loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
+//     }
 
 dependencies {
     minecraft("com.mojang:minecraft:${target.minecraftVersion.versionName}")
@@ -166,7 +161,7 @@ dependencies {
 
     headlessLwjgl(libs.headlessLwjgl)
 
-    compileOnly(ksp(project(":annotation-processors"))!!)
+    ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
     val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
 
@@ -175,7 +170,7 @@ dependencies {
             isTransitive = false
         }
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
-        annotationProcessor("com.google.code.gson:gson:2.11.0")
+        annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
     } else if (target == ProjectTarget.BRIDGE116FABRIC) {
         modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
@@ -204,7 +199,6 @@ dependencies {
         isTransitive = false
     }
 
-    shadowModImpl(libs.gson)
     shadowModImpl(libs.moulconfig)
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
@@ -353,7 +347,6 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
-    relocate("com.google.gson", "at.hannibal2.skyhanni.deps.gson")
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
@@ -392,7 +385,6 @@ preprocess {
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
-    patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
 
 blossom {
