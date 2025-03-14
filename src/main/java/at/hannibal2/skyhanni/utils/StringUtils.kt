@@ -2,24 +2,22 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
 import java.util.NavigableMap
 import java.util.UUID
-import java.util.function.Predicate
 import java.util.regex.Matcher
 
 object StringUtils {
@@ -200,7 +198,7 @@ object StringUtils {
     fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) this.toInt().toString() else this.toString()
 
     fun String.splitLines(width: Int): String = GuiUtilRenderComponents.splitText(
-        ChatComponentText(this),
+        asComponent(),
         width,
         Minecraft.getMinecraft().fontRendererObj,
         false,
@@ -270,36 +268,6 @@ object StringUtils {
         }
     }
 
-    // recursively goes through the chat component until an action is completed
-    fun modifyFirstChatComponent(chatComponent: IChatComponent, action: Predicate<IChatComponent>): Boolean {
-        if (action.test(chatComponent)) {
-            return true
-        }
-        for (sibling in chatComponent.siblings) {
-            if (modifyFirstChatComponent(sibling, action)) {
-                return true
-            }
-        }
-        return false
-    }
-
-    // replaces a word without breaking any chat components
-    fun replaceFirstChatText(chatComponent: IChatComponent, toReplace: String, replacement: String): IChatComponent {
-        modifyFirstChatComponent(chatComponent) { component ->
-            if (component is ChatComponentText) {
-                component as AccessorChatComponentText
-                val componentText = component.text_skyhanni()
-                if (componentText.contains(toReplace)) {
-                    component.setText_skyhanni(componentText.replace(toReplace, replacement))
-                    return@modifyFirstChatComponent true
-                }
-                return@modifyFirstChatComponent false
-            }
-            return@modifyFirstChatComponent false
-        }
-        return chatComponent
-    }
-
     fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
 
     fun String.getPlayerNameAndRankFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("rankedName")
@@ -344,10 +312,10 @@ object StringUtils {
     fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
 
     fun replaceIfNeeded(
-        original: ChatComponentText,
+        original: IChatComponent,
         newText: String,
-    ): ChatComponentText? {
-        return replaceIfNeeded(original, ChatComponentText(newText))
+    ): IChatComponent? {
+        return replaceIfNeeded(original, newText.asComponent())
     }
 
     private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
@@ -445,7 +413,7 @@ object StringUtils {
 
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
-        chatComponent = ChatComponentText(new)
+        chatComponent = new.asComponent()
         if (clickEvents.size == 1) chatComponent.chatStyle.chatClickEvent = clickEvents.first()
         if (hoverEvents.size == 1) chatComponent.chatStyle.chatHoverEvent = hoverEvents.first()
     }
@@ -494,18 +462,12 @@ object StringUtils {
     }
 
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
-        val text = ChatComponentText(this)
-        text.chatStyle = original.sampleStyleAtStart()
-        return text
+        return asComponent { chatStyle = original.sampleStyleAtStart() }
     }
 
     fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
-        val text = ChatComponentText(this)
-        text.chatStyle = original.chatStyle
-        return text
+        return asComponent { chatStyle = original.chatStyle }
     }
-
-    fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
 
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 

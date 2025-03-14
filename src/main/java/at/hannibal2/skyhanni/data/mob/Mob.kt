@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.getWholeInventory
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -120,7 +120,7 @@ class Mob(
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getWholeInventory().isNullOrEmpty()
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isNullOrEmpty()
 
     private var highlightColor: Color? = null
     private var condition: () -> Boolean = { true }

@@ -11,12 +11,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
-import at.hannibal2.skyhanni.utils.compat.getNameAsString
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
@@ -61,7 +60,7 @@ object EntityUtils {
         contains: String,
         radius: Double = 3.0,
     ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
-        it.getNameAsString().contains(contains)
+        it.name.contains(contains)
     }
 
     @Deprecated("Use Mob Detection Instead")
@@ -83,7 +82,7 @@ object EntityUtils {
     ): List<EntityArmorStand> {
         val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
-            val result = it.getNameAsString().contains(contains)
+            val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
                 LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
@@ -147,7 +146,7 @@ object EntityUtils {
 
     @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
-        val inventory = this.getWholeInventory() ?: return false
+        val inventory = this.getAllEquipment() ?: return false
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
@@ -237,7 +236,7 @@ object EntityUtils {
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.getNameAsString().removeColor()
+    fun Entity.cleanName() = this.name.removeColor()
 }
 
 //#if FORGE
