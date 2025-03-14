@@ -47,9 +47,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.DyeCompat
+import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
@@ -254,7 +255,7 @@ object HoppityCollectionStats {
     )
 
     private fun missingRabbitStackNeedsFix(stack: ItemStack): Boolean =
-        stack.item == Items.dye && (stack.metadata == 8 || stack.getLore().any { it.lowercase().contains("milestone") })
+        stack.isDye() && (stack.isDye(8) || stack.getLore().any { it.lowercase().contains("milestone") })
 
     private val replacementCache: MutableMap<String, ItemStack> = mutableMapOf()
 
@@ -314,8 +315,7 @@ object HoppityCollectionStats {
         event.inventoryItems.values.filter { it.hasDisplayName() && missingRabbitStackNeedsFix(it) }.forEach { stack ->
             val rarity = HoppityApi.rarityByRabbit(stack.displayName)
             // Add NBT for the dye color itself
-            val newItemStack = if (collectionConfig.rarityDyeRecolor) ItemStack(
-                Items.dye, 1,
+            val newItemStack = if (collectionConfig.rarityDyeRecolor) DyeCompat.createDyeStack(
                 when (rarity) {
                     LorenzRarity.COMMON -> 7 // Light gray dye
                     LorenzRarity.UNCOMMON -> 10 // Lime dye
@@ -327,7 +327,8 @@ object HoppityCollectionStats {
                     LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
                     else -> return
                 },
-            ) else stack
+            )
+            else stack
 
             newItemStack.setLore(buildDescriptiveMilestoneLore(stack))
             newItemStack.setStackDisplayName(stack.displayName)
@@ -549,7 +550,7 @@ object HoppityCollectionStats {
                         if (indeterminateResidents > 0) "???"
                         else foundResidents.toString()
                     "$islandName: $color$foundFormat§7/§a$totalResidents"
-                }
+                },
             )
             if (indeterminateResidentRabbitsCount > 0) {
                 add("")

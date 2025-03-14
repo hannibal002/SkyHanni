@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
@@ -200,7 +199,7 @@ object NeuItems {
                 lastWarn = SimpleTimeMark.now()
                 println(" ")
                 println("item: $item")
-                println("name: ${item.name}")
+                println("name: ${item.displayName}")
                 println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
                 println(" ")
                 ChatUtils.debug("rendering an item has failed.")
