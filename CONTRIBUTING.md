@@ -306,6 +306,8 @@ To compile the mod, simply run `./gradlew build` (without a version number), and
 version up to 1.21. By default, only a few files will be compiled, these files can be found in the `versions/<version>/buildpaths.txt` file.
 If you want to compile more files, you can add them to this file or if you want to compile all files you can temporarily remove the file.
 
+> ⚠️ **Notice:** For this to work you **Must** have the `skyhanni.multi-version` set too `compile` in your `.gradle/private.properties` file.
+
 If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in intellij. This will compile the 1.21 version and run it.
 Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
 
