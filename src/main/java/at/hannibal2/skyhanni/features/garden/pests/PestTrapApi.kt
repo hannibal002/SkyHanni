@@ -4,13 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -25,37 +24,30 @@ object PestTrapApi {
     // Todo: Use these to yell at the user to enable the widget if it's disabled
     private val widgetEnabledAndVisible: TimeLimitedCache<TabWidget, Boolean> = baseWidgetStatus()
     private val widgetErrors: MutableMap<TabWidget, Long> = enumMapOf()
+
     private val tabListPestTrapsPattern = TabWidget.PEST_TRAPS.pattern
     private val tabListFullTrapsPattern = TabWidget.FULL_TRAPS.pattern
     private val tabListNoBaitPattern = TabWidget.NO_BAIT.pattern
 
+    private var lastTitleHash: Int = 0
+    private var lastNoBaitHash: Int = 0
+    private var lastFullHash: Int = 0
     private var trapsPlaced: Int = 0
     private var anyFull: Boolean = false
     private var anyNoBait: Boolean = false
-    private var lastTabHash: Int = 0
-    private var lastTitleHash: Int = 0
-    private var lastFullHash: Int = 0
-    private var lastNoBaitHash: Int = 0
     private var timeEnteredGarden: SimpleTimeMark? = null
     var MAX_TRAPS = 3
         private set
 
-    private fun releaseCache() {
-        lastTabHash = 0
-        lastTitleHash = 0
-        lastFullHash = 0
-        lastNoBaitHash = 0
-    }
-
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.PEST_TRAPS)) return
         val timeEnteredGarden = timeEnteredGarden ?: return
         if (timeEnteredGarden.passedSince() < 5.seconds) return
-        lastTabHash = event.tabList.hashCode().takeIf { it != lastTabHash } ?: return
 
-        trapsPlaced = event.tabList.map { it.getPlacedTraps() }.firstOrNull { it != trapsPlaced } ?: trapsPlaced
-        anyFull = event.tabList.map { it.anyFull() }.firstOrNull { it != anyFull } ?: anyFull
-        anyNoBait = event.tabList.map { it.anyNoBait() }.firstOrNull { it != anyNoBait } ?: anyNoBait
+        trapsPlaced = event.lines.map { it.getPlacedTraps() }.firstOrNull { it != trapsPlaced } ?: trapsPlaced
+        anyFull = event.lines.map { it.anyFull() }.firstOrNull { it != anyFull } ?: anyFull
+        anyNoBait = event.lines.map { it.anyNoBait() }.firstOrNull { it != anyNoBait } ?: anyNoBait
 
         PestTrapDataEvent(
             trapsPlaced = trapsPlaced,
@@ -64,9 +56,9 @@ object PestTrapApi {
         ).post()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        DelayedRun.runDelayed(5.seconds) { releaseCache() }
+        if (event.newIsland != IslandType.GARDEN) return
         timeEnteredGarden = SimpleTimeMark.now()
     }
 
