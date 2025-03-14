@@ -514,12 +514,12 @@ object ItemUtils {
     fun NeuInternalName.isRune(): Boolean = contains("_RUNE;")
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val ItemStack.repoItemName: String
+    val ItemStack.itemName: String
         get() {
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
             }
-            return getInternalNameOrNull()?.itemName ?: "<null>"
+            return getInternalNameOrNull()?.repoItemName ?: "<null>"
         }
 
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
@@ -529,14 +529,14 @@ object ItemUtils {
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val ItemStack.itemNameWithoutColor: String get() = repoItemName.removeColor()
+    val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val NeuInternalName.itemName: String
+    val NeuInternalName.repoItemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val NeuInternalName.itemNameWithoutColor: String get() = itemName.removeColor()
+    val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     val NeuInternalName.readableInternalName: String
         get() = asString().replace("_", " ").lowercase()
@@ -700,7 +700,7 @@ object ItemUtils {
 
     private fun MutableList<ChatComponentText>.formatTestItem(internalName: NeuInternalName, price: Double) {
         val priceColor = if (price > 0) "§6" else "§7"
-        val name = internalName.itemName
+        val name = internalName.repoItemName
         val priceFormat = "$priceColor${price.shortFormat()}"
         val componentText = " §8- §r$name $priceFormat".asComponent()
         componentText.onClick {
@@ -770,7 +770,7 @@ object ItemUtils {
 
     fun NeuInternalName.getNumberedName(amount: Number): String {
         val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
-        return "$prefix§r$itemName"
+        return "$prefix§r$repoItemName"
     }
 
     // Taken from NEU

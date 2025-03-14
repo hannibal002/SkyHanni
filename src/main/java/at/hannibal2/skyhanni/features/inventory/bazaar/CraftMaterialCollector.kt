@@ -46,7 +46,7 @@ object CraftMaterialCollector {
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
 
-        val recipeName = items[25]?.repoItemName ?: return
+        val recipeName = items[25]?.itemName ?: return
         showRecipe(calculateMaterialsNeeded(event.inventoryItemsPrimitive), recipeName)
     }
 
@@ -61,7 +61,7 @@ object CraftMaterialCollector {
             for (item in recipeMaterials) {
                 val material = item.internalName
                 val amount = item.amount
-                var text = "§8${amount.addSeparators()}x " + material.itemName
+                var text = "§8${amount.addSeparators()}x " + material.repoItemName
                 if (material.isBazaarItem() || material.isAuctionHouseItem()) {
                     neededMaterials.add(item)
                     text += " §6${(material.getPrice() * amount).shortFormat()}"
@@ -104,7 +104,7 @@ object CraftMaterialCollector {
             add(Renderable.string("§7Buy items:"))
             for ((material, amount) in neededMaterials) {
                 val priceMultiplier = amount * multiplier
-                val itemName = material.itemName
+                val itemName = material.repoItemName
                 val text = "§8${priceMultiplier.addSeparators()}x " + itemName + " §6${
                     (material.getPrice() * priceMultiplier).shortFormat(false)
                 }"

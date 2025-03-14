@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -39,7 +40,7 @@ object SlayerApi {
     fun getItemNameAndPrice(internalName: NeuInternalName, amount: Int): Pair<String, Double> =
         nameCache.getOrPut(internalName to amount) {
             val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
-            val displayName = internalName.itemName
+            val displayName = internalName.repoItemName
 
             val price = internalName.getPrice()
             val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0

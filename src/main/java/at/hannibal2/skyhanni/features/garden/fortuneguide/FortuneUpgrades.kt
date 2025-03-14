@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
@@ -79,7 +80,7 @@ object FortuneUpgrades {
             val nextTalisman = CropAccessory.entries[currentTalismanTier + 1]
             genericUpgrades.add(
                 FortuneUpgrade(
-                    "§7Upgrade your talisman to ${nextTalisman.internalName?.itemName}",
+                    "§7Upgrade your talisman to ${nextTalisman.internalName?.repoItemName}",
                     null, nextTalisman.upgradeCost?.first!!, nextTalisman.upgradeCost.second, 10.0,
                 ),
             )

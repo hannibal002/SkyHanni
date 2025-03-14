@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -60,9 +59,9 @@ object FishyTreatProfit {
                 readItem(slot, item, table)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
-                    e, "Error in FishyTreatProfit while reading item '${item.repoItemName}'",
+                    e, "Error in FishyTreatProfit while reading item '${item.itemName}'",
                     "item" to item,
-                    "name" to item.repoItemName,
+                    "name" to item.itemName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                 )
             }
@@ -147,7 +146,7 @@ object FishyTreatProfit {
         val name = item.displayName
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
-            item.repoItemName
+            item.itemName
         } else name
     }
 

@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -206,7 +207,7 @@ object SlayerRngMeterDisplay {
             storage.itemGoal = ""
             storage.goalNeeded = -1
         } else {
-            storage.itemGoal = internalName.itemName
+            storage.itemGoal = internalName.repoItemName
             val currentSlayer = getCurrentSlayer()
             storage.goalNeeded = rngScore[currentSlayer]?.get(internalName) ?: run {
                 ErrorManager.logErrorStateWithData(
