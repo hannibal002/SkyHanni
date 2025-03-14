@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
@@ -67,7 +67,7 @@ open class Enchant : Comparable<Enchant> {
 
         val itemCategory = itemStack?.getItemCategoryOrNull()
         val internalName = itemStack?.getInternalNameOrNull()
-        val itemName = internalName?.itemName?.removeColor()
+        val itemName = internalName?.repoItemName?.removeColor()
 
         if (this.nbtName == "efficiency") {
             // If the item is a Stonk, or a non-mining tool with Efficiency 5 (whilst not being a Promising Shovel),
