@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.prefix
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.chat.TextHelper.url
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.ChatComponentText

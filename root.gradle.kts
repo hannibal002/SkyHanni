@@ -2,7 +2,7 @@ import at.skyhanni.sharedvariables.ProjectTarget
 import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "487f8f1a46"
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "528a70e6c1"
     id("net.kyori.blossom") version "1.3.2" apply false
     id("gg.essential.loom") version "1.6.+" apply false
     kotlin("jvm") version "2.0.0" apply false
