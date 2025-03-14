@@ -243,7 +243,9 @@ object AccessoryOverviewDisplay {
         }
 
         sortedList.forEach { missingAcc ->
-            missingTable.addRow(missingAcc.buildRow(), missingAcc.internalName.itemName)
+            missingAcc.buildRow()?.let {
+                missingTable.addRow(it, missingAcc.internalName.itemName)
+            }
         }
 
         add(missingTable.renderable)
@@ -278,28 +280,20 @@ object AccessoryOverviewDisplay {
         add(Renderable.string(dividerLine))
     }
 
-    private fun Accessory.buildRow() = buildList {
-        val itemStack = this@buildRow.internalName.getItemStackOrNull() ?: run {
-            ChatUtils.chat("Item stack for $internalName is null")
-            return@buildList
-        }
-        val itemStackRender = Renderable.itemStack(
-            itemStack,
-            scale = 0.5,
-        )
-        val displayName = itemStack.displayName
-        val accessoryTips = tipCache[this.hashCode()] ?: buildTips().orEmpty().also {
-            tipCache[this.hashCode()] = it
-        }
+    private fun Accessory.buildRow(): List<Renderable>? = buildList {
+        val itemStack = this@buildRow.internalName.getItemStackOrNull() ?: return null
         val labelledIcon = Renderable.horizontalContainer(
             listOf(
-                itemStackRender,
-                Renderable.hoverTips(displayName, accessoryTips),
+                Renderable.itemStack(itemStack, scale = 0.5),
+                Renderable.string(itemStack.displayName),
             ),
         )
         val clickable = Renderable.clickable(
             render = labelledIcon,
             onAnyClick = mapOf(), // todo
+            tips = tipCache[this.hashCode()] ?: buildTips().orEmpty().also {
+                tipCache[this.hashCode()] = it
+            },
             condition = { AccessoryApi.inAccessoryBag }
         )
         add(clickable)
