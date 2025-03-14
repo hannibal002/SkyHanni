@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.message
+import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
 import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatComponentText
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -113,9 +112,7 @@ object RareDropMessages {
             if (start.endsWith("a ") && rarityName.first().isVowel())
                 start = start.substring(0..start.length - 2) + "n "
 
-            event.chatComponent = ChatComponentText(
-                "$start§$rarityColor§l$rarityName §$rarityColor$petName$end",
-            )
+            event.chatComponent = "$start§$rarityColor§l$rarityName §$rarityColor$petName$end".asComponent()
         }
     }
 
@@ -132,7 +129,7 @@ object RareDropMessages {
         var anyRecentMessage = false
         for (line in ChatUtils.chatLines) {
             if (line.passedSinceSent() > 1.seconds) break
-            val message = line.message
+            val message = line.chatMessage
             if (itemName in message) return // the message already has the enchant name
             if (enchantedBookPattern.matches(message)) {
                 anyRecentMessage = true
@@ -144,7 +141,7 @@ object RareDropMessages {
             ChatUtils.editFirstMessage(
                 component = { it.formattedText.replace("Enchanted Book", internalName.repoItemName).asComponent() },
                 "enchanted book",
-                predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) },
+                predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.chatMessage) },
             )
         }
 

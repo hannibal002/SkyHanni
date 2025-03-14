@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraft.util.ChatComponentText
 
 object SignUtils {
     private var pasteLastClicked = false
@@ -18,7 +18,7 @@ object SignUtils {
     fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
-        gui.tileSign.signText[line] = ChatComponentText(text)
+        gui.tileSign.signText[line] = text.asComponent()
     }
 
     private fun addTextIntoSign(addedText: String) {
@@ -27,7 +27,7 @@ object SignUtils {
         val lines = gui.tileSign.signText
         val index = gui.editLine
         val text = lines[index].unformattedText + addedText
-        lines[index] = ChatComponentText(text.capAtMinecraftLength(91))
+        lines[index] = text.capAtMinecraftLength(91).asComponent()
     }
 
     fun checkDeleting(gui: GuiScreen?) {

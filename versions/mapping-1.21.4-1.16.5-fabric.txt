@@ -1,4 +1,9 @@
 
+net.minecraft.client.gui.hud.ChatHudLine getContent() getChatComponent()
+
+net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.network.ClientPlayerEntity
+net.minecraft.client.network.ClientPlayerEntity networkHandler.sendChatMessage() sendChatMessage()
+
 net.minecraft.entity.Entity getEquippedItems() getItemsEquipped()
 net.minecraft.entity.Entity getId() getEntityId()
 
