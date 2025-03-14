@@ -19,7 +19,7 @@ fun IChatComponent.getDirectlyContainedText() =
 //$$        (this.content as? PlainTextContent)?.string().orEmpty()
 //#endif
 
-fun IChatComponent?.getFormattedTextCompat(): String =
+fun IChatComponent?.formattedTextCompat(): String =
 //#if MC < 1.16
     this?.formattedText.orEmpty()
 //#else
@@ -52,4 +52,4 @@ fun IChatComponent?.getFormattedTextCompat(): String =
 //$$}
 //#endif
 
-fun String.getFormattedTextCompat() = this
+fun String.formattedTextCompat() = this

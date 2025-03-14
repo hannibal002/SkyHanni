@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni
 
 import at.hannibal2.skyhanni.SkyHanniMod.modules
+import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
@@ -18,6 +19,7 @@ class SkyHanniModLoader {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
+        HotswapSupport.load()
         SkyHanniMod.preInit()
         loadedClasses.clear()
     }
