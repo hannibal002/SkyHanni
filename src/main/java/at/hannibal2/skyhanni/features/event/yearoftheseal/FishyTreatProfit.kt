@@ -16,8 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -56,14 +55,14 @@ object FishyTreatProfit {
             // ignore the last line of menu items
             if (slot > 44) continue
             // background items
-            if (item.name == " ") continue
+            if (item.displayName == " ") continue
             try {
                 readItem(slot, item, table)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
-                    e, "Error in FishyTreatProfit while reading item '${item.itemName}'",
+                    e, "Error in FishyTreatProfit while reading item '${item.repoItemName}'",
                     "item" to item,
-                    "name" to item.itemName,
+                    "name" to item.repoItemName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                 )
             }
@@ -145,10 +144,10 @@ object FishyTreatProfit {
     }
 
     private fun getItemName(item: ItemStack): String {
-        val name = item.name
+        val name = item.displayName
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
-            item.itemName
+            item.repoItemName
         } else name
     }
 
@@ -194,7 +193,7 @@ object FishyTreatProfit {
                     ErrorManager.logErrorStateWithData(
                         "Error in FishyTreat Profit", "Could not read item amount",
                         "rawItemName" to rawItemName,
-                        "name" to item.name,
+                        "name" to item.displayName,
                         "lore" to lore,
                     )
                     continue

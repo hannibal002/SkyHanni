@@ -16,8 +16,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -122,7 +121,7 @@ object OwnInventoryData {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
 
-        val itemName = event.item?.name ?: return
+        val itemName = event.item?.displayName ?: return
         checkAHMovements(itemName)
     }
 
@@ -175,7 +174,7 @@ object OwnInventoryData {
     fun onChat(event: SkyHanniChatEvent) {
         sackToInventoryChatPattern.matchMatcher(event.message) {
             val name = group("name")
-            ignoreItem(500.milliseconds) { it.itemName.contains(name) }
+            ignoreItem(500.milliseconds) { it.repoItemName.contains(name) }
         }
     }
 

@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -222,7 +222,7 @@ object TrophyFishDisplay {
     ) = trophyFishes.entries.sortedBy { it.value[rarity] ?: 0 }
 
     private fun getItemName(rawName: String): String {
-        val name = getInternalName(rawName).itemName
+        val name = getInternalName(rawName).repoItemName
         return name.split(" ").dropLast(1).joinToString(" ")
     }
 

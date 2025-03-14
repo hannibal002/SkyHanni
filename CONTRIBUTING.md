@@ -282,6 +282,7 @@ that can be slowly worked on over a long span of time.
 ### Set Up
 
 The modern version variants can be set using `skyhanni.multi-version` in `.gradle/private.properties` to three levels.
+You will have to create this file yourself, for example if you want to set it to compile the file should contain `skyhanni.multi-version=compile` 
 
 `off` completely disables any preprocessor action or alternative versions. There will be only one project (although still at the `:1.8.9`
 subproject path), and alternative version sources will not be generated (although old generated sources **will not be deleted**). To make
@@ -298,6 +299,17 @@ specifically compile 1.8.9 using `./gradlew :1.8.9:build`. This does not affect 
 `compile` enables compilation for the `:1.21` subproject. This means that a `build` or `assemble` task will try (and fail) to compile a
 1.21 (as well as 1.8.9) JAR. This mode may be useful for someone seeking out issues to fix, but is generally not useful in day to day
 operations since the compile task will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from completing.
+
+### Compiling and Testing
+
+To compile the mod, simply run `./gradlew build` (without a version number), and the preprocessor will generate the necessary files for each
+version up to 1.21. By default, only a few files will be compiled, these files can be found in the `versions/<version>/buildpaths.txt` file.
+If you want to compile more files, you can add them to this file or if you want to compile all files you can temporarily remove the file.
+
+> ⚠️ **Notice:** For this to work you **Must** have the `skyhanni.multi-version` set too `compile` in your `.gradle/private.properties` file.
+
+If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in intellij. This will compile the 1.21 version and run it.
+Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
 
 ### Improving mappings
 
@@ -349,6 +361,25 @@ Adding a mapping like this is the easiest way to fix a broken method call, field
 files, so you might be fixing issues in files you didn't even look at. It will even work in mixin targets, as long as they are unambiguous
 (consider using the method descriptor instead of just the method name for your mixin). However, if something aside from the name changed,
 this will not suffice.
+
+#### Custom mappings
+
+If you need to do a bit more advanced remapping that requires an import to be added to the file, you can add a custom mapping. This is
+done by creating/editing a pattern mappings file which can be found at `versions/pattern-mapping-<newVersion>-<oldVersion>.txt`.
+
+```
+# You can use # to comment lines
+
+# here is the format of these files
+# newClass oldClass newMethod oldMethod neededImport
+
+# heres an example mapping
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.getFormattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
+```
+
+This will change all calls of Entity.name to be Entity.name.getFormattedTextCompat(). The import will also be added to the file. This is
+helpful for places where the return type may have changed across minecraft versions, and then you need to call a compat method to get the
+same result as on previous versions.
 
 #### Conditional compilation
 

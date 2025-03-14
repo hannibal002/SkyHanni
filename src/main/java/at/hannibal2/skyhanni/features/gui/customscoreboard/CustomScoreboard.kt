@@ -2,7 +2,6 @@
  * TODO LIST
  *  - countdown events like fishing festival + fiesta when its not on tablist
  *  - improve hide coin difference to also work with bits, motes, etc
- *  - color options in the purse etc lines
  *  - choose the amount of decimal places in shorten nums
  *  - heavily optimize elements and events by only updating them when absolutely needed
  */
@@ -119,7 +118,7 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 5.seconds)
+        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 7.seconds)
             UnknownLinesHandler.handleUnknownLines()
     }
 
@@ -231,7 +230,7 @@ object CustomScoreboard {
                 add("Custom Scoreboard Events:")
                 addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }, currentIslandEvents))
 
-                add("Active Patterns:")
+                add("Active Patterns (${activePatterns.size}):")
                 activePatterns.forEach { add("   $it") }
 
                 allUnknownLines.takeIfNotEmpty()?.let { set ->

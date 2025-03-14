@@ -41,9 +41,8 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -211,7 +210,7 @@ object GardenVisitorFeatures {
         var totalPrice = 0.0
         addAsSingletonList("§7Visitor Shopping List:")
         for ((internalName, amount) in shoppingList) {
-            val name = internalName.itemName
+            val name = internalName.repoItemName
             val itemStack = internalName.getItemStack()
 
             val list = mutableListOf<Any>()
@@ -391,7 +390,7 @@ object GardenVisitorFeatures {
     }
 
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.name != "§aAccept Offer") return
+        if (itemStack.displayName != "§aAccept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)
