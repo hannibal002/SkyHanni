@@ -514,7 +514,7 @@ object ItemUtils {
     fun NeuInternalName.isRune(): Boolean = contains("_RUNE;")
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val ItemStack.itemName: String
+    val ItemStack.repoItemName: String
         get() {
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
@@ -529,7 +529,7 @@ object ItemUtils {
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
+    val ItemStack.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.repoItemName: String
