@@ -14,6 +14,11 @@ net.minecraft.item.ItemStack getName() getDisplayName()
 
 net.minecraft.entity.passive.VillagerEntity net.minecraft.world.entity.npc.Villager
 net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.decoration.ArmorStand
+net.minecraft.entity.decoration.ArmorStandEntity shouldShowArms() isShowArms()
+net.minecraft.entity.decoration.ArmorStandEntity shouldHideBasePlate() isNoBasePlate()
 
 net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.ServerPlayer
 
+net.minecraft.screen.slot.Slot net.minecraft.world.inventory.Slot
+net.minecraft.screen.slot.Slot getIndex() getSlotIndex()
+net.minecraft.screen.slot.Slot getStack() getItem()
