@@ -70,7 +70,7 @@ object SkyHanniMod {
         screenToOpen?.let {
             screenTicks++
             if (screenTicks == 5) {
-                Minecraft.getMinecraft().thePlayer.closeScreen()
+                Minecraft.getMinecraft().thePlayer?.closeScreen()
                 OtherInventoryData.close()
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
