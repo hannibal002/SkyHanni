@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.message
+import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
 import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -129,7 +129,7 @@ object RareDropMessages {
         var anyRecentMessage = false
         for (line in ChatUtils.chatLines) {
             if (line.passedSinceSent() > 1.seconds) break
-            val message = line.message
+            val message = line.chatMessage
             if (itemName in message) return // the message already has the enchant name
             if (enchantedBookPattern.matches(message)) {
                 anyRecentMessage = true
@@ -141,7 +141,7 @@ object RareDropMessages {
             ChatUtils.editFirstMessage(
                 component = { it.formattedText.replace("Enchanted Book", internalName.repoItemName).asComponent() },
                 "enchanted book",
-                predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) },
+                predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.chatMessage) },
             )
         }
 
