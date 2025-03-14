@@ -1,4 +1,5 @@
 # at/hannibal2/skyhanni/SkyHanniMod.kt
+# at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
 # at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
 
 at/hannibal2/skyhanni/SkyHanniModLoader.kt
@@ -35,10 +36,12 @@ at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuEssenceShopJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuHoppityJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuPetsJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuSkillLevelJson.kt
-# at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
 at/hannibal2/skyhanni/skyhannimodule/SkyHanniModule.kt
 at/hannibal2/skyhanni/utils/CircularList.kt
+at/hannibal2/skyhanni/utils/EnumUtils.kt
+at/hannibal2/skyhanni/utils/KSerializable.kt
 at/hannibal2/skyhanni/utils/OtherModsSettings.kt
+at/hannibal2/skyhanni/utils/RegexUtils.kt
 at/hannibal2/skyhanni/utils/compat/ArrayNormalization.kt
 at/hannibal2/skyhanni/utils/compat/EffectsCompat.kt
 at/hannibal2/skyhanni/utils/compat/EnchantmentsCompat.kt
@@ -49,7 +52,3 @@ at/hannibal2/skyhanni/utils/compat/MouseCompat.kt
 at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 at/hannibal2/skyhanni/utils/compat/TextCompat.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
-
-at/hannibal2/skyhanni/utils/RegexUtils.kt
-at/hannibal2/skyhanni/utils/EnumUtils.kt
-at/hannibal2/skyhanni/utils/KSerializable.kt
