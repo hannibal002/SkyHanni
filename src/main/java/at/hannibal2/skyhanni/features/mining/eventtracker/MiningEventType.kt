@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -20,6 +20,8 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 private fun Item.toItemStack(meta: Int = 0): ItemStack = ItemStack(this, 1, meta)
+
+val drawContext = DrawContext()
 
 enum class MiningEventType(
     val eventName: String,
@@ -42,11 +44,11 @@ enum class MiningEventType(
             val wind = Renderable.string("§9≈", scale = 0.75)
 
             override fun render(posX: Int, posY: Int) {
-                GlStateManager.translate(1f, 1f, -2f)
+                drawContext.getMatrices().translate(1f, 1f, -2f)
                 compass.render(posX, posY)
-                GlStateManager.translate(-1f, -2f, 2f)
+                drawContext.getMatrices().translate(-1f, -2f, 2f)
                 wind.render(posX, posY)
-                GlStateManager.translate(0f, 1f, 0f)
+                drawContext.getMatrices().translate(0f, 1f, 0f)
             }
         },
     ),
@@ -62,11 +64,11 @@ enum class MiningEventType(
             val dyePink = Renderable.itemStack(DyeCompat.PINK.createStack(), 0.45)
 
             override fun render(posX: Int, posY: Int) {
-                GlStateManager.translate(1f, 0f, 0f)
+                drawContext.getMatrices().translate(1f, 0f, 0f)
                 dyePink.render(posX + 1, posY - 1)
-                GlStateManager.translate(-2f, 1.5f, 0f)
+                drawContext.getMatrices().translate(-2f, 1.5f, 0f)
                 dyeGreen.render(posX, posY)
-                GlStateManager.translate(1f, -1.5f, 0f)
+                drawContext.getMatrices().translate(1f, -1.5f, 0f)
             }
 
         },
@@ -98,11 +100,11 @@ enum class MiningEventType(
             }
 
             override fun render(posX: Int, posY: Int) {
-                GlStateManager.translate(-1f, 0f, 0f)
+                drawContext.getMatrices().translate(-1f, 0f, 0f)
                 alexHead.render(posX, posY)
-                GlStateManager.translate(+4f, +3f, 0f)
+                drawContext.getMatrices().translate(+4f, +3f, 0f)
                 steveHead.render(posX, posY)
-                GlStateManager.translate(-3f, -3f, 0f)
+                drawContext.getMatrices().translate(-3f, -3f, 0f)
             }
 
         },

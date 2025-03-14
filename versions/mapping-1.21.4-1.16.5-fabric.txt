@@ -1,4 +1,6 @@
 
+net.minecraft.client.gui.DrawContext at.hannibal2.skyhanni.utils.compat.DrawContext
+
 net.minecraft.entity.Entity getEquippedItems() getItemsEquipped()
 net.minecraft.entity.Entity getId() getEntityId()
 

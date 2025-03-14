@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -18,6 +19,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object RenderData {
+    
+    var drawContext = DrawContext()
 
     @SubscribeEvent
     fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
@@ -26,9 +29,9 @@ object RenderData {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
-        GlStateManager.translate(0f, 0f, -3f)
+        drawContext.getMatrices().translate(0f, 0f, -3f)
         renderOverlay()
-        GlStateManager.translate(0f, 0f, 3f)
+        drawContext.getMatrices().translate(0f, 0f, 3f)
     }
 
     @SubscribeEvent
@@ -39,18 +42,18 @@ object RenderData {
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 
-        GlStateManager.pushMatrix()
+        drawContext.getMatrices().push()
         GlStateManager.enableDepth()
 
         if (GuiEditManager.isInGui()) {
-            GlStateManager.translate(0f, 0f, -3f)
+            drawContext.getMatrices().translate(0f, 0f, -3f)
             renderOverlay()
-            GlStateManager.translate(0f, 0f, 3f)
+            drawContext.getMatrices().translate(0f, 0f, 3f)
         }
 
         GuiRenderEvent.ChestGuiOverlayRenderEvent().post()
 
-        GlStateManager.popMatrix()
+        drawContext.getMatrices().pop()
     }
 
     private fun canRender(): Boolean = Minecraft.getMinecraft()?.renderManager?.fontRenderer != null
