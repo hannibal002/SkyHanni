@@ -64,7 +64,7 @@ _Frequently Asked Questions_
 > If you are using [VanillaHUD](https://modrinth.com/mod/vanillahud), please update to 2.2.9 or newer to resolve this issue.
 > If you are using [Apec](https://github.com/BananaFructa/Apec/) and want to remove their Scoreboard, you need to remove Apec since they don't have an option to disable their Scoreboard.
 > If you are using [Odin](https://github.com/odtheking/Odin), disable their "Sidebar".
-> If you are using [Patcher](https://sk1er.club/mods/patcher) or [PolyPatcher](https://modrinth.com/mod/patcher) and the vanilla scoreboard is flickering, disable the "HUD Caching" option.
+> If you are using [Patcher](https://sk1er.club/mods/patcher) or [PolyPatcher](https://modrinth.com/mod/patcher) and the vanilla scoreboard is flickering, disable the "HUD Caching" option (this may reduce FPS).
 > If you don't use any of these mods, make sure the option to "Hide Vanilla Scoreboard" is actually enabled.
 
 > **13: Why doesn't the burrow warp key and line prioritize my guess waypoint when there are known burrows nearby?**

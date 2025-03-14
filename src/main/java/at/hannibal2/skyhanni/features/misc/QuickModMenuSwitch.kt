@@ -135,7 +135,7 @@ object QuickModMenuSwitch {
             val renderable = Renderable.link(
                 Renderable.string(nameFormat + mod.name),
                 bypassChecks = true,
-                onClick = { open(mod) },
+                onLeftClick = { open(mod) },
                 condition = { System.currentTimeMillis() > lastGuiOpen + 250 },
             )
             add(listOf(renderable, nameSuffix))

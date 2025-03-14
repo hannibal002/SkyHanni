@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -179,7 +178,7 @@ object MinionFeatures {
         if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
-            if (minionCollectItemPattern.matches(it.name)) {
+            if (minionCollectItemPattern.matches(it.displayName)) {
                 MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
@@ -317,7 +316,7 @@ object MinionFeatures {
         val coinsPerDay = (coins / (duration.inWholeMilliseconds)) * 1000 * 60 * 60 * 24
 
         val format = coinsPerDay.toInt().addSeparators()
-        return "§7Coins/day with ${stack.name}§7: §6$format coins"
+        return "§7Coins/day with ${stack.displayName}§7: §6$format coins"
     }
 
     @HandleEvent

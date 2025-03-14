@@ -10,11 +10,11 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.message
+import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
 import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -23,9 +23,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatComponentText
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -78,10 +77,11 @@ object RareDropMessages {
 
     /**
      * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book §r§b(+§r§b208% §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lRARE DROP! §r§fEnchanted Book
      */
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook",
-        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book (?<end>§r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)).*",
+        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book(?<end> §r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\))?.*",
     )
 
     private val petPatterns = listOf(
@@ -112,26 +112,24 @@ object RareDropMessages {
             if (start.endsWith("a ") && rarityName.first().isVowel())
                 start = start.substring(0..start.length - 2) + "n "
 
-            event.chatComponent = ChatComponentText(
-                "$start§$rarityColor§l$rarityName §$rarityColor$petName$end",
-            )
+            event.chatComponent = "$start§$rarityColor§l$rarityName §$rarityColor$petName$end".asComponent()
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onItemAdd(event: ItemAddEvent) {
         if (event.amount != 1 || event.source != ItemAddManager.Source.ITEM_ADD) return
-        if (!config.enchantedBook) return
+        if (!config.enchantedBook || !config.enchantedBookMissingMessage) return
         val internalName = event.internalName
         val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.ENCHANTED_BOOK) return
         if (inAnyIsland(ignoredBookIslands)) return
 
-        val itemName = internalName.itemName
+        val itemName = internalName.repoItemName
         var anyRecentMessage = false
         for (line in ChatUtils.chatLines) {
             if (line.passedSinceSent() > 1.seconds) break
-            val message = line.message
+            val message = line.chatMessage
             if (itemName in message) return // the message already has the enchant name
             if (enchantedBookPattern.matches(message)) {
                 anyRecentMessage = true
@@ -139,22 +137,25 @@ object RareDropMessages {
             }
         }
 
-        if (!anyRecentMessage) {
-            var message = "§r§6§lRARE DROP! ${internalName.itemName}"
-            userLuck?.takeIf { it != 0f }?.let { luck ->
-                var luckString = luck.roundTo(2).addSeparators()
-                if (luck > 0) luckString = "+$luckString"
-                message += " §a($luckString ✴ SkyHanni User Luck)"
+        if (anyRecentMessage && config.enchantedBook) {
+            ChatUtils.editFirstMessage(
+                component = { it.formattedText.replace("Enchanted Book", internalName.repoItemName).asComponent() },
+                "enchanted book",
+                predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.chatMessage) },
+            )
+        }
+
+        if (!anyRecentMessage && config.enchantedBookMissingMessage) {
+            var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
+            if (SkyHanniMod.feature.misc.userluckEnabled) {
+                userLuck?.takeIf { it != 0f }?.let { luck ->
+                    var luckString = luck.roundTo(2).addSeparators()
+                    if (luck > 0) luckString = "+$luckString"
+                    message += " §a($luckString ✴ SkyHanni User Luck)"
+                }
             }
             ChatUtils.chat(message, prefix = false)
-            return
         }
-        ChatUtils.editFirstMessage(
-            component = { it.formattedText.replace("Enchanted Book", internalName.itemName).asComponent() },
-            "enchanted book",
-            predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) },
-        )
-
     }
 
     @HandleEvent

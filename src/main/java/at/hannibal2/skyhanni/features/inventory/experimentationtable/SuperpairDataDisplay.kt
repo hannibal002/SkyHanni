@@ -138,8 +138,6 @@ object SuperpairDataDisplay {
             hasFoundMatch(items, item) -> handleFoundMatch(items, item)
             else -> handleNormalReward(item)
         }
-
-        println(found)
     }
 
     private fun handleInstantFind(items: MutableMap<Int, SuperpairItem>, item: SuperpairItem, uncovered: Int) {
