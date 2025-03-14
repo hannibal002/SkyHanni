@@ -9,14 +9,11 @@ import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -24,7 +21,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.util.AxisAlignedBB
@@ -160,21 +156,6 @@ object LorenzUtils {
         return Renderable.table(outerList, xPadding = 5, yPadding = padding)
     }
 
-    fun setTextIntoSign(text: String, line: Int = 0) {
-        val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is AccessorGuiEditSign) return
-        gui.tileSign.signText[line] = text.asComponent()
-    }
-
-    fun addTextIntoSign(addedText: String) {
-        val gui = Minecraft.getMinecraft().currentScreen
-        if (gui !is AccessorGuiEditSign) return
-        val lines = gui.tileSign.signText
-        val index = gui.editLine
-        val text = lines[index].unformattedText + addedText
-        lines[index] = text.capAtMinecraftLength(91).asComponent()
-    }
-
     // TODO move into string api
     fun colorCodeToRarity(colorCode: Char): String {
         return when (colorCode) {
@@ -223,13 +204,6 @@ object LorenzUtils {
             }
             add(" ")
         }
-    }
-
-    fun GuiEditSign.isRancherSign(): Boolean {
-        if (this !is AccessorGuiEditSign) return false
-
-        val signText = (this as AccessorGuiEditSign).tileSign.signText.map { it.unformattedText.removeColor() }
-        return signText[1] == "^^^^^^" && signText[2] == "Set your" && signText[3] == "speed cap!"
     }
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
