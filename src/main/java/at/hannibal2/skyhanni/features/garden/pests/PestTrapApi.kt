@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -29,6 +30,7 @@ object PestTrapApi {
     private val tabListFullTrapsPattern = TabWidget.FULL_TRAPS.pattern
     private val tabListNoBaitPattern = TabWidget.NO_BAIT.pattern
 
+    private var delayEvent = false
     private var lastTitleHash: Int = 0
     private var lastNoBaitHash: Int = 0
     private var lastFullHash: Int = 0
@@ -43,8 +45,15 @@ object PestTrapApi {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PEST_TRAPS)) return
         val timeEnteredGarden = timeEnteredGarden ?: return
-        if (timeEnteredGarden.passedSince() < 5.seconds) return
+        if (timeEnteredGarden.passedSince() < 5.seconds) {
+            delayEvent = true
+            DelayedRun.runDelayed(5.seconds) {
+                if (delayEvent) onWidgetUpdate(event)
+            }
+            return
+        }
 
+        delayEvent = false
         trapsPlaced = event.lines.map { it.getPlacedTraps() }.firstOrNull { it != trapsPlaced } ?: trapsPlaced
         anyFull = event.lines.map { it.anyFull() }.firstOrNull { it != anyFull } ?: anyFull
         anyNoBait = event.lines.map { it.anyNoBait() }.firstOrNull { it != anyNoBait } ?: anyNoBait
@@ -60,6 +69,7 @@ object PestTrapApi {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.GARDEN) return
         timeEnteredGarden = SimpleTimeMark.now()
+
     }
 
     private fun Matcher.getTrapIndexSet(): Set<Int>? =
