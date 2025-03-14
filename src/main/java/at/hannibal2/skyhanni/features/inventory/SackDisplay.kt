@@ -171,7 +171,7 @@ object SackDisplay {
             }
         }
 
-        add(table.buildSearchableTable(textInputGetter = { getSackTextInput(InventoryUtils.openInventoryName()) }))
+        add(table.buildSearchableTable({ getSackTextInput(InventoryUtils.openInventoryName()) }))
 
         if (SackApi.isTrophySack) addString("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
         return totalPrice
@@ -260,7 +260,7 @@ object SackDisplay {
                 put(row, name)
             }
         }
-        add(table.buildSearchableTable(getSackTextInput("rune")))
+        add(table.buildSearchableTable({ getSackTextInput("rune") }))
     }
 
     private fun MutableList<Renderable>.drawGemstoneDisplay(): Long {
@@ -309,7 +309,7 @@ object SackDisplay {
             }
         }
 
-        add(table.buildSearchableTable(getSackTextInput("gemstone")))
+        add(table.buildSearchableTable({ getSackTextInput("gemstone") }))
         return totalPrice
     }
 

@@ -295,7 +295,7 @@ object AccessoryOverviewDisplay {
         val clickable = Renderable.clickable(
             render = labelledIcon,
             onAnyClick = mapOf(
-                LEFT_MOUSE to { ChatUtils.chat("$internalName clicked")}
+                LEFT_MOUSE to { ChatUtils.chat("$internalName clicked") }
             ), // todo
             tips = tipCache[this@buildRow.hashCode()] ?: buildTips().also {
                 tipCache[this@buildRow.hashCode()] = it
