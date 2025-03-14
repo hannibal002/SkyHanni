@@ -2,6 +2,6 @@
 net.minecraft.entity.Entity getEquippedItems() getItemsEquipped()
 net.minecraft.entity.Entity getId() getEntityId()
 
-net.minecraft.item.ItemStack getFormattedName() toHoverableText()
-
 net.minecraft.entity.decoration.ArmorStandEntity shouldShowBasePlate().not() shouldHideBasePlate()
+
+net.minecraft.item.ItemStack getName() toHoverableText()

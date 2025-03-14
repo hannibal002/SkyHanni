@@ -21,7 +21,7 @@ fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
     //$$ return this.getTooltipLines(Minecraft.getInstance().player) { advanced }.map { it.getFormattedTextCompat() }.toMutableList()
     //#else
     //$$ val tooltipType = if (advanced) TooltipType.ADVANCED else TooltipType.BASIC
-    //$$ return this.getTooltip(Item.TooltipContext.DEFAULT, MinecraftClient.getInstance().player, tooltipType).map { it.getFormattedTextCompat() }.toMutableList()
+    //$$ return this.getTooltip(Item.TooltipContext.DEFAULT, MinecraftClient.getInstance().player, tooltipType).map { it.formattedTextCompat() }.toMutableList()
     //#endif
 }
 

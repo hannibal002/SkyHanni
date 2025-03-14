@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.prefix
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.chat.TextHelper.url
-import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.ChatComponentText
@@ -125,7 +124,7 @@ object ChatUtils {
     }
 
     fun chat(message: IChatComponent, send: Boolean = true): Boolean {
-        val formattedMessage = message.getFormattedTextCompat()
+        val formattedMessage = message.formattedText
         log.log(formattedMessage)
 
         val minecraft = Minecraft.getMinecraft()
