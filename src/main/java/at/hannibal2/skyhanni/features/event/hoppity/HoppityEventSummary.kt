@@ -790,7 +790,7 @@ object HoppityEventSummary {
         val currentValue = this.typeCountSnapshot.getByIndex(index)
         val previousValue = it.typeCountSnapshot.getByIndex(index)
         val sinceValue = it.typeCountsSince.getByIndex(index) - previousValue
-        val validData = previousValue != 0 && previousValue != currentValue
+        val validData = previousValue > 0 && previousValue != currentValue
         Triple(
             if (validData) previousValue else 0,
             if (validData) currentValue else 0,
