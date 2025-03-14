@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.test.hotswap.HotswapSupport
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -40,8 +39,6 @@ object SkyHanniMod {
 
     fun preInit() {
         PlatformUtils.checkIfNeuIsLoaded()
-
-        HotswapSupport.load()
 
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
