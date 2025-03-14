@@ -21,6 +21,7 @@ import java.util.Locale
 import net.minecraftforge.common.util.Constants
 //#elseif MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.registry.Registries
 //#endif
 
 object SkyBlockItemModifierUtils {
@@ -237,7 +238,11 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getItemId() = getAttributeString("id")
 
+    //#if MC < 1.21
     fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as ResourceLocation
+    //#else
+    //$$ fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
+    //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
