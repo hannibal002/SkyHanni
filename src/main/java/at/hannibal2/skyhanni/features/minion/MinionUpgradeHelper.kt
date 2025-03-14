@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -108,7 +108,7 @@ object MinionUpgradeHelper {
             val itemsRemaining = itemsNeeded - itemsInSacks
             val totalCost = itemsNeeded * itemPrice
             val remainingCost = itemsRemaining * itemPrice
-            val itemName = internalName.itemName
+            val itemName = internalName.repoItemName
 
             add("§8(From SkyHanni)")
             add("")

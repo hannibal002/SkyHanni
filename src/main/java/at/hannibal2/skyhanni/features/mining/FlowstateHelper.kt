@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -143,7 +143,7 @@ object FlowstateHelper {
     fun getStreakColor(streak: Int = blockBreakStreak): String = if (streak < 200) "§e" else "§a"
 
     private fun hasFlowstate() {
-        val enchantList = InventoryUtils.getItemInHand()?.getEnchantments() ?: run {
+        val enchantList = InventoryUtils.getItemInHand()?.getHypixelEnchantments() ?: run {
             flowstateCache = null
             return
         }

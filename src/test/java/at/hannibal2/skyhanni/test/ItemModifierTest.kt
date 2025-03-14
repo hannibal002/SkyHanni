@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHotPotatoCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -19,7 +19,7 @@ class ItemModifierTest {
         assert(itemStack.getItemUuid() == "2810b7fe-33af-4dab-bb41-b4815f5847af")
         assert(itemStack.isEnchanted())
         assert(itemStack.getHotPotatoCount() == 15)
-        assert(itemStack.getEnchantments()?.size == 11)
+        assert(itemStack.getHypixelEnchantments()?.size == 11)
         assert(itemStack.hasArtOfPeace())
 //        assert(itemStack.getDungeonStarCount() == 10)
     }
