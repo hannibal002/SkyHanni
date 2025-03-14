@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -225,7 +225,7 @@ object EstimatedItemValue {
                 e, "Error in Estimated Item Value renderer",
                 "openInventoryName" to openInventoryName,
                 "item" to item,
-                "item name" to item.itemName,
+                "item name" to item.repoItemName,
                 "internal name" to item.getInternalNameOrNull(),
                 "lore" to item.getLore(),
             )

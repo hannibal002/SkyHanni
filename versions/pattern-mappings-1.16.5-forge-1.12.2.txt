@@ -3,3 +3,5 @@ net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack displayName.getF
 net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer name.getFormattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.getFormattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.getFormattedTextCompat() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
+net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.SPacketScoreboardObjective displayName.getFormattedTextCompat() getObjectiveValue() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
+net.minecraft.world.scores.Objective net.minecraft.scoreboard.ScoreObjective displayName.getFormattedTextCompat() getDisplayName() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat

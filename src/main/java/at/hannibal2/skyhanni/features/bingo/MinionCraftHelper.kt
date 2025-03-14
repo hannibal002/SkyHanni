@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.hasHypixelEnchantments
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -119,7 +119,7 @@ object MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item.displayName.removeColor()
-            if (item.hasEnchantments()) continue
+            if (item.hasHypixelEnchantments()) continue
             val rawId = item.getInternalName()
             if (!isMinionName(name)) {
                 if (!allIngredients.contains(rawId)) continue
@@ -214,7 +214,7 @@ object MinionCraftHelper {
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
-                val itemName = rawId.itemName
+                val itemName = rawId.repoItemName
                 val isTool = itemId.startsWith("WOOD_")
                 if (percentage >= 1) {
                     val color = if (isTool) "§7" else "§a"
