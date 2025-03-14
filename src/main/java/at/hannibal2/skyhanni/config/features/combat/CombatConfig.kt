@@ -75,7 +75,7 @@ class CombatConfig {
     @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after the it died.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var endstoneProtectorChat: Boolean = true;
+    var endstoneProtectorChat: Boolean = true
 
     @Expose
     @ConfigOption(name = "Broodmother", desc = "")
