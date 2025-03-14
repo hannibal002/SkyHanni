@@ -65,18 +65,6 @@ object AccessoryOverviewDisplay {
             config.selectedTab.set(value)
         }
 
-    private var missingSortType
-        get() = config.missingTabSortType.get()
-        set(value) {
-            config.missingTabSortType.set(value)
-        }
-
-    private var missingShowType
-        get() = config.missingTabShowType.get()
-        set(value) {
-            config.missingTabShowType.set(value)
-        }
-
     private var lastBuiltAccHash: Int = 0
 
     private val tabSearchInputs = enumMapOf<DisplayTab, SearchTextInput>()
@@ -157,13 +145,13 @@ object AccessoryOverviewDisplay {
             DisplayTab.MISSING -> {
                 this.addRenderableButton<MissingSortType>(
                     label = "Sort",
-                    current = missingSortType,
-                    onChange = { missingSortType = it },
+                    current = config.missingTabSortType.get(),
+                    onChange = { config.missingTabSortType.set(it) },
                 )
                 this.addRenderableButton<MissingShowType>(
                     label = "Show",
-                    current = missingShowType,
-                    onChange = { missingShowType = it },
+                    current = config.missingTabShowType.get(),
+                    onChange = { config.missingTabShowType.set(it) },
                 )
             }
 
@@ -259,10 +247,8 @@ object AccessoryOverviewDisplay {
         val otherLines = buildList {
             // Price
             buildString {
-                val doublePrice = internalName.getPriceOrNull()?.takeIf {
-                    it > 0
-                }
-                if (doublePrice != null) append("§7Price: §6${doublePrice.toInt().addSeparators()}")
+                val doublePrice = internalName.getPriceOrNull()
+                if (doublePrice != null && doublePrice > 0) append("§7Price: §6${doublePrice.toInt().addSeparators()}")
                 else append("§7Price: §c§lNo price data!")
             }.takeIf { it.isNotEmpty() }?.let { add(Pair(Renderable.string(it), it)) }
 
@@ -304,7 +290,12 @@ object AccessoryOverviewDisplay {
         )
         add(clickable)
 
-        add(Renderable.string("§6${getUpgradeCost().toInt().addSeparators()}"))
+        buildString {
+            val price = getUpgradeCost().toInt()
+            if (price > 0) append("§6${price.addSeparators()}")
+            else append("§c§lNo price data!")
+        }.takeIf { it.isNotEmpty() }?.let { add(Renderable.string(it)) }
+
         add(Renderable.string("§b$magicPower"))
     }
 }
