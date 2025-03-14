@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.message
 import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -128,7 +128,7 @@ object RareDropMessages {
         if (category != ItemCategory.ENCHANTED_BOOK) return
         if (inAnyIsland(ignoredBookIslands)) return
 
-        val itemName = internalName.itemName
+        val itemName = internalName.repoItemName
         var anyRecentMessage = false
         for (line in ChatUtils.chatLines) {
             if (line.passedSinceSent() > 1.seconds) break
@@ -142,14 +142,14 @@ object RareDropMessages {
 
         if (anyRecentMessage && config.enchantedBook) {
             ChatUtils.editFirstMessage(
-                component = { it.formattedText.replace("Enchanted Book", internalName.itemName).asComponent() },
+                component = { it.formattedText.replace("Enchanted Book", internalName.repoItemName).asComponent() },
                 "enchanted book",
                 predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) },
             )
         }
 
         if (!anyRecentMessage && config.enchantedBookMissingMessage) {
-            var message = "§r§6§lRARE DROP! ${internalName.itemName}"
+            var message = "§r§6§lRARE DROP! ${internalName.repoItemName}"
             if (SkyHanniMod.feature.misc.userluckEnabled) {
                 userLuck?.takeIf { it != 0f }?.let { luck ->
                     var luckString = luck.roundTo(2).addSeparators()

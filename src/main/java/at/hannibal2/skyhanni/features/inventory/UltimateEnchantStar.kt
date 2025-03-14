@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import net.minecraft.init.Items
 
 @SkyHanniModule
@@ -18,7 +18,7 @@ object UltimateEnchantStar {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
         if (event.stack.item != Items.enchanted_book) return
-        val enchants = event.stack.getEnchantments() ?: return
+        val enchants = event.stack.getHypixelEnchantments() ?: return
         if (enchants.size != 1 || !enchants.keys.first().startsWith("ultimate_")) return
         event.renderObjects += RenderObject("§d✦", -10, -10)
     }
