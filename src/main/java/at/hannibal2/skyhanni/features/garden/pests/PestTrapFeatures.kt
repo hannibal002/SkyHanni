@@ -31,15 +31,15 @@ object PestTrapFeatures {
     private val chatWarnEnabled: Boolean
         get() = enabledTypes in listOf(
             WarningDisplayType.CHAT,
-            WarningDisplayType.BOTH
+            WarningDisplayType.BOTH,
         )
     private val titleWarnEnabled: Boolean
         get() = enabledTypes in listOf(
             WarningDisplayType.TITLE,
-            WarningDisplayType.BOTH
+            WarningDisplayType.BOTH,
         )
 
-    private val activeWarnings: MutableList<WarningReason> = mutableListOf()
+    private val allActiveWarnings: MutableList<WarningReason> = mutableListOf()
     private val reminderInterval: Property<Int> get() = config.warningConfig.warningIntervalSeconds
     private var nextWarningMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private val soundString get(): String = config.warningConfig.warningSound.get()
@@ -63,36 +63,22 @@ object PestTrapFeatures {
 
     @HandleEvent
     fun onPestTrapDataUpdate(event: PestTrapDataEvent) {
-        activeWarnings.clear()
-        if (event.trapsPlaced < MAX_TRAPS && WarningReason.UNPLACED_TRAPS in userEnabledWarnings)
-            activeWarnings.add(WarningReason.UNPLACED_TRAPS)
-        if (event.anyFull && WarningReason.TRAP_FULL in userEnabledWarnings)
-            activeWarnings.add(WarningReason.TRAP_FULL)
-        if (event.anyNoBait && WarningReason.NO_BAIT in userEnabledWarnings)
-            activeWarnings.add(WarningReason.NO_BAIT)
+        allActiveWarnings.clear()
+        if (event.trapsPlaced < MAX_TRAPS) allActiveWarnings.add(WarningReason.UNPLACED_TRAPS)
+        if (event.anyFull) allActiveWarnings.add(WarningReason.TRAP_FULL)
+        if (event.anyNoBait) allActiveWarnings.add(WarningReason.NO_BAIT)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (activeWarnings.isEmpty() || nextWarningMark.isInFuture()) return
-        val activeWarnings = activeWarnings.map { it.warningString }
+        val applicableWarnings = allActiveWarnings.filter { it in userEnabledWarnings }
+        if (applicableWarnings.isEmpty() || nextWarningMark.isInFuture()) return
+        val activeWarnings = applicableWarnings.map { it.warningString }
 
         warningSound?.playSound()
-        tryWarnTitle(activeWarnings.first())
-        tryWarnChat(activeWarnings)
+        if (titleWarnEnabled) LorenzUtils.sendTitle(activeWarnings.first(), 3.seconds, 2.8, 7f)
+        if (chatWarnEnabled) activeWarnings.forEach { ChatUtils.chat(it) }
 
         nextWarningMark = getNextWarningMark()
-    }
-
-    private fun tryWarnChat(finalWarnings: List<String>) {
-        if (!chatWarnEnabled) return
-        finalWarnings.forEach { warning ->
-            ChatUtils.chat(warning)
-        }
-    }
-
-    private fun tryWarnTitle(finalWarning: String) {
-        if (!titleWarnEnabled) return
-        LorenzUtils.sendTitle(finalWarning, 3.seconds, 2.8, 7f)
     }
 }
