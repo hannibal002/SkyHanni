@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -168,7 +168,7 @@ object CityProjectFeatures {
 
         for ((internalName, amount) in materials) {
             val stack = internalName.getItemStack()
-            val name = internalName.itemName
+            val name = internalName.repoItemName
             val list = mutableListOf<Any>()
             list.add(" §7- ")
             list.add(stack)
