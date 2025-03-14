@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrCommon
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSuffix
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import net.minecraft.item.ItemStack
@@ -80,7 +80,7 @@ object FortuneUpgrades {
             val nextTalisman = CropAccessory.entries[currentTalismanTier + 1]
             genericUpgrades.add(
                 FortuneUpgrade(
-                    "§7Upgrade your talisman to ${nextTalisman.internalName?.itemName}",
+                    "§7Upgrade your talisman to ${nextTalisman.internalName?.repoItemName}",
                     null, nextTalisman.upgradeCost?.first!!, nextTalisman.upgradeCost.second, 10.0,
                 ),
             )
@@ -93,7 +93,7 @@ object FortuneUpgrades {
             val item = piece.getItem()
             // todo tell them to buy the missing item
             if (!item.getInternalName().contains("LOTUS")) return
-            val enchantments = item.getEnchantments().orEmpty()
+            val enchantments = item.getHypixelEnchantments().orEmpty()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
             if (greenThumbLvl != 5 && visitors != 0.0) {
                 genericUpgrades.add(
@@ -157,7 +157,7 @@ object FortuneUpgrades {
         cropSpecificUpgrades.addAll(genericUpgrades)
         // todo tell them to get the tool if it is missing
         val crop = tool?.getCropType() ?: return
-        val enchantments = tool.getEnchantments().orEmpty()
+        val enchantments = tool.getHypixelEnchantments().orEmpty()
         val turboCropLvl = enchantments[crop.getTurboCrop()] ?: 0
         val dedicationLvl = enchantments["dedication"] ?: 0
         val cultivatingLvl = enchantments["cultivating"] ?: 0

@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -124,7 +124,11 @@ object ItemUtils {
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
+    //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+    //#else
+    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines.map { it.getFormattedTextCompat() }
+    //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
@@ -240,7 +244,7 @@ object ItemUtils {
     fun ItemStack.isEnchanted() = isItemEnchanted
 
     // Checks for hypixel enchantments in the attributes
-    fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
+    fun ItemStack.hasHypixelEnchantments() = getHypixelEnchantments()?.isNotEmpty() ?: false
 
     fun ItemStack.removeEnchants(): ItemStack = apply {
         val tempTag = tagCompound ?: NBTTagCompound()
@@ -510,12 +514,12 @@ object ItemUtils {
     fun NeuInternalName.isRune(): Boolean = contains("_RUNE;")
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val ItemStack.itemName: String
+    val ItemStack.repoItemName: String
         get() {
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
             }
-            return getInternalNameOrNull()?.itemName ?: "<null>"
+            return getInternalNameOrNull()?.repoItemName ?: "<null>"
         }
 
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
@@ -525,14 +529,14 @@ object ItemUtils {
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
+    val ItemStack.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val NeuInternalName.itemName: String
+    val NeuInternalName.repoItemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val NeuInternalName.itemNameWithoutColor: String get() = itemName.removeColor()
+    val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     val NeuInternalName.readableInternalName: String
         get() = asString().replace("_", " ").lowercase()
@@ -696,7 +700,7 @@ object ItemUtils {
 
     private fun MutableList<ChatComponentText>.formatTestItem(internalName: NeuInternalName, price: Double) {
         val priceColor = if (price > 0) "§6" else "§7"
-        val name = internalName.itemName
+        val name = internalName.repoItemName
         val priceFormat = "$priceColor${price.shortFormat()}"
         val componentText = " §8- §r$name $priceFormat".asComponent()
         componentText.onClick {
@@ -766,7 +770,7 @@ object ItemUtils {
 
     fun NeuInternalName.getNumberedName(amount: Number): String {
         val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
-        return "$prefix§r$itemName"
+        return "$prefix§r$repoItemName"
     }
 
     // Taken from NEU

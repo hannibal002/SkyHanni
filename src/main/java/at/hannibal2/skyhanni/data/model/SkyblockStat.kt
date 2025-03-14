@@ -89,7 +89,7 @@ enum class SkyblockStat(
     MINING_SPEED("§6⸕", " Mining Speed: §r§6⸕(?<value>\\d+)(?: .*)?", " §6⸕ Mining Speed §f(?<value>\\d+)(?: .*)?"),
     BREAKING_POWER("§2Ⓟ", "", " §2Ⓟ Breaking Power §f(?<value>\\d+)(?: .*)?"),
     PRISTINE("§5✧", " Pristine: §r§5✧(?<value>\\d+)(?: .*)?", " §5✧ Pristine §f(?<value>\\d+)(?: .*)?"),
-    FORAGING_FORTUNE("§☘", " Foraging Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Foraging Fortune §f(?<value>\\d+)(?: .*)?"),
+    FORAGING_FORTUNE("§6☘", " Foraging Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Foraging Fortune §f(?<value>\\d+)(?: .*)?"),
     FARMING_FORTUNE(
         "§6☘",
         " (?:§r§7§m)?Farming Fortune: (?:§r§6)?☘(?<value>\\d+)(?: .*)?",
