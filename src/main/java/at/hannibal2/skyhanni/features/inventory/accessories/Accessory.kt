@@ -22,8 +22,9 @@ class Accessory(
     @Expose val totalStats: Map<SkyblockStat, Double> = enumMapOf(),
 ) {
     var index: Int = -1
-    var usageSlayerRequirement: Pair<SlayerType, Int>? = null
-    var craftSlayerRequirement: Pair<SlayerType, Int>? = null
+    // String in each of these is the lore line that matched them
+    var usageSlayerRequirement: Triple<SlayerType, Int, String>? = null
+    var craftSlayerRequirement: Triple<SlayerType, Int, String>? = null
 
     override fun toString(): String = internalName.asString()
 

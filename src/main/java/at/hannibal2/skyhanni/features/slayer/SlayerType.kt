@@ -49,6 +49,9 @@ enum class SlayerType(
     ) // previously called "Riftstalker Bloodfiend"
     ;
 
+    // Really, really janky way to get to the "entity description" that NEU uses
+    fun getClazzName() = clazz.name.replace("Entity", "")
+
     companion object {
         fun getByName(name: String): SlayerType? = entries.firstOrNull { name.contains(it.displayName) }
     }

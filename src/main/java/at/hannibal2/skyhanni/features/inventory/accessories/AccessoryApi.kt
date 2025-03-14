@@ -187,13 +187,14 @@ object AccessoryApi {
             }
         }.toMap()
 
-    private fun ItemStack.getAccessoryUsageSlayerRequirementOrNull(): Pair<SlayerType, Int>? =
+    private fun ItemStack.getAccessoryUsageSlayerRequirementOrNull(): Triple<SlayerType, Int, String>? =
         if (!this.isAccessory() || this.getLore().isEmpty()) null
         else this.getLore().mapNotNull { line ->
             accessorySlayerRequirementLorePattern.matchMatcher(line) {
                 val slayer = groupOrNull("slayer")?.let { SlayerType.getByName(it) } ?: return@matchMatcher null
                 val level = groupOrNull("level")?.formatIntOrNull() ?: return@matchMatcher null
-                slayer to level
+                val fixedLine = line.replace("§cRequires", "§cUsage Requires")
+                Triple(slayer, level, fixedLine)
             }
         }.firstOrNull()
 

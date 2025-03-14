@@ -11,17 +11,22 @@ import at.hannibal2.skyhanni.events.inventory.AccessoriesUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.SearchableRenderableTable
+import kotlin.time.Duration.Companion.minutes
 
 typealias AccStorage = ProfileSpecificStorage.StatsStorage.AccessoryStorage
 private typealias DisplayTab = AccessoryOverviewDisplayConfig.AccessoryDisplayTab
@@ -86,6 +91,8 @@ object AccessoryOverviewDisplay {
         }
     }
 
+    private val tipCache: TimeLimitedCache<Int, List<Renderable>> = TimeLimitedCache(5.minutes)
+
     @HandleEvent
     fun onAccessoriesUpdated(event: AccessoriesUpdatedEvent) {
         val newAccessories = event.accessories.takeIf { it.hashCode() != lastBuiltAccHash } ?: return
@@ -97,7 +104,6 @@ object AccessoryOverviewDisplay {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.enabled || !inAccBag) return
 
-        val storage = storage?.accessoryStorage ?: return
         val fullRenderCache = fullRenderCache ?: run {
             rebuildCaches()
             fullRenderCache
@@ -243,6 +249,35 @@ object AccessoryOverviewDisplay {
         add(missingTable.renderable)
     }
 
+    private fun Accessory.buildTips(): List<Renderable>? = buildList {
+        add(Renderable.string("§7${internalName.itemName}"))
+        val otherLines = buildList {
+            // Price
+            buildString {
+                val doublePrice = internalName.getPriceOrNull()?.takeIf {
+                    it > 0
+                } ?: return@buildString
+                append("§7Price: §6${doublePrice.toInt().addSeparators()}")
+            }.takeIf { it.isNotEmpty() }?.let { add(Pair(Renderable.string(it), it)) }
+
+            // Requirements
+            usageSlayerRequirement?.third?.takeIf { it.isNotEmpty() }?.let {
+                add(Pair(Renderable.string(it), it))
+            }
+            craftSlayerRequirement?.third?.takeIf { it.isNotEmpty() }?.let {
+                add(Pair(Renderable.string(it), it))
+            }
+        }
+        val longestLineCount = otherLines.maxOfOrNull { it.second.removeColor().length } ?: return null
+
+        val dividerLine = "§7${"—".repeat(longestLineCount - 5)}"
+        add(Renderable.string(dividerLine))
+        otherLines.forEach { (renderable, _) ->
+            add(renderable)
+        }
+        add(Renderable.string(dividerLine))
+    }
+
     private fun Accessory.buildRow() = buildList {
         val itemStack = this@buildRow.internalName.getItemStackOrNull() ?: run {
             ChatUtils.chat("Item stack for $internalName is null")
@@ -253,14 +288,22 @@ object AccessoryOverviewDisplay {
             scale = 0.5,
         )
         val displayName = itemStack.displayName
-        add(
-            Renderable.horizontalContainer(
-                listOf(
-                    itemStackRender,
-                    Renderable.string(displayName),
-                ),
+        val accessoryTips = tipCache[this.hashCode()] ?: buildTips().orEmpty().also {
+            tipCache[this.hashCode()] = it
+        }
+        val labelledIcon = Renderable.horizontalContainer(
+            listOf(
+                itemStackRender,
+                Renderable.hoverTips(displayName, accessoryTips),
             ),
         )
+        val clickable = Renderable.clickable(
+            render = labelledIcon,
+            onAnyClick = mapOf(), // todo
+            condition = { AccessoryApi.inAccessoryBag }
+        )
+        add(clickable)
+
         add(Renderable.string("§6${getUpgradeCost().toInt().addSeparators()}"))
         add(Renderable.string("§b$magicPower"))
     }

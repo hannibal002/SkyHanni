@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import com.google.gson.JsonObject
 
@@ -69,9 +70,10 @@ class AccessoryLineageTree {
     }
 
     fun tryAddAccessory(repoData: MutableMap.MutableEntry<String, JsonObject>) {
-        val internalName = repoData.key.toInternalName().takeIf { it.isAccessory() } ?: return
+        val (internalNameString, data) = repoData
+        val internalName = internalNameString.toInternalName().takeIf { it.isAccessory() } ?: return
         val accessory = addAccessory(Accessory(internalName = internalName))
-        val craftText = repoData.value.get("craftText")?.asString ?: return
+        val craftText = data.get("craftText")?.asString.orEmpty()
         neuCraftTextSlayerCraftReqPattern.matchMatcher(craftText) {
             val slayerType = when (group("slayer")) {
                 "Wolf" -> SlayerType.SVEN
@@ -81,9 +83,13 @@ class AccessoryLineageTree {
                 "Spider" -> SlayerType.TARANTULA
                 "Zombie" -> SlayerType.REVENANT
                 else -> null
-            } ?: return
-            val level = group("level").formatIntOrNull() ?: return
-            accessory.craftSlayerRequirement = slayerType to level
+            } ?: return@matchMatcher
+            val level = group("level").formatIntOrNull() ?: return@matchMatcher
+            accessory.craftSlayerRequirement = Triple(
+                slayerType,
+                level,
+                "§7§4☠ §cCrafting Requires §5${slayerType.getClazzName()} Slayer $level§c.",
+            )
         }
     }
 

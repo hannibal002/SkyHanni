@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -37,10 +38,28 @@ class AccessoryOverviewDisplayConfig {
     }
 
     @Expose
-    var selectedTab: Property<AccessoryDisplayTab> = Property.of(AccessoryDisplayTab.SUMMARY)
+    @ConfigOption(name = "Enabled Clicks", desc = "What options will be enabled from within the accessory overlay hovers.")
+    @ConfigEditorDraggableList
+    var enabledClickActions: MutableList<ClickActionType> = mutableListOf(
+        ClickActionType.SEARCH_AH,
+        ClickActionType.OPEN_IN_NEU,
+        ClickActionType.OPEN_IN_WIKI,
+    )
+
+    enum class ClickActionType(private val displayName: String) {
+        SEARCH_AH("§6Search Auction House"),
+        OPEN_IN_NEU("§bOpen in NEU"),
+        OPEN_IN_WIKI("§aOpen in Wiki"),
+        ;
+
+        override fun toString() = displayName
+    }
 
     // Not exposed to the user, configured within the UI
     //
+    @Expose
+    var selectedTab: Property<AccessoryDisplayTab> = Property.of(AccessoryDisplayTab.SUMMARY)
+
     @Expose
     var missingTabSortType: Property<MissingSortType> = Property.of(MissingSortType.BEST_RATIO)
 
