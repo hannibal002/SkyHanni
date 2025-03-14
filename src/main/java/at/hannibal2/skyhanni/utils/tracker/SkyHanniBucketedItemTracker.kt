@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
@@ -48,7 +48,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         if (source == ItemAddManager.Source.COMMAND) {
             TrackerManager.commandEditTrackerSuccess = true
             ChatUtils.chat(
-                "Added ${internalName.itemName} §e$amount§7x to ($selectedBucket§7)",
+                "Added ${internalName.repoItemName} §e$amount§7x to ($selectedBucket§7)",
             )
         }
     }

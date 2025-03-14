@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -358,7 +358,7 @@ object CaptureFarmingGear {
                 item.setItem(slot)
                 outdatedItems[item] = false
                 FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
-                val enchantments = slot.getEnchantments().orEmpty()
+                val enchantments = slot.getHypixelEnchantments().orEmpty()
                 val greenThumbLvl = (enchantments["green_thumb"] ?: continue)
                 val visitors = FarmingFortuneDisplay.greenThumbFortune / (greenThumbLvl * 0.05)
                 GardenApi.storage?.uniqueVisitors = round(visitors).toInt()
