@@ -26,8 +26,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toCleanChatComponent
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.style
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.style
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
@@ -92,7 +92,7 @@ object PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            Text.text("§bCo-op > ") {
+            TextHelper.text("§bCo-op > ") {
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())
@@ -105,7 +105,7 @@ object PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            Text.text("§2Guild > ") {
+            TextHelper.text("§2Guild > ") {
                 appendSibling(nameFormat(event.authorComponent, guildRank = event.guildRank))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())
@@ -118,7 +118,7 @@ object PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            Text.text("§9Party §8> ") {
+            TextHelper.text("§9Party §8> ") {
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())
@@ -131,7 +131,7 @@ object PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            Text.text("§d${event.direction}") {
+            TextHelper.text("§d${event.direction}") {
                 appendText(" ")
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
@@ -145,7 +145,7 @@ object PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            Text.text("") {
+            TextHelper.text("") {
                 appendSibling(
                     nameFormat(
                         event.authorComponent,

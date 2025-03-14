@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import net.minecraft.entity.Entity
@@ -55,7 +54,7 @@ object GlowingDroppedItems {
         if (shouldHideShowcaseItem(entity)) return null
 
         val entityItem = item.entityItem
-        if (!config.highlightFishingBait && entityItem.name.endsWith(" Bait")) {
+        if (!config.highlightFishingBait && entityItem.displayName.endsWith(" Bait")) {
             return null
         }
 

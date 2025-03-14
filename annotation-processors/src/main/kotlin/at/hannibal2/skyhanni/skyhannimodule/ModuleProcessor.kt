@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.skyhannimodule
 
+import com.google.devtools.ksp.containingFile
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.getDeclaredFunctions
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -12,25 +13,40 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.validate
+import java.io.File
 import java.io.OutputStreamWriter
 
-class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logger: KSPLogger) : SymbolProcessor {
+class ModuleProcessor(
+    private val codeGenerator: CodeGenerator,
+    private val logger: KSPLogger,
+    private val mcVersion: String,
+    private val buildPaths: String?,
+) : SymbolProcessor {
 
-    // TODO remove once all events are migrated to SkyHanniEvent
+    companion object {
+        private val processedVersions = mutableSetOf<String>()
+    }
+
     private var skyHanniEvent: KSType? = null
     private var minecraftForgeEvent: KSType? = null
     private val warnings = mutableListOf<String>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        if (!processedVersions.add(mcVersion)) {
+            return emptyList()
+        }
 
         skyHanniEvent =
             resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
 
-        minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
-            ?.asStarProjectedType()
+        if (mcVersion == "1.8.9") {
+            minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
+                ?.asStarProjectedType()
                 ?: return emptyList()
+        }
 
-        val symbols = resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList()
+        val symbols = processBuildPaths(resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList())
+        logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion")
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
 
         if (validSymbols.isNotEmpty()) {
@@ -38,6 +54,24 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         }
 
         return emptyList()
+    }
+
+    private fun processBuildPaths(symbols: List<KSAnnotated>): List<KSAnnotated> {
+        val buildPathsFile = buildPaths?.let { File(it) } ?: return symbols
+        if (!buildPathsFile.exists()) {
+            return symbols
+        }
+
+        val validPaths = buildPathsFile.readText().lineSequence()
+            .map { it.substringBefore("#").trim() }
+            .filter { it.isNotBlank() }
+            .toSet()
+
+        return symbols.filter {
+            val path = it.containingFile?.filePath ?: return@filter false
+            val properPath = path.substringAfter("/main/java/")
+            properPath in validPaths
+        }
     }
 
     private fun validateSymbol(symbol: KSAnnotated): KSClassDeclaration? {
@@ -60,7 +94,7 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         val className = symbol.qualifiedName?.asString() ?: "unknown"
 
         for (function in symbol.getDeclaredFunctions()) {
-            if (function.annotations.any { it.shortName.asString() == "SubscribeEvent" }) {
+            if (function.annotations.any { it.shortName.asString() == "SubscribeEvent" } && mcVersion == "1.8.9") {
                 val firstParameter = function.parameters.firstOrNull()?.type?.resolve()!!
                 if (!minecraftForgeEvent!!.isAssignableFrom(firstParameter)) {
                     warnings.add("Function in $className must have an event assignable from $minecraftForgeEvent because it is annotated with @SubscribeEvent")
