@@ -20,12 +20,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraft.util.ChatComponentText
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -103,7 +103,7 @@ object MythologicalCreatureTracker {
 
                 // TODO migrate to abstract feature in the future
                 if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
-                    event.chatComponent = ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
+                    event.chatComponent = (event.message + " §e(${it.creaturesSinceLastInquisitor})").asComponent()
                     it.creaturesSinceLastInquisitor = 0
                 } else it.creaturesSinceLastInquisitor++
             }

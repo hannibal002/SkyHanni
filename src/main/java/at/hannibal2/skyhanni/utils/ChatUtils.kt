@@ -107,7 +107,7 @@ object ChatUtils {
         onlySendOnce: Boolean = false,
         messageId: Int? = null,
     ): Boolean {
-        val text = ChatComponentText(message)
+        val text = message.asComponent()
         if (onlySendOnce) {
             if (message in messagesThatAreOnlySentOnce) {
                 return false
@@ -128,10 +128,6 @@ object ChatUtils {
         log.log(formattedMessage)
 
         val minecraft = Minecraft.getMinecraft()
-        if (minecraft == null) {
-            LorenzUtils.consoleLog(formattedMessage.removeColor())
-            return false
-        }
 
         val thePlayer = minecraft.thePlayer
         if (thePlayer == null) {
@@ -139,7 +135,11 @@ object ChatUtils {
             return false
         }
 
+        //#if FORGE
         if (send) thePlayer.addChatMessage(message)
+        //#else
+        //$$ if (send) thePlayer.sendMessage(message, false)
+        //#endif
         return true
     }
 

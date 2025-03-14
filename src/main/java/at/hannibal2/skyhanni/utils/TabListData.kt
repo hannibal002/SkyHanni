@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-//#if MC < 1.12
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -24,11 +23,11 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem
-import net.minecraft.world.WorldSettings
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-
+//#if MC < 1.12
+import net.minecraft.world.WorldSettings
 //#else
 //$$ import net.minecraft.world.GameType
 //#endif
@@ -134,7 +133,7 @@ object TabListData {
 
     private fun readTabList(): List<String>? {
         val thePlayer = Minecraft.getMinecraft().thePlayer ?: return null
-        //#if MC<1.16
+        //#if MC < 1.16
         val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
         //#else
         //$$ val players = playerOrdering.sortedCopy(thePlayer.connection.onlinePlayers)
@@ -143,7 +142,11 @@ object TabListData {
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
+            //#if MC < 1.16
             result.add(name.stripHypixelMessage())
+            //#else
+            //$$ result.add(name.formattedTextCompat().stripHypixelMessage())
+            //#endif
         }
         tabListGuard = false
         return if (result.size < 80) result.dropLast(1)

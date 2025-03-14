@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
@@ -200,7 +201,7 @@ object StringUtils {
     fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) this.toInt().toString() else this.toString()
 
     fun String.splitLines(width: Int): String = GuiUtilRenderComponents.splitText(
-        ChatComponentText(this),
+        asComponent(),
         width,
         Minecraft.getMinecraft().fontRendererObj,
         false,
@@ -347,7 +348,7 @@ object StringUtils {
         original: ChatComponentText,
         newText: String,
     ): ChatComponentText? {
-        return replaceIfNeeded(original, ChatComponentText(newText))
+        return replaceIfNeeded(original, newText.asComponent())
     }
 
     private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
@@ -445,7 +446,7 @@ object StringUtils {
 
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
-        chatComponent = ChatComponentText(new)
+        chatComponent = new.asComponent()
         if (clickEvents.size == 1) chatComponent.chatStyle.chatClickEvent = clickEvents.first()
         if (hoverEvents.size == 1) chatComponent.chatStyle.chatHoverEvent = hoverEvents.first()
     }
@@ -494,18 +495,12 @@ object StringUtils {
     }
 
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
-        val text = ChatComponentText(this)
-        text.chatStyle = original.sampleStyleAtStart()
-        return text
+        return asComponent { chatStyle = original.sampleStyleAtStart() }
     }
 
     fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
-        val text = ChatComponentText(this)
-        text.chatStyle = original.chatStyle
-        return text
+        return asComponent { chatStyle = original.chatStyle }
     }
-
-    fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
 
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 

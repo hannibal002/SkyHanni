@@ -16,7 +16,13 @@ net.minecraft.client.Minecraft submit() addScheduledTask()
 
 net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
 
+net.minecraft.client.gui.Gui getChat() getChatGUI()
+
 net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNewChat
+
+net.minecraft.client.gui.components.ChatComponent allMessages chatLines
+net.minecraft.client.gui.components.ChatComponent trimmedMessages drawnChatLines
+net.minecraft.client.gui.components.ChatComponent rescaleChat() refreshChat()
 
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
 
@@ -42,6 +48,8 @@ net.minecraft.client.player.LocalPlayer net.minecraft.client.entity.EntityPlayer
 net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOtherPlayerMP
 
 net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
+
+net.minecraft.client.player.LocalPlayer chat() sendChatMessage()
 
 net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
 

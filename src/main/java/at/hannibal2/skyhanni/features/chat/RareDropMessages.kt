@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatComponentText
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -113,9 +112,7 @@ object RareDropMessages {
             if (start.endsWith("a ") && rarityName.first().isVowel())
                 start = start.substring(0..start.length - 2) + "n "
 
-            event.chatComponent = ChatComponentText(
-                "$start§$rarityColor§l$rarityName §$rarityColor$petName$end",
-            )
+            event.chatComponent = "$start§$rarityColor§l$rarityName §$rarityColor$petName$end".asComponent()
         }
     }
 

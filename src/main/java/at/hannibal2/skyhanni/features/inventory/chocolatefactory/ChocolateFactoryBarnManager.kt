@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.util.ChatComponentText
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object ChocolateFactoryBarnManager {
@@ -81,7 +81,7 @@ object ChocolateFactoryBarnManager {
                 )
             }
 
-            if (event.message != changedMessage) event.chatComponent = ChatComponentText(changedMessage)
+            if (event.message != changedMessage) event.chatComponent = changedMessage.asComponent()
         }
 
         rabbitCrashedPattern.matchMatcher(event.message) {

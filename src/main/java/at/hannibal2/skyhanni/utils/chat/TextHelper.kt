@@ -17,11 +17,16 @@ object TextHelper {
     val EMPTY = "".asComponent()
 
     fun text(text: String, init: IChatComponent.() -> Unit = {}) = text.asComponent(init)
+
+    //#if MC < 1.21
     fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
+    //#else
+    //$$ fun String.asComponent(init: Text.() -> Unit = {}): Text = Text.of(this).also(init)
+    //#endif
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
     fun join(vararg components: Any?, separator: IChatComponent? = null): IChatComponent {
-        val result = ChatComponentText("")
+        val result = "".asComponent()
         components.forEachIndexed { index, component ->
             when (component) {
                 is IChatComponent -> result.appendSibling(component)
@@ -54,7 +59,7 @@ object TextHelper {
         val maxWidth = Minecraft.getMinecraft().ingameGUI.chatGUI.chatWidth
         if (width < maxWidth) {
             val repeat = maxWidth / width
-            val component = ChatComponentText("")
+            val component = "".asComponent()
             repeat(repeat) { component.appendSibling(this) }
             return component
         }

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import net.minecraft.util.ChatComponentText
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.IChatComponent
 
 object TestChatCommand {
@@ -47,12 +47,12 @@ object TestChatCommand {
 
     private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
         val component = if (isComplex) try {
-            IChatComponent.Serializer.jsonToComponent(text) ?: ChatComponentText("")
+            IChatComponent.Serializer.jsonToComponent(text) ?: "".asComponent()
         } catch (ex: Exception) {
             ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
             return
         }
-        else ChatComponentText(text.replace("&", "§"))
+        else text.replace("&", "§").asComponent()
 
         println("component unformatted: ${component.unformattedText}")
         println("${component.unformattedTextForChat} ${component.chatStyle} ${component.siblings}")

@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatComponentText
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -63,7 +63,7 @@ object TrophyFishMessages {
         var edited = original
 
         if (config.enabled) {
-            edited = ChatComponentText(
+            edited = (
                 "§6§lTROPHY FISH! " + when (config.design) {
                     DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
                     else "§7$amount${amount.ordinal()} §r$displayRarity $displayName"
@@ -71,13 +71,13 @@ object TrophyFishMessages {
                     DesignFormat.STYLE_2 -> "§bYou caught a $displayName $displayRarity§b. §7(${amount.addSeparators()})"
                     else -> "§bYou caught your ${amount.addSeparators()}${amount.ordinal()} $displayRarity $displayName§b."
                 }
-            )
+                ).asComponent()
         }
 
         if (config.totalAmount) {
             val total = trophyFishCounts.sumAllValues()
 
-            edited.appendSibling(ChatComponentText(" §7(${total.addSeparators()}${total.ordinal()} total)"))
+            edited.appendSibling((" §7(${total.addSeparators()}${total.ordinal()} total)").asComponent())
         }
 
         if (config.tooltip) {
