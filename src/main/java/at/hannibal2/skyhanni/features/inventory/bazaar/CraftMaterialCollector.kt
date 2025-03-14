@@ -46,7 +46,7 @@ object CraftMaterialCollector {
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
 
-        val recipeName = items[25]?.itemName ?: return
+        val recipeName = items[25]?.repoItemName ?: return
         showRecipe(calculateMaterialsNeeded(event.inventoryItemsPrimitive), recipeName)
     }
 

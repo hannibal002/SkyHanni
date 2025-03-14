@@ -797,7 +797,7 @@ object EstimatedItemValueCalculator {
         shouldIgnorePrice: Property<Boolean>,
     ): Double {
         val price = internalName.getPrice()
-        val name = internalName.getItemStackOrNull()?.itemName
+        val name = internalName.getItemStackOrNull()?.repoItemName
         val displayName = name ?: "§c${internalName.asString()}"
         val gray = shouldIgnorePrice.get()
 
