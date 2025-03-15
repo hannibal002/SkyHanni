@@ -1,6 +1,47 @@
+# at/hannibal2/skyhanni/SkyHanniMod.kt
+# at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
 # at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
+
+at/hannibal2/skyhanni/SkyHanniModLoader.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/AnitaUpgradeCostsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/ArmorDropsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/ArrowTypeJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/BeltsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/BingoJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/BingoRanksJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/CarryTrackerJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/ChangedChatErrorsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/ContributorsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/DanceRoomInstructionsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/DicerDropsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/DisabledApiJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/DisabledEventsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/DisabledFeaturesJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/EnchantedClockJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/FameRankJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/HideNotClickableItemsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/HoppityRabbitTexturesJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/IslandTypeJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/MaxwellPowersJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/MinionXPJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/ModGuiSwitcherJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/MultiFilterJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/PlayerChatFilterJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/StackingEnchantsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/VipVisitsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/WarpsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuCarnivalShops.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuEssenceCostJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuEssenceShopJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuHoppityJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuPetsJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/neu/NeuSkillLevelJson.kt
+at/hannibal2/skyhanni/skyhannimodule/SkyHanniModule.kt
 at/hannibal2/skyhanni/utils/CircularList.kt
+at/hannibal2/skyhanni/utils/EnumUtils.kt
+at/hannibal2/skyhanni/utils/KSerializable.kt
 at/hannibal2/skyhanni/utils/OtherModsSettings.kt
+at/hannibal2/skyhanni/utils/RegexUtils.kt
 at/hannibal2/skyhanni/utils/compat/ArrayNormalization.kt
 at/hannibal2/skyhanni/utils/compat/EffectsCompat.kt
 at/hannibal2/skyhanni/utils/compat/EnchantmentsCompat.kt
@@ -10,7 +51,4 @@ at/hannibal2/skyhanni/utils/compat/ItemCompat.kt
 at/hannibal2/skyhanni/utils/compat/MouseCompat.kt
 at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 at/hannibal2/skyhanni/utils/compat/TextCompat.kt
-# at/hannibal2/skyhanni/SkyHanniMod.kt
-at/hannibal2/skyhanni/SkyHanniModLoader.kt
-at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
-at/hannibal2/skyhanni/skyhannimodule/SkyHanniModule.kt
+at/hannibal2/skyhanni/utils/system/ModVersion.kt

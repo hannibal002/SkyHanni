@@ -399,7 +399,7 @@ object ItemUtils {
             UtilsPatterns.sackPattern.matches(name) -> ItemCategory.SACK
             else -> ItemCategory.NONE
         } else {
-            LorenzUtils.enumValueOfOrNull<ItemCategory>(itemCategory)
+            EnumUtils.enumValueOfOrNull<ItemCategory>(itemCategory)
         }
 
     private fun ItemStack.updateCategoryAndRarity() {

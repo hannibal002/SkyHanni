@@ -369,6 +369,8 @@ net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler
 net.minecraftforge.eventbus.api.EventPriority net.minecraftforge.fml.common.eventhandler.EventPriority
 net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+net.minecraftforge.fml.ModContainer net.minecraftforge.fml.common.ModContainer
+
 org.lwjgl.glfw.GLFW org.lwjgl.input.Keyboard
 
 org.lwjgl.glfw.GLFW GLFW_KEY_0 KEY_0
