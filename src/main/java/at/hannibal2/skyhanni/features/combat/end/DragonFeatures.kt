@@ -35,6 +35,7 @@ object DragonFeatures {
         .map { it.name.firstLetterUppercase() }
 
     private val dragonNamesAsRegex = dragonNames.joinToString("|")
+    private val dragonNamesAsRegexUppercase = dragonNames.joinToString("|") { it.uppercase() }
 
     private val protectorRepoGroup = RepoPattern.group("combat.boss.protector")
     private val repoGroup = RepoPattern.group("combat.boss.dragon")
@@ -67,7 +68,7 @@ object DragonFeatures {
      */
     private val endStartLineDragon by chatGroup.pattern(
         "end.boss",
-        "§f +§r§6§l(?<Dragon>$dragonNamesAsRegex) DRAGON DOWN!",
+        "§f +§r§6§l(?<Dragon>$dragonNamesAsRegexUppercase) DRAGON DOWN!",
     )
 
     /**
