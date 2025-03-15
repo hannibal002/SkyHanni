@@ -494,7 +494,12 @@ object HypixelData {
 
         var hypixel = false
 
-        player.clientBrand?.let {
+        //#if MC < 1.21
+        val clientBrand = player.clientBrand
+        //#else
+        //$$ val clientBrand = MinecraftClient.getInstance().networkHandler?.brand
+        //#endif
+        clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
                 hypixel = true
             }
