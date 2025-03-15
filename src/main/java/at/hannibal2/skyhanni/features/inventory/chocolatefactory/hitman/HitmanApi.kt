@@ -145,6 +145,8 @@ object HitmanApi {
         return purchasedHitmanSlots - slotsOnCooldown
     }
 
+    fun HitmanStatsStorage.getSlotsNotOnCooldown(): Int = getOpenSlots() - availableHitmanEggs
+
     /**
      * Get the time until slots are full (number of spawns 'catches up' to number of slots).
      * If the event ends before the slots are full, the time until the event ends is returned.
