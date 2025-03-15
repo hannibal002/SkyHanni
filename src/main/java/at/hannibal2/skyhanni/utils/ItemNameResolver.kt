@@ -116,10 +116,6 @@ object ItemNameResolver {
             return it
         }
 
-        if (NeuItems.allInternalNames.isEmpty()) {
-            NeuItems.readAllNeuItems()
-        }
-
         // supports colored names, rarities
         NeuItems.allItemsCache[itemName]?.let {
             itemNameCache[itemName] = it

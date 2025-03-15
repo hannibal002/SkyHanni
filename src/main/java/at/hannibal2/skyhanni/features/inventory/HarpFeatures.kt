@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -74,7 +75,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, 2, 3)
+            clickInventorySlot(37 + index, chest.inventorySlots.windowId, 2, 3)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -176,7 +177,7 @@ object HarpFeatures {
         }.takeIf { it != -1 }?.let {
             val clickType = event.clickType?.id ?: return
             event.cancel()
-            InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, clickType)
+            clickInventorySlot(it, event.container.windowId, event.clickedButton, clickType)
         }
     }
 
