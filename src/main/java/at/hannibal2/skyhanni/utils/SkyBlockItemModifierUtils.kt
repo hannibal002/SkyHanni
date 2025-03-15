@@ -14,9 +14,15 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.util.Constants
 import java.util.Locale
+//#if FORGE
+import net.minecraftforge.common.util.Constants
+//#elseif MC > 1.21
+//$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.registry.Registries
+//#endif
 
 object SkyBlockItemModifierUtils {
 
@@ -36,7 +42,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
 
-    fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
+    fun ItemStack.getSilexCount() = getHypixelEnchantments()?.get("efficiency")?.let {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
 
@@ -211,7 +217,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPersonalCompactorActive() = getAttributeByte("PERSONAL_DELETOR_ACTIVE") == 1.toByte()
 
-    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()
+    fun ItemStack.getHypixelEnchantments(): Map<String, Int>? = getExtraAttributes()
         ?.takeIf { it.hasKey("enchantments") }
         ?.run {
             val enchantments = this.getCompoundTag("enchantments")
@@ -232,7 +238,11 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getItemId() = getAttributeString("id")
 
+    //#if MC < 1.21
     fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as ResourceLocation
+    //#else
+    //$$ fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
+    //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
@@ -288,7 +298,11 @@ object SkyBlockItemModifierUtils {
     private fun ItemStack.getAttributeByte(label: String) =
         getExtraAttributes()?.getByte(label) ?: 0
 
-    fun ItemStack.getExtraAttributes() = tagCompound?.extraAttributes
+    //#if MC < 1.21
+    fun ItemStack.getExtraAttributes(): NBTTagCompound? = tagCompound?.extraAttributes
+    //#else
+    //$$ fun ItemStack.getExtraAttributes(): NbtCompound? = get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
+    //#endif
 
     class GemstoneSlot(private val type: GemstoneType, private val quality: GemstoneQuality) {
         fun getInternalName() = "${quality.name}_${type.name}_GEM".toInternalName()

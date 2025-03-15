@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 
@@ -28,7 +28,7 @@ object CrystalNucleusProfitPer {
         for ((internalName, amount) in loot) {
             internalName.getPrice().takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
                 val profit: Double = amount * pricePer
-                val nameFormat = internalName.itemName
+                val nameFormat = internalName.repoItemName
                 val text = "§eFound $nameFormat §8${amount.addSeparators()}x §7(§6${profit.shortFormat()}§7)"
                 map.addOrPut(text, profit)
                 totalProfit += profit

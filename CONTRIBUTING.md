@@ -300,6 +300,17 @@ specifically compile 1.8.9 using `./gradlew :1.8.9:build`. This does not affect 
 1.21 (as well as 1.8.9) JAR. This mode may be useful for someone seeking out issues to fix, but is generally not useful in day to day
 operations since the compile task will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from completing.
 
+### Compiling and Testing
+
+To compile the mod, simply run `./gradlew build` (without a version number), and the preprocessor will generate the necessary files for each
+version up to 1.21. By default, only a few files will be compiled, these files can be found in the `versions/<version>/buildpaths.txt` file.
+If you want to compile more files, you can add them to this file or if you want to compile all files you can temporarily remove the file.
+
+> ⚠️ **Notice:** For this to work you **Must** have the `skyhanni.multi-version` set too `compile` in your `.gradle/private.properties` file.
+
+If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in intellij. This will compile the 1.21 version and run it.
+Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
+
 ### Improving mappings
 
 The different project versions are set up in such a way that each version depends on a slightly older version from which it is then adapted.
