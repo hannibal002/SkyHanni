@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.back
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.util.ResourceLocation
 
 object RenderBackground {
 
-    private val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
+    private val textureLocation = createResourceLocation("skyhanni", "scoreboard.png")
 
     internal fun addBackground(renderable: Renderable): Renderable {
         with(backgroundConfig) {

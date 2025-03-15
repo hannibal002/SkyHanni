@@ -1,20 +1,20 @@
-package at.hannibal2.skyhanni.features.event.hoppity
+package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
 
-// TODO move into mining category and package
 @SkyHanniModule
 object NucleusBarriersBox {
     private val config get() = SkyHanniMod.feature.mining.crystalHighlighter
@@ -27,38 +27,28 @@ object NucleusBarriersBox {
         val configColorOption: Property<String>,
     ) {
         AMBER(
-            AxisAlignedBB(
-                BlockPos(474.0, 124.0, 524.0),
-                BlockPos(485.0, 111.0, 535.0),
-            ).expandBlock(),
+            LorenzVec(474, 124, 524).axisAlignedTo(LorenzVec(485, 111, 535))
+                .expandBlock(),
             colorConfig.amber,
         ),
         AMETHYST(
-            AxisAlignedBB(
-                BlockPos(474.0, 124.0, 492.0),
-                BlockPos(485.0, 111.0, 503.0),
-            ).expandBlock(),
+            LorenzVec(474, 124, 492).axisAlignedTo(LorenzVec(485, 111, 503))
+                .expandBlock(),
             colorConfig.amethyst,
         ),
         TOPAZ(
-            AxisAlignedBB(
-                BlockPos(508.0, 124.0, 473.0),
-                BlockPos(519.0, 111.0, 484.0),
-            ).expandBlock(),
+            LorenzVec(508, 124, 473).axisAlignedTo(LorenzVec(519, 111, 484))
+                .expandBlock(),
             colorConfig.topaz,
         ),
         JADE(
-            AxisAlignedBB(
-                BlockPos(542.0, 124.0, 492.0),
-                BlockPos(553.0, 111.0, 503.0),
-            ).expandBlock(),
+            LorenzVec(542, 124, 492).axisAlignedTo(LorenzVec(553, 111, 503))
+                .expandBlock(),
             colorConfig.jade,
         ),
         SAPPHIRE(
-            AxisAlignedBB(
-                BlockPos(542.0, 124.0, 524.0),
-                BlockPos(553.0, 111.0, 535.0),
-            ).expandBlock(),
+            LorenzVec(542, 124, 524).axisAlignedTo(LorenzVec(553, 111, 535))
+                .expandBlock(),
             colorConfig.sapphire,
         ),
     }

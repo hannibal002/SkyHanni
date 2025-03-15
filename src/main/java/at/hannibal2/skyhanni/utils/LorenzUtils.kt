@@ -234,19 +234,6 @@ object LorenzUtils {
         TitleManager.setTitle(text, duration, height, fontSize)
     }
 
-    inline fun <reified T : Enum<T>> enumValueOfOrNull(name: String): T? {
-        val enums = enumValues<T>()
-        return enums.firstOrNull { it.name == name }
-    }
-
-    inline fun <reified T : Enum<T>> enumValueOf(name: String) =
-        enumValueOfOrNull<T>(name) ?: error("Unknown enum constant for ${enumValues<T>().first().name.javaClass.simpleName}: '$name'")
-
-    inline fun <reified T : Enum<T>> enumJoinToPattern(noinline transform: (T) -> CharSequence = { it.name }) =
-        enumValues<T>().joinToString("|", transform = transform)
-
-    inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
-
     fun shutdownMinecraft(reason: String? = null) {
         val reasonLine = reason?.let { " Reason: $it" }.orEmpty()
         System.err.println("SkyHanni-@MOD_VERSION@ ${"forced the game to shutdown.$reasonLine"}")

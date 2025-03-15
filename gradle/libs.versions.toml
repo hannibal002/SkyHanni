@@ -9,6 +9,7 @@ modmenu = "13.0.3"
 
 [libraries]
 moulconfig = { module = "org.notenoughupdates.moulconfig:legacy", version.ref = "moulconfig" }
+moulconfigModern = { module = "org.notenoughupdates.moulconfig:modern", version.ref = "moulconfig" }
 libautoupdate = { module = "moe.nea:libautoupdate", version.ref = "libautoupdate" }
 headlessLwjgl = { module = "com.github.3arthqu4ke.HeadlessMc:headlessmc-lwjgl", version.ref = "headlessLwjgl" }
 jbAnnotations = { module = "org.jetbrains:annotations", version.ref = "jbAnnotations" }
