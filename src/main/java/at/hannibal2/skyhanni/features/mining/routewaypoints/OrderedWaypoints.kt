@@ -348,20 +348,17 @@ object OrderedWaypoints {
     }
 
     private fun save(args: Array<String>) {
+        ChatUtils.chat("test")
         if (args.isEmpty()) {
             return ChatUtils.chat("Usage: /shorderedsave (name).")
         }
+        ChatUtils.chat("test1")
         val waypoints = SoopyWaypointList(orderedWaypoints)
-        ChatUtils.debug(waypoints::class.java.toString())
-        ChatUtils.debug(waypoints.toJson())
-        try {
-            ProfileStorageData.playerSpecific
-                ?.routes!![args[0]] = waypoints
-        } catch (e: Exception) {
-            e.message?.let { ChatUtils.debug(it) }
-            ChatUtils.debug(e.stackTraceToString())
-            return
-        }
+        ChatUtils.chat("test2")
+            ChatUtils.chat("test3")
+            ProfileStorageData.playerSpecific?.routes!![args[0]] = waypoints
+            ChatUtils.chat("test4")
+
         ChatUtils.chat("Route saved as ${args[0]}. Do /shorderedimport ${args[0]} to import it.")
     }
 
