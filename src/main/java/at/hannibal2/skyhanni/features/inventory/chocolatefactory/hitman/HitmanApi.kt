@@ -77,9 +77,9 @@ object HitmanApi {
     /**
      * Return the time until the given number of rabbits can be hunted.
      */
-    private fun HitmanStatsStorage.getTimeToHuntCount(targetHuntCount: Int): Duration {
+    private fun getTimeToHuntCount(targetHuntCount: Int): Duration {
         // Determine how many hunts we need to perform
-        var huntsToPerform = (targetHuntCount - availableHitmanEggs)
+        var huntsToPerform = (targetHuntCount)
         if (huntsToPerform <= 0) return Duration.ZERO
 
         // Determine which pre-available meals we have, to determine better the first hunt
@@ -142,10 +142,8 @@ object HitmanApi {
             it.isInFuture()
         }?.timeUntil() ?: return purchasedHitmanSlots
         val slotsOnCooldown = ceil(allSlotsCooldownDuration.inPartialMinutes / MINUTES_PER_DAY).toInt()
-        return purchasedHitmanSlots - slotsOnCooldown
+        return purchasedHitmanSlots - slotsOnCooldown - availableHitmanEggs
     }
-
-    fun HitmanStatsStorage.getSlotsNotOnCooldown(): Int = getOpenSlots() - availableHitmanEggs
 
     /**
      * Get the time until slots are full (number of spawns 'catches up' to number of slots).
@@ -187,7 +185,7 @@ object HitmanApi {
         val eventEndMark = HoppityApi.getEventEndMark() ?: return Pair(Duration.ZERO, false)
 
         val timeToSlots = getTimeToNumSlots(purchasedHitmanSlots)
-        val timeToHunt = getTimeToHuntCount(purchasedHitmanSlots)
+        val timeToHunt = getTimeToHuntCount(purchasedHitmanSlots - availableHitmanEggs)
 
         // Figure out which timer is the inhibitor
         val longerTime = if (timeToSlots > timeToHunt) timeToSlots else timeToHunt
