@@ -460,3 +460,4 @@ at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer net.minecraft.client.gui
 net.minecraft.world.inventory.AbstractContainerMenu net.minecraft.inventory.Container
 
 net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
+net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
