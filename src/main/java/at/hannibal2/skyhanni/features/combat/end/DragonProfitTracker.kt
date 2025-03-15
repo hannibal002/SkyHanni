@@ -173,7 +173,7 @@ object DragonProfitTracker {
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
         val totalMessage = "Profit for Dragon§e: $profitPrefix${totalProfit.shortFormat()}"
 
-        hover.add("§cUsed §5Summoning Eye§7: §c-${eyePrice?.times(lastPlaced)?.shortFormat()}")
+        hover.add("§cPlaced §5Summoning Eye§7: §c-${eyePrice?.times(lastPlaced)?.shortFormat()}")
         hover.add("§e$totalMessage")
 
         ChatUtils.hoverableChat(totalMessage, hover)

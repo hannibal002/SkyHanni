@@ -357,6 +357,7 @@ object DragonFeatures {
     private fun handleEggSpawn(message: String): Boolean {
         if (eggSpawned.matches(message)) {
             egg = true
+            ProfitPerDragon.finishedLoot = false
             return true
         }
         return false

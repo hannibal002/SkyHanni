@@ -16,6 +16,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ProfitPerDragon {
+    var finishedLoot = false
+
     private val scannedLootUUIDs = mutableSetOf<UUID>()
     private val dragonLoot = mutableMapOf<NeuInternalName, Int>()
 
@@ -48,7 +50,7 @@ object ProfitPerDragon {
             }
         }
 
-        if (dragonLoot.isNotEmpty()) {
+        if (dragonLoot.isNotEmpty() && DragonFeatures.weight >= 290) {
             var weight = DragonFeatures.weight
             ChatUtils.debug("Weight: $weight")
 
@@ -96,6 +98,7 @@ object ProfitPerDragon {
         DragonProfitTracker.addDragonLootFromList(dragType, dragonLoot.toList())
 
         dragonLoot.clear()
+        finishedLoot = true
     }
 
     fun reset() {
@@ -132,7 +135,7 @@ object ProfitPerDragon {
 
     @HandleEvent
     fun onTick(e: SkyHanniTickEvent) {
-        if (lastScanned.passedSince() >= 1.seconds && !DragonFeatures.egg) {
+        if (lastScanned.passedSince() >= 1.seconds && !DragonFeatures.egg && !finishedLoot) {
             scanForLoot()
             lastScanned = SimpleTimeMark.now()
         }
