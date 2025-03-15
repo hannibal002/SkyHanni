@@ -177,7 +177,6 @@ object CrystalNucleusApi {
     )
     // </editor-fold>
 
-    // <editor-fold desc="Helper Classes">
     enum class NucleusCrystalType(private val gemstoneType: SkyBlockItemModifierUtils.GemstoneType) {
         AMBER(SkyBlockItemModifierUtils.GemstoneType.AMBER),
         AMETHYST(SkyBlockItemModifierUtils.GemstoneType.AMETHYST),
@@ -194,7 +193,6 @@ object CrystalNucleusApi {
                 entries.firstOrNull { it.gemstoneType == this }
         }
     }
-    // </editor-fold>
 
     private var inLootLoop = false
     private var unCheckedBooks: Int = 0
@@ -219,12 +217,12 @@ object CrystalNucleusApi {
         "SYNTHETIC_HEART",
     ).map { it.toInternalName() }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onAreaChange(event: GraphAreaChangeEvent) {
         inNucleus = event.area == "Crystal Nucleus"
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
         if (event.itemStack.displayName != "§fEnchanted Book") return
@@ -272,7 +270,7 @@ object CrystalNucleusApi {
         if (!unclosedCrystalCollected) return
         crystalCollectedIdentifierPattern.matchMatcher(message) {
             val crystal = group("crystal") ?: return@matchMatcher
-            val gem = NucleusCrystalType.getByNameOrNull(group("crystal") ?: return@matchMatcher) ?: return@matchMatcher
+            val gem = NucleusCrystalType.getByNameOrNull(crystal) ?: return@matchMatcher
             CrystalNucleusCrystalFoundEvent(gem).post()
         }
     }
@@ -327,7 +325,5 @@ object CrystalNucleusApi {
 
     fun getPrecursorRunPrice() =
         if (usesApparatus()) PRECURSOR_APPARATUS_ITEM.getPrice()
-        else ROBOT_PARTS_ITEMS.sumOf {
-            it.getPrice()
-        }
+        else ROBOT_PARTS_ITEMS.sumOf { it.getPrice() }
 }
