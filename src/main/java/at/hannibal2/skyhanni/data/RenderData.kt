@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -12,15 +14,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object RenderData {
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
+    @HandleEvent
+    fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
         if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
@@ -31,8 +31,8 @@ object RenderData {
         GlStateManager.translate(0f, 0f, 3f)
     }
 
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
+    @HandleEvent
+    fun onBackgroundDraw(event: DrawBackgroundEvent) {
         if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -11,12 +10,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
-import at.hannibal2.skyhanni.utils.compat.getNameAsString
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
@@ -29,10 +27,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.fml.common.eventhandler.Event
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object EntityUtils {
@@ -61,7 +55,7 @@ object EntityUtils {
         contains: String,
         radius: Double = 3.0,
     ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
-        it.getNameAsString().contains(contains)
+        it.name.contains(contains)
     }
 
     @Deprecated("Use Mob Detection Instead")
@@ -83,7 +77,7 @@ object EntityUtils {
     ): List<EntityArmorStand> {
         val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
-            val result = it.getNameAsString().contains(contains)
+            val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
                 LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
@@ -97,9 +91,9 @@ object EntityUtils {
     }
 
     private fun getArmorStandsInRadius(center: LorenzVec, radius: Double): List<EntityArmorStand> {
-        val a = center.add(-radius, -radius - 3, -radius).toBlockPos()
-        val b = center.add(radius, radius + 3, radius).toBlockPos()
-        val alignedBB = AxisAlignedBB(a, b)
+        val a = center.add(-radius, -radius - 3, -radius)
+        val b = center.add(radius, radius + 3, radius)
+        val alignedBB = a.axisAlignedTo(b)
         val clazz = EntityArmorStand::class.java
         val worldObj = Minecraft.getMinecraft().theWorld ?: return emptyList()
         return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
@@ -147,7 +141,7 @@ object EntityUtils {
 
     @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
-        val inventory = this.getWholeInventory() ?: return false
+        val inventory = this.getAllEquipment() ?: return false
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
@@ -185,63 +179,9 @@ object EntityUtils {
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.getEntityLevel()?.getEntityByID(entityId)
 
-    @SubscribeEvent
-    fun onEntityRenderPre(
-        event:
-        //#if MC < 1.14
-        RenderLivingEvent.Pre<*>,
-        //#else
-        //$$ RenderLivingEvent.Pre<*, *>
-        //#endif
-
-    ) {
-        val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.post()) {
-            event.cancel()
-        }
-    }
-
-    @SubscribeEvent
-    fun onEntityRenderPost(
-        event:
-        //#if MC < 11400
-        RenderLivingEvent.Post<*>,
-        //#else
-        //$$ RenderLivingEvent.Post<*, *>
-        //#endif
-
-    ) {
-        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
-    }
-
-    //#if MC < 11400
-    @SubscribeEvent
-    fun onEntityRenderSpecialsPre(
-        event: RenderLivingEvent.Specials.Pre<*>,
-    ) {
-        val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.post()) {
-            event.cancel()
-        }
-    }
-
-    @SubscribeEvent
-    fun onEntityRenderSpecialsPost(
-        event: RenderLivingEvent.Specials.Post<*>,
-    ) {
-        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
-    }
-    //#endif
-
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.getNameAsString().removeColor()
+    fun Entity.cleanName() = this.name.removeColor()
 }
-
-//#if FORGE
-private fun Event.cancel() {
-    isCanceled = true
-}
-//#endif

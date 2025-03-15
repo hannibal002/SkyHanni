@@ -12,11 +12,11 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.hover
-import at.hannibal2.skyhanni.utils.chat.Text.onClick
-import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import kotlinx.coroutines.launch
 
 object NavigationHelper {
@@ -63,7 +63,7 @@ object NavigationHelper {
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
-        Text.displayPaginatedList(
+        TextHelper.displayPaginatedList(
             title,
             locations,
             chatLineId = messageId,

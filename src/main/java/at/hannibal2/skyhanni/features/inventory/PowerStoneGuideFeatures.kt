@@ -50,7 +50,7 @@ object PowerStoneGuideFeatures {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        event.gui.inventorySlots.inventorySlots
+        event.container.inventorySlots
             .filter { missing.containsKey(it.slotNumber) }
             .forEach { it highlight LorenzColor.RED }
     }

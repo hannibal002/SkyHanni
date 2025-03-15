@@ -78,6 +78,16 @@ object SkillProgress {
     }
 
     @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!isDisplayEnabled()) return
+        if (display.isEmpty()) return
+
+        if (etaConfig.enabled.get()) {
+            config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
+        }
+    }
+
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
@@ -387,6 +397,8 @@ object SkillProgress {
                     xpInfo.sessionTimerActive = false
                     xpInfo.timeActive = 0L
                     chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
+                    updateDisplay()
+                    update()
                 },
             ),
         )
