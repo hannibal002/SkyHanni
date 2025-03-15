@@ -2,13 +2,15 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkyBlockXPApi
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import net.minecraft.client.Minecraft
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SkyBlockXPBar {
@@ -17,8 +19,8 @@ object SkyBlockXPBar {
 
     private class OriginalValues(val currentXP: Float, val maxXP: Int, val level: Int)
 
-    @SubscribeEvent
-    fun onRenderExperienceBar(event: RenderGameOverlayEvent.Pre) {
+    @HandleEvent
+    fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (!isEnabled()) return
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
         val (level, xp) = SkyBlockXPApi.levelXPPair ?: return
@@ -29,8 +31,8 @@ object SkyBlockXPBar {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderExperienceBarPost(event: RenderGameOverlayEvent.Post) {
+    @HandleEvent
+    fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
         with(cache ?: return) {
             Minecraft.getMinecraft().thePlayer.setXPStats(currentXP, maxXP, level)
