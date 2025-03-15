@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -57,6 +58,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItem
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -71,8 +73,6 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
@@ -224,7 +224,7 @@ object GardenVisitorFeatures {
                     onLeftClick = {
                         if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickable
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                            LorenzUtils.setTextIntoSign("$amount")
+                            SignUtils.setTextIntoSign("$amount")
                         } else {
                             internalName.buy(amount)
                         }
@@ -289,7 +289,7 @@ object GardenVisitorFeatures {
                     "§aCraftable!",
                     {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                            LorenzUtils.setTextIntoSign("$leftToCraft")
+                            SignUtils.setTextIntoSign("$leftToCraft")
                         } else {
                             HypixelCommands.viewRecipe(internalName.asString())
                         }
@@ -638,9 +638,8 @@ object GardenVisitorFeatures {
 
     private fun renderDisplay() = config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
 
-    @SubscribeEvent
-    fun onRenderInSigns(event: DrawScreenEvent.Post) {
-        if (!GardenApi.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!config.shoppingList.display) return
         val gui = event.gui
         if (gui !is GuiEditSign) return

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -29,9 +28,6 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.fml.common.eventhandler.Event
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object EntityUtils {
@@ -184,63 +180,9 @@ object EntityUtils {
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.getEntityLevel()?.getEntityByID(entityId)
 
-    @SubscribeEvent
-    fun onEntityRenderPre(
-        event:
-        //#if MC < 1.14
-        RenderLivingEvent.Pre<*>,
-        //#else
-        //$$ RenderLivingEvent.Pre<*, *>
-        //#endif
-
-    ) {
-        val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.post()) {
-            event.cancel()
-        }
-    }
-
-    @SubscribeEvent
-    fun onEntityRenderPost(
-        event:
-        //#if MC < 11400
-        RenderLivingEvent.Post<*>,
-        //#else
-        //$$ RenderLivingEvent.Post<*, *>
-        //#endif
-
-    ) {
-        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
-    }
-
-    //#if MC < 11400
-    @SubscribeEvent
-    fun onEntityRenderSpecialsPre(
-        event: RenderLivingEvent.Specials.Pre<*>,
-    ) {
-        val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.post()) {
-            event.cancel()
-        }
-    }
-
-    @SubscribeEvent
-    fun onEntityRenderSpecialsPost(
-        event: RenderLivingEvent.Specials.Post<*>,
-    ) {
-        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
-    }
-    //#endif
-
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
     fun Entity.cleanName() = this.name.removeColor()
 }
-
-//#if FORGE
-private fun Event.cancel() {
-    isCanceled = true
-}
-//#endif
