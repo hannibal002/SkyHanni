@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.util.IChatComponent
+import net.minecraft.util.ResourceLocation
+
 //#if MC > 1.16
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.TextColor
@@ -53,3 +55,21 @@ fun IChatComponent?.formattedTextCompat(): String =
 //#endif
 
 fun String.formattedTextCompat() = this
+
+fun createResourceLocation(domain: String, path: String): ResourceLocation {
+    //#if MC < 1.21
+    val textureLocation = ResourceLocation(domain, path)
+    //#else
+    //$$ val textureLocation = Identifier.of(domain, path)
+    //#endif
+    return textureLocation
+}
+
+fun createResourceLocation(path: String): ResourceLocation {
+    //#if MC < 1.21
+    val textureLocation = ResourceLocation(path)
+    //#else
+    //$$ val textureLocation = Identifier.of(path)
+    //#endif
+    return textureLocation
+}

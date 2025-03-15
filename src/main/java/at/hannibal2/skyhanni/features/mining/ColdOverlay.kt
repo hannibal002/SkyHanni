@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
@@ -25,11 +26,7 @@ object ColdOverlay {
     private var lastCold = 0
     private var lastColdUpdate = SimpleTimeMark.farPast()
 
-    //#if MC < 1.21
-    private val textureLocation = ResourceLocation("skyhanni", "cold_overlay.png")
-    //#else
-    //$$ private val textureLocation = Identifier.of("skyhanni", "cold_overlay.png")
-    //#endif
+    private val textureLocation = createResourceLocation("skyhanni", "cold_overlay.png")
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
@@ -71,11 +72,7 @@ object RenderUtils {
         override fun toString() = value
     }
 
-    //#if MC < 1.21
-    private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
-    //#else
-    //$$ private val beaconBeam = Identifier.of("textures/entity/beacon_beam.png")
-    //#endif
+    private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
