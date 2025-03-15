@@ -162,16 +162,6 @@ object InventoryUtils {
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
-    fun clickSlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int = 0, mode: Int = 0) {
-        windowId ?: return
-        val controller = Minecraft.getMinecraft().playerController
-        //#if MC < 1.12
-        controller.windowClick(windowId, slot, mouseButton, mode, Minecraft.getMinecraft().thePlayer)
-        //#else
-        //$$ controller.windowClick(windowId, slot, mouseButton, ClickType.entries[mode], Minecraft.getMinecraft().player)
-        //#endif
-    }
-
     fun Slot.isTopInventory() = inventory.isTopInventory()
 
     fun IInventory.isTopInventory() = this is ContainerLocalMenu
