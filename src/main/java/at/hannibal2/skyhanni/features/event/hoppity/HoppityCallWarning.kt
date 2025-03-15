@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
