@@ -113,7 +113,7 @@ object DragonFeatures {
      */
     private val dragonSpawn by chatGroup.pattern(
         "spawn",
-        "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>$dragonNamesAsRegexUppercase) Dragon§r§d§l has spawned!",
+        "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>$dragonNamesAsRegex) Dragon§r§d§l has spawned!",
     )
 
     /**
