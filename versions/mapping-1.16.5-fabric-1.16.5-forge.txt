@@ -2,6 +2,8 @@
 net.fabricmc.api.EnvType net.minecraftforge.api.distmarker.Dist
 net.fabricmc.api.Environment net.minecraftforge.api.distmarker.OnlyIn
 
+net.fabricmc.loader.api.ModContainer net.minecraftforge.fml.ModContainer
+
 net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.player.LocalPlayer
 
 net.minecraft.client.network.ClientPlayerEntity sendChatMessage() chat()
