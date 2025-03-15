@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.compat.containerSlots
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
@@ -113,8 +114,7 @@ object InventoryUtils {
     }
 
     fun isSlotInPlayerInventory(itemStack: ItemStack): Boolean {
-        val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
-        val slotUnderMouse = screen.slotUnderMouse ?: return false
+        val slotUnderMouse = slotUnderCursor() ?: return false
         return slotUnderMouse.inventory is InventoryPlayer && slotUnderMouse.stack == itemStack
     }
 
