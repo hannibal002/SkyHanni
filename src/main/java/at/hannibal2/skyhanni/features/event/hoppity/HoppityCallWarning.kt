@@ -18,6 +18,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
+<<<<<<< HEAD
+=======
+import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
+>>>>>>> upstream/beta
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
