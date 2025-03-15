@@ -38,10 +38,10 @@ object ThunderBottleNotification {
             val bottlesInInventory = bottles.filter { InventoryUtils.isItemInInventory(it) }
                 .map { it.itemNameWithoutColor }
             if (bottlesInInventory.isNotEmpty()) {
-                val length = bottlesInInventory.size
+                val size = bottlesInInventory.size
                 ChatUtils.clickableChat(
                     "You are currently fishing, but " +
-                        "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(length, "is", "are")} full. " +
+                        "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(size, "is", "are")} full. " +
                         "Click here to disable this notification.",
                     { config::thunderBottleNotification.jumpToEditor() },
                     replaceSameMessage = true,
