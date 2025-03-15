@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
 import kotlin.math.ceil
 
 object RenderableInventory {

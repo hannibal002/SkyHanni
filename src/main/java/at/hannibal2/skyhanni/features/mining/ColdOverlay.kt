@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
 

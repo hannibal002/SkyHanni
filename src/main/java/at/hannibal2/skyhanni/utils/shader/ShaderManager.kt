@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
-import net.minecraft.util.ResourceLocation
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.OpenGLException
 import java.io.BufferedReader
