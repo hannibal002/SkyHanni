@@ -22,4 +22,13 @@ class DragonProfitTrackerConfig {
     @Expose
     @ConfigLink(owner = DragonProfitTrackerConfig::class, field = "enabled")
     var position: Position = Position(20, 20, false, true)
+
+    @Expose
+    @ConfigOption(
+        name = "Count Leeched Dragons",
+        desc = "Count Dragons you placed no eyes in towards your total profit."
+    )
+    @FeatureToggle
+    @ConfigEditorBoolean
+    var countLeechedDragons: Boolean = true
 }

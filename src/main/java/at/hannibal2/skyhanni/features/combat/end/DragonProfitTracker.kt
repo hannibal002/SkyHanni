@@ -148,6 +148,7 @@ object DragonProfitTracker {
     }
 
     fun addDragonLootFromList(type: DragonType, items: List<Pair<NeuInternalName, Int>>) {
+        if (lastPlaced == 0 && !config.countLeechedDragons) return
         items.forEach { (item, amount) -> addDragonLoot(type, item, amount) }
 
         val lootMap = mutableMapOf<String, Double>()
