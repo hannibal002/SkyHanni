@@ -77,10 +77,8 @@ object HitmanApi {
     /**
      * Return the time until the given number of rabbits can be hunted.
      */
-    private fun getTimeToHuntCount(targetHuntCount: Int): Duration {
-        // Determine how many hunts we need to perform
-        var huntsToPerform = (targetHuntCount)
-        if (huntsToPerform <= 0) return Duration.ZERO
+    private fun getTimeToHuntCount(targetHunts: Int): Duration {
+        var huntsToPerform = targetHunts.takeIf { it > 0 } ?: return Duration.ZERO
 
         // Determine which pre-available meals we have, to determine better the first hunt
         val initialClaimable = sortedEntries.filter {
