@@ -35,7 +35,6 @@ object DragonFeatures {
         .map { it.name.firstLetterUppercase() }
 
     private val dragonNamesAsRegex = dragonNames.joinToString("|")
-    private val dragonNamesAsRegexUppercase = dragonNames.joinToString("|") { it.uppercase() }
 
     private val protectorRepoGroup = RepoPattern.group("combat.boss.protector")
     private val repoGroup = RepoPattern.group("combat.boss.dragon")
@@ -81,6 +80,7 @@ object DragonFeatures {
 
     /**
      * REGEX-TEST: §f                   §r§eYour Damage: §r§a88,966 §r§7(Position #5)
+     * REGEX-TEST: §f                 §r§eYour Damage: §r§a3,198,068 §r§7(Position #1)
      */
     @Suppress("MaxLineLength")
     private val endPosition by chatGroup.pattern(
@@ -110,6 +110,7 @@ object DragonFeatures {
 
     /**
      * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lProtector Dragon§r§d§l has spawned!
+     * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lYoung Dragon§r§d§l has spawned!
      */
     private val dragonSpawn by chatGroup.pattern(
         "spawn",
@@ -212,9 +213,8 @@ object DragonFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.display) return
-
         val message = event.message
+
         if (!config.chat && !config.display && !config.superiorNotify && !configProtector) return
 
         if (handleDragonSpawn(message)) return
