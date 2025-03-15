@@ -31,10 +31,11 @@ object DragonFeatures {
     private val configProtector get() = SkyHanniMod.feature.combat.endstoneProtectorChat
 
     private val dragonNames = DragonType.entries
-        .filter { it != DragonType.UNKNOWN } // Exclude UNKNOWN if necessary
+        .filter { it != DragonType.UNKNOWN }
         .map { it.name.firstLetterUppercase() }
 
     private val dragonNamesAsRegex = dragonNames.joinToString("|")
+    private val dragonNamesAsRegexUppercase = dragonNames.joinToString("|") { it.uppercase() }
 
     private val protectorRepoGroup = RepoPattern.group("combat.boss.protector")
     private val repoGroup = RepoPattern.group("combat.boss.dragon")
@@ -112,7 +113,7 @@ object DragonFeatures {
      */
     private val dragonSpawn by chatGroup.pattern(
         "spawn",
-        "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>$dragonNamesAsRegex) Dragon§r§d§l has spawned!",
+        "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>$dragonNamesAsRegexUppercase) Dragon§r§d§l has spawned!",
     )
 
     /**
