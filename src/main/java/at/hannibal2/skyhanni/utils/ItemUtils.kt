@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
@@ -214,8 +215,9 @@ object ItemUtils {
             }
         }
 
-        if (withCursorItem && player.inventory != null && player.inventory.itemStack != null) {
-            list.add(player.inventory.itemStack)
+        val cursorStack = player.getItemOnCursor()
+        if (withCursorItem && cursorStack != null) {
+            list.add(cursorStack)
         }
         return list
     }
