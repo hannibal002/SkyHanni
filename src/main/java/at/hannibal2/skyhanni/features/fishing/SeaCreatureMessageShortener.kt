@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.util.ChatComponentText
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object SeaCreatureMessageShortener {
@@ -26,6 +26,6 @@ object SeaCreatureMessageShortener {
         }
 
         if (original == edited) return
-        event.chatEvent.chatComponent = ChatComponentText(edited)
+        event.chatEvent.chatComponent = edited.asComponent()
     }
 }

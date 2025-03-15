@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
@@ -15,7 +16,6 @@ import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
-import org.lwjgl.input.Mouse
 
 class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult>) : GuiScreen() {
 
@@ -43,7 +43,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         RenderUtils.drawFloatingRectDark(0, 0, w, h)
         GlStateManager.translate(5.0, 5.0 - scroll, 0.0)
         val mouseX = originalMouseX - l
-        val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && Mouse.isButtonDown(0)
+        val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)
         var mouseY = originalMouseY - (t - scroll).toInt()
         val sr = ScaledResolution(mc)
         GlScissorStack.push(l + 5, t + 5, w + l - 5, h + t - 5, sr)
@@ -132,6 +132,6 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
 
     override fun handleMouseInput() {
         super.handleMouseInput()
-        setScroll(scroll - Mouse.getEventDWheel())
+        setScroll(scroll - MouseCompat.getScrollDelta())
     }
 }

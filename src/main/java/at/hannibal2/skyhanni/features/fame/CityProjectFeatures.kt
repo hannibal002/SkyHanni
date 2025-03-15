@@ -22,10 +22,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -36,6 +34,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -115,7 +114,7 @@ object CityProjectFeatures {
             // internal name -> amount
             val materials = mutableMapOf<NeuInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
-                if (item.name != "§eContribute this component!") continue
+                if (item.displayName != "§eContribute this component!") continue
                 fetchMaterials(item, materials)
             }
 
@@ -145,7 +144,7 @@ object CityProjectFeatures {
                         nextTime = endTime
                     }
                 }
-                if (item.name != "§eContribute this component!") continue
+                if (item.displayName != "§eContribute this component!") continue
                 nextTime = now
             }
             ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
@@ -169,7 +168,7 @@ object CityProjectFeatures {
 
         for ((internalName, amount) in materials) {
             val stack = internalName.getItemStack()
-            val name = internalName.itemName
+            val name = internalName.repoItemName
             val list = mutableListOf<Any>()
             list.add(" §7- ")
             list.add(stack)
@@ -179,7 +178,7 @@ object CityProjectFeatures {
                     "$name §ex${amount.addSeparators()}",
                     {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                            LorenzUtils.setTextIntoSign("$amount")
+                            SignUtils.setTextIntoSign("$amount")
                         } else {
                             BazaarApi.searchForBazaarItem(name, amount)
                         }

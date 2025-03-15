@@ -42,7 +42,11 @@ object CosmeticFollowingLine {
 
         updateClose(event)
 
+        //#if MC < 1.16
         val firstPerson = Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
+        //#else
+        //$$ val firstPerson = Minecraft.getInstance().options.cameraType.isFirstPerson
+        //#endif
         val color = config.lineColor.toSpecialColor()
 
         renderClose(event, firstPerson, color)
