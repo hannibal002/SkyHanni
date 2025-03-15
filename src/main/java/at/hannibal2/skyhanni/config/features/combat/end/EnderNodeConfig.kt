@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.combat
+package at.hannibal2.skyhanni.config.features.combat.end
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import java.util.*
 
 class EnderNodeConfig {
     @Expose
