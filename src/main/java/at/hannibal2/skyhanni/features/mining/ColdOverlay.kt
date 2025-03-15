@@ -25,7 +25,11 @@ object ColdOverlay {
     private var lastCold = 0
     private var lastColdUpdate = SimpleTimeMark.farPast()
 
+    //#if MC < 1.21
     private val textureLocation = ResourceLocation("skyhanni", "cold_overlay.png")
+    //#else
+    //$$ private val textureLocation = Identifier.of("skyhanni", "cold_overlay.png")
+    //#endif
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

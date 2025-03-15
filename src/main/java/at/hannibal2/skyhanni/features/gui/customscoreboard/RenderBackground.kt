@@ -13,7 +13,11 @@ import net.minecraft.util.ResourceLocation
 
 object RenderBackground {
 
+    //#if MC < 1.21
     private val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
+    //#else
+    //$$ private val textureLocation = Identifier.of("skyhanni", "scoreboard.png")
+    //#endif
 
     internal fun addBackground(renderable: Renderable): Renderable {
         with(backgroundConfig) {

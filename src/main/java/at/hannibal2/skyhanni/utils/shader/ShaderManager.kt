@@ -60,7 +60,11 @@ object ShaderManager {
     }
 
     fun loadShader(type: ShaderType, fileName: String): Int {
+        //#if MC < 1.21
         val resourceLocation = ResourceLocation("skyhanni:shaders/$fileName${type.extension}")
+        //#else
+        //$$ val resourceLocation = Identifier.of("skyhanni:shaders/$fileName${type.extension}")
+        //#endif
 
         val source = StringBuilder()
 

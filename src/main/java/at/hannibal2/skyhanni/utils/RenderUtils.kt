@@ -71,7 +71,11 @@ object RenderUtils {
         override fun toString() = value
     }
 
+    //#if MC < 1.21
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
+    //#else
+    //$$ private val beaconBeam = Identifier.of("textures/entity/beacon_beam.png")
+    //#endif
 
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)

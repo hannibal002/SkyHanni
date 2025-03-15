@@ -8,7 +8,11 @@ import kotlin.math.ceil
 
 object RenderableInventory {
 
+    //#if MC < 1.21
     private val inventoryTextures = ResourceLocation("skyhanni", "gui/slot.png")
+    //#else
+    //$$ private val inventoryTextures = Identifier.of("skyhanni", "gui/slot.png")
+    //#endif
     private const val TEXTURE_WIDTH = 90
     private const val TEXTURE_HEIGHT = 54
 
