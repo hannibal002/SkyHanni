@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
+//#if MC < 1.21
+import net.minecraft.util.ChatComponentText
+//#endif
 
 object TextHelper {
 
@@ -17,11 +19,16 @@ object TextHelper {
     val EMPTY = "".asComponent()
 
     fun text(text: String, init: IChatComponent.() -> Unit = {}) = text.asComponent(init)
+
+    //#if MC < 1.21
     fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
+    //#else
+    //$$ fun String.asComponent(init: Text.() -> Unit = {}): Text = Text.of(this).also(init)
+    //#endif
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
     fun join(vararg components: Any?, separator: IChatComponent? = null): IChatComponent {
-        val result = ChatComponentText("")
+        val result = "".asComponent()
         components.forEachIndexed { index, component ->
             when (component) {
                 is IChatComponent -> result.appendSibling(component)
@@ -54,7 +61,7 @@ object TextHelper {
         val maxWidth = Minecraft.getMinecraft().ingameGUI.chatGUI.chatWidth
         if (width < maxWidth) {
             val repeat = maxWidth / width
-            val component = ChatComponentText("")
+            val component = "".asComponent()
             repeat(repeat) { component.appendSibling(this) }
             return component
         }

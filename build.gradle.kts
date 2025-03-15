@@ -3,15 +3,16 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import com.google.devtools.ksp.gradle.KspTaskJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import moe.nea.shot.ShotParser
 import moe.nea.shot.Shots
 import net.fabricmc.loom.api.processor.MinecraftJarProcessor
 import net.fabricmc.loom.api.processor.ProcessorContext
 import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
@@ -50,6 +51,7 @@ java {
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
+
 // Minecraft configuration:
 loom {
     if (this.isForgeLike) {
@@ -70,8 +72,12 @@ loom {
             if (target == ProjectTarget.MAIN) {
                 isIdeConfigGenerated = true
                 appendProjectPathToConfigName.set(false)
+                this.runDir(runDirectory.relativeTo(projectDir).toString())
+            } else if (target == ProjectTarget.MODERN) {
+                isIdeConfigGenerated = true
+                appendProjectPathToConfigName.set(true)
+                this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
             }
-            this.runDir(runDirectory.relativeTo(projectDir).toString())
             property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
@@ -173,11 +179,13 @@ dependencies {
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
     } else if (target == ProjectTarget.BRIDGE116FABRIC) {
-        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
-        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
+        modImplementation("net.fabricmc:fabric-loader:0.16.7")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
-        modCompileOnly("net.fabricmc:fabric-loader:0.16.10")
-        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
+        modImplementation("net.fabricmc:fabric-loader:0.16.10")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
+
+        modLocalRuntime(libs.modmenu)
     }
 
     implementation(kotlin("stdlib-jdk8"))
@@ -229,6 +237,10 @@ dependencies {
 afterEvaluate {
     loom.runs.named("client") {
         programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+    }
+    tasks.named("kspKotlin", KspTaskJvm::class) {
+        this.options.add(SubpluginOption("apoption", "skyhanni.sourceset=${target.minecraftVersion.versionName}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
     }
 }
 
