@@ -202,21 +202,19 @@ object DragonFeatures {
         else -> 70
     }
 
-    private fun calculateBaseWeight(place: Int, firstDamage: Double, yourDamage: Double): Double {
-        return weightMap(if (yourDamage == 0.0) -1 else place) + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
-    }
-
     private fun calculateDragonWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double) =
         weightMap(
             if (yourDamage == 0.0) -1 else place,
         ) + 100 * (
             eyes + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
             )
-        // return calculateBaseWeight(place, firstDamage, yourDamage) + 100 * eyes
 
-    private fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double): Double {
-        return calculateBaseWeight(place, firstDamage, yourDamage) + 50 + if (zealots > 100) 100 else zealots
-    }
+    private fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double) =
+        weightMap(
+            if (yourDamage == 0.0) -1 else place,
+        ) + 50 * (
+            yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
+            ) + if (zealots > 100) 100 else zealots
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onChat(event: SkyHanniChatEvent) {
