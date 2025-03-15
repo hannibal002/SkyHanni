@@ -2,6 +2,8 @@
 # at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
 # at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
 
+at/hannibal2/skyhanni/TestingModFeatures.kt
+
 at/hannibal2/skyhanni/SkyHanniModLoader.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/AnitaUpgradeCostsJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/ArmorDropsJson.kt
