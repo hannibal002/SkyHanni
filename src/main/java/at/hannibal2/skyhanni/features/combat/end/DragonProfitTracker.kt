@@ -15,7 +15,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -96,7 +97,7 @@ object DragonProfitTracker {
             )
         }
 
-        val colorCode = bucketData.selectedBucket?.colorCode ?: "§b"
+        val colorCode = bucketData.selectedBucket?.color ?: LorenzColor.AQUA
         val displayName = bucketData.selectedBucket?.displayName ?: "Total Dragon"
         val killAmount = bucketData.getTotalDragonCount()
         val dragonString = "$colorCode$displayName §r§bkills: $killAmount"
@@ -154,7 +155,7 @@ object DragonProfitTracker {
         items.forEach { (internalName, amount) ->
             internalName.getPrice().takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
                 val profit: Double = amount * pricePer
-                val nameFormat = internalName.itemName
+                val nameFormat = internalName.repoItemName
                 val text = "§eFound $nameFormat §8${amount}x §7(§6${profit.shortFormat()}§7)"
                 lootMap.addOrPut(text, profit)
                 totalProfit += profit

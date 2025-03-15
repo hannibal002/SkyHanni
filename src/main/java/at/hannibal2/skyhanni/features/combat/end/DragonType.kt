@@ -1,41 +1,37 @@
 package at.hannibal2.skyhanni.features.combat.end
 
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+
 enum class DragonType(
-    val displayName: String,
-    val colorCode: String,
+    val color: LorenzColor,
     val selectable: Boolean = true,
 ) {
     PROTECTOR(
-        "Protector Dragon",
-        "§7",
+        LorenzColor.GRAY,
     ),
     OLD(
-        "Old Dragon",
-        "§e",
+        LorenzColor.YELLOW,
     ),
     UNSTABLE(
-        "Unstable Dragon",
-        "§5",
+        LorenzColor.DARK_PURPLE,
     ),
     YOUNG(
-        "Young Dragon",
-        "§f",
+        LorenzColor.WHITE,
     ),
     STRONG(
-        "Strong Dragon",
-        "§c",
+        LorenzColor.RED,
     ),
     WISE(
-        "Wise Dragon",
-        "§b",
+        LorenzColor.AQUA,
     ),
     SUPERIOR(
-        "Superior Dragon",
-        "§6",
+        LorenzColor.GOLD,
     ),
     UNKNOWN(
-        "",
-        "",
+        LorenzColor.WHITE,
         false,
-    ),
+    );
+
+    val displayName: String = "${name.firstLetterUppercase()} Dragon"
 }

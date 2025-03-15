@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatPercentage
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -30,10 +29,10 @@ object DragonFeatures {
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
     private val configProtector get() = SkyHanniMod.feature.combat.endstoneProtectorChat
 
-    private val dragonNames = listOf("Protector", "Old", "Wise", "Unstable", "Young", "Strong", "Superior")
+    private val dragonNames = DragonType.entries
 
     private val dragonNamesAsRegex = dragonNames.joinToString("|")
-    private val dragonNamesUpperCaseAsRegex = dragonNames.joinToString("|") { it.uppercase() }
+    private val dragonNamesUpperCaseAsRegex = dragonNames.joinToString("|") { it.name.uppercase() }
 
     private val protectorRepoGroup = RepoPattern.group("combat.boss.protector")
     private val repoGroup = RepoPattern.group("combat.boss.dragon")
@@ -41,79 +40,93 @@ object DragonFeatures {
     private val scoreBoardGroup = repoGroup.group("scoreboard")
     private val tabListGroup = repoGroup.group("tablist")
 
-    /** REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! §r§7(§r§e2§r§7/§r§a8§r§7)
+    /**
+     * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! §r§7(§r§e2§r§7/§r§a8§r§7)
      * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7(§r§a8§r§7/§r§a8§r§7)
      */
+    @Suppress("MaxLineLength")
     private val eyePlaced by chatGroup.pattern(
         "eye.placed.you",
-        "§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|" +
-            "§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)",
+        "§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)",
     )
 
-    /** REGEX-TEST: §5You recovered a Summoning Eye!
+    /**
+     * REGEX-TEST: §5You recovered a Summoning Eye!
      */
     private val eyeRemoved by chatGroup.pattern("eye.removed.you", "§5You recovered a Summoning Eye!")
 
-    /** REGEX-TEST: §5☬ §r§dThe Dragon Egg has spawned!
+    /**
+     * REGEX-TEST: §5☬ §r§dThe Dragon Egg has spawned!
      */
     private val eggSpawned by chatGroup.pattern("egg.spawn", "§5☬ §r§dThe Dragon Egg has spawned!")
 
-    /** REGEX-TEST: §f                      §r§6§lPROTECTOR DRAGON DOWN!
+    /**
+     * REGEX-TEST: §f                      §r§6§lPROTECTOR DRAGON DOWN!
      */
     private val endStartLineDragon by chatGroup.pattern(
         "end.boss",
         "§f +§r§6§l(?<Dragon>$dragonNamesUpperCaseAsRegex) DRAGON DOWN!",
     )
 
-    /** REGEX-TEST: §f                    §r§6§lENDSTONE PROTECTOR DOWN!
+    /**
+     * REGEX-TEST: §f                    §r§6§lENDSTONE PROTECTOR DOWN!
      */
     private val endStartLineProtector by protectorRepoGroup.pattern(
         "chat.end.boss",
         "§f +§r§6§lENDSTONE PROTECTOR DOWN!",
     )
 
-    /** REGEX-TEST: §f                   §r§eYour Damage: §r§a88,966 §r§7(Position #5)
+    /**
+     * REGEX-TEST: §f                   §r§eYour Damage: §r§a88,966 §r§7(Position #5)
      */
+    @Suppress("MaxLineLength")
     private val endPosition by chatGroup.pattern(
         "end.position",
         "§f +§r§eYour Damage: §r§a(?<Damage>[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?<Position>\\d+)\\)",
     )
 
     // val endFinalHit by chatGroup.pattern("end.final", "§f                 §r§b[^ ]+ (?<Name>.*)§r§f §r§7dealt the final blow.")
-    /** REGEX-TEST: §f             §r§e§l1st Damager §r§7- §r§a[VIP] Jarre07§r§f §r§7- §r§e9,659,033
+    /**
+     * REGEX-TEST: §f             §r§e§l1st Damager §r§7- §r§a[VIP] Jarre07§r§f §r§7- §r§e9,659,033
      * REGEX-TEST: §f          §r§6§l2nd Damager §r§7- §r§b[MVP§r§9+§r§b] FlamingZoom§r§f §r§7- §r§e1,459,691
      * REGEX-TEST: §f          §r§c§l3rd Damager §r§7- §r§b[MVP§r§f+§r§b] Dustbringer§r§f §r§7- §r§e1,091,163
      */
+    @Suppress("MaxLineLength")
     private val endLeaderboard by chatGroup.pattern(
         "end.place",
         "§f +§r§.§l(?<Position>\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?<Name>.*)§r§. §r§7- §r§e(?<Damage>[\\d.,]+)",
     )
 
-    /** REGEX-TEST: §f                       §r§eZealots Contributed: §r§a27§r§e/100
+    /**
+     * REGEX-TEST: §f                       §r§eZealots Contributed: §r§a27§r§e/100
      */
     private val endZealots by protectorRepoGroup.pattern(
         "chat.end.zealot",
         "§f +§r§eZealots Contributed: §r§a(?<Amount>\\d+)§r§e/100",
     )
 
-    /** REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lProtector Dragon§r§d§l has spawned!
+    /**
+     * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lProtector Dragon§r§d§l has spawned!
      */
     private val dragonSpawn by chatGroup.pattern(
         "spawn",
         "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>$dragonNamesAsRegex) Dragon§r§d§l has spawned!",
     )
 
-    /** REGEX-TEST: Your Damage: §c2,003.2
+    /**
+     * REGEX-TEST: Your Damage: §c2,003.2
      */
     private val scoreDamage by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<Damage>[\\w,.]+)")
 
-    /** REGEX-TEST: Dragon HP: §a14,659,354 §c❤
+    /**
+     * REGEX-TEST: Dragon HP: §a14,659,354 §c❤
      */
     private val scoreDragon by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
 
     // private val scoreProtector by protectorRepoGroup.pattern("scoreboard.protector", "Protector HP: .*")
 
-    /** REGEX-TEST:  §r§bJamBeastie: §r§c7.4M❤
+    /**
+     * REGEX-TEST:  §r§bJamBeastie: §r§c7.4M❤
      * REGEX-TEST:  §r§a42069HzMonitor: §r§c3M❤
      * REGEX-TEST:  §r§bItsJxxxxx2001: §r§c457k❤
      * REGEX-TEST:  §r§bThunderblade73: §r§c12.3k❤
@@ -133,12 +146,12 @@ object DragonFeatures {
             }
         }
 
-    private enum class Type {
+    private enum class EndType {
         GOLEM,
         DRAGON
     }
 
-    private var endType: Type? = null
+    private var endType: EndType? = null
     private var endTopDamage = 0.0
     private var endDamage = 0.0
     private var endPlace = 0
@@ -169,10 +182,6 @@ object DragonFeatures {
         currentDragonType = null
     }
 
-    private fun enable() = LorenzUtils.inSkyBlock && IslandType.THE_END.isInIsland()
-
-    private fun enableDisplay() = enable() && config.display
-
     private fun weightMap(place: Int) = when (place) {
         -1 -> 10
         1 -> 200
@@ -186,121 +195,162 @@ object DragonFeatures {
         else -> 70
     }
 
-    private fun calculateDragonWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double) =
-        weightMap(
-            if (yourDamage == 0.0) -1 else place,
-        ) + 100 * (
-            eyes + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
-            )
+    private fun calculateBaseWeight(place: Int, firstDamage: Double, yourDamage: Double): Double {
+        return weightMap(if (yourDamage == 0.0) -1 else place) + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
+    }
 
-    private fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double) =
-        weightMap(
-            if (yourDamage == 0.0) -1 else place,
-        ) + 50 * (
-            yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
-            ) + if (zealots > 100) 100 else zealots
+    private fun calculateDragonWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double): Double {
+        return calculateBaseWeight(place, firstDamage, yourDamage) + 100 * eyes
+    }
 
-    @Suppress("CyclomaticComplexMethod")
-    @HandleEvent
+    private fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double): Double {
+        return calculateBaseWeight(place, firstDamage, yourDamage) + 50 + if (zealots > 100) 100 else zealots
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!enable()) return
+        if (!config.display) return
+
         val message = event.message
         if (!config.chat && !config.display && !config.superiorNotify && !configProtector) return
+
+        if (handleDragonSpawn(message)) return
+
+        if (!config.chat && !config.display && !configProtector) return
+
+        if (handleEyeEvents(message)) return
+
+        if (handleEggSpawn(message)) return
+
+        if (handleEndStart(message)) return
+
+
+        if (handleEndLeaderboard(message)) return
+
+        if (handleEndPosition(message)) return
+
+        if (handleZealots(message)) return
+    }
+
+    private fun handleDragonSpawn(message: String): Boolean {
         dragonSpawn.matchMatcher(message) {
             dragonSpawned = true
-
             currentDragonType = DragonType.valueOf(this.group("Dragon").uppercase())
             ChatUtils.debug("Dragon Type: $currentDragonType")
 
-            if (config.superiorNotify && this.group("Dragon") == "Superior") {
+            if (config.superiorNotify && currentDragonType == DragonType.SUPERIOR) {
                 LorenzUtils.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
             }
 
             DragonProfitTracker.addEyes(yourEyes)
-            return
+            return true
         }
-        if (!config.chat && !config.display && !configProtector) return
+        return false
+    }
+
+    private fun handleEyeEvents(message: String): Boolean {
         when {
             eyePlaced.matches(message) -> {
                 yourEyes++
+                return true
             }
-
             eyeRemoved.matches(message) -> {
                 yourEyes--
+                return true
             }
+        }
+        return false
+    }
 
-            eggSpawned.matches(message) -> {
-                egg = true
-            }
-
+    private fun handleEndStart(message: String): Boolean {
+        when {
             endStartLineDragon.matches(message) -> {
                 if (!config.chat) {
                     reset()
-                    return
+                    return true
                 }
-                endType = Type.DRAGON
+                endType = EndType.DRAGON
+                return true
             }
-
             endStartLineProtector.matches(message) -> {
-                if (!configProtector) return
-                endType = Type.GOLEM
-            }
-
-            else -> {
-                endLeaderboard.matchMatcher(message) {
-                    if (endType == null) return@matchMatcher
-                    if (this.group("Position") != "1") return@matchMatcher
-                    endTopDamage = this.group("Damage").replace(",", "").toDouble()
-                    return
-                }
-                endPosition.matchMatcher(message) {
-                    if (endType == null) return@matchMatcher
-                    endPlace = this.group("Position")?.toInt() ?: -1
-                    endDamage = this.group("Damage").replace(",", "").toDouble()
-                    when (endType) {
-                        Type.DRAGON -> {
-                            weight = calculateDragonWeight(
-                                yourEyes, endPlace, endTopDamage, endDamage,
-                            )
-
-                            if (endDamage > 0) {
-                                DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
-                                DragonProfitTracker.addDragonLoot(
-                                    currentDragonType ?: DragonType.UNKNOWN,
-                                    "ESSENCE_DRAGON".toInternalName(),
-                                    if (currentDragonType == DragonType.SUPERIOR) 10 else 5
-                                )
-                            }
-                            DragonProfitTracker.lastDragonPlacement = endPlace
-                            ChatUtils.debug(
-                                "Dragon type: $currentDragonType," +
-                                    " placement: ${DragonProfitTracker.lastDragonPlacement}"
-                            )
-
-                            printWeight(weight)
-
-                            DragonFeatures.reset() // love name collisions
-                        }
-
-                        Type.GOLEM -> {
-
-                            // NO reset because of Zealot Line
-                        }
-
-                        null -> return@matchMatcher
-                    }
-                    return
-                }
-                endZealots.matchMatcher(message) {
-                    if (endType != Type.GOLEM) return@matchMatcher
-                    val zealots = this.group("Amount").toInt()
-                    val weight = calculateProtectorWeight(zealots, endPlace, endTopDamage, endDamage)
-                    printWeight(weight)
-                    resetEnd()
-                }
+                if (!configProtector) return false
+                endType = EndType.GOLEM
+                return true
             }
         }
+        return false
+    }
 
+    private fun handleEndLeaderboard(message: String): Boolean {
+        endLeaderboard.matchMatcher(message) {
+            if (endType == null) return@matchMatcher
+            if (this.group("Position") != "1") return@matchMatcher
+
+            endTopDamage = this.group("Damage").replace(",", "").toDouble()
+            return true
+        }
+        return false
+    }
+
+    private fun handleEndPosition(message: String): Boolean {
+        endPosition.matchMatcher(message) {
+            if (endType == null) return@matchMatcher
+
+            endPlace = this.group("Position")?.toInt() ?: -1
+            endDamage = this.group("Damage").replace(",", "").toDouble()
+
+            when (endType) {
+                EndType.DRAGON -> {
+                    weight = calculateDragonWeight(yourEyes, endPlace, endTopDamage, endDamage)
+
+                    if (endDamage > 0) {
+                        DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
+                        DragonProfitTracker.addDragonLoot(
+                            currentDragonType ?: DragonType.UNKNOWN,
+                            "ESSENCE_DRAGON".toInternalName(),
+                            if (currentDragonType == DragonType.SUPERIOR) 10 else 5
+                        )
+                    }
+
+                    DragonProfitTracker.lastDragonPlacement = endPlace
+                    ChatUtils.debug("Dragon type: $currentDragonType, placement: ${DragonProfitTracker.lastDragonPlacement}")
+
+                    printWeight(weight)
+                    DragonFeatures.reset()
+                }
+
+                EndType.GOLEM -> {
+                    // NO reset because of Zealot Line
+                }
+
+                null -> return@matchMatcher
+            }
+            return true
+        }
+        return false
+    }
+
+    private fun handleZealots(message: String): Boolean {
+        endZealots.matchMatcher(message) {
+            if (endType != EndType.GOLEM) return@matchMatcher
+
+            val zealots = this.group("Amount").toInt()
+            val weight = calculateProtectorWeight(zealots, endPlace, endTopDamage, endDamage)
+
+            printWeight(weight)
+            resetEnd()
+
+            return true
+        }
+        return false
+    }
+
+    private fun handleEggSpawn(message: String): Boolean {
+        if (eggSpawned.matches(message)) {
+            egg = true
+            return true
+        }
+        return false
     }
 
     private fun printWeight(weight: Double) {
@@ -309,7 +359,7 @@ object DragonFeatures {
 
     @HandleEvent
     fun onScoreBoard(event: ScoreboardUpdateEvent) {
-        if (!(enableDisplay())) return
+        if (!config.display) return
         val index = event.full.indexOfFirst { scoreDragon.matches(it) }
         if (index == -1) return
         if (egg) {
@@ -318,13 +368,12 @@ object DragonFeatures {
         scoreDamage.matchMatcher(event.full[index + 1]) {
             currentDamage = this.group("Damage").replace(",", "").toDouble()
         }
-
     }
 
     @HandleEvent
     fun onTabList(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.DRAGON)) return
-        if (!(enableDisplay() && dragonSpawned)) return
+        if (!(config.display && dragonSpawned)) return
         widgetActive = true
         loop@ for (i in 1 until event.lines.size) {
             tabDamage.matchMatcher(event.lines[i]) {
@@ -348,7 +397,7 @@ object DragonFeatures {
 
     @HandleEvent
     fun onRender(event: GuiRenderEvent) {
-        if (!(enableDisplay() && dragonSpawned)) return
+        if (!(config.display && dragonSpawned)) return
         config.displayPosition.renderRenderables(
             if (!widgetActive) widgetErrorGUI else display(),
             posLabel = "Dragon Weight",

@@ -96,6 +96,7 @@ object ProfitPerDragon {
         dragonLoot.clear()
     }
 
+    // MAP: PLACEMENT -> Standard Ender Pearl Amount
     private fun enderPearlMap(place: Int) = when (place) {
         1 -> 30
         2 -> 25
@@ -108,6 +109,7 @@ object ProfitPerDragon {
         else -> 5
     }
 
+    // MAP: PLACEMENT -> Standard Enchanted Ender Pearl Amount
     private fun enchantedEnderPearlMap(place: Int) = when (place) {
         1 -> 7
         2 -> 6
