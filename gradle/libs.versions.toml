@@ -4,6 +4,7 @@ moulconfig = "3.5.0"
 headlessLwjgl = "1.7.2"
 jbAnnotations = "24.1.0"
 hypixelmodapi = "1.0.1.1"
+modmenu = "13.0.3"
 
 
 [libraries]
@@ -17,3 +18,4 @@ autoservice_annotations = {module="com.google.auto.service:auto-service-annotati
 hypixelmodapi = { module = "net.hypixel:mod-api-forge", version.ref = "hypixelmodapi" }
 hypixelmodapitweaker = { module = "net.hypixel:mod-api-forge-tweaker", version.ref = "hypixelmodapi" }
 
+modmenu = { module = "maven.modrinth:modmenu", version.ref = "modmenu" }

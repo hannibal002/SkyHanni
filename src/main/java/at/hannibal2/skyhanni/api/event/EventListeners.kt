@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.event.predicates.EventPredicate
 import at.hannibal2.skyhanni.api.event.predicates.EventPredicateProvider
-import at.hannibal2.skyhanni.data.MinecraftData
+import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
@@ -85,9 +85,9 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         fun shouldInvoke(event: SkyHanniEvent, context: Any?): Boolean {
             if (SkyHanniEvents.isDisabledInvoker(name)) return false
-            if (lastTick != MinecraftData.totalTicks) {
+            if (lastTick != ClientEvents.totalTicks) {
                 cachedPredicateValue = cachedPredicates.all { it(event, context) }
-                lastTick = MinecraftData.totalTicks
+                lastTick = ClientEvents.totalTicks
             }
             return cachedPredicateValue && predicates.all { it(event, context) }
         }

@@ -3,10 +3,16 @@ package at.hannibal2.skyhanni.utils.system
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.utils.DelayedRun
-import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.ModContainer
 import kotlin.time.Duration.Companion.INFINITE
+//#if MC < 1.16
+import net.minecraft.launchwrapper.Launch
+//#elseif FORGE
+//$$ import net.minecraftforge.fml.loading.FMLEnvironment
+//#else
+//$$ import net.fabricmc.loader.api.FabricLoader
+//#endif
 
 /**
  * This object contains utilities for all platform specific operations.
@@ -16,15 +22,21 @@ object PlatformUtils {
 
     const val MC_VERSION = "@MC_VERSION@"
 
+    val isDevEnvironment: Boolean by lazy {
+        //#if MC < 1.16
+        Launch.blackboard?.get("fml.deobfuscatedEnvironment") as? Boolean ?: true
+        //#elseif FORGE
+        //$$ FMLEnvironment.production.not()
+        //#else
+        //$$ FabricLoader.getInstance().isDevelopmentEnvironment
+        //#endif
+    }
+
     private val modPackages: Map<String, ModContainer> by lazy {
         Loader.instance().modList.flatMap { mod -> mod.ownedPackages.map { it to mod } }.toMap()
     }
 
-    val isDevEnvironment: Boolean by lazy {
-        Launch.blackboard?.get("fml.deobfuscatedEnvironment") as? Boolean ?: true
-    }
-
-    fun getModFromPackage(packageName: String?): ModInstance? = modPackages[packageName]?.let {
+    private fun getModFromPackage(packageName: String?): ModInstance? = modPackages[packageName]?.let {
         ModInstance(it.modId, it.name, it.version)
     }
 

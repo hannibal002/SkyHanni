@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -108,7 +108,7 @@ object CorpseTracker {
         val keyCostStrings = buildList {
             applicableKeys.forEach { keyData ->
                 keyData.key?.let { key ->
-                    val keyName = key.itemName
+                    val keyName = key.repoItemName
                     val price = key.getPrice()
                     val count = bucketData.corpsesLooted[keyData] ?: 0
                     val totalPrice = price * count
@@ -123,7 +123,7 @@ object CorpseTracker {
         }
 
         if (totalKeyCount > 0) {
-            val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.itemName else "§eCorpse Keys"
+            val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.repoItemName else "§eCorpse Keys"
             val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
             add(
                 if (applicableKeys.count() == 1) Renderable.string(keyFormat).toSearchable()

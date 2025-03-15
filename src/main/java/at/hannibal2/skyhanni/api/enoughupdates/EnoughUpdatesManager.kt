@@ -12,11 +12,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
+import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -31,13 +33,16 @@ import net.minecraft.nbt.NBTException
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
-import net.minecraftforge.common.util.Constants
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.TreeMap
 import kotlin.math.floor
+//#if MC > 1.21
+//$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.util.Identifier
+//#endif
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -107,9 +112,9 @@ object EnoughUpdatesManager {
     private fun parseItem(internalName: String, json: JsonObject): JsonObject? {
         if (json.get("itemid") == null) return null
         var itemId = json["itemid"].asString
-        val mcItem = Item.getByNameOrId(itemId)
+        val mcItem = itemId.getVanillaItem()
         if (mcItem != null) {
-            itemId = mcItem.registryName
+            itemId = mcItem.getIdentifierString()
         }
         json.addProperty("itemid", itemId)
 
@@ -149,13 +154,12 @@ object EnoughUpdatesManager {
     fun stackToJson(stack: ItemStack): JsonObject {
         val tag = stack.tagCompound ?: NBTTagCompound()
 
-        val lore = if (tag.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
-            tag.getCompoundTag("display").getStringList("Lore")
-        } else emptyList()
+        val lore = stack.getLore()
 
         val json = JsonObject()
-        json.addProperty("itemid", stack.item.registryName.toString())
+        json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.displayName)
+        // todo nbt tag doesnt exist on modern
         json.addProperty("nbttag", tag.toString())
         json.addProperty("damage", stack.itemDamage)
 
@@ -178,7 +182,8 @@ object EnoughUpdatesManager {
             if (cachedStack != null) return cachedStack.copy()
         }
 
-        val stack = ItemStack(Item.getByNameOrId(json["itemid"].asString))
+        // todo modern doesnt have the "meta" number
+        val stack = ItemStack(json["itemid"].asString.getVanillaItem() ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255))
         stack.item ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255)
 
         json["count"]?.asInt?.let { stack.stackSize = it }
