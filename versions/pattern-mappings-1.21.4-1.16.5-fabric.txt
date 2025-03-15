@@ -1,0 +1,1 @@
+net.minecraft.entity.Entity net.minecraft.entity.Entity deceased removed at.hannibal2.skyhanni.utils.compat.deceased

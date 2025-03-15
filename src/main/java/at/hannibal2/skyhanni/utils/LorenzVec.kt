@@ -268,11 +268,7 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
 
-//#if MC < 1.16
 fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
-//#else
-//$$ fun Entity.getMotionLorenzVec(): LorenzVec = deltaMovement.toLorenzVec()
-//#endif
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 

@@ -10,6 +10,18 @@ net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
 net.minecraft.client.Options net.minecraft.client.settings.GameSettings
 
+net.minecraft.client.Options keyUp keyBindForward
+net.minecraft.client.Options keyDown keyBindBack
+net.minecraft.client.Options keyLeft keyBindLeft
+net.minecraft.client.Options keyRight keyBindRight
+net.minecraft.client.Options keyJump keyBindJump
+net.minecraft.client.Options keyShift keyBindSneak
+net.minecraft.client.Options keyAttack keyBindAttack
+net.minecraft.client.Options keyUse keyBindUseItem
+net.minecraft.client.Options keyInventory keyBindInventory
+net.minecraft.client.Options keyScreenshot keyBindScreenshot
+net.minecraft.client.Options keyFullscreen keyBindFullscreen
+
 net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
 net.minecraft.client.Minecraft setScreen() displayGuiScreen()
 net.minecraft.client.Minecraft submit() addScheduledTask()
@@ -24,6 +36,7 @@ net.minecraft.client.gui.components.ChatComponent allMessages chatLines
 net.minecraft.client.gui.components.ChatComponent trimmedMessages drawnChatLines
 net.minecraft.client.gui.components.ChatComponent rescaleChat() refreshChat()
 
+net.minecraft.client.gui.screens.ChatScreen net.minecraft.client.gui.GuiChat
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
 
 net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
@@ -191,6 +204,8 @@ net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getE
 
 net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEntityFromWorld()
 
+net.minecraft.network.protocol.game.ServerboundUseItemOnPacket hitResult.getBlockPos() getPos()
+
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
 net.minecraft.server.level.ServerPlayer net.minecraft.entity.player.EntityPlayerMP
@@ -208,15 +223,19 @@ net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
 net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
 
 net.minecraft.world.entity.Entity customName setCustomNameTag()
+net.minecraft.world.entity.Entity deltaMovement.x motionX
+net.minecraft.world.entity.Entity deltaMovement.y motionY
+net.minecraft.world.entity.Entity deltaMovement.z motionZ
 net.minecraft.world.entity.Entity getAllSlots() getEquipmentAndArmor()
 net.minecraft.world.entity.Entity getBoundingBox() getEntityBoundingBox()
 net.minecraft.world.entity.Entity getEyePosition() getPositionEyes()
 net.minecraft.world.entity.Entity getId() getEntityId()
 net.minecraft.world.entity.Entity getLookAngle() getLookVec()
 net.minecraft.world.entity.Entity getUUID() getUniqueID()
+net.minecraft.world.entity.Entity isOnFire() isBurning()
 net.minecraft.world.entity.Entity level world
 net.minecraft.world.entity.Entity removed isDead
-net.minecraft.world.entity.Entity isOnFire() isBurning()
+net.minecraft.world.entity.Entity tickCount ticksExisted
 net.minecraft.world.entity.Entity xOld prevPosX
 net.minecraft.world.entity.Entity xRot rotationPitch
 net.minecraft.world.entity.Entity xo posX
@@ -225,6 +244,7 @@ net.minecraft.world.entity.Entity yRot rotationYaw
 net.minecraft.world.entity.Entity yo posY
 net.minecraft.world.entity.Entity zOld prevPosZ
 net.minecraft.world.entity.Entity zo posZ
+net.minecraft.world.entity.Entity isOnGround onGround
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
