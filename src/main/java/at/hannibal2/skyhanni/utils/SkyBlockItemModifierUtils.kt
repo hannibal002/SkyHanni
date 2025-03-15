@@ -21,6 +21,7 @@ import java.util.Locale
 import net.minecraftforge.common.util.Constants
 //#elseif MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.registry.Registries
 //#endif
 
 object SkyBlockItemModifierUtils {
@@ -41,7 +42,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
 
-    fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
+    fun ItemStack.getSilexCount() = getHypixelEnchantments()?.get("efficiency")?.let {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
 
@@ -216,7 +217,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPersonalCompactorActive() = getAttributeByte("PERSONAL_DELETOR_ACTIVE") == 1.toByte()
 
-    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()
+    fun ItemStack.getHypixelEnchantments(): Map<String, Int>? = getExtraAttributes()
         ?.takeIf { it.hasKey("enchantments") }
         ?.run {
             val enchantments = this.getCompoundTag("enchantments")
@@ -237,7 +238,11 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getItemId() = getAttributeString("id")
 
+    //#if MC < 1.21
     fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as ResourceLocation
+    //#else
+    //$$ fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
+    //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()

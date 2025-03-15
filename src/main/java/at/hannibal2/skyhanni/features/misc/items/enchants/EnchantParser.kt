@@ -18,13 +18,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.Loader
 import java.util.TreeSet
@@ -118,7 +118,7 @@ object EnchantParser {
         currentItem = event.itemStack
 
         // The enchants we expect to find in the lore, found from the items NBT data
-        val enchants = event.itemStack.getEnchantments() ?: return
+        val enchants = event.itemStack.getHypixelEnchantments() ?: return
 
         // Check for any vanilla gray enchants at the top of the tooltip
         indexOfLastGrayEnchant = accountForAndRemoveGrayEnchants(event.toolTip, event.itemStack)
@@ -405,7 +405,7 @@ object EnchantParser {
         val text = loreList.joinToString("\n").dropLast(2)
 
         // Just set the component text to the entire lore list instead of reconstructing the entire siblings tree
-        val chatComponentText = ChatComponentText(text)
+        val chatComponentText = text.asComponent()
         val hoverEvent = HoverEvent(chatComponent.chatStyle.chatHoverEvent?.action, chatComponentText)
 
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)

@@ -10,7 +10,7 @@ import net.minecraft.util.IChatComponent
 //$$ import net.minecraft.text.PlainTextContent
 //#endif
 
-fun IChatComponent.getDirectlyContainedText() =
+fun IChatComponent.directlyContainedText() =
 //#if MC < 1.16
     this.unformattedTextForChat
 //#elseif MC < 1.21
@@ -19,7 +19,7 @@ fun IChatComponent.getDirectlyContainedText() =
 //$$        (this.content as? PlainTextContent)?.string().orEmpty()
 //#endif
 
-fun IChatComponent?.getFormattedTextCompat(): String =
+fun IChatComponent?.formattedTextCompat(): String =
 //#if MC < 1.16
     this?.formattedText.orEmpty()
 //#else
@@ -28,7 +28,7 @@ fun IChatComponent?.getFormattedTextCompat(): String =
 //$$    val sb = StringBuilder()
 //$$    for (component in iterator()) {
 //$$        sb.append(component.style.color?.toChatFormatting()?.toString() ?: "§r")
-//$$        sb.append(component.getDirectlyContainedText())
+//$$        sb.append(component.directlyContainedText())
 //$$        sb.append("§r")
 //$$    }
 //$$    sb.toString()
@@ -52,4 +52,4 @@ fun IChatComponent?.getFormattedTextCompat(): String =
 //$$}
 //#endif
 
-fun String.getFormattedTextCompat() = this
+fun String.formattedTextCompat() = this
