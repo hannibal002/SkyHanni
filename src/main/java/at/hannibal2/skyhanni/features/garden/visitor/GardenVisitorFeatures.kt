@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -72,8 +73,6 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
@@ -637,9 +636,8 @@ object GardenVisitorFeatures {
         return ready
     }
 
-    @SubscribeEvent
-    fun onRenderInSigns(event: DrawScreenEvent.Post) {
-        if (!GardenApi.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!config.shoppingList.display) return
         val gui = event.gui
         if (gui !is GuiEditSign) return
