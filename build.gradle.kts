@@ -305,8 +305,8 @@ fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
         }
     }
 }
-// includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
-// includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
+includeBuildPaths(file("buildpaths.txt"), sourceSets.main)
+includeBuildPaths(file("buildpaths-test.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
