@@ -55,5 +55,4 @@ object ClientEvents {
     fun onPlayerInteract(event: PlayerInteractEvent) {
         PlayerInteractionEvent(event.action, event.pos, event.face).post()
     }
-
 }

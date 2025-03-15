@@ -93,10 +93,9 @@ object RenderEvents {
     fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
         GuiActionPerformedEvent(event.gui, event.button).post()
     }
+
     @SubscribeEvent
     fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
         InitializeGuiEvent(event.gui, event.buttonList).post()
     }
-
-
 }
