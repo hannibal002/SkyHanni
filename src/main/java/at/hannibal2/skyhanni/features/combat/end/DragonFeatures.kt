@@ -325,6 +325,7 @@ object DragonFeatures {
                     ChatUtils.debug("Dragon type: $currentDragonType, placement: ${DragonProfitTracker.lastDragonPlacement}")
 
                     printWeight(weight)
+                    ProfitPerDragon.finishedLoot = false
                     DragonFeatures.reset()
                 }
 
@@ -357,7 +358,6 @@ object DragonFeatures {
     private fun handleEggSpawn(message: String): Boolean {
         if (eggSpawned.matches(message)) {
             egg = true
-            ProfitPerDragon.finishedLoot = false
             return true
         }
         return false
