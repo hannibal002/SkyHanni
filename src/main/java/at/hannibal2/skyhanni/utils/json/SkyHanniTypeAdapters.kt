@@ -2,9 +2,12 @@ package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SoopyWaypoint
+import at.hannibal2.skyhanni.data.model.SoopyWaypointList
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -19,6 +22,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import net.minecraft.item.ItemStack
+import java.awt.Color
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
@@ -96,6 +100,69 @@ object SkyHanniTypeAdapters {
 
         override fun read(reader: JsonReader): LocalDate {
             return LocalDate.parse(reader.nextString())
+        }
+    }
+
+    val SOOPY_WAYPOINT_LIST = object : TypeAdapter<SoopyWaypointList>() {
+        override fun write(out: JsonWriter, value: SoopyWaypointList) {
+            ChatUtils.chat("test")
+            out.beginArray()
+            value.waypoints.forEach { waypoint: SoopyWaypoint ->
+                out.beginObject()
+                out.name("x").value(waypoint.location.x)
+                out.name("y").value(waypoint.location.y)
+                out.name("z").value(waypoint.location.z)
+                out.name("r").value(waypoint.color.red / 255.0)
+                out.name("g").value(waypoint.color.green / 255.0)
+                out.name("b").value(waypoint.color.blue / 255.0)
+
+                out.name("options").beginObject()
+                waypoint.options.forEach { (key, value) ->
+                    out.name(key).value(value)
+                }
+                out.endObject()
+
+                out.endObject()
+            }
+            out.endArray()
+        }
+
+        override fun read(reader: JsonReader): SoopyWaypointList {
+            reader.beginArray()
+            val waypoints = mutableListOf<SoopyWaypoint>()
+            while (reader.hasNext()) {
+                reader.beginObject()
+                var x = 0
+                var y = 0
+                var z = 0
+                var r = 0f
+                var g = 1f
+                var b = 0f
+                val options = mutableMapOf<String, String>()
+                while (reader.hasNext()) {
+                    when (reader.nextName()) {
+                        "x" -> x = reader.nextInt()
+                        "y" -> y = reader.nextInt()
+                        "z" -> z = reader.nextInt()
+                        "r" -> r = reader.nextDouble().toFloat()
+                        "g" -> g = reader.nextDouble().toFloat()
+                        "b" -> b = reader.nextDouble().toFloat()
+                        "options" -> {
+                            reader.beginObject()
+                            while (reader.hasNext()) {
+                                options[reader.nextName()] = reader.nextString()
+                            }
+                            reader.endObject()
+                        }
+                        else -> reader.skipValue()
+                    }
+                }
+                val waypoint = SoopyWaypoint(LorenzVec(x, y, z), Color(r, g, b, 0.4f), options)
+                waypoints.add(waypoint)
+                reader.endObject()
+            }
+            reader.endArray()
+            return SoopyWaypointList(waypoints)
         }
     }
 

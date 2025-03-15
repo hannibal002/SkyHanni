@@ -52,7 +52,7 @@ object WaypointLoader {
 
             when (format) {
                 "soopy" -> {
-                    Result(true, waypoints = SoopyWaypointList.fromJson(data))
+                    Result(true, waypoints = SoopyWaypointList.fromJson(data).waypoints)
                 }
                 else -> Result(false, "Invalid format?")
             }

@@ -23,5 +23,6 @@ object MetalDetectorMute {
         }
     }
 
+    // TODO: Replace with .inMOD
     fun isEnabled() = MiningApi.inCustomMiningIsland() && config
 }

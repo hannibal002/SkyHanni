@@ -11,17 +11,17 @@ class OrderedWaypointConfig {
     @Expose
     @ConfigOption(name = "Current Color", desc = "Color of the current ordered point.")
     @ConfigEditorColour
-    var currentWaypointColor: String = "0:153:159:0:5"
+    var currentWaypointColor: String = "0:153:85:255:85"
 
     @Expose
     @ConfigOption(name = "Previous Color", desc = "Color of the previous ordered point.")
     @ConfigEditorColour
-    var previousWaypointColor: String = "0:245:219:27:198"
+    var previousWaypointColor: String = "0:153:85:85:255"
 
     @Expose
     @ConfigOption(name = "Next Color", desc = "Color of the next ordered point.")
     @ConfigEditorColour
-    var nextWaypointColor: String = "0:249:0:255:88"
+    var nextWaypointColor: String = "0:153:255:255:88"
 
     @Expose
     @ConfigOption(name = "Waypoint Range", desc = "Range for ordered waypoints.")
@@ -37,7 +37,7 @@ class OrderedWaypointConfig {
     @Expose
     @ConfigOption(name = "Trace Line Color", desc = "Color of the trace line.")
     @ConfigEditorColour
-    var traceLineColor: String = "0:249:0:255:88"
+    var traceLineColor: String = "0:255:85:255:85"
 
     @Expose
     @ConfigOption(name = "Trace Line Thickness", desc = "Thickness of the trace line.")
@@ -60,4 +60,10 @@ class OrderedWaypointConfig {
     @ConfigOption(name = "Setup Mode Line Thickness", desc = "Thickness of the setup mode lines.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
     var setupModeLineThickness: Float = 1.0f
+
+    @Expose
+    @ConfigOption(name = "Show All Waypoints", desc = "Shows all waypoints. May cause lag")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var showAll: Boolean = false
 }

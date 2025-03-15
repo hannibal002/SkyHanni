@@ -1,10 +1,12 @@
-package at.hannibal2.skyhanni.features.mining.routewaypoints
+package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.SoopyWaypoint
+import at.hannibal2.skyhanni.data.model.SoopyWaypointList
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -14,8 +16,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.data.model.*
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -24,11 +26,10 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.WaypointLoader
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import java.awt.Color
-import kotlin.math.max
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object OrderedWaypoints {
@@ -49,52 +50,55 @@ object OrderedWaypoints {
             var r = 0
             var g = 0
             var b = 0
-            var alpha = 0.8
-            if (i == 0) {
-                wpColor = config.previousWaypointColor.toSpecialColor()
-            } else if (i == 1) {
-                wpColor = config.currentWaypointColor.toSpecialColor()
-            } else if (i == 2) {
-                wpColor = config.nextWaypointColor.toSpecialColor()
+            var alpha = 0.4f
+            if (!config.showAll) {
+                if (i == 0) {
+                    wpColor = config.previousWaypointColor.toSpecialColor()
+                } else if (i == 1) {
+                    wpColor = config.currentWaypointColor.toSpecialColor()
+                } else if (i == 2) {
+                    wpColor = config.nextWaypointColor.toSpecialColor()
+                } else {
+                    r = 255
+                }
             } else {
-                r = 255
-                alpha = 0.4
+                wpColor = orderedWaypoints[i].color
             }
             if (wpColor != null) {
                 r = wpColor.red
                 g = wpColor.green
                 b = wpColor.blue
-                alpha = wpColor.alpha / 255.0
+                alpha = wpColor.alpha / 255.0f
             }
             if (orderedWaypoints.getOrNull(renderWaypoints[i]) == null) {
                 ChatUtils.debug("${renderWaypoints[i]} $i")
                 continue
             }
             event.drawEdges(
-                orderedWaypoints[renderWaypoints[i]].toLorenzVec(),
+                orderedWaypoints[renderWaypoints[i]].location,
                 Color(r, g, b),
                 1,
                 false
             )
             event.drawColor(
-                orderedWaypoints[renderWaypoints[i]].toLorenzVec(),
+                orderedWaypoints[renderWaypoints[i]].location,
                 Color(r, g, b),
                 false,
-                alpha.toFloat()
+                alpha
             )
             val name = if (i < 3 && (config.setupMode || config.showText)) {
-                orderedWaypoints[renderWaypoints[i]].options["name"] ?: ""
+                orderedWaypoints[renderWaypoints[i]].options["name"]
             } else {
                 ""
             }
             event.drawString(
-                orderedWaypoints[renderWaypoints[i]].toLorenzVec().add(0.5, 2.5, 0.5),
+                orderedWaypoints[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
                 "§b$name",
                 seeThroughBlocks = true
             )
             event.drawString(
-                orderedWaypoints[renderWaypoints[i]].toLorenzVec().add(0.5, 2.0, 0.5),
-                "§e" + orderedWaypoints[renderWaypoints[i]].toLorenzVec().distanceToPlayer().roundTo(1).addSeparators() + "m",
+                orderedWaypoints[renderWaypoints[i]].location.add(0.5, 2.0, 0.5),
+                "§e" + orderedWaypoints[renderWaypoints[i]].location.distanceToPlayer().roundTo(1).addSeparators() + "m",
                 seeThroughBlocks = true
             )
         }
@@ -102,17 +106,17 @@ object OrderedWaypoints {
         val lineColor = config.traceLineColor.toSpecialColor()
         if (!config.setupMode && config.traceLine) {
             event.drawLineToEye(
-                traceWP.toLorenzVec().add(0.5, 0.25, 0.5),
+                traceWP.location.add(0.5, 0.25, 0.5),
                 Color(lineColor.red, lineColor.green, lineColor.blue),
                 config.traceLineThickness.toInt(),
                 false
             )
         }
         val currentWP = orderedWaypoints[renderWaypoints.getOrNull(1) ?: return decideWaypoints()]
-        if (config.setupMode) {
+        if (config.setupMode && !config.showAll) {
             event.draw3DLine(
-                currentWP.toLorenzVec().add(0.5, 2.65, 0.5),
-                traceWP.toLorenzVec().add(0.5, 0.5, 0.5),
+                currentWP.location.add(0.5, 2.65, 0.5),
+                traceWP.location.add(0.5, 0.5, 0.5),
                 Color(lineColor.red, lineColor.green, lineColor.blue),
                 config.setupModeLineThickness.toInt(),
                 depth = false
@@ -306,23 +310,20 @@ object OrderedWaypoints {
         if (args.isEmpty()) {
             return ChatUtils.chat("Stand where you want to add a waypoint (will be block under you) and re-run the command.")
         }
-        val player = Minecraft.getMinecraft().thePlayer.getLorenzVec()
-        val wX = player.x.toInt()
-        val wY = player.y.toInt() - 1
-        val wZ = player.z.toInt()
+        val waypoint = Minecraft.getMinecraft().thePlayer.getLorenzVec().add(0, -1, 0).roundLocationToBlock()
         val wNum = args[0].toIntOrNull() ?: return ChatUtils.chat("Not a number!")
         if (wNum == orderedWaypoints.size + 1) {
-            orderedWaypoints.add(SoopyWaypoint(wX, wY, wZ, options = mutableMapOf("name" to wNum.toString())))
-            return ChatUtils.chat("Added waypoint $wNum at $wX, $wY, $wZ.")
+            orderedWaypoints.add(SoopyWaypoint(waypoint, options = mutableMapOf("name" to wNum.toString())))
+            return ChatUtils.chat("Inserted waypoint $wNum at ${waypoint.toCleanString()}.")
         }
         if (wNum < 1 || wNum > orderedWaypoints.size) {
-            return ChatUtils.chat("Invalid number! Must be in range (1 - ${max(1, orderedWaypoints.size)})!")
+            return ChatUtils.chat("Invalid number! Must be in range (1 - ${orderedWaypoints.size + 1})!")
         }
         for (i in wNum - 1 until orderedWaypoints.size) {
             orderedWaypoints[i].options["name"] = ((orderedWaypoints[i].options["name"]?.toIntOrNull() ?: (i + 1)).inc()).toString()
         }
-        orderedWaypoints.add(wNum - 1, SoopyWaypoint(wX, wY, wZ, options = mutableMapOf("name" to wNum.toString())))
-        ChatUtils.chat("Inserted waypoint $wNum at $wX, $wY, $wZ!")
+        orderedWaypoints.add(wNum - 1, SoopyWaypoint(waypoint, options = mutableMapOf("name" to wNum.toString())))
+        ChatUtils.chat("Inserted waypoint $wNum at ${waypoint.toCleanString()}!")
     }
 
     private fun etherwarp(args: Array<String>) {
@@ -348,16 +349,12 @@ object OrderedWaypoints {
     }
 
     private fun save(args: Array<String>) {
-        ChatUtils.chat("test")
         if (args.isEmpty()) {
             return ChatUtils.chat("Usage: /shorderedsave (name).")
         }
-        ChatUtils.chat("test1")
         val waypoints = SoopyWaypointList(orderedWaypoints)
-        ChatUtils.chat("test2")
-            ChatUtils.chat("test3")
-            ProfileStorageData.playerSpecific?.routes!![args[0]] = waypoints
-            ChatUtils.chat("test4")
+
+        ProfileStorageData.playerSpecific?.routes!![args[0]] = waypoints
 
         ChatUtils.chat("Route saved as ${args[0]}. Do /shorderedimport ${args[0]} to import it.")
     }
@@ -374,7 +371,7 @@ object OrderedWaypoints {
         val currentWaypoint = orderedWaypoints.getOrNull(currentOrderedWaypointIndex)
         var distanceTo1 = Double.POSITIVE_INFINITY
         if (currentWaypoint != null) {
-            distanceTo1 = currentWaypoint.toLorenzVec().distanceToPlayer()
+            distanceTo1 = currentWaypoint.location.distanceToPlayer()
             currentWaypoint.options["name"]?.let { renderWaypoints.add(it.toInt() - 1) }
         }
         val nextWaypoint = orderedWaypoints.getOrNull(currentOrderedWaypointIndex + 1) ?: run {
@@ -391,11 +388,10 @@ object OrderedWaypoints {
         }
         var distanceTo2 = Double.POSITIVE_INFINITY
         if (nextWaypoint != null) {
-            distanceTo2 = nextWaypoint.toLorenzVec().distanceToPlayer()
+            distanceTo2 = nextWaypoint.location.distanceToPlayer()
             nextWaypoint.options["name"]?.let { renderWaypoints.add(it.toInt() - 1) }
-            // TODO: add title
             if (nextWaypoint.options["ether"]?.toBoolean() == true) {
-
+                LorenzUtils.sendTitle("§eETHERWARP", 1.seconds)
             }
         }
         if (lastCloser == currentOrderedWaypointIndex && distanceTo1 > distanceTo2 && distanceTo2 < config.waypointRange) {
@@ -418,9 +414,12 @@ object OrderedWaypoints {
         }
 
         orderedWaypoints.forEach { waypoint ->
-            if (config.setupMode &&
-                waypoint.options["name"]?.let { !renderWaypoints.contains(it.toInt() - 1) } == true &&
-                waypoint.toLorenzVec().distanceToPlayer() < 16
+            if ((
+                    config.setupMode &&
+                        waypoint.options["name"]?.let { !renderWaypoints.contains(it.toInt() - 1) } == true &&
+                        waypoint.location.distanceToPlayer() < 16
+                    ) ||
+                config.showAll
             ) {
                 waypoint.options["name"]?.let { renderWaypoints.add(it.toInt() - 1) }
             }
