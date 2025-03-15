@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
@@ -30,9 +31,10 @@ object DragonFeatures {
     private val configProtector get() = SkyHanniMod.feature.combat.endstoneProtectorChat
 
     private val dragonNames = DragonType.entries
+        .filter { it != DragonType.UNKNOWN } // Exclude UNKNOWN if necessary
+        .map { it.name.firstLetterUppercase() }
 
     private val dragonNamesAsRegex = dragonNames.joinToString("|")
-    private val dragonNamesUpperCaseAsRegex = dragonNames.joinToString("|") { it.name.uppercase() }
 
     private val protectorRepoGroup = RepoPattern.group("combat.boss.protector")
     private val repoGroup = RepoPattern.group("combat.boss.dragon")
@@ -65,7 +67,7 @@ object DragonFeatures {
      */
     private val endStartLineDragon by chatGroup.pattern(
         "end.boss",
-        "§f +§r§6§l(?<Dragon>$dragonNamesUpperCaseAsRegex) DRAGON DOWN!",
+        "§f +§r§6§l(?<Dragon>$dragonNamesAsRegex) DRAGON DOWN!",
     )
 
     /**
@@ -223,7 +225,6 @@ object DragonFeatures {
         if (handleEggSpawn(message)) return
 
         if (handleEndStart(message)) return
-
 
         if (handleEndLeaderboard(message)) return
 
