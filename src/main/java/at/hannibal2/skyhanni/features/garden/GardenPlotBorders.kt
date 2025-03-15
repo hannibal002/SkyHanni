@@ -37,7 +37,7 @@ object GardenPlotBorders {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!showBorders) return
-        val plot = GardenPlotApi.getCurrentPlot() ?: getClosestPlot() ?: return
+        val plot = GardenPlotApi.currentPlot ?: getClosestPlot() ?: return
         event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor(), showBuildLimit = true)
     }
 

@@ -75,7 +75,7 @@ object SprayFeatures {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.drawPlotsBorderWhenInHands) return
         if (InventoryUtils.itemInHandId != SPRAYONATOR) return
-        val plot = GardenPlotApi.getCurrentPlot() ?: return
+        val plot = GardenPlotApi.currentPlot ?: return
         event.renderPlot(plot, LorenzColor.YELLOW.toColor(), LorenzColor.DARK_BLUE.toColor())
     }
 

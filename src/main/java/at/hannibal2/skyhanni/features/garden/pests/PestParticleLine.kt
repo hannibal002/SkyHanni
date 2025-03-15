@@ -96,7 +96,7 @@ object PestParticleLine {
     private fun showMiddle(event: SkyHanniRenderWorldEvent) {
         if (!config.showMiddle) return
         if (locations.size <= 0) return
-        val plot = GardenPlotApi.getCurrentPlot() ?: return
+        val plot = GardenPlotApi.currentPlot ?: return
         val middle = plot.middle.copy(y = LocationUtils.playerLocation().y)
         if (middle.distanceToPlayer() > 15) return
 

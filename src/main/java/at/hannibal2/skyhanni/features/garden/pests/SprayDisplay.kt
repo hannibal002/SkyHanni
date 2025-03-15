@@ -30,7 +30,7 @@ object SprayDisplay {
         if (!event.isMod(5, 3)) return
 
         if (config.displayEnabled) {
-            display = GardenPlotApi.getCurrentPlot()?.takeIf { !it.isBarn() }?.let { plot ->
+            display = GardenPlotApi.currentPlot?.takeIf { !it.isBarn() }?.let { plot ->
                 plot.currentSpray?.let {
                     val timer = it.expiry.timeUntil()
                     "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"

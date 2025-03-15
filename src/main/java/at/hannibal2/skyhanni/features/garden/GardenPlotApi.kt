@@ -3,8 +3,11 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -84,7 +87,9 @@ object GardenPlotApi {
 
     var plots = listOf<Plot>()
 
-    fun getCurrentPlot(): Plot? {
+    var currentPlot: Plot? = null
+
+    private fun calculateCurrentPlot(): Plot? {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
@@ -249,6 +254,37 @@ object GardenPlotApi {
         }
         plots = list
     }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTick(event: SkyHanniTickEvent) {
+        // idk if it's possible that calculateCurrentPlot returns null even tho it shouldn't actually be null,
+        // which would lead to wrong PlotChangeEvent posts
+
+        val actualCurrentPlot = calculateCurrentPlot()
+
+        if (actualCurrentPlot == currentPlot) return
+
+        val previousPlot = currentPlot
+        currentPlot = actualCurrentPlot
+
+        PlotChangeEvent(previousPlot, currentPlot).post()
+    }
+
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland in setOf(IslandType.GARDEN, IslandType.GARDEN_GUEST, IslandType.NONE)) return
+        if (currentPlot == null) return
+
+        val previousPlot: Plot? = currentPlot
+        currentPlot = null
+
+        PlotChangeEvent(previousPlot, null).post()
+    }
+
+//     @HandleEvent
+//     fun onPlotChange(event: PlotChangeEvent) {
+//         println("PlotChangeEvent triggered: previousPlot: ${event.previousPlot?.name}, newPlot: ${event.newPlot?.name}")
+//     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
