@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -203,7 +204,7 @@ object JacobFarmingContestsInventory {
             if (line.contains("Contest boosted by Finnegan!")) finneganContest = true
 
             val name = medalPattern.matchMatcher(line) { group("medal").removeColor() } ?: continue
-            val medal = LorenzUtils.enumValueOfOrNull<ContestBracket>(name) ?: return
+            val medal = EnumUtils.enumValueOfOrNull<ContestBracket>(name) ?: return
 
             var stackTip = "§${medal.color}✦"
             var x = event.x + 9

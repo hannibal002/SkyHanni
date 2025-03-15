@@ -24,7 +24,6 @@ import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -118,14 +117,7 @@ object ChatManager {
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
-        //#if MC<1.12
-        if (event.type.toInt() == 2) return
-        //#else
-        //$$ if (event.type.id.toInt() == 2) return
-        //#endif
-
         val original = event.message
         val message = original.formattedText.stripHypixelMessage()
 

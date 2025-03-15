@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -204,7 +205,7 @@ object EnoughUpdatesManager {
                 for ((key, value) in replacements) {
                     name = name.replace("{$key}", value)
                 }
-                stack.setStackDisplayName(name)
+                stack.setCustomItemName(name)
             }
         }
 

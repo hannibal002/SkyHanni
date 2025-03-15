@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
+import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -45,8 +46,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.event.entity.living.LivingDeathEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -225,8 +224,8 @@ object VampireSlayerFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onLivingDeath(event: LivingDeathEvent) {
+    @HandleEvent
+    fun onEntityDeath(event: EntityDeathEvent<*>) {
         if (!isEnabled()) return
         val entity = event.entity
         if (entityList.contains(entity)) {
