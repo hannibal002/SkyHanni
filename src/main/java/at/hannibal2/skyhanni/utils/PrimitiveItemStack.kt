@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import net.minecraft.item.ItemStack
 
@@ -13,7 +13,7 @@ data class PrimitiveItemStack(val internalName: NeuInternalName, val amount: Int
 
     operator fun plus(amount: Int): PrimitiveItemStack = PrimitiveItemStack(internalName, this.amount + amount)
 
-    val itemName by lazy { internalName.itemName }
+    val itemName by lazy { internalName.repoItemName }
 
     fun toPair() = Pair(internalName, amount)
 

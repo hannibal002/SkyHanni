@@ -15,16 +15,15 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -86,7 +85,7 @@ object ChatManager {
         val packet = event.packet as? C01PacketChatMessage ?: return
 
         val message = packet.message
-        val component = ChatComponentText(message)
+        val component = message.asComponent()
         val originatingModCall = event.findOriginatingModCall()
         val originatingModContainer = originatingModCall?.getClassInstance()?.getModInstance()
         val hoverInfo = listOf(
@@ -118,14 +117,7 @@ object ChatManager {
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
-        //#if MC<1.12
-        if (event.type.toInt() == 2) return
-        //#else
-        //$$ if (event.type.id.toInt() == 2) return
-        //#endif
-
         val original = event.message
         val message = original.formattedText.stripHypixelMessage()
 
