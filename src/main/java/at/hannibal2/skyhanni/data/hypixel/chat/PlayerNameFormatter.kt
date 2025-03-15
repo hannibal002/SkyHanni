@@ -25,14 +25,13 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.toCleanChatComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.style
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 
@@ -79,10 +78,10 @@ object PlayerNameFormatter {
             privateIslandRank = privateIslandRank,
             privateIslandGuest = privateIslandGuest,
         )
-        val all = ChatComponentText("")
+        val all = "".asComponent()
         all.appendSibling(name)
         all.appendText(": ")
-        all.appendSibling(chatColor.toCleanChatComponent())
+        all.appendSibling(chatColor.asComponent())
         all.appendSibling(message.intoComponent())
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
     }
@@ -170,7 +169,7 @@ object PlayerNameFormatter {
         guildRank: ComponentSpan? = null,
         privateIslandRank: ComponentSpan? = null,
         privateIslandGuest: ComponentSpan? = null,
-    ): ChatComponentText {
+    ): IChatComponent {
         var cleanAuthor = cleanAuthor(author)
 
         var emblemFormat: IChatComponent? = null
@@ -187,9 +186,9 @@ object PlayerNameFormatter {
 
         val cleanName = cleanAuthor.getText().cleanPlayerName()
         val (faction, ironman, bingo) = AdvancedPlayerList.tabPlayerData[cleanName]?.let {
-            val faction = it.faction.icon?.trim()?.toCleanChatComponent()
-            val ironman = if (it.ironman) "§7♲".toCleanChatComponent() else null
-            val bingo = it.bingoLevel?.let { level -> BingoApi.getBingoIcon(level).toCleanChatComponent() }
+            val faction = it.faction.icon?.trim()?.asComponent()
+            val ironman = if (it.ironman) "§7♲".asComponent() else null
+            val bingo = it.bingoLevel?.let { level -> BingoApi.getBingoIcon(level).asComponent() }
             listOf(faction, ironman, bingo)
         } ?: listOf(null, null, null)
 
@@ -204,7 +203,7 @@ object PlayerNameFormatter {
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_RANK] = privateIslandRankFormat
         map[PlayerMessagesConfig.MessagePart.PRIVATE_ISLAND_GUEST] = privateIslandGuestFormat
 
-        val all = ChatComponentText("")
+        val all = "".asComponent()
         var first = true
         for (text in config.partsOrder.mapNotNull { map[it] }) {
             if (first) {
@@ -256,23 +255,23 @@ object PlayerNameFormatter {
         rankColor: String,
     ): ComponentSpan = when {
         MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
-            ChatComponentText(MarkedPlayerManager.replaceInChat(rankColor + removeColor))
+            (MarkedPlayerManager.replaceInChat(rankColor + removeColor)).asComponent()
                 .setChatStyle(name.sampleStyleAtStart()).intoSpan()
 
         levelColor != null && config.useLevelColorForName ->
-            ChatComponentText(levelColor + removeColor)
+            (levelColor + removeColor).asComponent()
                 .setChatStyle(name.sampleStyleAtStart())
                 .intoSpan()
 
         config.playerRankHider ->
-            ChatComponentText(removeColor)
+            removeColor.asComponent()
                 .setChatStyle(name.sampleStyleAtStart()?.createShallowCopy())
                 .style { color = EnumChatFormatting.AQUA }
                 .intoSpan()
 
         else ->
             if (rankColor.isEmpty()) name
-            else ChatComponentText(rankColor + removeColor)
+            else (rankColor + removeColor).asComponent()
                 .setChatStyle(name.sampleStyleAtStart())
                 .intoSpan()
     }
