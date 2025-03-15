@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object RenderData {
-    
+
     var drawContext = DrawContext()
 
     @SubscribeEvent

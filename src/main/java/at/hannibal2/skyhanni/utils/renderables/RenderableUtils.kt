@@ -18,7 +18,7 @@ import kotlin.reflect.KMutableProperty0
 
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
-    
+
     var drawContext = DrawContext()
 
     /** Calculates the relative x position of the columns in a table*/
