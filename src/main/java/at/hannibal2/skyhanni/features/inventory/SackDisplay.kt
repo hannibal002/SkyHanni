@@ -108,7 +108,7 @@ object SackDisplay {
                     // TODO move replace into itemName
                     val nameText = Renderable.optionalLink(
                         itemName.replace("§k", ""),
-                        onClick = {
+                        onLeftClick = {
                             if (!SackApi.isTrophySack) {
                                 BazaarApi.searchForBazaarItem(itemName)
                             }
@@ -249,7 +249,7 @@ object SackDisplay {
                     add(
                         Renderable.optionalLink(
                             name,
-                            onClick = {},
+                            onLeftClick = {},
                             highlightsOnHoverSlots = listOf(rune.slot),
                         ),
                     )
@@ -280,7 +280,7 @@ object SackDisplay {
                     add(
                         Renderable.optionalLink(
                             name,
-                            onClick = {
+                            onLeftClick = {
                                 BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),

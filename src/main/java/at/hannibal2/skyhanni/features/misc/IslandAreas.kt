@@ -186,7 +186,7 @@ object IslandAreas {
             foundAreas++
 
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     text,
                     tips = buildList {
                         add(tag.color.getChatColor() + node.name)
@@ -201,7 +201,7 @@ object IslandAreas {
                             add("§eClick to find a path!")
                         }
                     },
-                    onClick = {
+                    onLeftClick = {
                         if (node == targetNode) {
                             targetNode = null
                             IslandGraphs.stop()

@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.hover
-import at.hannibal2.skyhanni.utils.chat.Text.suggest
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
+import at.hannibal2.skyhanni.utils.chat.TextHelper.suggest
 import net.minecraft.util.IChatComponent
 
 @SkyHanniModule
@@ -24,8 +24,8 @@ object HelpCommand {
         val categoryDescription = category.description.splitLines(200).replace("§r", "§7")
         val aliases = command.aliases
 
-        return Text.text("§7 - $color${command.name}") {
-            this.hover = Text.multiline(
+        return TextHelper.text("§7 - $color${command.name}") {
+            this.hover = TextHelper.multiline(
                 "§e/${command.name}",
                 if (aliases.isNotEmpty()) "§7Aliases: §e/${aliases.joinToString("§7, §e/")}" else null,
                 if (description.isNotEmpty()) description.prependIndent("  ") else null,
@@ -46,7 +46,7 @@ object HelpCommand {
 
         val title = if (search.isBlank()) "SkyHanni Commands" else "SkyHanni Commands Matching: \"$search\""
 
-        Text.displayPaginatedList(
+        TextHelper.displayPaginatedList(
             title,
             filtered,
             chatLineId = messageId,

@@ -99,7 +99,7 @@ enum class FarmingItems(
             Renderable.itemStackWithTip(
                 getItem(), 1.0, 0, 0, false,
             ),
-            onClick = onClick(),
+            onLeftClick = onClick(),
             condition = { clickEnabled },
         )
 

@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -138,8 +138,6 @@ object SuperpairDataDisplay {
             hasFoundMatch(items, item) -> handleFoundMatch(items, item)
             else -> handleNormalReward(item)
         }
-
-        println(found)
     }
 
     private fun handleInstantFind(items: MutableMap<Int, SuperpairItem>, item: SuperpairItem, uncovered: Int) {

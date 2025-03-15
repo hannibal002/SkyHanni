@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -77,6 +76,8 @@ object NonGodPotEffectDisplay {
 
         PEST_REPELLENT("§6Pest Repellent I§r"),
         PEST_REPELLENT_MAX("§6Pest Repellent II"),
+
+        DOUCE_PLUIE_DE_STINKY_CHEESE("§eDouce Pluie de Stinky Cheese I"),
 
         CURSE_OF_GREED("§4Curse of Greed I"),
 
@@ -149,6 +150,11 @@ object NonGodPotEffectDisplay {
 
             "§a§lYUM! §r§2Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
                 effectDuration[NonGodPotEffect.PEST_REPELLENT_MAX] = Timer(1.hours)
+                update()
+            }
+
+            "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effectDuration[NonGodPotEffect.DOUCE_PLUIE_DE_STINKY_CHEESE] = Timer(1.hours)
                 update()
             }
 
@@ -228,7 +234,7 @@ object NonGodPotEffectDisplay {
         if (!event.inventoryName.endsWith("Active Effects")) return
 
         for (stack in event.inventoryItems.values) {
-            val name = stack.name
+            val name = stack.displayName
             for (effect in NonGodPotEffect.entries) {
                 if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {

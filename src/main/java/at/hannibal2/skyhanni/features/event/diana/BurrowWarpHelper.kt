@@ -37,7 +37,7 @@ object BurrowWarpHelper {
         if (Minecraft.getMinecraft().currentScreen != null) return
 
         currentWarp?.let {
-            if (lastWarpTime.passedSince() > 5.seconds) {
+            if (lastWarpTime.passedSince() > 1.seconds) {
                 lastWarpTime = SimpleTimeMark.now()
                 HypixelCommands.warp(it.name)
                 lastWarp = currentWarp

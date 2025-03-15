@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.api.event
 
-import at.hannibal2.skyhanni.data.MinecraftData
+import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -112,7 +112,7 @@ object SkyHanniEvents {
                             }
 
                             append(" ")
-                            append("${(log.invokeCount / (MinecraftData.totalTicks / 20)).addSeparators()}/s")
+                            append("${(log.invokeCount / (ClientEvents.totalTicks / 20)).addSeparators()}/s")
 
                         },
                     )
