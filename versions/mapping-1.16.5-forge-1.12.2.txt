@@ -461,3 +461,5 @@ net.minecraft.world.inventory.AbstractContainerMenu net.minecraft.inventory.Cont
 
 net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
 net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
+
+net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots

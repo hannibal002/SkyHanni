@@ -228,7 +228,6 @@ object CityProjectFeatures {
         if (!config.showReady) return
         if (!inInventory) return
 
-
         if (event.gui !is GuiChest) return
         val chest = event.container as ContainerChest
 
