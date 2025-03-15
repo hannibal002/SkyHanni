@@ -274,14 +274,20 @@ object ItemUtils {
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
+        //#if MC < 1.21
         val compound = tagCompound ?: return null
         if (!compound.hasKey("SkullOwner")) return null
         return compound.getCompoundTag("SkullOwner").getSkullTexture()
+        //#else
+        //$$ return stack.get(DataComponentTypes.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
+        //#endif
 
     }
 
+    //#if MC < 1.21
     fun NBTTagCompound.getSkullTexture(): String? =
         getCompoundTag("Properties").getCompoundList("textures").firstOrNull()?.getString("Value")
+    //#endif
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
