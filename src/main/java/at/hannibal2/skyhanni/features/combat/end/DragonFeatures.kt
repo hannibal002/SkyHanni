@@ -28,6 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 object DragonFeatures {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
+    private val leechBool get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
     private val configProtector get() = SkyHanniMod.feature.combat.endstoneProtectorChat
 
     private val dragonNames = DragonType.entries
@@ -94,6 +95,7 @@ object DragonFeatures {
      * REGEX-TEST: §f             §r§e§l1st Damager §r§7- §r§a[VIP] Jarre07§r§f §r§7- §r§e9,659,033
      * REGEX-TEST: §f          §r§6§l2nd Damager §r§7- §r§b[MVP§r§9+§r§b] FlamingZoom§r§f §r§7- §r§e1,459,691
      * REGEX-TEST: §f          §r§c§l3rd Damager §r§7- §r§b[MVP§r§f+§r§b] Dustbringer§r§f §r§7- §r§e1,091,163
+     * REGEX-TEST: §f              §r§e§l1st Damager §r§7- §r§a[VIP] filip_zd§r§f §r§7- §r§e3,965,533
      */
     @Suppress("MaxLineLength")
     private val endLeaderboard by chatGroup.pattern(
@@ -204,9 +206,13 @@ object DragonFeatures {
         return weightMap(if (yourDamage == 0.0) -1 else place) + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
     }
 
-    private fun calculateDragonWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double): Double {
-        return calculateBaseWeight(place, firstDamage, yourDamage) + 100 * eyes
-    }
+    private fun calculateDragonWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double) =
+        weightMap(
+            if (yourDamage == 0.0) -1 else place,
+        ) + 100 * (
+            eyes + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
+            )
+        // return calculateBaseWeight(place, firstDamage, yourDamage) + 100 * eyes
 
     private fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double): Double {
         return calculateBaseWeight(place, firstDamage, yourDamage) + 50 + if (zealots > 100) 100 else zealots
@@ -307,12 +313,14 @@ object DragonFeatures {
                     weight = calculateDragonWeight(yourEyes, endPlace, endTopDamage, endDamage)
 
                     if (endDamage > 0) {
-                        DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
-                        DragonProfitTracker.addDragonLoot(
-                            currentDragonType ?: DragonType.UNKNOWN,
-                            "ESSENCE_DRAGON".toInternalName(),
-                            if (currentDragonType == DragonType.SUPERIOR) 10 else 5
-                        )
+                        if (!(yourEyes == 0 && !leechBool.countLeechedDragons)) {
+                            DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
+                            DragonProfitTracker.addDragonLoot(
+                                currentDragonType ?: DragonType.UNKNOWN,
+                                "ESSENCE_DRAGON".toInternalName(),
+                                if (currentDragonType == DragonType.SUPERIOR) 10 else 5
+                            )
+                        }
                     }
 
                     DragonProfitTracker.lastDragonPlacement = endPlace
