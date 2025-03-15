@@ -69,6 +69,7 @@ class SearchableScrollableRenderableTable(
     useEmptySpace: Boolean = false,
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+    private val showScrollableTipsInList: Boolean = false,
     private val header: List<Renderable> = emptyList(),
     private val searchInputGetter: () -> SearchTextInput,
     private val scrollValueGetter: () -> ScrollValue = { ScrollValue() },
@@ -82,6 +83,7 @@ class SearchableScrollableRenderableTable(
                 header,
                 scrollValueGetter,
                 maxHeight = maxHeightGetter.invoke(),
+                showScrollableTipsInList = showScrollableTipsInList,
             )
 }
 

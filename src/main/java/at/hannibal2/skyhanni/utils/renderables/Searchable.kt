@@ -28,6 +28,7 @@ fun List<Searchable>.buildSearchableScrollable(
     textInput: SearchTextInput,
     scrollValue: ScrollValue = ScrollValue(),
     velocity: Double = 2.0,
+    showScrollableTipsInList: Boolean = false,
 ): Renderable {
     val key = 0
     return Renderable.searchBox(
@@ -38,6 +39,7 @@ fun List<Searchable>.buildSearchableScrollable(
             height = height,
             scrollValue = scrollValue,
             velocity = velocity,
+            showScrollableTipsInList = showScrollableTipsInList,
         ),
         SEARCH_PREFIX,
         onUpdateSize = {},
@@ -51,6 +53,7 @@ fun Map<List<Renderable>, String>.buildSearchableTable(
     header: List<Renderable> = emptyList(),
     scrollValueGetter: (() -> ScrollValue)? = null,
     maxHeight: Int = 200,
+    showScrollableTipsInList: Boolean = false,
 ): Renderable {
     val key = 0
 
@@ -71,6 +74,7 @@ fun Map<List<Renderable>, String>.buildSearchableTable(
                 textInput = textInputGetter.invoke(),
                 key = key + 1,
                 scrollValue = scrollValueGetter.invoke(),
+                showScrollableTipsInList = showScrollableTipsInList,
             )
         }
     }

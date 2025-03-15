@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -122,7 +122,8 @@ object AccessoryOverviewDisplay {
         maxHeightGetter = { config.maxHeight.get() },
         scrollValueGetter = { getScrollValueForTab(currentTab) },
         searchInputGetter = { getSearchInputForTab(currentTab) },
-        header = headerStrings.map { Renderable.string(it) }.toList()
+        header = headerStrings.map { Renderable.string(it) }.toList(),
+        showScrollableTipsInList = true,
     )
 
     private fun buildMainDisplay(): List<Renderable> = buildList {
@@ -235,7 +236,7 @@ object AccessoryOverviewDisplay {
 
         sortedList.forEach { missingAcc ->
             missingAcc.buildRow()?.let {
-                missingTable.addRow(it, missingAcc.internalName.itemName)
+                missingTable.addRow(it, missingAcc.internalName.repoItemName)
             }
         }
 
@@ -243,7 +244,7 @@ object AccessoryOverviewDisplay {
     }
 
     private fun Accessory.buildTips(): List<Renderable> = buildList {
-        add(Renderable.string("§7${internalName.itemName}"))
+        add(Renderable.string("§7${internalName.repoItemName}"))
         val otherLines = buildList {
             // Price
             buildString {
@@ -286,7 +287,7 @@ object AccessoryOverviewDisplay {
             tips = tipCache[this@buildRow.hashCode()] ?: buildTips().also {
                 tipCache[this@buildRow.hashCode()] = it
             },
-            condition = { AccessoryApi.inAccessoryBag }
+            condition = { AccessoryApi.inAccessoryBag },
         )
         add(clickable)
 
