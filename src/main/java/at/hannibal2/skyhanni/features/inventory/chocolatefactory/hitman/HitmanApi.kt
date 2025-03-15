@@ -142,7 +142,7 @@ object HitmanApi {
             it.isInFuture()
         }?.timeUntil() ?: return purchasedHitmanSlots
         val slotsOnCooldown = ceil(allSlotsCooldownDuration.inPartialMinutes / MINUTES_PER_DAY).toInt()
-        return purchasedHitmanSlots - slotsOnCooldown - availableHitmanEggs
+        return purchasedHitmanSlots - slotsOnCooldown
     }
 
     /**
