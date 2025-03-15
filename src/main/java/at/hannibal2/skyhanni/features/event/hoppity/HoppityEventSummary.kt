@@ -790,7 +790,7 @@ object HoppityEventSummary {
         val currentValue = this.typeCountSnapshot.getByIndex(index)
         val previousValue = it.typeCountSnapshot.getByIndex(index)
         val sinceValue = it.typeCountsSince.getByIndex(index) - previousValue
-        val validData = previousValue > 0 && previousValue != currentValue
+        val validData = previousValue > 0 && previousValue != currentValue && sinceValue > 0
         Triple(
             if (validData) previousValue else 0,
             if (validData) currentValue else 0,
@@ -807,7 +807,7 @@ object HoppityEventSummary {
         val rabbitsSum = rarityMap.values.sum()
         if (rabbitsSum == 0) return emptyList()
 
-        val sinceFormat = if (sinceCount != 0) " §8+$sinceCount§7" else ""
+        val sinceFormat = if (sinceCount > 0) " §8+$sinceCount§7" else ""
         val countFormat = if (config.eventSummary.showCountDiff && prevCount != 0 && currCount != 0) {
             " §7($prevCount$sinceFormat -> $currCount)"
         } else ""
