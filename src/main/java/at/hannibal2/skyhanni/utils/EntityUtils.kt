@@ -28,7 +28,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -96,9 +95,9 @@ object EntityUtils {
     }
 
     private fun getArmorStandsInRadius(center: LorenzVec, radius: Double): List<EntityArmorStand> {
-        val a = center.add(-radius, -radius - 3, -radius).toBlockPos()
-        val b = center.add(radius, radius + 3, radius).toBlockPos()
-        val alignedBB = AxisAlignedBB(a, b)
+        val a = center.add(-radius, -radius - 3, -radius)
+        val b = center.add(radius, radius + 3, radius)
+        val alignedBB = a.axisAlignedTo(b)
         val clazz = EntityArmorStand::class.java
         val worldObj = Minecraft.getMinecraft().theWorld ?: return emptyList()
         return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
