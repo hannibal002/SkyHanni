@@ -18,7 +18,7 @@ fun Scoreboard.getSidebarObjective(): ScoreObjective? {
 }
 
 //#if MC < 1.21
-@Suppress("UNUSED")
+@Suppress("UNUSED_PARAMETER")
 fun Collection<Score>.getPlayerNames(scoreboard: Scoreboard): List<Score> {
     return this.filter { input: Score? ->
         input != null && input.playerName != null && !input.playerName.startsWith("#")
