@@ -4,6 +4,7 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
+
 //#if MC > 1.16
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.TextColor
@@ -76,25 +77,45 @@ fun createResourceLocation(path: String): ResourceLocation {
 }
 
 var IChatComponent.hover: IChatComponent?
-    get() = this.chatStyle.chatHoverEvent?.value
+    //#if MC < 1.16
+    get() = this.chatStyle.chatHoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) it.value else null }
+    //#else
+    //$$ get() = this.style.hoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) it.getValue(HoverEvent.Action.SHOW_TEXT) else null }
+    //#endif
     set(value) {
+        //#if MC < 1.16
         this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
+        //#else
+        //$$ this.style.withHoverEvent(value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) })
+        //#endif
     }
 
 var IChatComponent.command: String?
     get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) it.value else null }
     set(value) {
+        //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) }
+        //#else
+        //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) })
+        //#endif
     }
 
 var IChatComponent.suggest: String?
     get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) it.value else null }
     set(value) {
+        //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) }
+        //#else
+        //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) })
+        //#endif
     }
 
 var IChatComponent.url: String?
     get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) it.value else null }
     set(value) {
+        //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
+        //#else
+        //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) })
+        //#endif
     }
