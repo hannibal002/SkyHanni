@@ -73,7 +73,7 @@ object FishingHotspotRadar {
         if (!isEnabled()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
-        if (item.getInternalNameOrNull()?.equals(HOTSPOT_RADAR) != true) return
+        if (item.getInternalNameOrNull() != HOTSPOT_RADAR) return
         if (lastParticle.passedSince() < 0.2.seconds) {
             event.cancel()
             return
