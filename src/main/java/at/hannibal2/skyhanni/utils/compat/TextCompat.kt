@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.LorenzColor
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.IChatComponent
@@ -119,3 +120,10 @@ var IChatComponent.url: String?
         //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) })
         //#endif
     }
+
+fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
+    //#if MC < 1.21
+    this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
+    //#else
+    //$$ this.copy().withColor(color.toChatFormatting())
+    //#endif

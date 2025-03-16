@@ -370,8 +370,6 @@ object ChatUtils {
         )
     }
 
-    fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
-        this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
 
     fun clickToActionOrDisable(
         message: String,
