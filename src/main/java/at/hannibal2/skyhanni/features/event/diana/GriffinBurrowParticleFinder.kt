@@ -64,18 +64,18 @@ object GriffinBurrowParticleFinder {
         if (!isEnabled()) return
         if (!config.guess) return
 
-        val type = ParticleTypeCool.entries.firstOrNull { it.check(event) } ?: return
+        val type = ParticleType.entries.firstOrNull { it.check(event) } ?: return
 
         val location = event.location
         val burrow = burrows.getOrPut(location) { Burrow(location) }
         val oldBurrowType = burrow.type
 
         when (type) {
-            ParticleTypeCool.FOOTSTEP -> burrow.hasFootstep = true
-            ParticleTypeCool.ENCHANT -> burrow.hasEnchant = true
-            ParticleTypeCool.EMPTY -> burrow.type = 0
-            ParticleTypeCool.MOB -> burrow.type = 1
-            ParticleTypeCool.TREASURE -> burrow.type = 2
+            ParticleType.FOOTSTEP -> burrow.hasFootstep = true
+            ParticleType.ENCHANT -> burrow.hasEnchant = true
+            ParticleType.EMPTY -> burrow.type = 0
+            ParticleType.MOB -> burrow.type = 1
+            ParticleType.TREASURE -> burrow.type = 2
         }
 
         burrow.burrowTimeToLive += 1
@@ -103,7 +103,7 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    private enum class ParticleTypeCool(val check: ReceiveParticleEvent.() -> Boolean) {
+    private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(
             { type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset == LorenzVec(0.5, 0.1, 0.5) },
         ),
