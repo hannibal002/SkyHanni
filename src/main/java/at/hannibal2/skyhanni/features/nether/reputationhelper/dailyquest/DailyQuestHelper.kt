@@ -127,7 +127,7 @@ object DailyQuestHelper {
         if (!isEnabled()) return
 
         if (event.gui !is GuiChest) return
-        val chest = event.gui.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
         val chestName = chest.getInventoryName()
 
         if (chestName == "Challenges") {

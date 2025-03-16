@@ -108,7 +108,7 @@ object JacobFarmingContestsInventory {
     }
 
     private fun openContest(year: String, month: String, day: String) {
-        val date = "$year/${LorenzUtils.getSBMonthByName(month)}/$day"
+        val date = "$year/${SkyBlockTime.getSBMonthByName(month)}/$day"
         OSUtils.openBrowser("https://elitebot.dev/contests/$date")
         ChatUtils.chat("Opening contest in elitebot.dev")
     }
@@ -146,7 +146,7 @@ object JacobFarmingContestsInventory {
             val day = GardenNextJacobContest.dayPattern.matchMatcher(itemName) { group("day") } ?: return
             val year = group("year")
             val month = group("month")
-            val time = SkyBlockTime(year.toInt(), LorenzUtils.getSBMonthByName(month), day.toInt()).toMillis()
+            val time = SkyBlockTime(year.toInt(), SkyBlockTime.getSBMonthByName(month), day.toInt()).toMillis()
             if (time < SkyBlockTime.now().toMillis()) {
                 openContest(year, month, day)
             } else {
@@ -167,8 +167,7 @@ object JacobFarmingContestsInventory {
         if (hideEverything) return
 
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (stack.getLore().any { it == "§eClick to claim reward!" }) {

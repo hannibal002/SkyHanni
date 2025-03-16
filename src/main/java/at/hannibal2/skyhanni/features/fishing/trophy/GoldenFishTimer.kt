@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -254,7 +255,7 @@ object GoldenFishTimer {
     private fun rodWarning() {
         if (!config.throwRodWarning || hasWarnedRod) return
         hasWarnedRod = true
-        LorenzUtils.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
+        TitleManager.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 

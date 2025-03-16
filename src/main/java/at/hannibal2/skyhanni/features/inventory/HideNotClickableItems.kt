@@ -114,8 +114,7 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (bypassActive()) return
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
         val chestName = chest.getInventoryName()
 
         for ((slot, stack) in chest.getLowerItems()) {

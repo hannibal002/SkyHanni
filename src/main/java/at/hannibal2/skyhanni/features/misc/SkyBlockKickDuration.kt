@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -108,7 +109,7 @@ object SkyBlockKickDuration {
     }
 
     private fun warn() {
-        LorenzUtils.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
+        TitleManager.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
         SoundUtils.playBeepSound()
     }
 
