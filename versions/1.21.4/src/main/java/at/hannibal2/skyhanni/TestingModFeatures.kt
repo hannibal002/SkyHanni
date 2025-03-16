@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.MinecraftClient
+import kotlin.system.exitProcess
 
 object TestingModFeatures {
 
