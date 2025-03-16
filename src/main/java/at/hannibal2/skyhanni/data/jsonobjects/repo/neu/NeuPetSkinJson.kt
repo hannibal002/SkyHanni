@@ -46,7 +46,7 @@ data class NeuPetSkinJson(
             ItemUtils.createSkull(
                 displayName,
                 it.getString("ID"),
-                it.getSkullTexture(),
+                it.getSkullTexture() ?: return@let null,
                 *lore.toTypedArray()
             )
         }
