@@ -3,10 +3,13 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
+import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -15,19 +18,16 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SignUtils
+import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -76,8 +76,8 @@ object GardenOptimalSpeed {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGuiScreenOpen(event: GuiScreenOpenEvent) {
         if (!isRancherOverlayEnabled()) return
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign()) return
@@ -94,7 +94,7 @@ object GardenOptimalSpeed {
                     ),
                     spacing = 2,
                 )
-                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
+                Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })
             }
         } else {
             crops.map { (crop, speed) ->
@@ -106,13 +106,13 @@ object GardenOptimalSpeed {
                     ),
                     spacing = 2,
                 )
-                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
+                Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })
             }
         }
     }
 
-    @SubscribeEvent
-    fun onGuiRender(event: DrawScreenEvent.Post) {
+    @HandleEvent
+    fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!isRancherOverlayEnabled()) return
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign()) return
@@ -191,7 +191,7 @@ object GardenOptimalSpeed {
         if (!ranchersEquipped && config.onlyWarnRanchers) return
 
         lastWarnTime = SimpleTimeMark.now()
-        LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
+        TitleManager.sendTitle("§cWrong speed!", 3.seconds)
         val cropInHand = cropInHand ?: return
 
         val text = "§cWrong speed while farming ${cropInHand.cropName} detected!" +

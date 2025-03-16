@@ -3,24 +3,45 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.putAt
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.leftAndRightClickable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
 import kotlin.reflect.KMutableProperty0
 
-private typealias Direction = Renderable.Companion.Direction
-
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
+    /** Calculates the relative x position of the columns in a table*/
+    fun calculateTableX(content: Collection<List<Renderable?>>, xPadding: Int): List<Int> {
+        var index = 0
+        return buildList {
+            while (true) {
+                val x = content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                    it?.width ?: 0
+                }?.let { it + xPadding } ?: break
+                add(x)
+                index++
+            }
+        }
+    }
+
+    /** Calculates the relative y position of the rows in a table*/
+    fun calculateTableY(content: Collection<List<Renderable?>>, yPadding: Int): Map<List<Renderable?>, Int> {
+        return content.associateWith { row ->
+            (row.maxOfOrNull { it?.height ?: 0 } ?: 0) + yPadding
+        }
+    }
+
     /** Calculates the absolute x position of the columns in a table*/
-    fun calculateTableXOffsets(content: List<List<Renderable?>>, xPadding: Int) = run {
+    fun calculateTableXOffsets(content: Collection<List<Renderable?>>, xPadding: Int) = run {
         var buffer = 0
         var index = 0
         buildList {
@@ -39,7 +60,7 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute y position of the rows in a table*/
-    fun calculateTableYOffsets(content: List<List<Renderable?>>, yPadding: Int) = run {
+    fun calculateTableYOffsets(content: Collection<List<Renderable?>>, yPadding: Int) = run {
         var buffer = 0
         listOf(0) + (
             content.takeIf { it.isNotEmpty() }?.map { row ->
@@ -94,7 +115,6 @@ internal object RenderableUtils {
         return yOffset
     }
 
-    @Suppress("NOTHING_TO_INLINE")
     inline fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         GlStateManager.translate(1.0, 1.0, 0.0)
@@ -255,18 +275,6 @@ internal object RenderableUtils {
         enableUniverseScroll: Boolean = true,
         scrollValue: ScrollValue = ScrollValue(),
     ): Searchable {
-        val onClick: (Direction) -> Unit = { direction ->
-            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                val next = when (direction) {
-                    Direction.LEFT -> universe.circle(current)
-                    Direction.RIGHT -> universe.circleBackwards(current)
-                }
-                onChange(next)
-                SoundUtils.playClickSound()
-                ChatUtils.lastButtonClicked = System.currentTimeMillis()
-            }
-        }
-
         val currentName = getName(current)
         val tips = buildList {
             add("§a$label")
@@ -287,12 +295,29 @@ internal object RenderableUtils {
             }
         }
 
+        val onClick: (Int) -> Unit = onClick@{ keyCode ->
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) < 150) return@onClick
+            val next = when (keyCode) {
+                LEFT_MOUSE -> universe.circle(current)
+                RIGHT_MOUSE -> universe.circleBackwards(current)
+                else -> return@onClick
+            }
+            onChange(next)
+            SoundUtils.playClickSound()
+            ChatUtils.lastButtonClicked = System.currentTimeMillis()
+        }
+
+        val clickMap = mapOf(
+            LEFT_MOUSE to { onClick(LEFT_MOUSE) },
+            RIGHT_MOUSE to { onClick(RIGHT_MOUSE) },
+        )
+
         return Renderable.line {
             addString("§7$label §a[")
             val displayFormat = hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {})
             when (enableUniverseScroll) {
-                true -> clickableAndScrollable(displayFormat, onClick = onClick, bypassChecks = false, scrollValue = scrollValue)
-                false -> leftAndRightClickable(displayFormat, onClick = onClick, bypassChecks = false)
+                true -> clickableAndScrollable(displayFormat, onAnyClick = clickMap, bypassChecks = false, scrollValue = scrollValue)
+                false -> clickable(displayFormat, onAnyClick = clickMap, bypassChecks = false)
             }.let { add(it) }
             addString("§a]")
         }.toSearchable()

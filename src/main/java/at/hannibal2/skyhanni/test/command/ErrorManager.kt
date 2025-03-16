@@ -66,12 +66,18 @@ object ErrorManager {
         cache.clear()
     }
 
+    // Extra data from last thrown error
+    private var cachedExtraData: String? = null
+
     // throw an error, best to not use it if not absolutely necessary
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message.removeColor())
         println("silent SkyHanni error:")
         println("message: '$message'")
-        println("extraData: \n${buildExtraDataString(extraData)}")
+        buildExtraDataString(extraData)?.let {
+            println("extraData: \n$it")
+            cachedExtraData = it
+        }
         throw exception
     }
 
@@ -105,8 +111,11 @@ object ErrorManager {
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ) {
-        logError(
+    ): Boolean {
+        if (extraData.isNotEmpty()) {
+            cachedExtraData = null
+        }
+        return logError(
             IllegalStateException(internalMessage),
             userMessage,
             ignoreErrorCache,
@@ -125,9 +134,7 @@ object ErrorManager {
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
-    ) {
-        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
-    }
+    ): Boolean = logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
@@ -139,19 +146,19 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ) {
-        if (betaOnly && !SkyHanniMod.isBetaVersion) return
+    ): Boolean {
+        if (betaOnly && !SkyHanniMod.isBetaVersion) return false
         if (!ignoreErrorCache) {
             val cachedError = throwable.stackTrace.getOrNull(0)?.let {
                 CachedError(it.fileName ?: "<unknown>", it.lineNumber, message)
             } ?: CachedError("<empty stack trace>", 0, message)
-            if (cachedError in cache) return
+            if (cachedError in cache) return false
             cache.add(cachedError)
         }
-        if (!condition()) return
+        if (!condition()) return false
 
         Error(message, throwable).printStackTrace()
-        Minecraft.getMinecraft().thePlayer ?: return
+        Minecraft.getMinecraft().thePlayer ?: return false
 
         val fullStackTrace: String
         val stackTrace: String
@@ -165,19 +172,30 @@ object ErrorManager {
         }
         val randomId = StringUtils.generateRandomId()
 
-        val extraDataString = buildExtraDataString(extraData)
+        val extraDataString = getExtraDataOrCached(extraData)
         val rawMessage = message.removeColor()
         errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.VERSION}: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
             "```\nSkyHanni ${SkyHanniMod.VERSION}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
-        val finalMessage = buildFinalMessage(message) ?: return
+        val finalMessage = buildFinalMessage(message) ?: return false
         ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.VERSION}]: $finalMessage Click here to copy the error into the clipboard.",
             onClick = { copyError(randomId) },
             "§eClick to copy!",
             prefix = false,
         )
+        return true
+    }
+
+    private fun getExtraDataOrCached(extraData: Array<out Pair<String, Any?>>): String {
+        cachedExtraData?.let {
+            cachedExtraData = null
+            if (extraData.isEmpty()) {
+                return it
+            }
+        }
+        return buildExtraDataString(extraData).orEmpty()
     }
 
     private fun buildFinalMessage(message: String): String? {
@@ -223,7 +241,7 @@ object ErrorManager {
         repoErrors = data.changedErrorMessages.filter { it.fixedIn == null || version < it.fixedIn }
     }
 
-    private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String {
+    private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String? {
         val extraDataString = if (extraData.isNotEmpty()) {
             val builder = StringBuilder()
             for ((key, value) in extraData) {
@@ -241,7 +259,7 @@ object ErrorManager {
                 builder.append("\n")
             }
             "\nExtra data:\n$builder"
-        } else ""
+        } else null
         return extraDataString
     }
 

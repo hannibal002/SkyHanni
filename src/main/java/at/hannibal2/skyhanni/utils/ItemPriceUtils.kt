@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -111,7 +110,7 @@ object ItemPriceUtils {
         }
 
         val defaultPrice = internalName.getPrice().addSeparators()
-        ChatUtils.chat("${internalName.itemName}§f: §6$defaultPrice")
+        ChatUtils.chat("${internalName.repoItemName}§f: §6$defaultPrice")
 
         println("")
         println(" Debug Item Price for $internalName ")
@@ -149,7 +148,6 @@ object ItemPriceUtils {
             } else {
                 NeuInternalName.fromItemNameOrNull(name)
             }
-
         }
     }
 
@@ -167,16 +165,21 @@ object ItemPriceUtils {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (PlatformUtils.isNeuLoaded()) return
+        if (ApiUtils.isMoulberryLowestBinDisabled()) return
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             refreshLowestBins()
         }
     }
 
     private fun refreshLowestBins() {
-        lowestBins = ApiUtils.getJSONResponse("https://moulberry.codes/lowestbin.json.gz", gunzip = true)
+        lowestBins = ApiUtils.getJSONResponse(
+            "https://moulberry.codes/lowestbin.json.gz",
+            apiName = "NEU Lowest Bin",
+            gunzip = true,
+        )
     }
 
     fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {

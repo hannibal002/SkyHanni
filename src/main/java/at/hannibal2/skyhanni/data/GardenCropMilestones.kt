@@ -9,11 +9,14 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
@@ -77,9 +80,10 @@ object GardenCropMilestones {
         }
 
         val cropName = crop.cropName
+        val levelUpLine = "§r§b§lGARDEN MILESTONE §3$cropName §8$oldLevel➜§3$newLevel§r"
         val messages = listOf(
             "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
-            "  §r§b§lGARDEN MILESTONE §3$cropName §8$oldLevel➜§3$newLevel§r",
+            "  $levelUpLine",
             if (goalReached)
                 listOf(
                     "",
@@ -93,7 +97,12 @@ object GardenCropMilestones {
             "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
         )
 
-        chat(messages.joinToString("\n"), false)
+        clickableChat(
+            messages.joinToString("\n"),
+            { ClipboardUtils.copyToClipboard(levelUpLine.removeColor()) },
+            "Click to copy!",
+            prefix = false
+        )
 
         val message = "§e§lYou have reached your milestone goal of §b§l$customGoalLevel " +
             "§e§lin the §b§l$cropName §e§lcrop!"

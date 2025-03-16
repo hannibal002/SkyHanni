@@ -123,6 +123,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Terminal Waypoints. - Stella (https://github.com/hannibal002/SkyHanni/pull/2719)
     +  Displays waypoints during the F7/M7 Goldor Phase.
 + Added mute for chest open and lever click sounds in dungeons (toggleable). - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2521)
++ Added Enchanted Book Drop Name. - Empa (https://github.com/hannibal002/SkyHanni/pull/2000)
+    + Shows enchantment name in rare drop messages and sends a custom one if none is provided by Hypixel.
 
 </details>
 <details open><summary>
@@ -249,6 +251,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added XP in Inventory. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3253)
     + Showing current XP in item lore of XP-dependent menus (e.g., Experimentation Table, Anvil, Hex).
     + This ensures XP visibility even when replaced by the SkyBlock XP bar.
++ Added Superpair Exp Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/3342)
+    + Displays XP for super pairs in the bottom right corner of the item.
 
 </details>
 <details open><summary>
@@ -993,6 +997,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Easter Egg Hunt 2024 waypoints. - Erymanthus + walker (https://github.com/hannibal002/SkyHanni/pull/1193)
 + Added Fishy Treat Profit Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3422)
     + Shows what item to purchase with your hard-earned Fishy Treat.
++ Added Gift Profit Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3072)
+    + Does NOT auto-track used gifts - see `/shaddusedgifts`.
++ Added precise Diana burrow prediction. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3249)
 
 ### Hoppity and Chocolate Factory
 
@@ -1397,10 +1404,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added Chunked Stats as a draggable list to the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1341)
         + Select and prioritize the order of the stats you want to see.
     + Added Soulflow to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
-      + Requires Soulflow to be enabled in Hypixel settings: /tab -> Profile Widget -> Show Soulflow.
-  + Added the current minister to the calendar. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2342)
-  + Allowed the use of the Custom Scoreboard outside of SkyBlock, but only on Hypixel. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
-  + Added an option to disable custom lines in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
+        + Requires Soulflow to be enabled in Hypixel settings: /tab -> Profile Widget -> Show Soulflow.
+    + Added the current minister to the calendar. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2342)
+    + Allowed the use of the Custom Scoreboard outside of SkyBlock, but only on Hypixel. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
+    + Added an option to disable custom lines in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
 + Added SkyBlock Level to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2895)
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
