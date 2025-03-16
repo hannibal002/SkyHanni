@@ -69,6 +69,11 @@ object SignUtils {
         pasteLastClicked = pasteClicked
     }
 
+    private fun GuiEditSign.getSignLines(): List<String>? {
+        if (this !is AccessorGuiEditSign) return null
+        return (this as AccessorGuiEditSign).tileSign.signText.map { it.unformattedText.removeColor() }
+    }
+
     fun GuiEditSign.isRancherSign(): Boolean {
         val signText = getSignLines() ?: return false
         return signText[1] == "^^^^^^" && signText[2] == "Set your" && signText[3] == "speed cap!"
@@ -77,11 +82,6 @@ object SignUtils {
     fun GuiEditSign.isMousematSign(): Boolean {
         val signText = getSignLines() ?: return false
         return signText[1] == "Set Yaw Above!" && signText[2] == "Set Pitch Below!"
-    }
-
-    private fun GuiEditSign.getSignLines(): List<String>? {
-        if (this !is AccessorGuiEditSign) return null
-        return (this as AccessorGuiEditSign).tileSign.signText.map { it.unformattedText.removeColor() }
     }
 
     fun GuiEditSign.isGardenSign(): Boolean {
