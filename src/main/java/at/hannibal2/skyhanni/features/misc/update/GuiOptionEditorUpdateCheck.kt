@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
@@ -10,7 +11,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.EnumChatFormatting.GREEN
 import net.minecraft.util.EnumChatFormatting.RED
-import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
@@ -69,7 +69,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
         val adjustedWidth = width - 20
-        if (Mouse.getEventButtonState() &&
+        if (MouseCompat.getEventButtonState() &&
             (mouseX - getButtonPosition(adjustedWidth) - x) in (0..button.width) &&
             (mouseY - 10 - y) in (0..button.height)
         ) {

@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
@@ -146,7 +145,7 @@ object ComposterOverlay {
         if (!inComposterUpgrades) return
         update()
         for (upgrade in ComposterUpgrade.entries) {
-            val name = event.itemStack.name
+            val name = event.itemStack.displayName
             if (name.contains(upgrade.displayName)) {
                 maxLevel = ComposterUpgrade.regex.matchMatcher(name) {
                     group("level")?.romanToDecimalIfNecessary() ?: 0
@@ -449,7 +448,7 @@ object ComposterOverlay {
                 list.add("#$i ")
             }
             list.add(item)
-            formatPrice(totalPrice, internalName, item.name, list, itemsNeeded, onClick)
+            formatPrice(totalPrice, internalName, item.displayName, list, itemsNeeded, onClick)
             bigList.add(list)
             if (i == 10 + testOffset) break
         }

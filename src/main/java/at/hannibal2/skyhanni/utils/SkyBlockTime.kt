@@ -126,6 +126,17 @@ data class SkyBlockTime(
         }
 
         fun isDay(): Boolean = Minecraft.getMinecraft().theWorld.worldTime % 24000 in 1..12000
+
+        fun getSBMonthByName(month: String): Int {
+            var monthNr = 0
+            for (i in 1..12) {
+                val monthName = monthName(i)
+                if (month == monthName) {
+                    monthNr = i
+                }
+            }
+            return monthNr
+        }
     }
 }
 

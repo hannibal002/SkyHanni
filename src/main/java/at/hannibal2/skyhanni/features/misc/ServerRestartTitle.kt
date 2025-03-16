@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -44,7 +44,7 @@ object ServerRestartTitle {
             val totalTime = minutes + seconds
             if (totalTime > 2.minutes && totalTime.inWholeSeconds % 30 != 0L) return
             val time = totalTime.format()
-            LorenzUtils.sendTitle("§cServer Restart in §b$time", 2.seconds)
+            TitleManager.sendTitle("§cServer Restart in §b$time", 2.seconds)
         }
     }
 }
