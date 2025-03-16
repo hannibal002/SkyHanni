@@ -141,9 +141,9 @@ fun IChatComponent.appendComponent(component: IChatComponent): IChatComponent =
 fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
     //#if MC < 1.21
     this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
-    //#else
-    //$$ this.copy().withColor(color.toChatFormatting())
-    //#endif
+//#else
+//$$ this.copy().withColor(color.toChatFormatting())
+//#endif
 
 fun addChatMessageToChat(message: IChatComponent) {
     //#if MC < 1.16
