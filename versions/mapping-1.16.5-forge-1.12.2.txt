@@ -457,3 +457,11 @@ org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
 
+at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer net.minecraft.client.gui.inventory.GuiContainer
+
+net.minecraft.world.inventory.AbstractContainerMenu net.minecraft.inventory.Container
+
+net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
+net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
+
+net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots

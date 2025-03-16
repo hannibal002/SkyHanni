@@ -185,8 +185,7 @@ object BazaarApi {
         if (currentSearchedItem == "") return
 
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (chest.inventorySlots.indexOf(slot) !in 9..44) {
