@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,10 +11,7 @@ import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
-import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.settings.KeyBinding
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
@@ -55,14 +51,6 @@ object KeyboardManager {
      * allow the user to set a different option instead and just set the default key to isModifierKeyDown
      */
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
-
-    @SubscribeEvent
-    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
-        val guiScreen = event.gui as? GuiContainer ?: return
-        if (GuiKeyPressEvent(guiScreen).post()) {
-            event.isCanceled = true
-        }
-    }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick(event: SkyHanniTickEvent) {
