@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
+import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -304,12 +305,12 @@ object SackApi {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
+            sibling.hover?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
         }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
-            sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
+            sibling.hover?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
         }.orEmpty()

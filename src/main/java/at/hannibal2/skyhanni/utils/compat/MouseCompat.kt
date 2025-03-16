@@ -76,10 +76,10 @@ object MouseCompat {
     //$$ fun isButtonDown(button: Int): Boolean =
     //$$     GLFW.glfwGetMouseButton(windowHandle, button) == GLFW.GLFW_PRESS
     //$$
-    //$$ fun getScrollDelta(): Double {
+    //$$ fun getScrollDelta(): Int {
     //$$     val delta = scrollDelta
     //$$     scrollDelta = 0.0
-    //$$     return delta
+    //$$     return delta.toInt()
     //$$ }
     //$$
     //$$ fun getX(): Int {
@@ -102,10 +102,11 @@ object MouseCompat {
     //$$ fun getEventX(): Int = lastEventX
     //$$ fun getEventY(): Int = lastEventY
     //$$
-    //$$ fun getEventDY(): Double {
+    //$$ //TODO check if the .toInt() is correct
+    //$$ fun getEventDY(): Int {
     //$$     val delta = eventDY
     //$$     eventDY = 0.0
-    //$$     return delta
+    //$$     return delta.toInt()
     //$$ }
     //$$
     //$$ fun getEventButton(): Int {

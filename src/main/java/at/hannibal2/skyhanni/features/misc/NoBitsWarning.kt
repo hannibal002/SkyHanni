@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -29,7 +30,7 @@ object NoBitsWarning {
                 }, "§eClick to run /bz booster cookie!"
             )
             // TODO use reminder utils
-            LorenzUtils.sendTitle("§bNo Bits Available", 5.seconds)
+            TitleManager.sendTitle("§bNo Bits Available", 5.seconds)
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
         }
 
