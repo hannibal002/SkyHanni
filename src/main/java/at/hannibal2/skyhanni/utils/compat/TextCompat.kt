@@ -14,6 +14,7 @@ import net.minecraft.util.ResourceLocation
 //#if MC > 1.21
 //$$ import net.minecraft.text.MutableText
 //$$ import net.minecraft.text.PlainTextContent
+//$$ import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
 
 fun IChatComponent.directlyContainedText() =
@@ -142,6 +143,6 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
     Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
     //#else
     //$$ // todo convert the id int to the middle variable of MessageSignatureData
-    //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(this, null, MessageIndicator.system())
+    //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, null, MessageIndicator.system())
     //#endif
 }
