@@ -1,14 +1,19 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
+import at.hannibal2.skyhanni.utils.compat.appendString
+import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.client.Minecraft
-import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 //#if MC < 1.21
 import net.minecraft.util.ChatComponentText
+//#endif
+//#if MC > 1.16
+//$$ import net.minecraft.network.chat.MutableComponent
 //#endif
 
 object TextHelper {
@@ -18,12 +23,15 @@ object TextHelper {
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
 
+    //#if MC < 1.16
     fun text(text: String, init: IChatComponent.() -> Unit = {}) = text.asComponent(init)
-
-    //#if MC < 1.21
     fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
+    //#elseif MC < 1.21
+    //$$ fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
+    //$$ fun String.asComponent(init: MutableComponent.() -> Unit = {}) = (TextComponent(this) as MutableComponent).also(init)
     //#else
-    //$$ fun String.asComponent(init: Text.() -> Unit = {}): Text = Text.of(this).also(init)
+    //$$ fun text(text: String, init: MutableText.() -> Unit = {}) = text.asComponent(init)
+    //$$ fun String.asComponent(init: MutableText.() -> Unit = {}): MutableText = (Text.of(this) as MutableText).also(init)
     //#endif
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
@@ -32,7 +40,7 @@ object TextHelper {
         components.forEachIndexed { index, component ->
             when (component) {
                 is IChatComponent -> result.appendSibling(component)
-                is String -> result.appendText(component)
+                is String -> result.appendString(component)
                 is List<*> -> result.appendSibling(join(*component.toTypedArray(), separator = separator))
                 null -> return@forEachIndexed
                 else -> error("Unsupported type: ${component::class.simpleName}")
@@ -76,7 +84,7 @@ object TextHelper {
     }
 
     fun IChatComponent.send(id: Int = 0) =
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(this, id)
+        addDeletableMessageToChat(this, id)
 
     fun List<IChatComponent>.send(id: Int = 0) {
         val parent = "".asComponent()
@@ -85,32 +93,8 @@ object TextHelper {
             parent.siblings.add("\n".asComponent())
         }
 
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(parent, id)
+        parent.send(id)
     }
-
-    var IChatComponent.hover: IChatComponent?
-        get() = this.chatStyle.chatHoverEvent?.value
-        set(value) {
-            this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
-        }
-
-    var IChatComponent.command: String?
-        get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) it.value else null }
-        set(value) {
-            this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) }
-        }
-
-    var IChatComponent.suggest: String?
-        get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) it.value else null }
-        set(value) {
-            this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) }
-        }
-
-    var IChatComponent.url: String?
-        get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) it.value else null }
-        set(value) {
-            this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
-        }
 
     fun IChatComponent.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
         val token = ChatClickActionManager.createAction(onClick, expiresAt, oneTime)

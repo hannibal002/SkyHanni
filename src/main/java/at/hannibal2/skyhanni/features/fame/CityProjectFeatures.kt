@@ -228,10 +228,8 @@ object CityProjectFeatures {
         if (!config.showReady) return
         if (!inInventory) return
 
-
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()

@@ -22,16 +22,11 @@ object ColorUtils {
 
     fun getBlue(color: Int) = color and 0xFF
 
-    /**
-     * Returns a quad of the color's alpha, red, green, and blue values, in that order.
-     */
-    fun getQuad(color: Int): Quad<Float, Float, Float, Float> =
-        Quad(
-            getAlpha(color) / 255f,
-            getRed(color) / 255f,
-            getGreen(color) / 255f,
-            getBlue(color) / 255f
-        )
+    // I think you need to manually import these
+    operator fun Color.component1(): Float = this.red / 255f
+    operator fun Color.component2(): Float = this.green / 255f
+    operator fun Color.component3(): Float = this.blue / 255f
+    operator fun Color.component4(): Float = this.alpha / 255f
 
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),

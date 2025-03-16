@@ -64,14 +64,16 @@ object NeuItems {
         readAllNeuItems()
     }
 
-    fun readAllNeuItems() {
+    private fun readAllNeuItems() {
         val map = mutableMapOf<String, NeuInternalName>()
+        val names = mutableSetOf<NeuInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             val internalName = rawInternalName.toInternalName()
             var name = internalName.getItemStackOrNull()?.displayName?.lowercase() ?: run {
                 ChatUtils.debug("skipped `$rawInternalName` from readAllNeuItems")
                 continue
             }
+            names.add(internalName)
 
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
@@ -90,7 +92,7 @@ object NeuItems {
             }
             map[name] = internalName
         }
-        allInternalNames = map.values.toSet()
+        allInternalNames = names
         allItemsCache = map
     }
 
