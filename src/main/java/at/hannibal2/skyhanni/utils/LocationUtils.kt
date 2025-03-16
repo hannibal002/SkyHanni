@@ -207,4 +207,13 @@ object LocationUtils {
         }
         return guessPitch
     }
+
+    fun AxisAlignedBB.getCornersAtHeight(y: Double): List<LorenzVec> {
+        val cornerOne = LorenzVec(minX, y, minZ)
+        val cornerTwo = LorenzVec(minX, y, maxZ)
+        val cornerThree = LorenzVec(maxX, y, maxZ)
+        val cornerFour = LorenzVec(maxX, y, minZ)
+
+        return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
+    }
 }
