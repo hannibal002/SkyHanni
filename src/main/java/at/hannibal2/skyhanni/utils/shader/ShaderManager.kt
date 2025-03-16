@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
-import net.minecraft.util.ResourceLocation
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.OpenGLException
 import java.io.BufferedReader
@@ -60,7 +60,7 @@ object ShaderManager {
     }
 
     fun loadShader(type: ShaderType, fileName: String): Int {
-        val resourceLocation = ResourceLocation("skyhanni:shaders/$fileName${type.extension}")
+        val resourceLocation = createResourceLocation("skyhanni:shaders/$fileName${type.extension}")
 
         val source = StringBuilder()
 
