@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.style
 import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.compat.appendString
-import at.hannibal2.skyhanni.utils.compat.changeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
@@ -294,4 +293,12 @@ object PlayerNameFormatter {
             newList
         }
     }
+
+    // TODO move to TextCompat once LorenzColor works on 1.21
+    private fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
+        //#if MC < 1.21
+        this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
+    //#else
+    //$$ this.copy().withColor(color.toChatFormatting())
+    //#endif
 }

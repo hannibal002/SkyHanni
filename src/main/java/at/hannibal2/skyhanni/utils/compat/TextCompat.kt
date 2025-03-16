@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.LorenzColor
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -135,14 +134,6 @@ fun IChatComponent.appendComponent(component: IChatComponent): IChatComponent =
     this.appendSibling(component)
 //#else
 //$$ (this as MutableComponent).append(component)
-//#endif
-
-
-fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
-    //#if MC < 1.21
-    this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
-//#else
-//$$ this.copy().withColor(color.toChatFormatting())
 //#endif
 
 fun addChatMessageToChat(message: IChatComponent) {
