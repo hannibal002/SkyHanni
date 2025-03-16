@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
@@ -150,7 +151,7 @@ object PlayerNameFormatter {
                 appendComponent(
                     nameFormat(
                         event.authorComponent,
-                        levelColor = event.levelComponent?.sampleStyleAtStart()?.color?.toString(),
+                        levelColor = event.levelComponent?.getText()?.getFirstColorCode()?.let { "§$it" },
                         level = event.levelComponent,
                     ),
                 )
