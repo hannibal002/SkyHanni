@@ -1,0 +1,98 @@
+package at.hannibal2.skyhanni.features.misc
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.EmojiJson
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.minecraft.client.renderer.texture.TextureManager
+import net.minecraft.util.ResourceLocation
+import org.lwjgl.opengl.GL11
+import org.lwjgl.util.Color
+
+@SkyHanniModule
+object EmojiReplacer {
+    private val config get() = SkyHanniMod.feature.gui
+    private var emojiNameMap: Map<String, Int>? = null
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val emojiJson = event.getConstant<EmojiJson>("Emojis")
+        emojiNameMap = emojiJson.emojiNames
+    }
+    private var stringIndex: Int = -1
+    private var emojiEnd = -1
+    private var renderedString: String = ""
+    private val emojiResource = ResourceLocation("skyhanni:emoji/emojis.png")
+    private var isShadow = false
+    private const val EMOJI_WIDTH = 72.0f
+    private const val EMOJI_DISPLAY_WIDTH = 8.0f
+    private const val EMOJI_SPRITESHEET_COUNT = 62
+
+    fun renderEmojiChar(char: Char, posX: Float, posY: Float, textureManager: TextureManager?, render: Boolean): Float {
+        if (!isEnabled()) return -1.0f
+        val nameMap = emojiNameMap ?: return -1.0f
+        if (stringIndex <= emojiEnd) return 0.0f
+        if (textureManager == null) return -1.0f
+        if (char == ':') {
+            val oldEmojiEnd = emojiEnd
+            for (i in stringIndex + 1 until renderedString.length) {
+                if (renderedString[i] == ':') {
+                    emojiEnd = i
+                    break
+                }
+            }
+            if (stringIndex > emojiEnd) return -1.0f
+            val emojiName = renderedString.slice(stringIndex..emojiEnd)
+            val emojiIndex = nameMap[emojiName]
+            if (emojiIndex == null) {
+                emojiEnd = oldEmojiEnd
+                return -1.0f
+            } else if (!render) {
+                return EMOJI_DISPLAY_WIDTH
+            }
+            textureManager.bindTexture(emojiResource)
+            val spriteSheetX = (emojiIndex % 62) * EMOJI_WIDTH
+            val spriteSheetY = ((emojiIndex - (emojiIndex % 62)) / 62) * EMOJI_WIDTH
+            GL11.glBegin(GL11.GL_TRIANGLE_STRIP)
+            GL11.glTexCoord2f(
+                spriteSheetX / (EMOJI_WIDTH * EMOJI_SPRITESHEET_COUNT),
+                (spriteSheetY) / (EMOJI_WIDTH * EMOJI_SPRITESHEET_COUNT),
+            )
+            GL11.glVertex3f(posX, posY, 0.0f)
+            GL11.glTexCoord2f(
+                spriteSheetX / (EMOJI_WIDTH * EMOJI_SPRITESHEET_COUNT),
+                (spriteSheetY + EMOJI_WIDTH) / (EMOJI_WIDTH * EMOJI_SPRITESHEET_COUNT),
+            )
+            GL11.glVertex3f(posX, posY + EMOJI_DISPLAY_WIDTH, 0.0f)
+            GL11.glTexCoord2f(
+                (spriteSheetX + EMOJI_WIDTH) / (EMOJI_WIDTH * EMOJI_SPRITESHEET_COUNT),
+                spriteSheetY / (EMOJI_WIDTH * EMOJI_SPRITESHEET_COUNT),
+            )
+            GL11.glVertex3f(posX + EMOJI_DISPLAY_WIDTH, posY, 0.0f)
+            GL11.glTexCoord2f(
+                (spriteSheetX + EMOJI_WIDTH) / (EMOJI_WIDTH * EMOJI_SPRITESHEET_COUNT),
+                (spriteSheetY + EMOJI_WIDTH) / (EMOJI_WIDTH * EMOJI_SPRITESHEET_COUNT),
+            )
+            GL11.glVertex3f(posX + EMOJI_DISPLAY_WIDTH, posY + EMOJI_DISPLAY_WIDTH, 0.0f)
+            GL11.glEnd()
+            return EMOJI_DISPLAY_WIDTH + 1.0f
+        }
+        return -1.0f
+    }
+
+    private var lastColor: Color = Color()
+
+    fun setLastColor(r: Float, g: Float, b: Float, a: Float) {
+        lastColor = Color((r * 255.0).toInt(), (g * 255.0).toInt(), (b * 255.0).toInt(), (a * 255.0).toInt())
+    }
+
+    fun setCharIndex(index: Int, s: String, shadow: Boolean) {
+        if (!isEnabled()) return
+        if (index == 0) emojiEnd = -1
+        renderedString = s
+        stringIndex = index
+        isShadow = shadow
+    }
+
+    private fun isEnabled() = config.emojiReplace
+}

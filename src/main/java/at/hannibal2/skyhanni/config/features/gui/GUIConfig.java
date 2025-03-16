@@ -136,6 +136,12 @@ public class GUIConfig {
     public CosmeticConfig cosmetic = new CosmeticConfig();
 
     @Expose
+    @ConfigOption(name = "Replace Emojis", desc = "Replaces names with colons with the emoji, similar to Discord")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean emojiReplace = true;
+
+    @Expose
     @ConfigOption(name = "TPS Display", desc = "Show the TPS of the current server, like in Soopy.")
     @ConfigEditorBoolean
     @FeatureToggle
