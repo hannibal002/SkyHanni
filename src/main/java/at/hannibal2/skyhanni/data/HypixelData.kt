@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -597,7 +598,7 @@ object HypixelData {
         val minecraft = Minecraft.getMinecraft()
         val world = minecraft.theWorld ?: return false
 
-        val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
+        val objective = world.scoreboard.getSidebarObjective() ?: return false
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)

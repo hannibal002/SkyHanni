@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -205,7 +206,7 @@ object GardenNextJacobContest {
         if (!config.display) return
         monthPattern.matchMatcher(event.inventoryName) {
             inCalendar = true
-            val month = LorenzUtils.getSBMonthByName(group("month"))
+            val month = SkyBlockTime.getSBMonthByName(group("month"))
             val year = group("year").toInt()
 
             readCalendar(event.inventoryItems.values, year, month)
@@ -430,7 +431,7 @@ object GardenNextJacobContest {
         lastWarningTime = SimpleTimeMark.now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         ChatUtils.chat("Next farming contest: $cropText")
-        LorenzUtils.sendTitle("§eFarming Contest!", 5.seconds)
+        TitleManager.sendTitle("§eFarming Contest!", 5.seconds)
         SoundUtils.playBeepSound()
 
         val cropTextNoColor = crops.joinToString(", ") {

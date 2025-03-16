@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import at.hannibal2.skyhanni.utils.compat.containerSlots
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
@@ -94,6 +97,14 @@ object InventoryUtils {
     fun getChestplate(): ItemStack? = getArmor()[2]
     fun getLeggings(): ItemStack? = getArmor()[1]
     fun getBoots(): ItemStack? = getArmor()[0]
+
+    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
+        if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
+        slot?.slotNumber?.let { slotNumber ->
+            clickInventorySlot(slotNumber, container.windowId, 0, 1)
+            this.cancel()
+        }
+    }
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
         if (!PlatformUtils.isNeuLoaded()) {

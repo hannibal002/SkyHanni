@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
@@ -250,7 +251,7 @@ object HoppityEggsManager {
                 action = action,
             )
         } else ChatUtils.chat(message, replaceSameMessage = true)
-        LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
+        TitleManager.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesConfig.DesignFormat
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -95,7 +95,7 @@ object TrophyFishMessages {
 
     private fun sendTitle(displayName: String, displayRarity: String?, amount: Int) {
         val text = "$displayName $displayRarity §8$amount§c!"
-        LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
+        TitleManager.sendTitle(text, 3.seconds, 2.8, 7f)
     }
 
     val regex = "[- ]".toRegex()

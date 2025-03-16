@@ -83,12 +83,18 @@ net.minecraft.core.particles.ParticleTypes net.minecraft.util.EnumParticleTypes
 
 net.minecraft.core.particles.ParticleTypes ANGRY_VILLAGER VILLAGER_ANGRY
 net.minecraft.core.particles.ParticleTypes DRIPPING_LAVA DRIP_LAVA
+net.minecraft.core.particles.ParticleTypes DUST REDSTONE
 net.minecraft.core.particles.ParticleTypes ENCHANT ENCHANTMENT_TABLE
 net.minecraft.core.particles.ParticleTypes ENCHANTED_HIT CRIT_MAGIC
+net.minecraft.core.particles.ParticleTypes ENTITY_EFFECT SPELL_MOB
+net.minecraft.core.particles.ParticleTypes EXPLOSION EXPLOSION_LARGE
+net.minecraft.core.particles.ParticleTypes EXPLOSION_EMITTER EXPLOSION_HUGE
+net.minecraft.core.particles.ParticleTypes FIREWORK FIREWORKS_SPARK
 net.minecraft.core.particles.ParticleTypes HAPPY_VILLAGER VILLAGER_HAPPY
 net.minecraft.core.particles.ParticleTypes LARGE_SMOKE SMOKE_LARGE
+net.minecraft.core.particles.ParticleTypes POOF EXPLOSION_NORMAL
 net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
-net.minecraft.core.particles.ParticleTypes SPELL_MOB ENTITY_EFFECT
+net.minecraft.core.particles.ParticleTypes WITCH SPELL_WITCH
 
 net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
 net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList

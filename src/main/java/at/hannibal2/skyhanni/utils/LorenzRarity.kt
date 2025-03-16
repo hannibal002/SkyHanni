@@ -21,6 +21,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
     val chatColorCode get() = color.getChatColor()
     val rawName = name.replace("_", " ")
+    val formattedName = rawName.firstLetterUppercase()
 
     fun oneBelow(logError: Boolean = true): LorenzRarity? {
         val rarityBelow = getById(ordinal - 1)
