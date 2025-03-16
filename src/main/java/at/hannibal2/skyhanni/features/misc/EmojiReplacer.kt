@@ -42,7 +42,7 @@ object EmojiReplacer {
                 }
             }
             if (stringIndex > emojiEnd) return -1.0f
-            val emojiName = renderedString.slice(stringIndex..emojiEnd)
+            val emojiName = renderedString.slice(stringIndex + 1 ..< emojiEnd)
             val emojiIndex = nameMap[emojiName]
             if (emojiIndex == null) {
                 emojiEnd = oldEmojiEnd
@@ -53,6 +53,13 @@ object EmojiReplacer {
             textureManager.bindTexture(emojiResource)
             val spriteSheetX = (emojiIndex % 62) * EMOJI_WIDTH
             val spriteSheetY = ((emojiIndex - (emojiIndex % 62)) / 62) * EMOJI_WIDTH
+            val brightness = if (isShadow) 0.25f else 1.0f
+            GL11.glColor4f(
+                brightness,
+                brightness,
+                brightness,
+                lastColor.alpha / 255.0f
+            )
             GL11.glBegin(GL11.GL_TRIANGLE_STRIP)
             GL11.glTexCoord2f(
                 spriteSheetX / (EMOJI_WIDTH * EMOJI_SPRITESHEET_COUNT),
@@ -75,6 +82,12 @@ object EmojiReplacer {
             )
             GL11.glVertex3f(posX + EMOJI_DISPLAY_WIDTH, posY + EMOJI_DISPLAY_WIDTH, 0.0f)
             GL11.glEnd()
+            GL11.glColor4f(
+                lastColor.red / 255.0f,
+                lastColor.blue / 255.0f,
+                lastColor.green / 255.0f,
+                lastColor.alpha / 255.0f
+            )
             return EMOJI_DISPLAY_WIDTH + 1.0f
         }
         return -1.0f

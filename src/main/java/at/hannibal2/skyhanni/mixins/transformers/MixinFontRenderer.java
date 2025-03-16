@@ -135,6 +135,6 @@ public abstract class MixinFontRenderer {
 
     @Inject(method = "setColor", at = @At("HEAD"), remap = false)
     public void emojiCharacterRenderOverride(float r, float g, float b, float a, CallbackInfo ci) {
-        EmojiReplacer.INSTANCE.setLastColor(r, g, b, 1.0f);
+        EmojiReplacer.INSTANCE.setLastColor(r, g, b, a);
     }
 }
