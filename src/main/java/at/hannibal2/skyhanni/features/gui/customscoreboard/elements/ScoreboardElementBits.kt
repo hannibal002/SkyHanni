@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 

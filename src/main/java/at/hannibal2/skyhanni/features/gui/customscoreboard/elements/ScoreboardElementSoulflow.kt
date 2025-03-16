@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSoulflow
 import at.hannibal2.skyhanni.features.rift.RiftApi
 
