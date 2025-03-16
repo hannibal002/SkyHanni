@@ -61,7 +61,7 @@ object GemstoneMoneyPerHour {
             lastMined = SimpleTimeMark.now()
             val gemstone = group("gemstone")
             lastGemstone = gemstone
-            val configGemstonePrice = getPrice(convertToInternalName(lastGemstone) ?: return)
+            val configGemstonePrice = getPrice(convertToInternalName(lastGemstone))
             val delta = group("amount").toDouble() * getFraction() * configGemstonePrice
             coins += delta.toInt()
         }
