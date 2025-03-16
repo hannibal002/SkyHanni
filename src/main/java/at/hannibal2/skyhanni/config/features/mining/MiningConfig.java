@@ -102,6 +102,11 @@ public class MiningConfig {
     public FlowstateHelperConfig flowstateHelper = new FlowstateHelperConfig();
 
     @Expose
+    @ConfigOption(name = "Gemstone Coins per Hour Display", desc = "")
+    @Accordion
+    public GemstoneMoneyPerHourConfig gemstoneMoneyPerHour = new GemstoneMoneyPerHourConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
