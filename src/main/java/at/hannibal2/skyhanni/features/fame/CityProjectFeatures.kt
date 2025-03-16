@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -35,6 +34,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -178,7 +178,7 @@ object CityProjectFeatures {
                     "$name §ex${amount.addSeparators()}",
                     {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                            LorenzUtils.setTextIntoSign("$amount")
+                            SignUtils.setTextIntoSign("$amount")
                         } else {
                             BazaarApi.searchForBazaarItem(name, amount)
                         }
@@ -228,10 +228,8 @@ object CityProjectFeatures {
         if (!config.showReady) return
         if (!inInventory) return
 
-
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()
