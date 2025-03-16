@@ -290,7 +290,7 @@ public class InventoryConfig {
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Time Held in Lore", desc = "Show time held in the lore of Evolving Items.")
+    @ConfigOption(name = "Time Held for Evolving Items", desc = "Show time held in the lore of Evolving Items.")
     @ConfigEditorBoolean
     @FeatureToggle
     @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
