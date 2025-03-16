@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumberTrackingElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSoulflow
 import at.hannibal2.skyhanni.features.rift.RiftApi
 
@@ -24,6 +24,9 @@ object ScoreboardElementSoulflow : ScoreboardElement(), CustomScoreboardNumberTr
             displayConfig.displayNumbersFirst -> "§3$line Soulflow"
             else -> "Soulflow: §3$line"
         }
+        if (informationFilteringConfig.hideEmptyLines && soulflow == "0") return null
+
+        return CustomScoreboardUtils.formatNumberDisplay("Soulflow", soulflow, "§3")
     }
 
     override val configLine = "Soulflow: §3761"

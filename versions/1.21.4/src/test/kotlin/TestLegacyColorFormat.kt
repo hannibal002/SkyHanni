@@ -1,8 +1,9 @@
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import at.hannibal2.skyhanni.utils.compat.*
 
 class TestLegacyColorFormat {
     @Test
@@ -16,7 +17,7 @@ class TestLegacyColorFormat {
             .append(Text.literal("+").withColor(Formatting.LIGHT_PURPLE))
             .append(Text.literal("] lrg89").withColor(Formatting.AQUA))
             .append(Text.literal(": test").withColor(Formatting.WHITE))
-        Assertions.assertEquals("§r§r§8[§r§9302§r§8] §r§6♫ §r§b[MVP§r§d+§r§b] lrg89§r§f: test§r", text.getFormattedTextCompat())
+        Assertions.assertEquals("§r§r§8[§r§9302§r§8] §r§6♫ §r§b[MVP§r§d+§r§b] lrg89§r§f: test§r", text.formattedTextCompat())
     }
 
 }

@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
@@ -93,7 +92,7 @@ object CopyNearbyEntitiesCommand {
                     if (inventory != null) {
                         add("armor:")
                         for ((i, itemStack) in inventory.armorInventory.withIndex()) {
-                            val name = itemStack?.name ?: "null"
+                            val name = itemStack?.displayName ?: "null"
                             add("-  at: $i: $name")
                         }
                     }
@@ -162,7 +161,7 @@ object CopyNearbyEntitiesCommand {
     private fun MutableList<String>.addItem(entity: EntityItem) {
         add("EntityItem:")
         val stack = entity.entityItem
-        val stackName = stack.name
+        val stackName = stack.displayName
         val stackDisplayName = stack.displayName
         val cleanName = stack.cleanName()
         val itemEnchanted = stack.isEnchanted()
@@ -213,7 +212,7 @@ object CopyNearbyEntitiesCommand {
                 add("-     $skullTexture")
             }
             val cleanName = stack.cleanName()
-            val stackName = stack.name
+            val stackName = stack.displayName
             val type = stack.javaClass.name
             add("-     name: '$stackName'")
             add("-     cleanName: '$cleanName'")

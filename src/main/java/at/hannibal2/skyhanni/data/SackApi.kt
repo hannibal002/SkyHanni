@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -231,7 +230,7 @@ object SackApi {
             priceUpdater(price)
             gem.price += price
             if (savingSacks) setSackItem(internalName, stored)
-            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.name] = gem
+            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.displayName] = gem
         }
     }
 
@@ -249,7 +248,7 @@ object SackApi {
                 3 -> {
                     rune.slot = key
                     rune.lvl3 = stored
-                    runeItem[value.name] = rune
+                    runeItem[value.displayName] = rune
                 }
             }
             if (savingSacks) setSackItem(value.getInternalName(), stored)
@@ -276,7 +275,7 @@ object SackApi {
                 internalName.getSackPrice(stored).coerceAtLeast(0)
             }
             item.slot = key
-            sackItem[value.name] = item
+            sackItem[value.displayName] = item
         }
     }
 
