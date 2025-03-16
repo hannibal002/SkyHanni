@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -122,7 +122,7 @@ class MobsConfig {
     var shurikenHighlight: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Shuriken Highlight Colour", desc = "Colour of the shuriken highlight.")
+    @ConfigOption(name = "Shuriken Highlight Color", desc = "Color of the shuriken highlight.")
     @ConfigEditorColour
-    var shurikenHighlightColour: String = "0:153:159:0:5"
+    var shurikenHighlightColor: String = "0:153:159:0:5"
 }
