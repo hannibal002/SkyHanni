@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.client.Minecraft
@@ -78,7 +79,7 @@ object TextHelper {
     }
 
     fun IChatComponent.send(id: Int = 0) =
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(this, id)
+        addDeletableMessageToChat(this, id)
 
     fun List<IChatComponent>.send(id: Int = 0) {
         val parent = "".asComponent()
@@ -87,7 +88,7 @@ object TextHelper {
             parent.siblings.add("\n".asComponent())
         }
 
-        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(parent, id)
+        parent.send(id)
     }
 
     fun IChatComponent.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
