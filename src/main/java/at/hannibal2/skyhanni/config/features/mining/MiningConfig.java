@@ -102,7 +102,7 @@ public class MiningConfig {
     public FlowstateHelperConfig flowstateHelper = new FlowstateHelperConfig();
 
     @Expose
-    @ConfigOption(name = "Gemstone Coins per Hour Display", desc = "")
+    @ConfigOption(name = "Gemstone Money per Hour Display", desc = "")
     @Accordion
     public GemstoneMoneyPerHourConfig gemstoneMoneyPerHour = new GemstoneMoneyPerHourConfig();
 

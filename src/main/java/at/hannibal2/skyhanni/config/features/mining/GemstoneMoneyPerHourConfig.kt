@@ -4,12 +4,13 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class GemstoneMoneyPerHourConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable gemstone coins per hour display.")
+    @ConfigOption(name = "Enabled", desc = "Enable gemstone money per hour display. use /shresetgemstone to manually reset it.")
     @ConfigEditorBoolean
     var enabled: Boolean = true
 
@@ -19,7 +20,7 @@ class GemstoneMoneyPerHourConfig {
     var forceNPC: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Gemstone Type", desc = "Which type of gemstone to use for the coins per hour calculation.")
+    @ConfigOption(name = "Gemstone Type", desc = "Which type of gemstone to use for the money per hour calculation.")
     @ConfigEditorDropdown
     var gemstoneType: GemstoneType = GemstoneType.FLAWLESS
 
@@ -34,6 +35,20 @@ class GemstoneMoneyPerHourConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Timeout Time", desc = "How long the display should wait (in seconds) after your last pristine message to reset.")
+    @ConfigEditorSlider(minValue = 10f, maxValue = 30f, minStep = 1f)
+    var timeoutTime: Float = 15f
+
+    @Expose
+    @ConfigOption(
+        name = "Pause Time",
+        desc = "Whether the timer should pause instead of resetting.\n" +
+            "Note: It will still reset when you enter a non-mining island."
+    )
+    @ConfigEditorBoolean
+    var pauseEnabled: Boolean = false
+
+    @Expose
     @ConfigLink(owner = GemstoneMoneyPerHourConfig::class, field = "enabled")
-    var position: Position = Position(16, 192, false, true)
+    var position: Position = Position(189, 52, false, true)
 }
