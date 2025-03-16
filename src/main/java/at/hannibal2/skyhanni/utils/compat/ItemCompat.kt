@@ -2,14 +2,18 @@ package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 
 //#if MC > 1.16
 //$$ import net.minecraft.world.item.DyeItem
-//$$ import net.minecraft.world.item.Item
 //#endif
 //#if MC > 1.21
 //$$ import net.minecraft.item.tooltip.TooltipType
+//$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.util.Identifier
+//$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.text.Text
 //#endif
 
 fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
@@ -24,6 +28,43 @@ fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
     //$$ return this.getTooltip(Item.TooltipContext.DEFAULT, MinecraftClient.getInstance().player, tooltipType).map { it.formattedTextCompat() }.toMutableList()
     //#endif
 }
+
+fun Item.getIdentifierString(): String {
+    //#if MC < 1.16
+    return this.registryName
+    //#else
+    //$$ return Registries.ITEM.getId(this).toString()
+    //#endif
+}
+
+/*
+ * On Modern it will return Items.AIR if it cant find it instead of null
+ */
+fun String.getVanillaItem(): Item? {
+    //#if MC < 1.16
+    return Item.getByNameOrId(this)
+    //#else
+    //$$ val item = Registries.ITEM.get(Identifier.of(this))
+    //$$ if (item == Items.AIR) return null
+    //$$ return item
+    //#endif
+}
+
+fun ItemStack.setCustomItemName(name: String): ItemStack {
+    //#if MC < 1.16
+    this.setStackDisplayName(name)
+    //#else
+    //$$ this.set(DataComponentTypes.CUSTOM_NAME, Text.of(name))
+    //#endif
+    return this
+}
+
+//#if MC > 1.21
+//$$    fun ItemStack.setCustomItemName(name: Text): ItemStack {
+//$$     this.set(DataComponentTypes.CUSTOM_NAME, name)
+//$$     return this
+//$$ }
+//#endif
 
 enum class DyeCompat(
     private val dyeColor: Int,

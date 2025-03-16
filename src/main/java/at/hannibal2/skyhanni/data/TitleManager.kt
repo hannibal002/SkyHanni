@@ -25,12 +25,7 @@ object TitleManager {
     private var heightModifier = 1.8
     private var fontSizeModifier = 4f
 
-    @Deprecated("Use LorenzUtils instead", ReplaceWith("LorenzUtils.sendTitle(text, duration, height, fontSize)"))
-    fun sendTitle(text: String, duration: Duration, height: Double, fontSize: Float) {
-        setTitle(text, duration, height, fontSize)
-    }
-
-    fun setTitle(text: String, duration: Duration, height: Double, fontSize: Float) {
+    fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
         currentText = text
         display = "§f$text"
         endTime = SimpleTimeMark.now() + duration

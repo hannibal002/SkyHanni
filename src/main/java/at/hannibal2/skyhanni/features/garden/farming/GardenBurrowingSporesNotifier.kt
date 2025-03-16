@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemBlink
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -33,7 +33,7 @@ object GardenBurrowingSporesNotifier {
         if (!titleEnabled && !blinkEnabled) return
         if (!sporeDropMessage.matches(event.message)) return
 
-        if (titleEnabled) LorenzUtils.sendTitle("§9Burrowing Spores!", 5.seconds)
+        if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!", 5.seconds)
         if (blinkEnabled) ItemBlink.setBlink(NeuItems.getItemStackOrNull("BURROWING_SPORES"), 5_000)
     }
 }
