@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
+import at.hannibal2.skyhanni.events.garden.PlotSwitchEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
@@ -258,7 +258,7 @@ object GardenPlotApi {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         // idk if it's possible that calculateCurrentPlot returns null even tho it shouldn't actually be null,
-        // which would lead to wrong PlotChangeEvent posts
+        // which would lead to wrong PlotSwitchEvent posts
 
         val actualCurrentPlot = calculateCurrentPlot()
 
@@ -267,7 +267,7 @@ object GardenPlotApi {
         val previousPlot = currentPlot
         currentPlot = actualCurrentPlot
 
-        PlotChangeEvent(previousPlot, currentPlot).post()
+        PlotSwitchEvent(previousPlot, currentPlot).post()
     }
 
     @HandleEvent
@@ -278,12 +278,12 @@ object GardenPlotApi {
         val previousPlot: Plot? = currentPlot
         currentPlot = null
 
-        PlotChangeEvent(previousPlot, null).post()
+        PlotSwitchEvent(previousPlot, null).post()
     }
 
 //     @HandleEvent
-//     fun onPlotChange(event: PlotChangeEvent) {
-//         println("PlotChangeEvent triggered: previousPlot: ${event.previousPlot?.name}, newPlot: ${event.newPlot?.name}")
+//     fun onPlotChange(event: PlotSwitchEvent) {
+//         println("PlotSwitchEvent triggered: previousPlot: ${event.previousPlot?.name}, newPlot: ${event.newPlot?.name}")
 //     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
