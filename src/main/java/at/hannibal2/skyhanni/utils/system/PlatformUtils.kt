@@ -8,10 +8,12 @@ import net.minecraftforge.fml.common.ModContainer
 import kotlin.time.Duration.Companion.INFINITE
 //#if MC < 1.16
 import net.minecraft.launchwrapper.Launch
+import net.minecraftforge.fml.common.FMLCommonHandler
 //#elseif FORGE
 //$$ import net.minecraftforge.fml.loading.FMLEnvironment
 //#else
 //$$ import net.fabricmc.loader.api.FabricLoader
+//$$ import kotlin.system.exitProcess
 //#endif
 
 /**
@@ -29,6 +31,17 @@ object PlatformUtils {
         //$$ FMLEnvironment.production.not()
         //#else
         //$$ FabricLoader.getInstance().isDevelopmentEnvironment
+        //#endif
+    }
+
+    fun shutdownMinecraft(reason: String? = null) {
+        val reasonLine = reason?.let { " Reason: $it" }.orEmpty()
+        System.err.println("SkyHanni-@MOD_VERSION@ ${"forced the game to shutdown.$reasonLine"}")
+
+        //#if FORGE
+        FMLCommonHandler.instance().handleExit(-1)
+        //#else
+        //$$ exitProcess(-1)
         //#endif
     }
 

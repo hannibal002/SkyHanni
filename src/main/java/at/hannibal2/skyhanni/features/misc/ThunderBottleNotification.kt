@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -24,7 +25,7 @@ object ThunderBottleNotification {
         if (!isEnabled()) return
 
         if (thunderBottleChargedPattern.matches(event.message)) {
-            LorenzUtils.sendTitle("§eThunder Bottle Charged!", 3.seconds)
+            TitleManager.sendTitle("§eThunder Bottle Charged!", 3.seconds)
         }
     }
 

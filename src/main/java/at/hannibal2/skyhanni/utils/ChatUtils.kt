@@ -14,12 +14,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.command
-import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.prefix
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.chat.TextHelper.url
+import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
+import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.url
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.IChatComponent
@@ -89,7 +90,6 @@ object ChatUtils {
         onlySendOnce: Boolean = false,
         messageId: Int? = null,
     ) {
-
         if (prefix) {
             internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce, messageId = messageId)
         } else {
@@ -133,11 +133,7 @@ object ChatUtils {
             return false
         }
 
-        //#if FORGE
-        if (send) thePlayer.addChatMessage(message)
-        //#else
-        //$$ if (send) thePlayer.sendMessage(message, false)
-        //#endif
+        if (send) addChatMessageToChat(message)
         return true
     }
 
@@ -371,8 +367,6 @@ object ChatUtils {
         )
     }
 
-    fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
-        this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
 
     fun clickToActionOrDisable(
         message: String,
