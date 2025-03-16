@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -337,7 +338,7 @@ object HoppityCollectionStats {
             else stack
 
             newItemStack.setLore(buildDescriptiveMilestoneLore(stack))
-            newItemStack.setStackDisplayName(stack.displayName)
+            newItemStack.setCustomItemName(stack.displayName)
             replacementCache[stack.displayName] = newItemStack
         }
 
