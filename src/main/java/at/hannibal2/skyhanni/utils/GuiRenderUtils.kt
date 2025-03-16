@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ColorUtils.component1
+import at.hannibal2.skyhanni.utils.ColorUtils.component2
+import at.hannibal2.skyhanni.utils.ColorUtils.component3
+import at.hannibal2.skyhanni.utils.ColorUtils.component4
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -22,11 +26,6 @@ import java.text.DecimalFormat
  * Some functions taken from NotEnoughUpdates
  */
 object GuiRenderUtils {
-    private operator fun Color.component1(): Float = this.red / 255f
-    private operator fun Color.component2(): Float = this.green / 255f
-    private operator fun Color.component3(): Float = this.blue / 255f
-    private operator fun Color.component4(): Float = this.alpha / 255f
-
 
     private fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.getStringWidth(str)
