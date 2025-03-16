@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.mining.GemstoneMoneyPerHourConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
@@ -24,6 +25,8 @@ import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.math.pow
+import kotlin.time.Duration.Companion.convert
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GemstoneMoneyPerHour {
@@ -42,7 +45,7 @@ object GemstoneMoneyPerHour {
     private var start = SimpleTimeMark.farFuture()
     private var lastMined = SimpleTimeMark.farFuture()
     private var coins = 0
-    private var lastGemstone: NeuInternalName? = null
+    private var lastGemstone: String = ""
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
@@ -50,13 +53,16 @@ object GemstoneMoneyPerHour {
         pristineMessagePattern.matchMatcher(event.message) {
             if (start.isFarFuture()) start = SimpleTimeMark.now()
             lastMined = SimpleTimeMark.now()
-            ChatUtils.debug("among us?")
             val gemstone = group("gemstone")
-            lastGemstone = "${config.gemstoneType.displayName}_${gemstone}_GEM".toInternalName()
-            val configGemstonePrice = getPrice(lastGemstone ?: return)
+            lastGemstone = gemstone
+            val configGemstonePrice = getPrice(convertToInternalName(lastGemstone) ?: return)
             val delta = group("amount").toDouble() * getFraction() * configGemstonePrice
             coins += delta.toInt()
         }
+    }
+
+    private fun convertToInternalName(name: String): NeuInternalName {
+        return "${config.gemstoneType.displayName}_${name}_GEM".toInternalName()
     }
 
     private fun getPrice(gemstone: NeuInternalName): Double {
@@ -83,11 +89,12 @@ object GemstoneMoneyPerHour {
 
     private fun createDisplay() = buildList {
         if (start.isFarFuture()) return@buildList
+        if (lastGemstone.isEmpty()) return@buildList
         val uptime = start.passedSince()
-        val lastGemstoneNonNull = lastGemstone ?: return@buildList
         val moneyPerHour = coins / maxOf(uptime.inPartialSeconds, 1.0) * 3600
-        val gemstoneName = lastGemstoneNonNull.itemNameWithoutColor
-        val gemstonePrice = getPrice(lastGemstoneNonNull)
+        val internalName = convertToInternalName(lastGemstone)
+        val gemstoneName = internalName.itemNameWithoutColor
+        val gemstonePrice = getPrice(internalName)
 
         add(Renderable.string("§d§lGemstone Coins/h"))
         add(Renderable.string("§a($gemstoneName @ §b${gemstonePrice.addSeparators()})"))
@@ -96,7 +103,7 @@ object GemstoneMoneyPerHour {
         add(Renderable.string("§bUptime: ${uptime.format()}"))
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         display.ifEmpty { updateDisplay() }
@@ -111,12 +118,18 @@ object GemstoneMoneyPerHour {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) display = listOf()
-        else display = createDisplay()
+        if (lastMined.passedSince() > 10.seconds) reset()
+        display = createDisplay()
+    }
+
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        reset()
     }
 
     private fun reset() {
-        start = SimpleTimeMark.farPast()
-        lastMined = SimpleTimeMark.farPast()
+        start = SimpleTimeMark.farFuture()
+        lastMined = SimpleTimeMark.farFuture()
         coins = 0
     }
 
