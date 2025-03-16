@@ -163,6 +163,8 @@ object EmojiReplacer {
                 }
                 if (lastValidEmoji != null) {
                     builder.append(getEmojiString(lastValidEmoji))
+                } else {
+                    builder.append(char)
                 }
                 i = oldI
             } else {
