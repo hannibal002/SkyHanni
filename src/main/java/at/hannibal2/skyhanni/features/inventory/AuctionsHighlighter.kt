@@ -37,8 +37,7 @@ object AuctionsHighlighter {
         if (!config.highlightAuctions) return
         if (event.gui !is GuiChest) return
 
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
         if (chest.getInventoryName() != "Manage Auctions") return
 
         for ((slot, stack) in chest.getUpperItems()) {

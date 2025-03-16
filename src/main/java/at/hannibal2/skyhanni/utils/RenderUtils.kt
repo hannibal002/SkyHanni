@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
+import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -1665,7 +1665,7 @@ object RenderUtils {
         color: Color,
         depth: Boolean,
     ) {
-        val (cornerOne, cornerTwo, cornerThree, cornerFour) = boundingBox.getCorners(boundingBox.maxY)
+        val (cornerOne, cornerTwo, cornerThree, cornerFour) = boundingBox.getCornersAtHeight(boundingBox.maxY)
         this.draw3DLine(cornerOne, cornerTwo, color, lineWidth, depth)
         this.draw3DLine(cornerTwo, cornerThree, color, lineWidth, depth)
         this.draw3DLine(cornerThree, cornerFour, color, lineWidth, depth)
@@ -1723,8 +1723,8 @@ object RenderUtils {
         color: Color,
         depth: Boolean,
     ) {
-        val cornersTop = boundingBox.getCorners(boundingBox.maxY)
-        val cornersBottom = boundingBox.getCorners(boundingBox.minY)
+        val cornersTop = boundingBox.getCornersAtHeight(boundingBox.maxY)
+        val cornersBottom = boundingBox.getCornersAtHeight(boundingBox.minY)
 
         // Draw lines for the top and bottom faces
         for (i in 0..3) {

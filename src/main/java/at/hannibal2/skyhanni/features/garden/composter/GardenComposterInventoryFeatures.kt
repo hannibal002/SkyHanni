@@ -78,8 +78,7 @@ object GardenComposterInventoryFeatures {
 
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
             if (event.gui !is GuiChest) return
-            val guiChest = event.gui
-            val chest = guiChest.inventorySlots as ContainerChest
+            val chest = event.container as ContainerChest
 
             for ((slot, stack) in chest.getUpperItems()) {
                 if (stack.getLore().any { it == "§eClick to upgrade!" }) {

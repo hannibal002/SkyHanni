@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.combat.FlareConfig
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -120,12 +120,12 @@ object FlareDisplay {
                 }
 
                 FlareConfig.AlertType.TITLE -> {
-                    LorenzUtils.sendTitle(message, 1.seconds)
+                    TitleManager.sendTitle(message, 1.seconds)
                 }
 
                 FlareConfig.AlertType.CHAT_TITLE -> {
                     ChatUtils.chat(message)
-                    LorenzUtils.sendTitle(message, 1.seconds)
+                    TitleManager.sendTitle(message, 1.seconds)
                 }
 
                 else -> {}

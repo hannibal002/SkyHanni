@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
@@ -63,7 +64,7 @@ object SeaCreatureFeatures {
         if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
             else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
-            LorenzUtils.sendTitle(text, 1.5.seconds, 3.6, 7f)
+            TitleManager.sendTitle(text, 1.5.seconds, 3.6, 7f)
             if (config.playSound) SoundUtils.playBeepSound()
         }
     }
@@ -80,7 +81,7 @@ object SeaCreatureFeatures {
         if (event.seaCreature.rare) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
-            LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
+            TitleManager.sendTitle(text, 3.seconds, 2.8, 7f)
             if (config.playSound) SoundUtils.playBeepSound()
             lastRareCatch = SimpleTimeMark.now()
         }

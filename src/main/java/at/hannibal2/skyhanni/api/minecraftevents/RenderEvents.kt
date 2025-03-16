@@ -72,7 +72,7 @@ object RenderEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onMouseInput(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (GuiMouseInputEvent.post()) {
+        if (GuiMouseInputEvent().post()) {
             event.isCanceled = true
         }
     }
