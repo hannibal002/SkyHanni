@@ -13,9 +13,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -88,7 +87,7 @@ object GardenCropMilestonesCommunityFix {
         crop: CropType,
         wrongData: MutableList<String>,
     ) {
-        val rawNumber = stack.name.removeColor().replace(crop.cropName, "").trim()
+        val rawNumber = stack.displayName.removeColor().replace(crop.cropName, "").trim()
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()
@@ -131,7 +130,7 @@ object GardenCropMilestonesCommunityFix {
             val split = line.replace("```", "").replace(".", ",").split(":")
             if (split.size != 3) continue
             val (rawCrop, tier, amount) = split
-            val crop = LorenzUtils.enumValueOf<CropType>(rawCrop)
+            val crop = EnumUtils.enumValueOf<CropType>(rawCrop)
 
             if (tryFix(crop, tier.toInt(), amount.formatInt())) {
                 fixed++
