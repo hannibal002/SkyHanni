@@ -22,17 +22,6 @@ object ColorUtils {
 
     fun getBlue(color: Int) = color and 0xFF
 
-    /**
-     * Returns a quad of the color's alpha, red, green, and blue values, in that order.
-     */
-    fun getQuad(color: Int): Quad<Float, Float, Float, Float> =
-        Quad(
-            getAlpha(color) / 255f,
-            getRed(color) / 255f,
-            getGreen(color) / 255f,
-            getBlue(color) / 255f
-        )
-
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),
         (start.green * (1 - percent) + end.green * percent).toInt(),

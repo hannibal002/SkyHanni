@@ -22,6 +22,11 @@ import java.text.DecimalFormat
  * Some functions taken from NotEnoughUpdates
  */
 object GuiRenderUtils {
+    private operator fun Color.component1(): Float = this.red / 255f
+    private operator fun Color.component2(): Float = this.green / 255f
+    private operator fun Color.component3(): Float = this.blue / 255f
+    private operator fun Color.component4(): Float = this.alpha / 255f
+
 
     private fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.getStringWidth(str)
@@ -128,8 +133,8 @@ object GuiRenderUtils {
         endColor: Int = -0xfeffff0,
         zLevel: Double = 0.0,
     ) {
-        val (startAlpha, startRed, startGreen, startBlue) = ColorUtils.getQuad(startColor)
-        val (endAlpha, endRed, endGreen, endBlue) = ColorUtils.getQuad(endColor)
+        val (startAlpha, startRed, startGreen, startBlue) = Color(startColor)
+        val (endAlpha, endRed, endGreen, endBlue) = Color(endColor)
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()
