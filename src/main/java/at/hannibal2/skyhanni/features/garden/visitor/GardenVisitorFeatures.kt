@@ -637,10 +637,10 @@ object GardenVisitorFeatures {
     }
 
     private fun renderDisplay() {
-				if (showGui() && shouldShowShoppingList()) {
-						config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
-				}
-		}
+        if (showGui() && shouldShowShoppingList()) {
+            config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
+        }
+    }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onScreenDrawn(event: ScreenDrawnEvent) {
