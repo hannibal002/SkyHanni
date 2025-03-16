@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -94,7 +94,7 @@ object HypixelBazaarFetcher {
             if (!isUnobtainableBazaarProduct(key) && LorenzUtils.debug) println("Unknown bazaar product: $key/$internalName")
             return@mapNotNull null
         }
-        internalName to BazaarData(internalName.itemName, sellOfferPrice, instantBuyPrice, product)
+        internalName to BazaarData(internalName.repoItemName, sellOfferPrice, instantBuyPrice, product)
     }.toMap()
 
     private fun isUnobtainableBazaarProduct(key: String): Boolean = when (key) {

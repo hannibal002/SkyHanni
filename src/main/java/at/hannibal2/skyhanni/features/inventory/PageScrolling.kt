@@ -12,9 +12,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -71,13 +72,13 @@ object PageScrolling {
             if (!(config.invertBypass xor config.bypassKey.isKeyHeld())) return
         }
 
-        val dWheel = Mouse.getEventDWheel()
+        val dWheel = MouseCompat.getScrollDelta()
         if (dWheel == 0) return
         val patterns = if ((dWheel > 0) xor config.invertScroll) forwardPattern else backwardPattern
         val slot = InventoryUtils.getItemsInOpenChest().firstOrNull {
             patterns.matches(it.stack?.displayName)
         } ?: return
-        InventoryUtils.clickSlot(slot.slotNumber)
+        clickInventorySlot(slot.slotNumber)
 
         currentlyScrollable = false
         cooldown = 1.0.seconds.fromNow()
