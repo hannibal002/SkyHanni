@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.MAX_TRAPS
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -76,7 +76,7 @@ object PestTrapFeatures {
         val activeWarnings = applicableWarnings.map { it.warningString }
 
         warningSound?.playSound()
-        if (titleWarnEnabled) LorenzUtils.sendTitle(activeWarnings.first(), 3.seconds, 2.8, 7f)
+        if (titleWarnEnabled) TitleManager.sendTitle(activeWarnings.first(), 3.seconds, 2.8, 7f)
         if (chatWarnEnabled) activeWarnings.forEach { ChatUtils.chat(it) }
 
         nextWarningMark = getNextWarningMark()
