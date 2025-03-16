@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -106,7 +106,7 @@ object RareDropMessages {
         petPatterns.matchMatchers(event.message) {
             var start = group("start")
             val rarityColor = group("rarityColor")
-            val rarityName = colorCodeToRarity(rarityColor.first()).uppercase()
+            val rarityName = LorenzRarity.colorCodeToRarity(rarityColor.first()).uppercase()
             val petName = group("petName")
             val end = group("end")
             if (start.endsWith("a ") && rarityName.first().isVowel())
