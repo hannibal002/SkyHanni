@@ -69,7 +69,7 @@ fun Map<List<Renderable>, String>.buildSearchableTable(
         else -> {
             Renderable.searchableScrollTable(
                 toMap(),
-                height = maxHeight,
+                height = maxHeight + 5,
                 header = header,
                 textInput = textInputGetter.invoke(),
                 key = key + 1,

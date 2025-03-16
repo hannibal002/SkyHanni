@@ -134,12 +134,22 @@ object AccessoryOverviewDisplay {
 
     private fun buildMainDisplay(): List<Renderable> = buildList {
         add(Renderable.string("§e§lAccessories Summary"))
-        add(buildToggleContainer())
+
+        val toggleContainer = getToggleContainer()
+        if (config.searchEnabled) add(
+            Renderable.searchBox(
+                toggleContainer,
+                textInput = getSearchInputForTab(currentTab),
+                searchPrefix = "Accessory Overview",
+                onUpdateSize = { rebuildCaches() },
+            )
+        ) else add(toggleContainer)
+
         val mainContent = renderCache[currentTab] ?: listOf(noDataWarning)
         addAll(mainContent)
     }
 
-    private fun buildToggleContainer() = Renderable.verticalContainer(
+    private fun MutableList<Renderable>.getToggleContainer() = Renderable.verticalContainer(
         buildList{
             addTabToggle()
             addTabSpecificToggles()

@@ -21,6 +21,11 @@ class AccessoryOverviewDisplayConfig {
     var enabled: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Enable Search", desc = "Enable searching for accessories in the overview.")
+    @ConfigEditorBoolean
+    var searchEnabled: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Max Height", desc = "Maximum height of the display.")
     @ConfigEditorSlider(minValue = 50f, maxValue = 500f, minStep = 10f)
     var maxHeight: Property<Int> = Property.of(250)
