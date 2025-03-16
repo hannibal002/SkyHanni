@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -284,7 +283,7 @@ object ChocolateFactoryStrayTracker {
         InventoryUtils.getItemsInOpenChest().filter {
             claimedStraysSlots.contains(it.slotIndex)
         }.forEach {
-            if (!strayCaughtPattern.matches(it.stack.name)) {
+            if (!strayCaughtPattern.matches(it.stack.displayName)) {
                 claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.slotIndex))
             }
         }

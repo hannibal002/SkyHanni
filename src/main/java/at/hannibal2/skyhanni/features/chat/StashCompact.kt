@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.StashCompact.StashType.Companion.fromGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.message
+import at.hannibal2.skyhanni.utils.ChatUtils.chatMessage
 import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -110,7 +110,7 @@ object StashCompact {
             currentMessages[currentType] = StashMessage(group("count").formatInt(), group("type"))
             event.blockedReason = REASON
             ChatUtils.deleteMessage(REASON, 2) {
-                StringUtils.isEmpty(it.message) && it.passedSinceSent() < 500.milliseconds
+                StringUtils.isEmpty(it.chatMessage) && it.passedSinceSent() < 500.milliseconds
             }
         }
 

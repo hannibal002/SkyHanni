@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.command
-import at.hannibal2.skyhanni.utils.chat.Text.hover
-import at.hannibal2.skyhanni.utils.chat.Text.send
-import at.hannibal2.skyhanni.utils.chat.Text.suggest
-import at.hannibal2.skyhanni.utils.chat.Text.wrap
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.command
+import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.chat.TextHelper.suggest
+import at.hannibal2.skyhanni.utils.chat.TextHelper.wrap
 import net.minecraft.util.IChatComponent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -37,7 +37,7 @@ object ReminderManager {
 
     private fun getSortedReminders() = storage.entries.sortedBy { it.value.remindAt }
 
-    private fun sendMessage(message: String) = Text.join("§e[Reminder]", " ", message).send(REMINDERS_ACTION_ID)
+    private fun sendMessage(message: String) = TextHelper.join("§e[Reminder]", " ", message).send(REMINDERS_ACTION_ID)
 
     private fun parseDuration(text: String): Duration? = try {
         val duration = TimeUtils.getDuration(text)
@@ -47,7 +47,7 @@ object ReminderManager {
     }
 
     private fun listReminders(page: Int) {
-        Text.displayPaginatedList(
+        TextHelper.displayPaginatedList(
             "SkyHanni Reminders",
             getSortedReminders(),
             chatLineId = REMINDERS_LIST_ID,
@@ -57,7 +57,7 @@ object ReminderManager {
         ) { reminderEntry ->
             val id = reminderEntry.key
             val reminder = reminderEntry.value
-            Text.join(
+            TextHelper.join(
                 "§c✕".asComponent {
                     hover = "§7Click to remove".asComponent()
                     command = "/shremind remove -l $id"
@@ -142,7 +142,7 @@ object ReminderManager {
     }
 
     private fun help() {
-        Text.createDivider().send()
+        TextHelper.createDivider().send()
         "§6SkyHanni Reminder Commands:".asComponent().send()
         "§e/shremind <time> <reminder> - §bCreates a new reminder".asComponent().send()
         "§e/shremind list <page> - §bLists all reminders".asComponent().send()
@@ -150,7 +150,7 @@ object ReminderManager {
         "§e/shremind edit <id> <reminder> - §bEdits a reminder".asComponent().send()
         "§e/shremind move <id> <time> - §bMoves a reminder".asComponent().send()
         "§e/shremind help - §bShows this help message".asComponent().send()
-        Text.createDivider().send()
+        TextHelper.createDivider().send()
     }
 
     @HandleEvent
@@ -163,7 +163,7 @@ object ReminderManager {
             var actionsComponent: IChatComponent? = null
 
             if (!config.autoDeleteReminders) {
-                actionsComponent = Text.join(
+                actionsComponent = TextHelper.join(
                     " ",
                     "§a✔".asComponent {
                         hover = "§7Click to dismiss".asComponent()
@@ -180,7 +180,7 @@ object ReminderManager {
             }
 
             remindersToSend.add(
-                Text.join(
+                TextHelper.join(
                     "§e[Reminder]".asComponent {
                         hover = "§7Reminders by SkyHanni".asComponent()
                     },
@@ -193,7 +193,7 @@ object ReminderManager {
 
         if (remindersToSend.isNotEmpty()) {
             val id = if (config.autoDeleteReminders) 0 else REMINDERS_MESSAGE_ID
-            Text.join(remindersToSend, separator = Text.NEWLINE).send(id)
+            TextHelper.join(remindersToSend, separator = TextHelper.NEWLINE).send(id)
         }
     }
 

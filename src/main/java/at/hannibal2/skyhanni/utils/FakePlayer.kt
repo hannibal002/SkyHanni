@@ -28,7 +28,7 @@ class FakePlayer(private val gameProfile: GameProfile? = null) :
                     loadSkin(it, MinecraftProfileTexture.Type.SKIN)
                 }
             }
-        } ?: player.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
+        } ?: player?.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(player?.uniqueID)
     }
 
     override fun getTeam() = object : ScorePlayerTeam(null, null) {
@@ -36,5 +36,5 @@ class FakePlayer(private val gameProfile: GameProfile? = null) :
     }
 
     override fun isWearing(part: EnumPlayerModelParts): Boolean =
-        Minecraft.getMinecraft().thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
+        Minecraft.getMinecraft().thePlayer?.isWearing(part) == true && part != EnumPlayerModelParts.CAPE
 }
