@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.config.features.inventory.accessories
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -50,6 +52,19 @@ class AccessoryOverviewDisplayConfig {
         SEARCH_AH("§6Search Auction House"),
         OPEN_IN_NEU("§bOpen in NEU"),
         OPEN_IN_WIKI("§aOpen in Wiki"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigOption(name = "Ignored Duplicates", desc = "Which items should be ignored when reporting duplicate accessories.")
+    @ConfigEditorDraggableList
+    var ignoredDupeItems: Property<MutableList<IgnorableDuplicateItem>> = Property.of(mutableListOf())
+
+    enum class IgnorableDuplicateItem(private val displayName: String) {
+        PERSONAL_COMPACTORS_DELETORS("Personal Compactors/Deletors"),
+        CAKE_BAGS("Cake Bags"),
         ;
 
         override fun toString() = displayName

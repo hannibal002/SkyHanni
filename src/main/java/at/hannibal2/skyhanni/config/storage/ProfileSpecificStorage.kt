@@ -825,8 +825,10 @@ class ProfileSpecificStorage {
                 accessories.any { it.internalName == accessoryName }
 
             fun isFulfilled(accessoryName: NeuInternalName): Boolean =
-                hasAccessory(accessoryName) ||
-                    isLineageFulfilled(accessoryName, LineageType.SUCCESSOR) ||
+                hasAccessory(accessoryName) || isNonSelfFulfilled(accessoryName)
+
+            fun isNonSelfFulfilled(accessoryName: NeuInternalName): Boolean =
+                isLineageFulfilled(accessoryName, LineageType.SUCCESSOR) ||
                     isLineageFulfilled(accessoryName, LineageType.SIBLING)
 
             private fun isLineageFulfilled(

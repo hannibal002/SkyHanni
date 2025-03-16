@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.inventory.AccessoriesUpdatedEvent
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.cakeBagPattern
+import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.personalXTorPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
@@ -18,6 +20,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -33,6 +36,7 @@ typealias AccStorage = ProfileSpecificStorage.StatsStorage.AccessoryStorage
 private typealias DisplayTab = AccessoryOverviewDisplayConfig.AccessoryDisplayTab
 private typealias MissingShowType = AccessoryOverviewDisplayConfig.MissingShowType
 private typealias MissingSortType = AccessoryOverviewDisplayConfig.MissingSortType
+private typealias IgnoreDupeItem = AccessoryOverviewDisplayConfig.IgnorableDuplicateItem
 
 @SkyHanniModule
 object AccessoryOverviewDisplay {
@@ -78,6 +82,7 @@ object AccessoryOverviewDisplay {
         renderCache[DisplayTab.SUMMARY] = storage.buildSummaryTab()
         renderCache[DisplayTab.STATS] = storage.buildStatsTab()
         renderCache[DisplayTab.MISSING] = storage.buildMissingTab()
+        renderCache[DisplayTab.DUPLICATES] = storage.buildDupesTab()
         return buildMainDisplay().also {
             fullRenderCache = it
         }
@@ -115,6 +120,7 @@ object AccessoryOverviewDisplay {
             config.missingTabShowType,
             config.missingTabSortType,
             config.maxHeight,
+            config.ignoredDupeItems,
         ) { rebuildCaches() }
     }
 
@@ -128,11 +134,17 @@ object AccessoryOverviewDisplay {
 
     private fun buildMainDisplay(): List<Renderable> = buildList {
         add(Renderable.string("§e§lAccessories Summary"))
-        addTabToggle()
-        addTabSpecificToggles()
+        add(buildToggleContainer())
         val mainContent = renderCache[currentTab] ?: listOf(noDataWarning)
         addAll(mainContent)
     }
+
+    private fun buildToggleContainer() = Renderable.verticalContainer(
+        buildList{
+            addTabToggle()
+            addTabSpecificToggles()
+        }
+    )
 
     private fun MutableList<Renderable>.addTabToggle() =
         addRenderableButton<DisplayTab>(
@@ -160,7 +172,6 @@ object AccessoryOverviewDisplay {
         }
 
     private fun AccStorage.buildSummaryTab(): List<Renderable> = buildList {
-        add(Renderable.underlined(Renderable.string("§eCount by Rarity")))
         val table = getBaseTable(listOf("§7Rarity", "§7Count", "§7MP"))
 
         val rarities = LorenzRarity.entries.reversed().filter { rarity ->
@@ -191,7 +202,6 @@ object AccessoryOverviewDisplay {
     }
 
     private fun AccStorage.buildStatsTab(): List<Renderable> = buildList {
-        add(Renderable.underlined(Renderable.string("§eAccessory Stats")))
         val statsTable = getBaseTable(listOf("§7Stat", "§7Accessory Bonus"))
 
         val stats = accessories.flatMap { it.totalStats.entries }
@@ -213,7 +223,6 @@ object AccessoryOverviewDisplay {
     }
 
     private fun AccStorage.buildMissingTab(): List<Renderable> = buildList {
-        add(Renderable.underlined(Renderable.string("§eMissing Accessories")))
         val missingTable = getBaseTable(listOf("§7Accessory", "§7Cost", "§7Magical Power"))
 
         val showType = config.missingTabShowType.get()
@@ -235,7 +244,7 @@ object AccessoryOverviewDisplay {
         }
 
         sortedList.forEach { missingAcc ->
-            missingAcc.buildRow()?.let {
+            missingAcc.buildMissingAccRow()?.let {
                 missingTable.addRow(it, missingAcc.internalName.repoItemName)
             }
         }
@@ -243,7 +252,7 @@ object AccessoryOverviewDisplay {
         add(missingTable.renderable)
     }
 
-    private fun Accessory.buildTips(): List<Renderable> = buildList {
+    private fun Accessory.buildMissingAccTips(): List<Renderable> = buildList {
         add(Renderable.string("§7${internalName.repoItemName}"))
         val otherLines = buildList {
             // Price
@@ -271,8 +280,8 @@ object AccessoryOverviewDisplay {
         add(Renderable.string(dividerLine))
     }
 
-    private fun Accessory.buildRow(): List<Renderable>? = buildList {
-        val itemStack = this@buildRow.internalName.getItemStackOrNull() ?: return null
+    private fun Accessory.buildMissingAccRow(): List<Renderable>? = buildList {
+        val itemStack = this@buildMissingAccRow.internalName.getItemStackOrNull() ?: return null
         val labelledIcon = Renderable.horizontalContainer(
             listOf(
                 Renderable.itemStack(itemStack, scale = 0.5),
@@ -284,8 +293,8 @@ object AccessoryOverviewDisplay {
             onAnyClick = mapOf(
                 LEFT_MOUSE to { ChatUtils.chat("$internalName clicked") }
             ), // todo
-            tips = tipCache[this@buildRow.hashCode()] ?: buildTips().also {
-                tipCache[this@buildRow.hashCode()] = it
+            tips = tipCache[this@buildMissingAccRow.hashCode()] ?: buildMissingAccTips().also {
+                tipCache[this@buildMissingAccRow.hashCode()] = it
             },
             condition = { AccessoryApi.inAccessoryBag },
         )
@@ -298,5 +307,28 @@ object AccessoryOverviewDisplay {
         }.takeIf { it.isNotEmpty() }?.let { add(Renderable.string(it)) }
 
         add(Renderable.string("§b$magicPower"))
+    }
+
+    private fun AccStorage.buildDupesTab(): List<Renderable> = buildList {
+        val dupeTable = getBaseTable(listOf("§7Accessory", "§7Page"))
+
+        val dupes = AccessoryApi.getDupes(this@buildDupesTab).filterDupes()
+        dupes.forEach { dupe ->
+            val dupeRenderable = dupe.buildMissingAccRow() ?: return@forEach
+            dupeTable.addRow(dupeRenderable, dupe.internalName.repoItemName)
+        }
+
+        add(dupeTable.renderable)
+    }
+
+    private fun List<Accessory>.filterDupes(): List<Accessory> = this.filter {
+        val filterTypes = config.ignoredDupeItems.get()
+        val filterOutXTors = IgnoreDupeItem.PERSONAL_COMPACTORS_DELETORS in filterTypes
+        val filterOutCakeBags = IgnoreDupeItem.CAKE_BAGS in filterTypes
+
+        val passesXTorFilter = !filterOutXTors || !personalXTorPattern.matches(it.internalName.asString())
+        val passesCakeBagFilter = !filterOutCakeBags || !cakeBagPattern.matches(it.internalName.toString())
+
+        passesXTorFilter && passesCakeBagFilter
     }
 }

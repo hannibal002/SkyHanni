@@ -131,6 +131,26 @@ object AccessoryApi {
         "lore.slayer-craft-req",
         "Requires: (?<slayer>.*) Slayer (?<level>\\d+)",
     )
+
+    val cakeBagPattern by RepoPattern.pattern(
+        "accessory.cake-bag",
+        "NEW_YEAR_CAKE_BAG",
+    )
+
+    /**
+     * REGEX-TEST: PERSONAL_COMPACTOR_4000
+     * REGEX-TEST: PERSONAL_COMPACTOR_5000
+     * REGEX-TEST: PERSONAL_COMPACTOR_6000
+     * REGEX-TEST: PERSONAL_COMPACTOR_7000
+     * REGEX-TEST: PERSONAL_DELETOR_4000
+     * REGEX-TEST: PERSONAL_DELETOR_5000
+     * REGEX-TEST: PERSONAL_DELETOR_6000
+     * REGEX-TEST: PERSONAL_DELETOR_7000
+     */
+    val personalXTorPattern by RepoPattern.pattern(
+        "accessory.personal-x-tor",
+        "PERSONAL_(?:COMPAC|DELE)TOR_\\d000"
+    )
     // </editor-fold>
 
     val HEGEMONY_ARTIFACT = "HEGEMONY_ARTIFACT".toInternalName()
@@ -148,6 +168,19 @@ object AccessoryApi {
         if (storage.isFulfilled(acc.internalName)) return@filter false
 
         true
+    }
+
+    private fun getAccCountMap(storage: AccStorage): Map<NeuInternalName, Int> = storage.accessories
+        .groupBy { it.internalName }
+        .mapValues { it.value.size }
+
+    fun getDupes(storage: AccStorage): List<Accessory> = getAccCountMap(storage).let { countMap ->
+        storage.accessories.filter { acc ->
+            val anyDirectSiblings = (countMap[acc.internalName] ?: 0) > 1
+            val fulfillingRelatives = storage.hasAccessory(acc.internalName) && storage.isNonSelfFulfilled(acc.internalName)
+
+            anyDirectSiblings || fulfillingRelatives
+        }
     }
 
     val repoAccessoryLineage: AccessoryLineageTree by lazy {
