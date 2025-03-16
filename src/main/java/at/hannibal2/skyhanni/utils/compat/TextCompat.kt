@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import net.minecraft.event.ClickEvent
+import net.minecraft.event.HoverEvent
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
-
 //#if MC > 1.16
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.TextColor
@@ -73,3 +74,27 @@ fun createResourceLocation(path: String): ResourceLocation {
     //#endif
     return textureLocation
 }
+
+var IChatComponent.hover: IChatComponent?
+    get() = this.chatStyle.chatHoverEvent?.value
+    set(value) {
+        this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
+    }
+
+var IChatComponent.command: String?
+    get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) it.value else null }
+    set(value) {
+        this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) }
+    }
+
+var IChatComponent.suggest: String?
+    get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) it.value else null }
+    set(value) {
+        this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) }
+    }
+
+var IChatComponent.url: String?
+    get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) it.value else null }
+    set(value) {
+        this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
+    }
