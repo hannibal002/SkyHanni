@@ -39,7 +39,7 @@ object GemstoneMoneyPerHour {
      */
     private val pristineMessagePattern by RepoPattern.pattern(
         "mining.pristine",
-        "§d§lPRISTINE! §r§fYou found §r§a. Flawed (?<gemstone>\\w+) Gemstone §r§8x(?<amount>\\d+).*!"
+        "§d§lPRISTINE! §r§fYou found §r§a. Flawed (?<gemstone>\\w+) Gemstone §r§8x(?<amount>\\d+)§r§f!"
     )
 
     private val config get() = SkyHanniMod.feature.mining.gemstoneMoneyPerHour
