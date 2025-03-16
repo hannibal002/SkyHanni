@@ -17,12 +17,19 @@ enum class ExperimentTaskType(private val displayName: String) {
     ;
 
     override fun toString() = displayName
+
+    companion object {
+        fun fromStringOrNull(string: String) = entries.firstOrNull {
+            it.displayName.equals(string, ignoreCase = true) ||
+                it.name.equals(string, ignoreCase = true)
+        }
+    }
 }
 
 enum class ExperimentTier(
     private val displayName: String,
     overInclusiveSlotRange: IntRange, // Filtered 'later' to remove side spaces
-    private val sideSpace: Int = 1
+    private val sideSpace: Int = 1,
 ) {
     NONE("", 0..0, sideSpace = 0),
     BEGINNER("Beginner", 18..35),

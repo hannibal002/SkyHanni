@@ -5,12 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.experiments.RareSuperpairUncoverEvent
+import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -36,7 +35,7 @@ object ExperimentsDryStreakDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onRareUncover(event: RareSuperpairUncoverEvent) {
+    fun onTableRareUncover(event: TableRareUncoverEvent) {
         if (!isEnabled()) return
         val storage = storage ?: return
         ChatUtils.chat(
@@ -48,7 +47,7 @@ object ExperimentsDryStreakDisplay {
         storage.xpSince = 0
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTableTaskCompleted(event: TableTaskCompletedEvent) {
         val storage = storage ?: return
         storage.xpSince += (event.enchantingXpGained ?: 0L)
@@ -77,6 +76,5 @@ object ExperimentsDryStreakDisplay {
         }
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && (config.xpSince || config.attemptsSince)
+    private fun isEnabled() = config.enabled && (config.xpSince || config.attemptsSince)
 }
