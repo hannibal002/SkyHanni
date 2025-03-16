@@ -90,6 +90,11 @@ object ExperimentationTableApi {
         "Instant Find",
     )
 
+    /**
+     * REGEX-TEST: Click any button!
+     * REGEX-TEST: Next button is instantly rewarded!
+     * REGEX-TEST: Click a second button!
+     */
     val waitingMessagesPattern by patternGroup.pattern(
         "waiting.messages",
         "Click any button!|Click a second button!|Next button is instantly rewarded!",

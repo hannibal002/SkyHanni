@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.features.garden.pests
+
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -45,10 +46,9 @@ import java.util.EnumMap
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
-
 @SkyHanniModule
-object PestProfitTracker {    val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
-
+object PestProfitTracker {
+    val config: PestProfitTrackerConfig get() = SkyHanniMod.feature.garden.pests.pestProfitTacker
 
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
