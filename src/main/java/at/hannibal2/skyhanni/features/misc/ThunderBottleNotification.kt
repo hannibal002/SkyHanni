@@ -32,22 +32,19 @@ object ThunderBottleNotification {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (lastChecked.passedSince() < 10.seconds) return
-        if (isFishing) {
-            lastChecked = SimpleTimeMark.now()
-            val bottlesInInventory = bottles.filter { InventoryUtils.isItemInInventory(it) }
-                .map { it.itemNameWithoutColor }
-            if (bottlesInInventory.isNotEmpty()) {
-                val size = bottlesInInventory.size
-                ChatUtils.clickableChat(
-                    "You are currently fishing, but " +
-                        "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(size, "is", "are")} full. " +
-                        "Click here to disable this notification.",
-                    { config::thunderBottleNotification.jumpToEditor() },
-                    replaceSameMessage = true,
-                )
-            }
-        }
+        if (lastChecked.passedSince() < 10.seconds || !isFishing) return
+        lastChecked = SimpleTimeMark.now()
+        val bottlesInInventory = bottles.filter { InventoryUtils.isItemInInventory(it) }
+            .map { it.itemNameWithoutColor }
+        if (bottlesInInventory.isEmpty()) return
+        val size = bottlesInInventory.size
+        ChatUtils.clickableChat(
+            "You are currently fishing, but " +
+                "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(size, "is", "are")} full. " +
+                "Click here to disable this notification.",
+            { config::thunderBottleNotification.jumpToEditor() },
+            replaceSameMessage = true,
+        )
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.thunderBottleNotification
