@@ -16,7 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ProfitPerDragon {
-    var finishedLoot = false
+    var finishedLoot = true
 
     private val scannedLootUUIDs = mutableSetOf<UUID>()
     private val dragonLoot = mutableMapOf<NeuInternalName, Int>()
