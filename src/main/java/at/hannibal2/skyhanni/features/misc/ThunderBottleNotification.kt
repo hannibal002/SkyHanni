@@ -32,8 +32,9 @@ object ThunderBottleNotification {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        if (lastChecked.passedSince() < 10.seconds || !isFishing) return
+        if (lastChecked.passedSince() < 10.seconds) return
         lastChecked = SimpleTimeMark.now()
+        if (!isFishing) return
         val bottlesInInventory = bottles.filter { InventoryUtils.isItemInInventory(it) }
             .map { it.itemNameWithoutColor }
         if (bottlesInInventory.isEmpty()) return
