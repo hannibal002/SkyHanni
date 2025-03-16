@@ -82,7 +82,7 @@ class SearchableScrollableRenderableTable(
                 searchInputGetter,
                 header,
                 scrollValueGetter,
-                maxHeight = maxHeightGetter.invoke() + 5,
+                maxHeight = maxHeightGetter.invoke(),
                 showScrollableTipsInList = showScrollableTipsInList,
             )
 }
