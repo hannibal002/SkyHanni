@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -58,6 +59,8 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.component.type.LoreComponent
+//$$ import net.minecraft.component.type.NbtComponent
 //#endif
 
 @SkyHanniModule
@@ -167,6 +170,7 @@ object ItemUtils {
     }
 
     fun ItemStack.setLore(lore: List<String>): ItemStack {
+        //#if MC < 1.21
         val tagCompound = this.tagCompound ?: NBTTagCompound()
         val display = tagCompound.getCompoundTag("display")
         val tagList = NBTTagList()
@@ -176,14 +180,21 @@ object ItemUtils {
         display.setTag("Lore", tagList)
         tagCompound.setTag("display", display)
         this.tagCompound = tagCompound
+        //#else
+        //$$ this.set(DataComponentTypes.LORE, LoreComponent(lore.map { Text.of(it) }))
+        //#endif
         return this
     }
 
     var ItemStack.extraAttributes: NBTTagCompound
-        get() = this.tagCompound?.extraAttributes ?: NBTTagCompound()
+        get() = this.getExtraAttributes() ?: NBTTagCompound()
         set(value) {
+            //#if MC < 1.21
             val tag = this.tagCompound ?: NBTTagCompound().also { tagCompound = it }
             tag.setTag("ExtraAttributes", value)
+            //#else
+            //$$ set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(value))
+            //#endif
         }
 
     val NBTTagCompound.extraAttributes: NBTTagCompound get() = this.getCompoundTag("ExtraAttributes")
@@ -252,29 +263,44 @@ object ItemUtils {
     fun ItemStack.hasHypixelEnchantments() = getHypixelEnchantments()?.isNotEmpty() ?: false
 
     fun ItemStack.removeEnchants(): ItemStack = apply {
+        //#if MC < 1.21
         val tempTag = tagCompound ?: NBTTagCompound()
         tempTag.removeTag("ench")
         tempTag.removeTag("StoredEnchantments")
         tagCompound = tempTag
+        //#else
+        //$$ //todo test what this actually does
+        //$$ this.remove(DataComponentTypes.ENCHANTMENTS)
+        //#endif
     }
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null
+        //#if MC < 1.21
         val compound = tagCompound ?: return null
         if (!compound.hasKey("SkullOwner")) return null
         return compound.getCompoundTag("SkullOwner").getSkullTexture()
+        //#else
+        //$$ return stack.get(DataComponentTypes.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
+        //#endif
 
     }
 
+    //#if MC < 1.21
     fun NBTTagCompound.getSkullTexture(): String? =
         getCompoundTag("Properties").getCompoundList("textures").firstOrNull()?.getString("Value")
+    //#endif
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
+        //#if MC < 1.21
         val nbt = tagCompound ?: return null
 
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
+        //#else
+        //$$ return this.get(DataComponentTypes.PROFILE)?.id?.get().toString()
+        //#endif
     }
 
     // Taken from NEU
