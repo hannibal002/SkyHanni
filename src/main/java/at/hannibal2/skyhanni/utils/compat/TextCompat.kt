@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.LorenzColor
+import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.IChatComponent
@@ -11,6 +13,7 @@ import net.minecraft.util.ResourceLocation
 //#endif
 //#if MC > 1.21
 //$$ import net.minecraft.text.PlainTextContent
+//$$ import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
 
 fun IChatComponent.directlyContainedText() =
@@ -134,3 +137,27 @@ fun IChatComponent.appendComponent(component: IChatComponent): IChatComponent =
 //$$ (this as MutableComponent).append(component)
 //#endif
 
+
+fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
+    //#if MC < 1.21
+    this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
+    //#else
+    //$$ this.copy().withColor(color.toChatFormatting())
+    //#endif
+
+fun addChatMessageToChat(message: IChatComponent) {
+    //#if MC < 1.16
+    Minecraft.getMinecraft().thePlayer.addChatMessage(message)
+    //#else
+    //$$ MinecraftClient.getInstance().player?.sendMessage(message, false)
+    //#endif
+}
+
+fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
+    //#if MC < 1.16
+    Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
+    //#else
+    //$$ // todo convert the id int to the middle variable of MessageSignatureData
+    //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, null, MessageIndicator.system())
+    //#endif
+}
