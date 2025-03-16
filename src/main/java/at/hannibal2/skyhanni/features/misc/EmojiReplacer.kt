@@ -134,23 +134,71 @@ object EmojiReplacer {
         return ":${unicodeToName[string]}:"
     }
 
+    private fun isEmojiString(string: String): Boolean {
+        val unicodeToName = reverseUnicodeToName ?: return false
+        return unicodeToName.containsKey(string)
+    }
+
+    fun replaceEmojis(string: String): String {
+        if (!isEnabled()) return string
+        val unicodeMap = reverseUnicodeToName ?: return string
+        val builder = StringBuilder()
+        var i = 0
+
+        while (i < string.length) {
+            val char = string[i].toString()
+
+            if (anyEmojiStartWith(char)) {
+                var emoji = char
+                var list = emojisStartingWith(unicodeMap.keys.toList(), emoji)
+                var oldI = i
+                var lastValidEmoji: String? = null
+                while (i + 1 < string.length && list.isNotEmpty()) {
+                    emoji += string[++i]
+                    list = emojisStartingWith(list, emoji)
+                    if (isEmojiString(emoji)) {
+                        lastValidEmoji = emoji
+                        oldI = i
+                    }
+                }
+                if (lastValidEmoji != null) {
+                    builder.append(getEmojiString(lastValidEmoji))
+                }
+                i = oldI
+            } else {
+                builder.append(char)
+            }
+            i++
+        }
+        return builder.toString()
+    }
+
     fun handleKeyboardInput() {
+        if (!isEnabled()) return
+        if (Keyboard.getEventKeyState()) return
         val char = Keyboard.getEventCharacter()
         val currentScreen = Minecraft.getMinecraft().currentScreen
         if (currentScreen !is GuiChat) return
+        val chat = (currentScreen as AccessorMixinGuiChat)
         if (!anyEmojiStartWith(char.toString())) return
         val unicodeMap = reverseUnicodeToName ?: return
         var string = char.toString()
         var startingWith = emojisStartingWith(unicodeMap.keys.toList(), string)
+        var lastValidEmoji: String? = null
         while (startingWith.isNotEmpty()) {
-            if (!Keyboard.next()) return
-            string += Keyboard.getEventCharacter()
-            startingWith = emojisStartingWith(startingWith, string)
-            if (startingWith.size == 1) {
-                (currentScreen as AccessorMixinGuiChat).inputField_skyhanni.writeText(getEmojiString(string))
+            if (!Keyboard.next()) {
+                if (isEmojiString(string)) {
+                    chat.inputField_skyhanni.writeText(getEmojiString(string))
+                }
                 return
             }
+            string += Keyboard.getEventCharacter()
+            startingWith = emojisStartingWith(startingWith, string)
+            if (isEmojiString(string)) {
+                lastValidEmoji = string
+            }
         }
+        if (lastValidEmoji != null) chat.inputField_skyhanni.writeText(getEmojiString(lastValidEmoji))
     }
 
     fun isEnabled() = config.emojiReplace
