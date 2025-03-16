@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.Quad
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -78,6 +79,16 @@ object SkillProgress {
     }
 
     @HandleEvent
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!isDisplayEnabled()) return
+        if (display.isEmpty()) return
+
+        if (etaConfig.enabled.get()) {
+            config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
+        }
+    }
+
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
@@ -97,7 +108,8 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
-                val content = horizontalContainer(display, horizontalAlign = textAlignment.alignment)
+                val horizontalAlignment = textAlignment.alignment ?: RenderUtils.HorizontalAlignment.LEFT
+                val content = horizontalContainer(display, horizontalAlign = horizontalAlignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
                 config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
             }
@@ -282,10 +294,10 @@ object SkillProgress {
                     Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
             this[skill] = if (level == -1) {
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§cOpen your skills menu!",
-                    listOf("§eClick here to execute §6/skills"),
-                    onClick = { HypixelCommands.skills() },
+                    tips = listOf("§eClick here to execute §6/skills"),
+                    onLeftClick = { HypixelCommands.skills() },
                 )
             } else {
                 val tips = buildList {
@@ -380,14 +392,15 @@ object SkillProgress {
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
         add(
-            Renderable.clickAndHover(
+            Renderable.clickable(
                 "§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
-                listOf("§eClick to reset!"),
-                onClick = {
+                tips = listOf("§eClick to reset!"),
+                onLeftClick = {
                     xpInfo.sessionTimerActive = false
-
                     xpInfo.timeActive = 0L
                     chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
+                    updateDisplay()
+                    update()
                 },
             ),
         )

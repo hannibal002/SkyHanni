@@ -29,14 +29,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getRawBaseStats
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -45,9 +44,7 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -59,6 +56,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -366,45 +364,10 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    fun testItemCommand(args: Array<String>) {
-        if (args.isEmpty()) {
-            ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
-            return
-        }
-
-        val input = args.joinToString(" ")
-        val result = buildList {
-            add("")
-            add("§bSkyHanni Test Item")
-            add("§einput: '§f$input§e'")
-
-            NeuInternalName.fromItemNameOrNull(input)?.let { internalName ->
-                add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
-                add("  §eitemName: '${internalName.itemName}§e'")
-                val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6$price§e'")
-                return@buildList
-            }
-
-            input.toInternalName().getItemStackOrNull()?.let { item ->
-                val itemName = item.itemName
-                val internalName = item.getInternalName()
-                add("§einternal name: §7${internalName.asString()}")
-                add("§einternal name -> item name: '$itemName§e'")
-                val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6$price§e'")
-                return@buildList
-            }
-
-            add("§cNothing found!")
-        }
-        ChatUtils.chat(result.joinToString("\n"), prefix = false)
-    }
-
     @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
-        val focussedSlot = event.guiContainer.slotUnderMouse ?: return
+        val focussedSlot = slotUnderCursor() ?: return
         val stack = focussedSlot.stack ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
@@ -493,7 +456,7 @@ object SkyHanniDebugsAndTests {
             event.toolTip.add("Item name: no item.")
             return
         }
-        val name = itemStack.itemName
+        val name = itemStack.repoItemName
         event.toolTip.add("Item name: '$name§7'")
     }
 

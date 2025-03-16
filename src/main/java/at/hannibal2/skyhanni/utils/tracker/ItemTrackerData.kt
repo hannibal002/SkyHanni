@@ -12,6 +12,7 @@ abstract class ItemTrackerData : TrackerData() {
 
     abstract fun getCoinName(item: TrackedItem): String
 
+    // TODO add amount in the string
     abstract fun getCoinDescription(item: TrackedItem): List<String>
 
     open fun getCustomPricePer(internalName: NeuInternalName) = SkyHanniTracker.getPricePer(internalName)

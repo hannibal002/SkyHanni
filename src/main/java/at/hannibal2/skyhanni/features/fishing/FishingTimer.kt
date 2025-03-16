@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -80,7 +81,7 @@ object FishingTimer {
         if (config.wormLimitAlert && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             if (currentCount >= 20) {
                 playSound()
-                LorenzUtils.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
+                TitleManager.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
             }
         } else if (config.fishingCapAlert && currentCount >= currentCap) {
             playSound()

@@ -29,11 +29,15 @@ object SoundUtils {
                 Minecraft.getMinecraft().soundHandler.playSound(this)
             } catch (e: IllegalArgumentException) {
                 if (e.message?.startsWith("value already present:") == true) return@execute
-                ErrorManager.logErrorWithData(e, "Failed to play a sound", "soundLocation" to this.soundLocation)
-            } catch (e: Exception) {
-
                 ErrorManager.logErrorWithData(
-                    e, "Failed to play a sound",
+                    e,
+                    "Failed to play a sound",
+                    "soundLocation" to this.soundLocation,
+                )
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Failed to play a sound",
                     "soundLocation" to this.soundLocation,
                 )
             } finally {

@@ -47,7 +47,7 @@ object PlayerChatManager {
      */
     private val partyPattern by patternGroup.pattern(
         "party",
-        "§9Party §8> (?<author>[^:]*)§f: (?<message>.*)"
+        "§9Party §8> (?<author>[^:]*)§f: (?<message>.*)",
     )
 
     /**
@@ -55,7 +55,7 @@ object PlayerChatManager {
      */
     private val coopPattern by patternGroup.pattern(
         "coop",
-        "§bCo-op > (?<author>[^:]+)§f: (?<message>.*)"
+        "§bCo-op > (?<author>[^:]+)§f: (?<message>.*)",
     )
 
     /**
@@ -79,7 +79,7 @@ object PlayerChatManager {
      */
     private val privateMessagePattern by patternGroup.pattern(
         "privatemessage",
-        "^(?!From stash: )(?<direction>From|To) (?<author>[^:]*): (?<message>.*)"
+        "^(?!From stash: )(?<direction>From|To) (?<author>[^:]*): (?<message>.*)",
     )
 
     /**
@@ -96,7 +96,7 @@ object PlayerChatManager {
     @Suppress("MaxLineLength")
     private val itemShowPattern by patternGroup.pattern(
         "itemshow",
-        "(?:§8\\[(?<levelColor>§.)(?<level>\\d+)§8] )?(?<author>.*)§.(?: §7♲)*?§7 (?<action>is (?:holding|friends with a|wearing)|has) (?<itemName>.*)"
+        "(?:§8\\[(?<levelColor>§.)(?<level>\\d+)§8] )?(?<author>.*)§.(?: §7♲)*?§7 (?<action>is (?:holding|friends with a|wearing)|has) (?<itemName>.*)",
     )
 
     /**
@@ -105,7 +105,7 @@ object PlayerChatManager {
      */
     private val privateIslandRankPattern by patternGroup.pattern(
         "privateislandrank",
-        "(?<prefix>.*?)(?<privateIslandRank>§.\\[(?!MVP(?:§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\]) (?<suffix>.*)"
+        "(?<prefix>.*?)(?<privateIslandRank>§.\\[(?!MVP(?:§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\]) (?<suffix>.*)",
     )
 
     /**
@@ -115,7 +115,7 @@ object PlayerChatManager {
      */
     private val privateIslandGuestPattern by patternGroup.pattern(
         "privateislandguest",
-        "(?<prefix>.*)(?<guest>§a\\[✌] )(?<suffix>.*)"
+        "(?<prefix>.*)(?<guest>§a\\[✌] )(?<suffix>.*)",
     )
 
     @HandleEvent
@@ -137,7 +137,7 @@ object PlayerChatManager {
                 groupOrThrow("author"),
                 groupOrThrow("message"),
                 group("guildRank"),
-                event.chatComponent
+                event.chatComponent,
             ).postChat(event)
             return
         }
@@ -160,7 +160,7 @@ object PlayerChatManager {
                 author,
                 itemName,
                 author + action + itemName,
-                event.chatComponent
+                event.chatComponent,
             ).postChat(event)
             return
         }

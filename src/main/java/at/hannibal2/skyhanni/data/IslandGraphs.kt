@@ -29,10 +29,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.hover
-import at.hannibal2.skyhanni.utils.chat.Text.onClick
-import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
@@ -151,7 +151,7 @@ object IslandGraphs {
     fun onWorldChange(event: WorldChangeEvent) {
         currentIslandGraph = null
         if (currentTarget != null) {
-            "§e[SkyHanni] Navigation stopped because of world switch!".asComponent().send(PATHFIND_ID)
+            "§e[SkyHanni] Navigation stopped because of world switch!".asComponent().send(pathFindMessageId)
         }
         reset()
     }
@@ -239,7 +239,7 @@ object IslandGraphs {
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
                 onFound()
-                "§e[SkyHanni] Navigation reached §r$label§e!".asComponent().send(PATHFIND_ID)
+                "§e[SkyHanni] Navigation reached §r$label§e!".asComponent().send(pathFindMessageId)
                 reset()
             }
             if (!condition()) {
@@ -432,7 +432,7 @@ object IslandGraphs {
         updateChat()
     }
 
-    private const val PATHFIND_ID = -6457563
+    private val pathFindMessageId = ChatUtils.getUniqueMessageId()
 
     private fun updateChat() {
         if (label == "") return
@@ -462,11 +462,11 @@ object IslandGraphs {
         componentText.onClick(
             onClick = {
                 stop()
-                "§e[SkyHanni] Navigation stopped!".asComponent().send(PATHFIND_ID)
+                "§e[SkyHanni] Navigation stopped!".asComponent().send(pathFindMessageId)
             },
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()
-        componentText.send(PATHFIND_ID)
+        componentText.send(pathFindMessageId)
     }
 
     @HandleEvent
@@ -522,4 +522,6 @@ object IslandGraphs {
 
         return locations.map { GraphNode(index++, it) }
     }
+
+    fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == label
 }

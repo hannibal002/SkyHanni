@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.combat.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
@@ -477,9 +478,23 @@ object DamageIndicatorManager {
                 return checkBacte(entityData)
             }
 
+            BossType.END_ENDER_DRAGON,
+            -> {
+                return checkEnderDragon(entityData)
+            }
+
             else -> return ""
         }
         return ""
+    }
+
+    private fun checkEnderDragon(entityData: EntityData): String {
+        DragonFightAPI.currentType?.let {
+            entityData.namePrefix = "§c§l$it "
+        }
+        return DragonFightAPI.currentHp?.let {
+            "§c" + it.shortFormat()
+        }.orEmpty()
     }
 
     private fun checkBacte(entityData: EntityData): String {

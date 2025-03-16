@@ -30,6 +30,14 @@ object ConditionalUtils {
         whenChanged { _, new -> observer(new) }
     }
 
+    fun Property<out Boolean>.onEnable(observer: Runnable) {
+        whenChanged { _, _ ->
+            if (this.get()) {
+                observer.run()
+            }
+        }
+    }
+
     fun <T : Comparable<T>, K> comparatorFirst(pair1: Pair<T?, K>, pair2: Pair<T?, K>): Int {
         val first1 = pair1.first
         val first2 = pair2.first

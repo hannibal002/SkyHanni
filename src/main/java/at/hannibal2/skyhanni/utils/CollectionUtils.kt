@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
@@ -90,6 +89,21 @@ object CollectionUtils {
         }
     }
 
+    fun <T, R> Sequence<IndexedValue<T>>.runningIndexedFold(initial: R, operation: (R, T) -> R): Sequence<IndexedValue<R>> =
+        map { it.value }.runningFold(initial, operation).zip(map { it.index }) { value, index -> IndexedValue(index, value) }
+
+    fun <T : Any> Sequence<T>.firstTwiceOf(a: (T) -> Boolean, b: (T) -> Boolean): Pair<T?, T?> {
+        var firstA: T? = null
+        var firstB: T? = null
+
+        for (item in this) {
+            if (firstA == null && a(item)) firstA = item
+            if (firstB == null && b(item)) firstB = item
+            if (firstA != null && firstB != null) break
+        }
+        return Pair(firstA, firstB)
+    }
+
     /** Returns a map containing the count of occurrences of each distinct result of the [selector] function. */
     inline fun <T, K> Iterable<T>.countBy(selector: (T) -> K): Map<K, Int> {
         val map = mutableMapOf<K, Int>()
@@ -166,8 +180,10 @@ object CollectionUtils {
 
     fun <T> MutableList<T>.addAll(vararg elements: T) = addAll(elements)
 
+    @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
+    @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
     fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
 
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
@@ -182,6 +198,7 @@ object CollectionUtils {
 
     operator fun IntRange.contains(range: IntRange): Boolean = range.first in this && range.last in this
 
+    @Deprecated("use Renderable")
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
     }
@@ -269,14 +286,11 @@ object CollectionUtils {
         true
     } else false
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? = takeIf { null !in this } as? Iterable<T>
+    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? = if (all { it != null }) filterNotNull() else null
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
+    fun <T> List<T?>.takeIfAllNotNull(): List<T>? = if (all { it != null }) filterNotNull() else null
 
     fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
-
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
@@ -340,84 +354,6 @@ object CollectionUtils {
         generateSequence(start) { it + 1 }.map {
             (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn
         }.takeWhile { it <= end }
-
-    // TODO move to RenderableUtils
-    inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
-        prefix: String,
-        getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
-    ) {
-        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
-    }
-
-    inline fun <reified T : Enum<T>> MutableList<Searchable>.addSearchableSelector(
-        prefix: String,
-        getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
-    ) {
-        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)).toSearchable())
-    }
-
-    // TODO move to RenderableUtils
-    inline fun <reified T : Enum<T>> buildSelector(
-        prefix: String,
-        getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
-    ) = buildSelector(prefix, getName, isCurrent, onChange, enumValues<T>())
-
-    inline fun <T> buildSelector(
-        prefix: String,
-        getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
-        universe: Array<T>,
-    ) = buildList<Renderable> {
-        addString(prefix)
-        for (entry in universe) {
-            val display = getName(entry)
-            if (isCurrent(entry)) {
-                addString("§a[$display§a]")
-            } else {
-                addString("§e[")
-                add(
-                    Renderable.link("§e$display") {
-                        onChange(entry)
-                    },
-                )
-                addString("§e]")
-            }
-            addString(" ")
-        }
-    }
-
-    // TODO move to RenderableUtils
-    inline fun MutableList<Renderable>.addButton(
-        prefix: String,
-        getName: String,
-        crossinline onChange: () -> Unit,
-        tips: List<String> = emptyList(),
-    ) {
-        val onClick = {
-            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                onChange()
-                SoundUtils.playClickSound()
-                ChatUtils.lastButtonClicked = System.currentTimeMillis()
-            }
-        }
-        addLine {
-            addString(prefix)
-            addString("§a[")
-            if (tips.isEmpty()) {
-                add(Renderable.link("§e$getName", false, onClick))
-            } else {
-                add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-            }
-            addString("§a]")
-        }
-    }
 
     // TODO move to RenderableUtils
     fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
@@ -542,4 +478,39 @@ object CollectionUtils {
         }
     }
 
+    fun <K, V> LinkedHashMap<K, V>.putAt(index: Int, key: K, value: V) {
+        val entries = LinkedHashMap<K, V>()
+        var currentIndex = 0
+
+        for ((existingKey, existingValue) in this) {
+            if (currentIndex == index) {
+                entries[key] = value // Insert at the specified index
+            }
+            entries[existingKey] = existingValue
+            currentIndex++
+        }
+
+        if (index >= size) {
+            entries[key] = value // If index is out of range, append at the end
+        }
+
+        clear()
+        putAll(entries)
+    }
+
+    fun <T> Collection<T>.indexOfFirstOrNull(predicate: (T) -> Boolean): Int? {
+        for ((index, element) in this.withIndex()) {
+            if (predicate(element)) {
+                return index
+            }
+        }
+        return null
+    }
+
+    fun <T> List<T>.insertAfterEach(extra: T): List<T> = buildList(size * 2) {
+        for (item in this@insertAfterEach) {
+            add(item)
+            add(extra)
+        }
+    }
 }

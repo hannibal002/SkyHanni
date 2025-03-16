@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
+import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -48,8 +49,6 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.Slot
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.full.memberProperties
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -135,16 +134,7 @@ object HoppityApi {
         var lastProfit: String = "",
         var lastMeal: HoppityEggType? = null,
         var lastDuplicateAmount: Long? = null
-    ) {
-        fun reset() {
-            val default = HoppityStateDataSet()
-            this::class.memberProperties
-                .filterIsInstance<KMutableProperty1<HoppityStateDataSet, Any?>>()
-                .forEach { prop ->
-                    prop.set(this, prop.get(default))
-                }
-        }
-    }
+    ) : ResettableStorageSet()
 
     val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
     private val hoppityDataSet = HoppityStateDataSet()

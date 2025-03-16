@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,14 +28,14 @@ object FavoritePowerStone {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
 
-        highlightedSlots.forEach { event.gui.inventorySlots.inventorySlots[it] highlight LorenzColor.AQUA }
+        highlightedSlots.forEach { event.container.inventorySlots[it] highlight LorenzColor.AQUA }
     }
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !KeyboardManager.isShiftKeyDown() || !inInventory) return
 
-        val displayName = event.item?.name?.removeColor()?.trim() ?: return
+        val displayName = event.item?.displayName?.removeColor()?.trim() ?: return
         val power = MaxwellApi.getPowerByNameOrNull(displayName) ?: return
 
         if (power in MaxwellApi.favoritePowers) {

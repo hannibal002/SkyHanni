@@ -66,11 +66,15 @@ object TpsCounter {
         val text = if (timeUntil.isPositive()) {
             "§f(${timeUntil.inWholeSeconds}s)"
         } else {
-            val sum = tpsList.sum().toDouble()
-            val newTps = (sum / tpsList.size).roundTo(1).coerceIn(0.0..20.0)
-            tps = newTps
-            val legacyColor = format(newTps)
-            "$legacyColor$newTps"
+            // when in limbo we don't receive any packets
+            if (tpsList.isEmpty()) {
+                "§70 (Limbo?)"
+            } else {
+                val newTps = tpsList.average().roundTo(1).coerceIn(0.0..20.0)
+                tps = newTps
+                val legacyColor = format(newTps)
+                "$legacyColor$newTps"
+            }
         }
         display = "§eTPS: $text"
     }

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import kotlinx.coroutines.launch
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ActionBarData {
@@ -62,14 +61,7 @@ object ActionBarData {
         actionBar = ""
     }
 
-    @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
-        //#if MC<1.12
-        if (event.type.toInt() != 2) return
-        //#else
-        //$$ if (event.type.id.toInt() != 2) return
-        //#endif
-
         val original = event.message
         val message = debugActionBar ?: original.formattedText.stripHypixelMessage()
         actionBar = message
