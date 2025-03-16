@@ -83,7 +83,7 @@ class FishingConfig {
     @Expose
     @ConfigOption(
         name = "Shorten Fishing Message",
-        desc = "Shorten the chat message that says what type of Sea Creature you have fished."
+        desc = "Shorten the chat message that says what type of Sea Creature you have fished.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -92,9 +92,15 @@ class FishingConfig {
     @Expose
     @ConfigOption(
         name = "Compact Double Hook",
-        desc = "Add Double Hook to the Sea Creature chat message instead of in a previous line."
+        desc = "Add Double Hook to the Sea Creature chat message instead of in a previous line.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var compactDoubleHook: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Hotspot Radar Guesser", desc = "Shows where the closest Fishing Hotspot is when using the §9Hotspot Radar§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var guessHotspotRadar: Boolean = true
 }

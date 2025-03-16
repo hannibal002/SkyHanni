@@ -62,7 +62,7 @@ object ActiveBeaconEffect {
         if (!isEnabled()) return
         val slot = slot ?: return
 
-        event.gui.inventorySlots.getSlot(slot) highlight LorenzColor.GREEN
+        event.container.getSlot(slot) highlight LorenzColor.GREEN
     }
 
     fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.highlightActiveBeaconEffect

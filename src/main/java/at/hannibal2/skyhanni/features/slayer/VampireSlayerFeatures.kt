@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
@@ -27,7 +28,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -141,7 +141,7 @@ object VampireSlayerFeatures {
                 if (!shouldSendTitle) continue
                 DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
                     if (nextClawSend < System.currentTimeMillis()) {
-                        LorenzUtils.sendTitle(
+                        TitleManager.sendTitle(
                             "§6§lTWINCLAWS",
                             (1750 - config.twinclawsDelay).milliseconds,
                             2.6,
@@ -180,7 +180,7 @@ object VampireSlayerFeatures {
                 else canUseSteak && configCoopBoss.steakAlert && containCoop
 
             if (shouldSendSteakTitle) {
-                LorenzUtils.sendTitle("§c§lSTEAK!", 300.milliseconds, 2.6)
+                TitleManager.sendTitle("§c§lSTEAK!", 300.milliseconds, 2.6)
             }
 
             if (shouldRender) {
