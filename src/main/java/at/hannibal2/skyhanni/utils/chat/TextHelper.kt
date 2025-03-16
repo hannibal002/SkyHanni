@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.chat
 
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.client.Minecraft
@@ -9,8 +10,9 @@ import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 //#if MC < 1.21
 import net.minecraft.util.ChatComponentText
-//#else
-//$$ import net.minecraft.text.MutableText
+//#endif
+//#if MC > 1.16
+//$$ import net.minecraft.network.chat.MutableComponent
 //#endif
 
 object TextHelper {
@@ -20,12 +22,15 @@ object TextHelper {
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
 
+    //#if MC < 1.16
     fun text(text: String, init: IChatComponent.() -> Unit = {}) = text.asComponent(init)
-
-    //#if MC < 1.21
     fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
+    //#elseif MC < 1.21
+    //$$ fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
+    //$$ fun String.asComponent(init: MutableComponent.() -> Unit = {}) = (TextComponent(this) as MutableComponent).also(init)
     //#else
-    //$$ fun String.asComponent(init: Text.() -> Unit = {}): MutableText = Text.of(this).also(init) as MutableText
+    //$$ fun text(text: String, init: MutableText.() -> Unit = {}) = text.asComponent(init)
+    //$$ fun String.asComponent(init: MutableText.() -> Unit = {}): MutableText = (Text.of(this) as MutableText).also(init)
     //#endif
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
@@ -34,7 +39,7 @@ object TextHelper {
         components.forEachIndexed { index, component ->
             when (component) {
                 is IChatComponent -> result.appendSibling(component)
-                is String -> result.appendText(component)
+                is String -> result.appendString(component)
                 is List<*> -> result.appendSibling(join(*component.toTypedArray(), separator = separator))
                 null -> return@forEachIndexed
                 else -> error("Unsupported type: ${component::class.simpleName}")
