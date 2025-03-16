@@ -53,6 +53,8 @@ object LorenzUtils {
 
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
+    private var previousApril = false
+
     val isAprilFoolsDay: Boolean
         get() {
             val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
@@ -67,8 +69,6 @@ object LorenzUtils {
         }
 
     val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
-
-    private var previousApril = false
 
     // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
