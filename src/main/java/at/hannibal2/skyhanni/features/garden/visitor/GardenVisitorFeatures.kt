@@ -636,7 +636,11 @@ object GardenVisitorFeatures {
         return ready
     }
 
-    private fun renderDisplay() = config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
+    private fun renderDisplay() {
+				if (showGui() && shouldShowShoppingList()) {
+						config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
+				}
+		}
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onScreenDrawn(event: ScreenDrawnEvent) {
@@ -644,18 +648,14 @@ object GardenVisitorFeatures {
         val gui = event.gui
         if (gui !is GuiEditSign) return
 
-        if (showGui() && shouldShowShoppingList()) {
-            renderDisplay()
-        }
+        renderDisplay()
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.shoppingList.display) return
 
-        if (showGui() && shouldShowShoppingList()) {
-            renderDisplay()
-        }
+        renderDisplay()
     }
 
     private fun shouldShowShoppingList(): Boolean {
