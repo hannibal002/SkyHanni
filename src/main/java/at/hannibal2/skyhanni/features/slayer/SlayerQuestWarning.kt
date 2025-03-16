@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
@@ -108,7 +109,7 @@ object SlayerQuestWarning {
         ChatUtils.chat(chatMessage)
 
         if (config.questWarningTitle) {
-            LorenzUtils.sendTitle("§e$titleMessage", 2.seconds)
+            TitleManager.sendTitle("§e$titleMessage", 2.seconds)
         }
     }
 

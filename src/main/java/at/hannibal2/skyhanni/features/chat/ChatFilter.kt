@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatComponentText
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -565,7 +565,7 @@ object ChatFilter {
                 val amountFormat = groupOrNull("amount")?.let {
                     "§a+ §b$it§r"
                 } ?: "§a+§r"
-                event.chatComponent = ChatComponentText("$amountFormat $reward")
+                event.chatComponent = "$amountFormat $reward".asComponent()
             }
             return null
         }
@@ -581,7 +581,7 @@ object ChatFilter {
      */
     private fun crystalNucleusBlock(event: SkyHanniChatEvent): String? {
         val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
-        newMessage?.let { event.chatComponent = ChatComponentText(it) }
+        newMessage?.let { event.chatComponent = it.asComponent() }
         blockCode?.let { return it }
         return null
     }

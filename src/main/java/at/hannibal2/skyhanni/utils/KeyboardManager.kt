@@ -2,22 +2,18 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
-import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.settings.KeyBinding
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -56,14 +52,6 @@ object KeyboardManager {
      */
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
-    @SubscribeEvent
-    fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
-        val guiScreen = event.gui as? GuiContainer ?: return
-        if (GuiKeyPressEvent(guiScreen).post()) {
-            event.isCanceled = true
-        }
-    }
-
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick(event: SkyHanniTickEvent) {
         val currentScreen = Minecraft.getMinecraft().currentScreen
@@ -72,8 +60,8 @@ object KeyboardManager {
         if (currentScreen is GuiChat) return
 
 
-        if (Mouse.getEventButtonState() && Mouse.getEventButton() != -1) {
-            val key = Mouse.getEventButton() - 100
+        if (MouseCompat.getEventButtonState() && MouseCompat.getEventButton() != -1) {
+            val key = MouseCompat.getEventButton() - 100
             postEvent(key)
             lastClickedMouseButton = key
             return
@@ -85,7 +73,7 @@ object KeyboardManager {
             return
         }
 
-        if (Mouse.getEventButton() == -1 && lastClickedMouseButton != -1) {
+        if (MouseCompat.getEventButton() == -1 && lastClickedMouseButton != -1) {
             if (lastClickedMouseButton.isKeyHeld()) {
                 postEvent(lastClickedMouseButton)
                 return
@@ -126,7 +114,7 @@ object KeyboardManager {
 
     fun Int.isKeyHeld(): Boolean = when {
         this == 0 -> false
-        this < 0 -> Mouse.isButtonDown(this + 100)
+        this < 0 -> MouseCompat.isButtonDown(this + 100)
         this >= Keyboard.KEYBOARD_SIZE -> {
             val pressedKey = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
             Keyboard.getEventKeyState() && this == pressedKey
