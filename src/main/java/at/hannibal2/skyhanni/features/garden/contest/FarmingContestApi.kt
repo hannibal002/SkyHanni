@@ -132,7 +132,7 @@ object FarmingContestApi {
 
     fun getSBTimeFor(text: String): Long? {
         val (year, month, day) = getSBDateFromItemName(text) ?: return null
-        val monthNr = LorenzUtils.getSBMonthByName(month)
+        val monthNr = SkyBlockTime.getSBMonthByName(month)
 
         return SkyBlockTime(year.toInt(), monthNr, day.toInt()).toMillis()
     }

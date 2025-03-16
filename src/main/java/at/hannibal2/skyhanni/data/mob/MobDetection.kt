@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -69,7 +70,7 @@ object MobDetection {
 
     // TODO this is a unused debug function. maybe connect with a debug commmand or remove
     private fun watchdog() {
-        val world = LorenzUtils.getPlayer()?.worldObj ?: return
+        val world = Minecraft.getMinecraft().thePlayer?.worldObj ?: return
         if (MobData.retries.any { it.value.entity.worldObj != world }) {
             ChatUtils.chat("Watchdog: Retires")
         }

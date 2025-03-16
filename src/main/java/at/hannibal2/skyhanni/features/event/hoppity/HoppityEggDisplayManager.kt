@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import org.lwjgl.opengl.GL11
@@ -30,7 +31,7 @@ object HoppityEggDisplayManager {
 
     private fun canChangeOpacity(entity: EntityPlayer): Boolean {
         if (!HoppityEggLocator.isEnabled()) return false
-        if (entity == LorenzUtils.getPlayer()) return false
+        if (entity == Minecraft.getMinecraft().thePlayer) return false
         if (!entity.isRealPlayer()) return false
         return config.playerOpacity < 100
     }
