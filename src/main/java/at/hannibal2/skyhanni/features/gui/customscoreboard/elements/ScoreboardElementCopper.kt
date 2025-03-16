@@ -20,14 +20,9 @@ object ScoreboardElementCopper : ScoreboardElement(), CustomScoreboardNumberTrac
         val copper = getCopper()
         checkDifference(copper.toLong())
         val line = formatStringNum(copper) + temporaryChangeDisplay.orEmpty()
-        if (informationFilteringConfig.hideEmptyLines && copper == "0") return null
+        if (informationFilteringConfig.hideEmptyLines && line == "0") return null
 
-        return CustomScoreboardUtils.formatNumberDisplay("Copper", copper, "§c")
-        return when {
-            informationFilteringConfig.hideEmptyLines && line == "0" -> null
-            displayConfig.displayNumbersFirst -> "§c$line Copper"
-            else -> "Copper: §c$line"
-        }
+        return CustomScoreboardUtils.formatNumberDisplay("Copper", line, numberColor)
     }
 
     override val configLine = "Copper: §c23,495"

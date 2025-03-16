@@ -19,14 +19,9 @@ object ScoreboardElementSoulflow : ScoreboardElement(), CustomScoreboardNumberTr
         checkDifference(soulflow.toLong())
         val line = formatStringNum(soulflow) + temporaryChangeDisplay.orEmpty()
 
-        return when {
-            informationFilteringConfig.hideEmptyLines && line == "0" -> null
-            displayConfig.displayNumbersFirst -> "§3$line Soulflow"
-            else -> "Soulflow: §3$line"
-        }
-        if (informationFilteringConfig.hideEmptyLines && soulflow == "0") return null
+        if (informationFilteringConfig.hideEmptyLines && line == "0") return null
 
-        return CustomScoreboardUtils.formatNumberDisplay("Soulflow", soulflow, "§3")
+        return CustomScoreboardUtils.formatNumberDisplay("Soulflow", line, numberColor)
     }
 
     override val configLine = "Soulflow: §3761"

@@ -23,12 +23,7 @@ object ScoreboardElementBits : ScoreboardElement(), CustomScoreboardNumberTracki
         val line = getBitsLine() + temporaryChangeDisplay.orEmpty()
         if (informationFilteringConfig.hideEmptyLines && BitsApi.bits == 0 && (bitsToClaim == -1 || bitsToClaim == 0)) return null
 
-        return when {
-            informationFilteringConfig.hideEmptyLines && bits == 0L && (bitsToClaim == -1 || bitsToClaim == 0) -> null
-            displayConfig.displayNumbersFirst -> "$line Bits"
-            else -> "Bits: $line"
-        }
-        return CustomScoreboardUtils.formatNumberDisplay("Bits", getBitsLine(), "§b")
+        return CustomScoreboardUtils.formatNumberDisplay("Bits", line, numberColor)
     }
 
     override fun showWhen() = !HypixelData.bingo

@@ -19,14 +19,9 @@ object ScoreboardElementMotes : ScoreboardElement(), CustomScoreboardNumberTrack
         val motes = getMotes()
         checkDifference(motes.toLong())
         val line = formatStringNum(motes) + temporaryChangeDisplay.orEmpty()
-        if (informationFilteringConfig.hideEmptyLines && motes == "0") return null
+        if (informationFilteringConfig.hideEmptyLines && line == "0") return null
 
-        return when {
-            informationFilteringConfig.hideEmptyLines && line == "0" -> null
-            displayConfig.displayNumbersFirst -> "§d$line Motes"
-            else -> "Motes: §d$line"
-        }
-        return CustomScoreboardUtils.formatNumberDisplay("Motes", motes, "§d")
+        return CustomScoreboardUtils.formatNumberDisplay("Motes", line, numberColor)
     }
 
     override val configLine = "Motes: §d64,647"

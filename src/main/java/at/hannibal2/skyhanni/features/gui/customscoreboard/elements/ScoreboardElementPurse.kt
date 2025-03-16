@@ -18,15 +18,10 @@ object ScoreboardElementPurse : ScoreboardElement(), CustomScoreboardNumberTrack
     override fun getDisplay(): String? {
         val currentPurse = PurseApi.currentPurse.toLong()
         checkDifference(currentPurse)
-        val purse = formatNumber(currentPurse) + temporaryChangeDisplay.orEmpty()
-        var purse = formatNumber(PurseApi.currentPurse)
-        if (informationFilteringConfig.hideEmptyLines && purse == "0") return null
+        val line = formatNumber(currentPurse) + temporaryChangeDisplay.orEmpty()
+        if (informationFilteringConfig.hideEmptyLines && line == "0") return null
 
-        if (!displayConfig.hideCoinsDifference) {
-            purse += getPurseEarned().orEmpty()
-        }
-
-        return CustomScoreboardUtils.formatNumberDisplay("Purse", purse, "§6")
+        return CustomScoreboardUtils.formatNumberDisplay("Purse", line, numberColor)
     }
 
     override val configLine = "Purse: §652,763,737"
