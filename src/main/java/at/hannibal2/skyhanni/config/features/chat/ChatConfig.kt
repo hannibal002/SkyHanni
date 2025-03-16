@@ -69,7 +69,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Hide Far Deaths",
-        desc = "Hide other players' death messages when they're not nearby (except during Dungeons/Kuudra fights)"
+        desc = "Hide other players' death messages when they're not nearby (except during Dungeons/Kuudra fights)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -84,7 +84,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Compact Bestiary Messages",
-        desc = "Compact the Bestiary level up message, only showing additional information when hovering."
+        desc = "Compact the Bestiary level up message, only showing additional information when hovering.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -94,7 +94,7 @@ class ChatConfig {
     @ConfigOption(
         name = "Compact Enchanting Rewards",
         desc = "Compact the rewards gained from Add-ons and Experiments in Experimentation Table,\n" +
-            "only showing additional information when hovering."
+            "only showing additional information when hovering.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -103,7 +103,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Arachne Hider",
-        desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7."
+        desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -113,7 +113,7 @@ class ChatConfig {
     @ConfigOption(
         name = "Sack Change Hider",
         desc = "Hide the sack change message while allowing mods to continue accessing sack data.\n" +
-            "§eUse this instead of the toggle in Hypixel Settings."
+            "§eUse this instead of the toggle in Hypixel Settings.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -140,7 +140,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Anita's Accessories",
-        desc = "Hide Anita's Accessories' fortune bonus messages outside the Garden."
+        desc = "Hide Anita's Accessories' fortune bonus messages outside the Garden.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -154,19 +154,9 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
-        name = "Pet Drop Rarity",
-        desc = "Show the rarity of the Pet Drop in the message.\n" +
-            "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)"
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var petRarityDropMessage: Boolean = true
-
-    @Expose
-    @ConfigOption(
         name = "Shorten Coin Amounts",
         desc = "Replace coin amounts in chat messages with their shortened version.\n" +
-            "e.g. §65,100,000 Coins §7-> §65.1M Coins"
+            "e.g. §65,100,000 Coins §7-> §65.1M Coins",
     )
     @ConfigEditorBoolean
     @FeatureToggle

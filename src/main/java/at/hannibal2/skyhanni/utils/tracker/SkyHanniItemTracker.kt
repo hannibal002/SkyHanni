@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -22,15 +22,16 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
+    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+) : SkyHanniTracker<Data>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
 
     companion object {
         private val config get() = SkyHanniMod.feature.misc.tracker
@@ -53,7 +54,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
 
         if (command) {
             TrackerManager.commandEditTrackerSuccess = true
-            val displayName = internalName.itemName
+            val displayName = internalName.repoItemName
             if (amount > 0) {
                 ChatUtils.chat("Manually added to $name: §r$displayName §7(${amount}x§7)")
             } else {
@@ -69,7 +70,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
     ): String {
         val item = items[this] ?: error("Item not found for $this")
-        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.itemName
+        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.repoItemName
     }
 
     open fun drawItems(
@@ -140,9 +141,10 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
 
             // TODO add row abstraction to api, with common click+hover behaviour
-            fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickAndHover(
-                string, lore,
-                onClick = {
+            fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickable(
+                string,
+                tips = lore,
+                onLeftClick = {
                     if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)
                     update()
@@ -168,15 +170,16 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             table[line] = cleanName
         }
 
+        val scrollValue = (data as? BucketedItemTrackerData<*>)?.selectedScrollValue ?: scrollValue
         Renderable.searchableScrollable(
             table,
             key = 99,
-            lines = config.itemsShown.get(),
+            lines = min(items.size, config.itemsShown.get()),
             velocity = 5.0,
             textInput = textInput,
             scrollValue = scrollValue,
             asTable = config.showTable.get(),
-            showScrollableTipsInList = true,
+            showScrollableTipsInList = isInventoryOpen(),
         )?.let {
             lists.add(it.toSearchable())
         }
@@ -191,7 +194,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         newDrop: Boolean,
         internalName: NeuInternalName,
     ) = buildList {
-        add(internalName.itemName)
+        add(internalName.repoItemName)
         add("")
         addAll(loreFormat)
         add("")

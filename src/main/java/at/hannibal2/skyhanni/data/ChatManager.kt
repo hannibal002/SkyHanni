@@ -15,16 +15,15 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -86,13 +85,13 @@ object ChatManager {
         val packet = event.packet as? C01PacketChatMessage ?: return
 
         val message = packet.message
-        val component = ChatComponentText(message)
+        val component = message.asComponent()
         val originatingModCall = event.findOriginatingModCall()
         val originatingModContainer = originatingModCall?.getClassInstance()?.getModInstance()
         val hoverInfo = listOf(
             "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
             "§7Mod id: §a${originatingModContainer?.id}",
-            "§7Mod name: §a${originatingModContainer?.name}"
+            "§7Mod name: §a${originatingModContainer?.name}",
         )
         val stackTrace =
             Thread.currentThread().stackTrace.map {
@@ -102,7 +101,7 @@ object ChatManager {
         val result = MessageFilteringResult(
             component, ActionKind.OUTGOING, null, null,
             hoverInfo = hoverInfo,
-            hoverExtraInfo = hoverInfo + listOf("") + stackTrace
+            hoverExtraInfo = hoverInfo + listOf("") + stackTrace,
         )
 
         messageHistory[IdentityCharacteristics(component)] = result
@@ -110,7 +109,7 @@ object ChatManager {
         if (MessageSendToServerEvent(
                 trimmedMessage,
                 trimmedMessage.split(" "),
-                originatingModContainer
+                originatingModContainer,
             ).post()
         ) {
             event.cancel()
@@ -118,14 +117,7 @@ object ChatManager {
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
-        //#if MC<1.12
-        if (event.type.toInt() == 2) return
-        //#else
-        //$$ if (event.type.id.toInt() == 2) return
-        //#endif
-
         val original = event.message
         val message = original.formattedText.stripHypixelMessage()
 
@@ -190,7 +182,7 @@ object ChatManager {
     fun MutableList<ChatLine>.editChatLine(
         component: (IChatComponent) -> IChatComponent,
         predicate: (ChatLine) -> Boolean,
-        reason: String? = null
+        reason: String? = null,
     ) {
         indexOfFirst {
             predicate(it)
@@ -224,6 +216,11 @@ object ChatManager {
         var removed = 0
         while (iterator.hasNext() && removed < amount) {
             val chatLine = iterator.next()
+
+            // chatLine can be null. maybe bc of other mods?
+            @Suppress("SENSELESS_COMPARISON")
+            if (chatLine == null) continue
+
             if (predicate(chatLine)) {
                 iterator.remove()
                 removed++

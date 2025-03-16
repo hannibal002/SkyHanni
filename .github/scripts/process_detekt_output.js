@@ -8,8 +8,9 @@ const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
 const detektOutput = fs.readFileSync('detekt_output.txt', 'utf8');
 
 const lines = detektOutput.split('\n');
+const lineLength = lines.length - 1; // We might have an empty line at the end maybe?
 
-let comment = `### ${lines.length} Detekt Failure${lines.length !== 1 ? 's were' : ' was'} detected:\n\n`;
+let comment = `### ${lineLength} Detekt Failure${lineLength !== 1 ? 's were' : ' was'} detected:\n\n`;
 
 lines.forEach((line) => {
     if (!line.trim()) return; // Skip empty lines

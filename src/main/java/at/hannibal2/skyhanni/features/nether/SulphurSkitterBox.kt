@@ -66,12 +66,6 @@ object SulphurSkitterBox {
         spongeLocations = BlockPos.getAllInBox(from, to).filter {
             val loc = it.toLorenzVec()
             loc.getBlockAt() == Blocks.sponge && loc.distanceToPlayer() <= 15
-        }.filter {
-            val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
-            val pos2 = it.add(RADIUS, RADIUS, RADIUS)
-            BlockPos.getAllInBox(pos1, pos2).any { pos ->
-                pos.toLorenzVec().getBlockAt() in FishingApi.lavaBlocks
-            }
         }.map { it.toLorenzVec() }
     }
 
