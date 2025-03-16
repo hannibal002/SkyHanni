@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import com.google.gson.JsonObject
 import net.minecraft.util.IChatComponent
 import org.apache.commons.io.FileUtils
@@ -266,7 +266,7 @@ object RepoManager {
                 for (constant in unsuccessfulConstants) {
                     text.add("   §e- §7$constant".asComponent())
                 }
-                Text.multiline(text).send()
+                TextHelper.multiline(text).send()
             }
             return
         }

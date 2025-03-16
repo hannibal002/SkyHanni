@@ -11,12 +11,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.getPlayerNames
+import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
-import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
 
 @SkyHanniModule
@@ -27,7 +28,7 @@ object ScoreboardData {
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
     val objectiveTitle: String get() =
-        Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName.orEmpty()
+        Minecraft.getMinecraft().theWorld?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -147,11 +148,10 @@ object ScoreboardData {
 
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
-        val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
+        val objective = scoreboard.getSidebarObjective() ?: return emptyList()
         var scores = scoreboard.getSortedScores(objective)
-        val list = scores.filter { input: Score? ->
-            input != null && input.playerName != null && !input.playerName.startsWith("#")
-        }
+        val list = scores.getPlayerNames(scoreboard)
+        //#if MC < 1.21
         scores = if (list.size > 15) {
             list.drop(15)
         } else {
@@ -160,6 +160,9 @@ object ScoreboardData {
         return scores.map {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
+        //#else
+        //$$ return list.map { it.formattedTextCompat() }
+        //#endif
     }
 
     // TODO USE SH-REPO

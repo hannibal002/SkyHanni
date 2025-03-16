@@ -18,8 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.getNameAsString
-import at.hannibal2.skyhanni.utils.compat.getWholeInventory
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
@@ -118,13 +117,13 @@ class Mob(
 
     val isCorrupted get() = !RiftApi.inRift() && baseEntity.isCorrupted() // Can change
     val isRunic = !RiftApi.inRift() && baseEntity.isRunic() // Does not Change
-    val shurikenUsed get() = mobType != Type.DUNGEON && armorStand?.getNameAsString()?.endsWith("§b✯") == true
+    val shurikenUsed get() = mobType != Type.DUNGEON && armorStand?.name?.endsWith("§b✯") == true
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
     fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getWholeInventory().isNullOrEmpty()
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getAllEquipment().isNullOrEmpty()
 
     private var highlightColor: Color? = null
     private var condition: () -> Boolean = { true }

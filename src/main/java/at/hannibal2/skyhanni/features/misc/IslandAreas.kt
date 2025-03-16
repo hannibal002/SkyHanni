@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
@@ -239,7 +240,7 @@ object IslandAreas {
         // when this is a small area and small areas are disabled via config
         if (event.onlyInternal) return
         if (inAnArea && config.enterTitle) {
-            LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
+            TitleManager.sendTitle("§aEntered $name!", 3.seconds)
         }
     }
 
