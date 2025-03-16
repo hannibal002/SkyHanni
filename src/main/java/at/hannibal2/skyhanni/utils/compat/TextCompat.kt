@@ -134,7 +134,7 @@ fun addChatMessageToChat(message: IChatComponent) {
     //#if MC < 1.16
     Minecraft.getMinecraft().thePlayer.addChatMessage(message)
     //#else
-    //$$ MinecraftClient.getInstance().player.sendMessage(message, false)
+    //$$ MinecraftClient.getInstance().player?.sendMessage(message, false)
     //#endif
 }
 
