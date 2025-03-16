@@ -51,8 +51,7 @@ object BazaarOrderHelper {
         if (!SkyHanniMod.feature.inventory.bazaar.orderHelper) return
         if (event.gui !is GuiChest) return
 
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
         val inventoryName = chest.getInventoryName()
         if (!BazaarApi.isBazaarOrderInventory(inventoryName)) return
 
