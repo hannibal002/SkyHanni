@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
+import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -26,9 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -77,8 +76,8 @@ object GardenOptimalSpeed {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGuiScreenOpen(event: GuiScreenOpenEvent) {
         if (!isRancherOverlayEnabled()) return
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign()) return
@@ -112,8 +111,8 @@ object GardenOptimalSpeed {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiRender(event: DrawScreenEvent.Post) {
+    @HandleEvent
+    fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!isRancherOverlayEnabled()) return
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign()) return

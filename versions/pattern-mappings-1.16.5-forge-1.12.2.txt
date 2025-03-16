@@ -1,8 +1,9 @@
 
-net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack displayName.formattedTextCompat() getDisplayName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer name.formattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.formattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.formattedTextCompat() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent directlyContainedText() getUnformattedText() at.hannibal2.skyhanni.utils.compat.directlyContainedText
 net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent formattedTextCompat() getFormattedText() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.SPacketScoreboardObjective displayName.formattedTextCompat() getObjectiveValue() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.formattedTextCompat() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.formattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer name.formattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack displayName.formattedTextCompat() getDisplayName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 net.minecraft.world.scores.Objective net.minecraft.scoreboard.ScoreObjective displayName.formattedTextCompat() getDisplayName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat

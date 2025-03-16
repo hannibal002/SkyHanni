@@ -33,7 +33,7 @@ data class LorenzVec(
 
     constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
-    fun toBlockPos(): BlockPos = BlockPos(x, y, z)
+    fun toBlockPos(): BlockPos = BlockPos(x.toInt(), y.toInt(), z.toInt())
 
     fun toVec3(): Vec3 = Vec3(x, y, z)
 
@@ -268,11 +268,7 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
 
-//#if MC < 1.16
 fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
-//#else
-//$$ fun Entity.getMotionLorenzVec(): LorenzVec = deltaMovement.toLorenzVec()
-//#endif
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
 

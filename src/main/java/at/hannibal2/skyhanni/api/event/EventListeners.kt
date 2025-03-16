@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -90,9 +90,9 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         fun shouldInvoke(event: SkyHanniEvent): Boolean {
             if (SkyHanniEvents.isDisabledInvoker(name)) return false
-            if (lastTick != MinecraftData.totalTicks) {
+            if (lastTick != ClientEvents.totalTicks) {
                 cachedPredicateValue = cachedPredicates.all { it(event) }
-                lastTick = MinecraftData.totalTicks
+                lastTick = ClientEvents.totalTicks
             }
             return cachedPredicateValue && predicates.all { it(event) }
         }
