@@ -28,6 +28,7 @@ object FishingHotspotRadar {
     private var lastAbilityUse = SimpleTimeMark.farPast()
     private val bezierFitter = ParticlePathBezierFitter(3)
     private var hotspotLocation: LorenzVec? = null
+    private val HOTSPOT_RADAR = "HOTSPOT_RADAR".toInternalName()
 
     @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -63,10 +64,9 @@ object FishingHotspotRadar {
             event.drawDynamicText(location.add(-0.5, 1.6 - distance / (12 * 1.7), -0.5), " §r§e${formattedDistance}m", 1.0)
         } else {
             hotspotLocation = null
+            bezierFitter.reset()
         }
     }
-
-    private val HOTSPOT_RADAR = "HOTSPOT_RADAR".toInternalName()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onUseAbility(event: ItemClickEvent) {
