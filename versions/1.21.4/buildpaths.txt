@@ -1,5 +1,17 @@
 # at/hannibal2/skyhanni/SkyHanniMod.kt
 # at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
+
+at/hannibal2/skyhanni/utils/EnumUtils.kt
+at/hannibal2/skyhanni/config/features/dev/RepoPatternConfig.java
+at/hannibal2/skyhanni/utils/ConditionalUtils.kt
+at/hannibal2/skyhanni/utils/Quad.kt
+at/hannibal2/skyhanni/utils/TimeLimitedSet.kt
+at/hannibal2/skyhanni/utils/TimeLimitedCache.kt
+at/hannibal2/skyhanni/api/minecraftevents/ClientEvents.kt
+at/hannibal2/skyhanni/utils/ReflectionUtils.kt
+at/hannibal2/skyhanni/config/HasLegacyId.java
+
+
 # at/hannibal2/skyhanni/utils/compat/InventoryCompat.kt
 # at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
 
