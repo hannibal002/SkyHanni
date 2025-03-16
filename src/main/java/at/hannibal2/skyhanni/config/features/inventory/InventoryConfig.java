@@ -152,6 +152,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
+    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,
@@ -174,7 +175,7 @@ public class InventoryConfig {
         LARVA_HOOK("§bLarva Hook", 12),
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
-        TIME_POCKET_ITEMS("§bEvolving Items (Jyrre, Truffle, Discrite, Moby-Duck)", 15), // TODO: Rename to EVOLVING_ITEMS
+        TIME_POCKET_ITEMS("§bEvolving Items", 15), // TODO: Rename to EVOLVING_ITEMS
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
@@ -289,9 +290,10 @@ public class InventoryConfig {
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Evolving Items (Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck) in the lore.")
+    @ConfigOption(name = "Time Held in Lore", desc = "Show time held in the lore of Evolving Items.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
     public boolean timeHeldInLore = false;
 
     @Expose
