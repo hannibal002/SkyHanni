@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.features.misc.EmojiReplacer;
 import at.hannibal2.skyhanni.mixins.hooks.FontRendererHook;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -136,5 +138,15 @@ public abstract class MixinFontRenderer {
     @Inject(method = "setColor", at = @At("HEAD"), remap = false)
     public void emojiCharacterRenderOverride(float r, float g, float b, float a, CallbackInfo ci) {
         EmojiReplacer.INSTANCE.setLastColor(r, g, b, a);
+    }
+
+    /**
+     * Prevent lag spikes whenever the first emoji
+     * appears by loading the emoji texture as soon
+     * as possible
+     */
+    @Inject(method = "<init>", at = @At("RETURN"), remap = false)
+    public void emojiCharacterRenderOverride(GameSettings gameSettingsIn, ResourceLocation location, TextureManager textureManagerIn, boolean unicode, CallbackInfo ci) {
+        EmojiReplacer.INSTANCE.initializeRenderer(textureManagerIn);
     }
 }

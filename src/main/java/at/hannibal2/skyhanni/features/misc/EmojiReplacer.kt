@@ -22,11 +22,11 @@ object EmojiReplacer {
     private var stringIndex: Int = -1
     private var emojiEnd = -1
     private var renderedString: String = ""
-    private val emojiResource = ResourceLocation("skyhanni:emoji/emojis.png")
     private var isShadow = false
+    private val emojiResource = ResourceLocation("skyhanni:emoji/emoji_table.png")
     private const val EMOJI_WIDTH = 72.0f
     private const val EMOJI_DISPLAY_WIDTH = 8.0f
-    private const val EMOJI_SPRITESHEET_COUNT = 62
+    private const val EMOJI_SPRITESHEET_COUNT = 44
 
     fun renderEmojiChar(char: Char, posX: Float, posY: Float, textureManager: TextureManager?, render: Boolean): Float {
         if (!isEnabled()) return -1.0f
@@ -42,7 +42,7 @@ object EmojiReplacer {
                 }
             }
             if (stringIndex > emojiEnd) return -1.0f
-            val emojiName = renderedString.slice(stringIndex + 1 ..< emojiEnd)
+            val emojiName = renderedString.slice(stringIndex + 1..<emojiEnd)
             val emojiIndex = nameMap[emojiName]
             if (emojiIndex == null) {
                 emojiEnd = oldEmojiEnd
@@ -51,8 +51,8 @@ object EmojiReplacer {
                 return EMOJI_DISPLAY_WIDTH
             }
             textureManager.bindTexture(emojiResource)
-            val spriteSheetX = (emojiIndex % 62) * EMOJI_WIDTH
-            val spriteSheetY = ((emojiIndex - (emojiIndex % 62)) / 62) * EMOJI_WIDTH
+            val spriteSheetX = (emojiIndex % EMOJI_SPRITESHEET_COUNT) * EMOJI_WIDTH
+            val spriteSheetY = (emojiIndex / EMOJI_SPRITESHEET_COUNT) * EMOJI_WIDTH
             val brightness = if (isShadow) 0.25f else 1.0f
             GL11.glColor4f(
                 brightness,
@@ -84,8 +84,8 @@ object EmojiReplacer {
             GL11.glEnd()
             GL11.glColor4f(
                 lastColor.red / 255.0f,
-                lastColor.blue / 255.0f,
                 lastColor.green / 255.0f,
+                lastColor.blue / 255.0f,
                 lastColor.alpha / 255.0f
             )
             return EMOJI_DISPLAY_WIDTH + 1.0f
@@ -107,5 +107,9 @@ object EmojiReplacer {
         isShadow = shadow
     }
 
-    private fun isEnabled() = config.emojiReplace
+    fun initializeRenderer(textureManager: TextureManager) {
+        textureManager.bindTexture(emojiResource)
+    }
+
+    fun isEnabled() = config.emojiReplace
 }

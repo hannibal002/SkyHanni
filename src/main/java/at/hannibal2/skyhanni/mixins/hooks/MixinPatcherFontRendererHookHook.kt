@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
+import at.hannibal2.skyhanni.features.misc.EmojiReplacer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
@@ -8,6 +9,8 @@ object MixinPatcherFontRendererHookHook {
     @JvmStatic
     @Suppress("UnusedParameter")
     fun overridePatcherFontRenderer(string: String, shadow: Boolean, cir: CallbackInfoReturnable<Boolean>) {
+        if (EmojiReplacer.isEnabled()) return
+
         if (!LorenzUtils.onHypixel) return
 
         if (ChromaManager.config.allChroma) {
