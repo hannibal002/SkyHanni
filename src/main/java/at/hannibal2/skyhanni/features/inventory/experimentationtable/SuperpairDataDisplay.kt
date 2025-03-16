@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.instantFindNamePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.remainingClicksPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
@@ -25,18 +26,6 @@ import kotlin.time.Duration.Companion.milliseconds
 object SuperpairDataDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
-
-    // <editor-fold desc="Patterns">
-    private val instantFindNamePattern by ExperimentationTableApi.patternGroup.pattern(
-        "powerups.instantfind.name",
-        "Instant Find",
-    )
-
-    private val waitingMessagesPattern by ExperimentationTableApi.patternGroup.pattern(
-        "waiting.messages",
-        "Click any button!|Click a second button!|Next button is instantly rewarded!",
-    )
-    // </editor-fold>
 
     private data class SuperpairItem(val slotId: Int, val reward: String, val damage: Int)
     private data class FoundData(val item: SuperpairItem? = null, val first: SuperpairItem? = null, val second: SuperpairItem? = null)
@@ -70,7 +59,7 @@ object SuperpairDataDisplay {
                 posLabel = "Superpair Experimentation Data"
             )
         }
-        if (ExperimentationTableApi.currentExperiment == null) return
+        if (ExperimentationTableApi.currentExperimentTier == null) return
 
         if (display.isEmpty()) display = drawDisplay()
 
@@ -80,9 +69,7 @@ object SuperpairDataDisplay {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.superpairDisplay) return
-        if (ExperimentationTableApi.currentExperiment == null) return
-
-        val currentExperiment = ExperimentationTableApi.currentExperiment ?: return
+        val currentExperiment = ExperimentationTableApi.currentExperimentTier ?: return
 
         val item = event.item ?: return
         if (isOutOfBounds(event.slotId, currentExperiment) || item.displayName.removeColor() == "?") return
@@ -213,7 +200,7 @@ object SuperpairDataDisplay {
     }
 
     private fun drawDisplay() = buildList {
-        val currentExperiment = ExperimentationTableApi.currentExperiment ?: return emptyList<String>()
+        val currentExperiment = ExperimentationTableApi.currentExperimentTier ?: return emptyList<String>()
 
         add("§6Superpair Experimentation Data")
         add("")
@@ -224,31 +211,32 @@ object SuperpairDataDisplay {
         val pairs = found.entries.firstOrNull { it.key == FoundType.PAIR }?.value.orEmpty()
         val possiblePairs = calculatePossiblePairs(currentExperiment)
 
-        if (pairs.isNotEmpty()) add("§2Collected")
-        for (pair in pairs) {
-            val prefix = determinePrefix(pairs.indexOf(pair), pairs.lastIndex)
-            add(" $prefix §a${pair.first?.reward.orEmpty()}")
-        }
-        if (matches.isNotEmpty()) add("§eMatched")
-        for (match in matches) {
-            val prefix = determinePrefix(matches.indexOf(match), matches.lastIndex)
-            add(" $prefix §e${match.first?.reward.orEmpty()}")
-        }
-        if (powerups.isNotEmpty()) add("§bPowerUp")
-        for (powerup in powerups) {
-            val prefix = determinePrefix(powerups.indexOf(powerup), powerups.size - 1)
-            add(" $prefix §b${powerup.item?.reward.orEmpty()}")
-        }
-        val toAdd = mutableListOf<String>()
-        if (possiblePairs >= 1) toAdd.add("§ePairs - $possiblePairs")
-        if (2 - powerups.size >= 1) toAdd.add("§bPowerUps - ${2 - powerups.size}")
-        if (normals.isNotEmpty()) toAdd.add("§7Normals - ${normals.size}")
+        handleFoundDataList(pairs, "§2Collected")
+        handleFoundDataList(matches, "§eMatched")
+        handleFoundDataList(powerups, "§bPowerUp")
 
-        if (toAdd.isNotEmpty()) {
-            add("")
-            add("§4Not collected")
+        buildList {
+            if (possiblePairs >= 1) add("§ePairs - $possiblePairs")
+            if (2 - powerups.size >= 1) add("§bPowerUps - ${2 - powerups.size}")
+            if (normals.isNotEmpty()) add("§7Normals - ${normals.size}")
+            if (this.isNotEmpty()) {
+                add("")
+                add("§4Not collected")
+            }
+        }.forEach { displayLine ->
+            if (displayLine != this@buildList.last()) add(" ├ $displayLine")
+            else add(" └ $displayLine")
         }
-        for (string in toAdd) if (string != toAdd.last()) add(" ├ $string") else add(" └ $string")
+    }
+
+    private fun MutableList<String>.handleFoundDataList(sourceList: List<FoundData>, header: String) {
+        if (sourceList.isEmpty()) return
+        this.add(header)
+        val lastIndex = sourceList.lastIndex
+        for ((index, entry) in sourceList.withIndex()) {
+            val prefix = determinePrefix(index, lastIndex)
+            this.add(" $prefix ${entry.item?.reward.orEmpty()}")
+        }
     }
 
     private fun calculatePossiblePairs(currentExperiment: ExperimentTier) =
@@ -278,7 +266,7 @@ object SuperpairDataDisplay {
 
     private fun isReward(reward: String) = ExperimentationTableApi.rewardPattern.matches(reward) || isPowerUp(reward)
 
-    private fun isWaiting(itemName: String) = waitingMessagesPattern.matches(itemName)
+    private fun isWaiting(itemName: String) = ExperimentationTableApi.waitingMessagesPattern.matches(itemName)
 
     private fun clicksSinceSeparator(list: MutableMap<Int, SuperpairItem>): Int {
         val lastIndex = list.entries.indexOfLast { it.value == emptySuperpairItem }

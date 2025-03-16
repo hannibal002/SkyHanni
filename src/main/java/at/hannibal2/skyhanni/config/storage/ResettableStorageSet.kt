@@ -21,4 +21,20 @@ open class ResettableStorageSet {
                 }
             }
     }
+
+    open fun isEqualToDefault(): Boolean {
+        val default = this::class.createInstance()
+        // For every *mutable* property (var), check if its value on `this` is the same as the value from `default`.
+        return this::class.memberProperties
+            .filterIsInstance<KMutableProperty1<Any, Any?>>()
+            .all { prop ->
+                // Prop is declared as KMutableProperty1<Any, Any?>, but we know `this` is the same type at runtime.
+                try {
+                    prop.get(this) == prop.get(default)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    ErrorManager.skyHanniError("Failed to compare property ${prop.name} in ${this::class.simpleName}")
+                }
+            }
+    }
 }

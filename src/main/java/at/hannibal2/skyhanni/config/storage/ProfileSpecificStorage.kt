@@ -577,7 +577,7 @@ class ProfileSpecificStorage {
             var attemptsSince: Int = 0
 
             @Expose
-            var xpSince: Int = 0
+            var xpSince: Long = 0
         }
 
         @Expose

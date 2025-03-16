@@ -1,17 +1,20 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.experiments.RareSuperpairUncoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
@@ -22,30 +25,49 @@ import net.minecraft.entity.item.EntityArmorStand
 @SkyHanniModule
 object ExperimentationTableApi {
 
+    private val patternGroup = RepoPattern.group("enchanting.experiments")
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
-
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val inTable get() = inventoriesPattern.matches(openInventoryName())
 
-    val patternGroup = RepoPattern.group("enchanting.experiments")
-    var currentExperiment: ExperimentTier? = null
+    class ExperimentationDataSet(
+        var type: ExperimentTaskType? = null,
+        var tier: ExperimentTier? = null,
+        var enchantingXpGained: Long? = null,
+        var otherRewards: Map<NeuInternalName, Int>? = null,
+        var rareFoundFired: Boolean = false,
+    ) : ResettableStorageSet()
+    var currentData = ExperimentationDataSet()
+
+    val currentExperimentTier get() = currentData.tier
+
     val superpairInventory = InventoryDetector(
         openInventory = { name ->
-            currentExperiment = superpairsPattern.matchMatcher(name) {
+            currentData.tier = superpairsPattern.matchMatcher(name) {
                 ExperimentTier.byNameOrNone(group("experiment"))
             }
         },
     ) { name -> inventoriesPattern.matches(name) }
 
     // <editor-fold desc="Patterns">
-    /**
-     * REGEX-TEST: Superpairs (Metaphysical)
+    val instantFindNamePattern by patternGroup.pattern(
+        "powerups.instantfind.name",
+        "Instant Find",
+    )
+
+    val waitingMessagesPattern by patternGroup.pattern(
+        "waiting.messages",
+        "Click any button!|Click a second button!|Next button is instantly rewarded!",
+    )
+
+    /**     * REGEX-TEST: Superpairs (Metaphysical)
+
      */
     private val superpairsPattern by patternGroup.pattern(
         "superpairs",
         "Superpairs \\((?<experiment>\\w+)\\)",
-    )
 
+    )
     /**
      * REGEX-TEST: Gained +3 Clicks
      */
@@ -170,17 +192,36 @@ object ExperimentationTableApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onInventoryClosed(event: InventoryCloseEvent) {
-        currentExperiment = null
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!inTable) return currentData.reset()
+
+        updateTablePos()
+        fireUncoveredRare(event)
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!inTable) {
-            currentExperiment = null
-            return
-        }
+    private fun fireUncoveredRare(event: InventoryUpdatedEvent) {
+        if (currentData.isEqualToDefault() || currentData.rareFoundFired) return
 
+        if (!fireRareBookUncovered(event)) return
+
+        currentData.rareFoundFired = true
+    }
+
+    private fun fireRareBookUncovered(event: InventoryUpdatedEvent): Boolean {
+        for (lore in event.inventoryItems.map { it.value.getLore() }) {
+            val firstLine = lore.firstOrNull() ?: continue
+            if (!ultraRarePattern.matches(firstLine)) continue
+            val bookNameLine = lore.getOrNull(2) ?: continue
+            bookPattern.matchMatcher(bookNameLine) {
+                val enchant = group("enchant")
+                RareSuperpairUncoverEvent(enchant).post()
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun updateTablePos() {
         storage?.tablePos = EntityUtils.getEntities<EntityArmorStand>().find {
             it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
         }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
