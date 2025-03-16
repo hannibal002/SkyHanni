@@ -50,7 +50,7 @@ object ExperimentationTableApi {
     private val lastBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
     private val currentBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
     private var lastProcessedExperimentOverHash: Int = 0
-    private var currentData = ExperimentationDataSet()
+    private val currentData = ExperimentationDataSet()
 
     data class ExperimentationDataSet(
         var type: ExperimentTaskType? = null,
@@ -106,8 +106,7 @@ object ExperimentationTableApi {
     private val superpairsPattern by patternGroup.pattern(
         "superpairs",
         "Superpairs \\((?<experiment>\\w+)\\)",
-
-        )
+    )
 
     /**
      * REGEX-TEST: Gained +3 Clicks
@@ -401,7 +400,7 @@ object ExperimentationTableApi {
     }
 
     private fun fireUncoveredRare(event: InventoryUpdatedEvent) {
-        if (currentData.isEqualToDefault() || currentData.rareFoundFired) return
+        if (currentData.rareFoundFired) return
 
         if (!fireRareBookUncovered(event)) return
 
