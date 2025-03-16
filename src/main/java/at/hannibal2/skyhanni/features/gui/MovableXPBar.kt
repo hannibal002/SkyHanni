@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.transform
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MovableXPBar {
@@ -18,8 +19,8 @@ object MovableXPBar {
 
     private var post = false
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onRenderXPBar(event: RenderGameOverlayEvent.Pre) {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE || !isEnabled()) return
         post = true
         GlStateManager.pushMatrix()
@@ -31,8 +32,8 @@ object MovableXPBar {
         GuiEditManager.add(config.position, "XP Bar", 182 - 1, 5 - 1) // -1 since the editor for some reason add +1
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onRenderXPBar(event: RenderGameOverlayEvent.Post) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE || !post) return
         GlStateManager.popMatrix()
         post = false

@@ -31,8 +31,8 @@ object VisitorRewardWarning {
         if (!VisitorApi.inInventory) return
 
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
-        val refuseOfferSlot = event.gui.inventorySlots.getSlot(REFUSE_SLOT)
-        val acceptOfferSlot = event.gui.inventorySlots.getSlot(ACCEPT_SLOT)
+        val refuseOfferSlot = event.container.getSlot(REFUSE_SLOT)
+        val acceptOfferSlot = event.container.getSlot(ACCEPT_SLOT)
         val blockReason = visitor.blockReason ?: return
 
         if (blockReason.blockRefusing) {
