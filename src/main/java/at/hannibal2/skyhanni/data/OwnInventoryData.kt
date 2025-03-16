@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.client.C0EPacketClickWindow
@@ -112,7 +113,7 @@ object OwnInventoryData {
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        val item = Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return
+        val item = Minecraft.getMinecraft().thePlayer.getItemOnCursor() ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
         ignoreItem(500.milliseconds, internalNameOrNull)
     }

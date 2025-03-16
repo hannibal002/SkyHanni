@@ -101,7 +101,7 @@ class SkyblockGuideHighlightFeature private constructor(
             if (!isEnabled()) return
             if (activeObject == null) return
 
-            event.gui.inventorySlots.inventorySlots
+            event.container.inventorySlots
                 .filter { missing.contains(it.slotNumber) }
                 .forEach { it highlight LorenzColor.RED }
         }
