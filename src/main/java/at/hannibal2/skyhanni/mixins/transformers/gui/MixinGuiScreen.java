@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.data.model.TextInput;
+import at.hannibal2.skyhanni.features.misc.EmojiReplacer;
 import at.hannibal2.skyhanni.mixins.hooks.GuiScreenHookKt;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -33,6 +34,8 @@ public class MixinGuiScreen {
     @Inject(method = "handleKeyboardInput", at = @At("HEAD"), cancellable = true)
     public void handleKeyboardInput(CallbackInfo ci) {
         TextInput.Companion.onGuiInput(ci);
+
+        EmojiReplacer.INSTANCE.handleKeyboardInput();
     }
 
     @Redirect(method = "handleComponentClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;isShiftKeyDown()Z"))

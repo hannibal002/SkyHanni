@@ -4,9 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EmojiJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.renderer.texture.TextureManager
 import net.minecraft.util.ResourceLocation
+import org.lwjgl.input.Keyboard
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.Color
 
@@ -14,10 +18,12 @@ import org.lwjgl.util.Color
 object EmojiReplacer {
     private val config get() = SkyHanniMod.feature.gui
     private var emojiNameMap: Map<String, Int>? = null
+    private var reverseUnicodeToName: Map<String, String>? = null
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val emojiJson = event.getConstant<EmojiJson>("Emojis")
         emojiNameMap = emojiJson.emojiNames
+        reverseUnicodeToName = emojiJson.unicodeNames
     }
     private var stringIndex: Int = -1
     private var emojiEnd = -1
@@ -109,6 +115,42 @@ object EmojiReplacer {
 
     fun initializeRenderer(textureManager: TextureManager) {
         textureManager.bindTexture(emojiResource)
+    }
+
+    private fun anyEmojiStartWith(string: String): Boolean {
+        return reverseUnicodeToName?.any {
+            it.key.startsWith(string)
+        } ?: false
+    }
+
+    private fun emojisStartingWith(emojiList: List<String>, string: String): List<String> {
+        return emojiList.filter {
+            it.startsWith(string)
+        }
+    }
+
+    private fun getEmojiString(string: String): String {
+        val unicodeToName = reverseUnicodeToName ?: return ""
+        return ":${unicodeToName[string]}:"
+    }
+
+    fun handleKeyboardInput() {
+        val char = Keyboard.getEventCharacter()
+        val currentScreen = Minecraft.getMinecraft().currentScreen
+        if (currentScreen !is GuiChat) return
+        if (!anyEmojiStartWith(char.toString())) return
+        val unicodeMap = reverseUnicodeToName ?: return
+        var string = char.toString()
+        var startingWith = emojisStartingWith(unicodeMap.keys.toList(), string)
+        while (startingWith.isNotEmpty()) {
+            if (!Keyboard.next()) return
+            string += Keyboard.getEventCharacter()
+            startingWith = emojisStartingWith(startingWith, string)
+            if (startingWith.size == 1) {
+                (currentScreen as AccessorMixinGuiChat).inputField_skyhanni.writeText(getEmojiString(string))
+                return
+            }
+        }
     }
 
     fun isEnabled() = config.emojiReplace
