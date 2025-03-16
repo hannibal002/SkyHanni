@@ -177,7 +177,11 @@ object MiningEventTracker {
 
     private fun sendData(json: String) {
         val response = try {
-            ApiUtils.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
+            ApiUtils.postJSON(
+                "https://api.soopy.dev/skyblock/chevents/set",
+                json,
+                apiName = "Soopy Mining Events",
+            )
         } catch (e: IOException) {
             if (LorenzUtils.debug) {
                 ErrorManager.logErrorWithData(

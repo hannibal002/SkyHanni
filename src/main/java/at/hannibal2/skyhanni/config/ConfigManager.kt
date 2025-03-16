@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -161,7 +160,7 @@ class ConfigManager {
             println("2. Either add the Config Link.")
             println("3. Or add the name to ignoredMissingConfigLinks.")
             println("")
-            LorenzUtils.shutdownMinecraft("Missing Config Link")
+            PlatformUtils.shutdownMinecraft("Missing Config Link")
         }
     }
 
@@ -185,7 +184,7 @@ class ConfigManager {
                             run()
                         } catch (e: Throwable) {
                             logger.log(e.stackTraceToString())
-                            LorenzUtils.shutdownMinecraft("Config is corrupt inside development environment.")
+                            PlatformUtils.shutdownMinecraft("Config is corrupt inside development environment.")
                         }
                     } else {
                         run()
@@ -255,7 +254,7 @@ private fun getBackupFile(file: File): File {
 
     val directory = File(parent, "backup/$year/$month")
 
-    return File(directory, "$day-${SkyHanniMod.VERSION}-$fileName.json")
+    return File(directory, "$year-$month-$day-${SkyHanniMod.VERSION}-$fileName.json")
 }
 
 enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {

@@ -147,6 +147,7 @@ object UnknownLinesHandler {
             "reason" to reason,
             "Island" to LorenzUtils.skyBlockIsland,
             "Area" to HypixelData.skyBlockArea,
+            "Loaded Patterns" to CustomScoreboard.activePatterns.size,
             "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
             noStackTrace = true,
             betaOnly = true,

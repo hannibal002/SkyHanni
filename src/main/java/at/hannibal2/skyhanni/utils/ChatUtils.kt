@@ -12,19 +12,16 @@ import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.command
-import at.hannibal2.skyhanni.utils.chat.Text.hover
-import at.hannibal2.skyhanni.utils.chat.Text.onClick
-import at.hannibal2.skyhanni.utils.chat.Text.prefix
-import at.hannibal2.skyhanni.utils.chat.Text.send
-import at.hannibal2.skyhanni.utils.chat.Text.url
-import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.command
+import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.prefix
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.chat.TextHelper.url
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
-import net.minecraft.util.ChatComponentText
-import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import java.util.LinkedList
 import java.util.Queue
@@ -90,12 +87,13 @@ object ChatUtils {
         prefixColor: String = "§e",
         replaceSameMessage: Boolean = false,
         onlySendOnce: Boolean = false,
+        messageId: Int? = null,
     ) {
 
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce, messageId = messageId)
         } else {
-            internalChat(message, replaceSameMessage, onlySendOnce)
+            internalChat(message, replaceSameMessage, onlySendOnce, messageId = messageId)
         }
     }
 
@@ -105,8 +103,9 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean,
         onlySendOnce: Boolean = false,
+        messageId: Int? = null,
     ): Boolean {
-        val text = ChatComponentText(message)
+        val text = message.asComponent()
         if (onlySendOnce) {
             if (message in messagesThatAreOnlySentOnce) {
                 return false
@@ -114,8 +113,8 @@ object ChatUtils {
             messagesThatAreOnlySentOnce.add(message)
         }
 
-        return if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(message))
+        return if (replaceSameMessage || messageId != null) {
+            text.send(messageId ?: getUniqueMessageIdForString(message))
             chat(text, false)
         } else {
             chat(text)
@@ -123,14 +122,10 @@ object ChatUtils {
     }
 
     fun chat(message: IChatComponent, send: Boolean = true): Boolean {
-        val formattedMessage = message.getFormattedTextCompat()
+        val formattedMessage = message.formattedText
         log.log(formattedMessage)
 
         val minecraft = Minecraft.getMinecraft()
-        if (minecraft == null) {
-            LorenzUtils.consoleLog(formattedMessage.removeColor())
-            return false
-        }
 
         val thePlayer = minecraft.thePlayer
         if (thePlayer == null) {
@@ -138,7 +133,11 @@ object ChatUtils {
             return false
         }
 
+        //#if FORGE
         if (send) thePlayer.addChatMessage(message)
+        //#else
+        //$$ if (send) thePlayer.sendMessage(message, false)
+        //#endif
         return true
     }
 
@@ -167,7 +166,7 @@ object ChatUtils {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
         val rawText = msgPrefix + message
-        val text = Text.text(rawText) {
+        val text = TextHelper.text(rawText) {
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
         }
@@ -209,8 +208,8 @@ object ChatUtils {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
         chat(
-            Text.text(msgPrefix + message) {
-                this.hover = Text.multiline(hover)
+            TextHelper.text(msgPrefix + message) {
+                this.hover = TextHelper.multiline(hover)
                 if (command != null) {
                     this.command = command
                 }
@@ -239,7 +238,7 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
         chat(
-            Text.text(msgPrefix + message) {
+            TextHelper.text(msgPrefix + message) {
                 this.url = url
                 this.hover = "$prefixColor$hover".asComponent()
             },
@@ -256,12 +255,12 @@ object ChatUtils {
      * @see CHAT_PREFIX
      */
     fun multiComponentMessage(
-        components: List<ChatComponentText>,
+        components: List<IChatComponent>,
         prefix: Boolean = true,
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(Text.join(components).prefix(msgPrefix))
+        chat(TextHelper.join(components).prefix(msgPrefix))
     }
 
     private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
@@ -340,8 +339,17 @@ object ChatUtils {
     }
 
     fun sendMessageToServer(message: String) {
+        if (canSendInstantly()) {
+            Minecraft.getMinecraft().thePlayer?.let {
+                it.sendChatMessage(message)
+                lastMessageSent = SimpleTimeMark.now()
+                return
+            }
+        }
         sendQueue.add(message)
     }
+
+    private fun canSendInstantly() = sendQueue.isEmpty() && lastMessageSent.passedSince() > messageDelay
 
     fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
         it.isNotEmpty()
@@ -363,12 +371,8 @@ object ChatUtils {
         )
     }
 
-    fun IChatComponent.changeColor(color: LorenzColor): IChatComponent {
-        chatStyle = ChatStyle().also {
-            it.color = color.toChatFormatting()
-        }
-        return this
-    }
+    fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
+        this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
 
     fun clickToActionOrDisable(
         message: String,
@@ -392,8 +396,15 @@ object ChatUtils {
         )
     }
 
-    val ChatLine.message get() = chatComponent.formattedText.stripHypixelMessage()
-
+    //#if MC < 1.16
+    val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
     fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
+    //#elseif MC < 1.21
+    //$$ val GuiMessage<Component>.chatMessage get() = message.formattedTextCompat().stripHypixelMessage()
+    //$$ fun GuiMessage<Component>.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime).ticks
+    //#else
+    //$$ val ChatHudLine.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
+    //$$ fun ChatHudLine.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
+    //#endif
 
 }

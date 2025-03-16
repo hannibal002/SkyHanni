@@ -50,7 +50,7 @@ object HypixelLocationApi {
     var isGuest: Boolean = false
         private set
 
-    val config = SkyHanniMod.feature.dev.hypixelModApi
+    val config get() = SkyHanniMod.feature.dev.hypixelModApi
 
     private val logger = LorenzLogger("debug/hypixel_api")
 
