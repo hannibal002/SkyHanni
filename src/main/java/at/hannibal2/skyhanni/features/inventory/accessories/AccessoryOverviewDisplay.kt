@@ -149,8 +149,8 @@ object AccessoryOverviewDisplay {
         addAll(mainContent)
     }
 
-    private fun MutableList<Renderable>.getToggleContainer() = Renderable.verticalContainer(
-        buildList{
+    private fun getToggleContainer() = Renderable.verticalContainer(
+        buildList {
             addTabToggle()
             addTabSpecificToggles()
         }
