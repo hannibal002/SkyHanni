@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatPercentage
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -143,8 +142,20 @@ object DragonFeatures {
     private var endPlace = 0
 
     private var currentDamage = 0.0
+        set(value) {
+            if (field != value) display = null
+            field = value
+        }
     private var currentTopDamage = 0.0
+        set(value) {
+            if (field != value) display = null
+            field = value
+        }
     private var currentPlace: Int? = null
+        set(value) {
+            if (field != value) display = null
+            field = value
+        }
     private var widgetActive = false
     private var egg = true
 
@@ -163,11 +174,10 @@ object DragonFeatures {
         currentPlace = null
         widgetActive = false
         yourEyes = 0
+        display = null
     }
 
-    private fun enable() = LorenzUtils.inSkyBlock && IslandType.THE_END.isInIsland()
-
-    private fun enableDisplay() = enable() && config.display
+    private fun displayIsEnabled() = config.display && dragonSpawned
 
     private fun dragonWeightMap(place: Int) = when (place) {
         -1 -> 10
@@ -210,9 +220,8 @@ object DragonFeatures {
             ) + if (zealots > 100) 100 else zealots
 
     @Suppress("CyclomaticComplexMethod")
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!enable()) return
         val message = event.message
         if (!config.chat && !config.display && !config.superiorNotify && !configProtector) return
         dragonSpawn.matchMatcher(message) {
@@ -295,24 +304,23 @@ object DragonFeatures {
         ChatUtils.chat("§f                §r§eYour Weight: §r§a${weight.roundTo(0).addSeparators()}")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onScoreBoard(event: ScoreboardUpdateEvent) {
-        if (!(enableDisplay())) return
-        val index = event.full.indexOfFirst { scoreDragon.matches(it) }
+        val index = event.new.indexOfFirst { scoreDragon.matches(it) }
         if (index == -1) return
         if (egg) {
             dragonSpawned = true
         }
-        scoreDamage.matchMatcher(event.full[index + 1]) {
+        scoreDamage.matchMatcher(event.new[index + 1]) {
             currentDamage = this.group("Damage").replace(",", "").toDouble()
         }
 
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onTabList(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.DRAGON)) return
-        if (!(enableDisplay() && dragonSpawned)) return
+        if (!displayIsEnabled()) return
         widgetActive = true
         loop@ for (i in 1 until event.lines.size) {
             tabDamage.matchMatcher(event.lines[i]) {
@@ -334,13 +342,13 @@ object DragonFeatures {
 
     private val widgetErrorGUI = listOf(Renderable.string("§cDragon Widget is disabled!"))
 
-    @HandleEvent
+    private var display: List<Renderable>? = null
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onRender(event: GuiRenderEvent) {
-        if (!(enableDisplay() && dragonSpawned)) return
-        config.displayPosition.renderRenderables(
-            if (!widgetActive) widgetErrorGUI else display(),
-            posLabel = "Dragon Weight",
-        )
+        if (!displayIsEnabled()) return
+        val display = display ?: (if (!widgetActive) widgetErrorGUI else display()).also { display = it }
+        config.displayPosition.renderRenderables(display, posLabel = "Dragon Weight")
     }
 
     private fun display() = listOf(
