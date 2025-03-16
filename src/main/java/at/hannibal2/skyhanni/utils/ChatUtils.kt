@@ -89,7 +89,6 @@ object ChatUtils {
         onlySendOnce: Boolean = false,
         messageId: Int? = null,
     ) {
-
         if (prefix) {
             internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce, messageId = messageId)
         } else {

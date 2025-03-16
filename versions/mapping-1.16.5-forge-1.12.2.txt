@@ -35,6 +35,7 @@ net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNe
 net.minecraft.client.gui.components.ChatComponent allMessages chatLines
 net.minecraft.client.gui.components.ChatComponent trimmedMessages drawnChatLines
 net.minecraft.client.gui.components.ChatComponent rescaleChat() refreshChat()
+net.minecraft.client.gui.components.ChatComponent getWidth() getChatWidth()
 
 net.minecraft.client.gui.screens.ChatScreen net.minecraft.client.gui.GuiChat
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
@@ -118,8 +119,12 @@ net.minecraft.nbt.ListTag getString() getStringTagAt()
 net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent
 net.minecraft.network.chat.Style net.minecraft.util.text.Style
 net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
+net.minecraft.network.chat.BaseComponent net.minecraft.util.text.TextComponentBase
 
 net.minecraft.network.chat.Component copy() createCopy()
+
+net.minecraft.network.chat.BaseComponent append() appendSibling()
+net.minecraft.network.chat.MutableComponent append() appendSibling()
 
 net.minecraft.network.chat.Style withColor() setColor()
 

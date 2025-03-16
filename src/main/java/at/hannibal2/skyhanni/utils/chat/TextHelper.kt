@@ -9,6 +9,8 @@ import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 //#if MC < 1.21
 import net.minecraft.util.ChatComponentText
+//#else
+//$$ import net.minecraft.text.MutableText
 //#endif
 
 object TextHelper {
@@ -23,7 +25,7 @@ object TextHelper {
     //#if MC < 1.21
     fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
     //#else
-    //$$ fun String.asComponent(init: Text.() -> Unit = {}): Text = Text.of(this).also(init)
+    //$$ fun String.asComponent(init: Text.() -> Unit = {}): MutableText = Text.of(this).also(init) as MutableText
     //#endif
 
     fun multiline(vararg lines: Any?) = join(*lines, separator = NEWLINE)
