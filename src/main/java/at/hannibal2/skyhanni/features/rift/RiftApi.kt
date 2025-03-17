@@ -5,7 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -59,6 +60,22 @@ object RiftApi {
         inColosseum = event.area == "Colosseum"
     }
 
+    private val temporalPillars = mutableListOf<Mob>()
+
+    @HandleEvent
+    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+        if (event.mob.name == "Temporal Pillar") {
+            temporalPillars.add(event.mob)
+        }
+    }
+
+    @HandleEvent
+    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+        if (event.mob.name == "Temporal Pillar") {
+            temporalPillars.remove(event.mob)
+        }
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.temporalPillarDodge) {
@@ -67,17 +84,19 @@ object RiftApi {
             }
             return
         }
-        val temporalPillar = MobData.skyblockMobs.find { it.name == "Temporal Pillar" }
 
         IslandGraphs.disabledNodesReason?.let {
             IslandGraphs.enableAllNodes()
-            if (temporalPillar == null) {
+            if (temporalPillars.isEmpty()) {
                 IslandGraphs.update(force = true)
             }
         }
-        temporalPillar?.let {
-            val location = it.baseEntity.getLorenzVec()
-            IslandGraphs.disableNodes("Temporal Pillar", location, 7.0)
+
+        if (temporalPillars.isNotEmpty()) {
+            for (mob in temporalPillars) {
+                val location = mob.baseEntity.getLorenzVec()
+                IslandGraphs.disableNodes("Temporal Pillar", location, 7.0)
+            }
             IslandGraphs.update(force = true)
         }
 
