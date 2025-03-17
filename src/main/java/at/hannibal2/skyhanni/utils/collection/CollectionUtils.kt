@@ -23,16 +23,6 @@ object CollectionUtils {
         return this
     }
 
-    inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
-        repeat(amount) { this.poll() ?: return this }
-        return this
-    }
-
-    inline fun <reified E, reified K, reified L : MutableCollection<K>> Queue<E>.drainTo(list: L, action: (E) -> K): L {
-        while (true) list.add(action(this.poll() ?: break))
-        return list
-    }
-
     inline fun <reified E, reified L : MutableCollection<E>> Queue<E>.drainTo(list: L): L {
         while (true) list.add(this.poll() ?: break)
         return list
@@ -294,23 +284,17 @@ object CollectionUtils {
     // TODO move to RenderableUtils
     fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
         if (this.isEmpty()) return xSpace
-        val off = RenderableUtils.calculateTableXOffsets(this as List<List<Renderable?>>, 0)
+        val off = RenderableUtils.calculateTableXOffsets(this, 0)
         val xLength = off.size - 1
         val emptySpace = xSpace - off.last()
-        if (emptySpace < 0) {
-            //    throw IllegalArgumentException("Not enough space for content")
-        }
         return emptySpace / (xLength - 1)
     }
 
     fun Collection<Collection<Renderable>>.tableStretchYPadding(ySpace: Int): Int {
         if (this.isEmpty()) return ySpace
-        val off = RenderableUtils.calculateTableYOffsets(this as List<List<Renderable?>>, 0)
+        val off = RenderableUtils.calculateTableYOffsets(this, 0)
         val yLength = off.size - 1
         val emptySpace = ySpace - off.last()
-        if (emptySpace < 0) {
-            //    throw IllegalArgumentException("Not enough space for content")
-        }
         return emptySpace / (yLength - 1)
     }
 
@@ -365,6 +349,7 @@ object CollectionUtils {
     }
 
     fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
+        @Suppress("UNCHECKED_CAST")
         return filterKeys { it != null } as Map<K, V>
     }
 

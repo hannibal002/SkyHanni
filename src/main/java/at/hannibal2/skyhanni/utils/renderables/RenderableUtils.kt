@@ -41,13 +41,13 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute x position of the columns in a table*/
-    fun calculateTableXOffsets(content: Collection<List<Renderable?>>, xPadding: Int) = run {
+    fun calculateTableXOffsets(content: Collection<Collection<Renderable?>>, xPadding: Int) = run {
         var buffer = 0
         var index = 0
         buildList {
             add(0)
             while (true) {
-                buffer += content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                buffer += content.map { it.toList().getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
                     it?.width ?: 0
                 }?.let { it + xPadding } ?: break
                 add(buffer)
@@ -60,7 +60,7 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute y position of the rows in a table*/
-    fun calculateTableYOffsets(content: Collection<List<Renderable?>>, yPadding: Int) = run {
+    fun calculateTableYOffsets(content: Collection<Collection<Renderable?>>, yPadding: Int) = run {
         var buffer = 0
         listOf(0) + (
             content.takeIf { it.isNotEmpty() }?.map { row ->
