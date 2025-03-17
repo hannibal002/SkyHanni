@@ -23,7 +23,7 @@ class TimiteConfig {
     var timiteTracker: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Only Show While Holding", desc = "Only shows the tracker while holding the Timite pickaxes or the time gun.")
+    @ConfigOption(name = "Only Show While Holding", desc = "Only shows the tracker while holding the Timite pickaxes or the Time Gun.")
     @ConfigEditorBoolean
     var timiteOnlyShowWhileHolding: Boolean = false
 
