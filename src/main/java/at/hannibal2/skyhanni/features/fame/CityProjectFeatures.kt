@@ -16,8 +16,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -34,12 +33,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -55,7 +53,7 @@ object CityProjectFeatures {
 
     private val config get() = SkyHanniMod.feature.event.cityProject
 
-    private var display = emptyList<Renderable>()
+    private var display = emptyList<List<Any>>()
     private var inInventory = false
     private var lastReminderSend = SimpleTimeMark.farPast()
 
@@ -160,45 +158,45 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildList(materials: MutableMap<NeuInternalName, Int>) = buildList {
-        addString("§7City Project Materials")
+    private fun buildList(materials: MutableMap<NeuInternalName, Int>) = buildList<List<Any>> {
+        addAsSingletonList("§7City Project Materials")
 
         if (materials.isEmpty()) {
-            addString("§cNo Materials to contribute.")
+            addAsSingletonList("§cNo Materials to contribute.")
             return@buildList
         }
 
         for ((internalName, amount) in materials) {
             val stack = internalName.getItemStack()
             val name = internalName.repoItemName
-            addLine {
-                addString(" §7- ")
-                addItemStack(stack)
+            val list = mutableListOf<Any>()
+            list.add(" §7- ")
+            list.add(stack)
 
-                add(
-                    Renderable.optionalLink(
-                        "$name §ex${amount.addSeparators()}",
-                        {
-                            if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                                SignUtils.setTextIntoSign("$amount")
-                            } else {
-                                BazaarApi.searchForBazaarItem(name, amount)
-                            }
-                        },
-                    ) { inInventory && !NeuItems.neuHasFocus() },
-                )
+            list.add(
+                Renderable.optionalLink(
+                    "$name §ex${amount.addSeparators()}",
+                    {
+                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                            SignUtils.setTextIntoSign("$amount")
+                        } else {
+                            BazaarApi.searchForBazaarItem(name, amount)
+                        }
+                    },
+                ) { inInventory && !NeuItems.neuHasFocus() },
+            )
 
-                val price = internalName.getPrice() * amount
-                val format = price.shortFormat()
-                addString(" §7(§6$format§7)")
-            }
+            val price = internalName.getPrice() * amount
+            val format = price.shortFormat()
+            list.add(" §7(§6$format§7)")
+            add(list)
         }
     }
 
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
         val lore = item.getLore()
-        val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } == true
+        val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
         if (completed) return
         // TODO: Refactor this loop to not have so many jumps
         @Suppress("LoopWithTooManyJumpStatements")
@@ -222,7 +220,7 @@ object CityProjectFeatures {
         if (!config.showMaterials) return
         if (!inInventory) return
 
-        config.pos.renderRenderables(display, posLabel = "City Project Materials")
+        config.pos.renderStringsAndItems(display, posLabel = "City Project Materials")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
