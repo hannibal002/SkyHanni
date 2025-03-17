@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -42,7 +42,7 @@ object VoltHighlighter {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onArmorChange(event: EntityEquipmentChangeEvent<Entity>) {
         if (!config.voltWarning) return
-        val player = Minecraft.getMinecraft().thePlayer ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
         if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
             event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
         ) {
