@@ -1,5 +1,6 @@
 
-net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent directlyContainedText() getUnformattedText() at.hannibal2.skyhanni.utils.compat.directlyContainedText
+net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent unformattedTextForChatCompat() getUnformattedComponentText() at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
+net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent unformattedTextCompat() getUnformattedText() at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent formattedTextCompat() getFormattedText() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.SPacketScoreboardObjective displayName.formattedTextCompat() getObjectiveValue() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.formattedTextCompat() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.formattedTextCompat

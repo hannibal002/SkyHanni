@@ -127,6 +127,9 @@ net.minecraft.network.chat.BaseComponent append() appendSibling()
 net.minecraft.network.chat.MutableComponent append() appendSibling()
 
 net.minecraft.network.chat.Style withColor() setColor()
+net.minecraft.network.chat.Style withItalic() setItalic()
+net.minecraft.network.chat.Style withBold() setBold()
+net.minecraft.network.chat.Style applyTo() setParentStyle()
 
 net.minecraft.network.protocol.Packet net.minecraft.network.Packet
 
