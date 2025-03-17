@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -71,7 +71,7 @@ object RiftTimer {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !RiftApi.inRiftRace) return
         if (!event.isMod(5)) return
-        val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")
+        val newTime = TimeUtils.getDuration(MinecraftCompat.localPlayer.experienceLevel.toString() + " s")
         currentTime = newTime
         update()
     }

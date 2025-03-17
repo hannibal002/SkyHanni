@@ -193,9 +193,6 @@ object CollectionTracker {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
-        thePlayer.worldObj ?: return
-
         compareInventory()
         updateGain()
     }

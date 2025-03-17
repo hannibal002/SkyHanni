@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
@@ -55,7 +55,7 @@ object FireVeilWandParticles {
         if (lastClick.passedSince() > 5.5.seconds) return
 
         val color = config.displayColor.toSpecialColor()
-        RenderUtils.drawCircle(Minecraft.getMinecraft().thePlayer, event.partialTicks, 3.5, color)
+        RenderUtils.drawCircle(MinecraftCompat.localPlayer, event.partialTicks, 3.5, color)
     }
 
     @HandleEvent

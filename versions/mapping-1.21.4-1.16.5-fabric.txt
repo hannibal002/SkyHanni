@@ -10,3 +10,4 @@ net.minecraft.entity.Entity getId() getEntityId()
 net.minecraft.entity.decoration.ArmorStandEntity shouldShowBasePlate().not() shouldHideBasePlate()
 
 net.minecraft.item.ItemStack getName() toHoverableText()
+net.minecraft.item.ItemStack getComponents() getTag()

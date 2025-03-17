@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 @SkyHanniModule
 object InWaterDisplay {
@@ -17,7 +17,7 @@ object InWaterDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        val text = "§7In Water: " + if (Minecraft.getMinecraft().thePlayer.isInWater) "§aTrue" else "§cFalse"
+        val text = "§7In Water: " + if (MinecraftCompat.localPlayer.isInWater) "§aTrue" else "§cFalse"
         config.inWaterPosition.renderStrings(listOf(text), posLabel = "In Water Display")
     }
 
