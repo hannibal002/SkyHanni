@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class DragonConfig {
     @Expose
-    @ConfigOption(name = "Superior Notification", desc = "Notifies you with an Title that an superior dragon spawned.")
+    @ConfigOption(name = "Superior Notification", desc = "Notifies you with a title that a superior dragon spawned.")
     @ConfigEditorBoolean
     @FeatureToggle
     var superiorNotify: Boolean = true
@@ -17,7 +17,8 @@ class DragonConfig {
     @Expose
     @ConfigOption(
         name = "Weight HUD",
-        desc = "Shows your current dragon weight on the HUD and if hovered shows the breakdown. " +
+        desc = "Shows your current dragon/protector weight on the HUD during the dragon/protector fight. " +
+            "Hover over the HUD to show a breakdown. " +
             "The dragon widget needs to be enabled for this to work.",
     )
     @ConfigEditorBoolean
