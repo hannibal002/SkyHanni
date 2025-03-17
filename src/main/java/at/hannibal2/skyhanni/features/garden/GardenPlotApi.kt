@@ -257,9 +257,6 @@ object GardenPlotApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        // idk if it's possible that calculateCurrentPlot returns null even tho it shouldn't actually be null,
-        // which would lead to wrong PlotSwitchEvent posts
-
         val actualCurrentPlot = calculateCurrentPlot()
 
         if (actualCurrentPlot == currentPlot) return
@@ -280,11 +277,6 @@ object GardenPlotApi {
 
         PlotSwitchEvent(previousPlot, null).post()
     }
-
-//     @HandleEvent
-//     fun onPlotChange(event: PlotSwitchEvent) {
-//         println("PlotSwitchEvent triggered: previousPlot: ${event.previousPlot?.name}, newPlot: ${event.newPlot?.name}")
-//     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
