@@ -370,6 +370,7 @@ net.minecraft.world.item.enchantment.Enchantments net.minecraft.init.Enchantment
 
 net.minecraft.world.item.enchantment.Enchantments ALL_DAMAGE_PROTECTION PROTECTION
 
+net.minecraft.world.level.Level net.minecraft.world.World
 net.minecraft.world.level.Level getEntity() getEntityByID()
 net.minecraft.world.level.Level getBlockEntity() getTileEntity()
 
@@ -385,6 +386,11 @@ net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 net.minecraft.world.level.block.entity.SkullBlockEntity net.minecraft.tileentity.TileEntitySkull
 
 net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
+
+net.minecraft.world.level.block.state.properties.IntegerProperty net.minecraft.block.properties.PropertyInteger
+net.minecraft.world.level.block.state.properties.EnumProperty net.minecraft.block.properties.PropertyEnum
+net.minecraft.world.level.block.state.properties.BooleanProperty net.minecraft.block.properties.PropertyBool
+net.minecraft.world.level.block.state.properties.DirectionProperty net.minecraft.block.properties.PropertyDirection
 
 net.minecraft.world.phys.Vec3 net.minecraft.util.math.Vec3d
 
