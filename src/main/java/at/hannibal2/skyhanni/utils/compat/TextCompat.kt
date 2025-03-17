@@ -144,9 +144,9 @@ fun IChatComponent.appendComponent(component: IChatComponent): IChatComponent =
 
 fun addChatMessageToChat(message: IChatComponent) {
     //#if FORGE
-    MinecraftCompat.localPlayer.addChatMessage(message)
+    Minecraft.getMinecraft().thePlayer.addChatMessage(message)
     //#else
-    //$$ MinecraftCompat.localPlayer.sendMessage(message, false)
+    //$$ MinecraftClient.getInstance().player?.sendMessage(message, false)
     //#endif
 }
 
