@@ -6,6 +6,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
 import net.minecraft.tileentity.TileEntitySkull
+import net.minecraft.util.BlockPos
 
 object BlockUtils {
 
@@ -39,4 +40,30 @@ object BlockUtils {
         MinecraftCompat.localPlayer.lookVec.toLorenzVec(),
         distance,
     )
+
+    fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
+        val from = center.add(-distance, -distance, -distance).toBlockPos()
+        val to = center.add(distance, distance, distance).toBlockPos()
+        return BlockPos.getAllInBox(from, to)
+    }
+
+    fun nearbyBlocks(
+        center: LorenzVec,
+        distance: Int,
+        radius: Int = distance,
+        condition: (IBlockState) -> Boolean,
+    ): Map<LorenzVec, IBlockState> = nearbyBlocks(center, distance).mapNotNull {
+        val loc = it.toLorenzVec()
+        val state = loc.getBlockStateAt()
+        if (condition(state) && center.distance(loc) <= radius) {
+            loc to state
+        } else null
+    }.toMap()
+
+    fun nearbyBlocks(
+        center: LorenzVec,
+        distance: Int,
+        radius: Int = distance,
+        filter: Block,
+    ): Map<LorenzVec, IBlockState> = nearbyBlocks(center, distance, radius, condition = { it.block == filter })
 }
