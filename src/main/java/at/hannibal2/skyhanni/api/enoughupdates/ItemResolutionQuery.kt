@@ -23,6 +23,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.regex.Matcher
+
 //#if MC > 1.21
 //$$ import net.minecraft.component.ComponentMap
 //#endif
@@ -32,6 +33,7 @@ class ItemResolutionQuery {
 
     //#if MC < 1.21
     private var compound: NBTTagCompound? = null
+
     //#else
     //$$ private var compound: ComponentMap? = null
     //#endif

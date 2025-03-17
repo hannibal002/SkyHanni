@@ -8,6 +8,7 @@ import net.minecraft.inventory.Container
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+
 //#if FABRIC
 //$$ import net.minecraft.screen.slot.SlotActionType
 //#endif
@@ -62,7 +63,6 @@ val GuiChest.container: Container
 //#else
 //$$ get() = this.screenHandler
 //#endif
-
 
 object InventoryCompat {
 
