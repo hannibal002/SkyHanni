@@ -55,7 +55,7 @@ object MetalDetectorSolver {
     private val config get() = SkyHanniMod.feature.mining.metalDetector.metalDetectorSolver
 
     private var chestLocations: List<LorenzVec> = emptyList()
-    private var predictedChestLocations: MutableList<LorenzVec> = mutableListOf()
+    private val predictedChestLocations: MutableList<LorenzVec> = mutableListOf()
     private var baseCoordinates: LorenzVec? = null
     private var ignoreLocation: LorenzVec? = null
     private var lastSearchedForBase: SimpleTimeMark = SimpleTimeMark.farPast()
