@@ -1,18 +1,25 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.CONFIG_VERSION
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils.asIntOrNull
+import at.hannibal2.skyhanni.utils.json.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
+/** Used to define a move */
+@Suppress("unused")
+val CONFIG_MOVE_VERSION: Int = CONFIG_VERSION + 1
+
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    const val CONFIG_VERSION = 71
+    val CONFIG_VERSION = "@CONFIG_VERSION@".toInt()
+
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -44,12 +51,48 @@ object ConfigUpdaterMigrator {
             move(since, path, path, transform)
         }
 
+        fun add(since: Int, path: String, value: () -> JsonElement) {
+            if (since <= oldVersion) {
+                logger.log("Skipping add of $value to $path ($since <= $oldVersion)")
+                return
+            }
+            if (since > CONFIG_VERSION) {
+                error("Illegally new version $since > $CONFIG_VERSION")
+            }
+            if (since > oldVersion + 1) {
+                logger.log("Skipping add of $value to $path (will be done in another pass)")
+                return
+            }
+            val np = path.split(".")
+            if (np.first().startsWith("#")) {
+                val realPrefixes = dynamicPrefix[np.first()]
+                if (realPrefixes == null) {
+                    logger.log("Could not resolve dynamic prefix $path")
+                    return
+                }
+                for (realPrefix in realPrefixes) {
+                    add(since, "$realPrefix.${path.substringAfter('.')}", value)
+                    return
+                }
+            }
+            val newParentElement = new.at(np.dropLast(1), true)
+            if (newParentElement !is JsonObject) {
+                logger.log(
+                    "Skipping add of $value to $path, since another element already inhabits that path"
+                )
+                return
+            }
+            newParentElement.add(np.last(), value())
+            logger.log("Added element to $path")
+            return
+        }
+
         fun move(since: Int, oldPath: String, newPath: String, transform: (JsonElement) -> JsonElement = { it }) {
             if (since <= oldVersion) {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
                 return
             }
-            if (since > CONFIG_VERSION) {
+            if (!PlatformUtils.isDevEnvironment && since > CONFIG_VERSION) {
                 error("Illegally new version $since > $CONFIG_VERSION")
             }
             if (since > oldVersion + 1) {
@@ -69,7 +112,7 @@ object ConfigUpdaterMigrator {
                     move(
                         since,
                         "$realPrefix.${oldPath.substringAfter('.')}",
-                        "$realPrefix.${newPath.substringAfter('.')}", transform
+                        "$realPrefix.${newPath.substringAfter('.')}", transform,
                     )
                     return
                 }
@@ -83,7 +126,7 @@ object ConfigUpdaterMigrator {
             if (newParentElement !is JsonObject) {
                 logger.log(
                     "Catastrophic: element at path $old could not be relocated to $new, " +
-                        "since another element already inhabits that path"
+                        "since another element already inhabits that path",
                 )
                 return
             }
@@ -118,8 +161,13 @@ object ConfigUpdaterMigrator {
             config.add("lastVersion", JsonPrimitive(CONFIG_VERSION))
             return config
         }
-        if (lastVersion == CONFIG_VERSION) return config
-        return (lastVersion until CONFIG_VERSION).fold(config) { accumulator, i ->
+        val newVersion = if (PlatformUtils.isDevEnvironment) {
+            CONFIG_VERSION + 1
+        } else {
+            if (lastVersion == CONFIG_VERSION) return config
+            CONFIG_VERSION
+        }
+        return (lastVersion until newVersion).fold(config) { accumulator, i ->
             logger.log("Starting config transformation from $i to ${i + 1}")
             val storage = accumulator["storage"]?.asJsonObject
             val dynamicPrefix: Map<String, List<String>> = mapOf(
@@ -138,9 +186,11 @@ object ConfigUpdaterMigrator {
             val migration = ConfigFixEvent(
                 accumulator,
                 JsonObject().also {
-                    it.add("lastVersion", JsonPrimitive(i + 1))
+                    if (i + 1 <= CONFIG_VERSION) {
+                        it.add("lastVersion", JsonPrimitive(i + 1))
+                    }
                 },
-                i, 0, dynamicPrefix
+                i, 0, dynamicPrefix,
             ).also { it.post() }
             logger.log("Transformations scheduled: ${migration.new}")
             val mergesPerformed = merge(migration.old, migration.new)

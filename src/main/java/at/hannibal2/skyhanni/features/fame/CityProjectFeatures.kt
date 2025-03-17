@@ -13,17 +13,18 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -34,9 +35,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -44,6 +45,8 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -71,7 +74,7 @@ object CityProjectFeatures {
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (ReminderUtils.isBusy()) return
 
-        if (LorenzUtils.skyBlockArea == "Community Center") return
+        if (IslandAreas.currentAreaName == "Community Center") return
 
         playerSpecific.nextCityProjectParticipationTime.let {
             if (it.isFarPast() || it.isInFuture()) return
@@ -82,12 +85,12 @@ object CityProjectFeatures {
         ChatUtils.clickToActionOrDisable(
             "Daily City Project Reminder!",
             config::dailyReminder,
-            actionName = "warp to Hub",
+            actionName = "warp to Elizabeth",
             action = {
-                HypixelCommands.warp("hub")
+                HypixelCommands.warp("elizabeth")
                 EntityMovementData.onNextTeleport(IslandType.HUB) {
                     IslandGraphs.pathFind(
-                        LorenzVec(9.3, 72.0, -103.4),
+                        LorenzVec(-1.7, 72.0, -102.0),
                         "§aCity Project",
                         condition = { config.dailyReminder },
                     )
@@ -112,7 +115,7 @@ object CityProjectFeatures {
             // internal name -> amount
             val materials = mutableMapOf<NeuInternalName, Int>()
             for ((_, item) in event.inventoryItems) {
-                if (item.name != "§eContribute this component!") continue
+                if (item.displayName != "§eContribute this component!") continue
                 fetchMaterials(item, materials)
             }
 
@@ -129,14 +132,20 @@ object CityProjectFeatures {
                 if (completed) continue
                 contributeAgainPattern.firstMatcher(lore) {
                     val rawTime = group("time")
-                    if (!rawTime.contains("Soon!")) return
-                    val duration = TimeUtils.getDuration(rawTime)
+                    val duration = if (rawTime.contains("Soon!")) {
+                        5.seconds
+                    } else {
+                        // hypixel rounds down to the next full minute, it shows "1m" when it is in fact 1-2 minutes, and "0m" for the last 60s
+                        TimeUtils.getDuration(rawTime).let {
+                            if (it < 1.hours) it + 1.minutes else it
+                        }
+                    }
                     val endTime = now + duration
                     if (endTime < nextTime) {
                         nextTime = endTime
                     }
                 }
-                if (item.name != "§eContribute this component!") continue
+                if (item.displayName != "§eContribute this component!") continue
                 nextTime = now
             }
             ProfileStorageData.playerSpecific?.nextCityProjectParticipationTime = nextTime
@@ -150,14 +159,14 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildDisplay(materials: MutableMap<NeuInternalName, Int>) = Container.vertical {
-        string("§7City Project Materials")
+    private fun buildDisplay(materials: MutableMap<NeuInternalName, Int>) = Renderable.vertical {
+        addString("§7City Project Materials")
 
         if (materials.isEmpty()) {
-            string("§cNo Materials to contribute.")
+            addString("§cNo Materials to contribute.")
         } else {
             for ((internalName, amount) in materials) {
-                renderable(materialRow(internalName, amount))
+                add(materialRow(internalName, amount))
             }
         }
 
@@ -165,14 +174,14 @@ object CityProjectFeatures {
 
     private fun materialRow(internalName: NeuInternalName, amount: Int): Renderable {
         val stack = internalName.getItemStack()
-        val name = internalName.itemName
+        val name = internalName.repoItemName
         val price = internalName.getPrice() * amount
 
-        return Container.horizontal {
-            string(" §7- ")
-            item(stack)
-            renderable(materialLink(name, amount))
-            string(" §7(§6${price.shortFormat()}§7)")
+        return Renderable.line {
+            addString(" §7- ")
+            addItemStack(stack)
+            add(materialLink(name, amount))
+            addString(" §7(§6${price.shortFormat()}§7)")
         }
     }
 
@@ -180,7 +189,7 @@ object CityProjectFeatures {
         "$name §ex${amount.addSeparators()}",
         {
             if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                LorenzUtils.setTextIntoSign("$amount")
+                SignUtils.setTextIntoSign("$amount")
             } else {
                 BazaarApi.searchForBazaarItem(name, amount)
             }
@@ -222,10 +231,8 @@ object CityProjectFeatures {
         if (!config.showReady) return
         if (!inInventory) return
 
-
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()

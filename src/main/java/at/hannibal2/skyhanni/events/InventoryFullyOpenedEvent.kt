@@ -36,7 +36,7 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
  * This approach is faster than to wait a fix duration after the inventory open packet is detected.
  *
  * Since this logic only works via packets, and the player inventory (pressing E) is client side,
- * this event does not get fired when opening the invenotory via pressingE.
+ * this event does not get fired when opening the inventory via pressing E.
  */
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 

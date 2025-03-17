@@ -129,6 +129,11 @@ public class MiscConfig {
     @Accordion
     public EnchantedClockConfig enchantedClock = new EnchantedClockConfig();
 
+    @ConfigOption(name = "Century Party Invitation", desc = "Features for the Century Party Invitation")
+    @Accordion
+    @Expose
+    public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
+
     @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
@@ -369,6 +374,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "NEU Soul Path Find", desc = "When showing §e/neusouls on§7, show a pathfind to the Fairy Souls missing and a percentage of souls done in chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean neuSoulsPathFind = true;
 
     @Expose
     @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")

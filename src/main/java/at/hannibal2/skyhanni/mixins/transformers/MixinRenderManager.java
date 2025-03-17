@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.CheckRenderEntityEvent;
+import at.hannibal2.skyhanni.data.EntityData;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
@@ -14,7 +14,7 @@ public class MixinRenderManager {
 
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void shouldRender(Entity entity, ICamera camera, double camX, double camY, double camZ, CallbackInfoReturnable<Boolean> cir) {
-        if (new CheckRenderEntityEvent<>(entity, camera, camX, camY, camZ).post()) {
+        if (EntityData.onRenderCheck(entity, camera, camX, camY, camZ)) {
             cir.setReturnValue(false);
         }
     }

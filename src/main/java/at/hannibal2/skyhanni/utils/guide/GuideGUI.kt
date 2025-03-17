@@ -98,7 +98,7 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
             Renderable.string(
                 "§7SkyHanni ",
                 horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
-                verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+                verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
             ).renderXYAligned(0, 0, sizeX, sizeY)
 
             val page = pageList[currentPage]
@@ -106,16 +106,15 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
 
             GlStateManager.translate(-guiLeft.toFloat(), -guiTop.toFloat(), 0f)
         }
-
         GlStateManager.popMatrix()
-
     } catch (e: Exception) {
         GlStateManager.popMatrix()
         ErrorManager.logErrorWithData(
             e, "Something broke in GuideGUI",
             "Guide" to this.javaClass.typeName,
-            "Page" to currentPage.name
+            "Page" to currentPage.name,
         )
+        Unit
     }
 }
 

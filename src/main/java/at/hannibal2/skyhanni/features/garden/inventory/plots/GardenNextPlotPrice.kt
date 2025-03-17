@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.inventory.plots
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -8,21 +9,19 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 
 @SkyHanniModule
 object GardenNextPlotPrice {
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
-        if (!GardenApi.inGarden()) return
         if (!GardenApi.config.plotPrice) return
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 
-        if (!event.itemStack.name.startsWith("§ePlot")) return
+        if (!event.itemStack.displayName.startsWith("§ePlot")) return
 
         var next = false
         val list = event.toolTip

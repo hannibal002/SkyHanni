@@ -14,9 +14,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -59,14 +59,14 @@ object FarmingContestApi {
         ContestBracket.entries.forEach { it.bracketPattern }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-
         if (internalContest && startTime.passedSince() > 20.minutes) {
             FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
             internalContest = false
         }
 
+        @Suppress("IsInIslandEarlyReturn")
         if (!GardenApi.inGarden()) return
 
         checkActiveContest()
@@ -132,7 +132,7 @@ object FarmingContestApi {
 
     fun getSBTimeFor(text: String): Long? {
         val (year, month, day) = getSBDateFromItemName(text) ?: return null
-        val monthNr = LorenzUtils.getSBMonthByName(month)
+        val monthNr = SkyBlockTime.getSBMonthByName(month)
 
         return SkyBlockTime(year.toInt(), monthNr, day.toInt()).toMillis()
     }

@@ -93,7 +93,11 @@ object ComputerEnvDebug {
             group("update").toIntOrNull()?.let {
                 val devEnvironment = PlatformUtils.isDevEnvironment
                 if (it < 300 && !devEnvironment) {
-                    event.addData("Old update: $it")
+                    event.addData {
+                        add("Old java version: $it")
+                        add("Update to a newer version if you have performance issues.")
+                        add("For more infos: https://github.com/hannibal002/SkyHanni/blob/beta/docs/update_java.md")
+                    }
                 } else {
                     if (devEnvironment) {
                         event.addIrrelevant("Update version: $it (dev env)")

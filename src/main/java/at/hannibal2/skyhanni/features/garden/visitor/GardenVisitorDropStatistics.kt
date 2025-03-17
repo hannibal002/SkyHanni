@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -21,7 +22,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -179,7 +180,7 @@ object GardenVisitorDropStatistics {
 
     private fun setRarities(rarity: String) {
         acceptedVisitors += 1
-        val currentRarity = LorenzUtils.enumValueOf<VisitorRarity>(rarity)
+        val currentRarity = EnumUtils.enumValueOf<VisitorRarity>(rarity)
         val visitorRarities = GardenApi.storage?.visitorDrops?.visitorRarities ?: return
         fixRaritiesSize(visitorRarities)
         // TODO, change functionality to use enum rather than ordinals
@@ -318,10 +319,9 @@ object GardenVisitorDropStatistics {
         saveAndUpdate()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled) return
-        if (!GardenApi.inGarden()) return
         if (GardenApi.hideExtraGuis()) return
         if (config.onlyOnBarn && !GardenApi.onBarnPlot) return
         config.pos.renderStringsAndItems(display, posLabel = "Visitor Stats")
