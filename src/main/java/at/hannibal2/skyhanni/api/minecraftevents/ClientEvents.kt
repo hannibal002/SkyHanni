@@ -35,7 +35,8 @@ object ClientEvents {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase == TickEvent.Phase.START) return
-        MinecraftCompat.localPlayerOrNull ?: return
+        if (!MinecraftCompat.localPlayerExists) return
+        if (!MinecraftCompat.localWorldExists) return
 
         DelayedRun.checkRuns()
         totalTicks++
