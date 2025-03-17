@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
@@ -117,7 +117,6 @@ object HoppityCallWarning {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !activeWarning) return
-        val minecraft = Minecraft.getMinecraft()
         // Calculate a fluctuating alpha value based on the sine of time, for a smooth oscillation
         val randomizationAlphaDouble = ((2 + sin(Instant.now().toEpochMilli().toDouble() / 1000)) * 255 / 4)
         // Ensure the alpha value is an integer and within the valid range (0-255)
@@ -127,8 +126,8 @@ object HoppityCallWarning {
         Gui.drawRect(
             0,
             0,
-            minecraft.displayWidth,
-            minecraft.displayHeight,
+            GuiScreenUtils.displayWidth,
+            GuiScreenUtils.displayHeight,
             // Apply the shifted alpha and combine it with the RGB components of flashColor.
             shiftedRandomAlpha or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
         )

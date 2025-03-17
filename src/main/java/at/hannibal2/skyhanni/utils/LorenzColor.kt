@@ -74,8 +74,8 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
         CHROMA -> EnumDyeColor.WHITE
     }
 
-    fun toChatFormatting(): EnumChatFormatting? =
-        EnumChatFormatting.entries.firstOrNull { it.toString() == getChatColor() }
+    fun toChatFormatting(): EnumChatFormatting =
+        EnumChatFormatting.entries.firstOrNull { it.toString() == getChatColor() } ?: EnumChatFormatting.WHITE
 
     companion object {
 

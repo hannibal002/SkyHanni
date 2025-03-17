@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -134,7 +133,7 @@ object CroesusChestTracker {
             val lore = item.getLore()
 
             if (run.floor == null) run.floor =
-                (if (masterPattern.matches(item.name)) "M" else "F") + (
+                (if (masterPattern.matches(item.displayName)) "M" else "F") + (
                     lore.firstNotNullOfOrNull {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
@@ -156,7 +155,7 @@ object CroesusChestTracker {
     private fun pageSetup(event: InventoryFullyOpenedEvent) {
         inCroesusInventory = true
         pageSwitchable = true
-        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.name)
+        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.displayName)
         if (event.inventoryItems[BACK_ARROW_SLOT]?.item != Items.arrow) {
             currentPage = 0
         }
@@ -203,7 +202,7 @@ object CroesusChestTracker {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
-        if (!kismetPattern.matches(event.stack.name)) return
+        if (!kismetPattern.matches(event.stack.displayName)) return
         if (kismetUsedPattern.matches(event.stack.getLore().lastOrNull())) return
         event.stackTip = "§a$kismetAmountCache"
     }
