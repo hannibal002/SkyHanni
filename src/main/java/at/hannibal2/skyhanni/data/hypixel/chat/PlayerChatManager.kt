@@ -96,7 +96,7 @@ object PlayerChatManager {
     @Suppress("MaxLineLength")
     private val itemShowPattern by patternGroup.pattern(
         "itemshow",
-        "(?:§8\\[(?<levelColor>§.)(?<level>\\d+)§8] )?(?<author>.*)§.(?: §7♲)*?§7 (?<action>is (?:holding|friends with a|wearing)|has) (?<itemName>.*)",
+        "(?:§8\\[(?<level>§.\\d+)§8] )?(?<author>.*)§.(?: §7♲)*?§7 (?<action>is (?:holding|friends with a|wearing)|has) (?<itemName>.*)",
     )
 
     /**
