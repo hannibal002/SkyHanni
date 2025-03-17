@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -79,9 +80,8 @@ object GardenLevelDisplay {
         update()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenApi.inGarden()) return
 
         visitorRewardPattern.matchMatcher(event.message) {
             addExp(group("exp").toInt())
@@ -110,15 +110,14 @@ object GardenLevelDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenApi.inGarden()) return
         val item = when (event.inventoryName) {
             "Desk" -> event.inventoryItems[4] ?: return
             "SkyBlock Menu" -> event.inventoryItems[10] ?: return
             else -> return
         }
-        gardenItemNamePattern.matchMatcher(item.name.removeColor()) {
+        gardenItemNamePattern.matchMatcher(item.displayName.removeColor()) {
             val level = groupOrNull("currentLevel")
             if (level != null) useRomanNumerals = level.isRoman()
         } ?: return
@@ -144,9 +143,8 @@ object GardenLevelDisplay {
         update()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
-        if (!GardenApi.inGarden()) return
         if (!config.overflow.get()) return
         val slotIndex = event.slot.slotIndex
         val name = InventoryUtils.openInventoryName()
@@ -164,7 +162,7 @@ object GardenLevelDisplay {
 
         val iterator = event.toolTip.listIterator()
         if (slotIndex == 4 && currentLevel > 15) {
-            event.itemStack.name = "§aGarden Level ${currentLevel.toRomanIfNecessary()}"
+            event.itemStack.setCustomItemName("§aGarden Level ${currentLevel.toRomanIfNecessary()}")
         }
         var next = false
         for (line in iterator) {

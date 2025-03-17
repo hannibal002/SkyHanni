@@ -29,11 +29,11 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import java.io.IOException
 
 class GuiPositionEditor(
@@ -98,8 +98,8 @@ class GuiPositionEditor(
         }
 
         val pos = positions[displayPos]
-        val location = "§7x: §e${pos.rawX}§7, y: §e${pos.rawY}§7, scale: §e${pos.scale.roundTo(2)}"
-        GuiRenderUtils.drawStringCentered("§b" + pos.internalName, getScaledWidth() / 2, 18)
+        val location = "§7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}"
+        GuiRenderUtils.drawStringCentered("§b ${pos.internalName}", getScaledWidth() / 2, 18)
         GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
         if (pos.canJumpToConfigOptions())
             GuiRenderUtils.drawStringCentered(
@@ -228,13 +228,13 @@ class GuiPositionEditor(
             val elementHeight = position.getDummySize(true).y
             grabbedX += position.moveX(mouseX - grabbedX, elementWidth)
             grabbedY += position.moveY(mouseY - grabbedY, elementHeight)
-            GuiEditManager.handleGuiPositionMoved(position.internalName)
+            GuiEditManager.handleGuiPositionMoved(position.internalName ?: continue)
         }
     }
 
     override fun handleMouseInput() {
         super.handleMouseInput()
-        val mw = Mouse.getEventDWheel()
+        val mw = MouseCompat.getScrollDelta()
         if (mw == 0) return
 
         val (mouseX, mouseY) = GuiScreenUtils.mousePos

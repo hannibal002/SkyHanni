@@ -81,12 +81,13 @@ object HoppityEventSummary {
 
     /**
      * REGEX-TEST: Hoppity's Collection
+     * REGEX-TEST: (1/2) Hoppity's Collection
      * REGEX-TEST: Chocolate Factory Milestones
      * REGEX-TEST: Chocolate Shop Milestones
      */
     private val miscCfInventoryPatterns by ChocolateFactoryApi.patternGroup.pattern(
         "cf.inventory",
-        "Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
+        "(?:\\(\\d*\\/\\d*\\) )?Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
     )
 
     private const val LINE_HEADER = "    "
@@ -441,18 +442,18 @@ object HoppityEventSummary {
             predecessorYear?.let {
                 Renderable.optionalLink(
                     "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]".partyModeReplace(),
-                    onClick = { statYear = it },
+                    onLeftClick = { statYear = it },
                 )
             },
             successorYear?.let {
                 Renderable.optionalLink(
                     "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]".partyModeReplace(),
-                    onClick = { statYear = it },
+                    onLeftClick = { statYear = it },
                 )
             } ?: if (isNextEventEnabled && !isAlreadyNextEvent) {
                 Renderable.optionalLink(
                     "§d[ §7Next Hunt §r§f§l-> §r§d]".partyModeReplace(),
-                    onClick = { statYear = getCurrentSBYear() + 1 },
+                    onLeftClick = { statYear = getCurrentSBYear() + 1 },
                 )
             } else null,
         )

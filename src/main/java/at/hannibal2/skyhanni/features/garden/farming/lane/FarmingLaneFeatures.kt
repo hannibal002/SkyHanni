@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingLaneSwitchEvent
@@ -13,7 +15,6 @@ import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -60,9 +61,8 @@ object FarmingLaneFeatures {
         display = emptyList()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!GardenApi.inGarden()) return
         if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
 
         if (!calculateDistance()) return
@@ -138,7 +138,7 @@ object FarmingLaneFeatures {
     private fun showWarning() {
         with(config.laneSwitchNotification) {
             if (enabled) {
-                LorenzUtils.sendTitle(text.replace("&", "§"), 2.seconds)
+                TitleManager.sendTitle(text.replace("&", "§"), 2.seconds)
                 if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
                     lastPlaySound = SimpleTimeMark.now()
                     playUserSound()
@@ -190,9 +190,8 @@ object FarmingLaneFeatures {
         return MovementState.NORMAL
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!GardenApi.inGarden()) return
         if (!config.cornerWaypoints) return
 
         val lane = FarmingLaneApi.currentLane ?: return
@@ -209,9 +208,8 @@ object FarmingLaneFeatures {
 
     private fun LorenzVec.capAtBuildHeight(): LorenzVec = if (y > 76) copy(y = 76.0) else this
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenApi.inGarden()) return
         if (!config.distanceDisplay) return
 
         config.distanceDisplayPosition.renderStrings(display, posLabel = "Lane Display")

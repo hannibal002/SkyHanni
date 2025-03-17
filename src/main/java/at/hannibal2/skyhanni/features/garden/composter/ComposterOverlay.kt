@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -120,18 +120,16 @@ object ComposterOverlay {
         update()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!GardenApi.inGarden()) return
         if (inComposterUpgrades && extraComposterUpgrade != null && System.currentTimeMillis() > lastHovered + 200) {
             extraComposterUpgrade = null
             update()
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenApi.inGarden()) return
         if (!config.overlay) return
         inComposter = event.inventoryName == "Composter"
         inComposterUpgrades = event.inventoryName == "Composter Upgrades"
@@ -146,7 +144,7 @@ object ComposterOverlay {
         if (!inComposterUpgrades) return
         update()
         for (upgrade in ComposterUpgrade.entries) {
-            val name = event.itemStack.name
+            val name = event.itemStack.displayName
             if (name.contains(upgrade.displayName)) {
                 maxLevel = ComposterUpgrade.regex.matchMatcher(name) {
                     group("level")?.romanToDecimalIfNecessary() ?: 0
@@ -440,10 +438,9 @@ object ComposterOverlay {
                 Container.horizontal {
                     if (testOffset != 0) string("#$i ")
                     item(item)
-                    renderable(formatPrice(totalPrice, internalName, item.name, itemsNeeded, onClick))
+                    renderable(formatPrice(totalPrice, internalName, item.displayName, itemsNeeded, onClick))
                 }
             )
-
             if (i == 10 + testOffset) break
         }
         return first

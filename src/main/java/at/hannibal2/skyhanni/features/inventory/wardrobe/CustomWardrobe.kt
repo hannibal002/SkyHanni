@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
+import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -51,6 +52,10 @@ object CustomWardrobe {
     private var inventoryButton: Renderable? = null
     private var editMode = false
     private var waitingForInventoryUpdate = false
+
+    private val position: Position = Position().ignoreScale()
+    private val loadingPosition: Position = Position().ignoreScale()
+    private val inventoryButtonPosition: Position = Position().ignoreScale()
 
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
@@ -78,21 +83,21 @@ object CustomWardrobe {
         }
 
         val (width, height) = renderable.width to renderable.height
-        val pos = Position((gui.width - width) / 2, (gui.height - height) / 2).setIgnoreCustomScale(true)
+
+        position.moveTo((gui.width - width) / 2, (gui.height - height) / 2)
         if (waitingForInventoryUpdate && config.loadingText) {
             val loadingRenderable = Renderable.string(
                 "§cLoading...",
                 scale = activeScale / 100.0,
             )
-            val loadingPos =
-                Position(pos.rawX + (width - loadingRenderable.width) / 2, pos.rawY - loadingRenderable.height).setIgnoreCustomScale(true)
-            loadingPos.renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
+            loadingPosition.moveTo(position.x + (width - loadingRenderable.width) / 2, position.y - loadingRenderable.height)
+                .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 100f)
 
-        pos.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
             GlStateManager.translate(0f, 0f, 400f)
@@ -112,7 +117,8 @@ object CustomWardrobe {
         val accessorGui = gui as AccessorGuiContainer
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
         val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
-        Position(posX, posY).setIgnoreCustomScale(true).renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+        inventoryButtonPosition.moveTo(posX, posY)
+            .renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
     @HandleEvent
@@ -382,8 +388,8 @@ object CustomWardrobe {
                         horizontalAlign = HorizontalAlignment.RIGHT,
                         verticalAlign = VerticalAlignment.BOTTOM,
                         scale = 1.0 * (activeScale / 100.0),
-                    ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unhovered = it) },
-                    onClick = {
+                    ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unHovered = it) },
+                    onLeftClick = {
                         config::enabled.jumpToEditor()
                         reset()
                         WardrobeApi.currentPage = null
@@ -410,7 +416,7 @@ object CustomWardrobe {
         val backButton = createLabeledButton(
             "§aBack",
             onClick = {
-                InventoryUtils.clickSlot(48)
+                clickInventorySlot(48)
                 reset()
                 WardrobeApi.currentPage = null
             },
@@ -418,7 +424,7 @@ object CustomWardrobe {
         val exitButton = createLabeledButton(
             "§cClose",
             onClick = {
-                InventoryUtils.clickSlot(49)
+                clickInventorySlot(49)
                 reset()
                 WardrobeApi.currentPage = null
             },
@@ -487,7 +493,7 @@ object CustomWardrobe {
                         centerString((if (wardrobeSlot.favorite) "§c" else "§7") + "❤", scale = textScale),
                         centerString((if (wardrobeSlot.favorite) "§4" else "§8") + "❤", scale = textScale),
                     ),
-                    onClick = {
+                    onLeftClick = {
                         wardrobeSlot.favorite = !wardrobeSlot.favorite
                         update()
                     },
@@ -607,16 +613,16 @@ object CustomWardrobe {
         if (isInCurrentPage()) {
             if (isEmpty() || locked || waitingForInventoryUpdate) return
             WardrobeApi.currentSlot = if (isCurrentSlot()) null else id
-            InventoryUtils.clickSlot(inventorySlot)
+            clickInventorySlot(inventorySlot)
         } else {
             if (page < wardrobePage) {
                 WardrobeApi.currentPage = wardrobePage - 1
                 waitingForInventoryUpdate = true
-                InventoryUtils.clickSlot(previousPageSlot)
+                clickInventorySlot(previousPageSlot)
             } else if (page > wardrobePage) {
                 WardrobeApi.currentPage = wardrobePage + 1
                 waitingForInventoryUpdate = true
-                InventoryUtils.clickSlot(nextPageSlot)
+                clickInventorySlot(nextPageSlot)
             }
         }
         update()
