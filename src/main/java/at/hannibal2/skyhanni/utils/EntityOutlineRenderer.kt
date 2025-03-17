@@ -203,7 +203,7 @@ object EntityOutlineRenderer {
         GlStateManager.enableDepth()
         GlStateManager.enableAlpha()
 
-        return shouldRenderOutlines
+        return !shouldRenderOutlines
     }
 
     @JvmStatic
@@ -219,7 +219,7 @@ object EntityOutlineRenderer {
     /**
      * Caches OptiFine settings and determines whether outlines should be rendered
      *
-     * @return `true` if outlines should be rendered
+     * @return `true` iff outlines should be rendered
      */
     @JvmStatic
     fun shouldRenderEntityOutlines(): Boolean {
