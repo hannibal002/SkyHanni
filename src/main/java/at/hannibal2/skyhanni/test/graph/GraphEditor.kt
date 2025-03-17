@@ -380,9 +380,9 @@ object GraphEditor {
             return
         }
 
-        IslandGraphs.tempRemoveReason?.let {
+        IslandGraphs.disabledNodesReason?.let {
             if (bypassTempRemoveTimer.isInPast()) {
-                IslandGraphs.resetTempRemove()
+                IslandGraphs.enableAllNodes()
                 ChatUtils.chat("Reset temp remove!")
             } else {
                 ChatUtils.chat("§cParts of the island graph are currently temp removed: $it")

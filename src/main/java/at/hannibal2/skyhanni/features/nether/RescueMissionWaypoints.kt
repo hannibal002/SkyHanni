@@ -120,7 +120,7 @@ object RescueMissionWaypoints {
 
     private fun stopParkour() {
         if (parkourHelper != null) {
-            IslandGraphs.resetTempRemove()
+            IslandGraphs.enableAllNodes()
         }
         parkourHelper = null
     }
@@ -259,12 +259,12 @@ object RescueMissionWaypoints {
     private fun tweakGraphNetwork() {
         val reason = "rescue mission"
         // outside cathedral
-        IslandGraphs.tempRemove(reason, LorenzVec(6.9, 105.0, -852.0), 3.0)
+        IslandGraphs.disableNodes(reason, LorenzVec(6.9, 105.0, -852.0), 3.0)
 
         // in cathedral
-        IslandGraphs.tempRemove(reason, LorenzVec(-9.2, 114.1, -882.1), 3.0)
-        IslandGraphs.tempRemove(reason, LorenzVec(-30.9, 114.0, -884.1), 3.0)
-        IslandGraphs.tempRemove(reason, LorenzVec(-37.4, 114.1, -888.5), 3.0)
+        IslandGraphs.disableNodes(reason, LorenzVec(-9.2, 114.1, -882.1), 3.0)
+        IslandGraphs.disableNodes(reason, LorenzVec(-30.9, 114.0, -884.1), 3.0)
+        IslandGraphs.disableNodes(reason, LorenzVec(-37.4, 114.1, -888.5), 3.0)
     }
 
     private fun navigateToParkourStart() {
