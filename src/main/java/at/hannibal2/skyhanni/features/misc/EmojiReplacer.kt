@@ -32,7 +32,7 @@ object EmojiReplacer {
     private val emojiResource = ResourceLocation("skyhanni:emoji/emoji_table.png")
     private const val EMOJI_WIDTH = 72.0f
     private const val EMOJI_DISPLAY_WIDTH = 8.0f
-    private const val EMOJI_SPRITESHEET_COUNT = 44
+    private const val EMOJI_SPRITESHEET_COUNT = 42
 
     fun renderEmojiChar(char: Char, posX: Float, posY: Float, textureManager: TextureManager?, render: Boolean): Float {
         if (!isEnabled()) return -1.0f
