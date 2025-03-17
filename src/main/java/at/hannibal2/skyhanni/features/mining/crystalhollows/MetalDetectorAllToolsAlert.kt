@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -38,7 +39,7 @@ object MetalDetectorAllToolsAlert {
             if (internalName == DWARVEN_GOLD_HAMMER) hasGold = true
         }
         if (hasLapis && hasDiamond && hasEmerald && hasGold) {
-            LorenzUtils.sendTitle("§cALL TOOLS", 1.seconds)
+            TitleManager.sendTitle("§cALL TOOLS", 1.seconds)
         }
     }
 

@@ -64,7 +64,7 @@ object MetalDetectorSolver {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        chestLocations = event.getConstant<MetalDetectorChestsJson>("MetalDetectorChests").locations.toList()
+        chestLocations = event.getConstant<MetalDetectorChestsJson>("MetalDetectorChests").locations
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
