@@ -31,7 +31,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
@@ -100,9 +99,6 @@ object NeuItems {
         .withCurrentGuiContext()
         .withItemStack(itemStack)
         .resolveInternalName()
-
-    fun getInternalNameOrNull(nbt: NBTTagCompound): NeuInternalName? =
-        ItemResolutionQuery().withItemNbt(nbt).resolveInternalName()?.toInternalName()
 
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NeuInternalName? {
         val internalName = hypixelId.replace(':', '-')

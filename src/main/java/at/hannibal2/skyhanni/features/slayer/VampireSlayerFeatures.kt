@@ -38,8 +38,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.renderer.GlStateManager
@@ -259,7 +259,7 @@ object VampireSlayerFeatures {
         if (!isEnabled()) return
 
         if (config.drawLine) {
-            for (it in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>()) {
+            for (it in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
                 if (!it.isHighlighted()) continue
                 val vec = event.exactLocation(it)
                 if (vec.distanceToPlayer() < 15) {
@@ -273,7 +273,7 @@ object VampireSlayerFeatures {
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
-        for (stand in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()) {
+        for (stand in MinecraftCompat.localWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()) {
             val vec = stand.position.toLorenzVec()
             val distance = vec.distanceToPlayer()
             val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
