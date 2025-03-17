@@ -128,11 +128,6 @@ object ChatManager {
         val message = component.formattedText.stripHypixelMessage()
         var cancelled = false
 
-        println("new message")
-        println(component.formattedText)
-        println(component.unformattedText)
-        println()
-
         if (message.startsWith("§f{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
             if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
