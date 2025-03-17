@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
@@ -28,8 +29,8 @@ object SensitivityReducer {
     private var lastCheckCooldown = SimpleTimeMark.farPast()
     private const val LOCKED = -1F / 3F
 
-    private val mc get() = Minecraft.getMinecraft()
-    private val gameSettings = mc.gameSettings
+    private val gameSettings get() = Minecraft.getMinecraft().gameSettings
+    private val playerOnGround get() = MinecraftCompat.localPlayer.onGround
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -42,7 +43,7 @@ object SensitivityReducer {
             return
         }
         if (isManualToggle) return
-        if (isToggled && config.onGround.get() && !mc.thePlayer.onGround) {
+        if (isToggled && config.onGround.get() && !playerOnGround) {
             restoreSensitivity()
             isToggled = false
             return
@@ -70,7 +71,7 @@ object SensitivityReducer {
                 isToggled = false
                 restoreSensitivity()
             }
-            if (!mc.thePlayer.onGround && config.onGround.get()) {
+            if (!playerOnGround && config.onGround.get()) {
                 isToggled = false
                 restoreSensitivity()
             }
@@ -90,7 +91,7 @@ object SensitivityReducer {
             }
         }
         config.onGround.afterChange {
-            if (isToggled && config.onGround.get() && mc.thePlayer.onGround) {
+            if (isToggled && config.onGround.get() && playerOnGround) {
                 restoreSensitivity()
                 isToggled = false
             }
@@ -117,7 +118,7 @@ object SensitivityReducer {
     }
 
     private fun isHoldingKey(): Boolean {
-        return config.keybind.isKeyHeld() && mc.currentScreen == null
+        return config.keybind.isKeyHeld() && Minecraft.getMinecraft().currentScreen == null
     }
 
     fun isEnabled(): Boolean {
@@ -156,7 +157,7 @@ object SensitivityReducer {
 
     private fun toggle(state: Boolean) {
         if (config.onlyPlot.get() && GardenApi.onBarnPlot) return
-        if (config.onGround.get() && !mc.thePlayer.onGround) return
+        if (config.onGround.get() && !playerOnGround) return
         if (!isToggled) {
             lowerSensitivity()
         } else restoreSensitivity()
@@ -198,7 +199,7 @@ object SensitivityReducer {
         event.addData {
             add("Current Sensitivity: ${gameSettings.mouseSensitivity}")
             add("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
-            add("onGround: ${mc.thePlayer.onGround}")
+            add("onGround: $playerOnGround")
             add("onBarn: ${GardenApi.onBarnPlot}")
             add("enabled: ${isToggled || isManualToggle}")
             add("--- config ---")

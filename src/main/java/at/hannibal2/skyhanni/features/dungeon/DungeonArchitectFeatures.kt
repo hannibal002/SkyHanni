@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -54,7 +54,7 @@ object DungeonArchitectFeatures {
                 "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)"
         )
 
-        LorenzUtils.sendTitle("§c§lPUZZLE FAILED!", 3.seconds)
+        TitleManager.sendTitle("§c§lPUZZLE FAILED!", 3.seconds)
         event.blockedReason = "puzzle_fail"
     }
 
