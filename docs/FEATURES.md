@@ -408,6 +408,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Lava Replacement. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1885)
     +  Replaces the lava texture with the water texture.
     +  Primarily used for lava fishing in the Crimson Isle, but can be used anywhere else if the option is enabled.
++ Added Hotspot Radar Guesser. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3551)
+    + Added a waypoint of the Fishing Hotspot when using the Hotspot Radar.
 
 </details>
 <details open><summary>

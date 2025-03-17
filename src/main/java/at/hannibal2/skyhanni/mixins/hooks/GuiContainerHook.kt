@@ -16,11 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
 class GuiContainerHook(guiAny: Any) {
 
-    val gui: GuiContainer
-
-    init {
-        gui = guiAny as GuiContainer
-    }
+    val gui: GuiContainer = guiAny as GuiContainer
 
     fun closeWindowPressed(ci: CallbackInfo) {
         if (CloseWindowEvent(gui, gui.inventorySlots).post()) ci.cancel()

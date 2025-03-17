@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -40,7 +39,7 @@ object BitsPerCookieVisual {
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (event.itemStack.getInternalNameOrNull() != boosterCookie) return
-        if (wrongCookiePattern.matches(event.itemStack.name)) return
+        if (wrongCookiePattern.matches(event.itemStack.displayName)) return
         var timeReplaced = false
 
         val toolTip = event.toolTip
