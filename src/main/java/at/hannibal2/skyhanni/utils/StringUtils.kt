@@ -420,9 +420,9 @@ object StringUtils {
         if (hoverEvents.size == 1) chatComponent.hover =
             //#if MC < 1.21
             hoverEvents.first().value
-            //#else
-            //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
-            //#endif
+        //#else
+        //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
+        //#endif
     }
 
     private fun IChatComponent.findAllEvents(
@@ -438,14 +438,14 @@ object StringUtils {
             clickEvents.add(clickEvent)
         }
         if (hoverEvent?.action != null && hoverEvents.none {
-            //#if MC < 1.21
-            it.value ==
-                hoverEvent.value
-            //#else
-            //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) ==
-            //$$                 hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
-            //#endif
-        }) {
+                //#if MC < 1.21
+                it.value == hoverEvent.value
+                //#else
+                //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) ==
+                //$$                 hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
+                //#endif
+            }
+            ) {
             hoverEvents.add(hoverEvent)
         }
     }
