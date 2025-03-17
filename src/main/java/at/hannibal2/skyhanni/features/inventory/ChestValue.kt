@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -120,10 +121,10 @@ object ChestValue {
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
-            val name = "${stack.itemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+            val name = "${stack.repoItemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay) "$name $price"
-            else "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
+            else "${stack.repoItemName} §7x$amount: §6${total.formatPrice()}"
 
             addLine {
                 val renderable = Renderable.hoverTips(
@@ -187,7 +188,7 @@ object ChestValue {
         } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
             InventoryUtils.getItemsInOpenChest().filter {
-                it.hasStack && it.inventory != Minecraft.getMinecraft().thePlayer.inventory && (!isMinion || it.slotNumber % 9 != 1)
+                it.hasStack && it.inventory != MinecraftCompat.localPlayer.inventory && (!isMinion || it.slotNumber % 9 != 1)
             }
         }
         val stacks = buildMap {

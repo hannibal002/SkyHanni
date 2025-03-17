@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -41,7 +42,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
-import net.minecraft.util.ChatComponentText
 import java.util.EnumMap
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -172,7 +172,7 @@ object PestProfitTracker {
                 if (it == 1) return@also
                 // If the amount was fixed, edit the chat message to reflect the change
                 val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
-                chatComponent = ChatComponentText(fixedString)
+                chatComponent = fixedString.asComponent()
             }
 
             // Happens here so that the amount is fixed independently of tracker being enabled

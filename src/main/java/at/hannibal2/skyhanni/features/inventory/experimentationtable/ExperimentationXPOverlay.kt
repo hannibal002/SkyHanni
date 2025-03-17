@@ -37,7 +37,7 @@ object ExperimentationXPOverlay {
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!isEnabled()) return
         event.stack ?: return
-        if (event.stack.isDye()) return
+        if (!event.stack.isDye()) return
         enchantingXPPattern.matchMatcher(event.stack.displayName) {
             val text = "${group("xp")}k"
             val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)

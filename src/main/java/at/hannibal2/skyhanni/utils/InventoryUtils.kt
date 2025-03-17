@@ -1,8 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
+import at.hannibal2.skyhanni.utils.compat.containerSlots
+import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
@@ -16,10 +24,6 @@ import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
-
-//#if MC > 1.12
-//$$ import net.minecraft.inventory.ClickType
-//#endif
 
 @Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
 object InventoryUtils {
@@ -35,7 +39,7 @@ object InventoryUtils {
 
     fun getItemsInOpenChestWithNull(): List<Slot> {
         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList()
-        return guiChest.inventorySlots.inventorySlots
+        return guiChest.containerSlots()
             .filter { it.inventory !is InventoryPlayer }
     }
 
@@ -48,17 +52,11 @@ object InventoryUtils {
     // only works while not in an inventory
     fun getSlotsInOwnInventory(): List<Slot> {
         val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return emptyList()
-        return guiInventory.inventorySlots.inventorySlots
+        return guiInventory.containerSlots()
             .filter { it.inventory is InventoryPlayer && it.stack != null }
     }
 
-    // TODO add cache that persists until the next gui/window open/close packet is sent/received
-    fun openInventoryName(): String = Minecraft.getMinecraft().currentScreen.let {
-        if (it is GuiChest) {
-            val chest = it.inventorySlots as ContainerChest
-            chest.getInventoryName()
-        } else ""
-    }
+    fun openInventoryName(): String = InventoryCompat.getOpenChestName()
 
     fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
 
@@ -66,12 +64,11 @@ object InventoryUtils {
 
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
-    fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
-
     fun getItemsInOwnInventory(): List<ItemStack> =
         getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
 
-    fun getItemsInOwnInventoryWithNull(): Array<ItemStack?>? = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
+    fun getItemsInOwnInventoryWithNull(): Array<ItemStack?>? =
+        MinecraftCompat.localPlayerOrNull?.inventory?.mainInventory?.normalizeAsArray()
 
     // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
     fun getItemsInHotbar(): List<ItemStack> =
@@ -88,14 +85,22 @@ object InventoryUtils {
             it.contains("Ender Chest") || it.contains("Backpack")
     }
 
-    fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem
+    fun getItemInHand(): ItemStack? = MinecraftCompat.localPlayerOrNull?.heldItem
 
-    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer.getArmorInventory() ?: arrayOfNulls(4)
+    fun getArmor(): Array<ItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
 
     fun getHelmet(): ItemStack? = getArmor()[3]
     fun getChestplate(): ItemStack? = getArmor()[2]
     fun getLeggings(): ItemStack? = getArmor()[1]
     fun getBoots(): ItemStack? = getArmor()[0]
+
+    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
+        if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
+        slot?.slotNumber?.let { slotNumber ->
+            clickInventorySlot(slotNumber, container.windowId, 0, 1)
+            this.cancel()
+        }
+    }
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
         if (!PlatformUtils.isNeuLoaded()) {
@@ -116,8 +121,7 @@ object InventoryUtils {
     }
 
     fun isSlotInPlayerInventory(itemStack: ItemStack): Boolean {
-        val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
-        val slotUnderMouse = screen.slotUnderMouse ?: return false
+        val slotUnderMouse = slotUnderCursor() ?: return false
         return slotUnderMouse.inventory is InventoryPlayer && slotUnderMouse.stack == itemStack
     }
 
@@ -161,16 +165,6 @@ object InventoryUtils {
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
-
-    fun clickSlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int = 0, mode: Int = 0) {
-        windowId ?: return
-        val controller = Minecraft.getMinecraft().playerController
-        //#if MC < 1.12
-        controller.windowClick(windowId, slot, mouseButton, mode, Minecraft.getMinecraft().thePlayer)
-        //#else
-        //$$ controller.windowClick(windowId, slot, mouseButton, ClickType.entries[mode], Minecraft.getMinecraft().player)
-        //#endif
-    }
 
     fun Slot.isTopInventory() = inventory.isTopInventory()
 
