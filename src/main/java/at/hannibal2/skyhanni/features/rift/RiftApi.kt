@@ -34,10 +34,13 @@ object RiftApi {
 
     fun ItemStack.motesNpcPrice(): Double? {
         if (isRiftExportable() && wasRiftTransferred()) return null
-        val baseMotes = motesPrice[getInternalName()] ?: return null
+        return getInternalName().motesNpcPrice()?.times(stackSize)
+    }
+
+    fun NeuInternalName.motesNpcPrice(): Double? {
+        val baseMotes = motesPrice[this] ?: return null
         val burgerStacks = config.motes.burgerStacks
-        val pricePer = baseMotes + (burgerStacks * 5) * baseMotes / 100
-        return pricePer * stackSize
+        return baseMotes + (burgerStacks * 5) * baseMotes / 100
     }
 
     var inMirrorVerse = false

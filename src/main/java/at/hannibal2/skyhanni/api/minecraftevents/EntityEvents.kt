@@ -35,7 +35,7 @@ object EntityEvents {
 
     @SubscribeEvent
     fun onEnderTeleport(event: EnderTeleportEvent) {
-        if (EndermanTeleportEvent.post()) {
+        if (EndermanTeleportEvent().post()) {
             event.isCanceled = true
         }
     }
