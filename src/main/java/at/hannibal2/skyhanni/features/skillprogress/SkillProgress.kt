@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.Quad
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -107,7 +107,8 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
-                val content = horizontalContainer(display, horizontalAlign = textAlignment.alignment)
+                val horizontalAlignment = textAlignment.alignment ?: RenderUtils.HorizontalAlignment.LEFT
+                val content = horizontalContainer(display, horizontalAlign = horizontalAlignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
                 config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
             }
@@ -280,16 +281,16 @@ object SkillProgress {
 
             val (level, currentXP, currentXPMax, totalXP) =
                 if (useCustomGoalLevel)
-                    Quad(skillInfo.overflowLevel, have, need, xp)
+                    SkillLevel(skillInfo.overflowLevel, have, need, xp)
                 else if (config.overflowConfig.enableInAllDisplay.get() && !lockedLevels)
-                    Quad(
+                    SkillLevel(
                         skillInfo.overflowLevel,
                         skillInfo.overflowCurrentXp,
                         skillInfo.overflowCurrentXpMax,
                         skillInfo.overflowTotalXp,
                     )
                 else
-                    Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
+                    SkillLevel(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
             this[skill] = if (level == -1) {
                 Renderable.clickable(
@@ -427,11 +428,11 @@ object SkillProgress {
 
         val (level, currentXP, currentXPMax, _) =
             if (useCustomGoalLevel && customGoalConfig.enableInDisplay)
-                Quad(currentLevel, xp + add, need, xpTotalCurrent)
+                SkillLevel(currentLevel, xp + add, need, xpTotalCurrent)
             else if (config.overflowConfig.enableInDisplay.get())
-                Quad(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
+                SkillLevel(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
             else
-                Quad(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
+                SkillLevel(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
 
         if (config.showLevel.get())
             add(Renderable.string("§9[§d$level§9] "))

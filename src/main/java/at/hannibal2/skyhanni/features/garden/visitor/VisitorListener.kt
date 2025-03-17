@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -31,8 +30,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
@@ -60,8 +59,7 @@ object VisitorListener {
         val packet = event.packet
         if (packet !is C02PacketUseEntity) return
 
-        val theWorld = Minecraft.getMinecraft().theWorld
-        val entity = packet.getEntityFromWorld(theWorld) ?: return
+        val entity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
         val entityId = entity.entityId
 
         lastClickedNpc = entityId
@@ -99,13 +97,13 @@ object VisitorListener {
         if (!VisitorApi.isVisitorInfo(lore)) return
 
         val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
-        if (offerItem.name != "§aAccept Offer") return
+        if (offerItem.displayName != "§aAccept Offer") return
 
         VisitorApi.inInventory = true
 
         val visitorOffer = VisitorApi.VisitorOffer(offerItem)
 
-        var name = npcItem.name
+        var name = npcItem.displayName
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }

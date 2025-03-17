@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -80,7 +79,7 @@ object CollectionApi {
             if (inventoryName == "Boss Collections") return
 
             for ((_, stack) in event.inventoryItems) {
-                var name = stack.name.removeColor()
+                var name = stack.displayName.removeColor()
                 if (name.contains("Collections")) continue
 
                 val lore = stack.getLore()

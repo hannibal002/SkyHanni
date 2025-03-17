@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object EnderNodeTracker {
@@ -163,9 +162,10 @@ object EnderNodeTracker {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter {
-            it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
+        val newMiteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
+            it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
         }.sumOf { it.stackSize }
+
         val change = newMiteGelInInventory - miteGelInInventory
         if (change > 0) {
             tracker.modify { storage ->
