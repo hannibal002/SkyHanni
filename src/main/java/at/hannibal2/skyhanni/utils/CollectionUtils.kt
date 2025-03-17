@@ -361,9 +361,6 @@ object CollectionUtils {
         val off = RenderableUtils.calculateTableXOffsets(this as List<List<Renderable?>>, 0)
         val xLength = off.size - 1
         val emptySpace = xSpace - off.last()
-//         if (emptySpace < 0) {
-//                throw IllegalArgumentException("Not enough space for content")
-//         }
         return emptySpace / (xLength - 1)
     }
 
