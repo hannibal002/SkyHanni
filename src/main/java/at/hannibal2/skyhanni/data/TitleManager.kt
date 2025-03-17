@@ -31,7 +31,7 @@ object TitleManager {
     private val titleQueue: Queue<DisplayTitleData> = LinkedList()
     private val sortTitleQueue: Queue<Map<DisplayTitleData, Double>> = LinkedList()
 
-    data class DisplayTitleData (
+    data class DisplayTitleData(
         val text: String,
         val duration: Duration,
         val height: Double = 1.8,
