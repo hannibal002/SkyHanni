@@ -105,8 +105,8 @@ object GemstoneMoneyPerHour {
 
         add(Renderable.string("§d§lGemstone Money per Hour"))
         add(Renderable.string("§a($gemstoneName @ §b${gemstonePrice.shortFormat()})"))
-        add(Renderable.string("§a$/hr: §b${moneyPerHour.toInt().shortFormat()}"))
-        add(Renderable.string("§a$ made: §b${coins.shortFormat()}"))
+        add(Renderable.string("§aCoins/hr: §b${moneyPerHour.toInt().shortFormat()}"))
+        add(Renderable.string("§aCoins made: §b${coins.shortFormat()}"))
         add(Renderable.string("§aUptime: §b${uptime.format()}$pausedText"))
     }
 
