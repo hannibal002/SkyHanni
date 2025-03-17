@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.player.PlayerInteractionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -35,7 +35,8 @@ object ClientEvents {
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (event.phase == TickEvent.Phase.START) return
-        Minecraft.getMinecraft().thePlayer ?: return
+        if (!MinecraftCompat.localPlayerExists) return
+        if (!MinecraftCompat.localWorldExists) return
 
         DelayedRun.checkRuns()
         totalTicks++
@@ -45,9 +46,18 @@ object ClientEvents {
     @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
         if (event.type.toInt() == 2) {
-            ActionBarData.onChatReceive(event)
+            ActionBarData.onChatReceive(event.message)?.let { result ->
+                event.message = result
+            }
         } else {
-            ChatManager.onChatReceive(event)
+            val (result, cancel) = ChatManager.onChatReceive(event.message)
+
+            result?.let {
+                event.message = it
+            }
+            if (cancel) {
+                event.isCanceled = true
+            }
         }
     }
 

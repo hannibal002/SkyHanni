@@ -24,9 +24,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,7 +38,7 @@ object GardenOptimalSpeed {
     private val configCustomSpeed get() = config.customSpeed
     private var sneakingSince = SimpleTimeMark.farFuture()
     private var sneakingTime = 0.seconds
-    private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
+    private val sneaking get() = MinecraftCompat.localPlayer.isSneaking
     private val sneakingPersistent get() = sneakingSince.passedSince() > 5.seconds
     private val rancherBoots = "RANCHERS_BOOTS".toInternalName()
 
@@ -65,7 +65,7 @@ object GardenOptimalSpeed {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()
+        currentSpeed = (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
 
         if (sneaking && !sneakingSince.isInPast()) {
             sneakingSince = SimpleTimeMark.now()
@@ -182,7 +182,7 @@ object GardenOptimalSpeed {
     }
 
     private fun warn(optimalSpeed: Int) {
-        if (!Minecraft.getMinecraft().thePlayer.onGround) return
+        if (!MinecraftCompat.localPlayer.onGround) return
         if (GardenApi.onBarnPlot) return
         if (!config.warning) return
         if (!GardenApi.isCurrentlyFarming()) return
