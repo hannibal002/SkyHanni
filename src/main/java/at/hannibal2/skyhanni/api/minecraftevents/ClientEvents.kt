@@ -51,7 +51,6 @@ object ClientEvents {
                 event.message = result
             }
         } else {
-
             val (result, cancel) = ChatManager.onChatReceive(event.message)
 
             if (result != null) {
