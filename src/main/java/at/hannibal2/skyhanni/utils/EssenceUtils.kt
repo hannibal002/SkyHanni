@@ -143,12 +143,12 @@ object EssenceUtils {
     )
 
     private fun extractPurchasedUpgrades(inventoryItems: Map<Int, ItemStack>) = buildMap {
-        loop@ for (value in inventoryItems.values) {
+        for (value in inventoryItems.values) {
             // Right now Carnival and Essence Upgrade patterns are 'in-sync'
             // This may change in the future, and this would then need its own pattern
             essenceUpgradePattern.matchMatcher(value.displayName) {
-                val upgradeName = groupOrNull("upgrade") ?: continue@loop
-                val nextUpgradeRoman = groupOrNull("tier") ?: continue@loop
+                val upgradeName = groupOrNull("upgrade") ?: continue
+                val nextUpgradeRoman = groupOrNull("tier") ?: continue
                 val nextUpgrade = nextUpgradeRoman.romanToDecimal()
                 val isMaxed = value.getLore().any { loreLine -> maxedUpgradeLorePattern.matches(loreLine) }
                 put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1)
