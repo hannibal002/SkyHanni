@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MaxwellApi
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 
@@ -21,18 +23,25 @@ object ScoreboardElementTuning : ScoreboardElement() {
         return if (maxwellConfig.compactTuning) {
             val tuningDisplay = tunings.take(3).joinToString("§7, ") { tuning ->
                 with(tuning) {
-                    if (displayConfig.displayNumbersFirst) "$color$value$icon"
-                    else "$color$icon$value"
+                    when (displayConfig.numberDisplayFormat) {
+                        NumberDisplayFormat.TEXT_COLOR_NUMBER -> "$icon$color$value"
+                        NumberDisplayFormat.COLOR_TEXT_NUMBER -> "$color$icon$value"
+                        NumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$value$icon"
+                        NumberDisplayFormat.COLOR_NUMBER_RESET_TEXT -> "$color$value§f$icon"
+                    }
                 }
             }
-            if (displayConfig.displayNumbersFirst) "$tuningDisplay §f$title"
-            else "$title: $tuningDisplay"
+            CustomScoreboardUtils.formatNumberDisplay(title, tuningDisplay, "§f")
         } else {
             val tuningAmount = maxwellConfig.tuningAmount.coerceAtLeast(1)
             val tuningList = tunings.take(tuningAmount).map { tuning ->
                 with(tuning) {
-                    " §7- §f" + if (displayConfig.displayNumbersFirst) "$color$value $icon $name"
-                    else "$name: $color$value$icon"
+                    " §7- §f" + when (displayConfig.numberDisplayFormat) {
+                        NumberDisplayFormat.TEXT_COLOR_NUMBER -> "$name: $icon$color$value"
+                        NumberDisplayFormat.COLOR_TEXT_NUMBER -> "$color$name: $icon$value"
+                        NumberDisplayFormat.COLOR_NUMBER_TEXT -> "$color$value$icon $name"
+                        NumberDisplayFormat.COLOR_NUMBER_RESET_TEXT -> "$color$value§f$icon $name"
+                    }
                 }
             }
             listOf("$title:") + tuningList
