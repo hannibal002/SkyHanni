@@ -59,9 +59,9 @@ fun slotUnderCursor(): Slot? {
 val GuiChest.container: Container
     //#if MC < 1.16
     get() = this.inventorySlots
-    //#else
-    //$$ get() = this.screenHandler
-    //#endif
+//#else
+//$$ get() = this.screenHandler
+//#endif
 
 
 object InventoryCompat {
@@ -72,7 +72,7 @@ object InventoryCompat {
         //#if MC < 1.16
         if (currentScreen !is GuiChest) return ""
         val value = currentScreen.inventorySlots as ContainerChest
-        return value.lowerChestInventory?.displayName?.unformattedText ?: ""
+        return value.lowerChestInventory?.displayName?.unformattedText.orEmpty()
         //#else
         //$$ return currentScreen?.title.formattedTextCompat()
         //#endif
