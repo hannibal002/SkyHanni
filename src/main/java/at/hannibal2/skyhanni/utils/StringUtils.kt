@@ -445,7 +445,7 @@ object StringUtils {
                 //$$                 hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
                 //#endif
             }
-            ) {
+        ) {
             hoverEvents.add(hoverEvent)
         }
     }
