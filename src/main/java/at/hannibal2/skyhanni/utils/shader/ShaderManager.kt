@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
 import org.apache.commons.lang3.StringUtils
@@ -94,7 +95,7 @@ object ShaderManager {
         return shaderID
     }
 
-    fun inWorld() = (Minecraft.getMinecraft().theWorld != null) && (Minecraft.getMinecraft().thePlayer != null)
+    fun inWorld() = MinecraftCompat.localWorldExists && MinecraftCompat.localPlayerExists
 }
 
 enum class ShaderType(val extension: String, val shaderType: Int) {
