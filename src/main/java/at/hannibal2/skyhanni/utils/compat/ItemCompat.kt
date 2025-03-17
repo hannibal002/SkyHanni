@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-
 //#if MC > 1.16
 //$$ import net.minecraft.world.item.DyeItem
 //#endif
@@ -17,14 +17,14 @@ import net.minecraft.item.ItemStack
 
 fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
     //#if MC < 1.12
-    return this.getTooltip(MinecraftCompat.localPlayer, advanced)
+    return this.getTooltip(Minecraft.getMinecraft().thePlayer, advanced)
     //#elseif MC < 1.16
-    //$$ return this.getTooltip(MinecraftCompat.localPlayer) { advanced }
+    //$$ return this.getTooltip(Minecraft.getMinecraft().player) { advanced }
     //#elseif MC < 1.21
-    //$$ return this.getTooltipLines(MinecraftCompat.localPlayer) { advanced }.map { it.getFormattedTextCompat() }.toMutableList()
+    //$$ return this.getTooltipLines(Minecraft.getInstance().player) { advanced }.map { it.getFormattedTextCompat() }.toMutableList()
     //#else
     //$$ val tooltipType = if (advanced) TooltipType.ADVANCED else TooltipType.BASIC
-    //$$ return this.getTooltip(Item.TooltipContext.DEFAULT, MinecraftCompat.localPlayer, tooltipType).map { it.formattedTextCompat() }.toMutableList()
+    //$$ return this.getTooltip(Item.TooltipContext.DEFAULT, MinecraftClient.getInstance().player, tooltipType).map { it.formattedTextCompat() }.toMutableList()
     //#endif
 }
 
