@@ -16,9 +16,11 @@ import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
+import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
@@ -37,7 +39,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
-import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
@@ -71,7 +72,7 @@ object RenderUtils {
         override fun toString() = value
     }
 
-    private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
+    private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
@@ -232,7 +233,7 @@ object RenderUtils {
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, 1, 1, 0)
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        val time = Minecraft.getMinecraft().theWorld.totalWorldTime + partialTicks.toDouble()
+        val time = MinecraftCompat.localWorld.totalWorldTime + partialTicks.toDouble()
         val d1 = MathHelper.func_181162_h(
             -time * 0.2 - MathHelper.floor_double(-time * 0.1)
                 .toDouble(),
@@ -449,7 +450,7 @@ object RenderUtils {
         debug: Boolean = false,
     ) {
         val minecraft = Minecraft.getMinecraft()
-        val player = minecraft.thePlayer
+        val player = MinecraftCompat.localPlayer
         val x =
             pos.x - player.lastTickPosX + (pos.x - player.posX - (pos.x - player.lastTickPosX)) * partialTicks
         val y =
@@ -1035,7 +1036,7 @@ object RenderUtils {
         maxDistance: Int? = null,
     ) {
         val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
-        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
 
         val x = location.x
         val y = location.y
@@ -1044,7 +1045,7 @@ object RenderUtils {
         val renderOffsetX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
         val renderOffsetY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
         val renderOffsetZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        val eyeHeight = thePlayer.getEyeHeight()
+        val eyeHeight = player.getEyeHeight()
 
         val dX = (x - renderOffsetX) * (x - renderOffsetX)
         val dY = (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight))
@@ -1149,7 +1150,7 @@ object RenderUtils {
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
-        val player = Minecraft.getMinecraft().thePlayer
+        val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
         PatcherFixes.onPlayerEyeLine()
         return exactLocation(player).add(y = eyeHeight)
@@ -1358,7 +1359,7 @@ object RenderUtils {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
             listOf(
-                this.exactPlayerEyeLocation() + Minecraft.getMinecraft().thePlayer.getLook(this.partialTicks)
+                this.exactPlayerEyeLocation() + MinecraftCompat.localPlayer.getLook(this.partialTicks)
                     .toLorenzVec()
                     /* .rotateXZ(-Math.PI / 72.0) */
                     .times(2),
@@ -1665,7 +1666,7 @@ object RenderUtils {
         color: Color,
         depth: Boolean,
     ) {
-        val (cornerOne, cornerTwo, cornerThree, cornerFour) = boundingBox.getCorners(boundingBox.maxY)
+        val (cornerOne, cornerTwo, cornerThree, cornerFour) = boundingBox.getCornersAtHeight(boundingBox.maxY)
         this.draw3DLine(cornerOne, cornerTwo, color, lineWidth, depth)
         this.draw3DLine(cornerTwo, cornerThree, color, lineWidth, depth)
         this.draw3DLine(cornerThree, cornerFour, color, lineWidth, depth)
@@ -1723,8 +1724,8 @@ object RenderUtils {
         color: Color,
         depth: Boolean,
     ) {
-        val cornersTop = boundingBox.getCorners(boundingBox.maxY)
-        val cornersBottom = boundingBox.getCorners(boundingBox.minY)
+        val cornersTop = boundingBox.getCornersAtHeight(boundingBox.maxY)
+        val cornersBottom = boundingBox.getCornersAtHeight(boundingBox.minY)
 
         // Draw lines for the top and bottom faces
         for (i in 0..3) {

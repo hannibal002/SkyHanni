@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -114,7 +115,7 @@ object SlayerRngMeterDisplay {
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
                 ChatUtils.userError("No Slayer RNG Meter Item selected!")
-                LorenzUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
+                TitleManager.sendTitle("§cNo RNG Meter Item!", 3.seconds)
             }
             var blockChat = config.hideChat && hasItemSelected
             val diff = currentMeter - old
