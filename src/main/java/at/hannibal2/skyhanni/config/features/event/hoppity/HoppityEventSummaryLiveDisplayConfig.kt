@@ -65,7 +65,7 @@ class HoppityEventSummaryLiveDisplayConfig {
         desc = "Add a dummy \"All-Time\" entry after the last set of stats, showing the total stats for all recorded events."
     )
     @ConfigEditorBoolean
-    public boolean showAllTime = true;
+    var showAllTime: Boolean = true
 
     @Expose
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
