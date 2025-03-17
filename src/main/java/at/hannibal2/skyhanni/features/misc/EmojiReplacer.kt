@@ -129,14 +129,14 @@ object EmojiReplacer {
         }
     }
 
-    private fun getEmojiString(string: String): String {
-        val unicodeToName = reverseUnicodeToName ?: return ""
-        return ":${unicodeToName[string]}:"
-    }
-
     private fun isEmojiString(string: String): Boolean {
         val unicodeToName = reverseUnicodeToName ?: return false
         return unicodeToName.containsKey(string)
+    }
+
+    private fun getEmojiString(string: String): String {
+        val unicodeToName = reverseUnicodeToName ?: return ""
+        return ":${unicodeToName[string]}:"
     }
 
     fun replaceEmojis(string: String): String {
