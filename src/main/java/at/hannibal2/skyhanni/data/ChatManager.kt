@@ -24,6 +24,7 @@ import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
@@ -169,7 +170,7 @@ object ChatManager {
             cancelled = true
             component.send(chatEvent.chatLineId)
         }
-        return Pair(if (modified) component else null, cancelled)
+        return Pair(component.takeIf { modified }, cancelled)
     }
 
     private fun openChatFilterGUI(args: Array<String>) {

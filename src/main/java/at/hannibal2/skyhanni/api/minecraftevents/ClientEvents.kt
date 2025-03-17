@@ -46,15 +46,14 @@ object ClientEvents {
     @SubscribeEvent(receiveCanceled = true)
     fun onChatReceive(event: ClientChatReceivedEvent) {
         if (event.type.toInt() == 2) {
-            val result = ActionBarData.onChatReceive(event.message)
-            if (result != null) {
+            ActionBarData.onChatReceive(event.message)?.let { result ->
                 event.message = result
             }
         } else {
             val (result, cancel) = ChatManager.onChatReceive(event.message)
 
-            if (result != null) {
-                event.message = result
+            result?.let {
+                event.message = it
             }
             if (cancel) {
                 event.isCanceled = true
