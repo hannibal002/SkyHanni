@@ -94,6 +94,7 @@ object TimiteHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
+        if (!RiftApi.inMountainTop() || !config.timiteExpiryTimer) return
         val location = LocationUtils.playerLocation()
         val from = location.add(-15, -15, -15).toBlockPos()
         val to = location.add(15, 15, 15).toBlockPos()
