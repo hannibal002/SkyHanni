@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
@@ -132,11 +133,11 @@ object TabListData {
     }
 
     private fun readTabList(): List<String>? {
-        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return null
+        val player = MinecraftCompat.localPlayerOrNull ?: return null
         //#if MC < 1.16
-        val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
+        val players = playerOrdering.sortedCopy(player.sendQueue.playerInfoMap)
         //#else
-        //$$ val players = playerOrdering.sortedCopy(thePlayer.connection.onlinePlayers)
+        //$$ val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
         //#endif
         val result = mutableListOf<String>()
         tabListGuard = true

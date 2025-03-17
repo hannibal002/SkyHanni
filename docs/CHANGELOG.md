@@ -1,5 +1,111 @@
 # SkyHanni - Change Log
 
+## Version 3.0.0
+
+### New Features
+
+#### Fishing
+
++ Added Hotspot Radar Guesser. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3551)
+    + Added a waypoint of the Fishing Hotspot when using the Hotspot Radar.
+
+### Improvements
+
+#### Garden
+
++ Added /shlockmouse as an alias for /shmouselock. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3470)
+
+#### Mining
+
++ Added Outline Mode to the Nucleus Barriers Highlighter. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3530)
+
+#### Misc
+
++ Added 5 more separators to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3539)
++ Added a dropdown option for changing the display of numbers with their prefix in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2830)
+    + Replaced Display Numbers First option.
+
+### Bug Fixes
+
+#### Garden
+
++ Fixed Garden Commands issue preventing warp (barn/home) and sethome hotkeys from triggering within 2 seconds. - Luna (https://github.com/hannibal002/SkyHanni/pull/3529)
+
+#### The Rift
+
++ Fixed Custom Scoreboard Chunked Stats using the wrong color for motes. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3534)
+
+#### Fishing
+
++ Fixed Sulphur Skitter Box not displaying without lava nearby. - Luna (https://github.com/hannibal002/SkyHanni/pull/3523)
+    + The Player must be within 4 blocks, not the bobber, for the box to display.
+
+#### Events
+
++ Fixed incorrect Hitman times when eggs were claimable. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3573)
+
+#### Chat
+
++ Fixed SkyBlock Level not displaying in `/show` messages with Custom Chat Formatting enabled. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3519)
+
+#### Misc
+
++ Fixed missing Rod Part category. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3544)
++ Fixed wrong skull fallback texture spamming logs. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3576)
+
+### Technical Details
+
++ Added all remaining particle mappings for modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3579)
++ Added Color deconstruct operators. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/3583)
++ Added Item.getIdentifierString() and String.getVanillaItem(). - nopo (https://github.com/hannibal002/SkyHanni/pull/3561)
++ Added ItemStack.setCustomItemName and updated some AxisAlignedBB to use the LorenzVec helper method. - nopo (https://github.com/hannibal002/SkyHanni/pull/3565)
++ Added mappings for inventories on modern versions. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/3575)
+    + Replaced usage of `event.gui.inventorySlots.inventorySlots` with `event.container.inventorySlots`.
++ Added more 1.21 mappings. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/3543)
++ Added more preprocessing and compat methods for chat on modern versions. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/3584)
++ Added new island Backwater Bayou to IslandType enum. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3570)
++ Added scoreboard compatibility for 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3581)
++ Added support for Pattern Mappings. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3546)
+    + Allowed mappings that require an additional import.
++ Added Treasure Chance to StatsApi. - Thunderblade73 & SuperClash (https://github.com/hannibal002/SkyHanni/pull/3545)
++ Allowed command registration on modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3564)
++ Centralised all receiving of Forge events. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3566)
+    + Improves handling of Minecraft events on modern versions.
++ Changed CrystalHighlighterConfig to Kotlin. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3530)
++ Changed Minecraft dye code to use DyeCompat class instead. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3548)
++ Cleaned up GriffinBurrowParticleFinder extensively. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3579)
++ Created EnumUtils for enum-related utility methods. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3564)
++ Created SignUtils. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3368)
++ Disabled `shots.txt` due to causing Minecraft plugin issues in mixins. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3537)
++ Fixed 1.21 errors using remap and preprocessor. - nopo (https://github.com/hannibal002/SkyHanni/pull/3540)
++ Fixed missing repo item highlight on many items. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3575)
++ Fixed various chat-related errors on modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3563)
++ Generated Minecraft Client run configs for modern versions and enabled launching. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/3556)
+    + Minecraft Client 1.21.4 task now auto-generates; click play to launch 1.21.4.
++ Made all compat files work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3543)
++ Made Item Utils work in 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3577)
++ More mappings for modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3568)
++ Moved methods from LorenzUtils to more appropriate classes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3582)
++ Moved NucleusBarriersBox to the mining.crystalhollows package. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3530)
++ Moved the Fabric SkyHanniModLoader to the 1.21.4 folder. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3564)
+    + This makes modern development easier.
++ Preprocessed mouse-related code. - hannibal2 & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3532)
++ Preprocessed ResourceLocations. - nopo (https://github.com/hannibal002/SkyHanni/pull/3569)
+    + A letter 1.21 mentioned.
++ Re-enabled the multi-version build action. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3532)
++ Removed Quad. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3583)
++ Removed the ItemStack.name function. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3547)
+    + This function did not provide any benefits over the default Forge one.
++ Renamed .getFormattedTextCompat() to .formattedTextCompat(). - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3559)
++ Renamed `1.16.5` to `1.16.5-fabric` for clarity. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3537)
++ Renamed ItemStack.getEnchants and ItemStack.itemName. - nopo (https://github.com/hannibal002/SkyHanni/pull/3558)
++ Renamed Text to TextHelper and ChestValue's Item to ChestItem. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3549)
+    + Clarified imports and fixed class name overlaps on modern versions.
++ Split SkyHanniMod into two files. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3556)
+    + One file for loader-specific operations and one for original logic.
++ Used TextHelper.asComponent() for chat components. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3563)
+    + This fixes issues on modern versions.
+
 ## Version 2.0.0
 
 ### New Features

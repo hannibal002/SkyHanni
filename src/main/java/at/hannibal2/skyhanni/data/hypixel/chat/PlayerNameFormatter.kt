@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils.changeColor
+import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
@@ -28,6 +28,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.style
+import at.hannibal2.skyhanni.utils.compat.appendComponent
+import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
@@ -79,10 +81,10 @@ object PlayerNameFormatter {
             privateIslandGuest = privateIslandGuest,
         )
         val all = "".asComponent()
-        all.appendSibling(name)
-        all.appendText(": ")
-        all.appendSibling(chatColor.asComponent())
-        all.appendSibling(message.intoComponent())
+        all.appendComponent(name)
+        all.appendString(": ")
+        all.appendComponent(chatColor.asComponent())
+        all.appendComponent(message.intoComponent())
         event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
     }
 
@@ -92,9 +94,9 @@ object PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§bCo-op > ") {
-                appendSibling(nameFormat(event.authorComponent))
-                appendText("§f: ")
-                appendSibling(event.messageComponent.intoComponent())
+                appendComponent(nameFormat(event.authorComponent))
+                appendString("§f: ")
+                appendComponent(event.messageComponent.intoComponent())
             },
         ) ?: return
     }
@@ -105,9 +107,9 @@ object PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§2Guild > ") {
-                appendSibling(nameFormat(event.authorComponent, guildRank = event.guildRank))
-                appendText("§f: ")
-                appendSibling(event.messageComponent.intoComponent())
+                appendComponent(nameFormat(event.authorComponent, guildRank = event.guildRank))
+                appendString("§f: ")
+                appendComponent(event.messageComponent.intoComponent())
             },
         ) ?: return
     }
@@ -118,9 +120,9 @@ object PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§9Party §8> ") {
-                appendSibling(nameFormat(event.authorComponent))
-                appendText("§f: ")
-                appendSibling(event.messageComponent.intoComponent())
+                appendComponent(nameFormat(event.authorComponent))
+                appendString("§f: ")
+                appendComponent(event.messageComponent.intoComponent())
             },
         ) ?: return
     }
@@ -131,10 +133,10 @@ object PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("§d${event.direction}") {
-                appendText(" ")
-                appendSibling(nameFormat(event.authorComponent))
-                appendText("§f: ")
-                appendSibling(event.messageComponent.intoComponent())
+                appendString(" ")
+                appendComponent(nameFormat(event.authorComponent))
+                appendString("§f: ")
+                appendComponent(event.messageComponent.intoComponent())
             },
         ) ?: return
     }
@@ -145,19 +147,19 @@ object PlayerNameFormatter {
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
             TextHelper.text("") {
-                appendSibling(
+                appendComponent(
                     nameFormat(
                         event.authorComponent,
-                        levelColor = event.levelComponent?.sampleStyleAtStart()?.color?.toString(),
+                        levelColor = event.levelComponent?.getText()?.getFirstColorCode()?.let { "§$it" },
                         level = event.levelComponent,
                     ),
                 )
 
-                appendText(" ")
-                appendSibling(event.action.intoComponent().changeColor(LorenzColor.GRAY))
+                appendString(" ")
+                appendComponent(event.action.intoComponent().changeColor(LorenzColor.GRAY))
 
-                appendText(" ")
-                appendSibling(event.item.intoComponent())
+                appendString(" ")
+                appendComponent(event.item.intoComponent())
             },
         ) ?: return
     }
@@ -210,10 +212,10 @@ object PlayerNameFormatter {
                 first = false
             } else {
                 if (!all.unformattedText.endsWith(" ")) {
-                    all.appendText(" ")
+                    all.appendString(" ")
                 }
             }
-            all.appendSibling(text)
+            all.appendComponent(text)
         }
 
         return all
@@ -291,4 +293,12 @@ object PlayerNameFormatter {
             newList
         }
     }
+
+    // TODO move to TextCompat once LorenzColor works on 1.21
+    private fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
+        //#if MC < 1.21
+        this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
+    //#else
+    //$$ this.copy().withColor(color.toChatFormatting())
+    //#endif
 }
