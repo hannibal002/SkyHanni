@@ -101,27 +101,29 @@ object GardenPlotIcon {
                 else
                     editMode--
             }
-        } else if (editMode != 0) {
-            if (event.slotId in 54..89) {
-                event.cancel()
-                copyStack = event.slot?.stack?.copy()?.also {
-                    it.stackSize = 1
-                } ?: return
-                // TODO different format, not bold or show not in chat at all.
-                ChatUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
-                return
-            }
-            val plotList = plotList ?: return
-            if (!whitelistedSlot.contains(event.slotId)) return
-            event.cancel()
-            if (editMode == 2) {
-                plotList.remove(event.slotId)
-                return
-            }
-            val copyStack = copyStack ?: return
-            plotList[event.slotId] = copyStack.getInternalName()
-            cachedStack[event.slotId] = copyStack
         }
+        if (editMode == 0) return
+
+        if (event.slotId in 54..89) {
+            event.cancel()
+            copyStack = event.slot?.stack?.copy()?.also {
+                it.stackSize = 1
+            } ?: return
+            // TODO different format, not bold or show not in chat at all.
+            ChatUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
+            return
+        }
+
+        val plotList = plotList ?: return
+        if (!whitelistedSlot.contains(event.slotId)) return
+        event.cancel()
+        if (editMode == 2) {
+            plotList.remove(event.slotId)
+            return
+        }
+        val copyStack = copyStack ?: return
+        plotList[event.slotId] = copyStack.getInternalName()
+        cachedStack[event.slotId] = copyStack
     }
 
     @HandleEvent
