@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.MiningApi.inGlaciteArea
 import at.hannibal2.skyhanni.data.MiningApi.lastColdReset
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -106,7 +107,7 @@ object MiningNotifications {
 
     private fun sendNotification(type: MiningNotificationList) {
         if (type !in config.notifications) return
-        LorenzUtils.sendTitle(type.notification, 1500.milliseconds)
+        TitleManager.sendTitle(type.notification, 1500.milliseconds)
         if (config.playSound) SoundUtils.playPlingSound()
     }
 }

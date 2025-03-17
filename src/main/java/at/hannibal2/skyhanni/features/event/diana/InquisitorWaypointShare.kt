@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
@@ -298,7 +299,7 @@ object InquisitorWaypointShare {
         if (!waypoints.containsKey(name)) {
             ChatUtils.chat("$displayName §l§efound an inquisitor at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
             if (name != LorenzUtils.getPlayerName()) {
-                LorenzUtils.sendTitle("§dINQUISITOR §efrom §b$displayName", 5.seconds)
+                TitleManager.sendTitle("§dINQUISITOR §efrom §b$displayName", 5.seconds)
                 playUserSound()
             }
         }

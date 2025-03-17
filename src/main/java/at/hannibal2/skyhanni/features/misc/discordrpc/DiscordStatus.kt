@@ -18,8 +18,8 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -78,7 +78,7 @@ fun getPetDisplay(): String = PetApi.currentPet?.let {
     val petName = it.substring(2).removeColor()
     val petLevel = if (PlatformUtils.isNeuLoaded()) getCurrentPet()?.petLevel?.currentLevel ?: "?" else "?"
 
-    "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
+    "[Lvl $petLevel] ${LorenzRarity.colorCodeToRarity(colorCode)} $petName"
 } ?: "No pet equipped"
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
