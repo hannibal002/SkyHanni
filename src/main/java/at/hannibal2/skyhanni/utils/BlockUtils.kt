@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.Minecraft
 import net.minecraft.tileentity.TileEntitySkull
 
 object BlockUtils {
 
-    private val world get() = Minecraft.getMinecraft().theWorld
+    private val world get() = MinecraftCompat.localWorld
 
     fun LorenzVec.getBlockAt(): Block = getBlockStateAt().block
 
@@ -18,7 +18,7 @@ object BlockUtils {
     fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
 
     fun getTextureFromSkull(position: LorenzVec?): String? {
-        val entity = world?.getTileEntity(position?.toBlockPos()) as? TileEntitySkull ?: return null
+        val entity = world.getTileEntity(position?.toBlockPos()) as? TileEntitySkull ?: return null
         return entity.serializeNBT().getCompoundTag("Owner").getSkullTexture()
     }
 
@@ -36,7 +36,7 @@ object BlockUtils {
 
     fun getBlockLookingAt(distance: Double = 10.0) = rayTrace(
         LocationUtils.playerEyeLocation(),
-        Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec(),
+        MinecraftCompat.localPlayer.lookVec.toLorenzVec(),
         distance,
     )
 }

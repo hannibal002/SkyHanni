@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isFormatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import java.util.Collections
 
@@ -193,8 +194,7 @@ object CollectionTracker {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
-        thePlayer.worldObj ?: return
+        MinecraftCompat.localPlayer.worldObj ?: return
 
         compareInventory()
         updateGain()

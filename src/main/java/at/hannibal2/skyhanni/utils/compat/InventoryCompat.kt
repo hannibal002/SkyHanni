@@ -13,7 +13,7 @@ import net.minecraft.item.ItemStack
 fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int = 0, mode: Int = 0) {
     windowId ?: return
     val controller = Minecraft.getMinecraft().playerController ?: return
-    val player = Minecraft.getMinecraft().thePlayer ?: return
+    val player = MinecraftCompat.localPlayerOrNull ?: return
     //#if FORGE
     controller.windowClick(windowId, slot, mouseButton, mode, player)
     //#else

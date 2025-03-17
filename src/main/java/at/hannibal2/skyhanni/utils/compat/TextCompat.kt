@@ -138,9 +138,9 @@ fun IChatComponent.appendComponent(component: IChatComponent): IChatComponent =
 
 fun addChatMessageToChat(message: IChatComponent) {
     //#if MC < 1.16
-    Minecraft.getMinecraft().thePlayer.addChatMessage(message)
+    MinecraftCompat.localPlayer.addChatMessage(message)
     //#else
-    //$$ MinecraftClient.getInstance().player?.sendMessage(message, false)
+    //$$ MinecraftCompat.localPlayer.sendMessage(message, false)
     //#endif
 }
 
