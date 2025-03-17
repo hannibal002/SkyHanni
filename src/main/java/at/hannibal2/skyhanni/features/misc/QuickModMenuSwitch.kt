@@ -7,18 +7,18 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ModGuiSwitcherJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.ClientCommandHandler
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object QuickModMenuSwitch {
@@ -147,15 +147,14 @@ object QuickModMenuSwitch {
         currentlyOpeningMod = mod.name
         update()
         try {
-            val thePlayer = Minecraft.getMinecraft().thePlayer
-            ClientCommandHandler.instance.executeCommand(thePlayer, "/" + mod.command)
+            ClientCommandHandler.instance.executeCommand(MinecraftCompat.localPlayer, "/" + mod.command)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)
         }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiScreenEvent.DrawScreenEvent.Post) {
+    @HandleEvent
+    fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!isEnabled()) return
 
         GlStateManager.pushMatrix()
