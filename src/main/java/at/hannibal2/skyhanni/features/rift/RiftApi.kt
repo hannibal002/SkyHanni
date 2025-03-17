@@ -62,22 +62,22 @@ object RiftApi {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.temporalPillarDodge) {
-            if (IslandGraphs.tempRemoveReason == "Temporal Pillar") {
-                IslandGraphs.resetTempRemove()
+            if (IslandGraphs.disabledNodesReason == "Temporal Pillar") {
+                IslandGraphs.enableAllNodes()
             }
             return
         }
         val temporalPillar = MobData.skyblockMobs.find { it.name == "Temporal Pillar" }
 
-        IslandGraphs.tempRemoveReason?.let {
-            IslandGraphs.resetTempRemove()
+        IslandGraphs.disabledNodesReason?.let {
+            IslandGraphs.enableAllNodes()
             if (temporalPillar == null) {
                 IslandGraphs.update(force = true)
             }
         }
         temporalPillar?.let {
             val location = it.baseEntity.getLorenzVec()
-            IslandGraphs.tempRemove("Temporal Pillar", location, 7.0)
+            IslandGraphs.disableNodes("Temporal Pillar", location, 7.0)
             IslandGraphs.update(force = true)
         }
 
