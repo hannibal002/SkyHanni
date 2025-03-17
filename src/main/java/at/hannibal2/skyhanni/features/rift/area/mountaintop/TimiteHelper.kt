@@ -11,22 +11,20 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.block.BlockStainedGlassPane
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
-import net.minecraft.util.BlockPos
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -94,18 +92,19 @@ object TimiteHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!RiftApi.inMountainTop() || !config.expiryTimer) return
-        val location = LocationUtils.playerLocation()
-        val from = location.add(-15, -15, -15).toBlockPos()
-        val to = location.add(15, 15, 15).toBlockPos()
 
-        for (loc in BlockPos.getAllInBox(from, to).map { it.toLorenzVec() }) {
-            val state = loc.getBlockStateAt()
-            if (state.block == Blocks.stained_glass_pane && loc.distanceToPlayer() <= 15) {
-                val color = state.getValue(BlockStainedGlassPane.COLOR)
-                if (color != EnumDyeColor.BLUE && color != EnumDyeColor.LIGHT_BLUE) continue
-                if (locations[loc] == null) locations[loc] = SimpleTimeMark.now()
-            }
+        val map = BlockUtils.nearbyBlocks(
+            LocationUtils.playerLocation(),
+            distance = 15,
+            filter = Blocks.stained_glass_pane,
+        )
+
+        for ((loc, state) in map) {
+            val color = state.getValue(BlockStainedGlassPane.COLOR)
+            if (color != EnumDyeColor.BLUE && color != EnumDyeColor.LIGHT_BLUE) continue
+            if (locations[loc] == null) locations[loc] = SimpleTimeMark.now()
         }
+
         val iterator = locations.entries.iterator()
         while (iterator.hasNext()) {
             val state = iterator.next().key.getBlockStateAt()

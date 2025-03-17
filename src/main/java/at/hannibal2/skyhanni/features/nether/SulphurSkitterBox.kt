@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -19,10 +19,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
 
 @SkyHanniModule
 object SulphurSkitterBox {
@@ -59,14 +57,11 @@ object SulphurSkitterBox {
     }
 
     private fun calculateSpongeLocations() {
-        val location = LocationUtils.playerLocation()
-        val from = location.add(-15, -15, -15).toBlockPos()
-        val to = location.add(15, 15, 15).toBlockPos()
-
-        spongeLocations = BlockPos.getAllInBox(from, to).filter {
-            val loc = it.toLorenzVec()
-            loc.getBlockAt() == Blocks.sponge && loc.distanceToPlayer() <= 15
-        }.map { it.toLorenzVec() }
+        spongeLocations = BlockUtils.nearbyBlocks(
+            LocationUtils.playerLocation(),
+            distance = 15,
+            filter = Blocks.sponge,
+        ).map { it.key }
     }
 
     @HandleEvent
