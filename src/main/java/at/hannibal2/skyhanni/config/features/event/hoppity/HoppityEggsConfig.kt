@@ -51,7 +51,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Adjust player opacity",
-        desc = "Adjust the opacity of players near shared & guessed egg waypoints. (in %)"
+        desc = "Adjust the opacity of players near shared & guessed egg waypoints. (in %)",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
     var playerOpacity: Int = 40
@@ -59,7 +59,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Hoppity Shop",
-        desc = "Highlight items that haven't been bought from the Hoppity shop yet."
+        desc = "Highlight items that haven't been bought from the Hoppity shop yet.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -75,7 +75,7 @@ class HoppityEggsConfig {
     @ConfigOption(
         name = "Rabbit Pet Warning",
         desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
-            "§eOnly enable this setting when you own a mythic Rabbit pet."
+            "§eOnly enable this setting when you own a mythic Rabbit pet.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -84,7 +84,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Prevent Missing Rabbit the Fish",
-        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present."
+        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

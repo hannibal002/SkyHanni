@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -13,7 +14,7 @@ object GuiChatHook {
         if (!this::replacement.isInitialized) return
 
         // Initialise new component
-        val newComponent = ChatComponentText(title)
+        val newComponent = title.asComponent()
         newComponent.setChatStyle(chatStyle)
 
         replacement = newComponent
@@ -23,9 +24,10 @@ object GuiChatHook {
         if (!this::replacement.isInitialized) return
 
         // Initialise new component
-        val newComponent = ChatComponentText(replacement.chatComponentText_TextValue)
-        newComponent.setChatStyle(replacement.chatStyle)
-        newComponent.chatStyle.chatHoverEvent = hoverEvent
+        val newComponent = replacement.chatComponentText_TextValue.asComponent {
+            chatStyle = replacement.chatStyle
+            chatStyle.chatHoverEvent = hoverEvent
+        }
 
         replacement = newComponent
     }
@@ -33,7 +35,7 @@ object GuiChatHook {
     fun getReplacementAsIChatComponent(): IChatComponent {
         if (!this::replacement.isInitialized) {
             // Return an extremely basic chat component as to not error downstream
-            return ChatComponentText("Original component was not set")
+            return "Original component was not set".asComponent()
         }
         return replacement
     }
