@@ -21,9 +21,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import kotlin.time.Duration.Companion.seconds
@@ -40,36 +38,26 @@ object TimiteTracker {
             return
         }
 
-        override fun getDescription(timesGained: Long): List<String> {
-            return emptyList()
-        }
+        override fun getDescription(timesGained: Long): List<String> = emptyList()
 
-        override fun getCoinName(item: TrackedItem): String {
-            return "§5Motes"
-        }
+        override fun getCoinName(item: TrackedItem): String = "§5Motes"
 
-        override fun getCoinDescription(item: TrackedItem): List<String> {
-            return emptyList()
-        }
+        override fun getCoinDescription(item: TrackedItem): List<String> = emptyList()
 
         override fun getCustomPricePer(internalName: NeuInternalName): Double {
             return internalName.getItemStack().motesNpcPrice() ?: 0.0
         }
 
-        fun getTime(): Int {
-            this.items[TIMITE]?.let {
-                return it.totalAmount.toInt() * 2
-            }
-            return 0
-        }
+        fun getTime(): Int = this.items[TIMITE]?.let {
+            it.totalAmount.toInt() * 2
+        } ?: 0
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§9§lTimite Tracker")
         val profit = tracker.drawItems(data, { true }, this)
 
-        val highliteRecipe = NeuItems.getRecipes(HIGHLITE).singleOrNull()
-        if (highliteRecipe != null) {
+        NeuItems.getRecipes(HIGHLITE).singleOrNull()?.let { highliteRecipe ->
             var craftableAmount = 0
 
             for (neededItem in ItemUtils.neededItems(highliteRecipe)) {
@@ -84,27 +72,17 @@ object TimiteTracker {
             }
             val motes = HIGHLITE.motesNpcPrice()?.times(craftableAmount)?.shortFormat() ?: "0"
             if (craftableAmount > 0) {
-                add(
-                    Renderable.string(
-                        " §7${craftableAmount.shortFormat()}x ${HIGHLITE.repoItemName} Craftable§7: §5$motes motes"
-                    ).toSearchable()
-                )
+                addSearchString(" §7${craftableAmount.shortFormat()}x ${HIGHLITE.repoItemName} Craftable§7: §5$motes motes")
             }
         }
 
-        add(Renderable.string("§aTime§7: §a${data.getTime().seconds.format()}ф").toSearchable())
-
-        add(
-            Renderable.string(
-                "§dTotal Profit§7: §5${profit.toInt().shortFormat()} Motes"
-            ).toSearchable()
-        )
+        addSearchString("§aTime§7: §a${data.getTime().seconds.format()}ф")
+        addSearchString("§dTotal Profit§7: §5${profit.toInt().shortFormat()} Motes")
     }
 
-    private val tracker =
-        SkyHanniItemTracker("Timite Tracker", { Data() }, { it.rift.timiteTracker }) {
-            drawDisplay(it)
-        }
+    private val tracker = SkyHanniItemTracker("Timite Tracker", { Data() }, { it.rift.timiteTracker }) {
+        drawDisplay(it)
+    }
 
     private val validItems = listOf(
         TIMITE,
@@ -114,7 +92,7 @@ object TimiteTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onItem(event: ItemAddEvent) {
-        if (validItems.contains(event.internalName)) {
+        if (event.internalName in validItems) {
             tracker.addItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
         }
     }
@@ -123,7 +101,7 @@ object TimiteTracker {
     fun onRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
-        tracker.renderDisplay(config.trackerPos)
+        tracker.renderDisplay(config.trackerPosition)
     }
 
     @HandleEvent
@@ -136,10 +114,10 @@ object TimiteTracker {
     }
 
     private fun isEnabled() =
-        RiftApi.inMountainTop() && config.timiteTracker &&
-            (!config.timiteOnlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
+        RiftApi.inMountainTop() && config.tracker &&
+            (!config.onlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
 
-    val timiteItems = listOf(
+    private val timiteItems = listOf(
         "ANTI_SENTIENT_PICKAXE".toInternalName(),
         "EON_PICKAXE".toInternalName(),
         "CHRONO_PICKAXE".toInternalName(),
