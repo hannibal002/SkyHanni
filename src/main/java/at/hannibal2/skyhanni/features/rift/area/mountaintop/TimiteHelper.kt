@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -94,26 +93,26 @@ object TimiteHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftApi.inMountainTop() || !config.timiteExpiryTimer) return
+        if (!RiftApi.inMountainTop() || !config.expiryTimer) return
         val location = LocationUtils.playerLocation()
         val from = location.add(-15, -15, -15).toBlockPos()
         val to = location.add(15, 15, 15).toBlockPos()
 
-        for (pos in BlockPos.getAllInBox(from, to)) {
-            val loc = pos.toLorenzVec()
-            if (loc.getBlockAt() == Blocks.stained_glass_pane && loc.distanceToPlayer() <= 15) {
-                val color = loc.getBlockStateAt().getValue(BlockStainedGlassPane.COLOR)
+        for (loc in BlockPos.getAllInBox(from, to).map { it.toLorenzVec() }) {
+            val state = loc.getBlockStateAt()
+            if (state.block == Blocks.stained_glass_pane && loc.distanceToPlayer() <= 15) {
+                val color = state.getValue(BlockStainedGlassPane.COLOR)
                 if (color != EnumDyeColor.BLUE && color != EnumDyeColor.LIGHT_BLUE) continue
                 if (locations[loc] == null) locations[loc] = SimpleTimeMark.now()
             }
         }
         val iterator = locations.entries.iterator()
         while (iterator.hasNext()) {
-            val entry = iterator.next()
-            if (entry.key.getBlockAt() == Blocks.air) {
+            val state = iterator.next().key.getBlockStateAt()
+            if (state.block == Blocks.air) {
                 iterator.remove()
-            } else if (entry.key.getBlockAt() == Blocks.stained_glass_pane) {
-                val color = entry.key.getBlockStateAt().getValue(BlockStainedGlassPane.COLOR)
+            } else if (state.block == Blocks.stained_glass_pane) {
+                val color = state.getValue(BlockStainedGlassPane.COLOR)
                 if (color == EnumDyeColor.LIGHT_BLUE) {
                     iterator.remove()
                 }
