@@ -30,6 +30,7 @@ object SensitivityReducer {
     private const val LOCKED = -1F / 3F
 
     private val gameSettings get() = Minecraft.getMinecraft().gameSettings
+    private val onGround get() = MinecraftCompat.localPlayer.onGround
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -42,7 +43,7 @@ object SensitivityReducer {
             return
         }
         if (isManualToggle) return
-        if (isToggled && config.onGround.get() && !MinecraftCompat.localPlayer.onGround) {
+        if (isToggled && config.onGround.get() && !onGround) {
             restoreSensitivity()
             isToggled = false
             return
@@ -70,7 +71,7 @@ object SensitivityReducer {
                 isToggled = false
                 restoreSensitivity()
             }
-            if (!MinecraftCompat.localPlayer.onGround && config.onGround.get()) {
+            if (!onGround && config.onGround.get()) {
                 isToggled = false
                 restoreSensitivity()
             }
@@ -90,7 +91,7 @@ object SensitivityReducer {
             }
         }
         config.onGround.afterChange {
-            if (isToggled && config.onGround.get() && MinecraftCompat.localPlayer.onGround) {
+            if (isToggled && config.onGround.get() && onGround) {
                 restoreSensitivity()
                 isToggled = false
             }
@@ -156,7 +157,7 @@ object SensitivityReducer {
 
     private fun toggle(state: Boolean) {
         if (config.onlyPlot.get() && GardenApi.onBarnPlot) return
-        if (config.onGround.get() && !MinecraftCompat.localPlayer.onGround) return
+        if (config.onGround.get() && !onGround) return
         if (!isToggled) {
             lowerSensitivity()
         } else restoreSensitivity()
@@ -198,7 +199,7 @@ object SensitivityReducer {
         event.addData {
             add("Current Sensitivity: ${gameSettings.mouseSensitivity}")
             add("Stored Sensitivity: ${storage.savedMouseloweredSensitivity}")
-            add("onGround: ${MinecraftCompat.localPlayer.onGround}")
+            add("onGround: $onGround")
             add("onBarn: ${GardenApi.onBarnPlot}")
             add("enabled: ${isToggled || isManualToggle}")
             add("--- config ---")
