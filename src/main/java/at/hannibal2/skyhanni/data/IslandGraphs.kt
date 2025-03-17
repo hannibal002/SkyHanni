@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -31,11 +30,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import java.awt.Color
 import java.io.File
@@ -100,39 +99,21 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object IslandGraphs {
     var currentIslandGraph: Graph? = null
-    private var backup: Graph? = null
-    var tempRemoveReason: String? = null
+    var disabledNodesReason: String? = null
         private set
 
-    private fun Graph.deepCopy(): Graph {
-        val copyMap = nodes.associateWith {
-            GraphNode(it.id, it.position, it.name, it.tagNames)
-        }
-        copyMap.forEach { (original, copy) ->
-            copy.neighbours = original.neighbours.filter { copyMap.containsKey(it.key) }
-                .mapKeysNotNull { copyMap[it.key] }
-        }
-        return Graph(copyMap.values.toList())
-    }
-
-    fun tempRemove(reason: String, center: LorenzVec, radius: Double) {
+    fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
         val graph = currentIslandGraph ?: return
-        tempRemoveReason = reason
-        if (backup == null) {
-            backup = graph.deepCopy()
+        disabledNodesReason = reason
+        for (node in graph.nodes.filter { it.position.distance(center) < radius }) {
+            node.enabled = false
         }
-        val copiedGraph = graph.deepCopy()
-        val removedNodes = copiedGraph.nodes.filter { it.position.distance(center) < radius }.toSet()
-        val filteredNodes = copiedGraph.nodes.filter { it !in removedNodes }
-        filteredNodes.forEach { node ->
-            node.neighbours = node.neighbours.filter { it.key !in removedNodes }
-        }
-        currentIslandGraph = Graph(filteredNodes)
     }
 
-    fun resetTempRemove() {
-        currentIslandGraph = backup
-        backup = null
+    fun enableAllNodes() {
+        disabledNodesReason = null
+        val graph = currentIslandGraph ?: return
+        graph.nodes.forEach { it.enabled = true }
     }
 
     private var pathfindClosestNode: GraphNode? = null
@@ -177,8 +158,7 @@ object IslandGraphs {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        backup = null
-        tempRemoveReason = null
+        enableAllNodes()
         if (currentIslandGraph != null) return
         if (event.newIsland == IslandType.NONE) return
         loadIsland(event.newIsland)
@@ -321,7 +301,7 @@ object IslandGraphs {
     }
 
     private fun skipIfCloser(graph: Graph): Graph = if (graph.nodes.size > 1) {
-        val hideNearby = if (Minecraft.getMinecraft().thePlayer.onGround) 3 else 5
+        val hideNearby = if (MinecraftCompat.localPlayer.onGround) 3 else 5
         Graph(graph.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
     } else {
         graph
@@ -377,7 +357,7 @@ object IslandGraphs {
         // TODO cleanup
         val (fastestPath, distance) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.nodes.toMutableList()
-        if (Minecraft.getMinecraft().thePlayer.onGround) {
+        if (MinecraftCompat.localPlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
         }
         if (setPath) {

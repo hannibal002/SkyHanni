@@ -90,6 +90,7 @@ object GraphUtils {
 
         while (queue.isNotEmpty()) {
             val current = queue.poll()
+            if (!current.enabled) continue
             lastVisitedNode = current
             if (bailout(current)) break
 

@@ -20,7 +20,6 @@ import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
-import net.minecraft.client.Minecraft
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 
@@ -54,7 +53,6 @@ object UpdateManager {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        Minecraft.getMinecraft().thePlayer ?: return
         if (hasCheckedForUpdate) return
         hasCheckedForUpdate = true
 
