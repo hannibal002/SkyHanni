@@ -136,7 +136,8 @@ object TimiteTracker {
     }
 
     private fun isEnabled() =
-        RiftApi.inMountainTop() && config.timiteTracker && (!config.timiteOnlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
+        RiftApi.inMountainTop() && config.timiteTracker &&
+            (!config.timiteOnlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
 
     val timiteItems = listOf(
         "ANTI_SENTIENT_PICKAXE".toInternalName(),
