@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.compat
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
+import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
 //#if MC > 1.16
@@ -15,13 +16,20 @@ import net.minecraft.util.ResourceLocation
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
 
-fun IChatComponent.directlyContainedText() =
+fun IChatComponent.unformattedTextForChatCompat(): String =
 //#if MC < 1.16
     this.unformattedTextForChat
 //#elseif MC < 1.21
 //$$ this.contents
 //#else
 //$$ (this.content as? PlainTextContent)?.string().orEmpty()
+//#endif
+
+fun IChatComponent.unformattedTextCompat(): String =
+//#if MC < 1.16
+    this.unformattedText
+//#else
+//$$ iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
 //#endif
 
 fun IChatComponent?.formattedTextCompat(): String =
@@ -33,7 +41,7 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
 //$$         sb.append(component.style.color?.toChatFormatting()?.toString() ?: "§r")
-//$$         sb.append(component.directlyContainedText())
+//$$         sb.append(component.unformattedTextForChatCompat())
 //$$         sb.append("§r")
 //$$     }
 //$$     sb.toString()
@@ -57,8 +65,6 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$     return this.styled { it.withColor(formatting) }
 //$$ }
 //#endif
-
-fun String.formattedTextCompat() = this
 
 fun createResourceLocation(domain: String, path: String): ResourceLocation {
     //#if MC < 1.21
@@ -137,7 +143,7 @@ fun IChatComponent.appendComponent(component: IChatComponent): IChatComponent =
 //#endif
 
 fun addChatMessageToChat(message: IChatComponent) {
-    //#if MC < 1.16
+    //#if FORGE
     Minecraft.getMinecraft().thePlayer.addChatMessage(message)
     //#else
     //$$ MinecraftClient.getInstance().player?.sendMessage(message, false)
@@ -152,3 +158,10 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
     //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, null, MessageIndicator.system())
     //#endif
 }
+
+val defaultStyleConstructor: ChatStyle =
+    //#if MC < 1.16
+    ChatStyle()
+//#else
+//$$ Style.EMPTY
+//#endif
