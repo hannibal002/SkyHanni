@@ -10,6 +10,7 @@ class SkyHanniModLoader : ModInitializer {
 //         SkyHanniMod.init()
         println("skyhanni loaded")
         loadedClasses.clear()
+        TestingModFeatures
     }
 
     companion object {

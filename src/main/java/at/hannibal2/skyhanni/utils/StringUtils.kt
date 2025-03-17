@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.command
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
@@ -390,9 +391,9 @@ object StringUtils {
     }
 
     private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
-        val clickEvent = message.chatStyle.chatClickEvent
+        val clickEvent = message.command
         if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent?.value == clickEvent.value) {
+            if (foundCommands.size == 1 && foundCommands[0].command == clickEvent) {
                 return
             }
             foundCommands.add(message)
