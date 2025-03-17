@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
@@ -77,10 +78,10 @@ object CosmeticFollowingLine {
     }
 
     private fun updateClose(event: SkyHanniRenderWorldEvent) {
-        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).up(0.3)
+        val playerLocation = event.exactLocation(MinecraftCompat.localPlayer).up(0.3)
 
         latestLocations = latestLocations.editCopy {
-            val locationSpot = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
+            val locationSpot = LocationSpot(SimpleTimeMark.now(), MinecraftCompat.localPlayer.onGround)
             this[playerLocation] = locationSpot
             values.removeIf { it.time.passedSince() > 600.milliseconds }
         }
@@ -126,7 +127,7 @@ object CosmeticFollowingLine {
             }
 
             locations = locations.editCopy {
-                this[playerLocation] = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
+                this[playerLocation] = LocationSpot(SimpleTimeMark.now(), MinecraftCompat.localPlayer.onGround)
             }
         }
     }
