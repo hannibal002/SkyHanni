@@ -59,8 +59,7 @@ object VisitorListener {
         val packet = event.packet
         if (packet !is C02PacketUseEntity) return
 
-        val world = MinecraftCompat.localWorld
-        val entity = packet.getEntityFromWorld(world) ?: return
+        val entity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
         val entityId = entity.entityId
 
         lastClickedNpc = entityId
