@@ -21,7 +21,6 @@ object MetalDetectorAllToolsAlert {
 
     private val config get() = SkyHanniMod.feature.mining.metalDetector.metalDetectorAllToolsAlert
 
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return

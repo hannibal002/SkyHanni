@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MetalDetectorChestsJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -28,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
@@ -41,7 +44,7 @@ object MetalDetectorSolver {
      */
     private val metalDetectorDistancePattern by RepoPattern.pattern(
         "mining.crystalnucleus.metaldetector.treasure",
-        "§3§lTREASURE: §b(?<distance>.*)m"
+        ".*§3§lTREASURE: §b(?<distance>.*)m"
     )
 
     /**
@@ -54,7 +57,7 @@ object MetalDetectorSolver {
 
     private val config get() = SkyHanniMod.feature.mining.metalDetector.metalDetectorSolver
 
-    private var chestLocations: List<LorenzVec> = emptyList()
+    private var chestLocations: List<LorenzVec> = listOf()
     private val predictedChestLocations: MutableList<LorenzVec> = mutableListOf()
     private var baseCoordinates: LorenzVec? = null
     private var ignoreLocation: LorenzVec? = null
@@ -64,7 +67,7 @@ object MetalDetectorSolver {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        chestLocations = event.getConstant<List<List<Int>>>("MetalDetectorChests").map { LorenzVec(it[0], it[1] + 12, it[2]) }
+        chestLocations = event.getConstant<MetalDetectorChestsJson>("MetalDetectorChests").locations.toList()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
@@ -72,7 +75,7 @@ object MetalDetectorSolver {
         if (!isEnabled()) return
         if (predictedChestLocations.size == 1) return
 
-        val player = Minecraft.getMinecraft().thePlayer.getLorenzVec()
+        val player = LocationUtils.playerLocation()
         if (lastLoc != player) {
             lastLoc = player
             playedPling = false
@@ -163,13 +166,12 @@ object MetalDetectorSolver {
     private fun findBaseCoordinates() {
         if (lastSearchedForBase.passedSince() < 15.seconds) return
         lastSearchedForBase = SimpleTimeMark.now()
-        val player = Minecraft.getMinecraft().thePlayer.getLorenzVec()
-        val playerInt = LorenzVec(player.x.toInt(), player.y.toInt(), player.z.toInt())
+        val player = LocationUtils.playerLocation().roundLocationToBlock()
 
         for (i in -50 until 50) {
             for (j in 30 downTo -30) {
                 for (k in -50 until 50) {
-                    val blockPosition = playerInt.add(i, j, k)
+                    val blockPosition = player.add(i, j, k).roundLocationToBlock()
                     val nextBlockPosition = blockPosition.add(0, 13, 0)
                     if (blockPosition.getBlockAt() == Blocks.quartz_stairs && nextBlockPosition.getBlockAt() == Blocks.barrier) {
                         baseCoordinates = getBaseCoordinates(nextBlockPosition)
@@ -180,6 +182,7 @@ object MetalDetectorSolver {
         }
     }
 
+    // Finds the barrier block near the Jade crystal (middle of Mines of Divan) with the highest x, y, z values (chest locations are offset from this point).
     private fun getBaseCoordinates(blockPosition: LorenzVec): LorenzVec {
         var changed = true
         var currentPosition = blockPosition
