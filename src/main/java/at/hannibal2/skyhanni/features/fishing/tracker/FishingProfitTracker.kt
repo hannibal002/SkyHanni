@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.fishing.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -149,14 +151,15 @@ object FishingProfitTracker {
         }
 
         if (tracker.isInventoryOpen()) {
-            addButton(
-                prefix = "§7Category: ",
-                getName = currentCategory + " §7(" + amounts[currentCategory] + ")",
+            addButton<String>(
+                label = "Category",
+                current = currentCategory,
+                getName = { it + " §7(" + amounts[it] + ")" },
                 onChange = {
-                    val id = list.indexOf(currentCategory)
-                    currentCategory = list[(id + 1) % list.size]
+                    currentCategory = it
                     tracker.update()
                 },
+                universe = list,
             )
         }
 
@@ -254,9 +257,14 @@ object FishingProfitTracker {
         tracker.firstUpdate()
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
-    }
-
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetfishingtracker") {
+            description = "Resets the Fishing Profit Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
+    }
 }

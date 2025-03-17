@@ -5,8 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.SulphurSkitterBoxConfig
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SulphurSkitterBox {
@@ -33,15 +33,18 @@ object SulphurSkitterBox {
     private var renderBox: AxisAlignedBB? = null
     private const val RADIUS = 4
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
-        if (event.repeatSeconds(1)) {
-            calculateSpongeLocations()
-        }
         if (event.isMod(5)) {
             calculateClosestSponge()
         }
+    }
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        calculateSpongeLocations()
     }
 
     private fun calculateClosestSponge() {
@@ -80,7 +83,7 @@ object SulphurSkitterBox {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val location = closestSponge ?: return
         if (location.distanceToPlayer() >= 50) return

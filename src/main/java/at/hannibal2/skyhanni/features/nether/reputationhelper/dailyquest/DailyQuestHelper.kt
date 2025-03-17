@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.R
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -36,7 +37,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -53,12 +53,12 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import kotlin.time.Duration.Companion.seconds
 
-class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
+@SkyHanniModule
+object DailyQuestHelper {
 
     private val townBoardMage = LorenzVec(-138, 92, -755)
     private val townBoardBarbarian = LorenzVec(-572, 100, -687)
 
-    private val questLoader = QuestLoader(this)
     val quests = mutableListOf<Quest>()
     var greatSpook = false
 
@@ -89,24 +89,24 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        questLoader.checkInventory(event)
+        QuestLoader.checkInventory(event)
     }
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
-                questLoader.loadFromTabList()
+                QuestLoader.loadFromTabList()
             }
         }
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
         if (!isEnabled()) return
 
-        questLoader.loadFromTabList()
+        QuestLoader.loadFromTabList()
     }
 
     @HandleEvent
@@ -119,7 +119,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     fun update() {
-        reputationHelper.update()
+        CrimsonIsleReputationHelper.update()
     }
 
     @HandleEvent
@@ -127,7 +127,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         if (!isEnabled()) return
 
         if (event.gui !is GuiChest) return
-        val chest = event.gui.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
         val chestName = chest.getInventoryName()
 
         if (chestName == "Challenges") {
@@ -136,7 +136,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
             for ((slot, stack) in chest.getUpperItems()) {
-                if (stack.name.contains(dojoQuest.dojoName)) {
+                if (stack.displayName.contains(dojoQuest.dojoName)) {
                     slot highlight LorenzColor.AQUA
                 }
             }
@@ -178,7 +178,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
         val itemName = fetchQuest.itemName
 
-        val count = InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) }
+        val count = InventoryUtils.countItemsInLowerInventory { it.displayName.contains(itemName) }
         updateProcessQuest(fetchQuest, count)
     }
 
@@ -197,9 +197,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        if (!reputationHelper.showLocations()) return
+        if (!CrimsonIsleReputationHelper.showLocations()) return
 
         for (quest in quests) {
             if (quest is MiniBossQuest) continue
@@ -213,9 +213,9 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         renderTownBoard(event)
     }
 
-    private fun renderTownBoard(event: RenderWorldEvent) {
+    private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
-        val location = when (reputationHelper.factionType ?: return) {
+        val location = when (CrimsonIsleReputationHelper.factionType ?: return) {
             FactionType.BARBARIAN -> townBoardBarbarian
             FactionType.MAGE -> townBoardMage
         }
@@ -278,7 +278,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
-            val name = item.name
+            val name = item.displayName
             if (category == QuestCategory.FISHING) {
                 name.removeWordsAtEnd(1)
             } else name
@@ -322,7 +322,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
             } else {
                 oldQuest.state = QuestState.READY_TO_COLLECT
             }
-            reputationHelper.update()
+            CrimsonIsleReputationHelper.update()
         }
     }
 
@@ -340,7 +340,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     fun load(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
         reset()
-        questLoader.loadConfig(storage)
+        QuestLoader.loadConfig(storage)
     }
 
     fun saveConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {

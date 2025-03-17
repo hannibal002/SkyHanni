@@ -15,7 +15,7 @@ import org.lwjgl.input.Keyboard;
 
 public class EstimatedItemValueConfig {
     @Expose
-    @ConfigOption(name = "Enable Estimated Price", desc = "Display an Estimated Item Value for the item you hover over.")
+    @ConfigOption(name = "Enabled", desc = "Display an Estimated Item Value for the item you hover over.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -83,15 +83,15 @@ public class EstimatedItemValueConfig {
         INSTANT_BUY("Instant Buy"),
         BUY_ORDER("Buy Order"),
         ;
-        private final String str;
+        private final String displayName;
 
-        BazaarPriceSource(String str) {
-            this.str = str;
+        BazaarPriceSource(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

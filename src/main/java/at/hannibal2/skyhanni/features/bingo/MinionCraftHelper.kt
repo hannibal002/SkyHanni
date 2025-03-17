@@ -3,17 +3,17 @@ package at.hannibal2.skyhanni.features.bingo
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.hasHypixelEnchantments
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -58,15 +57,15 @@ object MinionCraftHelper {
         alreadyNotified.clear()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 
         val mainInventory = InventoryUtils.getItemsInOwnInventory()
 
         if (event.isMod(10)) {
-            hasMinionInInventory = mainInventory.map { it.name }.any { isMinionName(it) }
+            hasMinionInInventory = mainInventory.map { it.displayName }.any { isMinionName(it) }
         }
 
         if (event.repeatSeconds(2)) {
@@ -109,7 +108,7 @@ object MinionCraftHelper {
         val otherItems = mutableMapOf<NeuInternalName, Int>()
 
         for (item in mainInventory) {
-            val name = item.name.removeColor()
+            val name = item.displayName.removeColor()
             val rawId = item.getInternalName()
             if (isMinionName(name)) {
                 minions[name] = rawId
@@ -120,19 +119,17 @@ object MinionCraftHelper {
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
         for (item in mainInventory) {
-            val name = item.name.removeColor()
+            val name = item.displayName.removeColor()
+            if (item.hasHypixelEnchantments()) continue
             val rawId = item.getInternalName()
+            if (!isMinionName(name)) {
+                if (!allIngredients.contains(rawId)) continue
+                if (!isAllowed(allMinions, rawId)) continue
 
-            if (
-                item.hasEnchantments() ||
-                !isMinionName(name) ||
-                !allIngredients.contains(rawId) ||
-                !isAllowed(allMinions, rawId)
-            ) continue
-
-            val (itemId, multiplier) = NeuItems.getPrimitiveMultiplier(rawId)
-            val old = otherItems.getOrDefault(itemId, 0)
-            otherItems[itemId] = old + item.stackSize * multiplier
+                val (itemId, multiplier) = NeuItems.getPrimitiveMultiplier(rawId)
+                val old = otherItems.getOrDefault(itemId, 0)
+                otherItems[itemId] = old + item.stackSize * multiplier
+            }
         }
 
         FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
@@ -218,7 +215,7 @@ object MinionCraftHelper {
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
-                val itemName = rawId.itemName
+                val itemName = rawId.repoItemName
                 val isTool = itemId.startsWith("WOOD_")
                 if (percentage >= 1) {
                     val color = if (isTool) "§7" else "§a"
@@ -255,7 +252,7 @@ object MinionCraftHelper {
     private fun notify(minionName: String) {
         if (alreadyNotified.contains(minionName)) return
 
-        LorenzUtils.sendTitle("Can craft $minionName", 3.seconds)
+        TitleManager.sendTitle("Can craft $minionName", 3.seconds)
         alreadyNotified.add(minionName)
     }
 
@@ -273,7 +270,7 @@ object MinionCraftHelper {
         if (event.inventoryName != "Crafted Minions") return
 
         for ((_, b) in event.inventoryItems) {
-            val name = b.name
+            val name = b.displayName
             if (!name.startsWith("§e")) continue
             val internalName = NeuInternalName.fromItemName("$name I")
                 .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")

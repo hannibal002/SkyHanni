@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.ACCEPT_SLOT
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -67,9 +66,8 @@ object VisitorListener {
         lastClickedNpc = entityId
     }
 
-    @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
-        if (!GardenApi.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.VISITORS)) return
 
         val hasVisitorInfo = event.lines.any { VisitorApi.visitorCountPattern.matches(it) }
@@ -93,21 +91,20 @@ object VisitorListener {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenApi.inGarden()) return
         val npcItem = event.inventoryItems[INFO_SLOT] ?: return
         val lore = npcItem.getLore()
         if (!VisitorApi.isVisitorInfo(lore)) return
 
         val offerItem = event.inventoryItems[ACCEPT_SLOT] ?: return
-        if (offerItem.name != "§aAccept Offer") return
+        if (offerItem.displayName != "§aAccept Offer") return
 
         VisitorApi.inInventory = true
 
         val visitorOffer = VisitorApi.VisitorOffer(offerItem)
 
-        var name = npcItem.name
+        var name = npcItem.displayName
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }
@@ -154,9 +151,8 @@ object VisitorListener {
         }
     }
 
-    @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
-        if (!GardenApi.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!GardenApi.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 

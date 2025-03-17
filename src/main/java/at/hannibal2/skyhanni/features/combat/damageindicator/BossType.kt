@@ -21,7 +21,7 @@ enum class BossType(
     NETHER_VANQUISHER("§5Vanquisher", Type.VANQUISHER),
 
     END_ENDSTONE_PROTECTOR("§cEndstone Protector", Type.ENDERSTONE_PROTECTOR),
-    END_ENDER_DRAGON("Ender Dragon", Type.ENDER_DRAGON), // TODO fix totally
+    END_ENDER_DRAGON("Dragon", Type.ENDER_DRAGON),
 
     SLAYER_ZOMBIE_1("§aRevenant Horror 1", Type.REVENANT_HORROR, "§aRev 1", showDeathTime = true),
     SLAYER_ZOMBIE_2("§eRevenant Horror 2", Type.REVENANT_HORROR, "§eRev 2", showDeathTime = true),
@@ -106,6 +106,7 @@ enum class BossType(
     // The Rift
     LEECH_SUPREME("§cLeech Supreme", Type.THE_RIFT_BOSSES),
     BACTE("§aBacte", Type.THE_RIFT_BOSSES),
+    SUN_GECKO("§cSun Gecko", Type.THE_RIFT_BOSSES),
 
     WINTER_REINDRAKE("Reindrake", Type.REINDRAKE), // TODO fix totally
 
@@ -119,7 +120,7 @@ enum class BossType(
     GARDEN_PEST_RAT("§cRat", Type.GARDEN_PESTS),
     GARDEN_PEST_SLUG("§cSlug", Type.GARDEN_PESTS),
     GARDEN_PEST_EARTHWORM("§cEarthworm", Type.GARDEN_PESTS),
-    GARDEN_PEST_MOUSE("§c§lField Mouse", Type.GARDEN_PESTS),
+    GARDEN_PEST_FIELD_MOUSE("§c§lField Mouse", Type.GARDEN_PESTS),
 
     // TODO Corleone
     // TODO bal

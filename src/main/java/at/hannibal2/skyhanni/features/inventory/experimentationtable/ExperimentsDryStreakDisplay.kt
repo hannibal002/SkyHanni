@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -50,7 +51,7 @@ object ExperimentsDryStreakDisplay {
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled() || didJustFind || ExperimentationTableApi.getCurrentExperiment() == null) return
+        if (!isEnabled() || didJustFind || ExperimentationTableApi.currentExperiment == null) return
 
         for (lore in event.inventoryItems.map { it.value.getLore() }) {
             val firstLine = lore.firstOrNull() ?: continue
@@ -70,9 +71,9 @@ object ExperimentsDryStreakDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HIGH)
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (didJustFind || ExperimentationTableApi.getCurrentExperiment() == null) return
+        if (didJustFind || ExperimentationTableApi.currentExperiment == null) return
 
         val storage = storage ?: return
         storage.attemptsSince += 1

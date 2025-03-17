@@ -3,14 +3,15 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isLavaRod
@@ -42,7 +43,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -167,7 +167,7 @@ object GoldenFishTimer {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isActive()) return
         if (!config.nametag) return
         val entity = confirmedGoldenFishEntity ?: return
@@ -255,12 +255,12 @@ object GoldenFishTimer {
     private fun rodWarning() {
         if (!config.throwRodWarning || hasWarnedRod) return
         hasWarnedRod = true
-        LorenzUtils.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
+        TitleManager.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isActive()) return
         // This makes it only count as the rod being throw into lava if the rod goes down, up, and down again.
         // Not confirmed that this is correct, but it's the best solution found.

@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
@@ -210,11 +213,11 @@ object ExperimentsProfitTracker {
         return npcPrice.coerceAtLeast(price).toInt()
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HIGH)
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
 
-        if (ExperimentationTableApi.getCurrentExperiment() != null) {
+        if (ExperimentationTableApi.currentExperiment != null) {
             tracker.modify {
                 it.experimentsDone++
             }
@@ -226,7 +229,6 @@ object ExperimentsProfitTracker {
         val profit = tracker.drawItems(data, { true }, this) + data.startCost
 
         val experimentsDone = data.experimentsDone
-        addSearchString("")
         addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
         val startCostFormat = data.startCost.absoluteValue.shortFormat()
         val bitCostFormat = data.bitCost.shortFormat()
@@ -246,7 +248,10 @@ object ExperimentsProfitTracker {
     }
 
     init {
-        tracker.initRenderer(config.position) { isEnabled() }
+        tracker.initRenderer(
+            { config.position },
+            ExperimentationTableApi.superpairInventory,
+        ) { isEnabled() }
     }
 
     @HandleEvent
@@ -256,8 +261,13 @@ object ExperimentsProfitTracker {
         }
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetexperimentsprofittracker") {
+            description = "Resets the Experiments Profit Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
     private fun handleExpBottles(addToTracker: Boolean) {

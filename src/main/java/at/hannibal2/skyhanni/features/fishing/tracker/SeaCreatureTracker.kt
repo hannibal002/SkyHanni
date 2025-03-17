@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.fishing.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
@@ -137,14 +139,15 @@ object SeaCreatureTracker {
         }
 
         if (tracker.isInventoryOpen()) {
-            addButton(
-                prefix = "§7Category: ",
-                getName = currentCategory.allLettersFirstUppercase() + " §7(" + amounts[currentCategory] + ")",
+            addButton<String>(
+                label = "Category",
+                current = currentCategory,
+                getName = { it.allLettersFirstUppercase() + " §7(" + amounts[it] + ")" },
                 onChange = {
-                    val id = list.indexOf(currentCategory)
-                    currentCategory = list[(id + 1) % list.size]
+                    currentCategory = it
                     tracker.update()
                 },
+                universe = list,
             )
         }
 
@@ -179,7 +182,7 @@ object SeaCreatureTracker {
     }
 
     init {
-        tracker.initRenderer(config.position) { shouldShowDisplay() }
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -189,8 +192,13 @@ object SeaCreatureTracker {
         return true
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetseacreaturetracker") {
+            description = "Resets the Sea Creature Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !FishingApi.wearingTrophyArmor && !LorenzUtils.inKuudraFight

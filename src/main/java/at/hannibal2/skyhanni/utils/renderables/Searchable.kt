@@ -15,7 +15,7 @@ fun List<Searchable>.buildSearchBox(
 ): Renderable {
     val key = 0
     return Renderable.searchBox(
-        Renderable.verticalSearchableContainer(toMap(), textInput = textInput, key = key + 1),
+        Renderable.verticalSearchableContainer(toMap(), textInput = textInput, key = key + 1, spacing = 1),
         SEARCH_PREFIX,
         onUpdateSize = {},
         textInput = textInput,
@@ -46,10 +46,7 @@ fun List<Searchable>.buildSearchableScrollable(
     )
 }
 
-// TODO remove this function entirely, sack display should use a SearchTextInput object per sack name
-@Deprecated("remove this function, instead use a fix SearchTextInput object")
-fun Map<List<Renderable>, String?>.buildSearchableTable(): Renderable {
-    val textInput = SearchTextInput()
+fun Map<List<Renderable>, String?>.buildSearchableTable(textInput: SearchTextInput): Renderable {
     val key = 0
     return Renderable.searchBox(
         Renderable.searchableTable(toMap(), textInput = textInput, key = key + 1),

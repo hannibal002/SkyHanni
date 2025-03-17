@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -18,12 +20,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraft.util.ChatComponentText
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -59,11 +61,13 @@ object MythologicalCreatureTracker {
 
     private val tracker = SkyHanniTracker(
         "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
-        SkyHanniTracker.DisplayMode.MAYOR to {
-            it.diana.mythologicalMobTrackerPerElection.getOrPut(
-                SkyBlockTime.now().getElectionYear(), ::Data,
-            )
-        },
+        extraDisplayModes = mapOf(
+            SkyHanniTracker.DisplayMode.MAYOR to {
+                it.diana.mythologicalMobTrackerPerElection.getOrPut(
+                    SkyBlockTime.now().getElectionYear(), ::Data,
+                )
+            },
+        ),
     ) { drawDisplay(it) }
 
     class Data : TrackerData() {
@@ -99,7 +103,7 @@ object MythologicalCreatureTracker {
 
                 // TODO migrate to abstract feature in the future
                 if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
-                    event.chatComponent = ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
+                    event.chatComponent = (event.message + " §e(${it.creaturesSinceLastInquisitor})").asComponent()
                     it.creaturesSinceLastInquisitor = 0
                 } else it.creaturesSinceLastInquisitor++
             }
@@ -149,8 +153,12 @@ object MythologicalCreatureTracker {
         )
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetmythologicalcreaturetracker") {
+            description = "Resets the Mythological Creature Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
-
 }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -62,7 +63,7 @@ object ComposterDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.COMPOSTER)) return
 
         readData(event.lines)
@@ -139,7 +140,7 @@ object ComposterDisplay {
 
         if (ComposterApi.getOrganicMatter() <= config.notifyLow.organicMatter && storage.informedAboutLowMatter.isInPast()) {
             if (config.notifyLow.title) {
-                LorenzUtils.sendTitle("§cYour Organic Matter is low", 4.seconds)
+                TitleManager.sendTitle("§cYour Organic Matter is low", 4.seconds)
             }
             ChatUtils.chat("§cYour Organic Matter is low!")
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
@@ -147,7 +148,7 @@ object ComposterDisplay {
 
         if (ComposterApi.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()) {
             if (config.notifyLow.title) {
-                LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
+                TitleManager.sendTitle("§cYour Fuel is low", 4.seconds)
             }
             ChatUtils.chat("§cYour Fuel is low!")
             storage.informedAboutLowFuel = 5.0.minutes.fromNow()
@@ -208,7 +209,7 @@ object ComposterDisplay {
                 action = { HypixelCommands.warp("garden") },
             )
         }
-        LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
+        TitleManager.sendTitle("§eComposter Warning!", 3.seconds)
     }
 
     @HandleEvent

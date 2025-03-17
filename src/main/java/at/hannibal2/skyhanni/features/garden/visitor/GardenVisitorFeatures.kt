@@ -1,14 +1,16 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.ItemBuyApi.buy
+import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTip
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
@@ -19,12 +21,13 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRefusedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getByNameOrNull
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.blockReason
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -37,13 +40,11 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -58,6 +59,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItem
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -72,8 +74,6 @@ import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
@@ -211,7 +211,7 @@ object GardenVisitorFeatures {
         var totalPrice = 0.0
         addAsSingletonList("§7Visitor Shopping List:")
         for ((internalName, amount) in shoppingList) {
-            val name = internalName.itemName
+            val name = internalName.repoItemName
             val itemStack = internalName.getItemStack()
 
             val list = mutableListOf<Any>()
@@ -219,23 +219,18 @@ object GardenVisitorFeatures {
             list.add(itemStack)
 
             list.add(
-                Renderable.optionalLink(
+                Renderable.clickable(
                     "$name §ex${amount.addSeparators()}",
-                    {
+                    tips = internalName.createBuyTip(),
+                    onLeftClick = {
+                        if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickable
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                            LorenzUtils.setTextIntoSign("$amount")
+                            SignUtils.setTextIntoSign("$amount")
                         } else {
-                            if (internalName.isBazaarItem()) {
-                                BazaarApi.searchForBazaarItem(name, amount)
-                            } else if (internalName.isAuctionHouseItem()) {
-                                HypixelCommands.auctionSearch(name.removeColor())
-                            } else {
-                                val itemName = internalName.itemName
-                                ChatUtils.chat("Could not find $itemName§e on AH or BZ!", replaceSameMessage = true)
-                            }
+                            internalName.buy(amount)
                         }
                     },
-                ) { GardenApi.inGarden() && !NeuItems.neuHasFocus() },
+                ),
             )
 
             if (config.shoppingList.showPrice) {
@@ -295,7 +290,7 @@ object GardenVisitorFeatures {
                     "§aCraftable!",
                     {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                            LorenzUtils.setTextIntoSign("$leftToCraft")
+                            SignUtils.setTextIntoSign("$leftToCraft")
                         } else {
                             HypixelCommands.viewRecipe(internalName.asString())
                         }
@@ -396,7 +391,7 @@ object GardenVisitorFeatures {
     }
 
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.name != "§aAccept Offer") return
+        if (itemStack.displayName != "§aAccept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)
@@ -512,9 +507,8 @@ object GardenVisitorFeatures {
         visitor.lastLore = finalList
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!GardenApi.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTick(event: SkyHanniTickEvent) {
         if (!config.shoppingList.display && config.highlightStatus == HighlightMode.DISABLED) return
         if (!event.isMod(10, 2)) return
 
@@ -534,7 +528,7 @@ object GardenVisitorFeatures {
         val recentWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince() < 2.seconds
 
         if (config.notificationTitle && !recentWorldSwitch) {
-            LorenzUtils.sendTitle("§eNew Visitor", 5.seconds)
+            TitleManager.sendTitle("§eNew Visitor", 5.seconds)
         }
         if (config.notificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(name)
@@ -591,7 +585,7 @@ object GardenVisitorFeatures {
             val visitorName = visitor.visitorName
             val entity = visitor.getEntity()
             if (entity == null) {
-                NPCVisitorFix.findNametag(visitorName.removeColor())?.let {
+                NpcVisitorFix.findNametag(visitorName.removeColor())?.let {
                     findEntity(it, visitor)
                 }
             }
@@ -643,9 +637,8 @@ object GardenVisitorFeatures {
         return ready
     }
 
-    @SubscribeEvent
-    fun onRenderInSigns(event: DrawScreenEvent.Post) {
-        if (!GardenApi.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!config.shoppingList.display) return
         val gui = event.gui
         if (gui !is GuiEditSign) return

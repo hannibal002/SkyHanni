@@ -5,12 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
+import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +23,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DanceRoomHelper {
@@ -87,9 +87,9 @@ object DanceRoomHelper {
         } + this@addColor
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (!inRoom) return
         config.position.renderStrings(
             display,
@@ -103,20 +103,21 @@ object DanceRoomHelper {
         inRoom = false
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onTick(event: SkyHanniTickEvent) {
+        // We want this to run even if not enabled, so that the Hide Other Players feature
+        // properly updates without the helper being enabled
         if (event.isMod(10)) {
-            inRoom = danceRoom.isPlayerInside()
+            inRoom = RiftApi.inMirrorVerse && danceRoom.isPlayerInside()
         }
         if (inRoom) {
             update()
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!isEnabled() || !inRoom) return
+        if (!config.enabled || !inRoom) return
         if ((event.soundName == "random.burp" && event.volume == 0.8f) ||
             (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)
         ) {
@@ -132,9 +133,9 @@ object DanceRoomHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTitleReceived(event: TitleReceivedEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (config.hideOriginalTitle && inRoom) event.cancel()
     }
 
@@ -161,7 +162,7 @@ object DanceRoomHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
-        if (config.hidePlayers && inRoom) {
+        if (config.hidePlayers && inRoom && event.entity.isRealPlayer()) {
             event.cancel()
         }
     }
@@ -180,8 +181,6 @@ object DanceRoomHelper {
             }
         }
     }
-
-    fun isEnabled() = RiftApi.inRift() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

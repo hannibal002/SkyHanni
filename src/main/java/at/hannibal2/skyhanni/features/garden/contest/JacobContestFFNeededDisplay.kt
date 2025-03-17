@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -46,7 +45,7 @@ object JacobContestFFNeededDisplay {
             return
         }
 
-        val time = FarmingContestApi.getSBTimeFor(stack.name) ?: return
+        val time = FarmingContestApi.getSBTimeFor(stack.displayName) ?: return
         val contest = FarmingContestApi.getContestAtTime(time) ?: return
 
         val newDisplay = drawDisplay(contest)

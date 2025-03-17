@@ -3,51 +3,59 @@ package at.hannibal2.skyhanni.features.anvil
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.inventory.AnvilUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
-import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
-import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraft.inventory.ContainerChest
+import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object AnvilCombineHelper {
 
-    // TODO use InventoryUpdatedEvent and item id instead of no cache and lore comparison
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!SkyHanniMod.feature.inventory.anvilCombineHelper) return
+    private var highlightedSlots = setOf<Int>()
 
-        if (event.gui !is GuiChest) return
-        val chest = event.gui.inventorySlots as ContainerChest
-        val chestName = chest.getInventoryName()
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onInventoryUpdated(event: AnvilUpdateEvent) {
+        highlightedSlots = updateSlots(event.left, event.right)
+    }
 
-        if (chestName != "Anvil") return
-        if (chest.getUpperItems().size < 52) return
+    @HandleEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        highlightedSlots = updateSlots(AnvilApi.left, AnvilApi.right)
+    }
 
-        val matchLore = mutableListOf<String>()
+    private fun updateSlots(left: ItemStack?, right: ItemStack?): Set<Int> {
+        if (!isEnabled()) return emptySet()
 
-        val leftStack = chest.getSlot(29)?.stack
-        val rightStack = chest.getSlot(33)?.stack
+        val leftStack = left?.getInternalName()
+        val rightStack = right?.getInternalName()
 
         // don't highlight if both slots have items
-        if (leftStack != null && rightStack != null) return
+        if (leftStack != null && rightStack != null) return emptySet()
 
-        if (leftStack != null) {
-            matchLore.addAll(leftStack.getLore())
-        } else if (rightStack != null) {
-            matchLore.addAll(rightStack.getLore())
-        }
+        // don't highlight if both slots have no items
+        if (leftStack == null && rightStack == null) return emptySet()
 
-        if (matchLore.isEmpty()) return
+        return InventoryUtils.getSlotsInOwnInventory().filter { slot ->
+            val name = slot.stack?.getInternalName()
+            name == leftStack || name == rightStack
+        }.map { it.slotNumber }.toSet()
 
-        for ((slot, stack) in chest.getLowerItems()) {
-            if (matchLore == stack.getLore()) {
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!isEnabled()) return
+
+        for (slot in InventoryUtils.getSlotsInOwnInventory()) {
+            if (slot.slotNumber in highlightedSlots) {
                 slot highlight LorenzColor.GREEN
             }
         }
     }
+
+    fun isEnabled() = SkyHanniMod.feature.inventory.anvilCombineHelper && AnvilApi.inventory.isInside()
 }

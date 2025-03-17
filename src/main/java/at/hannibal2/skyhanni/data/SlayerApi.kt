@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -41,7 +40,7 @@ object SlayerApi {
     fun getItemNameAndPrice(internalName: NeuInternalName, amount: Int): Pair<String, Double> =
         nameCache.getOrPut(internalName to amount) {
             val amountFormat = if (amount != 1) "§7${amount}x §r" else ""
-            val displayName = internalName.itemName
+            val displayName = internalName.repoItemName
 
             val price = internalName.getPrice()
             val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
@@ -100,10 +99,8 @@ object SlayerApi {
         return null
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick(event: SkyHanniTickEvent) {
         // wait with sending SlayerChangeEvent until profile is detected
         if (ProfileStorageData.profileSpecific == null) return
 

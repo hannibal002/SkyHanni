@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper
@@ -141,8 +141,7 @@ object EnigmaSoulWaypoints {
         if (!isEnabled() || !inInventory) return
 
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getAllItems()) {
             for (soul in trackedSouls) {
@@ -157,7 +156,7 @@ object EnigmaSoulWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         for (soul in trackedSouls) {
             soulLocations[soul]?.let {

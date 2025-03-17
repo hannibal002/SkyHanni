@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.bingo.card
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -49,7 +51,7 @@ object BingoCardDisplay {
         BingoApi.bingoGoals.clear()
     }
 
-    fun toggleCommand() {
+    private fun toggleCommand() {
         if (!LorenzUtils.isBingoProfile) {
             ChatUtils.userError("This command only works on a bingo profile!")
             return
@@ -85,10 +87,10 @@ object BingoCardDisplay {
         if (BingoApi.bingoGoals.isEmpty()) {
             newList.add(Renderable.string("§6Bingo Goals:"))
             newList.add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§cOpen the §e/bingo §ccard.",
-                    listOf("Click to run §e/bingo"),
-                    onClick = {
+                    tips = listOf("Click to run §e/bingo"),
+                    onLeftClick = {
                         HypixelCommands.bingo()
                     }
                 )
@@ -185,9 +187,9 @@ object BingoCardDisplay {
 
             if (editDisplay) {
                 val clickName = if (currentlyHighlighted) "remove" else "add"
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     display,
-                    buildList {
+                    tips = buildList {
                         add("§a" + it.displayName)
                         for (s in it.guide) {
                             add(s)
@@ -195,7 +197,7 @@ object BingoCardDisplay {
                         add("")
                         add("§eClick to $clickName this goal as highlight!")
                     },
-                    onClick = {
+                    onLeftClick = {
                         it.highlight = !currentlyHighlighted
                         it.displayName
                         update()
@@ -266,5 +268,14 @@ object BingoCardDisplay {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "bingo", "event.bingo")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shbingotoggle") {
+            description = "Toggle the bingo card display mode"
+            category = CommandCategory.USERS_ACTIVE
+            callback { toggleCommand() }
+        }
     }
 }

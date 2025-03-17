@@ -4,14 +4,12 @@ import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.HotmApi.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmApi.SkymallPerk
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -24,7 +22,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -189,7 +186,6 @@ enum class HotmData(
             )
         },
     ),
-
 
     // Static
 
@@ -563,12 +559,14 @@ enum class HotmData(
 
         fun getPerkByNameOrNull(name: String): HotmData? = entries.find { it.guiName == name }
 
-        private fun resetTree() = entries.forEach {
-            it.rawLevel = 0
-            it.enabled = false
-            it.isUnlocked = false
-            HotmApi.PowderType.entries.forEach { it.setCurrent(it.getTotal()) }
-            availableTokens = tokens
+        private fun resetTree() {
+            entries.forEach {
+                it.rawLevel = 0
+                it.enabled = false
+                it.isUnlocked = false
+                availableTokens = tokens
+            }
+            HotmApi.PowderType.entries.forEach(HotmApi.PowderType::resetTree)
         }
 
         private fun Slot.parse() {
@@ -576,7 +574,7 @@ enum class HotmData(
 
             if (this.handlePowder()) return
 
-            val entry = entries.firstOrNull { it.guiNamePattern.matches(item.name) } ?: return
+            val entry = entries.firstOrNull { it.guiNamePattern.matches(item.displayName) } ?: return
             entry.slot = this
 
             val lore = item.getLore().takeIf { it.isNotEmpty() } ?: return
@@ -617,15 +615,15 @@ enum class HotmData(
             val item = this.stack ?: return false
 
             val isHeartItem = when {
-                heartItemPattern.matches(item.name) -> true
-                resetItemPattern.matches(item.name) -> false
+                heartItemPattern.matches(item.displayName) -> true
+                resetItemPattern.matches(item.displayName) -> false
                 else -> return false
             }
 
             if (isHeartItem) { // Reset on the heart Item to remove duplication
                 tokens = 0
                 availableTokens = 0
-                HotmApi.PowderType.entries.forEach { it.reset() }
+                HotmApi.PowderType.entries.forEach { it.resetFull() }
                 heartItem = this
             }
 
@@ -638,10 +636,8 @@ enum class HotmData(
                 HotmApi.PowderType.entries.forEach {
                     it.pattern(isHeartItem).matchMatcher(line) {
                         val powder = group("powder").formatLong()
-                        if (isHeartItem) {
-                            it.setCurrent(powder)
-                        }
-                        it.addTotal(powder)
+                        if (isHeartItem) it.setAmount(powder)
+                        else it.total += powder
                         continue@lore
                     }
                 }
@@ -695,11 +691,7 @@ enum class HotmData(
             ScoreboardPattern.powderPattern.firstMatcher(event.added) {
                 val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
-                val difference = amount - type.getCurrent()
-
-                if (difference > 0) {
-                    type.gain(difference)
-                }
+                type.setAmount(amount, postEvent = true)
             }
         }
 
@@ -726,15 +718,11 @@ enum class HotmData(
         @HandleEvent
         fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
-            event.lines.forEach {
-                powderPattern.matchMatcher(it) {
+            event.lines.forEach { line ->
+                powderPattern.matchMatcher(line) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                     val amount = group("amount").formatLong()
-                    val difference = amount - type.getCurrent()
-
-                    if (difference > 0) {
-                        type.gain(difference)
-                    }
+                    type.setAmount(amount, postEvent = true)
                 }
             }
         }
@@ -784,24 +772,12 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onProfileSwitch(event: ProfileJoinEvent) {
-            HotmApi.PowderType.entries.forEach {
-                if (it.getStorage() == null) {
-                    ProfileStorageData.profileSpecific?.mining?.powder?.put(
-                        it,
-                        ProfileSpecificStorage.MiningConfig.PowderStorage(),
-                    )
-                }
-            }
-        }
-
-        @HandleEvent
         fun onDebug(event: DebugDataCollectEvent) {
             event.title("HotM")
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
                 HotmApi.PowderType.entries.forEach {
-                    add("${it.displayName} Powder: ${it.getCurrent()}/${it.getTotal()}")
+                    add("${it.displayName} Powder: ${it.current}/${it.total}")
                 }
                 add("Ability: ${HotmApi.activeMiningAbility?.printName}")
                 add("Blue Egg: ${HotmApi.isBlueEggActive}")

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -51,7 +51,7 @@ object TentacleWaypoint {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onRender(event: RenderWorldEvent) {
+    fun onRender(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         tentacleHits.removeIfKey { it.isDead || it.health == 0f }
 
@@ -67,11 +67,11 @@ object TentacleWaypoint {
         }
     }
 
-    private fun getText(hits: Int) = if (BactePhase.currentPhase == BactePhase.BactePhase.PHASE_5) {
+    private fun getText(hits: Int) = if (BacteApi.currentPhase == BacteApi.Phase.PHASE_5) {
         "§a${pluralize(hits, "Hit", withNumber = true)}"
     } else {
-        val maxHp = when (BactePhase.currentPhase) {
-            BactePhase.BactePhase.PHASE_4 -> 3
+        val maxHp = when (BacteApi.currentPhase) {
+            BacteApi.Phase.PHASE_4 -> 3
             else -> 4
         }
         val hpColor = if (hits > 0) "§c" else "§a"

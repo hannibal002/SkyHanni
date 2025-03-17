@@ -81,6 +81,11 @@ enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     EMPTY_LINE8(ScoreboardElementEmptyLine),
     EMPTY_LINE9(ScoreboardElementEmptyLine),
     EMPTY_LINE10(ScoreboardElementEmptyLine),
+    EMPTY_LINE11(ScoreboardElementEmptyLine),
+    EMPTY_LINE12(ScoreboardElementEmptyLine),
+    EMPTY_LINE13(ScoreboardElementEmptyLine),
+    EMPTY_LINE14(ScoreboardElementEmptyLine),
+    EMPTY_LINE15(ScoreboardElementEmptyLine),
     ;
 
     override fun toString() = element.configLine

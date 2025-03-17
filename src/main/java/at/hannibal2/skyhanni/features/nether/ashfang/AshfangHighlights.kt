@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils
@@ -34,7 +34,7 @@ object AshfangHighlights {
     private val gravityOrbs = mutableSetOf<EntityArmorStand>()
     private const val MAX_DISTANCE = 15.0
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRIMSON_ISLE)
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityJoin(event: EntityEnterWorldEvent<EntityArmorStand>) {
         if (!AshfangManager.active) return
         val entity = event.entity
@@ -46,14 +46,14 @@ object AshfangHighlights {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRIMSON_ISLE)
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityLeave(event: EntityLeaveWorldEvent<EntityArmorStand>) {
         blazingSouls -= event.entity
         gravityOrbs -= event.entity
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!AshfangManager.active) return
 
         if (config.blazingSouls.enabled) {
@@ -81,7 +81,7 @@ object AshfangHighlights {
         gravityOrbs.clear()
     }
 
-    private fun RenderWorldEvent.drawBlendedColorString(location: LorenzVec, text: String) {
+    private fun SkyHanniRenderWorldEvent.drawBlendedColorString(location: LorenzVec, text: String) {
         val distance = location.distanceToPlayer()
         if (distance < MAX_DISTANCE) {
             val colorCode = getColorCode(distance)

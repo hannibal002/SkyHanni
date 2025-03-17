@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -18,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -282,7 +283,7 @@ object ChocolateFactoryStrayTracker {
         InventoryUtils.getItemsInOpenChest().filter {
             claimedStraysSlots.contains(it.slotIndex)
         }.forEach {
-            if (!strayCaughtPattern.matches(it.stack.name)) {
+            if (!strayCaughtPattern.matches(it.stack.displayName)) {
                 claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.slotIndex))
             }
         }
@@ -302,7 +303,10 @@ object ChocolateFactoryStrayTracker {
     }
 
     init {
-        tracker.initRenderer(config.strayRabbitTrackerPosition) { isEnabled() }
+        tracker.initRenderer(
+            { config.strayRabbitTrackerPosition },
+            ChocolateFactoryApi.mainInventory,
+        ) { isEnabled() }
     }
 
     @HandleEvent
@@ -350,8 +354,13 @@ object ChocolateFactoryStrayTracker {
         config.partyMode.onToggle(tracker::update)
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetstrayrabbittracker") {
+            description = "Resets the Stray Rabbit Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.strayRabbitTracker && ChocolateFactoryApi.inChocolateFactory

@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ActionBarStatsData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -67,8 +67,8 @@ object RiftTimer {
 
     // prevents rift time from pausing during Rift Race
     // (hypixel hides the action bar during the race)
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !RiftApi.inRiftRace) return
         if (!event.isMod(5)) return
         val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")
@@ -132,9 +132,9 @@ object RiftTimer {
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
-        if (!RiftApi.inRift() || !config.nametag) return
+        if (!config.nametag) return
         val time = nametagPattern.matchMatcher(event.text) {
             group("time")?.toIntOrNull()
         } ?: return

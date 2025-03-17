@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,12 +17,10 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -66,7 +65,7 @@ object EndermanSlayerFeatures {
         if (entity is EntityArmorStand) {
             if (showBeacon()) {
                 val stack = entity.getStandHelmet() ?: return
-                if (stack.name == "Beacon" && entity.canBeSeen(15.0)) {
+                if (stack.displayName == "Beacon" && entity.canBeSeen(15.0)) {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
@@ -75,7 +74,7 @@ object EndermanSlayerFeatures {
                         beaconConfig.highlightBeacon
                     }
                     if (beaconConfig.showWarning) {
-                        LorenzUtils.sendTitle("§4Beacon", 2.seconds)
+                        TitleManager.sendTitle("§4Beacon", 2.seconds)
                     }
                     logger.log("Added flying beacons at ${entity.getLorenzVec()}")
                 }
@@ -99,7 +98,7 @@ object EndermanSlayerFeatures {
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
@@ -113,7 +112,7 @@ object EndermanSlayerFeatures {
         drawNukekubiSkulls(event)
     }
 
-    private fun drawNukekubiSkulls(event: RenderWorldEvent) {
+    private fun drawNukekubiSkulls(event: SkyHanniRenderWorldEvent) {
         for (skull in nukekubiSkulls) {
             if (skull.isDead) continue
             if (config.highlightNukekebi) {
@@ -139,7 +138,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawFlyingBeacon(event: RenderWorldEvent) {
+    private fun drawFlyingBeacon(event: SkyHanniRenderWorldEvent) {
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
             if (beaconConfig.highlightBeacon) {
@@ -159,7 +158,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawSittingBeacon(event: RenderWorldEvent) {
+    private fun drawSittingBeacon(event: SkyHanniRenderWorldEvent) {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
             if (beaconConfig.showLine) {

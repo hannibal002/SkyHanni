@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -38,12 +37,16 @@ object CosmeticFollowingLine {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         updateClose(event)
 
+        //#if MC < 1.16
         val firstPerson = Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
+        //#else
+        //$$ val firstPerson = Minecraft.getInstance().options.cameraType.isFirstPerson
+        //#endif
         val color = config.lineColor.toSpecialColor()
 
         renderClose(event, firstPerson, color)
@@ -51,7 +54,7 @@ object CosmeticFollowingLine {
     }
 
     private fun renderFar(
-        event: RenderWorldEvent,
+        event: SkyHanniRenderWorldEvent,
         firstPerson: Boolean,
         color: Color,
     ) {
@@ -73,7 +76,7 @@ object CosmeticFollowingLine {
         }
     }
 
-    private fun updateClose(event: RenderWorldEvent) {
+    private fun updateClose(event: SkyHanniRenderWorldEvent) {
         val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).up(0.3)
 
         latestLocations = latestLocations.editCopy {
@@ -83,7 +86,7 @@ object CosmeticFollowingLine {
         }
     }
 
-    private fun renderClose(event: RenderWorldEvent, firstPerson: Boolean, color: Color) {
+    private fun renderClose(event: SkyHanniRenderWorldEvent, firstPerson: Boolean, color: Color) {
         if (firstPerson && latestLocations.any { !it.value.onGround }) return
 
 
@@ -102,8 +105,8 @@ object CosmeticFollowingLine {
         return lineWidth.toInt().coerceAtLeast(1)
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
         if (event.isMod(5)) {

@@ -2,7 +2,6 @@
  * TODO LIST
  *  - countdown events like fishing festival + fiesta when its not on tablist
  *  - improve hide coin difference to also work with bits, motes, etc
- *  - color options in the purse etc lines
  *  - choose the amount of decimal places in shorten nums
  *  - heavily optimize elements and events by only updating them when absolutely needed
  */
@@ -12,15 +11,14 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
@@ -40,7 +38,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -107,8 +104,8 @@ object CustomScoreboard {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
         if (dirty || nextScoreboardUpdate.isInPast()) {
@@ -121,7 +118,7 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 5.seconds)
+        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 7.seconds)
             UnknownLinesHandler.handleUnknownLines()
     }
 
@@ -206,7 +203,7 @@ object CustomScoreboard {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.NONE) updateIslandEntries()
+        updateIslandEntries()
     }
 
     private fun updateIslandEntries() {
@@ -233,7 +230,7 @@ object CustomScoreboard {
                 add("Custom Scoreboard Events:")
                 addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }, currentIslandEvents))
 
-                add("Active Patterns:")
+                add("Active Patterns (${activePatterns.size}):")
                 activePatterns.forEach { add("   $it") }
 
                 allUnknownLines.takeIfNotEmpty()?.let { set ->

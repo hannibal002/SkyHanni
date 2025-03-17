@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -346,6 +348,8 @@ enum class TabWidget(
     /** Internal value for the checking to set [isActive] */
     private var gotChecked = false
 
+    private var sendOnThisIsland = false
+
     /** A [matchMatcher] for the first line using the pattern from the widget*/
     inline fun <T> matchMatcherFirstLine(consumer: Matcher.() -> T) =
         if (isActive)
@@ -411,6 +415,23 @@ enum class TabWidget(
                 return
             }
             update(event.tabList)
+        }
+
+        // TODO remove this workaround once the WidgetUpdateEvent gets send when the tab list gets first loaded, as intended.
+        @HandleEvent(priority = HandleEvent.HIGHEST)
+        fun onIslandChange(event: IslandChangeEvent) {
+            for (widget in entries) {
+                widget.sendOnThisIsland = false
+            }
+
+            DelayedRun.runDelayed(2.seconds) {
+                TabWidget.reSendEvents()
+                for (widget in entries) {
+                    if (widget.isActive && !widget.sendOnThisIsland) {
+                        WidgetUpdateEvent(widget, widget.lines).post()
+                    }
+                }
+            }
         }
 
         private fun update(newTablist: List<String>) {

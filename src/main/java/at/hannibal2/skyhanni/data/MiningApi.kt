@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -34,7 +35,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.netty.util.internal.ConcurrentSet
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
@@ -192,11 +192,11 @@ object MiningApi {
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (!inColdIsland()) return
-
-        dungeonRoomPattern.firstMatcher(event.added) {
-            mineshaftRoomId = group("roomId")
+        dungeonRoomPattern.firstMatcher(event.full) {
+            groupOrNull("roomId")?.let { mineshaftRoomId = it }
         }
+
+        if (!inColdIsland()) return
 
         val newCold = coldPattern.firstMatcher(event.added) {
             group("cold").toInt().absoluteValue
@@ -342,8 +342,8 @@ object MiningApi {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!inCustomMiningIsland()) return
         if (currentAreaOreBlocks.isEmpty()) return
 

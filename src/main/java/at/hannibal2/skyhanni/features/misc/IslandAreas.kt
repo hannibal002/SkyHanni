@@ -4,14 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,7 +36,6 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -87,8 +87,8 @@ object IslandAreas {
 
     private var hasMoved = false
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (event.isMod(2) && hasMoved) {
             updatePosition()
@@ -187,7 +187,7 @@ object IslandAreas {
             foundAreas++
 
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     text,
                     tips = buildList {
                         add(tag.color.getChatColor() + node.name)
@@ -202,7 +202,7 @@ object IslandAreas {
                             add("§eClick to find a path!")
                         }
                     },
-                    onClick = {
+                    onLeftClick = {
                         if (node == targetNode) {
                             targetNode = null
                             IslandGraphs.stop()
@@ -240,12 +240,12 @@ object IslandAreas {
         // when this is a small area and small areas are disabled via config
         if (event.onlyInternal) return
         if (inAnArea && config.enterTitle) {
-            LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
+            TitleManager.sendTitle("§aEntered $name!", 3.seconds)
         }
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
