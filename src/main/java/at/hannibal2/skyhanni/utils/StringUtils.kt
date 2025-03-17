@@ -437,12 +437,12 @@ object StringUtils {
         if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
             clickEvents.add(clickEvent)
         }
+
         if (hoverEvent?.action != null && hoverEvents.none {
                 //#if MC < 1.21
                 it.value == hoverEvent.value
                 //#else
-                //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) ==
-                //$$                 hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
+                //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) == hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
                 //#endif
             }
         ) {
