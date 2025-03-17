@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import com.google.gson.JsonObject
@@ -71,7 +72,7 @@ class AccessoryLineageTree {
     fun tryAddAccessory(repoData: MutableMap.MutableEntry<String, JsonObject>) {
         val (internalNameString, data) = repoData
         val internalName = internalNameString.toInternalName().takeIf { it.isAccessory() } ?: return
-        val accessory = addAccessory(Accessory(internalName = internalName))
+        addAccessory(Accessory(internalName = internalName))
         val craftText = data.get("craftText")?.asString.orEmpty()
         neuCraftTextSlayerCraftReqPattern.matchMatcher(craftText) {
             val slayerType = when (group("slayer")) {
@@ -84,12 +85,18 @@ class AccessoryLineageTree {
                 else -> null
             } ?: return@matchMatcher
             val level = group("level").formatIntOrNull() ?: return@matchMatcher
-            accessory.craftSlayerRequirement = Triple(
-                slayerType,
-                level,
-                "§7§4☠ §cCrafting Requires §5${slayerType.getClazzName()} Slayer $level§c.",
+            AccessoryApi.addSlayerReq(
+                internalName = internalName,
+                type = SlayerRequirementType.CRAFT,
+                slayerType = slayerType,
+                level = level,
+                matchLore = "§7§4☠ §cCrafting Requires §5${slayerType.getClazzName()} Slayer $level§c.",
             )
         }
+        val itemStack = internalName.getItemStackOrNull() ?: return
+        val slayerUsageReq = AccessoryApi.getAccessoryUsageSlayerRequirementOrNull(
+
+        )
     }
 
     fun rebuildLineageLine(sourceMap: Map<String, List<String>>) = sourceMap.mapNotNull {

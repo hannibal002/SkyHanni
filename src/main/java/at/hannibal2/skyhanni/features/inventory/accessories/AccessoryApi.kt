@@ -28,6 +28,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcherWithMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
@@ -161,6 +163,27 @@ object AccessoryApi {
     private val pageHashCache: TimeLimitedCache<Int, Int> = TimeLimitedCache(10.minutes)
     private val ignoredAccessories: MutableList<NeuInternalName> = mutableListOf()
     private val repoAccessoryLineageSoT: MutableMap<String, List<String>> = mutableMapOf()
+    private val accSlayerReqMap: MutableMap<NeuInternalName, MutableList<SlayerRequirement>> = mutableMapOf()
+
+    fun addSlayerReq(
+        internalName: NeuInternalName,
+        type: SlayerRequirementType,
+        slayerType: SlayerType,
+        level: Int,
+        matchLore: String,
+    ) {
+        accSlayerReqMap.getOrPut(internalName) { mutableListOf() }.add(
+            SlayerRequirement(
+                type = type,
+                slayerType = slayerType,
+                level = level,
+                matchLore = matchLore,
+            )
+        )
+    }
+
+    fun getSlayerReqOrNull(internalName: NeuInternalName, type: SlayerRequirementType) =
+        accSlayerReqMap[internalName]?.firstOrNull { it.type == type }
 
     fun getMissing(storage: AccStorage): List<Accessory> = repoAccessoryLineage.getAdjacencyMap().keys.filter { acc ->
         if (acc.internalName in ignoredAccessories) return@filter false
@@ -204,9 +227,7 @@ object AccessoryApi {
             rarity = rarity,
             enrichment = enrichment,
             totalStats = getAccessoryStatsOrEmpty(),
-        ).apply {
-            usageSlayerRequirement = getAccessoryUsageSlayerRequirementOrNull()
-        }
+        )
     }
 
     private fun ItemStack.getAccessoryStatsOrEmpty(): Map<SkyblockStat, Double> =
@@ -220,16 +241,19 @@ object AccessoryApi {
             }
         }.toMap()
 
-    private fun ItemStack.getAccessoryUsageSlayerRequirementOrNull(): Triple<SlayerType, Int, String>? =
-        if (!this.isAccessory() || this.getLore().isEmpty()) null
-        else this.getLore().mapNotNull { line ->
-            accessorySlayerRequirementLorePattern.matchMatcher(line) {
-                val slayer = groupOrNull("slayer")?.let { SlayerType.getByName(it) } ?: return@matchMatcher null
-                val level = groupOrNull("level")?.formatIntOrNull() ?: return@matchMatcher null
-                val fixedLine = line.replace("§cRequires", "§cUsage Requires")
-                Triple(slayer, level, fixedLine)
-            }
-        }.firstOrNull()
+    fun getAccessoryUsageSlayerRequirementOrNull(itemStack: ItemStack): SlayerRequirement? =
+        if (!itemStack.isAccessory() || itemStack.getLore().isEmpty()) null
+        else accessorySlayerRequirementLorePattern.firstMatcherWithMatch(itemStack.getLore()) { line: String ->
+            val slayer = groupOrNull("slayer")?.let { SlayerType.getByName(it) } ?: return@firstMatcherWithMatch null
+            val level = groupOrNull("level")?.formatIntOrNull() ?: return@firstMatcherWithMatch null
+            val fixedLine = line.replace("§cRequires", "§cUsage Requires")
+            SlayerRequirement(
+                type = SlayerRequirementType.USAGE,
+                slayerType = slayer,
+                level = level,
+                matchLore = fixedLine,
+            )
+        }
 
     fun NeuInternalName.isAccessory() = this.getItemStackOrNull()?.isAccessory() ?: false
     fun ItemStack.isAccessory(): Boolean = getItemCategoryOrNull() in ItemCategory.accessories

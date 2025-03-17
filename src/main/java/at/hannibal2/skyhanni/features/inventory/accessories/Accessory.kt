@@ -22,9 +22,10 @@ class Accessory(
     @Expose val totalStats: Map<SkyblockStat, Double> = enumMapOf(),
 ) {
     var index: Int = -1
-    // String in each of these is the lore line that matched them
-    var usageSlayerRequirement: Triple<SlayerType, Int, String>? = null
-    var craftSlayerRequirement: Triple<SlayerType, Int, String>? = null
+    var usageSlayerRequirement: SlayerRequirement? =
+        AccessoryApi.getSlayerReqOrNull(this.internalName, SlayerRequirementType.USAGE)
+    var craftSlayerRequirement: SlayerRequirement? =
+        AccessoryApi.getSlayerReqOrNull(this.internalName, SlayerRequirementType.CRAFT)
 
     override fun toString(): String = internalName.asString()
 
@@ -41,6 +42,11 @@ class Accessory(
 
     override fun hashCode(): Int = internalName.hashCode()
 
+    private fun getMagicalPower(): Int {
+        val basePower = rarity?.getBaseMagicalPower() ?: return 0
+        return magicalPowerOutlierHandler(basePower) ?: basePower
+    }
+
     private fun magicalPowerOutlierHandler(basePower: Int): Int? = when {
         internalName == HEGEMONY_ARTIFACT -> basePower * 2
         isAbiCase -> {
@@ -51,14 +57,21 @@ class Accessory(
         else -> null
     }
 
-    private fun getMagicalPower(): Int {
-        val basePower = rarity?.getBaseMagicalPower() ?: return 0
-        return magicalPowerOutlierHandler(basePower) ?: basePower
-    }
-
     fun getUpgradeCost(from: Accessory? = null): Double {
         val thisCost = this.internalName.getPrice()
         val fromCost = from?.internalName?.getPrice() ?: 0.0
         return thisCost - fromCost
     }
 }
+
+enum class SlayerRequirementType {
+    USAGE,
+    CRAFT,
+}
+
+data class SlayerRequirement(
+    val type: SlayerRequirementType,
+    val slayerType: SlayerType,
+    val level: Int,
+    val matchLore: String,
+)
