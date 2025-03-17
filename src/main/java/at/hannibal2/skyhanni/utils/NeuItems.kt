@@ -101,9 +101,6 @@ object NeuItems {
         .withItemStack(itemStack)
         .resolveInternalName()
 
-    fun getInternalNameOrNull(nbt: NBTTagCompound): NeuInternalName? =
-        ItemResolutionQuery().withItemNbt(nbt).resolveInternalName()?.toInternalName()
-
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NeuInternalName? {
         val internalName = hypixelId.replace(':', '-')
         return internalName.toInternalName().takeIf { it.getItemStackOrNull() != null }
