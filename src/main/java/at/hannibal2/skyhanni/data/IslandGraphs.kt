@@ -31,11 +31,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import java.awt.Color
 import java.io.File
@@ -321,7 +321,7 @@ object IslandGraphs {
     }
 
     private fun skipIfCloser(graph: Graph): Graph = if (graph.nodes.size > 1) {
-        val hideNearby = if (Minecraft.getMinecraft().thePlayer.onGround) 3 else 5
+        val hideNearby = if (MinecraftCompat.localPlayer.onGround) 3 else 5
         Graph(graph.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
     } else {
         graph
@@ -377,7 +377,7 @@ object IslandGraphs {
         // TODO cleanup
         val (fastestPath, distance) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.nodes.toMutableList()
-        if (Minecraft.getMinecraft().thePlayer.onGround) {
+        if (MinecraftCompat.localPlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
         }
         if (setPath) {

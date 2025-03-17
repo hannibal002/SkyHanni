@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -77,7 +78,7 @@ object TrophyFishMessages {
         if (config.totalAmount) {
             val total = trophyFishCounts.sumAllValues()
 
-            edited.appendSibling((" §7(${total.addSeparators()}${total.ordinal()} total)").asComponent())
+            edited.appendComponent((" §7(${total.addSeparators()}${total.ordinal()} total)").asComponent())
         }
 
         if (config.tooltip) {

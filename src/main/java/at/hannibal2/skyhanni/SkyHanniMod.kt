@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.CoroutineName
@@ -67,7 +68,7 @@ object SkyHanniMod {
         screenToOpen?.let {
             screenTicks++
             if (screenTicks == 5) {
-                Minecraft.getMinecraft().thePlayer?.closeScreen()
+                MinecraftCompat.localPlayer.closeScreen()
                 OtherInventoryData.close()
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
