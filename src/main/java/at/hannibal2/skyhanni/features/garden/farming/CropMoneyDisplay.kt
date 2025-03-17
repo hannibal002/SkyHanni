@@ -20,6 +20,9 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -37,8 +40,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
-import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.line
 import kotlinx.coroutines.launch
 
 @SkyHanniModule
@@ -118,21 +121,21 @@ object CropMoneyDisplay {
         }
 
         if (!ready) {
-            return Container.vertical {
-                string(title)
-                string("§eLoading...")
+            return Renderable.vertical {
+                addString(title)
+                addString("§eLoading...")
             }
         }
 
         if (GardenApi.getCurrentlyFarmedCrop() == null && !config.alwaysOn) return null
 
-        return Container.vertical {
-            if (!config.hideTitle) string(fullTitle(title))
+        return Renderable.vertical {
+            if (!config.hideTitle) addString(fullTitle(title))
 
             if (!GardenApi.config.cropMilestones.progress) {
-                string("§cCrop Milestone Progress Display is disabled!")
+                addString("§cCrop Milestone Progress Display is disabled!")
             } else {
-                renderable(buildDisplayBody())
+                add(buildDisplayBody())
             }
         }
     }
@@ -197,9 +200,9 @@ object CropMoneyDisplay {
             return Renderable.string("§cFarm crops to add them to this list!")
         }
         val cropList = createDescendingCropList(moneyPerHour)
-        return Container.vertical {
+        return Renderable.vertical {
             for ((index, pair) in cropList.withIndex()) {
-                renderable(buildCropMoneyLine(index + 1, pair.first, pair.second, extraMoneyPerHour.total))
+                addNotNull(buildCropMoneyLine(index + 1, pair.first, pair.second, extraMoneyPerHour.total))
             }
         }
     }
@@ -235,24 +238,26 @@ object CropMoneyDisplay {
         val isCurrent = crop == GardenApi.getCurrentlyFarmedCrop()
         if (number > config.showOnlyBest && (!config.showCurrent || !isCurrent)) return null
 
-        return Container.horizontal {
-            if (!config.compact) string("§7$number# ")
+        return line {
+            if (!config.compact) {
+                addString("§7$number# ")
+            }
 
             if (isSeeds(internalName)) {
-                item(BOX_OF_SEEDS)
+                addItemStack(BOX_OF_SEEDS)
             } else {
-                item(internalName)
+                addItemStack(internalName)
             }
 
             if (cropNames[internalName] == CropType.WHEAT && config.mergeSeeds) {
-                item(BOX_OF_SEEDS)
+                addItemStack(BOX_OF_SEEDS)
             }
 
             if (!config.compact) {
                 val itemName = internalName.itemNameWithoutColor
                 val currentColor = if (isCurrent) "§e" else "§7"
                 val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-                string("$currentColor$contestFormat$itemName§7: ")
+                addString("$currentColor$contestFormat$itemName§7: ")
             }
 
             val coinsColor = if (config.compact && GardenApi.getCurrentlyFarmedCrop() == crop) "§e" else "§6"
@@ -265,7 +270,7 @@ object CropMoneyDisplay {
                 }
                 "$coinsColor$formattedPrice"
             }
-            string(coins)
+            addString(coins)
         }
     }
 
