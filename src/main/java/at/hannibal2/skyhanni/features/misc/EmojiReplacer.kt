@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.EmojiJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.texture.TextureManager
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.input.Keyboard
@@ -175,13 +175,12 @@ object EmojiReplacer {
         return builder.toString()
     }
 
-    fun handleKeyboardInput() {
+    fun handleKeyboardInput(screen: GuiScreen) {
         if (!isEnabled()) return
         if (Keyboard.getEventKeyState()) return
         val char = Keyboard.getEventCharacter()
-        val currentScreen = Minecraft.getMinecraft().currentScreen
-        if (currentScreen !is GuiChat) return
-        val chat = (currentScreen as AccessorMixinGuiChat)
+        if (screen !is GuiChat) return
+        val chat = (screen as AccessorMixinGuiChat)
         if (!anyEmojiStartWith(char.toString())) return
         val unicodeMap = reverseUnicodeToName ?: return
         var string = char.toString()

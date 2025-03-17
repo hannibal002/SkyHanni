@@ -35,7 +35,7 @@ public class MixinGuiScreen {
     public void handleKeyboardInput(CallbackInfo ci) {
         TextInput.Companion.onGuiInput(ci);
 
-        EmojiReplacer.INSTANCE.handleKeyboardInput();
+        EmojiReplacer.INSTANCE.handleKeyboardInput((GuiScreen)(Object) this);
     }
 
     @Redirect(method = "handleComponentClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;isShiftKeyDown()Z"))
