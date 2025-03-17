@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -69,7 +68,7 @@ object TestCopyBestiaryValues {
     }
 
     private fun copy(titleItem: ItemStack, inventoryItems: Map<Int, ItemStack>) {
-        val titleName = titleItem.name.removeWordsAtEnd(1)
+        val titleName = titleItem.displayName.removeWordsAtEnd(1)
 
         val obj = BestiaryObject()
         obj.name = titleName
@@ -89,7 +88,7 @@ object TestCopyBestiaryValues {
         val mobs = mutableListOf<String>()
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
-            bestiaryTypePattern.matchMatcher(stack.name.removeColor()) {
+            bestiaryTypePattern.matchMatcher(stack.displayName.removeColor()) {
                 val lvl = group("lvl").toInt()
                 var text = group("text").lowercase().replace(" ", "_")
 
