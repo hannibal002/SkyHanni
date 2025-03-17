@@ -340,6 +340,8 @@ net.minecraft.world.entity.projectile.SmallFireball net.minecraft.entity.project
 net.minecraft.world.entity.projectile.FishingHook getPlayerOwner() getAngler()
 
 net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
+net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
+
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.Slot getItem() getStack()
@@ -352,6 +354,7 @@ net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
 net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
 net.minecraft.world.item.ItemStack isEnchanted() isItemEnchanted()
+net.minecraft.world.item.ItemStack getTag() getTagCompound()
 net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 
 net.minecraft.world.item.Item byBlock() getItemFromBlock()
@@ -467,8 +470,6 @@ org.lwjgl.glfw.GLFW GLFW_KEY_W KEY_W
 org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
-
-at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer net.minecraft.client.gui.inventory.GuiContainer
 
 net.minecraft.world.inventory.AbstractContainerMenu net.minecraft.inventory.Container
 

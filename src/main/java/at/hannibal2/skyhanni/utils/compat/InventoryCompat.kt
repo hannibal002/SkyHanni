@@ -4,8 +4,11 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.inventory.Container
+import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+
 //#if FABRIC
 //$$ import net.minecraft.screen.slot.SlotActionType
 //#endif
@@ -52,4 +55,27 @@ fun slotUnderCursor(): Slot? {
     //#else
     //$$ return screen.getSlotUnderMouse()
     //#endif
+}
+
+val GuiChest.container: Container
+    //#if MC < 1.16
+    get() = this.inventorySlots
+//#else
+//$$ get() = this.screenHandler
+//#endif
+
+object InventoryCompat {
+
+    // TODO add cache that persists until the next gui/window open/close packet is sent/received
+    fun getOpenChestName(): String {
+        val currentScreen = Minecraft.getMinecraft().currentScreen
+        //#if MC < 1.16
+        if (currentScreen !is GuiChest) return ""
+        val value = currentScreen.inventorySlots as ContainerChest
+        return value.lowerChestInventory?.displayName?.unformattedText.orEmpty()
+        //#else
+        //$$ return currentScreen?.title.formattedTextCompat()
+        //#endif
+    }
+
 }
