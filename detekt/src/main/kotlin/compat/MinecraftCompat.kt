@@ -19,36 +19,39 @@ class MinecraftCompat(config: Config) : SkyHanniRule(config) {
 
     override fun visitProperty(property: KtProperty) {
         if (shouldIgnore(property)) return
+        if (checkForMinecraftPlayer(property.initializer)) return
+        if (checkForMinecraftWorld(property.initializer)) return
         super.visitProperty(property)
-        checkForMinecraftPlayer(property.initializer)
-        checkForMinecraftWorld(property.initializer)
     }
 
     override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
         if (shouldIgnore(expression)) return
+        if (checkForMinecraftPlayer(expression)) return
+        if (checkForMinecraftWorld(expression)) return
         super.visitDotQualifiedExpression(expression)
-        checkForMinecraftPlayer(expression)
-        checkForMinecraftWorld(expression)
     }
 
     private fun shouldIgnore(element: KtExpression): Boolean {
         val filePath = element.containingFile.virtualFile.path
-        return filePath.contains("at\\hannibal2\\skyhanni\\utils\\compat")
+        return filePath.contains("at\\hannibal2\\skyhanni\\utils\\compat") ||
+            filePath.contains("at/hannibal2/skyhanni/utils/compat")
     }
 
-    private fun checkForMinecraftPlayer(element: KtExpression?) {
+    private fun checkForMinecraftPlayer(element: KtExpression?): Boolean {
         if (element?.text?.contains("Minecraft.getMinecraft().thePlayer") == true) {
-            println("filePath: ${element.containingFile.virtualFile.path}")
             element.reportIssue("Usage of Minecraft.getMinecraft().thePlayer detected. Please replace this with " +
                 "`MinecraftCompat.localPlayer` instead.")
+            return true
         }
+        return false
     }
 
-    private fun checkForMinecraftWorld(element: KtExpression?) {
+    private fun checkForMinecraftWorld(element: KtExpression?): Boolean {
         if (element?.text?.contains("Minecraft.getMinecraft().theWorld") == true) {
-            println("filePath: ${element.containingFile.virtualFile.path}")
             element.reportIssue("Usage of Minecraft.getMinecraft().theWorld detected. Please replace this with " +
                 "`MinecraftCompat.world` instead.")
+            return true
         }
+        return false
     }
 }
