@@ -79,5 +79,5 @@ class HoppityEventSummaryConfig {
             ".e.g. §7Unique Rabbits: §f5 §7(270 -> 275)"
     )
     @ConfigEditorBoolean
-    var showCountDiff: Boolean = false;
+    var showCountDiff: Boolean = false
 }
