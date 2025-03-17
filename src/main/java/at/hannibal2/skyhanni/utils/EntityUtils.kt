@@ -96,8 +96,8 @@ object EntityUtils {
         val b = center.add(radius, radius + 3, radius)
         val alignedBB = a.axisAlignedTo(b)
         val clazz = EntityArmorStand::class.java
-        val worldObj = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
+        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
+        return world.getEntitiesWithinAABB(clazz, alignedBB)
     }
 
     @Deprecated("Old. Instead use entity detection feature instead.")

@@ -39,7 +39,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
@@ -183,7 +182,7 @@ object GriffinBurrowHelper {
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val newLocation = event.guessLocation
-        val playerLocation = MinecraftCompat.localPlayer.getLorenzVec()
+        val playerLocation = LocationUtils.playerLocation()
 
         if (newLocation.distance(playerLocation) < 6) return
 
