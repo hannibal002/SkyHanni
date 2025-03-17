@@ -39,11 +39,11 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -57,10 +57,12 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
 //$$ import net.minecraft.component.type.NbtComponent
+//$$ import net.minecraft.component.ComponentMap
 //#endif
 
 @SkyHanniModule
@@ -139,10 +141,17 @@ object ItemUtils {
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
+    //#if MC < 1.21
     fun NBTTagCompound?.getLore(): List<String> {
         this ?: return emptyList()
         return this.getCompoundTag("display").getStringList("Lore")
     }
+    //#else
+    //$$ fun ComponentMap?.getLore(): List<String> {
+    //$$     this ?: return emptyList()
+    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() } ?: emptyList()
+    //$$ }
+    //#endif
 
     fun NBTTagCompound?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
         this ?: return emptyList()
@@ -162,12 +171,21 @@ object ItemUtils {
         return tagList
     }
 
+    //#if MC < 1.21
     fun getDisplayName(compound: NBTTagCompound?): String? {
         compound ?: return null
         val name = compound.getCompoundTag("display").getString("Name")
         if (name == null || name.isEmpty()) return null
         return name
     }
+    //#else
+    //$$ fun getDisplayName(compound: ComponentMap?): String? {
+    //$$     compound ?: return null
+    //$$     val name = compound.get(DataComponentTypes.CUSTOM_NAME)?.formattedTextCompat()
+    //$$     if (name.isNullOrEmpty()) return null
+    //$$     return name
+    //$$ }
+    //#endif
 
     fun ItemStack.setLore(lore: List<String>): ItemStack {
         //#if MC < 1.21
@@ -197,7 +215,11 @@ object ItemUtils {
             //#endif
         }
 
+    //#if MC < 1.21
     val NBTTagCompound.extraAttributes: NBTTagCompound get() = this.getCompoundTag("ExtraAttributes")
+    //#else
+    //$$ val ComponentMap.extraAttributes: NbtCompound get() = this.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt() ?: NbtCompound()
+    //#endif
 
     fun ItemStack.overrideId(id: String): ItemStack {
         extraAttributes = extraAttributes.apply { setString("id", id) }
@@ -218,7 +240,7 @@ object ItemUtils {
 
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
-        val player = Minecraft.getMinecraft().thePlayer ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")
+        val player = MinecraftCompat.localPlayer
 
         for (slot in player.openContainer.inventorySlots) {
             if (slot.hasStack) {
@@ -281,7 +303,7 @@ object ItemUtils {
         if (!compound.hasKey("SkullOwner")) return null
         return compound.getCompoundTag("SkullOwner").getSkullTexture()
         //#else
-        //$$ return stack.get(DataComponentTypes.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
+        //$$ return this.get(DataComponentTypes.PROFILE)?.properties?.get("textures")?.firstOrNull()?.value
         //#endif
 
     }

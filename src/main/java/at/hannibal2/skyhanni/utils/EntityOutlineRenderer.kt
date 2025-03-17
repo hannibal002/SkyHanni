@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -93,7 +94,7 @@ object EntityOutlineRenderer {
 
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
         val renderManager = mc.renderManager
-        mc.theWorld.theProfiler.endStartSection("entityOutlines")
+        MinecraftCompat.localWorld.theProfiler.endStartSection("entityOutlines")
         updateFrameBufferSize()
 
         // Clear and bind the outline framebuffer
@@ -230,7 +231,7 @@ object EntityOutlineRenderer {
 
         // Vanilla Conditions
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
-        if (renderGlobal.frameBuffer == null || renderGlobal.shader == null || mc.thePlayer == null) return false
+        if (renderGlobal.frameBuffer == null || renderGlobal.shader == null || !MinecraftCompat.localPlayerExists) return false
 
         // OptiFine Conditions
         if (!stopLookingForOptiFine && isFastRender == null) {
@@ -294,14 +295,14 @@ object EntityOutlineRenderer {
                 )
         ) {
             false
-        } else mc.theWorld.isBlockLoaded(BlockPos(entity)) && (
+        } else MinecraftCompat.localWorld.isBlockLoaded(BlockPos(entity)) && (
             mc.renderManager.shouldRender(
                 entity,
                 camera,
                 vector.x,
                 vector.y,
                 vector.z
-            ) || entity.getFirstPassenger() === mc.thePlayer
+            ) || entity.getFirstPassenger() === MinecraftCompat.localPlayerOrNull
             )
     // Only render if renderManager would render and the world is loaded at the entity
 
@@ -371,7 +372,7 @@ object EntityOutlineRenderer {
             return
         }
 
-        if (mc.theWorld != null && shouldRenderEntityOutlines()) {
+        if (MinecraftCompat.localWorldExists && shouldRenderEntityOutlines()) {
             // These events need to be called in this specific order for the xray to have priority over the no xray
             // Get all entities to render xray outlines
             val xrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null)
