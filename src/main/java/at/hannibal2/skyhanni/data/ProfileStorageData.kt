@@ -125,7 +125,7 @@ object ProfileStorageData {
 
     @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
-        val playerUuid = LorenzUtils.getRawPlayerUuid() ?: return
+        val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
         ConfigLoadEvent.post()
