@@ -29,3 +29,7 @@ net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.Serve
 net.minecraft.screen.slot.Slot net.minecraft.world.inventory.Slot
 net.minecraft.screen.slot.Slot getIndex() getSlotIndex()
 net.minecraft.screen.slot.Slot getStack() getItem()
+
+net.minecraft.text.Style net.minecraft.network.chat.Style
+
+net.minecraft.text.Style withStrikethrough() setStrikethrough()
