@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MaxwellApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxwellConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 
@@ -10,6 +9,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 // power update event
 object ScoreboardElementTuning : ScoreboardElement() {
     override fun getDisplay(): Any {
+        val config = SkyHanniMod.feature.gui.customScoreboard
+        val displayConfig = config.display
+        val maxwellConfig = config.display.maxwell
+
         val tunings = MaxwellApi.tunings ?: return "§cTalk to \"Maxwell\"!"
         if (tunings.isEmpty()) return "§cNo Maxwell Tunings :("
 
@@ -18,15 +21,18 @@ object ScoreboardElementTuning : ScoreboardElement() {
         return if (maxwellConfig.compactTuning) {
             val tuningDisplay = tunings.take(3).joinToString("§7, ") { tuning ->
                 with(tuning) {
-                    CustomScoreboardUtils.formatNumberDisplay(value, icon, color)
+                    if (displayConfig.displayNumbersFirst) "$color$value$icon"
+                    else "$color$icon$value"
                 }
             }
-            CustomScoreboardUtils.formatNumberDisplay(title, tuningDisplay, "§f")
+            if (displayConfig.displayNumbersFirst) "$tuningDisplay §f$title"
+            else "$title: $tuningDisplay"
         } else {
             val tuningAmount = maxwellConfig.tuningAmount.coerceAtLeast(1)
             val tuningList = tunings.take(tuningAmount).map { tuning ->
                 with(tuning) {
-                    " §7- §f" + CustomScoreboardUtils.formatNumberDisplay(value, icon, color)
+                    " §7- §f" + if (displayConfig.displayNumbersFirst) "$color$value $icon $name"
+                    else "$name: $color$value$icon"
                 }
             }
             listOf("$title:") + tuningList
