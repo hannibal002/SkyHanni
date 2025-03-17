@@ -725,7 +725,9 @@ interface Renderable {
                     onHover(textInput)
                     textInput.makeActive()
                     textInput.handle()
-                    val yOff: Int = if (shouldRenderTopElseBottom) {
+                    val yOff: Int = 
+                    	if (shouldRenderTopElseBottom) 0
+                    	else content.height + ySpacing
                         0
                     } else {
                         content.height + ySpacing
