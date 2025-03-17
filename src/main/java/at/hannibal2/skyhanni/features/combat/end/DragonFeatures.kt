@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat.end
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -246,7 +247,7 @@ object DragonFeatures {
             ChatUtils.debug("Dragon Type: $currentDragonType")
 
             if (config.superiorNotify && currentDragonType == DragonType.SUPERIOR) {
-                LorenzUtils.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
+                TitleManager.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
             }
 
             DragonProfitTracker.addEyes(yourEyes)
