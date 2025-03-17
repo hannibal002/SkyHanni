@@ -31,7 +31,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
@@ -64,14 +63,16 @@ object NeuItems {
         readAllNeuItems()
     }
 
-    fun readAllNeuItems() {
+    private fun readAllNeuItems() {
         val map = mutableMapOf<String, NeuInternalName>()
+        val names = mutableSetOf<NeuInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             val internalName = rawInternalName.toInternalName()
             var name = internalName.getItemStackOrNull()?.displayName?.lowercase() ?: run {
                 ChatUtils.debug("skipped `$rawInternalName` from readAllNeuItems")
                 continue
             }
+            names.add(internalName)
 
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
@@ -90,7 +91,7 @@ object NeuItems {
             }
             map[name] = internalName
         }
-        allInternalNames = map.values.toSet()
+        allInternalNames = names
         allItemsCache = map
     }
 
@@ -98,9 +99,6 @@ object NeuItems {
         .withCurrentGuiContext()
         .withItemStack(itemStack)
         .resolveInternalName()
-
-    fun getInternalNameOrNull(nbt: NBTTagCompound): NeuInternalName? =
-        ItemResolutionQuery().withItemNbt(nbt).resolveInternalName()?.toInternalName()
 
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NeuInternalName? {
         val internalName = hypixelId.replace(':', '-')

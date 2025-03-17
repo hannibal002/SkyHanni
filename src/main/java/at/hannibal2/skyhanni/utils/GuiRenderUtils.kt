@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.ColorUtils.component1
+import at.hannibal2.skyhanni.utils.ColorUtils.component2
+import at.hannibal2.skyhanni.utils.ColorUtils.component3
+import at.hannibal2.skyhanni.utils.ColorUtils.component4
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -128,8 +132,8 @@ object GuiRenderUtils {
         endColor: Int = -0xfeffff0,
         zLevel: Double = 0.0,
     ) {
-        val (startAlpha, startRed, startGreen, startBlue) = ColorUtils.getQuad(startColor)
-        val (endAlpha, endRed, endGreen, endBlue) = ColorUtils.getQuad(endColor)
+        val (startAlpha, startRed, startGreen, startBlue) = Color(startColor)
+        val (endAlpha, endRed, endGreen, endBlue) = Color(endColor)
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()
