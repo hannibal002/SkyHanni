@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.prefix
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -125,10 +126,7 @@ object ChatUtils {
         val formattedMessage = message.formattedText
         log.log(formattedMessage)
 
-        val minecraft = Minecraft.getMinecraft()
-
-        val thePlayer = minecraft.thePlayer
-        if (thePlayer == null) {
+        if (!MinecraftCompat.localPlayerExists) {
             LorenzUtils.consoleLog(formattedMessage.removeColor())
             return false
         }
@@ -323,20 +321,15 @@ object ChatUtils {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        val player = Minecraft.getMinecraft().thePlayer
-        if (player == null) {
-            sendQueue.clear()
-            return
-        }
         if (lastMessageSent.passedSince() > messageDelay) {
-            player.sendChatMessage(sendQueue.poll() ?: return)
+            MinecraftCompat.localPlayer.sendChatMessage(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
         }
     }
 
     fun sendMessageToServer(message: String) {
         if (canSendInstantly()) {
-            Minecraft.getMinecraft().thePlayer?.let {
+            MinecraftCompat.localPlayerOrNull?.let {
                 it.sendChatMessage(message)
                 lastMessageSent = SimpleTimeMark.now()
                 return

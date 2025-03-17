@@ -228,9 +228,6 @@ object CollectionTracker {
     fun onTick(event: SkyHanniTickEvent) {
         if (isDungeonBoss) return
 
-        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
-        thePlayer.worldObj ?: return
-
         compareInventory()
         updateGain()
     }

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import java.time.Instant
 
 /**
@@ -125,7 +125,7 @@ data class SkyBlockTime(
             return fromInstant(Instant.ofEpochMilli(millis))
         }
 
-        fun isDay(): Boolean = Minecraft.getMinecraft().theWorld.worldTime % 24000 in 1..12000
+        fun isDay(): Boolean = MinecraftCompat.localWorld.worldTime % 24000 in 1..12000
 
         fun getSBMonthByName(month: String): Int {
             var monthNr = 0
