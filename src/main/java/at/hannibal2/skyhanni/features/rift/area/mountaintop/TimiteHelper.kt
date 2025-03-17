@@ -51,7 +51,7 @@ object TimiteHelper {
             lastClick = SimpleTimeMark.farPast()
 
             if (event.position == currentPos && currentBlockState != event.getBlockState) {
-                timiteLocations[event.position] = SimpleTimeMark.now()
+                locations[event.position] = SimpleTimeMark.now()
                 doubleTimeShooting = true
             } else {
                 doubleTimeShooting = false
@@ -90,7 +90,7 @@ object TimiteHelper {
         }
     }
 
-    private val timiteLocations = mutableMapOf<LorenzVec, SimpleTimeMark>()
+    private val locations = mutableMapOf<LorenzVec, SimpleTimeMark>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -103,10 +103,10 @@ object TimiteHelper {
             if (loc.getBlockAt() == Blocks.stained_glass_pane && loc.distanceToPlayer() <= 15) {
                 val color = loc.getBlockStateAt().getValue(BlockStainedGlassPane.COLOR)
                 if (color != EnumDyeColor.BLUE && color != EnumDyeColor.LIGHT_BLUE) continue
-                if (timiteLocations[loc] == null) timiteLocations[loc] = SimpleTimeMark.now()
+                if (locations[loc] == null) locations[loc] = SimpleTimeMark.now()
             }
         }
-        val iterator = timiteLocations.entries.iterator()
+        val iterator = locations.entries.iterator()
         while (iterator.hasNext()) {
             val entry = iterator.next()
             if (entry.key.getBlockAt() == Blocks.air) {
@@ -122,20 +122,20 @@ object TimiteHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!RiftApi.inMountainTop() || !config.timiteExpiryTimer) return
+        if (!RiftApi.inMountainTop() || !config.expiryTimer) return
 
-        for (timiteLocation in timiteLocations.entries) {
-            val timeLeft = timiteLocation.value + 31.seconds
+        for (location in locations.entries) {
+            val timeLeft = location.value + 31.seconds
             if (timeLeft.timeUntil() < 6.seconds) {
-                event.drawDynamicText(timiteLocation.key, "§c${timeLeft.timeUntil().format()}", 1.5)
+                event.drawDynamicText(location.key, "§c${timeLeft.timeUntil().format()}", 1.5)
             }
         }
     }
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        timiteLocations.clear()
+        locations.clear()
     }
 
-    private fun isEnabled() = RiftApi.inMountainTop() && config.timiteTimer
+    private fun isEnabled() = RiftApi.inMountainTop() && config.evolutionTimer
 }

@@ -10,28 +10,28 @@ class TimiteConfig {
     @Expose
     @ConfigOption(name = "Timite Evolution Timer", desc = "Count down the time until Timite evolves with the time gun.")
     @ConfigEditorBoolean
-    var timiteTimer: Boolean = true
+    var evolutionTimer: Boolean = true
 
     @Expose
     @ConfigOption(name = "Expiry Timer", desc = "Count down the time until Timite/Obsolite expires.")
     @ConfigEditorBoolean
-    var timiteExpiryTimer: Boolean = true
+    var expiryTimer: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Tracker", desc = "Tracks collected Timite ores and shows mote profit")
+    @ConfigOption(name = "Timite Tracker", desc = "Tracks collected Timite ores and shows mote profit.")
     @ConfigEditorBoolean
-    var timiteTracker: Boolean = false
+    var tracker: Boolean = false
 
     @Expose
     @ConfigOption(name = "Only Show While Holding", desc = "Only shows the tracker while holding the Timite pickaxes or the Time Gun.")
     @ConfigEditorBoolean
-    var timiteOnlyShowWhileHolding: Boolean = false
+    var onlyShowWhileHolding: Boolean = false
 
     @Expose
-    @ConfigLink(owner = TimiteConfig::class, field = "timiteTimer")
-    var timerPosition: Position = Position(421, -220, false, true)
+    @ConfigLink(owner = TimiteConfig::class, field = "evolutionTimer")
+    var timerPosition: Position = Position(421, -220)
 
     @Expose
-    @ConfigLink(owner = TimiteConfig::class, field = "timiteTracker")
-    var trackerPos: Position = Position(-201, -220, false, true)
+    @ConfigLink(owner = TimiteConfig::class, field = "tracker")
+    var trackerPosition: Position = Position(-201, -220)
 }
