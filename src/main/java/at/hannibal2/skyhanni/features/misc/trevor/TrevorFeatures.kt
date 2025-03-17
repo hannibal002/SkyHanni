@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -191,11 +192,11 @@ object TrevorFeatures {
 
         clickOptionPattern.findMatcher(event.message) {
             for (sibling in event.chatComponent.siblings) {
-                val clickEvent = sibling.chatStyle.chatClickEvent ?: continue
+                val clickEvent = sibling.command ?: continue
 
-                if (clickEvent.value.contains("YES")) {
+                if (clickEvent.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
-                    lastChatPrompt = clickEvent.value.substringAfter(" ")
+                    lastChatPrompt = clickEvent.substringAfter(" ")
                 }
             }
         }
