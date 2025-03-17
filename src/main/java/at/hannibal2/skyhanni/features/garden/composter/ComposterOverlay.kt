@@ -24,6 +24,10 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -46,9 +50,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.renderables.Container
-import at.hannibal2.skyhanni.utils.renderables.ContainerBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -170,18 +174,18 @@ object ComposterOverlay {
             return
         }
         if (organicMatterFactors.isEmpty()) {
-            organicMatterDisplay = Container.vertical {
-                string("§cSkyHanni composter error:")
-                string("§cRepo data not loaded!")
-                string("§7(organicMatterFactors is empty)")
+            organicMatterDisplay = Renderable.vertical {
+                addString("§cSkyHanni composter error:")
+                addString("§cRepo data not loaded!")
+                addString("§7(organicMatterFactors is empty)")
             }
             return
         }
         if (fuelFactors.isEmpty()) {
-            organicMatterDisplay = Container.vertical {
-                string("§cSkyHanni composter error:")
-                string("§cRepo data not loaded!")
-                string("§7(fuelFactors is empty)")
+            organicMatterDisplay = Renderable.vertical {
+                addString("§cSkyHanni composter error:")
+                addString("§cRepo data not loaded!")
+                addString("§7(fuelFactors is empty)")
             }
             return
         }
@@ -242,12 +246,12 @@ object ComposterOverlay {
         val fuelFormatPreview =
             if (fuelMaxDuration != fuelMaxDurationPreview) " §c➜ §b" + formatTime(fuelMaxDurationPreview) else ""
 
-        return Container.vertical {
-            renderable(preview(extraComposterUpgrade))
-            spacer()
-            renderable(profitDisplay())
-            string("§7Full §eOrganic Matter §7empty time: §b$organicMatterFormat$organicMatterFormatPreview")
-            string("§7Full §eOrganic Matter §7empty time: §b$fuelFormat$fuelFormatPreview")
+        return Renderable.vertical {
+            add(preview(extraComposterUpgrade))
+            addVerticalSpacer()
+            addNotNull(profitDisplay())
+            addString("§7Full §eOrganic Matter §7empty time: §b$organicMatterFormat$organicMatterFormatPreview")
+            addString("§7Full §eFuel §7empty time: §b$fuelFormat$fuelFormatPreview")
         }
     }
 
@@ -258,8 +262,8 @@ object ComposterOverlay {
         val currentOrganicMatter = ComposterApi.getOrganicMatter()
         val missingOrganicMatter = (maxOrganicMatter - currentOrganicMatter).toDouble()
 
-        return Container.vertical {
-            string("§7Items needed to fill §eOrganic Matter")
+        return Renderable.vertical {
+            addString("§7Items needed to fill §eOrganic Matter")
             val fillList = fillList(organicMatterFactors, missingOrganicMatter, testOffset) {
                 currentOrganicMatterItem = it
                 update()
@@ -271,10 +275,10 @@ object ComposterOverlay {
         }
     }
 
-    private fun drawFuelExtraDisplay() = Container.vertical {
-        renderable(profitDisplay())
+    private fun drawFuelExtraDisplay() = Renderable.vertical {
+        addNotNull(profitDisplay())
         if (inComposter) {
-            string("§7Items needed to fill §2Fuel")
+            addString("§7Items needed to fill §2Fuel")
             val maxFuel = ComposterApi.maxFuel(null)
             val currentFuel = ComposterApi.getFuel()
             val missingFuel = (maxFuel - currentFuel).toDouble()
@@ -349,33 +353,32 @@ object ComposterOverlay {
 
         val profitFormatPreview = if (profit != profitPreview) " §c➜ §6" + profitPreview.shortFormat() else ""
 
-        return Container.vertical {
-            selector<TimeType>(
+        return Renderable.vertical {
+            addRenderableButton<TimeType>(
                 "§7Per ",
-                getName = { type -> type.display },
-                isCurrent = { it == currentTimeType },
+                current = currentTimeType,
                 onChange = {
                     currentTimeType = it
                     update()
-                }
+                },
             )
 
-            horizontal {
-                string("§7Using: ")
-                item(organicMatterItem)
-                string(" §7and ")
-                item(fuelItem)
+            addLine {
+                addString("§7Using: ")
+                addItemStack(organicMatterItem)
+                addString(" §7and ")
+                addItemStack(fuelItem)
             }
 
-            string(" §7Time per Compost: §b$format$formatPreview")
-            string(" §7$compostPerTitle: §e${multiplier.roundTo(2)}$compostPerTitlePreview")
-            string(" §7Material costs per $timeText: §6${totalCost.shortFormat()}$materialCostFormatPreview")
-            string(" §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview")
-            spacer()
+            addString(" §7Time per Compost: §b$format$formatPreview")
+            addString(" §7$compostPerTitle: §e${multiplier.roundTo(2)}$compostPerTitlePreview")
+            addString(" §7Material costs per $timeText: §6${totalCost.shortFormat()}$materialCostFormatPreview")
+            addString(" §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview")
+            addVerticalSpacer()
         }
     }
 
-    private fun ContainerBuilder.fillList(
+    private fun MutableList<Renderable>.fillList(
         factors: Map<NeuInternalName, Double>,
         missing: Double,
         testOffsetRec: Int = 0,
@@ -394,7 +397,7 @@ object ComposterOverlay {
 
         val first: NeuInternalName? = calculateFirst(map, testOffset, factors, missing, onClick)
         if (testOffset != 0) {
-            renderable(
+            add(
                 Renderable.link("testOffset = $testOffset") {
                     ComposterOverlay.testOffset = 0
                     update()
@@ -405,7 +408,7 @@ object ComposterOverlay {
         return first ?: error("First is empty!")
     }
 
-    private fun ContainerBuilder.calculateFirst(
+    private fun MutableList<Renderable>.calculateFirst(
         map: MutableMap<NeuInternalName, Double>,
         testOffset: Int,
         factors: Map<NeuInternalName, Double>,
@@ -434,13 +437,12 @@ object ComposterOverlay {
             }
             val totalPrice = itemsNeeded * price
 
-            renderable(
-                Container.horizontal {
-                    if (testOffset != 0) string("#$i ")
-                    item(item)
-                    renderable(formatPrice(totalPrice, internalName, item.displayName, itemsNeeded, onClick))
-                }
-            )
+            addLine {
+                if (testOffset != 0) addString("#$i ")
+                addItemStack(item)
+                add(formatPrice(totalPrice, internalName, item.displayName, itemsNeeded, onClick))
+            }
+
             if (i == 10 + testOffset) break
         }
         return first

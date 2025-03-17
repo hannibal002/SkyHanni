@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -32,10 +34,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -157,14 +159,14 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildDisplay(materials: MutableMap<NeuInternalName, Int>) = Container.vertical {
-        string("§7City Project Materials")
+    private fun buildDisplay(materials: MutableMap<NeuInternalName, Int>) = Renderable.vertical {
+        addString("§7City Project Materials")
 
         if (materials.isEmpty()) {
-            string("§cNo Materials to contribute.")
+            addString("§cNo Materials to contribute.")
         } else {
             for ((internalName, amount) in materials) {
-                renderable(materialRow(internalName, amount))
+                add(materialRow(internalName, amount))
             }
         }
 
@@ -175,11 +177,11 @@ object CityProjectFeatures {
         val name = internalName.repoItemName
         val price = internalName.getPrice() * amount
 
-        return Container.horizontal {
-            string(" §7- ")
-            item(stack)
-            renderable(materialLink(name, amount))
-            string(" §7(§6${price.shortFormat()}§7)")
+        return Renderable.line {
+            addString(" §7- ")
+            addItemStack(stack)
+            add(materialLink(name, amount))
+            addString(" §7(§6${price.shortFormat()}§7)")
         }
     }
 

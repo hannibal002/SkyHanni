@@ -12,6 +12,10 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addHorizontalSpacer
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -22,8 +26,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.renderables.Container
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -49,9 +53,9 @@ object ComposterDisplay {
 
         val pattern = rawPattern.toPattern()
 
-        fun label(label: String) = Container.horizontal {
-            item(displayItem)
-            string(label)
+        fun label(label: String) = Renderable.line {
+            addItemStack(displayItem)
+            addString(label)
         }
 
         fun labeledWithData(map: Map<DataType, String>): Renderable? {
@@ -74,16 +78,15 @@ object ComposterDisplay {
 
     private fun updateDisplay() {
         if (!config.displayEnabled) return
-        display = Container.vertical {
-            string("§bComposter")
-            renderable(DataType.TIME_LEFT.labeledWithData(tabListData))
-            horizontal {
-                renderable(DataType.ORGANIC_MATTER.labeledWithData(tabListData))
-                spacer()
-                renderable(DataType.FUEL.labeledWithData(tabListData))
+        display = Renderable.vertical {
+            addString("§bComposter")
+            addNotNull(DataType.TIME_LEFT.labeledWithData(tabListData))
+            addLine {
+                addNotNull(DataType.ORGANIC_MATTER.labeledWithData(tabListData))
+                addHorizontalSpacer()
+                addNotNull(DataType.FUEL.labeledWithData(tabListData))
             }
-            renderable(DataType.STORED_COMPOST.labeledWithData(tabListData))
-            renderable(composterEmptyTime(composterEmptyTime))
+            add(composterEmptyTime(composterEmptyTime))
         }
     }
 
@@ -91,9 +94,9 @@ object ComposterDisplay {
         return if (emptyTime != null) {
             GardenApi.storage?.composterEmptyTime = emptyTime.fromNow()
             val format = emptyTime.format()
-            Container.horizontal {
-                item(bucket)
-                string("§b$format")
+            Renderable.line {
+                addItemStack(bucket)
+                addString("§b$format")
             }
         } else Renderable.string("§cOpen Composter Upgrades!")
     }
@@ -181,9 +184,9 @@ object ComposterDisplay {
         val inSB = LorenzUtils.inSkyBlock && config.displayOutsideGarden
         val outsideSB = !LorenzUtils.inSkyBlock && OutsideSBFeature.COMPOSTER_TIME.isSelected()
         if (!GardenApi.inGarden() && (inSB || outsideSB)) {
-            val outsideGardenDisplay = Container.horizontal {
-                item(bucket)
-                string("§b$format")
+            val outsideGardenDisplay = Renderable.line {
+                addItemStack(bucket)
+                addString("§b$format")
             }
             config.outsideGardenPos.renderRenderable(outsideGardenDisplay, posLabel = "Composter Outside Garden")
         }
