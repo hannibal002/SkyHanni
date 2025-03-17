@@ -35,6 +35,7 @@ net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNe
 net.minecraft.client.gui.components.ChatComponent allMessages chatLines
 net.minecraft.client.gui.components.ChatComponent trimmedMessages drawnChatLines
 net.minecraft.client.gui.components.ChatComponent rescaleChat() refreshChat()
+net.minecraft.client.gui.components.ChatComponent getWidth() getChatWidth()
 
 net.minecraft.client.gui.screens.ChatScreen net.minecraft.client.gui.GuiChat
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
@@ -118,10 +119,17 @@ net.minecraft.nbt.ListTag getString() getStringTagAt()
 net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent
 net.minecraft.network.chat.Style net.minecraft.util.text.Style
 net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
+net.minecraft.network.chat.BaseComponent net.minecraft.util.text.TextComponentBase
 
 net.minecraft.network.chat.Component copy() createCopy()
 
+net.minecraft.network.chat.BaseComponent append() appendSibling()
+net.minecraft.network.chat.MutableComponent append() appendSibling()
+
 net.minecraft.network.chat.Style withColor() setColor()
+net.minecraft.network.chat.Style withItalic() setItalic()
+net.minecraft.network.chat.Style withBold() setBold()
+net.minecraft.network.chat.Style applyTo() setParentStyle()
 
 net.minecraft.network.protocol.Packet net.minecraft.network.Packet
 
@@ -335,6 +343,8 @@ net.minecraft.world.entity.projectile.SmallFireball net.minecraft.entity.project
 net.minecraft.world.entity.projectile.FishingHook getPlayerOwner() getAngler()
 
 net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
+net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
+
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.Slot getItem() getStack()
@@ -347,6 +357,7 @@ net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
 net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
 net.minecraft.world.item.ItemStack isEnchanted() isItemEnchanted()
+net.minecraft.world.item.ItemStack getTag() getTagCompound()
 net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 
 net.minecraft.world.item.Item byBlock() getItemFromBlock()
@@ -462,8 +473,6 @@ org.lwjgl.glfw.GLFW GLFW_KEY_W KEY_W
 org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
-
-at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer net.minecraft.client.gui.inventory.GuiContainer
 
 net.minecraft.world.inventory.AbstractContainerMenu net.minecraft.inventory.Container
 
