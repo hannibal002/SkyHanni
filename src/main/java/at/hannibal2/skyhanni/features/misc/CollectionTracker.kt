@@ -194,7 +194,7 @@ object CollectionTracker {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        MinecraftCompat.localPlayer.worldObj ?: return
+        MinecraftCompat.localPlayerOrNull?.worldObj ?: return
 
         compareInventory()
         updateGain()

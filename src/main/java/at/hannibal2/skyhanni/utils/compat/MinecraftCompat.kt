@@ -8,31 +8,17 @@ import net.minecraft.entity.Entity
 
 object MinecraftCompat {
 
-    val localPlayer
-        get(): EntityPlayerSP =
-            localPlayerOrNull ?: ErrorManager.skyHanniError("thePlayer is null")
+    val localPlayer get(): EntityPlayerSP = localPlayerOrNull ?: ErrorManager.skyHanniError("thePlayer is null")
 
-    val localPlayerOrNull
-        get(): EntityPlayerSP? =
-            Minecraft.getMinecraft().thePlayer
+    val localPlayerOrNull get(): EntityPlayerSP? = Minecraft.getMinecraft().thePlayer
 
-    val Entity.isLocalPlayer
-        get(): Boolean =
-            this == localPlayerOrNull
+    val Entity.isLocalPlayer get(): Boolean = this == localPlayerOrNull
 
-    val localPlayerExists
-        get(): Boolean =
-            localPlayerOrNull != null
+    val localPlayerExists get(): Boolean = localPlayerOrNull != null
 
-    val localWorld
-        get(): WorldClient =
-            localWorldOrNull ?: ErrorManager.skyHanniError("theWorld is null")
+    val localWorld get(): WorldClient = localWorldOrNull ?: ErrorManager.skyHanniError("theWorld is null")
 
-    val localWorldOrNull
-        get(): WorldClient? =
-            Minecraft.getMinecraft().theWorld
+    val localWorldOrNull get(): WorldClient? = Minecraft.getMinecraft().theWorld
 
-    val localWorldExists
-        get(): Boolean =
-            localWorldOrNull != null
+    val localWorldExists get(): Boolean = localWorldOrNull != null
 }
