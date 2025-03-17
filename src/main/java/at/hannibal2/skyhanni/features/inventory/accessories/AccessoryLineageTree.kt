@@ -94,8 +94,13 @@ class AccessoryLineageTree {
             )
         }
         val itemStack = internalName.getItemStackOrNull() ?: return
-        val slayerUsageReq = AccessoryApi.getAccessoryUsageSlayerRequirementOrNull(
-
+        val slayerUsageReq = AccessoryApi.getAccessoryUsageSlayerRequirementOrNull(itemStack) ?: return
+        AccessoryApi.addSlayerReq(
+            internalName = internalName,
+            type = SlayerRequirementType.USAGE,
+            slayerType = slayerUsageReq.slayerType,
+            level = slayerUsageReq.level,
+            matchLore = "§7§4☠ §cUsage Requires §5${slayerUsageReq.slayerType.getClazzName()} Slayer ${slayerUsageReq.level}§c.",
         )
     }
 

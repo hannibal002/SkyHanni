@@ -273,10 +273,10 @@ object AccessoryOverviewDisplay {
             }.takeIf { it.isNotEmpty() }?.let { add(Pair(Renderable.string(it), it)) }
 
             // Requirements
-            usageSlayerRequirement?.third?.takeIf { it.isNotEmpty() }?.let {
+            usageSlayerRequirement?.matchLore?.takeIf { it.isNotEmpty() }?.let {
                 add(Pair(Renderable.string(it), it))
             }
-            craftSlayerRequirement?.third?.takeIf { it.isNotEmpty() }?.let {
+            craftSlayerRequirement?.matchLore?.takeIf { it.isNotEmpty() }?.let {
                 add(Pair(Renderable.string(it), it))
             }
         }
