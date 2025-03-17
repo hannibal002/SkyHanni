@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo

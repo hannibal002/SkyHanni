@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice

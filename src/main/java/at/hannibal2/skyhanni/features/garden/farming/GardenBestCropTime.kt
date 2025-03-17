@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format

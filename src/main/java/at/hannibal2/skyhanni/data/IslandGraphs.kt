@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils

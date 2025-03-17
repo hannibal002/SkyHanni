@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceToPlayer
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators

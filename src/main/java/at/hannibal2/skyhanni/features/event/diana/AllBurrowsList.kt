@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec

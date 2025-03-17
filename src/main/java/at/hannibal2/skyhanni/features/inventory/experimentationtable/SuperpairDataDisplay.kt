@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.remainingClicksPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.InventoryUtils

@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Comp
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches

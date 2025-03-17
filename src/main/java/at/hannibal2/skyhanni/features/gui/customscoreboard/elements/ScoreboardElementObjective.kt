@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 

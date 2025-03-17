@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack

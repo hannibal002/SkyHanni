@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName

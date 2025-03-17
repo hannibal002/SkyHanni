@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData

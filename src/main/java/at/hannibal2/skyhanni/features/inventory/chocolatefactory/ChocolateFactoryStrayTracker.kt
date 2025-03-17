@@ -14,8 +14,8 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils

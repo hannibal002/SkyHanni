@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators

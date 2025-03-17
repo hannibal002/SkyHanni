@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.utils.collection
 
 /**
  * A generic, immutable circular list that cycles through its elements infinitely.

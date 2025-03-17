@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture

@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems

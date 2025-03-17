@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec

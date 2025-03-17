@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.essenceUpgrade
 import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.maxedUpgradeLorePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal

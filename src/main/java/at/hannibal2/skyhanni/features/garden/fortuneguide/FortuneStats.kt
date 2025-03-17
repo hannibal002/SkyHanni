@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumOfPair
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumOfPair
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
 enum class FortuneStats(

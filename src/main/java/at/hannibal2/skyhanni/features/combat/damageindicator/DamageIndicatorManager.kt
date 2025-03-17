@@ -25,8 +25,8 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen

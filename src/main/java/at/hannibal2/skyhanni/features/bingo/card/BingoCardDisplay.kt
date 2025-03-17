@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils

@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo

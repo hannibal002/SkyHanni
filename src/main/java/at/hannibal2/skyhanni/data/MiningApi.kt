@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
-import at.hannibal2.skyhanni.utils.CollectionUtils.countBy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland

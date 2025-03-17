@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt

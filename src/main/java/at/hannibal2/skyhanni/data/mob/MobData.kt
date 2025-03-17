@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.getLorenzVec

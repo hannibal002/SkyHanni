@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture

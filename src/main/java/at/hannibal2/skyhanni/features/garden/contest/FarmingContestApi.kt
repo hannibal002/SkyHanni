@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils

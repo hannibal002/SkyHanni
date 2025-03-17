@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName

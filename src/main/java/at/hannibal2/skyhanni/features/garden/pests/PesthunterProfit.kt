@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirstOrNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils

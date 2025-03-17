@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzVec

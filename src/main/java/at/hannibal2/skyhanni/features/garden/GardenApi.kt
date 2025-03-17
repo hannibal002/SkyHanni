@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPr
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName

@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils

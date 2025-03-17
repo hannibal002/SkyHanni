@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CircularList
+import at.hannibal2.skyhanni.utils.collection.CircularList
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase

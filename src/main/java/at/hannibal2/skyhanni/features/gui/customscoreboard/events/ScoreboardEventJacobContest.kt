@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.CollectionUtils.sublistAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 

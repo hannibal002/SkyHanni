@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.RenderUtils

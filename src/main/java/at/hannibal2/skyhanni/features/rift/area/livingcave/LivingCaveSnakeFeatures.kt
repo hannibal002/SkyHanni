@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.livingcave.snake.LivingCaveSnake
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec

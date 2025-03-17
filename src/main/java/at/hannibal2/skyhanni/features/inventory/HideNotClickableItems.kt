@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems

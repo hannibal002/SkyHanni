@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName

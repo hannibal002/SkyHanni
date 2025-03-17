@@ -1,6 +1,9 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.utils.collection
 
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils

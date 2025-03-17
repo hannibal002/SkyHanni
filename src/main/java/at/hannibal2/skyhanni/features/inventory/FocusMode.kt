@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.sublistAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull

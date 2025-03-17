@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName

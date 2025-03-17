@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture

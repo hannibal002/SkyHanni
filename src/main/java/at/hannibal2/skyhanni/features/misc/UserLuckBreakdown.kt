@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators

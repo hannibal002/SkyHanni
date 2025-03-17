@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName

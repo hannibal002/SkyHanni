@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull

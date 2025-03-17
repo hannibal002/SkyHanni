@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.Progressio
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.SkillLevelStep
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators

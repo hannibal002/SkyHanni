@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils

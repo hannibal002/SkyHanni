@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
