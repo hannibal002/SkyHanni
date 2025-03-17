@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -80,12 +81,11 @@ object TimiteTracker {
                     }
                 }
             }
-            val stack = HIGHLITE.getItemStack()
-            val motes = stack.motesNpcPrice()?.times(craftableAmount)?.shortFormat() ?: "0"
+            val motes = HIGHLITE.motesNpcPrice()?.times(craftableAmount)?.shortFormat() ?: "0"
             if (craftableAmount > 0) {
                 add(
                     Renderable.string(
-                        " §7${craftableAmount.shortFormat()}x ${stack.displayName} Craftable§7: §5$motes motes"
+                        " §7${craftableAmount.shortFormat()}x ${HIGHLITE.repoItemName} Craftable§7: §5$motes motes"
                     ).toSearchable()
                 )
             }
@@ -101,12 +101,12 @@ object TimiteTracker {
     }
 
     private val tracker =
-        SkyHanniItemTracker("Timite Tracker", { Data() }, { it.rift.timiteHelperTracker }) {
+        SkyHanniItemTracker("Timite Tracker", { Data() }, { it.rift.timiteTracker }) {
             drawDisplay(it)
         }
 
     private val validItems = listOf(
-        "TIMITE".toInternalName(),
+        TIMITE,
         "YOUNGITE".toInternalName(),
         "OBSOLITE".toInternalName(),
     )

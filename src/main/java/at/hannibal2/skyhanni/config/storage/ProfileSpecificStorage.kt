@@ -739,7 +739,7 @@ class ProfileSpecificStorage {
         var verminTracker: VerminTracker.Data = VerminTracker.Data()
 
         @Expose
-        var timiteHelperTracker: TimiteTracker.Data = TimiteTracker.Data()
+        var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
     }
 
     // - slayer
