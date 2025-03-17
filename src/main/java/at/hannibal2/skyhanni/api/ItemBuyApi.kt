@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
@@ -19,11 +20,19 @@ object ItemBuyApi {
         }
     }
 
-    fun NeuInternalName.createBuyTip() = listOf(
-        when {
-            isBazaarItem() -> "§eClick to search for $repoItemName §ein Bazaar!"
-            isAuctionHouseItem() -> "§eClick to search for $repoItemName §ein Auction House!"
-            else -> "§cCould not find $repoItemName §eon AH or BZ!"
-        },
-    )
+    fun NeuInternalName.createBuyTip(
+        colorActive: LorenzColor = LorenzColor.YELLOW,
+        colorInactive: LorenzColor = LorenzColor.RED,
+        clickType: String = "Click",
+    ): List<String> {
+        val firstPart = "§${colorActive.chatColorCode}$clickType to search for $repoItemName §${colorActive.chatColorCode}in"
+
+        return listOf(
+            when {
+                isBazaarItem() -> "$firstPart Bazaar!"
+                isAuctionHouseItem() -> "$firstPart Auction House!"
+                else -> "§${colorInactive.chatColorCode}Could not find $repoItemName §${colorInactive.chatColorCode}on AH or BZ!"
+            },
+        )
+    }
 }
