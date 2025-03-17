@@ -43,7 +43,7 @@ class HoppityEggsConfig {
     @ConfigOption(
         name = "Show Waypoints Immediately",
         desc = "Show an estimated waypoint immediately after clicking.\n" +
-            "§cThis might cause issues with other particle sources."
+            "§cThis might cause issues with other particle sources.",
     )
     @ConfigEditorBoolean
     var waypointsImmediately: Boolean = false
@@ -69,7 +69,7 @@ class HoppityEggsConfig {
     @ConfigOption(
         name = "Show All Waypoints",
         desc = "Show all possible egg waypoints for the current lobby.\n" +
-            "§eOnly works when you don't have an Egglocator in your inventory."
+            "§eOnly works when you don't have an Egglocator in your inventory.",
     )
     @ConfigEditorBoolean
     var showAllWaypoints: Boolean = false
@@ -78,7 +78,7 @@ class HoppityEggsConfig {
     @ConfigOption(
         name = "Hide Duplicate Waypoints",
         desc = "Hide egg waypoints you have already found.\n" +
-            "§eOnly works when you don't have an Egglocator in your inventory."
+            "§eOnly works when you don't have an Egglocator in your inventory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -87,7 +87,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Mark Duplicate Locations",
-        desc = "Marks egg location waypoints which you have already found in red."
+        desc = "Marks egg location waypoints which you have already found in red.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -102,7 +102,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Load from NEU PV",
-        desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer."
+        desc = "Load Hoppity Egg Location data from API when opening the NEU Profile Viewer.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -111,7 +111,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show Unclaimed Eggs",
-        desc = "Display which eggs haven't been found in the last SkyBlock day."
+        desc = "Display which eggs haven't been found in the last SkyBlock day.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -134,7 +134,7 @@ class HoppityEggsConfig {
     @ConfigOption(
         name = "Show Collected Locations",
         desc = "Show the number of found egg locations on this island.\n" +
-            "§eThis is not retroactive and may not be fully synced with Hypixel's count."
+            "§eThis is not retroactive and may not be fully synced with Hypixel's count.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -149,7 +149,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Click to Warp",
-        desc = "Make the eggs ready chat message & unclaimed timer display clickable to warp you to an island."
+        desc = "Make the eggs ready chat message & unclaimed timer display clickable to warp you to an island.",
     )
     @ConfigEditorBoolean
     var warpUnclaimedEggs: Boolean = false
@@ -162,7 +162,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show While Busy",
-        desc = "Show while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc)."
+        desc = "Show while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -171,7 +171,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Warn While Busy",
-        desc = "Warn while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc)."
+        desc = "Warn while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -186,7 +186,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Shared Hoppity Waypoints",
-        desc = "Enable being able to share and receive egg waypoints in your lobby."
+        desc = "Enable being able to share and receive egg waypoints in your lobby.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -195,7 +195,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Adjust player opacity",
-        desc = "Adjust the opacity of players near shared & guessed egg waypoints. (in %)"
+        desc = "Adjust the opacity of players near shared & guessed egg waypoints. (in %)",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
     var playerOpacity: Int = 40
@@ -207,7 +207,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Hoppity Shop",
-        desc = "Highlight items that haven't been bought from the Hoppity shop yet."
+        desc = "Highlight items that haven't been bought from the Hoppity shop yet.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -222,7 +222,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Time in Chat",
-        desc = "When the Egglocator can't find an egg, show the time until the next Hoppity event or egg spawn."
+        desc = "When the Egglocator can't find an egg, show the time until the next Hoppity event or egg spawn.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -252,7 +252,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show Duplicate Count",
-        desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages."
+        desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.",
     )
     @ConfigEditorBoolean
     var showDuplicateNumber: Boolean = false
@@ -260,7 +260,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Recolor Time-Towered Chocolate",
-        desc = "Recolor raw chocolate gain from duplicate rabbits while Time Tower is active."
+        desc = "Recolor raw chocolate gain from duplicate rabbits while Time Tower is active.",
     )
     @ConfigEditorBoolean
     var recolorTTChocolate: Boolean = false
@@ -269,7 +269,7 @@ class HoppityEggsConfig {
     @ConfigOption(
         name = "Rabbit Pet Warning",
         desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
-            "§eOnly enable this setting when you own a mythic Rabbit pet."
+            "§eOnly enable this setting when you own a mythic Rabbit pet.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -278,7 +278,7 @@ class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Prevent Missing Rabbit the Fish",
-        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present."
+        desc = "Prevent closing a Meal Egg's inventory if Rabbit the Fish is present.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

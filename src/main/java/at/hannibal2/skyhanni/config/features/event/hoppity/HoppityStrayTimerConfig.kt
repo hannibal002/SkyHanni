@@ -22,7 +22,7 @@ class HoppityStrayTimerConfig {
     @Expose
     @ConfigOption(
         name = "Ding For Timer",
-        desc = "Play a ding sound when the timer drops below this number. Set to 0 to disable."
+        desc = "Play a ding sound when the timer drops below this number. Set to 0 to disable.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
     var dingForTimer: Int = 3

@@ -11,7 +11,7 @@ class HoppityEventSummaryCFReminderConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Periodically get reminded to switch to a new server to update your Chocolate Factory leaderboard position statistic."
+        desc = "Periodically get reminded to switch to a new server to update your Chocolate Factory leaderboard position statistic.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -20,7 +20,7 @@ class HoppityEventSummaryCFReminderConfig {
     @Expose
     @ConfigOption(
         name = "Note",
-        desc = "§cNote§7: Reminders will only appear if you have added Leaderboard Change to your stat list."
+        desc = "§cNote§7: Reminders will only appear if you have added Leaderboard Change to your stat list.",
     )
     @ConfigEditorInfoText
     var statListNote: Boolean = false
@@ -33,7 +33,7 @@ class HoppityEventSummaryCFReminderConfig {
     @Expose
     @ConfigOption(
         name = "Show for Last X Hours",
-        desc = "Only show the reminder for the last X hours of the event.\n0: Off\n30: Entire event"
+        desc = "Only show the reminder for the last X hours of the event.\n0: Off\n30: Entire event",
     )
     @ConfigEditorSlider(minValue = 0f, minStep = 1f, maxValue = 30f)
     var showForLastXHours: Int = 2

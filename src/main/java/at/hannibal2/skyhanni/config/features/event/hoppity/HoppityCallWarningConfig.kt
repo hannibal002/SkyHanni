@@ -31,7 +31,7 @@ class HoppityCallWarningConfig {
         desc = "The sound that plays when hoppity calls.\n" +
             "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" +
             "§eThen write §bskyhanni:yourfilename\n" +
-            "§cMust be a .ogg file"
+            "§cMust be a .ogg file",
     )
     @ConfigEditorText
     var hoppityCallSound: Property<String> = Property.of("note.pling")
@@ -48,7 +48,7 @@ class HoppityCallWarningConfig {
     @Expose
     @ConfigOption(
         name = "Ensure Coins Pre-Trade",
-        desc = "Block opening Hoppity's abiphone trade menu if you do not have enough coins in your purse."
+        desc = "Block opening Hoppity's abiphone trade menu if you do not have enough coins in your purse.",
     )
     @ConfigEditorBoolean
     var ensureCoins: Boolean = false
@@ -56,7 +56,7 @@ class HoppityCallWarningConfig {
     @Expose
     @ConfigOption(
         name = "Coin Threshold",
-        desc = "The amount of coins you need to have in your purse to be able to open Hoppity's abiphone trade menu."
+        desc = "The amount of coins you need to have in your purse to be able to open Hoppity's abiphone trade menu.",
     )
     @ConfigEditorSlider(minValue = 250000f, maxValue = 5000000f, minStep = 250000f)
     var coinThreshold: Int = 5000000

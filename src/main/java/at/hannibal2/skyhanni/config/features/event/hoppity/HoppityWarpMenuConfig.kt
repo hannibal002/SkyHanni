@@ -9,7 +9,7 @@ class HoppityWarpMenuConfig {
     @Expose
     @ConfigOption(
         name = "Show uniques in Warp Menu",
-        desc = "Shows your unique eggs in the Warp Menu during the hoppity event."
+        desc = "Shows your unique eggs in the Warp Menu during the hoppity event.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
