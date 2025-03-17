@@ -69,7 +69,8 @@ enum class SkyblockStat(
     PET_LUCK("§d♣", " Pet Luck: §r§d♣(?<value>\\d+)(?: .*)?", " §d♣ Pet Luck §f(?<value>\\d+)(?: .*)?"),
     FISHING_SPEED("§b☂", " Fishing Speed: §r§b☂(?<value>\\d+)(?: .*)?", " §b☂ Fishing Speed §f(?<value>\\d+)(?: .*)?"),
     TROPHY_FISH_CHANCE("§b☂", "Trophy Fish Chance: §r§6♔(?<value>\\d+)(?: .*)?", " §6♔ Trophy Fish Chance §f(?<value>\\d+)%"),
-    DOUBLE_HOOK_CHANCE("§9⚓", " Double Hook Chance: §r§9⚓(?<value>\\d+)(?: .*)?", ""),
+    DOUBLE_HOOK_CHANCE("§9⚓", " Double Hook Chance: §r§9⚓(?<value>\\d+)(?: .*)?", " §9⚓ Double Hook Chance §f(?<value>\\d+(?:\\.\\d+)?)%"),
+    TREASURE_CHANCE("§6⛃", " Treasure Chance: §r§6⛃(?<value>\\d+(?:\\.\\d+)?)", " §6⛃ Treasure Chance §f(?<value>\\d+(?:\\.\\d+)?)%"),
     BONUS_PEST_CHANCE(
         "§2ൠ",
         " (?:§r§7§m)?Bonus Pest Chance: (?:§r§2)?ൠ(?<value>\\d+)(?: .*)?",
@@ -89,7 +90,7 @@ enum class SkyblockStat(
     MINING_SPEED("§6⸕", " Mining Speed: §r§6⸕(?<value>\\d+)(?: .*)?", " §6⸕ Mining Speed §f(?<value>\\d+)(?: .*)?"),
     BREAKING_POWER("§2Ⓟ", "", " §2Ⓟ Breaking Power §f(?<value>\\d+)(?: .*)?"),
     PRISTINE("§5✧", " Pristine: §r§5✧(?<value>\\d+)(?: .*)?", " §5✧ Pristine §f(?<value>\\d+)(?: .*)?"),
-    FORAGING_FORTUNE("§☘", " Foraging Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Foraging Fortune §f(?<value>\\d+)(?: .*)?"),
+    FORAGING_FORTUNE("§6☘", " Foraging Fortune: §r§6☘(?<value>\\d+)(?: .*)?", " §6☘ Foraging Fortune §f(?<value>\\d+)(?: .*)?"),
     FARMING_FORTUNE(
         "§6☘",
         " (?:§r§7§m)?Farming Fortune: (?:§r§6)?☘(?<value>\\d+)(?: .*)?",
@@ -187,7 +188,7 @@ enum class SkyblockStat(
             }
         }
 
-        private val statsMenuRelevantSlotIndexes = listOf(15, 16, 24, 25)
+        private val statsMenuRelevantSlotIndexes = listOf(15, 16, 24, 25, 33)
 
         private fun onStatsMenu(event: InventoryFullyOpenedEvent) {
             if (event.inventoryName != "Your Equipment and Stats") return

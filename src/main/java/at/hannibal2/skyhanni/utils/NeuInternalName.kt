@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 
 class NeuInternalName private constructor(private val internalName: String) {
@@ -20,6 +21,12 @@ class NeuInternalName private constructor(private val internalName: String) {
         val TIGHTLY_TIED_HAY_BALE = "TIGHTLY_TIED_HAY_BALE".toInternalName()
 
         fun String.toInternalName(): NeuInternalName = uppercase().replace(" ", "_").let {
+            if (it.contains("§") || it.contains("&") || it.contains("'")) {
+                ErrorManager.skyHanniError(
+                    "Internal name found with color codes",
+                    "Internal Name" to it, "Original String" to this
+                )
+            }
             internalNameMap.getOrPut(it) { NeuInternalName(it) }
         }
 

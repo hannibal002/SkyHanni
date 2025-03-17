@@ -81,23 +81,85 @@ Now that we are done with that, you should be able to launch your game from your
 SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**, so if you want to look at another guide, check
 out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md).
 
-## Creating a Pull Request
+## Pull Requests
+
+General infos about Pull Request can be found on [Github Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
+
+### Creating a Pull Request
 
 If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
 
-Proposed changes are better off being in their own branch as this makes development easier for both you and the maintainers of this repository, you can do this by following the instructions from within the IntelliJ window with the SkyHanni project already open.
-- Click the beta dropdown at the top of IntelliJ
-- Click new branch
-- Give the branch a name relating to the changes you plan to make
+Proposed changes are best made in their own branch, as this makes development easier for both you and the maintainers of this repository.
+You can do this by following the instructions within the IntelliJ window in the open SkyHanni project:
 
-_A more in depth explanation how to use intellij and branches will follow here soon._
+- Click the beta dropdown at the top of IntelliJ.
+- Click **New branch**.
+- Give the branch a name related to the changes you plan to make.
 
-Please use a prefix for the name of the PR (E.g. Feature, Improvement, Fix, Backend, ...).
+_A more in-depth explanation of how to use IntelliJ and branches will follow someday._
 
-When writing the description of the PR, ensure you fill out the template with the necessary information, including the "WHAT" section, and the changelog entries.
+### Guidelines for Pull Requests
 
-If your PR relies on another PR, please include this information at the beginning of the description. Consider using a
-format like "- #821" to illustrate the dependency.
+Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, etc.).
+
+When writing the PR description, ensure you fill out the template with all the necessary information.
+In the **What** section, write technical details or explanations that don't belong in the changelog.
+Including that field is optional for small changes.
+
+If your PR relies on another PR, please include this information at the beginning of the description. Use the format `- #<pr number>`
+for the dependency, or `- <url>` for REPO dependencies.
+
+### Changelog Builder
+
+The PR description is processed by our [ChangeLog Builder](https://github.com/SkyHanniStudios/SkyHanniChangelogBuilder).
+
+- Follow the format examples from the template and remove the categories that do not apply to your PR.
+- A PR might include multiple changelog categories simultaneously.
+
+Here is an explanation of which changes belong to each category:
+
+#### New Features
+
+New standalone features that are independent of existing features. Additional settings for existing features belong in the **Improvements**
+category.
+
+#### Improvements
+
+Changes that improve or expand the code's logic and have a visible impact on users. This category is for enhancements, not for fixing
+incorrect logic.
+The line between bug fixes and improvements is sometimes not clear. If you are unsure whether a change is an improvement or a bug fix, ask
+for guidance.
+
+#### Fixes
+
+Bug fixes, including typos (only those visible to the user, e.g., in config or chat messages), missing checks that cause incorrect behavior
+under specific conditions, or logic errors.
+Only significant performance issues are considered bugs; otherwise, they fall under **Technical Details**. If the code does not behave as
+intended by the original developer, it is a bug. If the original code had logical errors, it is a bug. If the original code lacks nuance but
+is not incorrect, it is not a bug.
+
+#### Technical Details
+
+Internal changes that do not impact the end user. Examples include:
+
+- Refactoring (renaming or moving members, functions, classes, files or packages)
+- Typos in object names (which the end user will not see)
+- API updates
+- Minor performance improvements
+- Preparations for 1.21
+- Documentation changes to markdown files, e.g., in `/docs` or this file.
+
+#### Removed Features
+
+Features that have merged with existing features (in the config) or have become obsolete (e.g., if Hypixel implements them on the server
+side).
+
+#### No category
+
+Some changes don't fit any categories.
+E.g. when reverting pull requests or doing quick fixes to PRs merged immediately beforehand but not yet released in a beta.
+To tell the changelog build this, write either `exclude_from_changelog` or `ignore_from_changelog` in one line.
+Make sure such pull requests have a good explanation in the **What** section.
 
 ## Coding Styles and Conventions
 
@@ -270,6 +332,11 @@ different Minecraft versions.
 Note also that the only targets we consider are 1.8.9 and 1.21 (or whatever the latest version we may target). The other versions are only there
 to make mappings translate more easily (more on that later).
 
+## Discord Bot
+
+While not directly part of the Minecraft mod, it is useful to know that we have
+a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
+
 ### Goals
 
 It is the explicit goal of this operation to passively generate a 1.21 version of SH using preprocessor. To this end, contributors are
@@ -282,6 +349,7 @@ that can be slowly worked on over a long span of time.
 ### Set Up
 
 The modern version variants can be set using `skyhanni.multi-version` in `.gradle/private.properties` to three levels.
+You will have to create this file yourself, for example if you want to set it to compile the file should contain `skyhanni.multi-version=compile` 
 
 `off` completely disables any preprocessor action or alternative versions. There will be only one project (although still at the `:1.8.9`
 subproject path), and alternative version sources will not be generated (although old generated sources **will not be deleted**). To make
@@ -298,6 +366,17 @@ specifically compile 1.8.9 using `./gradlew :1.8.9:build`. This does not affect 
 `compile` enables compilation for the `:1.21` subproject. This means that a `build` or `assemble` task will try (and fail) to compile a
 1.21 (as well as 1.8.9) JAR. This mode may be useful for someone seeking out issues to fix, but is generally not useful in day to day
 operations since the compile task will never succeed and will block things like hotswap compilations (via <kbd>CTRL+F9</kbd>) from completing.
+
+### Compiling and Testing
+
+To compile the mod, simply run `./gradlew build` (without a version number), and the preprocessor will generate the necessary files for each
+version up to 1.21. By default, only a few files will be compiled, these files can be found in the `versions/<version>/buildpaths.txt` file.
+If you want to compile more files, you can add them to this file or if you want to compile all files you can temporarily remove the file.
+
+> ⚠️ **Notice:** For this to work you **Must** have the `skyhanni.multi-version` set too `compile` in your `.gradle/private.properties` file.
+
+If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in intellij. This will compile the 1.21 version and run it.
+Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
 
 ### Improving mappings
 
@@ -350,6 +429,25 @@ files, so you might be fixing issues in files you didn't even look at. It will e
 (consider using the method descriptor instead of just the method name for your mixin). However, if something aside from the name changed,
 this will not suffice.
 
+#### Custom mappings
+
+If you need to do a bit more advanced remapping that requires an import to be added to the file, you can add a custom mapping. This is
+done by creating/editing a pattern mappings file which can be found at `versions/pattern-mapping-<newVersion>-<oldVersion>.txt`.
+
+```
+# You can use # to comment lines
+
+# here is the format of these files
+# newClass oldClass newMethod oldMethod neededImport
+
+# heres an example mapping
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.getFormattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
+```
+
+This will change all calls of Entity.name to be Entity.name.getFormattedTextCompat(). The import will also be added to the file. This is
+helpful for places where the return type may have changed across minecraft versions, and then you need to call a compat method to get the
+same result as on previous versions.
+
 #### Conditional compilation
 
 In addition to the built-in remapping, there is also the more complicated art of preprocessor directives. Directives allow you to comment or
@@ -389,7 +487,7 @@ private fun ClientLevel.getAllEntities(): Iterable<Entity> =
 //#if MC < 1.14
 //$$         loadedEntityList
 //#else
-   entitiesForRendering()
+    entitiesForRendering()
 //#endif
 ```
 
@@ -403,7 +501,7 @@ private fun ClientWorld.getAllEntities(): Iterable<Entity> =
 //#if MC < 1.14
 //$$         loadedEntityList
 //#else
-   entities
+    entities
 //#endif
 ```
 
@@ -414,7 +512,7 @@ private fun ClientWorld.getAllEntities(): Iterable<Entity> =
 //#if MC < 1.14
 //$$         loadedEntityList
 //#else
-   entities
+    entities
 //#endif
 ```
 

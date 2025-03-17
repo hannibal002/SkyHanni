@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -77,6 +77,8 @@ object NonGodPotEffectDisplay {
 
         PEST_REPELLENT("§6Pest Repellent I§r"),
         PEST_REPELLENT_MAX("§6Pest Repellent II"),
+
+        DOUCE_PLUIE_DE_STINKY_CHEESE("§eDouce Pluie de Stinky Cheese I"),
 
         CURSE_OF_GREED("§4Curse of Greed I"),
 
@@ -152,6 +154,11 @@ object NonGodPotEffectDisplay {
                 update()
             }
 
+            "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effectDuration[NonGodPotEffect.DOUCE_PLUIE_DE_STINKY_CHEESE] = Timer(1.hours)
+                update()
+            }
+
             "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain." -> {
                 effectDuration[NonGodPotEffect.GOBLIN] = Timer(20.minutes)
                 update()
@@ -213,7 +220,7 @@ object NonGodPotEffectDisplay {
         effectDuration.sorted().forEach { (effect, time) ->
             if (time.remaining.inWholeSeconds != config.expireWarnTime.toLong()) return
 
-            if (effectWarning) LorenzUtils.sendTitle(effect.tabListName, 3.seconds)
+            if (effectWarning) TitleManager.sendTitle(effect.tabListName, 3.seconds)
             if (effectSound) repeat(5) { playPlingSound() }
         }
     }
@@ -228,7 +235,7 @@ object NonGodPotEffectDisplay {
         if (!event.inventoryName.endsWith("Active Effects")) return
 
         for (stack in event.inventoryItems.values) {
-            val name = stack.name
+            val name = stack.displayName
             for (effect in NonGodPotEffect.entries) {
                 if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {

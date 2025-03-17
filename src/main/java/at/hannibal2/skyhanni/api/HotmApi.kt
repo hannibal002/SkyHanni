@@ -67,11 +67,12 @@ object HotmApi {
                 storage?.total = value
             }
 
-        fun setAmount(value: Long) {
+        fun setAmount(value: Long, postEvent: Boolean = false) {
             val diff = value - current
             if (diff == 0L) return
             total += diff
             current = value
+            if (!postEvent) return
             if (diff > 0) {
                 if (shouldSendDebug) ChatUtils.debug("Gained §a${diff.addSeparators()} $color$displayName Powder")
                 PowderEvent.Gain(this, diff).post()
