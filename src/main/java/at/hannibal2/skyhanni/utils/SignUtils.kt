@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiEditSign
+import net.minecraft.util.IChatComponent
 
 object SignUtils {
     private var pasteLastClicked = false
@@ -18,13 +19,13 @@ object SignUtils {
     fun setTextIntoSign(text: String, line: Int = 0) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
-        gui.tileSign.signText[line] = text.asComponent()
+        gui.text[line] = text.asComponent()
     }
 
     private fun addTextIntoSign(addedText: String) {
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is AccessorGuiEditSign) return
-        val lines = gui.tileSign.signText
+        val lines = gui.text
         val index = gui.editLine
         val text = lines[index].unformattedText + addedText
         lines[index] = text.capAtMinecraftLength(91).asComponent()
@@ -36,7 +37,7 @@ object SignUtils {
             SkyHanniMod.coroutineScope.launch {
                 val newLine = if (KeyboardManager.isDeleteLineDown()) ""
                 else if (KeyboardManager.isDeleteWordDown()) {
-                    val currentLine = gui.tileSign.signText[gui.editLine].unformattedText
+                    val currentLine = gui.text[gui.editLine].unformattedText
 
                     val lastSpaceIndex = currentLine.trimEnd().lastIndexOf(' ')
                     if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 2) else ""
@@ -51,7 +52,7 @@ object SignUtils {
         val copyClicked = KeyboardManager.isCopyingKeysDown()
         if (!copyLastClicked && copyClicked && gui is AccessorGuiEditSign) {
             SkyHanniMod.coroutineScope.launch {
-                ClipboardUtils.copyToClipboard(gui.tileSign.signText[gui.editLine].unformattedText)
+                ClipboardUtils.copyToClipboard(gui.text[gui.editLine].unformattedText)
             }
         }
         copyLastClicked = copyClicked
@@ -81,10 +82,17 @@ object SignUtils {
 
     private fun GuiEditSign.getSignLines(): List<String>? {
         if (this !is AccessorGuiEditSign) return null
-        return (this as AccessorGuiEditSign).tileSign.signText.map { it.unformattedText.removeColor() }
+        return (this as AccessorGuiEditSign).text.map { it.unformattedText.removeColor() }
     }
 
     fun GuiEditSign.isGardenSign(): Boolean {
         return isRancherSign() || isMousematSign()
     }
+
+    val AccessorGuiEditSign.text: Array<IChatComponent>
+        //#if MC < 1.21
+        get() = this.tileSign.signText
+    //#else
+    //$$ get() = this.tileSign.frontText.getMessages(false)
+    //#endif
 }

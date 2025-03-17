@@ -49,6 +49,9 @@ net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.
 net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
 net.minecraft.client.gui.screens.inventory.SignEditScreen net.minecraft.client.gui.inventory.GuiEditSign
 
+net.minecraft.client.gui.screens.inventory.SignEditScreen sign tileSign
+net.minecraft.client.gui.screens.inventory.SignEditScreen line editLine
+
 net.minecraft.client.multiplayer.ClientLevel net.minecraft.client.multiplayer.WorldClient
 net.minecraft.client.multiplayer.ClientPacketListener net.minecraft.client.network.NetHandlerPlayClient
 net.minecraft.client.multiplayer.PlayerInfo net.minecraft.client.network.NetworkPlayerInfo
@@ -385,6 +388,7 @@ net.minecraft.world.level.block.Blocks MELON MELON_BLOCK
 
 net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
+net.minecraft.world.level.block.entity.SignBlockEntity net.minecraft.tileentity.TileEntitySign
 net.minecraft.world.level.block.entity.SkullBlockEntity net.minecraft.tileentity.TileEntitySkull
 
 net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
