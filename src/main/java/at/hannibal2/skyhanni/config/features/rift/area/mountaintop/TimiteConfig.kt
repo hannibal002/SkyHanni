@@ -23,6 +23,11 @@ class TimiteConfig {
     var timiteTracker: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Only Show While Holding", desc = "Only shows the tracker while holding the Timite pickaxes or the time gun.")
+    @ConfigEditorBoolean
+    var timiteOnlyShowWhileHolding: Boolean = false
+
+    @Expose
     @ConfigLink(owner = TimiteConfig::class, field = "timiteTimer")
     var timerPosition: Position = Position(421, -220, false, true)
 

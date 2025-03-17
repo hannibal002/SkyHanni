@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -134,5 +135,13 @@ object TimiteTracker {
         }
     }
 
-    private fun isEnabled() = RiftApi.inMountainTop() && config.timiteTracker
+    private fun isEnabled() =
+        RiftApi.inMountainTop() && config.timiteTracker && (!config.timiteOnlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
+
+    val timiteItems = listOf(
+        "ANTI_SENTIENT_PICKAXE".toInternalName(),
+        "EON_PICKAXE".toInternalName(),
+        "CHRONO_PICKAXE".toInternalName(),
+        "TIME_GUN".toInternalName(),
+    )
 }
