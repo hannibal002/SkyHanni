@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
@@ -328,12 +329,12 @@ object StringUtils {
         class ChatIterator(var component: IChatComponent) {
             var queue = mutableListOf<IChatComponent>()
             var idx = 0
-            var colorOverride = ChatStyle()
+            var colorOverride = defaultStyleConstructor
             fun next(): Pair<Char, ChatStyle>? {
                 while (true) {
                     while (idx >= component.unformattedTextForChat.length) {
                         queue.addAll(0, component.siblings)
-                        colorOverride = ChatStyle()
+                        colorOverride = defaultStyleConstructor
                         component = queue.removeFirstOrNull() ?: return null
                     }
                     val char = component.unformattedTextForChat[idx++]
@@ -362,7 +363,7 @@ object StringUtils {
                             }
 
                             else -> {
-                                colorOverride = ChatStyle().setColor(formatting)
+                                colorOverride = defaultStyleConstructor.setColor(formatting)
                             }
                         }
                     } else {
