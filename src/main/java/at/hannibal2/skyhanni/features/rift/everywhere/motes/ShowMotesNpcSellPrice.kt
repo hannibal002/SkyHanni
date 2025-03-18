@@ -163,25 +163,20 @@ object ShowMotesNpcSellPrice {
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
         addString("§7Total price: §b$total")
-        val name = FormatType.entries[config.inventoryValue.formatType.ordinal].type // todo avoid ordinal
+        val name = config.inventoryValue.formatType.ordinal.get().type
         addString("§7Price format: §c$name")
-        addRenderableButton<FormatType>(
+        addRenderableButton<NumberFormatEntry>(
             label = " ",
             getName = { type -> type.type },
-            current = { it.ordinal == config.inventoryValue.formatType.ordinal }, // todo avoid ordinal
+            current = config.inventoryValue.formatType.ordinal.get(),
             onChange = {
-                config.inventoryValue.formatType = NumberFormatEntry.entries[it.ordinal] // todo avoid ordinal
+                config.inventoryValue.formatType.set(it)
                 update()
             },
         )
     }
 
-    enum class FormatType(val type: String) {
-        SHORT("Short"),
-        LONG("Long")
-    }
-
-    private fun Double.formatPrice(): String = when (config.inventoryValue.formatType) {
+    private fun Double.formatPrice(): String = when (config.inventoryValue.formatType.get()) {
         NumberFormatEntry.SHORT -> this.shortFormat()
         NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
