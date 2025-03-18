@@ -35,7 +35,7 @@ object LivingMetalSuitProgress {
         display = drawDisplay()
     }
 
-    fun drawDisplay()= buildList<Renderable> {
+    fun drawDisplay() = buildList {
         val piecesMaxed = progressMap.values.filterNotNull().count { it >= 1 }
         val isMaxed = piecesMaxed == 4
 

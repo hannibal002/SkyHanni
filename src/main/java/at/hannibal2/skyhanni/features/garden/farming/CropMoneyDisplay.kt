@@ -101,6 +101,8 @@ object CropMoneyDisplay {
         display = drawDisplay()
     }
 
+    // Todo: Split up
+    @Suppress("LongMethod", "CyclomaticComplexMethod", "ReturnCount")
     private fun drawDisplay(): List<Renderable> {
         val newDisplay = mutableListOf<Renderable>()
 
@@ -290,6 +292,7 @@ object CropMoneyDisplay {
         moneyPerHour.toLong().addSeparators()
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun calculateMoneyPerHour(debugList: MutableList<Renderable>): Map<NeuInternalName, Array<Double>> {
         val moneyPerHours = mutableMapOf<NeuInternalName, Array<Double>>()
 

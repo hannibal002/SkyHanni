@@ -63,7 +63,7 @@ object ComposterDisplay {
     private fun horizontalItemAndString(item: ItemStack, text: String, itemScale: Double = NeuItems.itemFontSize): Renderable {
         return Renderable.horizontalContainer(
             listOf(
-                Renderable.itemStack(item),
+                Renderable.itemStack(item, scale = itemScale),
                 Renderable.string(text),
             ),
         )
