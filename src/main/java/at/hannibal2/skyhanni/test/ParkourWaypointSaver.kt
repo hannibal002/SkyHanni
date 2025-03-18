@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -40,7 +41,7 @@ object ParkourWaypointSaver {
                 if (locations.isEmpty()) {
                     loadClipboard()
                 } else {
-                    if (Minecraft.getMinecraft().thePlayer.isSneaking()) {
+                    if (MinecraftCompat.localPlayer.isSneaking) {
                         locations.clear()
                     } else {
                         locations = locations.dropLast(1).toMutableList()
