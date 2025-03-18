@@ -115,6 +115,7 @@ net.minecraft.nbt.CompoundTag remove() removeTag()
 
 net.minecraft.nbt.ListTag getSize() tagCount()
 net.minecraft.nbt.ListTag getString() getStringTagAt()
+net.minecraft.nbt.ListTag getCompound() getCompoundTagAt()
 
 net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent
 net.minecraft.network.chat.Style net.minecraft.util.text.Style
@@ -349,6 +350,7 @@ net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.Slot getItem() getStack()
+net.minecraft.world.inventory.Slot hasItem() getHasStack()
 net.minecraft.world.inventory.Slot index slotNumber
 net.minecraft.world.inventory.Slot x xPos
 net.minecraft.world.inventory.Slot y yPos
