@@ -42,12 +42,13 @@ internal object RenderableUtils {
 
     /** Calculates the absolute x position of the columns in a table*/
     fun calculateTableXOffsets(content: Collection<Collection<Renderable?>>, xPadding: Int) = run {
+        val rows: List<List<Renderable?>> = content.map { it.toList() }
         var buffer = 0
         var index = 0
         buildList {
             add(0)
             while (true) {
-                buffer += content.map { it.toList().getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                buffer += rows.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
                     it?.width ?: 0
                 }?.let { it + xPadding } ?: break
                 add(buffer)
