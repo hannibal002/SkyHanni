@@ -37,7 +37,6 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -100,7 +99,7 @@ object SkillProgress {
     private fun renderDisplay() {
         when (val textAlignment = config.textAlignmentProperty.get()) {
             SkillProgressConfig.TextAlignment.NONE -> {
-                val content = horizontalContainer(display)
+                val content = Renderable.horizontalContainer(display)
                 config.displayPosition.renderRenderable(content, posLabel = "Skill Progress")
             }
 
@@ -109,7 +108,7 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.RIGHT,
             -> {
                 val horizontalAlignment = textAlignment.alignment ?: RenderUtils.HorizontalAlignment.LEFT
-                val content = horizontalContainer(display, horizontalAlign = horizontalAlignment)
+                val content = Renderable.horizontalContainer(display, horizontalAlign = horizontalAlignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
                 config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
             }
