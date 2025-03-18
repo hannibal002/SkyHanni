@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE

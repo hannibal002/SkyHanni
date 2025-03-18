@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQu
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.MiniBossQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.QuestState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland

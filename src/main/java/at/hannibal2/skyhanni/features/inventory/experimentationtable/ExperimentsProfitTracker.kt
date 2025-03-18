@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.inventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.guide
 
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.tableStretchXPadding
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.tableStretchXPadding
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.tableStretchYPadding
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable

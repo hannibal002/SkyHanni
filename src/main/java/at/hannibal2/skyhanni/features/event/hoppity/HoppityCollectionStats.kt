@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.collectWhile
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.consumeWhile
 import at.hannibal2.skyhanni.utils.DelayedRun
