@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 
 @SkyHanniModule
 object GraphParkour {
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shgraphloadparkour") {
@@ -119,7 +119,7 @@ object GraphParkour {
     }
 
     private fun showErrorAt(vec: LorenzVec) {
-        pathFind(
+        IslandGraphs.pathFind(
             vec, "Node error",
             LorenzColor.RED.toColor(),
             condition = { isEnabled() },
@@ -162,6 +162,7 @@ object GraphParkour {
                 },
             )
         }
+
         for (node in nodes) {
             nodes.getOrNull(node.id - 1)?.let { previous ->
                 val distance = previous.position.distance(node.position)
