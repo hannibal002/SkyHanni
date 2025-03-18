@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isVanillaItem
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -145,7 +146,7 @@ object NeuItems {
             val json = allNeuRepoItems()[vanillaName]
             if (json != null && json.has("vanilla") && json["vanilla"].asBoolean) return true
         }
-        return Item.itemRegistry.getObject(ResourceLocation(vanillaName)) != null
+        return vanillaName.isVanillaItem()
     }
 
     fun NeuInternalName.removePrefix(prefix: String): NeuInternalName {
