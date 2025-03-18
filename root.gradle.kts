@@ -4,7 +4,7 @@ import com.replaymod.gradle.preprocess.Node
 plugins {
     id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "20415a5ee3"
     id("net.kyori.blossom") version "1.3.2" apply false
-    id("gg.essential.loom") version "1.6.+" apply false
+    id("gg.essential.loom") version "1.9.+" apply false
     kotlin("jvm") version "2.0.0" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
     id("com.google.devtools.ksp") version "2.0.0-1.0.24" apply false
