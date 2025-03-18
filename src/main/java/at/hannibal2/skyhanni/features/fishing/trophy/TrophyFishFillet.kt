@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -23,7 +24,7 @@ object TrophyFishFillet {
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
-        if (event.itemStack.displayName.contains("Sack")) return
+        if (InventoryUtils.openInventoryName().contains("Sack")) return
 
         val internalName = event.itemStack.getInternalName().asString()
         val trophyFishName = internalName.substringBeforeLast("_")
