@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -48,10 +48,10 @@ object JacobContestTimeNeeded {
         display = buildList {
             addString("§e§lTime Needed for ${currentBracket.displayName} §eMedal!")
 
-            addSelector<ContestBracket>(
-                "§7Bracket: ",
+            addRenderableButton<ContestBracket>(
+                label = "§7Bracket: ",
                 getName = { type -> type.name.lowercase() },
-                isCurrent = { it == currentBracket },
+                current = { it == currentBracket },
                 onChange = {
                     currentBracket = it
                     update()

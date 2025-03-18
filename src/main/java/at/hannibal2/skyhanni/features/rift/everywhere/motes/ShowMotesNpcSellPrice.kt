@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -27,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -165,10 +165,10 @@ object ShowMotesNpcSellPrice {
         addString("§7Total price: §b$total")
         val name = FormatType.entries[config.inventoryValue.formatType.ordinal].type // todo avoid ordinal
         addString("§7Price format: §c$name")
-        addSelector<FormatType>(
-            " ",
+        addRenderableButton<FormatType>(
+            label = " ",
             getName = { type -> type.type },
-            isCurrent = { it.ordinal == config.inventoryValue.formatType.ordinal }, // todo avoid ordinal
+            current = { it.ordinal == config.inventoryValue.formatType.ordinal }, // todo avoid ordinal
             onChange = {
                 config.inventoryValue.formatType = NumberFormatEntry.entries[it.ordinal] // todo avoid ordinal
                 update()
