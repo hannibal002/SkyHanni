@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.utils.system
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.utils.DelayedRun
-import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.ModContainer
 import kotlin.time.Duration.Companion.INFINITE
 //#if MC < 1.16
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.Loader
 //#elseif FORGE
 //$$ import net.minecraftforge.fml.loading.FMLEnvironment
 //#else
@@ -45,6 +45,7 @@ object PlatformUtils {
         //#endif
     }
 
+    //#if MC < 1.16
     private val modPackages: Map<String, ModContainer> by lazy {
         Loader.instance().modList.flatMap { mod -> mod.ownedPackages.map { it to mod } }.toMap()
     }
@@ -54,6 +55,9 @@ object PlatformUtils {
     }
 
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
+    //#else
+    //$$ fun Class<*>.getModInstance(): ModInstance? = null
+    //#endif
 
     private var validNeuInstalled = false
 
