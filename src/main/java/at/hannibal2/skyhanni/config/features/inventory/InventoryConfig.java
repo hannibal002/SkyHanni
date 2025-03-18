@@ -295,6 +295,12 @@ public class InventoryConfig {
     public boolean timeHeldInLore = false;
 
     @Expose
+    @ConfigOption(name = "Time Left in Lore", desc = "Show time left until maxed for Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite) in the lore.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean timeLeftInLore = false;
+
+    @Expose
     @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
     @ConfigEditorBoolean
     @FeatureToggle

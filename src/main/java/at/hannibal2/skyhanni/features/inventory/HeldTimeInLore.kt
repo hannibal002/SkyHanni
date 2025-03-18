@@ -15,11 +15,14 @@ object HeldTimeInLore {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
-        if (!config.timeHeldInLore) return
+        if (!config.timeHeldInLore && !config.timeLeftInLore) return
 
-        val seconds = event.itemStack.getSecondsHeld() ?: return
-        val formatted = seconds.seconds.format(maxUnits = 2)
+        val secondsHeld = event.itemStack.getSecondsHeld() ?: return
+        val timeHeldFormatted = secondsHeld.seconds.format(maxUnits = 3)
+        val timeLeftFormatted = (300*60*60 - secondsHeld).seconds.format(maxUnits = 3)
+        // All the current ones take 300 hours. If any in the future need a different amount, this will need to be changed.
 
-        event.toolTip.addOrInsert(10, "§7Time Held: §b$formatted")
+        if (config.timeHeldInLore) event.toolTip.addOrInsert(10, "§7Time Held: §b$timeHeldFormatted")
+        if (config.timeLeftInLore) event.toolTip.addOrInsert(10, "§7Time Left: §b$timeLeftFormatted")
     }
 }
