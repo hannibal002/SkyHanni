@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -54,7 +55,7 @@ object CityProjectFeatures {
 
     private val config get() = SkyHanniMod.feature.event.cityProject
 
-    private var display = emptyList<Renderable>()
+    private var display: Renderable? = null
     private var inInventory = false
     private var lastReminderSend = SimpleTimeMark.farPast()
 
@@ -119,7 +120,7 @@ object CityProjectFeatures {
                 fetchMaterials(item, materials)
             }
 
-            display = buildMaterialsList(materials)
+            display = buildDisplay(materials)
         }
 
         if (config.showReady) {
@@ -159,41 +160,42 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildMaterialsList(materials: MutableMap<NeuInternalName, Int>) = buildList {
+    private fun buildDisplay(materials: MutableMap<NeuInternalName, Int>) = Renderable.vertical {
         addString("§7City Project Materials")
 
         if (materials.isEmpty()) {
             addString("§cNo Materials to contribute.")
-            return@buildList
+        } else {
+            for ((internalName, amount) in materials) {
+                add(materialRow(internalName, amount))
+            }
         }
 
-        for ((internalName, amount) in materials) {
-            val stack = internalName.getItemStack()
-            val name = internalName.repoItemName
-            val list = mutableListOf<Renderable>()
-            list.addString(" §7- ")
-            list.addItemStack(stack)
+    }
 
-            list.add(
-                Renderable.optionalLink(
-                    "$name §ex${amount.addSeparators()}",
-                    {
-                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                            SignUtils.setTextIntoSign("$amount")
-                        } else {
-                            BazaarApi.searchForBazaarItem(name, amount)
-                        }
-                    },
-                ) { inInventory && !NeuItems.neuHasFocus() },
-            )
+    private fun materialRow(internalName: NeuInternalName, amount: Int): Renderable {
+        val stack = internalName.getItemStack()
+        val name = internalName.repoItemName
+        val price = internalName.getPrice() * amount
 
-            val price = internalName.getPrice() * amount
-            val format = price.shortFormat()
-            list.addString(" §7(§6$format§7)")
-
-            addAll(list)
+        return Renderable.line {
+            addString(" §7- ")
+            addItemStack(stack)
+            add(materialLink(name, amount))
+            addString(" §7(§6${price.shortFormat()}§7)")
         }
     }
+
+    private fun materialLink(name: String, amount: Int): Renderable = Renderable.optionalLink(
+        "$name §ex${amount.addSeparators()}",
+        {
+            if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                SignUtils.setTextIntoSign("$amount")
+            } else {
+                BazaarApi.searchForBazaarItem(name, amount)
+            }
+        },
+    ) { inInventory && !NeuItems.neuHasFocus() }
 
     private fun fetchMaterials(item: ItemStack, materials: MutableMap<NeuInternalName, Int>) {
         var next = false
@@ -222,7 +224,7 @@ object CityProjectFeatures {
         if (!config.showMaterials) return
         if (!inInventory) return
 
-        config.pos.renderRenderables(display, posLabel = "City Project Materials")
+        config.pos.renderRenderable(display, posLabel = "City Project Materials")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
