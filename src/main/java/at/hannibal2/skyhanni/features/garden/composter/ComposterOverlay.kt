@@ -355,7 +355,7 @@ object ComposterOverlay {
 
         return Renderable.vertical {
             addRenderableButton<TimeType>(
-                "§7Per ",
+                "Display",
                 current = currentTimeType,
                 onChange = {
                     currentTimeType = it
@@ -606,6 +606,9 @@ object ComposterOverlay {
         COMPOST("Compost", 1),
         HOUR("Hour", 60 * 60),
         DAY("Day", 60 * 60 * 24),
+        ;
+
+        override fun toString(): String = display
     }
 
     @HandleEvent
