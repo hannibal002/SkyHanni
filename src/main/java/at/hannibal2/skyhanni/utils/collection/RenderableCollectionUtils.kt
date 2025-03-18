@@ -18,7 +18,6 @@ object RenderableCollectionUtils {
         add(Collections.singletonList(text))
     }
 
-    // TODO move to RenderableUtils
     fun MutableList<List<Renderable>>.addSingleString(text: String) {
         add(Collections.singletonList(Renderable.string(text)))
     }
@@ -59,7 +58,6 @@ object RenderableCollectionUtils {
         addItemStack(internalName.getItemStack())
     }
 
-    // TODO move to RenderableUtils
     fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
         if (this.isEmpty()) return xSpace
         val off = RenderableUtils.calculateTableXOffsets(this, 0)
