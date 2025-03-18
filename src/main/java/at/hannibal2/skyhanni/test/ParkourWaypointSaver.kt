@@ -41,7 +41,7 @@ object ParkourWaypointSaver {
                 if (locations.isEmpty()) {
                     loadClipboard()
                 } else {
-                    if (MinecraftCompat.localPlayer.isSneaking()) {
+                    if (MinecraftCompat.localPlayer.isSneaking) {
                         locations.clear()
                     } else {
                         locations = locations.dropLast(1).toMutableList()
