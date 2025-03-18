@@ -1,15 +1,5 @@
 package at.hannibal2.skyhanni.utils.collection
 
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.EnumMap
 import java.util.Queue
@@ -169,16 +159,6 @@ object CollectionUtils {
 
     operator fun IntRange.contains(range: IntRange): Boolean = range.first in this && range.last in this
 
-    @Deprecated("use Renderable")
-    fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
-        add(Collections.singletonList(text))
-    }
-
-    // TODO move to RenderableUtils
-    fun MutableList<List<Renderable>>.addSingleString(text: String) {
-        add(Collections.singletonList(Renderable.string(text)))
-    }
-
     fun <K, V : Comparable<V>> List<Pair<K, V>>.sorted(): List<Pair<K, V>> {
         return sortedBy { (_, value) -> value }
     }
@@ -243,59 +223,6 @@ object CollectionUtils {
 
     inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> {
         return EnumMap<K, V>(K::class.java)
-    }
-
-    // TODO add cache
-    fun MutableList<Renderable>.addString(
-        text: String,
-        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
-        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
-    ) {
-        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
-    }
-
-    // TODO add cache
-    fun MutableList<Searchable>.addSearchString(
-        text: String,
-        searchText: String? = null,
-        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
-        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
-    ) {
-        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign).toSearchable(searchText))
-    }
-
-    // TODO add internal name support, and caching
-    fun MutableList<Renderable>.addItemStack(
-        itemStack: ItemStack,
-        highlight: Boolean = false,
-        scale: Double = NeuItems.itemFontSize,
-    ) {
-        if (highlight) {
-            // Hack to add enchant glint, like Hypixel does it
-            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
-        }
-        add(Renderable.itemStack(itemStack, scale = scale))
-    }
-
-    fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {
-        addItemStack(internalName.getItemStack())
-    }
-
-    // TODO move to RenderableUtils
-    fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
-        if (this.isEmpty()) return xSpace
-        val off = RenderableUtils.calculateTableXOffsets(this, 0)
-        val xLength = off.size - 1
-        val emptySpace = xSpace - off.last()
-        return emptySpace / (xLength - 1)
-    }
-
-    fun Collection<Collection<Renderable>>.tableStretchYPadding(ySpace: Int): Int {
-        if (this.isEmpty()) return ySpace
-        val off = RenderableUtils.calculateTableYOffsets(this, 0)
-        val yLength = off.size - 1
-        val emptySpace = ySpace - off.last()
-        return emptySpace / (yLength - 1)
     }
 
     /** Splits the input into equal sized lists. If the list can't get divided clean by [subs] then the last entry gets reduced. e.g. 13/4 = [4,4,4,1]*/
