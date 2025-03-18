@@ -9,7 +9,20 @@ object MixinPatcherFontRendererHookHook {
     @JvmStatic
     @Suppress("UnusedParameter")
     fun overridePatcherFontRenderer(string: String, shadow: Boolean, cir: CallbackInfoReturnable<Boolean>) {
-        if (EmojiReplacer.isEnabled()) return
+        if (EmojiReplacer.isEnabled()) {
+            var inEmoji = false
+            for (i in string.indices) {
+                if (string[i] == ":") {
+                    if (inEmoji) {
+                        cir.returnValue = false
+                        return
+                    }
+                    inEmoji = true
+                } else if (string[i] == " ") {
+                    inEmoji = false
+                }
+            }
+        }
 
         if (!LorenzUtils.onHypixel) return
 
