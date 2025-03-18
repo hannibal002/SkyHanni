@@ -346,6 +346,14 @@ object CollectionUtils {
         add(Renderable.itemStack(itemStack, scale = scale))
     }
 
+    fun MutableList<Renderable>.addHorizontalSpacer(width: Int = 3) {
+        add(Renderable.placeholder(width, 0))
+    }
+
+    fun MutableList<Renderable>.addVerticalSpacer(height: Int = 10) {
+        add(Renderable.placeholder(0, height))
+    }
+
     fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {
         addItemStack(internalName.getItemStack())
     }

@@ -894,6 +894,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlights head or tail based on whether the held item calms or breaks the snake.
 + Added Sun Gecko Helper. - nopo (https://github.com/hannibal002/SkyHanni/pull/3097)
     + Displays health, combo, combo progress, combo timeout, and active modifiers.
++ Added Timite Helpers for the Rift. - nopo (https://github.com/hannibal002/SkyHanni/pull/3102)
+    + Displays countdown until Timite evolves with the Time Gun.
+    + Displays countdown until Timite/Obsolite expires.
++ Added Timite Tracker for the Rift. - nopo (https://github.com/hannibal002/SkyHanni/pull/3102)
+    + Shows collected ores, time gained from mining, profit for raw ores, and Highlite profit.
 
 </details>
 <details open><summary>
@@ -1173,6 +1178,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Added Ghost Profit Tracker. - Empa (https://github.com/hannibal002/SkyHanni/pull/1753)
     + Replaces the outdated and buggy Ghost Counter.
++ Added Dragon/Protector Weight displays. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/844)
+    + Shows your current Dragon/Protector weight on the HUD during fights in the End.
++ Added Superior Notification. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/844)
+    + Notifies via title when a Superior Dragon spawns in the End.
 
 </details>
 <details open><summary>
@@ -1213,6 +1222,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Display your rank, score, actual belt and points needed for the next belt in the Challenges inventory on the
       Crimson Isles.
 + Added Crimson Isle Miniboss Respawn Timer. - Empa (https://github.com/hannibal002/SkyHanni/pull/2042)
++ Added Rescue Mission Waypoints. - NetheriteMiner + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1928)
+    + Shows paths to the Agent, Recruiter, or Hostage during Crimson Isle rescue missions.
 + Matriarch Helper. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1385)
     + Highlights the Heavy Pearls.
     + Draws a line to the Heavy Pearls.
