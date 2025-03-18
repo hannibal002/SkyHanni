@@ -401,4 +401,9 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnAboutPcTimeOffset = true;
+
+    @Expose
+    @ConfigOption(name = "Revert Tooltip Fix", desc = "Reverts the tooltip fix. §cFUN!")
+    @ConfigEditorBoolean
+    public boolean revertTooltipFix = false;
 }
