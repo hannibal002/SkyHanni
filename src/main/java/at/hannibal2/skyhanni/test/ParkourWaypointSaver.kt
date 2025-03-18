@@ -8,12 +8,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -36,8 +38,16 @@ object ParkourWaypointSaver {
 
         when (event.keyCode) {
             config.deleteKey -> {
-                locations = locations.dropLast(1).toMutableList()
-                update()
+                if (locations.isEmpty()) {
+                    loadClipboard()
+                } else {
+                    if (MinecraftCompat.localPlayer.isSneaking) {
+                        locations.clear()
+                    } else {
+                        locations = locations.dropLast(1).toMutableList()
+                    }
+//                     update()
+                }
             }
 
             config.saveKey -> {
@@ -46,6 +56,23 @@ object ParkourWaypointSaver {
                 locations.add(newLocation)
                 update()
             }
+        }
+    }
+
+    /**
+     *       "-625:119:-962",
+     *       "-626:121:-971",
+     *       "-728:122:-998"
+     */
+
+    private fun loadClipboard() {
+        SkyHanniMod.launchCoroutine {
+            val clipboard = OSUtils.readFromClipboard() ?: return@launchCoroutine
+            locations = clipboard.split("\n").map { line ->
+                val raw = line.replace("\"", "").replace(",", "")
+                raw.split(":").map { it.toDouble() }.toLorenzVec()
+            }.toMutableList()
+            update()
         }
     }
 

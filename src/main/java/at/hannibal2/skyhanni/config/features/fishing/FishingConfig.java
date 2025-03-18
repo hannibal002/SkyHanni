@@ -101,4 +101,9 @@ public class FishingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean guessHotspotRadar = true;
+
+    @Expose
+    @ConfigOption(name = "Pathfind to Hotspots", desc = "When the Hotspot Radar Guesser feature finds a target, shows a pathfind to that Fishing Hotspot.")
+    @ConfigEditorBoolean
+    public boolean guessHotspotRadarPathFind = true;
 }
