@@ -757,7 +757,7 @@ object RenderUtils {
         val worldRenderer = tessellator.worldRenderer
         worldRenderer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION)
         val inverseView = getViewerPos(partialTicks)
-        RenderUtils.translate(inverseView.negated())
+        translate(inverseView.negated())
 
         worldRenderer.pos(topPoint).endVertex()
 
@@ -1505,7 +1505,7 @@ object RenderUtils {
 
                 GlStateManager.pushMatrix()
                 val inverseView = getViewerPos(partialTicks)
-                RenderUtils.translate(inverseView.negated())
+                translate(inverseView.negated())
 
                 draws.invoke(LineDrawer(Tessellator.getInstance(), inverseView))
 
@@ -1550,7 +1550,7 @@ object RenderUtils {
                 GlStateManager.disableCull()
 
                 GlStateManager.pushMatrix()
-                RenderUtils.translate(getViewerPos(partialTicks).negated())
+                translate(getViewerPos(partialTicks).negated())
                 getViewerPos(partialTicks)
 
                 quads.invoke(QuadDrawer(Tessellator.getInstance()))
@@ -1941,4 +1941,6 @@ object RenderUtils {
         if (colorBuffer.limit() < 4) return 1f
         return colorBuffer.get(3)
     }
+
+    fun translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
 }
