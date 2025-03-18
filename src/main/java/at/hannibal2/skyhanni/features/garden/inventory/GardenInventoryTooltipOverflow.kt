@@ -10,12 +10,12 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 
 // TODO: Merge common code with skill overflow
 @SkyHanniModule
@@ -48,7 +48,7 @@ object GardenInventoryTooltipOverflow {
             val maxTierReached = "§7§8Max tier reached!"
             if (line.contains(maxTierReached)) {
                 iterator.set("§7Progress to tier $nextLevel: §e${LorenzUtils.formatPercentage(percentage)}")
-                event.itemStack.name = "§a${crop.cropName} $level"
+                event.itemStack.setCustomItemName("§a${crop.cropName} $level")
                 next = true
                 continue
             }
