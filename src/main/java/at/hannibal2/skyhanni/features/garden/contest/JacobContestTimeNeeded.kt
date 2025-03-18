@@ -14,9 +14,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -43,11 +45,11 @@ object JacobContestTimeNeeded {
             testCrop(crop, sorted, map)
         }
 
-        this.display = buildList<Renderable> {
+        display = buildList<Renderable> {
             addString("§e§lTime Needed for ${currentBracket.displayName} §eMedal!")
 
             addRenderableButton<ContestBracket>(
-                label = "Bracket",
+                label = "§7Bracket: ",
                 getName = { type -> type.name.lowercase() },
                 current = currentBracket,
                 onChange = {
@@ -58,14 +60,10 @@ object JacobContestTimeNeeded {
             addString("")
             for (crop in sorted.sorted().keys) {
                 val text = map[crop]!!
-                add(
-                    Renderable.horizontalContainer(
-                        listOf(
-                            Renderable.itemStack(crop.icon),
-                            text
-                        )
-                    )
-                )
+                addLine {
+                    addItemStack(crop.icon)
+                    add(text)
+                }
             }
         }
     }

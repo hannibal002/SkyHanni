@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -66,15 +65,13 @@ object CruxTalismanDisplay {
                 for (line in cruxes) {
                     percent += if (config.compactWhenMaxed) {
                         if (!line.maxed) {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(line.progress.removeColor())?.groupValues?.get(1)
-                                ?.toInt() ?: 0
+                            "(?<progress>\\d+)/\\d+".toRegex().find(line.progress.removeColor())?.groupValues?.get(1)?.toInt() ?: 0
                         } else 100
                     } else {
                         if (line.progress.contains("MAXED"))
                             100
                         else {
-                            "(?<progress>\\d+)/\\d+".toRegex().find(line.progress.removeColor())?.groupValues?.get(1)
-                                ?.toInt() ?: 0
+                            "(?<progress>\\d+)/\\d+".toRegex().find(line.progress.removeColor())?.groupValues?.get(1)?.toInt() ?: 0
                         }
                     }
                     addString("  ${line.tier} ${line.name}: ${line.progress}")
@@ -133,5 +130,5 @@ object CruxTalismanDisplay {
 
     data class Crux(val name: String, val tier: String, val progress: String, val maxed: Boolean)
 
-    fun isEnabled() = RiftApi.inRift() && config.enabled && LorenzUtils.skyBlockArea != "Mirrorverse"
+    fun isEnabled() = RiftApi.inRift() && config.enabled && !RiftApi.inMirrorVerse
 }

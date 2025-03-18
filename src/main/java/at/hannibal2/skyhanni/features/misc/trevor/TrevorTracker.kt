@@ -82,14 +82,8 @@ object TrevorTracker {
         stoppedChecks = 0
     }
 
-    private fun formatDisplay(map: List<Renderable>): List<Renderable> {
-        val newList = mutableListOf<Renderable>()
-        for (index in config.textFormat) {
-            // TODO, change functionality to use enum rather than ordinals
-            newList.add(map[index.ordinal])
-        }
-        return newList
-    }
+    // TODO change functionality to use enum rather than ordinals
+    private fun formatDisplay(map: List<Renderable>) = config.textFormat.map { map[it.ordinal] }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -126,7 +120,7 @@ object TrevorTracker {
         display = formatDisplay(drawTrapperDisplay(storage))
     }
 
-    private fun drawTrapperDisplay(storage: ProfileSpecificStorage.TrapperData) = buildList<Renderable> {
+    private fun drawTrapperDisplay(storage: ProfileSpecificStorage.TrapperData) = buildList {
         addString("§b§lTrevor Data Tracker")
         addString("§b${storage.questsDone.addSeparators()} §9Quests Started")
         addString("§b${storage.peltsGained.addSeparators()} §5Total Pelts Gained")

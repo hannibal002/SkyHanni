@@ -15,8 +15,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.item.ItemStack
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
@@ -74,14 +76,22 @@ object JacobContestFFNeededDisplay {
         addString("")
 
         val crop = contest.crop
-        addTextStackTextHorizontal("§7For this ", crop.icon, "§7${crop.cropName} contest:")
+        addLine {
+            addString("§7For this ")
+            addItemStack(crop.icon)
+            addString("§7${crop.cropName} contest:")
+        }
         for (bracket in ContestBracket.entries) {
             addString(getLine(bracket, contest.brackets, crop))
         }
         addString("")
 
         val (size, averages) = FarmingContestApi.calculateAverages(crop)
-        addTextStackTextHorizontal("§7For the last §e$size ", crop.icon, "§7${crop.cropName} contests:")
+        addLine {
+            addString("§7For the last §e$size ")
+            addItemStack(crop.icon)
+            addString("§7${crop.cropName} contests:")
+        }
         for (bracket in ContestBracket.entries) {
             addString(getLine(bracket, averages, crop))
         }
@@ -89,11 +99,20 @@ object JacobContestFFNeededDisplay {
 
         var blocksPerSecond = crop.getLatestBlocksPerSecond()
         if (blocksPerSecond == null) {
-            addTextStackTextHorizontal("§cNo ", crop.icon, "§cblocks/second data,")
+            addLine {
+                addString("§cNo ")
+                addItemStack(crop.icon)
+                addString("§cblocks/second data,")
+            }
             addString("§cassuming 19.9 instead.")
         } else {
             if (blocksPerSecond < 15.0) {
-                addTextStackTextHorizontal("§7Your latest ", crop.icon, "§7blocks/second: §e${blocksPerSecond.roundTo(2)}")
+                val formatted = blocksPerSecond.roundTo(2)
+                addLine {
+                    addString("§cYour latest ")
+                    addItemStack(crop.icon)
+                    addString("§cblocks/second: §e$formatted")
+                }
                 addString("§cThis is too low, showing 19.9 Blocks/second instead!")
                 blocksPerSecond = 19.9
             }
@@ -105,15 +124,22 @@ object JacobContestFFNeededDisplay {
             addString("§cNo latest true FF saved!")
         } else {
             val farmingFortune = formatFarmingFortune(trueFF)
-            addTextStackTextHorizontal("§6Your ", crop.icon, "§6FF: $farmingFortune")
+            addLine {
+                addString("§6Your latest ")
+                addItemStack(crop.icon)
+                addString("§6FF: $farmingFortune")
+            }
         }
         addString("")
         if (blocksPerSecond == null || trueFF == null) {
             addString("§cMissing data from above!")
         } else {
-            val predictedScore =
-                ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
-            addTextStackTextHorizontal("§6Predicted ", crop.icon, "§6crops: $predictedScore")
+            val predictedScore = ((100.0 + trueFF) * blocksPerSecond * crop.baseDrops * 20 * 60 / 100).toInt().addSeparators()
+            addLine {
+                addString("§6Predicted ")
+                addItemStack(crop.icon)
+                addString("§6crops: $predictedScore")
+            }
         }
     }
 

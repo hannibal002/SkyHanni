@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -36,7 +37,7 @@ object ShowMotesNpcSellPrice {
 
     private val burgerPattern by RepoPattern.pattern(
         "rift.everywhere.burger",
-        ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*"
+        ".*(?:§\\w)+You have (?:§\\w)+(?<amount>\\d) Grubber Stacks.*",
     )
 
     private var display = emptyList<Renderable>()
@@ -131,46 +132,40 @@ object ShowMotesNpcSellPrice {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList<Renderable> {
-        val newDisplay = mutableListOf<Renderable>()
-        newDisplay.addString("§7Item Values:")
+    private fun drawDisplay() = buildList {
+        addString("§7Item Values:")
         val sorted = itemMap.toList().sortedByDescending { it.second.second }.toMap().toMutableMap()
 
         for ((internalName, pair) in sorted) {
-            newDisplay.add(
-                Renderable.verticalContainer(
-                    buildList {
-                        val (index, value) = pair
-                        addString("  §7- ")
-                        val stack = internalName.getItemStack()
-                        addItemStack(stack, scale = 0.7)
-                        val price = value.formatPrice()
-                        val valuePer = stack.motesNpcPrice() ?: continue
-                        val tips = buildList {
-                            add("§6Item: ${stack.displayName}")
-                            add("§6Value per: §d$valuePer Motes")
-                            add("§6Total in chest: §d${(value / valuePer).toInt()}")
-                            add("")
-                            add("§6Total value: §d$price coins")
-                        }
-                        add(
-                            Renderable.hoverTips(
-                                "§6${stack.displayName}: §b$price",
-                                tips,
-                                highlightsOnHoverSlots = index,
-                                stack = stack,
-                            ),
-                        )
-                    },
+            val (index, value) = pair
+            val stack = internalName.getItemStack()
+            val valuePer = stack.motesNpcPrice() ?: continue
+            val price = value.formatPrice()
+            addLine {
+                addString("  §7- ")
+                addItemStack(stack)
+                val tips = buildList {
+                    add("§6Item: ${stack.displayName}")
+                    add("§6Value per: §d$valuePer Motes")
+                    add("§6Total in chest: §d${(value / valuePer).toInt()}")
+                    add("")
+                    add("§6Total value: §d$price coins")
+                }
+                add(
+                    Renderable.hoverTips(
+                        "§6${stack.displayName}: §b$price",
+                        tips,
+                        highlightsOnHoverSlots = index,
+                        stack = stack,
+                    ),
                 )
-            )
+            }
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
-        newDisplay.addString("§7Total price: §b$total")
-        val name = config.inventoryValue.formatType.get().name
-        newDisplay.addString("§7Price format: §c$name")
-
-        newDisplay.addRenderableButton<NumberFormatEntry>(
+        addString("§7Total price: §b$total")
+        val name = config.inventoryValue.formatType.get().toString()
+        addString("§7Price format: §c$name")
+        addRenderableButton<NumberFormatEntry>(
             label = "Format",
             current = config.inventoryValue.formatType.get(),
             onChange = {
@@ -178,7 +173,6 @@ object ShowMotesNpcSellPrice {
                 update()
             },
         )
-        return newDisplay
     }
 
     private fun Double.formatPrice(): String = when (config.inventoryValue.formatType.get()) {

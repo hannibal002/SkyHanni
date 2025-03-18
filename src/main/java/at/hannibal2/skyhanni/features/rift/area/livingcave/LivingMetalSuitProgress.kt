@@ -35,7 +35,7 @@ object LivingMetalSuitProgress {
         display = drawDisplay()
     }
 
-    fun drawDisplay() = buildList {
+    private fun drawDisplay() = buildList {
         val piecesMaxed = progressMap.values.filterNotNull().count { it >= 1 }
         val isMaxed = piecesMaxed == 4
 
@@ -48,20 +48,16 @@ object LivingMetalSuitProgress {
         if (config.compactWhenMaxed && isMaxed) return@buildList
 
         for ((stack, progress) in progressMap.entries.reversed()) {
-            add(
-                Renderable.verticalContainer(
-                    buildList {
-                        addString("  §7- ")
-                        addItemStack(stack)
-                        addString("${stack.displayName}: ")
-                        addString(
-                            progress?.let {
-                                drawProgressBar(progress) + " §b${LorenzUtils.formatPercentage(progress)}"
-                            } ?: "§cStart upgrading it!",
-                        )
-                    },
+            addLine {
+                addString("§7- ")
+                addItemStack(stack)
+                addString("${stack.displayName}: ")
+                addString(
+                    progress?.let {
+                        drawProgressBar(it) + " §b${LorenzUtils.formatPercentage(it)}"
+                    } ?: "§cStart upgrading it!",
                 )
-            )
+            }
         }
     }
 
@@ -103,5 +99,5 @@ object LivingMetalSuitProgress {
         return progressBar.toString()
     }
 
-    fun isEnabled() = RiftApi.inRift() && config.enabled
+    private fun isEnabled() = RiftApi.inRift() && config.enabled
 }

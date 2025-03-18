@@ -29,8 +29,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -107,14 +109,7 @@ object GardenVisitorDropStatistics {
 
     private var rewardsCount = mapOf<VisitorReward, Int>()
 
-    private fun formatDisplay(map: List<Renderable>): List<Renderable> {
-        val newList = mutableListOf<Renderable>()
-        for (index in config.textFormat) {
-            // We need to use the ordinal here, can't change this.
-            newList.add(map[index.ordinal])
-        }
-        return newList
-    }
+    private fun formatDisplay(map: List<Renderable>) = config.textFormat.map { map[it.ordinal] }
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -230,13 +225,18 @@ object GardenVisitorDropStatistics {
             val count = rewardsCount[reward] ?: 0
             if (config.displayIcons) { // Icons
                 val stack = reward.itemStack
-                val itemRender = Renderable.itemStack(stack)
-                val stringRender = Renderable.string("§b${count.addSeparators()}")
-                val renderList: List<Renderable> = when (config.displayNumbersFirst) {
-                    true -> listOf(stringRender, itemRender)
-                    else -> listOf(itemRender, stringRender)
+                val text = "§b${count.addSeparators()}"
+                if (config.displayNumbersFirst) {
+                    addLine {
+                        addString(text)
+                        addItemStack(stack)
+                    }
+                } else {
+                    addLine {
+                        addString(text)
+                        addItemStack(stack)
+                    }
                 }
-                add(Renderable.horizontalContainer(renderList))
             } else { // No Icons
                 addString(format(count, reward.displayName, "§b"))
             }
