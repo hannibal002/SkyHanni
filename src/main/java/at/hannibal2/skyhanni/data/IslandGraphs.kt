@@ -411,6 +411,7 @@ object IslandGraphs {
         allowRerouting: Boolean = false,
         condition: () -> Boolean,
     ) {
+        if (isActive(position, label)) return
         reset()
         currentTargetNode = this
         shouldAllowRerouting = allowRerouting
@@ -433,6 +434,7 @@ object IslandGraphs {
         onFound: () -> Unit = {},
         condition: () -> Boolean,
     ) {
+        if (isActive(location, label)) return
         require(label.isNotEmpty()) { "Label cannot be empty." }
         reset()
         shouldAllowRerouting = false
@@ -548,4 +550,11 @@ object IslandGraphs {
     }
 
     fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == label
+
+    fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = 100.0): GraphNode? {
+        val graph = currentIslandGraph ?: return null
+
+        val found = graph.nodes.filter { condition(it) }.minBy { it.position.distanceSq(location) }
+        return found.takeIf { it.position.distance(location) < radius }
+    }
 }
