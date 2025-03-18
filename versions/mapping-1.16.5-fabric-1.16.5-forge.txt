@@ -33,3 +33,6 @@ net.minecraft.screen.slot.Slot getStack() getItem()
 net.minecraft.text.Style net.minecraft.network.chat.Style
 
 net.minecraft.text.Style withStrikethrough() setStrikethrough()
+net.minecraft.text.Style withUnderline() setUnderlined()
+net.minecraft.text.Style withObfuscated() setObfuscated()
+net.minecraft.text.Style withParent() applyTo()
