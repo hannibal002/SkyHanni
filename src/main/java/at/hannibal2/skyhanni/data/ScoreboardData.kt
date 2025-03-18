@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getPlayerNames
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
-import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
@@ -28,7 +28,7 @@ object ScoreboardData {
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
     val objectiveTitle: String get() =
-        Minecraft.getMinecraft().theWorld?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
+        MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -147,7 +147,7 @@ object ScoreboardData {
     }.joinToString(separator = "")
 
     private fun fetchScoreboardLines(): List<String> {
-        val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
+        val scoreboard = MinecraftCompat.localWorldOrNull?.scoreboard ?: return emptyList()
         val objective = scoreboard.getSidebarObjective() ?: return emptyList()
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.getPlayerNames(scoreboard)

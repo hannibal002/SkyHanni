@@ -1,25 +1,18 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.CONFIG_VERSION
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.json.asIntOrNull
 import at.hannibal2.skyhanni.utils.json.shDeepCopy
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 
-/** Used to define a move */
-@Suppress("unused")
-val CONFIG_MOVE_VERSION: Int = CONFIG_VERSION + 1
-
 object ConfigUpdaterMigrator {
 
     val logger = LorenzLogger("ConfigMigration")
-    val CONFIG_VERSION = "@CONFIG_VERSION@".toInt()
-
+    const val CONFIG_VERSION = 75
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -92,7 +85,7 @@ object ConfigUpdaterMigrator {
                 logger.log("Skipping move from $oldPath to $newPath ($since <= $oldVersion)")
                 return
             }
-            if (!PlatformUtils.isDevEnvironment && since > CONFIG_VERSION) {
+            if (since > CONFIG_VERSION) {
                 error("Illegally new version $since > $CONFIG_VERSION")
             }
             if (since > oldVersion + 1) {
@@ -161,13 +154,8 @@ object ConfigUpdaterMigrator {
             config.add("lastVersion", JsonPrimitive(CONFIG_VERSION))
             return config
         }
-        val newVersion = if (PlatformUtils.isDevEnvironment) {
-            CONFIG_VERSION + 1
-        } else {
-            if (lastVersion == CONFIG_VERSION) return config
-            CONFIG_VERSION
-        }
-        return (lastVersion until newVersion).fold(config) { accumulator, i ->
+        if (lastVersion == CONFIG_VERSION) return config
+        return (lastVersion until CONFIG_VERSION).fold(config) { accumulator, i ->
             logger.log("Starting config transformation from $i to ${i + 1}")
             val storage = accumulator["storage"]?.asJsonObject
             val dynamicPrefix: Map<String, List<String>> = mapOf(
@@ -186,9 +174,7 @@ object ConfigUpdaterMigrator {
             val migration = ConfigFixEvent(
                 accumulator,
                 JsonObject().also {
-                    if (i + 1 <= CONFIG_VERSION) {
-                        it.add("lastVersion", JsonPrimitive(i + 1))
-                    }
+                    it.add("lastVersion", JsonPrimitive(i + 1))
                 },
                 i, 0, dynamicPrefix,
             ).also { it.post() }

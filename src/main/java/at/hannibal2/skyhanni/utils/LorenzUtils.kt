@@ -11,21 +11,22 @@ import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.SharedMonsterAttributes
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
+import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
     val connectedToHypixel get() = HypixelData.hypixelLive || HypixelData.hypixelAlpha
 
-    val onHypixel get() = connectedToHypixel && Minecraft.getMinecraft().thePlayer != null
+    val onHypixel get() = connectedToHypixel && MinecraftCompat.localPlayerExists
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
@@ -90,9 +91,9 @@ object LorenzUtils {
 
     fun getPlayerUuid() = getRawPlayerUuid().toDashlessUUID()
 
-    fun getRawPlayerUuid() = Minecraft.getMinecraft().thePlayer.uniqueID
+    fun getRawPlayerUuid(): UUID = MinecraftCompat.localPlayer.uniqueID
 
-    fun getPlayerName(): String = Minecraft.getMinecraft().thePlayer.name
+    fun getPlayerName(): String = MinecraftCompat.localPlayer.name
 
     // TODO move into renderable utils
     fun fillTable(

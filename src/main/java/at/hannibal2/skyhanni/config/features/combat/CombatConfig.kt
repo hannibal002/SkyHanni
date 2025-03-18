@@ -33,7 +33,7 @@ class CombatConfig {
     @Expose
     @ConfigOption(name = "Armor Stack Display", desc = "")
     @Accordion
-    var stackDisplay: StackDisplayConfig = StackDisplayConfig()
+    var stackDisplayConfig: StackDisplayConfig = StackDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Summonings", desc = "")
@@ -65,6 +65,17 @@ class CombatConfig {
     @ConfigOption(name = "Flare", desc = "")
     @Accordion
     var flare: FlareConfig = FlareConfig()
+
+    @Expose
+    @ConfigOption(name = "Dragon Features", desc = "")
+    @Accordion
+    var dragon: DragonConfig = DragonConfig()
+
+    @Expose
+    @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after it died.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var endstoneProtectorChat: Boolean = true
 
     @Expose
     @ConfigOption(name = "Broodmother", desc = "")
