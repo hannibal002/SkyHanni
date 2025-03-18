@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getLivingMetalProgr
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
