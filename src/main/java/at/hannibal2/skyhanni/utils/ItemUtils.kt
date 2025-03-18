@@ -609,12 +609,12 @@ object ItemUtils {
         }
 
         // We do not use NeuItems.allItemsCache here since we need itemStack below
-        val itemStack = getItemStackOrNull()
-        val name = itemStack?.displayName ?: run {
+        val itemStack = getItemStackOrNull() ?: run {
             val name = toString()
             addMissingRepoItem(name, "Could not find item name for $name")
             return "§c$name"
         }
+        val name = itemStack.displayName
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {

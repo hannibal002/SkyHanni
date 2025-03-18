@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.transform
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.event.RenderGameOverlayEvent
@@ -24,9 +25,8 @@ object MovableHotBar {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR || !isEnabled()) return
         post = true
         GlStateManager.pushMatrix()
-        val scaled = event.resolution
-        val x = scaled.scaledWidth / 2 - 91
-        val y = scaled.scaledHeight - 22
+        val x = GuiScreenUtils.scaledWindowWidth / 2 - 91
+        val y = GuiScreenUtils.scaledWindowHeight - 22
         config.hotbar.transform()
         GlStateManager.translate(-x.toFloat(), -y.toFloat(), 0f) // Must be after transform to work with scaling
         GuiEditManager.add(config.hotbar, "Hotbar", 182 - 1, 22 - 1) // -1 since the editor for some reason add +1
