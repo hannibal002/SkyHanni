@@ -103,6 +103,7 @@ net.minecraft.core.particles.ParticleTypes WITCH SPELL_WITCH
 
 net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
 net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
+net.minecraft.nbt.ListTag add() appendTag()
 net.minecraft.nbt.StringTag net.minecraft.nbt.NBTTagString
 
 net.minecraft.nbt.CompoundTag getCompound() getCompoundTag()

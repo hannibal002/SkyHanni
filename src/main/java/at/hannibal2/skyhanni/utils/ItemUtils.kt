@@ -291,8 +291,7 @@ object ItemUtils {
         tempTag.removeTag("StoredEnchantments")
         tagCompound = tempTag
         //#else
-        //$$ //todo test what this actually does
-        //$$ this.remove(DataComponentTypes.ENCHANTMENTS)
+        //$$ this.set(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT)
         //#endif
     }
 

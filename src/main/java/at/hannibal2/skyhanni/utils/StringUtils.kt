@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -387,8 +388,13 @@ object StringUtils {
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
         chatComponent = new.asComponent()
-        if (clickEvents.size == 1) chatComponent.chatStyle.chatClickEvent = clickEvents.first()
-        if (hoverEvents.size == 1) chatComponent.chatStyle.chatHoverEvent = hoverEvents.first()
+        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value
+        if (hoverEvents.size == 1) chatComponent.hover =
+            //#if MC < 1.21
+            hoverEvents.first().value
+        //#else
+        //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
+        //#endif
     }
 
     private fun IChatComponent.findAllEvents(
@@ -403,7 +409,15 @@ object StringUtils {
         if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
             clickEvents.add(clickEvent)
         }
-        if (hoverEvent?.action != null && hoverEvents.none { it.value == hoverEvent.value }) {
+
+        if (hoverEvent?.action != null && hoverEvents.none {
+                //#if MC < 1.21
+                it.value == hoverEvent.value
+                //#else
+                //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) == hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
+                //#endif
+            }
+        ) {
             hoverEvents.add(hoverEvent)
         }
     }
