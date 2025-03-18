@@ -27,8 +27,8 @@ object MixinPatcherFontRendererHookHook {
         if (!LorenzUtils.onHypixel) return
 
         if (
-            ChromaManager.config.allChroma || 
-            string == FontRendererHook.chromaPreviewText || 
+            ChromaManager.config.allChroma ||
+            string == FontRendererHook.chromaPreviewText ||
             string.contains("§#§")
         ) {
             cir.returnValue = false
