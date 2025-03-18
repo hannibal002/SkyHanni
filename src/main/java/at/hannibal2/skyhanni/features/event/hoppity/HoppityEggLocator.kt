@@ -186,7 +186,6 @@ object HoppityEggLocator {
         val location = possibleEggLocations.firstOrNull() ?: return
 
         val color = waypointsConfig.color.toSpecialColor()
-        if (IslandGraphs.isActive(location, "Hoppity Egg")) return
 
         IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { waypointsConfig.showPathFinder })
     }
