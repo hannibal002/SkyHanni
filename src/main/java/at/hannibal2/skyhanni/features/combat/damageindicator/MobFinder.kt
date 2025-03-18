@@ -328,6 +328,7 @@ class MobFinder {
         entity.name == "Minos Inquisitor" -> EntityResult(bossType = BossType.MINOS_INQUISITOR)
         entity.name == "Minos Champion" -> EntityResult(bossType = BossType.MINOS_CHAMPION)
         entity.name == "Minotaur " -> EntityResult(bossType = BossType.MINOTAUR)
+        entity.name == "Ragnarok" -> EntityResult(bossType = BossType.RAGNAROK)
 
         else -> null
     }
