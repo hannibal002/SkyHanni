@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -370,11 +371,11 @@ object GardenNextJacobContest {
             return@line
         }
 
-        if (isCloseToNewYear()) {
-            addString(CLOSE_TO_NEW_YEAR_TEXT)
-        } else {
-            addString("§cOpen calendar to read Jacob contest times!")
-        }
+            if (isCloseToNewYear()) {
+                addString(CLOSE_TO_NEW_YEAR_TEXT)
+            } else {
+                addString("§cOpen calendar to read Jacob contest times!")
+            }
 
         fetchedFromElite = false
         contests.clear()

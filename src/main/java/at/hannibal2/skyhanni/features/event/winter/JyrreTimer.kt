@@ -75,12 +75,13 @@ object JyrreTimer {
             addItemStack(displayIcon)
             addString("§aJyrre Boost: ")
 
-            if (duration <= 0.seconds && config.showInactive) {
-                addString("§cInactive!")
-            } else {
-                addString("§b${duration.format()}")
-            }
-        }
+                if (duration <= 0.seconds && config.showInactive) {
+                    addString("§cInactive!")
+                } else {
+                    addString("§b${duration.format()}")
+                }
+            },
+        )
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
