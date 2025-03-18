@@ -382,9 +382,9 @@ public class MiscConfig {
     public boolean neuSoulsPathFind = true;
 
     @Expose
-    @ConfigOption(name = "Soul Find Better", desc = "When NEU Fairy Soul Pathfind is enabled, plan one route to catch all missing souls.")
+    @ConfigOption(name = "Fast Fairy Souls", desc = "Use a fast pathfinder route to get all Fairy Souls on current island. §eDoes not require NEU. ")
     @ConfigEditorBoolean
-    public boolean neuSoulsPathFindBetter = false;
+    public boolean fastFairySouls = false;
 
     @Expose
     @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")

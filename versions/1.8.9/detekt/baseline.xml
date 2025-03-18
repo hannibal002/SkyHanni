@@ -2,6 +2,7 @@
 <SmellBaseline>
   <ManuallySuppressedIssues>
     <ID>MaxLineLength:FairySoulPathFind.kt$FairySoulPathFind$ChatUtils.chat("route with ${targetNodes.size} nodes and ($maxIterations-$neighborhoodSize) took ${routeTime.milliseconds} (total length ${length.addSeparators()})")</ID>
+    <ID>MaxLineLength:FairySoulsPathfinder.kt$FairySoulsPathfinder.Data$IslandGraphs.overrideChatMessage("§e[SkyHanni] Found all §5$found Fairy Souls §ein ${LorenzUtils.skyBlockIsland.displayName}!")</ID>
   </ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>ArrayPrimitive:CropMoneyDisplay.kt$CropMoneyDisplay$Array&lt;Double></ID>

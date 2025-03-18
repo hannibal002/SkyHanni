@@ -48,19 +48,19 @@ object NavigationUtils {
         val criticalOptTime = measureTimeMillis {
             optimizeCriticalSegments(tspRoute, distanceMap)
         }
-        println("optimizeCriticalSegments took $criticalOptTime ms.")
+//         println("optimizeCriticalSegments took $criticalOptTime ms.")
 
         var currentPosition: LorenzVec
         val currentPositionTime = measureTimeMillis {
             currentPosition = LocationUtils.playerLocation()
         }
-        println("LocationUtils.playerLocation took $currentPositionTime ms.")
+//         println("LocationUtils.playerLocation took $currentPositionTime ms.")
 
         var adjustedRoute: List<GraphNode>
         val adjustRouteTime = measureTimeMillis {
             adjustedRoute = adjustRouteForCurrentLocation(tspRoute, currentPosition)
         }
-        println("adjustRouteForCurrentLocation took $adjustRouteTime ms.")
+//         println("adjustRouteForCurrentLocation took $adjustRouteTime ms.")
 
         return adjustedRoute.map { it.position }
     }

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -152,7 +153,6 @@ object IslandGraphs {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRepoReload(event: RepositoryReloadEvent) {
-
         loadIsland(LorenzUtils.skyBlockIsland)
     }
 
@@ -232,12 +232,9 @@ object IslandGraphs {
             }
         }
 
-        // calling various update functions to make swtiching between deep caverns and glacite tunnels bareable
+        // calling various update functions to make switching between deep caverns and glacite tunnels bearable
         handleTick()
-        IslandAreas.nodeMoved()
-        DelayedRun.runDelayed(150.milliseconds) {
-            IslandAreas.updatePosition()
-        }
+        IslandGraphReloadEvent(graph).post()
     }
 
     private fun reset() {
@@ -505,6 +502,10 @@ object IslandGraphs {
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()
         componentText.send(pathFindMessageId)
+    }
+
+    fun overrideChatMessage(message: String) {
+        message.asComponent().send(pathFindMessageId)
     }
 
     @HandleEvent

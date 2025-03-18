@@ -420,6 +420,12 @@ object GraphEditor {
             if (inTextMode) {
                 inTextMode = false
                 feedBackInTutorial("Exited Text Mode.")
+                activeNode?.let {
+                    handleNameShortcut(it.name)?.let { (tag, name) ->
+                        it.tags.add(tag)
+                        it.name = name
+                    }
+                }
                 return
             }
             if (inEditMode) {
@@ -433,11 +439,7 @@ object GraphEditor {
         if (inTextMode) {
             textBox.handle()
             val text = textBox.finalText()
-            if (text.isEmpty()) {
-                activeNode?.name = null
-            } else {
-                activeNode?.name = text
-            }
+            activeNode?.name = text.ifEmpty { null }
             return
         }
         if (activeNode != null && config.textKey.isKeyClicked()) {
@@ -590,6 +592,12 @@ object GraphEditor {
             activeNode = null
             addEdge(neighbors1, neighbors2, direction)
         }
+    }
+
+    private fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {
+        "fsoul" -> GraphNodeTag.FAIRY_SOUL to "Fairy Soul"
+        "na" -> GraphNodeTag.AREA to "no_area"
+        else -> null
     }
 
     private fun save() {

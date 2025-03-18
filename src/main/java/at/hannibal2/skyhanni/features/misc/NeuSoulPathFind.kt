@@ -3,28 +3,22 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.BlockPos
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object FairySoulPathFind {
+object NeuSoulPathFind {
     val config get() = SkyHanniMod.feature.misc
 
     private var lastRender = SimpleTimeMark.farPast()
@@ -38,7 +32,6 @@ object FairySoulPathFind {
     private var lastMissing = 0
     private var found = 0
     private var total = 0
-    private var foundButNotClickedSoul: LorenzVec? = null
     private var goodRoute = emptyList<LorenzVec>()
     private var currentIndex = 0
 
@@ -49,24 +42,8 @@ object FairySoulPathFind {
         found = 0
         total = 0
 
-        foundButNotClickedSoul = null
         goodRoute = emptyList()
         currentIndex = 0
-    }
-
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        val lastSoul = foundButNotClickedSoul ?: return
-
-        // disabled or last soul found
-        if (lastRender.passedSince() > 300.milliseconds) {
-            foundButNotClickedSoul = null
-        }
-
-        if (lastSoul.distanceToPlayer() > 5) {
-            pathTo(lastSoul)
-            foundButNotClickedSoul = null
-        }
     }
 
     @JvmStatic
@@ -74,6 +51,8 @@ object FairySoulPathFind {
         val graph = IslandGraphs.currentIslandGraph ?: return
         if (lastRender.passedSince() > 300.milliseconds) return
         if (!config.neuSoulsPathFind) return
+        // we dont need neu souls if fast souls is enabled
+        if (config.fastFairySouls) return
 
         val missingLocally = mutableMapOf<LorenzVec, GraphNode>()
         var foundLocally = 0
@@ -93,11 +72,6 @@ object FairySoulPathFind {
         missing = missingLocally.keys.toSet()
         found = foundLocally
         total = missing.size + found
-
-        if (config.neuSoulsPathFindBetter) {
-            tryRunBetter()
-            return
-        }
 
         // stopped bc we are done already
         if (missing.isEmpty()) return
@@ -123,64 +97,6 @@ object FairySoulPathFind {
         )
     }
 
-    private var lastFound: SimpleTimeMark? = null
-
-    private fun tryRunBetter() {
-        if (missing.size > lastMissing) {
-            // when new souls are enabled, e.g. the user runs /neusouls unclear, we want to recalculate
-            var shouldUpdate = true
-            // We ignore inconsistent data from NEU here
-            lastFound?.let {
-                val diff = it.passedSince()
-                if (diff < 3.seconds) {
-                    ChatUtils.chat("§7caught and blocked recalculate")
-                    shouldUpdate = false
-                }
-            }
-            if (shouldUpdate) {
-                ChatUtils.chat("§crecalculate")
-            } else {
-                // fix wrong index count
-                currentIndex -= 2
-            }
-            testCoolNewPath(forceUpdate = shouldUpdate)
-        } else if (lastMissing > missing.size) {
-            testCoolNewPath(forceUpdate = false)
-            lastFound = SimpleTimeMark.now()
-        }
-        lastMissing = missing.size
-    }
-
-    fun testCoolNewPath(forceUpdate: Boolean) {
-        foundButNotClickedSoul = null
-        if (goodRoute.isNotEmpty() && !forceUpdate) {
-            currentIndex++
-            pathTo(goodRoute[currentIndex])
-            return
-        }
-        val allNodes = IslandGraphs.currentIslandGraph ?: return
-
-        val targetNodes = getTargetNodes(allNodes)
-        if (targetNodes.isEmpty()) return
-
-        goodRoute = NavigationUtils.getRoute(targetNodes, maxIterations = 300, neighborhoodSize = 50)
-        currentIndex = 0
-        pathTo(goodRoute.first())
-    }
-
-    private fun pathTo(loc: LorenzVec) {
-        if (found == total) return
-        IslandGraphs.pathFind(
-            loc,
-            "§5NEU Souls $found/$total",
-            LorenzColor.DARK_PURPLE.toColor(),
-            onFound = {
-                foundButNotClickedSoul = loc
-            },
-            condition = { true },
-        )
-    }
-
     // TODO write villager hub feature later, fix duplicate andrew
 //     val hubVillagers = setOf(
 //         "Andrew", "Duke", "Felix", "Jack", "Jamie", "Leo",
@@ -188,8 +104,4 @@ object FairySoulPathFind {
 //     )
 
 //         return allNodes.filter { GraphNodeTag.NPC in it.tags && it.name in hubVillagers }
-
-    private fun getTargetNodes(allNodes: Graph): List<GraphNode> = missing.mapNotNull { pos ->
-        allNodes.minByOrNull { it.position.distance(pos) }
-    }
 }

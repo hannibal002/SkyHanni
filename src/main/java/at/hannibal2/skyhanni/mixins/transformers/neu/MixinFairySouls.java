@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.neu;
 
-import at.hannibal2.skyhanni.features.misc.FairySoulPathFind;
+import at.hannibal2.skyhanni.features.misc.NeuSoulPathFind;
 import io.github.moulberry.notenoughupdates.miscfeatures.FairySouls;
 import net.minecraft.util.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
@@ -44,11 +44,11 @@ public class MixinFairySouls {
         if (!showSouls || !trackSouls || currentLocation == null || closestMissingSouls.isEmpty()) {
             return;
         }
-        FairySoulPathFind.render();
+        NeuSoulPathFind.render();
     }
 
     @Inject(method = "refreshMissingSoulInfo", at = @At(value = "TAIL"))
     public void refreshMissingSoulInfo_skyhanni(CallbackInfo ci) {
-        FairySoulPathFind.updateList(allSoulsInCurrentLocation, missingSoulsDistanceSqMap);
+        NeuSoulPathFind.updateList(allSoulsInCurrentLocation, missingSoulsDistanceSqMap);
     }
 }
