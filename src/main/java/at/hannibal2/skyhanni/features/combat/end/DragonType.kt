@@ -34,4 +34,6 @@ enum class DragonType(
     );
 
     val displayName: String = "${name.firstLetterUppercase()} Dragon"
+
+    override fun toString(): String = displayName
 }

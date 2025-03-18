@@ -100,7 +100,7 @@ object DragonProfitTracker {
         val colorCode = bucketData.selectedBucket?.color ?: LorenzColor.AQUA
         val displayName = bucketData.selectedBucket?.displayName ?: "Total Dragon"
         val killAmount = bucketData.getTotalDragonCount()
-        val dragonString = "$colorCode$displayName §r§bkills: $killAmount"
+        val dragonString = "${colorCode.getChatColor()}$displayName §r§bkills: $killAmount"
         add(
             Renderable.string(dragonString).toSearchable()
         )
