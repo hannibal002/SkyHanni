@@ -51,7 +51,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.common.util.Constants
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
@@ -809,15 +808,15 @@ object ItemUtils {
     }
 
     fun NBTTagCompound.getStringList(key: String): List<String> {
-        if (!hasKey(key, Constants.NBT.TAG_LIST)) return emptyList()
+        if (!hasKey(key, 9)) return emptyList()
 
-        return getTagList(key, Constants.NBT.TAG_STRING).let { loreList ->
+        return getTagList(key, 8).let { loreList ->
             List(loreList.tagCount()) { loreList.getStringTagAt(it) }
         }
     }
 
     fun NBTTagCompound.getCompoundList(key: String): List<NBTTagCompound> =
-        getTagList(key, Constants.NBT.TAG_COMPOUND).let { loreList ->
+        getTagList(key, 10).let { loreList ->
             List(loreList.tagCount()) { loreList.getCompoundTagAt(it) }
         }
 

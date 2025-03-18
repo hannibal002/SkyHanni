@@ -334,6 +334,7 @@ net.minecraft.world.entity.player.Inventory getSelected() getCurrentItem()
 net.minecraft.world.entity.player.Inventory items mainInventory
 
 net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
+net.minecraft.world.entity.player.Player containerMenu openContainer
 
 net.minecraft.world.entity.projectile.Arrow net.minecraft.entity.projectile.EntityArrow
 net.minecraft.world.entity.projectile.Fireball net.minecraft.entity.projectile.EntityFireball
@@ -376,6 +377,7 @@ net.minecraft.world.item.enchantment.Enchantments ALL_DAMAGE_PROTECTION PROTECTI
 net.minecraft.world.level.Level net.minecraft.world.World
 net.minecraft.world.level.Level getEntity() getEntityByID()
 net.minecraft.world.level.Level getBlockEntity() getTileEntity()
+net.minecraft.world.level.Level getDayTime() getWorldTime()
 
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
 net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
