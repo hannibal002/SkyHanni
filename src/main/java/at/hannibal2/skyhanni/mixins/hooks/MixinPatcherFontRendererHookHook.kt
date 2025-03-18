@@ -12,13 +12,13 @@ object MixinPatcherFontRendererHookHook {
         if (EmojiReplacer.isEnabled()) {
             var inEmoji = false
             for (i in string.indices) {
-                if (string[i] == ":") {
+                if (string[i] == ':') {
                     if (inEmoji) {
                         cir.returnValue = false
                         return
                     }
                     inEmoji = true
-                } else if (string[i] == " ") {
+                } else if (string[i] == ' ') {
                     inEmoji = false
                 }
             }
