@@ -1,16 +1,38 @@
 package at.hannibal2.skyhanni.utils.navigation
 
 import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import kotlin.system.measureTimeMillis
 
 object NavigationUtils {
 
-    fun getRoute(targetNodes: List<GraphNode>, maxIterations: Int = 50, neighborhoodSize: Int = 6): List<LorenzVec> {
+    fun getRoute(input: List<GraphNode>, maxIterations: Int = 50, neighborhoodSize: Int = 6): List<LorenzVec> {
+        val output = calculateTravelingSalesman(input, maxIterations, neighborhoodSize)
+
+        if (input.size != output.size) {
+            ErrorManager.skyHanniError(
+                "calculateTravelingSalesman could not reach all goals",
+                "input" to input.size,
+                "output" to output.size,
+                "island" to LorenzUtils.skyBlockIsland,
+            )
+        }
+
+        return output
+    }
+
+    // This is no actual traveling salesman, this is a approximation
 //         val maxIterations = 50 // Cap on total iterations.
 //         val neighborhoodSize = 6 // Limit candidate j-range for each i.
+    private fun calculateTravelingSalesman(
+        targetNodes: List<GraphNode>,
+        maxIterations: Int,
+        neighborhoodSize: Int,
+    ): List<LorenzVec> {
         var distanceMap: Map<GraphNode, Map<GraphNode, Double>>
         val distanceMapTime = measureTimeMillis {
             distanceMap = computeDistanceMap(targetNodes)
@@ -23,7 +45,6 @@ object NavigationUtils {
         }
         println("improvedTSP took $tspRouteTime ms.")
 
-        // Optimize critical segments in the route
         val criticalOptTime = measureTimeMillis {
             optimizeCriticalSegments(tspRoute, distanceMap)
         }
@@ -44,7 +65,6 @@ object NavigationUtils {
         return adjustedRoute.map { it.position }
     }
 
-    // Step 1: Preload the 50×50 Distance Matrix
     private fun computeDistanceMap(targetNodes: List<GraphNode>): Map<GraphNode, Map<GraphNode, Double>> {
         val distanceMap = mutableMapOf<GraphNode, MutableMap<GraphNode, Double>>()
         for (node in targetNodes) {

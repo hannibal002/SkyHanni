@@ -8,24 +8,20 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.BlockPos
 import java.util.TreeMap
-import kotlin.system.measureTimeMillis
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FairySoulPathFind {
@@ -94,17 +90,8 @@ object FairySoulPathFind {
                 }
             }
         }
-        if (missing.size != missingLocally.keys.toSet().size) {
-            ChatUtils.chat("NEU update: missing changed ${missing.size} -> ${missingLocally.keys.toSet().size}")
-        }
         missing = missingLocally.keys.toSet()
-        if (found != foundLocally) {
-            ChatUtils.chat("NEU update: found changed $found -> $foundLocally")
-        }
         found = foundLocally
-        if (total != missing.size + found) {
-            ChatUtils.chat("NEU update: total changed $total -> ${missing.size + found}")
-        }
         total = missing.size + found
 
         if (config.neuSoulsPathFindBetter) {
@@ -136,12 +123,30 @@ object FairySoulPathFind {
         )
     }
 
+    private var lastFound: SimpleTimeMark? = null
+
     private fun tryRunBetter() {
         if (missing.size > lastMissing) {
             // when new souls are enabled, e.g. the user runs /neusouls unclear, we want to recalculate
-            testCoolNewPath(forceUpdate = true)
+            var shouldUpdate = true
+            // We ignore inconsistent data from NEU here
+            lastFound?.let {
+                val diff = it.passedSince()
+                if (diff < 3.seconds) {
+                    ChatUtils.chat("§7caught and blocked recalculate")
+                    shouldUpdate = false
+                }
+            }
+            if (shouldUpdate) {
+                ChatUtils.chat("§crecalculate")
+            } else {
+                // fix wrong index count
+                currentIndex -= 2
+            }
+            testCoolNewPath(forceUpdate = shouldUpdate)
         } else if (lastMissing > missing.size) {
             testCoolNewPath(forceUpdate = false)
+            lastFound = SimpleTimeMark.now()
         }
         lastMissing = missing.size
     }
@@ -155,38 +160,11 @@ object FairySoulPathFind {
         }
         val allNodes = IslandGraphs.currentIslandGraph ?: return
 
-        var targetNodes: List<GraphNode>
-        val targetNodesTime = measureTimeMillis {
-            targetNodes = getTargetNodes(allNodes)
-        }
-        println("getTargetNodes took $targetNodesTime ms.")
+        val targetNodes = getTargetNodes(allNodes)
+        if (targetNodes.isEmpty()) return
 
-        if (targetNodes.isEmpty()) {
-            ChatUtils.chat("is empty")
-            return
-        }
-
-        val maxIterations = SkyHanniDebugsAndTests.a.toInt()
-        val neighborhoodSize = SkyHanniDebugsAndTests.b.toInt()
-
-        val routeTime = measureTimeMillis {
-            goodRoute = NavigationUtils.getRoute(targetNodes, maxIterations, neighborhoodSize)
-        }
-        val length = GraphUtils.calculatePathLength(goodRoute)
-
-        val ms = routeTime.milliseconds
-        val distance = length.roundTo(0).addSeparators()
-        ChatUtils.chat("route ${targetNodes.size}n ($maxIterations/$neighborhoodSize) took $ms/${distance}m")
-
+        goodRoute = NavigationUtils.getRoute(targetNodes, maxIterations = 300, neighborhoodSize = 50)
         currentIndex = 0
-        if (found == 0 && total != goodRoute.size) {
-            ErrorManager.skyHanniError(
-                "Advanced route planning could not find one path between all goals",
-                "total" to total,
-                "goodRoute size" to goodRoute.size,
-                "island" to LorenzUtils.skyBlockIsland,
-            )
-        }
         pathTo(goodRoute.first())
     }
 
@@ -209,11 +187,9 @@ object FairySoulPathFind {
 //         "Liam", "Lynn", "Ryu", "Stella", "Tom", "Vex",
 //     )
 
-    private fun getTargetNodes(allNodes: Graph): List<GraphNode> {
-        return missing.mapNotNull { pos ->
-            allNodes.minByOrNull { it.position.distance(pos) }
-        }
-
 //         return allNodes.filter { GraphNodeTag.NPC in it.tags && it.name in hubVillagers }
+
+    private fun getTargetNodes(allNodes: Graph): List<GraphNode> = missing.mapNotNull { pos ->
+        allNodes.minByOrNull { it.position.distance(pos) }
     }
 }
