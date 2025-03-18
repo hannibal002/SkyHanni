@@ -34,7 +34,9 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.moveEntryToTop
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -206,7 +208,7 @@ object CropMoneyDisplay {
     }
 
     private fun createDescendingCropList(
-        moneyPerHour: Map<NeuInternalName, CropMoneyData>
+        moneyPerHour: Map<NeuInternalName, CropMoneyData>,
     ): List<Pair<NeuInternalName, List<Double>>> {
         val defaultPrices = listOf(0.0, 0.0, 0.0)
         val enchantedSeedPrices = moneyPerHour[ENCHANTED_SEEDS]?.toPrices() ?: defaultPrices
@@ -230,7 +232,7 @@ object CropMoneyDisplay {
         number: Int,
         internalName: NeuInternalName,
         prices: List<Double>,
-        extraMoneyPerHour: Double
+        extraMoneyPerHour: Double,
     ): Renderable? {
         val crop = cropNames[internalName]!!
         val isCurrent = crop == GardenApi.getCurrentlyFarmedCrop()
@@ -407,7 +409,7 @@ object CropMoneyDisplay {
     data class ExtraMoneyData(
         var mushroomCowCoins: Double,
         var armorCoins: Double,
-        var dicerCoins: Double
+        var dicerCoins: Double,
     ) {
         override fun toString(): String = """
             extraMushroomCowPerkCoins: ${mushroomCowCoins.addSeparators()}
