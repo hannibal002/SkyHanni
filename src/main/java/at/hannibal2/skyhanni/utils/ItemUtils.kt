@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlinx.coroutines.launch
@@ -51,7 +52,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.common.util.Constants
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
@@ -63,6 +63,10 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.component.type.LoreComponent
 //$$ import net.minecraft.component.type.NbtComponent
 //$$ import net.minecraft.component.ComponentMap
+//$$ import com.mojang.authlib.GameProfile
+//$$ import java.util.UUID
+//$$ import com.mojang.authlib.properties.Property
+//$$ import net.minecraft.component.type.ProfileComponent
 //#endif
 
 @SkyHanniModule
@@ -326,7 +330,8 @@ object ItemUtils {
 
     // Taken from NEU
     fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
-        val render = ItemStack(Items.skull, 1, 3)
+        //#if MC < 1.21
+        val stack = ItemStack(Items.skull, 1, 3)
         val tag = NBTTagCompound()
         val skullOwner = NBTTagCompound()
         val properties = NBTTagCompound()
@@ -344,8 +349,17 @@ object ItemUtils {
         properties.setTag("textures", textures)
         skullOwner.setTag("Properties", properties)
         tag.setTag("SkullOwner", skullOwner)
-        render.tagCompound = tag
-        return render
+        stack.tagCompound = tag
+        return stack
+        //#else
+        //$$ val stack = ItemStack(Items.PLAYER_HEAD)
+        //$$ val profile = GameProfile(UUID.fromString(uuid), uuid)
+        //$$ profile.properties.put("textures", Property("textures", value))
+        //$$ stack.set(DataComponentTypes.PROFILE, ProfileComponent(profile))
+        //$$ stack.setCustomItemName(displayName)
+        //$$ stack.setLore(lore.toList())
+        //$$ return stack
+        //#endif
     }
 
     fun createItemStack(item: Item, displayName: String, vararg lore: String): ItemStack {
@@ -358,15 +372,26 @@ object ItemUtils {
 
     // Taken from NEU
     fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
+        //#if MC < 1.16
         val stack = ItemStack(item, amount, damage)
         val tag = NBTTagCompound()
         addNameAndLore(tag, displayName, *lore.toTypedArray())
         tag.setInteger("HideFlags", 254)
         stack.tagCompound = tag
         return stack
+        //#else
+        //$$ // todo we are ignoring damage for now, idk what to do for this
+        //$$ val stack = ItemStack(item, amount)
+        //$$ stack.setCustomItemName(displayName)
+        //$$ stack.setLore(lore)
+        //$$ return stack
+        //#endif
     }
 
     // Taken from NEU
+    //#if MC < 1.21
+    // Doesnt make sense in modern
+    // just use itemstack.setCustomItemName and itemstack.setLore
     private fun addNameAndLore(tag: NBTTagCompound, displayName: String, vararg lore: String) {
         val display = NBTTagCompound()
         display.setString("Name", displayName)
@@ -379,6 +404,7 @@ object ItemUtils {
         }
         tag.setTag("display", display)
     }
+    //#endif
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
@@ -485,23 +511,17 @@ object ItemUtils {
 
     // Taken from NEU
     fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
+        this.setCustomItemName(displayName)
+        this.setLore(lore)
+        //#if MC < 1.21
         val tag = this.tagCompound ?: NBTTagCompound()
-        val display = tag.getCompoundTag("display")
-        val loreList = NBTTagList()
-        for (line in lore) {
-            loreList.appendTag(NBTTagString(line))
-        }
-
-        display.setString("Name", displayName)
-        display.setTag("Lore", loreList)
-
-        tag.setTag("display", display)
         tag.setInteger("HideFlags", 254)
         if (disableNeuTooltips) {
             tag.setBoolean("disableNeuTooltip", true)
         }
 
         this.tagCompound = tag
+        //#endif
         return this
     }
 
@@ -808,15 +828,15 @@ object ItemUtils {
     }
 
     fun NBTTagCompound.getStringList(key: String): List<String> {
-        if (!hasKey(key, Constants.NBT.TAG_LIST)) return emptyList()
+        if (!hasKey(key, 9)) return emptyList()
 
-        return getTagList(key, Constants.NBT.TAG_STRING).let { loreList ->
+        return getTagList(key, 8).let { loreList ->
             List(loreList.tagCount()) { loreList.getStringTagAt(it) }
         }
     }
 
     fun NBTTagCompound.getCompoundList(key: String): List<NBTTagCompound> =
-        getTagList(key, Constants.NBT.TAG_COMPOUND).let { loreList ->
+        getTagList(key, 10).let { loreList ->
             List(loreList.tagCount()) { loreList.getCompoundTagAt(it) }
         }
 

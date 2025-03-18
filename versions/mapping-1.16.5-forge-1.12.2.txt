@@ -120,6 +120,7 @@ net.minecraft.nbt.CompoundTag remove() removeTag()
 
 net.minecraft.nbt.ListTag getSize() tagCount()
 net.minecraft.nbt.ListTag getString() getStringTagAt()
+net.minecraft.nbt.ListTag getCompound() getCompoundTagAt()
 
 net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent
 net.minecraft.network.chat.Style net.minecraft.util.text.Style
@@ -339,6 +340,7 @@ net.minecraft.world.entity.player.Inventory getSelected() getCurrentItem()
 net.minecraft.world.entity.player.Inventory items mainInventory
 
 net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
+net.minecraft.world.entity.player.Player containerMenu openContainer
 
 net.minecraft.world.entity.projectile.Arrow net.minecraft.entity.projectile.EntityArrow
 net.minecraft.world.entity.projectile.Fireball net.minecraft.entity.projectile.EntityFireball
@@ -353,6 +355,7 @@ net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.Slot getItem() getStack()
+net.minecraft.world.inventory.Slot hasItem() getHasStack()
 net.minecraft.world.inventory.Slot index slotNumber
 net.minecraft.world.inventory.Slot x xPos
 net.minecraft.world.inventory.Slot y yPos
@@ -378,8 +381,10 @@ net.minecraft.world.item.enchantment.Enchantments net.minecraft.init.Enchantment
 
 net.minecraft.world.item.enchantment.Enchantments ALL_DAMAGE_PROTECTION PROTECTION
 
+net.minecraft.world.level.Level net.minecraft.world.World
 net.minecraft.world.level.Level getEntity() getEntityByID()
 net.minecraft.world.level.Level getBlockEntity() getTileEntity()
+net.minecraft.world.level.Level getDayTime() getWorldTime()
 
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
 net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
@@ -394,6 +399,11 @@ net.minecraft.world.level.block.entity.SignBlockEntity net.minecraft.tileentity.
 net.minecraft.world.level.block.entity.SkullBlockEntity net.minecraft.tileentity.TileEntitySkull
 
 net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
+
+net.minecraft.world.level.block.state.properties.IntegerProperty net.minecraft.block.properties.PropertyInteger
+net.minecraft.world.level.block.state.properties.EnumProperty net.minecraft.block.properties.PropertyEnum
+net.minecraft.world.level.block.state.properties.BooleanProperty net.minecraft.block.properties.PropertyBool
+net.minecraft.world.level.block.state.properties.DirectionProperty net.minecraft.block.properties.PropertyDirection
 
 net.minecraft.world.phys.Vec3 net.minecraft.util.math.Vec3d
 

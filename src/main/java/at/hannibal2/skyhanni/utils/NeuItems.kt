@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -155,7 +156,7 @@ object NeuItems {
             return it
         }
         val result = allNeuRepoItems().filter {
-            Item.getByNameOrId(it.value["itemid"].asString) == item
+            it.value["itemid"].asString.getVanillaItem() == item
         }.keys.map {
             it.toInternalName()
         }
