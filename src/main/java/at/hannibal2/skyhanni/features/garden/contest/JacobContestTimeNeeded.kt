@@ -51,7 +51,7 @@ object JacobContestTimeNeeded {
             addRenderableButton<ContestBracket>(
                 label = "§7Bracket: ",
                 getName = { type -> type.name.lowercase() },
-                current = { it == currentBracket },
+                current = currentBracket,
                 onChange = {
                     currentBracket = it
                     update()
