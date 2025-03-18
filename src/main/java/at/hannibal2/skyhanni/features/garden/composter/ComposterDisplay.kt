@@ -71,14 +71,14 @@ object ComposterDisplay {
 
         if (tabListData.isNotEmpty()) {
             composterEmptyTime = ComposterApi.estimateEmptyTimeFromTab()
-            display = buildDisplay()
+            updateDisplay()
             sendNotify()
         }
     }
 
-    private fun buildDisplay(): Renderable? =
-        if (!config.displayEnabled) null
-        else Renderable.vertical {
+    private fun updateDisplay() {
+        if (!config.displayEnabled) return
+        display = Renderable.vertical {
             addString("§bComposter")
             addNotNull(DataType.TIME_LEFT.labeledWithData(tabListData))
             addLine {
@@ -88,6 +88,7 @@ object ComposterDisplay {
             }
             add(composterEmptyTime(composterEmptyTime))
         }
+    }
 
     private fun composterEmptyTime(emptyTime: Duration?): Renderable {
         return if (emptyTime != null) {

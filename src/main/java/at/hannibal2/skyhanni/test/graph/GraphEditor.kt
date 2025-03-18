@@ -371,11 +371,25 @@ object GraphEditor {
         }
     }
 
+    private var bypassTempRemoveTimer = SimpleTimeMark.farPast()
+
     private fun loadThisIsland() {
         val graph = IslandGraphs.currentIslandGraph
         if (graph == null) {
             ChatUtils.userError("This island does not have graph data!")
             return
+        }
+
+        IslandGraphs.disabledNodesReason?.let {
+            if (bypassTempRemoveTimer.isInPast()) {
+                IslandGraphs.enableAllNodes()
+                ChatUtils.chat("Reset temp remove!")
+            } else {
+                ChatUtils.chat("§cParts of the island graph are currently temp removed: $it")
+                ChatUtils.chat("Run this command again in the next 5 seconds to remove the temp remove logic and copy the current island!")
+                bypassTempRemoveTimer = 5.seconds.fromNow()
+                return
+            }
         }
         if (!config.enabled) {
             config.enabled = true
