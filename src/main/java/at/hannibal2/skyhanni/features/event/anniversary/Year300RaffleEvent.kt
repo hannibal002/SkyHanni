@@ -44,7 +44,7 @@ object Year300RaffleEvent {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         config.activeTimerPosition.renderRenderable(
-            overlay,
+            overlay ?: return,
             posLabel = "300þ Anniversary Active Timer",
         )
     }
