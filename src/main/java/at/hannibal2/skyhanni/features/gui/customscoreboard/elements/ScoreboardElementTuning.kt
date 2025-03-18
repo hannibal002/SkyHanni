@@ -10,11 +10,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 // internal
 // power update event
 object ScoreboardElementTuning : ScoreboardElement() {
-    override fun getDisplay(): Any {
-        val config = SkyHanniMod.feature.gui.customScoreboard
-        val displayConfig = config.display
-        val maxwellConfig = config.display.maxwell
+    private val config get() = SkyHanniMod.feature.gui.customScoreboard
+    private val displayConfig get() = config.display
+    private val maxwellConfig get() = config.display.maxwell
 
+    override fun getDisplay(): Any {
         val tunings = MaxwellApi.tunings ?: return "§cTalk to \"Maxwell\"!"
         if (tunings.isEmpty()) return "§cNo Maxwell Tunings :("
 
