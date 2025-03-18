@@ -230,7 +230,9 @@ object NeuItems {
         // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
         // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
+        //#if MC < 1.12
         if (NEUOverlay.searchBarHasFocus) return true
+        //#endif
 
         return false
     }
