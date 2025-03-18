@@ -337,7 +337,7 @@ object CollectionUtils {
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
         highlight: Boolean = false,
-        scale: Double = NeuItems.itemFontSize,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it

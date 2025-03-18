@@ -21,6 +21,7 @@ net.minecraft.client.Options keyUse keyBindUseItem
 net.minecraft.client.Options keyInventory keyBindInventory
 net.minecraft.client.Options keyScreenshot keyBindScreenshot
 net.minecraft.client.Options keyFullscreen keyBindFullscreen
+net.minecraft.client.Options getSoundSourceVolume() getSoundLevel()
 
 net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
 net.minecraft.client.Minecraft setScreen() displayGuiScreen()
