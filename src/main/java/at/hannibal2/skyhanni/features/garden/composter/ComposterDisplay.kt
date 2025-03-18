@@ -16,13 +16,17 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.item.ItemStack
 import java.util.Collections
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -33,7 +37,7 @@ object ComposterDisplay {
 
     private val config get() = GardenApi.config.composters
     private val storage get() = GardenApi.storage
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private var composterEmptyTime: Duration? = null
 
     private val bucket by lazy { "BUCKET".toInternalName().getItemStack() }
@@ -49,9 +53,20 @@ object ComposterDisplay {
 
         val pattern = rawPattern.toPattern()
 
-        fun addToList(map: Map<DataType, String>): List<Any> {
-            return map[this]?.let { listOf(displayItem, it) }.orEmpty()
+        fun getRenderable(map: Map<DataType, String>): Renderable? {
+            return map[this]?.let {
+                horizontalItemAndString(displayItem, it)
+            }
         }
+    }
+
+    private fun horizontalItemAndString(item: ItemStack, text: String, itemScale: Double = NeuItems.itemFontSize): Renderable {
+        return Renderable.horizontalContainer(
+            listOf(
+                Renderable.itemStack(item),
+                Renderable.string(text),
+            ),
+        )
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -62,38 +77,33 @@ object ComposterDisplay {
 
         if (tabListData.isNotEmpty()) {
             composterEmptyTime = ComposterApi.estimateEmptyTimeFromTab()
-            updateDisplay()
+            display = buildDisplay()
             sendNotify()
         }
     }
 
-    private fun updateDisplay() {
-        if (!config.displayEnabled) return
-        val newDisplay = mutableListOf<List<Any>>()
-        newDisplay.addAsSingletonList("§bComposter")
-
-        newDisplay.add(DataType.TIME_LEFT.addToList(tabListData))
-
-        val list = mutableListOf<Any>()
-        list.addAll(DataType.ORGANIC_MATTER.addToList(tabListData))
-        list.add(" ")
-        list.addAll(DataType.FUEL.addToList(tabListData))
-        newDisplay.add(list)
-
-        newDisplay.add(DataType.STORED_COMPOST.addToList(tabListData))
-        newDisplay.add(addComposterEmptyTime(composterEmptyTime))
-
-        display = newDisplay
+    private fun buildDisplay(): List<Renderable> = buildList {
+        if (!config.displayEnabled) return emptyList()
+        addString("§bComposter")
+        DataType.TIME_LEFT.getRenderable(tabListData)?.let { add(it) }
+        DataType.ORGANIC_MATTER.getRenderable(tabListData)?.let { add(it) }
+        addString(" ")
+        DataType.FUEL.getRenderable(tabListData)?.let { add(it) }
+        DataType.STORED_COMPOST.getRenderable(tabListData)?.let { add(it) }
+        add(addComposterEmptyTime(composterEmptyTime))
     }
 
-    private fun addComposterEmptyTime(emptyTime: Duration?): List<Any> {
+    private fun addComposterEmptyTime(emptyTime: Duration?): Renderable {
         return if (emptyTime != null) {
             GardenApi.storage?.composterEmptyTime = emptyTime.fromNow()
             val format = emptyTime.format()
-            listOf(bucket, "§b$format")
-        } else {
-            listOf("§cOpen Composter Upgrades!")
-        }
+            Renderable.horizontalContainer(
+                listOf(
+                    Renderable.itemStack(bucket),
+                    Renderable.string("§b$format"),
+                ),
+            )
+        } else Renderable.string("§cOpen Composter Upgrades!")
     }
 
     private fun readData(tabList: List<String>) {
@@ -154,7 +164,7 @@ object ComposterDisplay {
         if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
 
         if (GardenApi.inGarden() && config.displayEnabled) {
-            config.displayPos.renderStringsAndItems(display, posLabel = "Composter Display")
+            config.displayPos.renderRenderables(display, posLabel = "Composter Display")
         }
 
         checkWarningsAndOutsideGarden()

@@ -32,11 +32,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -53,7 +54,7 @@ object CityProjectFeatures {
 
     private val config get() = SkyHanniMod.feature.event.cityProject
 
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private var inInventory = false
     private var lastReminderSend = SimpleTimeMark.farPast()
 
@@ -118,7 +119,7 @@ object CityProjectFeatures {
                 fetchMaterials(item, materials)
             }
 
-            display = buildList(materials)
+            display = buildMaterialsList(materials)
         }
 
         if (config.showReady) {
@@ -158,20 +159,20 @@ object CityProjectFeatures {
         return true
     }
 
-    private fun buildList(materials: MutableMap<NeuInternalName, Int>) = buildList<List<Any>> {
-        addAsSingletonList("§7City Project Materials")
+    private fun buildMaterialsList(materials: MutableMap<NeuInternalName, Int>) = buildList {
+        addString("§7City Project Materials")
 
         if (materials.isEmpty()) {
-            addAsSingletonList("§cNo Materials to contribute.")
+            addString("§cNo Materials to contribute.")
             return@buildList
         }
 
         for ((internalName, amount) in materials) {
             val stack = internalName.getItemStack()
             val name = internalName.repoItemName
-            val list = mutableListOf<Any>()
-            list.add(" §7- ")
-            list.add(stack)
+            val list = mutableListOf<Renderable>()
+            list.addString(" §7- ")
+            list.addItemStack(stack)
 
             list.add(
                 Renderable.optionalLink(
@@ -188,8 +189,9 @@ object CityProjectFeatures {
 
             val price = internalName.getPrice() * amount
             val format = price.shortFormat()
-            list.add(" §7(§6$format§7)")
-            add(list)
+            list.addString(" §7(§6$format§7)")
+
+            addAll(list)
         }
     }
 
@@ -220,7 +222,7 @@ object CityProjectFeatures {
         if (!config.showMaterials) return
         if (!inInventory) return
 
-        config.pos.renderStringsAndItems(display, posLabel = "City Project Materials")
+        config.pos.renderRenderables(display, posLabel = "City Project Materials")
     }
 
     @HandleEvent(onlyOnSkyblock = true)

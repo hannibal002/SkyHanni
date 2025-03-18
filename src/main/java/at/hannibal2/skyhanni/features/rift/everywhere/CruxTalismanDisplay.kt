@@ -13,9 +13,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -35,7 +36,7 @@ object CruxTalismanDisplay {
     )
 
     private const val PARTIAL_NAME = "CRUX_TALISMAN"
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private val cruxes = mutableListOf<Crux>()
     private val bonusesLine = mutableListOf<String>()
     private var maxed = false
@@ -44,7 +45,7 @@ object CruxTalismanDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.position.renderStringsAndItems(
+        config.position.renderRenderables(
             display,
             posLabel = "Crux Talisman Display",
         )
@@ -54,13 +55,13 @@ object CruxTalismanDisplay {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList {
+    private fun drawDisplay() = buildList<Renderable> {
         var showAsMaxed = maxed
         if (!config.compactWhenMaxed && maxed) showAsMaxed = false
 
         var percent = 0
         if (cruxes.isNotEmpty()) {
-            addAsSingletonList("§7Crux Talisman Progress: ${if (showAsMaxed) "§a§lMAXED!" else "§a$percentValue%"}")
+            addString("§7Crux Talisman Progress: ${if (showAsMaxed) "§a§lMAXED!" else "§a$percentValue%"}")
             if (!showAsMaxed) {
                 for (line in cruxes) {
                     percent += if (config.compactWhenMaxed) {
@@ -76,15 +77,15 @@ object CruxTalismanDisplay {
                                 ?.toInt() ?: 0
                         }
                     }
-                    addAsSingletonList("  ${line.tier} ${line.name}: ${line.progress}")
+                    addString("  ${line.tier} ${line.name}: ${line.progress}")
                 }
             }
         }
         val totalPercentage = cruxes.size * 100
         percentValue = ((percent.toDouble() / totalPercentage) * 100).roundTo(1)
         if (bonusesLine.isNotEmpty() && config.showBonuses.get()) {
-            addAsSingletonList("§7Bonuses:")
-            bonusesLine.forEach { addAsSingletonList("  $it") }
+            addString("§7Bonuses:")
+            bonusesLine.forEach { addString("  $it") }
         }
     }
 
