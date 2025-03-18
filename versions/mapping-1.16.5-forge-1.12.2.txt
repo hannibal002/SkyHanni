@@ -267,6 +267,7 @@ net.minecraft.world.entity.Entity yo posY
 net.minecraft.world.entity.Entity zOld prevPosZ
 net.minecraft.world.entity.Entity zo posZ
 net.minecraft.world.entity.Entity isOnGround onGround
+net.minecraft.world.entity.Entity getVehicle() getRidingEntity()
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
@@ -320,6 +321,7 @@ net.minecraft.world.entity.monster.MagmaCube net.minecraft.entity.monster.Entity
 net.minecraft.world.entity.monster.Silverfish net.minecraft.entity.monster.EntitySilverfish
 net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntitySkeleton
 net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
+net.minecraft.world.entity.monster.Slime getSize() getSlimeSize()
 net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
 net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch
 net.minecraft.world.entity.monster.WitherSkeleton net.minecraft.entity.monster.EntityWitherSkeleton
