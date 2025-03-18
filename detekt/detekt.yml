@@ -5,6 +5,10 @@ GrammarRules:
     AvoidBritishSpelling:
         active: true
 
+CompatRules:
+    MinecraftCompat:
+        active: true
+
 FormattingRules:
     CustomCommentSpacing:
         active: true
