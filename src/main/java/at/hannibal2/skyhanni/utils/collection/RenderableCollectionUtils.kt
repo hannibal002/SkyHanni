@@ -73,4 +73,12 @@ object RenderableCollectionUtils {
         val emptySpace = ySpace - off.last()
         return emptySpace / (yLength - 1)
     }
+
+    fun MutableList<Renderable>.addHorizontalSpacer(width: Int = 3) {
+        add(Renderable.placeholder(width, 0))
+    }
+
+    fun MutableList<Renderable>.addVerticalSpacer(height: Int = 10) {
+        add(Renderable.placeholder(0, height))
+    }
 }

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -155,7 +156,10 @@ object GraphNodeEditor {
     private fun checkIsland(tag: GraphNodeTag): Boolean {
         val islandMatches = tag.onlyIsland?.let {
             it == LorenzUtils.skyBlockIsland
+        } ?: tag.onlyIslands.takeIfNotEmpty()?.let {
+            LorenzUtils.skyBlockIsland in it
         } ?: true
+
         val skyblockMatches = tag.onlySkyblock?.let {
             it == LorenzUtils.inSkyBlock
         } ?: true
