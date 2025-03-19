@@ -105,13 +105,14 @@ object SkyHanniTypeAdapters {
 
     val SOOPY_WAYPOINT_LIST = object : TypeAdapter<SoopyWaypointList>() {
         override fun write(out: JsonWriter, value: SoopyWaypointList) {
-            ChatUtils.chat("test")
             out.beginArray()
             value.waypoints.forEach { waypoint: SoopyWaypoint ->
                 out.beginObject()
+
                 out.name("x").value(waypoint.location.x)
                 out.name("y").value(waypoint.location.y)
                 out.name("z").value(waypoint.location.z)
+
                 out.name("r").value(waypoint.color.red / 255.0)
                 out.name("g").value(waypoint.color.green / 255.0)
                 out.name("b").value(waypoint.color.blue / 255.0)
@@ -175,7 +176,7 @@ object SkyHanniTypeAdapters {
             object : TypeAdapter<T>() {
                 override fun write(out: JsonWriter, value: T) = write(out, value)
                 override fun read(reader: JsonReader) = read(reader)
-            }.nullSafe(),
+            }.nullSafe()
         )
         return this
     }

@@ -1,27 +1,28 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
-import com.google.gson.Gson
 import java.awt.Color
 
 @JvmInline
 value class SoopyWaypointList(
-    @Expose val waypoints: List<SoopyWaypoint> = listOf(),
+    @Expose val waypoints: List<SoopyWaypoint>,
 ) {
+
     companion object {
-        fun fromJson(json: String): SoopyWaypointList = SkyHanniTypeAdapters.SOOPY_WAYPOINT_LIST.fromJson(json)
-        fun fromJson(json: JsonElement): SoopyWaypointList = SkyHanniTypeAdapters.SOOPY_WAYPOINT_LIST.fromJsonTree(json)
+        val gson = ConfigManager.gson
+
+        fun fromJson(json: String): SoopyWaypointList = gson.fromJson<SoopyWaypointList>(json)
+        fun fromJson(json: JsonElement): SoopyWaypointList = gson.fromJson<SoopyWaypointList>(json)
     }
-    fun toJson(): String = SkyHanniTypeAdapters.SOOPY_WAYPOINT_LIST.toJson(this)
+    fun toJson(): String = gson.toJson(this)
 }
-
-
 
 class SoopyWaypoint(
     val location: LorenzVec,

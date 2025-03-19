@@ -202,7 +202,6 @@ object OrderedWaypoints {
         SkyHanniMod.coroutineScope.launch {
             val res = if (args.isEmpty()) WaypointLoader.getWaypoints(ClipboardUtils.readFromClipboard() ?: "", "soopy")
             else {
-                ChatUtils.chat(ProfileStorageData.playerSpecific!!.routes::class.java.toString())
                 ProfileStorageData.playerSpecific?.routes?.get(args[0])?.let {
                     WaypointLoader.getWaypoints(it.toJson(), "soopy")
                 } ?: run {
@@ -211,13 +210,13 @@ object OrderedWaypoints {
                 }
             }
 
-            if (res.success) {
+            if (res != null) {
                 orderedWaypoints = res.waypoints?.toMutableList() ?: mutableListOf()
                 currentOrderedWaypointIndex = 0
                 renderWaypoints.clear()
                 ChatUtils.chat("Loaded ordered waypoints!")
             } else {
-                ChatUtils.chat("There was an error parsing waypoints! ${res.message}")
+                ChatUtils.chat("There was an error parsing waypoints. Please make sure they are Coleweight formatted waypoints.")
                 return@launch
             }
 
