@@ -176,7 +176,7 @@ object SkyHanniTypeAdapters {
             object : TypeAdapter<T>() {
                 override fun write(out: JsonWriter, value: T) = write(out, value)
                 override fun read(reader: JsonReader) = read(reader)
-            }.nullSafe()
+            }.nullSafe(),
         )
         return this
     }
