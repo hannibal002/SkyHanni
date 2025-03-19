@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class OrderedWaypointConfig {
+class OrderedWaypointsConfig {
     @Expose
     @ConfigOption(name = "Current Color", desc = "Color of the current ordered point.")
     @ConfigEditorColour
@@ -24,12 +24,12 @@ class OrderedWaypointConfig {
     var nextWaypointColor: String = "0:153:255:255:88"
 
     @Expose
-    @ConfigOption(name = "Waypoint Range", desc = "Range for ordered waypoints.")
+    @ConfigOption(name = "Waypoint Range", desc = "How close you have to be for it to go to the next waypoint.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 0.1f)
     var waypointRange: Float = 3f
 
     @Expose
-    @ConfigOption(name = "Enable trace line", desc = "Enable the trace line.")
+    @ConfigOption(name = "Enable trace line", desc = "Enables the trace line.")
     @ConfigEditorBoolean
     @FeatureToggle
     var traceLine: Boolean = true
@@ -45,10 +45,10 @@ class OrderedWaypointConfig {
     var traceLineThickness: Float = 1.0f
 
     @Expose
-    @ConfigOption(name = "Show Text", desc = "Whether the distance and name for ordered waypoints should be shown.")
+    @ConfigOption(name = "Show Text", desc = "Whether the distance for ordered waypoints should be shown.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var showText: Boolean = true
+    var showDistance: Boolean = true
 
     @Expose
     @ConfigOption(name = "Setup mode", desc = "Setup mode for route clearing.")
@@ -62,7 +62,7 @@ class OrderedWaypointConfig {
     var setupModeLineThickness: Float = 1.0f
 
     @Expose
-    @ConfigOption(name = "Show All Waypoints", desc = "Shows all waypoints. May cause lag")
+    @ConfigOption(name = "Show All Waypoints", desc = "Whether all waypoints should be displayed. May cause lag")
     @ConfigEditorBoolean
     @FeatureToggle
     var showAll: Boolean = false

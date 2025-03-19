@@ -2,18 +2,15 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
-import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import java.awt.Color
 
 @JvmInline
 value class SoopyWaypointList(
-    @Expose val waypoints: List<SoopyWaypoint>,
-) {
+    @Expose val waypoints: MutableList<SoopyWaypoint> = mutableListOf(),
+) : MutableList<SoopyWaypoint> by waypoints {
 
     companion object {
         val gson = ConfigManager.gson

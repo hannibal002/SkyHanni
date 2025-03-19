@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig;
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig;
-import at.hannibal2.skyhanni.config.features.mining.orderedwaypoints.OrderedWaypointConfig;
+import at.hannibal2.skyhanni.config.features.mining.orderedwaypoints.OrderedWaypointsConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -57,9 +57,9 @@ public class MiningConfig {
     public CrystalNucleusTrackerConfig crystalNucleusTracker = new CrystalNucleusTrackerConfig();
 
     @Expose
-    @ConfigOption(name = "Ordered Waypoints", desc = "")
+    @ConfigOption(name = "Ordered Waypoints", desc = "Settings for ordered waypoints (credit to Ninjune and Soopy).")
     @Accordion
-    public OrderedWaypointConfig orderedWaypoints = new OrderedWaypointConfig();
+    public OrderedWaypointsConfig orderedWaypoints = new OrderedWaypointsConfig();
 
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
