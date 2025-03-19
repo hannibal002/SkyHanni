@@ -164,7 +164,6 @@ object ShowMotesNpcSellPrice {
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
         addString("§7Total price: §b$total")
         val name = config.inventoryValue.formatType.get().toString()
-        addString("§7Price format: §c$name")
         addRenderableButton<NumberFormatEntry>(
             label = "Format",
             current = config.inventoryValue.formatType.get(),
