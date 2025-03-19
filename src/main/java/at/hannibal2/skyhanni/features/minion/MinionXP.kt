@@ -21,8 +21,8 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.block.BlockChest
-import net.minecraft.client.Minecraft
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import java.util.EnumMap
@@ -139,7 +139,7 @@ object MinionXP {
 
         return positionsToCheck.any { position ->
             val pos = (minionPosition + position).toBlockPos()
-            val block = Minecraft.getMinecraft().theWorld.getBlockState(pos).block
+            val block = MinecraftCompat.localWorld.getBlockState(pos).block
             block is BlockChest
         }
     }
