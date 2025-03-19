@@ -47,9 +47,7 @@ object NavigationUtils {
         }
         println("improvedTSP took $tspRouteTime ms.")
 
-        val criticalOptTime = measureTimeMillis {
-            optimizeCriticalSegments(tspRoute, distanceMap)
-        }
+        optimizeCriticalSegments(tspRoute, distanceMap)
         // println("optimizeCriticalSegments took $criticalOptTime ms.")
 
         // Re-run TSP with an optimized (intra- and inter-cluster) distance map.
@@ -58,11 +56,7 @@ object NavigationUtils {
 
         // Apply 3‑opt for further refinement.
         tspRoute = threeOpt(tspRoute, optimizedDistanceMap, maxIterations)
-
-        val currentPosition: LorenzVec
-        val currentPositionTime = measureTimeMillis {
-            currentPosition = LocationUtils.playerLocation()
-        }
+        val currentPosition = LocationUtils.playerLocation()
         // println("LocationUtils.playerLocation took $currentPositionTime ms.")
 
         val adjustedRoute = adjustRouteForCurrentLocation(tspRoute, currentPosition)

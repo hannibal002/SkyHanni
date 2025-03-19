@@ -65,11 +65,11 @@ object FastFairySoulsPathfinder {
     )
 
     /**
-     * REGEX-TEST: §d§lSOUL! §fYou found a §r§dFairy Soul§r§f!
+     * REGEX-TEST: §7Fairy Souls: §e11§7/§d11
      */
     private val loreSoulPattern by patternGroup.pattern(
         "new",
-        "§7Fairy Souls: §e(?<have>.*)§7/§d(?<total>.*)",
+        "§7Fairy Souls: §e(?<have>.*)§7\\/§d(?<total>.*)",
     )
 
     class Data(
@@ -191,9 +191,7 @@ object FastFairySoulsPathfinder {
 
 
             if (LorenzUtils.skyBlockIsland == island) {
-                data?.apply {
-                    checkHaveAll(have)
-                }
+                data?.checkHaveAll(have)
             } else {
                 totalFound[island] = have
                 ChatUtils.chat("set ${island.name} to $have")
