@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
 
@@ -80,7 +81,7 @@ object MinisterInCalendar {
             addAll(suffix)
         }
 
-        return item.setLore(ministerLore).setStackDisplayName(ministerDisplayName)
+        return item.setLore(ministerLore).setCustomItemName(ministerDisplayName)
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.ministerInCalendar

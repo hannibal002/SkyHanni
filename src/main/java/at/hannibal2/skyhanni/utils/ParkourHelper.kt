@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.outlineTopFace
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
-    val locations: List<LorenzVec>,
+    private val locations: List<LorenzVec>,
     private val shortCuts: List<ParkourShortCut>,
     val platformSize: Double = 1.0,
     val detectionRange: Double = 1.0,
@@ -36,6 +36,8 @@ class ParkourHelper(
     var showEverything = false
 
     fun inParkour() = current != -1
+
+    fun getStartLocation(): LorenzVec = locations.first()
 
     fun reset() {
         current = -1
@@ -58,7 +60,7 @@ class ParkourHelper(
 
                 if (visible) {
                     for ((index, location) in locations.withIndex()) {
-                        val onGround = Minecraft.getMinecraft().thePlayer.onGround
+                        val onGround = MinecraftCompat.localPlayer.onGround
                         val closeEnough = location.offsetCenter().distanceToPlayer() < detectionRange
                         if (!(closeEnough && onGround)) continue
                         if (goInOrder && (index < current - 1 || index > current + 1)) continue

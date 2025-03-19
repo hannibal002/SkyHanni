@@ -3,13 +3,12 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
+import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.clickSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -35,9 +34,9 @@ object CustomWardrobeKeybinds {
         if (handlePress()) event.cancel()
     }
 
-    @SubscribeEvent
-    fun onMouse(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (handlePress()) event.isCanceled = true
+    @HandleEvent
+    fun onMouseInput(event: GuiMouseInputEvent) {
+        if (handlePress()) event.cancel()
     }
 
     private fun handlePress(): Boolean {

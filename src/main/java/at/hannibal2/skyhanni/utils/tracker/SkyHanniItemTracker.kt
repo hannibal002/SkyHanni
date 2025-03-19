@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -43,7 +43,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         addItem(SKYBLOCK_COIN, amount, command)
     }
 
-    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
         modify {
             it.addItem(internalName, amount, command)
         }
@@ -54,7 +54,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
 
         if (command) {
             TrackerManager.commandEditTrackerSuccess = true
-            val displayName = internalName.itemName
+            val displayName = internalName.repoItemName
             if (amount > 0) {
                 ChatUtils.chat("Manually added to $name: §r$displayName §7(${amount}x§7)")
             } else {
@@ -62,7 +62,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
             return
         }
-        handlePossibleRareDrop(internalName, amount)
+        handlePossibleRareDrop(internalName, amount, message)
     }
 
     private fun NeuInternalName.getCleanName(
@@ -70,7 +70,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
     ): String {
         val item = items[this] ?: error("Item not found for $this")
-        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.itemName
+        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.repoItemName
     }
 
     open fun drawItems(
@@ -194,7 +194,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         newDrop: Boolean,
         internalName: NeuInternalName,
     ) = buildList {
-        add(internalName.itemName)
+        add(internalName.repoItemName)
         add("")
         addAll(loreFormat)
         add("")
