@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -45,12 +46,12 @@ object JacobContestTimeNeeded {
             testCrop(crop, sorted, map)
         }
 
-        display = buildList<Renderable> {
+        display = buildList {
             addString("§e§lTime Needed for ${currentBracket.displayName} §eMedal!")
 
             addRenderableButton<ContestBracket>(
-                label = "§7Bracket: ",
-                getName = { type -> type.name.lowercase() },
+                label = "Bracket",
+                getName = { type -> type.name.firstLetterUppercase() },
                 current = currentBracket,
                 onChange = {
                     currentBracket = it
