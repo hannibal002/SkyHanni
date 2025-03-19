@@ -7,11 +7,16 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import kotlin.system.measureTimeMillis
+import kotlin.time.Duration.Companion.milliseconds
 
 object NavigationUtils {
 
     fun getRoute(input: List<GraphNode>, maxIterations: Int = 50, neighborhoodSize: Int = 6): List<LorenzVec> {
-        val output = calculateTravelingSalesman(input, maxIterations, neighborhoodSize)
+        val output: List<LorenzVec>
+        val duration = measureTimeMillis {
+            output = calculateTravelingSalesman(input, maxIterations, neighborhoodSize)
+        }
+        println("total took: ${duration.milliseconds}")
 
         if (input.size != output.size) {
             ErrorManager.skyHanniError(
@@ -25,15 +30,12 @@ object NavigationUtils {
         return output
     }
 
-    // This is no actual traveling salesman, this is a approximation
-//         val maxIterations = 50 // Cap on total iterations.
-//         val neighborhoodSize = 6 // Limit candidate j-range for each i.
     private fun calculateTravelingSalesman(
         targetNodes: List<GraphNode>,
         maxIterations: Int,
         neighborhoodSize: Int,
     ): List<LorenzVec> {
-        var distanceMap: Map<GraphNode, Map<GraphNode, Double>>
+        val distanceMap: Map<GraphNode, Map<GraphNode, Double>>
         val distanceMapTime = measureTimeMillis {
             distanceMap = computeDistanceMap(targetNodes)
         }
@@ -48,19 +50,23 @@ object NavigationUtils {
         val criticalOptTime = measureTimeMillis {
             optimizeCriticalSegments(tspRoute, distanceMap)
         }
-//         println("optimizeCriticalSegments took $criticalOptTime ms.")
+        // println("optimizeCriticalSegments took $criticalOptTime ms.")
 
-        var currentPosition: LorenzVec
+        // Re-run TSP with an optimized (intra- and inter-cluster) distance map.
+        val optimizedDistanceMap = computeDistanceMapOptimized(tspRoute)
+        tspRoute = improvedTSP(optimizedDistanceMap, maxIterations, neighborhoodSize)
+
+        // Apply 3‑opt for further refinement.
+        tspRoute = threeOpt(tspRoute, optimizedDistanceMap, maxIterations)
+
+        val currentPosition: LorenzVec
         val currentPositionTime = measureTimeMillis {
             currentPosition = LocationUtils.playerLocation()
         }
-//         println("LocationUtils.playerLocation took $currentPositionTime ms.")
+        // println("LocationUtils.playerLocation took $currentPositionTime ms.")
 
-        var adjustedRoute: List<GraphNode>
-        val adjustRouteTime = measureTimeMillis {
-            adjustedRoute = adjustRouteForCurrentLocation(tspRoute, currentPosition)
-        }
-//         println("adjustRouteForCurrentLocation took $adjustRouteTime ms.")
+        val adjustedRoute = adjustRouteForCurrentLocation(tspRoute, currentPosition)
+        // println("adjustRouteForCurrentLocation took ${measureTimeMillis { }} ms.")
 
         return adjustedRoute.map { it.position }
     }
@@ -78,44 +84,101 @@ object NavigationUtils {
         return distanceMap
     }
 
-    // Improved TSP using Greedy initialization + 2-opt optimization
     private fun improvedTSP(
         distanceMap: Map<GraphNode, Map<GraphNode, Double>>,
         maxIterations: Int,
         neighborhoodSize: Int,
     ): MutableList<GraphNode> {
-        // Step 1: Get initial route from the simple greedy algorithm.
         val route = greedyTSP(distanceMap).toMutableList()
-
-        // Step 2: Apply 2-opt improvement with limits.
-        var improved = true
         var iteration = 0
-//         val maxIterations = 50 // Cap on total iterations.
-//         val neighborhoodSize = 6 // Limit candidate j-range for each i.
+        var improved = true
 
         while (improved && iteration < maxIterations) {
             improved = false
-            // Fix the starting node; begin at index 1.
             for (i in 1 until route.size - 1) {
-                // Limit j to a smaller neighborhood.
                 val jMax = (i + neighborhoodSize).coerceAtMost(route.size)
                 for (j in i + 1 until jMax) {
-                    val costCurrent = distanceMap.getValue(route[i - 1]).getValue(route[i]) +
-                        distanceMap.getValue(route[j - 1]).getValue(route[j])
-                    val costNew = distanceMap.getValue(route[i - 1]).getValue(route[j]) +
-                        distanceMap.getValue(route[j - 1]).getValue(route[i])
+                    val costCurrent = (distanceMap[route[i - 1]]?.get(route[i]) ?: Double.POSITIVE_INFINITY) +
+                        (distanceMap[route[j - 1]]?.get(route[j]) ?: Double.POSITIVE_INFINITY)
+                    val costNew = (distanceMap[route[i - 1]]?.get(route[j]) ?: Double.POSITIVE_INFINITY) +
+                        (distanceMap[route[j - 1]]?.get(route[i]) ?: Double.POSITIVE_INFINITY)
                     if (costNew < costCurrent) {
                         route.subList(i, j).reverse()
                         improved = true
+                        break // break inner loop on improvement
                     }
                 }
+                if (improved) break // restart iteration after a change
             }
             iteration++
         }
         return route
     }
 
-    // Step 2: Fast Greedy TSP Algorithm (~1ms for 50 nodes)
+    // Updated to compute both intra- and inter-cluster distances.
+    private fun computeDistanceMapOptimized(targetNodes: List<GraphNode>): Map<GraphNode, Map<GraphNode, Double>> {
+        val clusters = computeClusters(targetNodes)
+        val result = mutableMapOf<GraphNode, MutableMap<GraphNode, Double>>()
+
+        // Compute intra-cluster distances.
+        clusters.forEach { cluster ->
+            cluster.parallelStream().forEach { node ->
+                val dijkstraTree = GraphUtils.findAllShortestDistances(node)
+                result[node] = cluster.associateWith { target ->
+                    dijkstraTree.distances[target] ?: Double.POSITIVE_INFINITY
+                }.toMutableMap()
+            }
+        }
+
+        // Compute inter-cluster distances.
+        for (i in clusters.indices) {
+            for (j in i + 1 until clusters.size) {
+                val clusterA = clusters[i]
+                val clusterB = clusters[j]
+                for (nodeA in clusterA) {
+                    val dijkstraTreeA = GraphUtils.findAllShortestDistances(nodeA)
+                    for (nodeB in clusterB) {
+                        val distance = dijkstraTreeA.distances[nodeB] ?: Double.POSITIVE_INFINITY
+                        result[nodeA]?.put(nodeB, distance)
+                    }
+                }
+                for (nodeB in clusterB) {
+                    val dijkstraTreeB = GraphUtils.findAllShortestDistances(nodeB)
+                    for (nodeA in clusterA) {
+                        val distance = dijkstraTreeB.distances[nodeA] ?: Double.POSITIVE_INFINITY
+                        result[nodeB]?.put(nodeA, distance)
+                    }
+                }
+            }
+        }
+        return result
+    }
+
+    private fun computeClusters(targetNodes: List<GraphNode>): List<List<GraphNode>> {
+        val clusters = mutableListOf<MutableList<GraphNode>>()
+        val visited = mutableSetOf<GraphNode>()
+
+        fun dfs(node: GraphNode, cluster: MutableList<GraphNode>) {
+            visited.add(node)
+            cluster.add(node)
+            for (neighbor in node.neighbours) {
+                // Ensure neighbor.key equals one of the target nodes.
+                if (targetNodes.contains(neighbor.key) && !visited.contains(neighbor.key)) {
+                    dfs(neighbor.key, cluster)
+                }
+            }
+        }
+
+        for (node in targetNodes) {
+            if (!visited.contains(node)) {
+                val cluster = mutableListOf<GraphNode>()
+                dfs(node, cluster)
+                clusters.add(cluster)
+            }
+        }
+        return clusters
+    }
+
     private fun greedyTSP(distanceMap: Map<GraphNode, Map<GraphNode, Double>>): List<GraphNode> {
         val startNode = distanceMap.keys.first()
         val route = mutableListOf(startNode)
@@ -126,17 +189,15 @@ object NavigationUtils {
             var nextNode: GraphNode? = null
             var bestDistance = Double.POSITIVE_INFINITY
 
-            // Try to pick the nearest unvisited neighbor from the current node.
             distanceMap[current]?.forEach { (candidate, distance) ->
-                if (candidate !in visited && distance < bestDistance) {
+                if (!visited.contains(candidate) && distance < bestDistance) {
                     bestDistance = distance
                     nextNode = candidate
                 }
             }
 
-            // If none was found, search among all unvisited nodes.
             if (nextNode == null) {
-                for (candidate in distanceMap.keys.filter { it !in visited }) {
+                for (candidate in distanceMap.keys.filter { !visited.contains(it) }) {
                     val candidateMinDistance =
                         visited.mapNotNull { distanceMap[it]?.get(candidate) }.minOrNull() ?: Double.POSITIVE_INFINITY
                     if (candidateMinDistance < bestDistance) {
@@ -146,28 +207,20 @@ object NavigationUtils {
                 }
             }
 
-            // Use a temporary variable for safe smart cast.
-            val chosen = nextNode
-            if (chosen != null) {
-                route.add(chosen)
-                visited.add(chosen)
-                current = chosen
-            } else {
-                break
-            }
+            nextNode?.let {
+                route.add(it)
+                visited.add(it)
+                current = it
+            } ?: break
         }
         return route
     }
 
-    // Given: a TSP route (a list of target GraphNodes forming a cycle)
-// and a current location (as a LorenzVec), plus a helper to compute distance.
     private fun adjustRouteForCurrentLocation(
         route: List<GraphNode>,
         currentLocation: LorenzVec,
     ): List<GraphNode> {
-        // Find the closest node in the route by comparing the squared distances.
         val closestNode = route.minByOrNull { it.position.distanceSq(currentLocation) } ?: route.first()
-        // Rotate the route so that the closest node comes first.
         val idx = route.indexOf(closestNode)
         return route.drop(idx) + route.take(idx)
     }
@@ -176,46 +229,32 @@ object NavigationUtils {
         route: MutableList<GraphNode>,
         distanceMap: Map<GraphNode, Map<GraphNode, Double>>,
     ) {
-        if (route.size < 2) {
-            return
-        }
+        if (route.size < 2) return
 
-        // Calculate cost for each edge (including the closing edge of the cycle)
-        val edgeCosts = mutableListOf<Pair<Int, Double>>() // Pair: index and cost
+        val edgeCosts = mutableListOf<Pair<Int, Double>>()
         for (i in 0 until route.size - 1) {
-            val cost = distanceMap.getValue(route[i]).getValue(route[i + 1])
+            val cost = distanceMap[route[i]]?.get(route[i + 1]) ?: Double.POSITIVE_INFINITY
             edgeCosts.add(Pair(i, cost))
         }
-        val cycleCost = distanceMap.getValue(route.last()).getValue(route.first())
+        val cycleCost = distanceMap[route.last()]?.get(route.first()) ?: Double.POSITIVE_INFINITY
         edgeCosts.add(Pair(route.size - 1, cycleCost))
 
-        // Compute average cost and set a threshold (e.g., 20% above average)
         val averageCost = edgeCosts.map { it.second }.average()
         val threshold = 1.2 * averageCost
 
-        // Identify critical edges
         val criticalEdges = edgeCosts.filter { it.second > threshold }
         if (criticalEdges.isNotEmpty()) {
-            // Sort critical segments in descending order of cost
             val sortedCritical = criticalEdges.sortedByDescending { it.second }
             for ((index, _) in sortedCritical) {
-                // Process only if this is not the last edge in the list
-                if (index < route.size - 1) {
-                    // Use a conditional block to check if swapping could improve the segment
-                    if (index > 0) {
-                        // Try swapping a segment starting at index+1 with various subsequent segments
-                        for (j in index + 2 until route.size) {
-                            if (j - index >= 2) {
-                                val costBefore = distanceMap.getValue(route[index]).getValue(route[index + 1]) +
-                                    distanceMap.getValue(route[j - 1]).getValue(route[j])
-                                val costAfter = distanceMap.getValue(route[index]).getValue(route[j - 1]) +
-                                    distanceMap.getValue(route[index + 1]).getValue(route[j])
-                                // Conditional block: if the swap improves cost, then reverse the sublist
-                                if (costAfter < costBefore) {
-                                    if (true) { // Conditional bracket added for clarity
-                                        route.subList(index + 1, j).reverse()
-                                    }
-                                }
+                if (index < route.size - 1 && index > 0) {
+                    for (j in index + 2 until route.size) {
+                        if (j - index >= 2) {
+                            val costBefore = (distanceMap[route[index]]?.get(route[index + 1]) ?: Double.POSITIVE_INFINITY) +
+                                (distanceMap[route[j - 1]]?.get(route[j]) ?: Double.POSITIVE_INFINITY)
+                            val costAfter = (distanceMap[route[index]]?.get(route[j - 1]) ?: Double.POSITIVE_INFINITY) +
+                                (distanceMap[route[index + 1]]?.get(route[j]) ?: Double.POSITIVE_INFINITY)
+                            if (costAfter < costBefore) {
+                                route.subList(index + 1, j).reverse()
                             }
                         }
                     }
@@ -224,4 +263,47 @@ object NavigationUtils {
         }
     }
 
+    private fun threeOpt(
+        route: MutableList<GraphNode>,
+        distanceMap: Map<GraphNode, Map<GraphNode, Double>>,
+        maxIterations: Int = 50,
+    ): MutableList<GraphNode> {
+        var improved = true
+        var iteration = 0
+        val n = route.size
+        while (improved && iteration < maxIterations) {
+            improved = false
+            for (i in 0 until n - 2) {
+                for (j in i + 1 until n - 1) {
+                    for (k in j + 1 until n) {
+                        val a = route[i]
+                        val b = route[i + 1]
+                        val c = route[j]
+                        val d = route[j + 1]
+                        val e = route[k]
+                        val f = route[(k + 1) % n]
+
+                        val costAB = distanceMap[a]?.get(b) ?: Double.POSITIVE_INFINITY
+                        val costCD = distanceMap[c]?.get(d) ?: Double.POSITIVE_INFINITY
+                        val costEF = distanceMap[e]?.get(f) ?: Double.POSITIVE_INFINITY
+                        val currentCost = costAB + costCD + costEF
+
+                        // One reconnection: reverse segments (i+1..j) and (j+1..k)
+                        val costAC = distanceMap[a]?.get(c) ?: Double.POSITIVE_INFINITY
+                        val costBE = distanceMap[b]?.get(e) ?: Double.POSITIVE_INFINITY
+                        val costDF = distanceMap[d]?.get(f) ?: Double.POSITIVE_INFINITY
+                        val newCost = costAC + costBE + costDF
+
+                        if (newCost < currentCost) {
+                            route.subList(i + 1, j + 1).reverse()
+                            route.subList(j + 1, k + 1).reverse()
+                            improved = true
+                        }
+                    }
+                }
+            }
+            iteration++
+        }
+        return route
+    }
 }
