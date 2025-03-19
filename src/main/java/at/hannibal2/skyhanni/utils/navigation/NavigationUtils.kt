@@ -6,17 +6,11 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import kotlin.system.measureTimeMillis
-import kotlin.time.Duration.Companion.milliseconds
 
 object NavigationUtils {
 
     fun getRoute(input: List<GraphNode>, maxIterations: Int = 50, neighborhoodSize: Int = 6): List<LorenzVec> {
-        val output: List<LorenzVec>
-        val duration = measureTimeMillis {
-            output = calculateTravelingSalesman(input, maxIterations, neighborhoodSize)
-        }
-        println("total took: ${duration.milliseconds}")
+        val output = calculateTravelingSalesman(input, maxIterations, neighborhoodSize)
 
         if (input.size != output.size) {
             ErrorManager.skyHanniError(
@@ -35,20 +29,10 @@ object NavigationUtils {
         maxIterations: Int,
         neighborhoodSize: Int,
     ): List<LorenzVec> {
-        val distanceMap: Map<GraphNode, Map<GraphNode, Double>>
-        val distanceMapTime = measureTimeMillis {
-            distanceMap = computeDistanceMap(targetNodes)
-        }
-        println("computeDistanceMap took $distanceMapTime ms.")
-
-        var tspRoute: MutableList<GraphNode>
-        val tspRouteTime = measureTimeMillis {
-            tspRoute = improvedTSP(distanceMap, maxIterations, neighborhoodSize)
-        }
-        println("improvedTSP took $tspRouteTime ms.")
+        val distanceMap = computeDistanceMap(targetNodes)
+        var tspRoute = improvedTSP(distanceMap, maxIterations, neighborhoodSize)
 
         optimizeCriticalSegments(tspRoute, distanceMap)
-        // println("optimizeCriticalSegments took $criticalOptTime ms.")
 
         // Re-run TSP with an optimized (intra- and inter-cluster) distance map.
         val optimizedDistanceMap = computeDistanceMapOptimized(tspRoute)
@@ -57,10 +41,8 @@ object NavigationUtils {
         // Apply 3‑opt for further refinement.
         tspRoute = threeOpt(tspRoute, optimizedDistanceMap, maxIterations)
         val currentPosition = LocationUtils.playerLocation()
-        // println("LocationUtils.playerLocation took $currentPositionTime ms.")
 
         val adjustedRoute = adjustRouteForCurrentLocation(tspRoute, currentPosition)
-        // println("adjustRouteForCurrentLocation took ${measureTimeMillis { }} ms.")
 
         return adjustedRoute.map { it.position }
     }
