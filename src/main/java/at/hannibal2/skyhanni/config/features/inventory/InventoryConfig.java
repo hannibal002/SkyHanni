@@ -150,6 +150,11 @@ public class InventoryConfig {
     public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
+    @ConfigOption(name = "Time Pocket Items", desc = "Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck)")
+    @Accordion
+    public timePocketItemsConfig timePocketItems = new timePocketItemsConfig();
+
+    @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
@@ -174,7 +179,7 @@ public class InventoryConfig {
         LARVA_HOOK("§bLarva Hook", 12),
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
-        TIME_POCKET_ITEMS("§bTime Pocket Items (Jyrre, Truffle, Discrite)", 15),
+        TIME_POCKET_ITEMS("§bTime Pocket Items (Jyrre, Truffle, Discrite, Moby Duck)", 15),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
@@ -287,18 +292,6 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shiftClickBrewing = false;
-
-    @Expose
-    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite) in the lore.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean timeHeldInLore = false;
-
-    @Expose
-    @ConfigOption(name = "Time Left in Lore", desc = "Show time left until maxed for Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite) in the lore.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean timeLeftInLore = false;
 
     @Expose
     @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
