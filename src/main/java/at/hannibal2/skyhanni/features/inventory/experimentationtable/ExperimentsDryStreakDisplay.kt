@@ -51,7 +51,7 @@ object ExperimentsDryStreakDisplay {
     fun onTableTaskCompleted(event: TableTaskCompletedEvent) {
         val storage = storage ?: return
         storage.xpSince += (event.enchantingXpGained ?: 0L)
-        if (event.type == ExperimentTaskType.SUPERPAIRS) {
+        if (event.type == ExperimentationTaskType.SUPERPAIRS) {
             storage.attemptsSince++
         }
     }

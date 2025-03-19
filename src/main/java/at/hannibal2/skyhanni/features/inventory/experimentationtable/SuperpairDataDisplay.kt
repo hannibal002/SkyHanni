@@ -239,7 +239,7 @@ object SuperpairDataDisplay {
         }
     }
 
-    private fun calculatePossiblePairs(currentExperiment: ExperimentTier) =
+    private fun calculatePossiblePairs(currentExperiment: ExperimentationTableApi.ExperimentationTier) =
         ((currentExperiment.gridSize - 2) / 2) - found.filter { it.key != FoundType.POWERUP }.values.sumOf { it.size }
 
     private fun convertToReward(item: ItemStack) = if (item.displayName.removeColor() == "Enchanted Book") item.getLore()[2].removeColor()
@@ -273,7 +273,7 @@ object SuperpairDataDisplay {
         return if (lastIndex != -1) list.size - 1 - lastIndex else -1
     }
 
-    private fun isOutOfBounds(slot: Int, experiment: ExperimentTier): Boolean = slot !in experiment.slotRange
+    private fun isOutOfBounds(slot: Int, experiment: ExperimentationTableApi.ExperimentationTier): Boolean = slot !in experiment.slotRange
 
     private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this.damage == other.damage
 }

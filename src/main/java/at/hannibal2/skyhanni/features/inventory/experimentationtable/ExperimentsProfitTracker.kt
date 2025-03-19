@@ -109,7 +109,7 @@ object ExperimentsProfitTracker {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTableTaskCompleted(event: TableTaskCompletedEvent) {
         tracker.modify {
-            if (event.type == ExperimentTaskType.SUPERPAIRS) {
+            if (event.type == ExperimentationTaskType.SUPERPAIRS) {
                 it.experimentsDone++
             }
             it.xpGained += event.enchantingXpGained ?: 0L

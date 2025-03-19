@@ -52,9 +52,68 @@ object ExperimentationTableApi {
     private var lastProcessedExperimentOverHash: Int = 0
     private val currentData = ExperimentationDataSet()
 
+    enum class ExperimentationMessages(private val displayName: String) {
+        DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
+        EXPERIENCE("§8 +§3141k Experience §8(§7Experience Drops§8)"),
+        ENCHANTMENTS("§8 +§9Smite VII §8(§7Enchantment Drops§8)"),
+        BOTTLES("§8 +§9Titanic Experience Bottle §8(§7Bottle Drops§8)"),
+        MISC("§8 +§5Metaphysical Serum §8(§7Misc Drops§8)");
+
+        override fun toString() = displayName
+    }
+
+    enum class ExperimentationTaskType(private val displayName: String) {
+        CHRONOMATRON("Chronomatron"),
+        ULTRASEQUENCER("Ultrasequencer"),
+        SUPERPAIRS("Superpairs"),
+        ;
+
+        override fun toString() = displayName
+
+        companion object {
+            fun fromStringOrNull(string: String) = entries.firstOrNull {
+                it.displayName.equals(string, ignoreCase = true) ||
+                    it.name.equals(string, ignoreCase = true)
+            }
+        }
+    }
+
+    enum class ExperimentationTier(
+        private val displayName: String,
+        overInclusiveSlotRange: IntRange, // Filtered 'later' to remove side spaces
+        private val sideSpace: Int = 1,
+    ) {
+        NONE("", 0..0, sideSpace = 0),
+        BEGINNER("Beginner", 18..35),
+        HIGH("High", 10..43, sideSpace = 2),
+        GRAND("Grand", 10..43, sideSpace = 2),
+        SUPREME("Supreme", 9..44),
+        TRANSCENDENT("Transcendent", 9..44),
+        METAPHYSICAL("Metaphysical", 9..44),
+        ;
+
+        val slotRange = overInclusiveSlotRange.filter {
+            (it % 9) !in when (sideSpace) {
+                1 -> listOf(0, 8)
+                2 -> listOf(0, 1, 7, 8)
+                else -> emptyList()
+            }
+        }
+
+        val gridSize: Int = slotRange.size
+
+        override fun toString() = displayName
+
+        companion object {
+            fun byNameOrNone(name: String): ExperimentationTier = entries.firstOrNull {
+                it.displayName.equals(name, ignoreCase = true)
+            } ?: NONE
+        }
+    }
+
     data class ExperimentationDataSet(
-        var type: ExperimentTaskType? = null,
-        var tier: ExperimentTier? = null,
+        var type: ExperimentationTaskType? = null,
+        var tier: ExperimentationTier? = null,
         var enchantingXpGained: Long? = null,
         var rareFoundFired: Boolean = false,
     ) : ResettableStorageSet() {
@@ -79,7 +138,7 @@ object ExperimentationTableApi {
     val superpairInventory = InventoryDetector(
         openInventory = { name ->
             currentData.tier = superpairsPattern.matchMatcher(name) {
-                ExperimentTier.byNameOrNone(group("experiment"))
+                ExperimentationTier.byNameOrNone(group("experiment"))
             }
         },
     ) { name -> inventoriesPattern.matches(name) }
@@ -257,11 +316,11 @@ object ExperimentationTableApi {
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
     }
 
-    private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
+    private fun ExperimentationMessages.isSelected() = config.hideMessages.contains(this)
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent) {
-        if (claimMessagePattern.matches(event.message) && ExperimentMessages.DONE.isSelected()) {
+        if (claimMessagePattern.matches(event.message) && ExperimentationMessages.DONE.isSelected()) {
             event.blockedReason = "CLAIM_MESSAGE"
             return
         }
@@ -273,10 +332,10 @@ object ExperimentationTableApi {
 
     private fun SkyHanniChatEvent.tryBlockChat(reward: String) {
         blockedReason = when {
-            enchantingExpPattern.matches(reward) && ExperimentMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
-            experienceBottleChatPattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
-            listOf("Metaphysical Serum", "Experiment The Fish").contains(reward) && ExperimentMessages.MISC.isSelected() -> "MISC_DROP"
-            ExperimentMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
+            enchantingExpPattern.matches(reward) && ExperimentationMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
+            experienceBottleChatPattern.matches(reward) && ExperimentationMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
+            listOf("Metaphysical Serum", "Experiment The Fish").contains(reward) && ExperimentationMessages.MISC.isSelected() -> "MISC_DROP"
+            ExperimentationMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
             else -> ""
         }
 
@@ -362,7 +421,7 @@ object ExperimentationTableApi {
     private fun InventoryUpdatedEvent.processExperimentOver() {
         val item = getExperimentOverItem() ?: return
         val lore = item.getLore().takeIfNotEmpty()?.toList() ?: return
-        val taskType = ExperimentTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
+        val taskType = ExperimentationTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
         // If this doesn't match the current stored task type, something has gone horribly wrong
         if (taskType != currentData.type && currentData.type != null) {
             ErrorManager.skyHanniError(
@@ -371,8 +430,8 @@ object ExperimentationTableApi {
             )
         }
         val stake = experimentOverStakesLorePattern.firstMatcher(lore) {
-            ExperimentTier.byNameOrNone(group("stakes")).takeIf {
-                it != ExperimentTier.NONE
+            ExperimentationTier.byNameOrNone(group("stakes")).takeIf {
+                it != ExperimentationTier.NONE
             }
         } ?: return
 
@@ -394,7 +453,7 @@ object ExperimentationTableApi {
             enchantingXpGained = enchantingXp
         }
 
-        if (taskType == ExperimentTaskType.SUPERPAIRS) return
+        if (taskType == ExperimentationTaskType.SUPERPAIRS) return
 
         createTaskCompleteEventOrNull()?.post()
     }

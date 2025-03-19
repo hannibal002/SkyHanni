@@ -5,20 +5,25 @@ import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.memberProperties
 
 open class ResettableStorageSet {
-    open fun reset() {
-        val default = this::class.createInstance()
-        // For every *mutable* property (var), set its value on `this` to the value from `default`.
+    @Suppress("UNCHECKED_CAST")
+    private val mutableMemberProperties: List<KMutableProperty1<Any?, Any?>> =
         this::class.memberProperties
             .filterIsInstance<KMutableProperty1<Any, Any?>>()
-            .forEach { prop ->
-                // Prop is declared as KMutableProperty1<Any, Any?>, but we know `this` is the same type at runtime.
-                @Suppress("UNCHECKED_CAST")
-                try {
-                    (prop as KMutableProperty1<Any?, Any?>).set(this, prop.get(default))
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    ErrorManager.skyHanniError("Failed to reset property ${prop.name} in ${this::class.simpleName}")
-                }
+            .map { it as KMutableProperty1<Any?, Any?> }
+
+    open fun reset() = applyFromOther(this::class.createInstance())
+
+    open fun applyFromOther(other: ResettableStorageSet) {
+        if (this::class != other::class) return
+        mutableMemberProperties.forEach { prop ->
+            try {
+                prop.set(this, prop.get(other))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ErrorManager.skyHanniError(
+                    "Failed to apply property ${prop.name} from ${other::class.simpleName} to ${this::class.simpleName}"
+                )
             }
+        }
     }
 }
