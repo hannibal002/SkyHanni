@@ -181,15 +181,21 @@ public class MiscConfig {
     public boolean crashOnDeath = false;
 
     @Expose
-    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\nExcept in Catacombs & Rift.\nBest used with the option below.")
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\n" +
+        "Except in Catacombs & Rift.\nBest used with the option below.")
     @SearchTag("skyblockxp")
+    @SearchTag("level")
+    @SearchTag("skyblock level")
+    @SearchTag("skyblocklevel")
+    @SearchTag("skyblock lvl")
     @ConfigEditorBoolean
     @FeatureToggle
     // TODO rename to skyblockXPBar
     public boolean skyblockXpBar = false;
 
     @Expose
-    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventories that would use your XP.")
+    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventory lore that would use your XP.\n" +
+        "E.g. when hovering over the anvil combine button.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean xpInInventory = true;
