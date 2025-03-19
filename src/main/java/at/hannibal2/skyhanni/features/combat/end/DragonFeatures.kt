@@ -30,7 +30,7 @@ object DragonFeatures {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
     private val leechBool get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
-    private val configProtector get() = SkyHanniMod.feature.combat.endstoneProtectorChat
+    private val configProtector get() = SkyHanniMod.feature.combat.endIsland.endstoneProtectorChat
 
     private val dragonNames = DragonType.entries
         .filter { it != DragonType.UNKNOWN }

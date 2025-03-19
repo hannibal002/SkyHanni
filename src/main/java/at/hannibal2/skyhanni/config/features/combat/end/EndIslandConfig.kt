@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.combat.end
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.misc.DraconicSacrificeTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class EndIslandConfig {
@@ -20,4 +22,10 @@ class EndIslandConfig {
     @ConfigOption(name = "Dragon Features", desc = "")
     @Accordion
     var dragon: DragonConfig = DragonConfig()
+
+    @Expose
+    @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after it died.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var endstoneProtectorChat: Boolean = true
 }
