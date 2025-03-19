@@ -9,6 +9,26 @@
 + Added Hotspot Radar Guesser. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3551)
     + Added a waypoint of the Fishing Hotspot when using the Hotspot Radar.
 
+#### Combat
+
++ Added Dragon/Protector Weight displays. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/844)
+    + Shows your current Dragon/Protector weight on the HUD during fights in the End.
++ Added Superior Notification. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/844)
+    + Notifies via title when a Superior Dragon spawns in the End.
+
+#### Crimson
+
++ Added Rescue Mission Waypoints. - NetheriteMiner + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1928)
+    + Shows paths to the Agent, Recruiter, or Hostage during Crimson Isle rescue missions.
+
+#### The Rift
+
++ Added Timite Helpers for the Rift. - nopo (https://github.com/hannibal002/SkyHanni/pull/3102)
+    + Displays countdown until Timite evolves with the Time Gun.
+    + Displays countdown until Timite/Obsolite expires.
++ Added Timite Tracker for the Rift. - nopo (https://github.com/hannibal002/SkyHanni/pull/3102)
+    + Shows collected ores, time gained from mining, profit for raw ores, and Highlite profit.
+
 ### Improvements
 
 #### Garden
@@ -18,6 +38,16 @@
 #### Mining
 
 + Added Outline Mode to the Nucleus Barriers Highlighter. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3530)
+
+#### Fishing
+
++ Added pathfinding to Hotspots. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3599)
+    + Displays pathfinding to fishing hotspots when Hotspot Radar Guesser detects them.
+
+#### The Rift
+
++ Added Temporal Pillar Dodge. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3541)
+    + Tweaked pathfinding in the Rift to avoid scary Endermen.
 
 #### Misc
 
@@ -40,6 +70,10 @@
 + Fixed Sulphur Skitter Box not displaying without lava nearby. - Luna (https://github.com/hannibal002/SkyHanni/pull/3523)
     + The Player must be within 4 blocks, not the bobber, for the box to display.
 
+#### Mining
+
++ Fixed Corpse Tracker not displaying profit titles. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3451)
+
 #### Events
 
 + Fixed incorrect Hitman times when eggs were claimable. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3573)
@@ -48,10 +82,16 @@
 
 + Fixed SkyBlock Level not displaying in `/show` messages with Custom Chat Formatting enabled. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3519)
 
+#### Inventory
+
++ Fixed Superpairs XP overlay not working. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3591)
+
 #### Misc
 
 + Fixed missing Rod Part category. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3544)
 + Fixed wrong skull fallback texture spamming logs. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3576)
++ Fixed Custom Scoreboard Number Display Format incorrectly formatting tunings. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3601)
++ Fixed incorrect text rendering when hovering over GUIs. - hannibal2 + Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3585)
 
 ### Technical Details
 
@@ -105,6 +145,21 @@
     + One file for loader-specific operations and one for original logic.
 + Used TextHelper.asComponent() for chat components. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3563)
     + This fixes issues on modern versions.
++ Added `BlockUtils.nearbyBlocks()`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3596)
++ Added a detekt rule for MinecraftCompat. - CalMWolfs & j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3597)
++ Added debug data to BitsAPI. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3527)
++ Added miscellaneous functionalities. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3603)
++ Added task to validate the Gradle wrapper. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3605)
++ Added title sorting for same-tick title display, sorted by profit. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3451)
++ Added two InventoryCompat methods and preprocessing to ItemResolutionQuery and ItemUtils. - nopo (https://github.com/hannibal002/SkyHanni/pull/3588)
++ ArachneSpawnTimer now works directly with the particle event rather than the packet event. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3595)
++ Changed processing of chat and action bars. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3595)
+    + Now returns replacement and cancellation info for chat components.
++ Created and used MinecraftCompat. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3590)
+    + Provides null-safe player and world access on modern versions.
++ Migrated several features to use Renderables. - appable0 (https://github.com/hannibal002/SkyHanni/pull/3069)
++ Ported `hoppity` config to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3571)
++ Updated to Loom 1.9 and Gradle 8.13. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3604)
 
 ## Version 2.0.0
 

@@ -17,7 +17,7 @@ import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
-    val locations: List<LorenzVec>,
+    private val locations: List<LorenzVec>,
     private val shortCuts: List<ParkourShortCut>,
     val platformSize: Double = 1.0,
     val detectionRange: Double = 1.0,
@@ -36,6 +36,8 @@ class ParkourHelper(
     var showEverything = false
 
     fun inParkour() = current != -1
+
+    fun getStartLocation(): LorenzVec = locations.first()
 
     fun reset() {
         current = -1
