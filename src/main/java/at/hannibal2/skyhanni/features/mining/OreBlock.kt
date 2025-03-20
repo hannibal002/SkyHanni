@@ -202,17 +202,17 @@ private fun isHardstoneTunnels(state: IBlockState): Boolean =
     //#if MC < 1.16
     (state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.STONE) ||
         (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.SILVER)
-    //#else
-    //$$ state.block == Blocks.INFESTED_STONE || state.block == Blocks.LIGHT_GRAY_WOOL
-    //#endif
+//#else
+//$$ state.block == Blocks.INFESTED_STONE || state.block == Blocks.LIGHT_GRAY_WOOL
+//#endif
 
 private fun isHardstoneMineshaft(state: IBlockState): Boolean =
     //#if MC < 1.16
     (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) ||
         (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.SILVER)
-    //#else
-    //$$ state.block == Blocks.STONE || state.block == Blocks.LIGHT_GRAY_WOOL
-    //#endif
+//#else
+//$$ state.block == Blocks.STONE || state.block == Blocks.LIGHT_GRAY_WOOL
+//#endif
 
 private fun isRedSand(state: IBlockState): Boolean =
     //#if MC < 1.16
