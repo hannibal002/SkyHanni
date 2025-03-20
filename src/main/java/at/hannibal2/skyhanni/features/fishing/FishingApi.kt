@@ -23,8 +23,11 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
+import at.hannibal2.skyhanni.utils.compat.addLavas
+import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
@@ -44,8 +47,8 @@ object FishingApi {
         "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
-    val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
-    private val waterBlocks = listOf(Blocks.water, Blocks.flowing_water)
+    val lavaBlocks = mutableListOf<Block>().addLavas()
+    private val waterBlocks = mutableListOf<Block>().addWaters()
 
     var lastCastTime = SimpleTimeMark.farPast()
     var holdingRod = false

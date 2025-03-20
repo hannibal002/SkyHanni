@@ -67,3 +67,17 @@ fun MutableList<Block>.addRedstoneOres() {
     this.add(Blocks.lit_redstone_ore)
     //#endif
 }
+
+fun MutableList<Block>.addWaters() {
+    this.add(Blocks.water)
+    //#if MC < 1.16
+    this.add(Blocks.flowing_water)
+    //#endif
+}
+
+fun MutableList<Block>.addLavas() {
+    this.add(Blocks.lava)
+    //#if MC < 1.16
+    this.add(Blocks.flowing_lava)
+    //#endif
+}

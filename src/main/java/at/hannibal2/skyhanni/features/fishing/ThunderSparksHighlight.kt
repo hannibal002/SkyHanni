@@ -18,7 +18,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 
@@ -48,8 +50,10 @@ object ThunderSparksHighlight {
             if (spark.isDead) continue
             val sparkLocation = spark.getLorenzVec()
             val block = sparkLocation.getBlockAt()
+            val lavas = mutableListOf<Block>()
+            lavas.addLavas()
             val seeThroughBlocks =
-                sparkLocation.distanceToPlayer() < 6 && (block == Blocks.flowing_lava || block == Blocks.lava)
+                sparkLocation.distanceToPlayer() < 6 && (block in lavas)
             event.drawWaypointFilled(
                 sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks,
             )
