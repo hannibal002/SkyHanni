@@ -276,7 +276,7 @@ class ShoppingListItem(
 
     fun removeItem() {
         if (topLevelItem != null) return
-        topLevelCategory.remove(internalName)
+        topLevelCategory.remove(this)
         ShoppingList.update()
     }
 
