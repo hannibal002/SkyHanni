@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.TitleManager
@@ -50,9 +51,9 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GraphEditor {
 
-    val config get() = SkyHanniMod.feature.dev.devTool.graph
+    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
-    fun isEnabled() = config != null && config.enabled
+    fun isEnabled(): Boolean = config.enabled
 
     private var id = 0
 
@@ -371,17 +372,27 @@ object GraphEditor {
         }
     }
 
+    private var bypassTempRemoveTimer = SimpleTimeMark.farPast()
+
     private fun loadThisIsland() {
         val graph = IslandGraphs.currentIslandGraph
         if (graph == null) {
             ChatUtils.userError("This island does not have graph data!")
             return
         }
-        if (!config.enabled) {
-            config.enabled = true
-            ChatUtils.chat("Graph Editor is now active.")
-        }
 
+        IslandGraphs.disabledNodesReason?.let {
+            if (bypassTempRemoveTimer.isInPast()) {
+                IslandGraphs.enableAllNodes()
+                ChatUtils.chat("Reset temp remove!")
+            } else {
+                ChatUtils.chat("§cParts of the island graph are currently temp removed: $it")
+                ChatUtils.chat("Run this command again in the next 5 seconds to remove the temp remove logic and copy the current island!")
+                bypassTempRemoveTimer = 5.seconds.fromNow()
+                return
+            }
+        }
+        enable()
         import(graph)
         ChatUtils.chat("Graph Editor loaded this island!")
     }
@@ -696,7 +707,7 @@ object GraphEditor {
             edges.add(edge)
         } else false
 
-    private fun compileGraph(): Graph {
+    fun compileGraph(): Graph {
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
         val nodes = nodes.mapIndexed { index, node ->
             GraphNode(
@@ -806,6 +817,13 @@ object GraphEditor {
     fun distanceToPlayer(location: LorenzVec): Double {
         val playerPosition = ghostPosition ?: LocationUtils.playerLocation()
         return location.distanceSq(playerPosition)
+    }
+
+    fun enable() {
+        if (!config.enabled) {
+            config.enabled = true
+            ChatUtils.chat("Graph Editor is now active.")
+        }
     }
 }
 
