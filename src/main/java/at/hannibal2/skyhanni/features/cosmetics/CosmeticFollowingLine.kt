@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.client.Minecraft
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -43,11 +43,7 @@ object CosmeticFollowingLine {
 
         updateClose(event)
 
-        //#if MC < 1.16
-        val firstPerson = Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
-        //#else
-        //$$ val firstPerson = Minecraft.getInstance().options.cameraType.isFirstPerson
-        //#endif
+        val firstPerson = PlayerUtils.isFirstPersonView()
         val color = config.lineColor.toSpecialColor()
 
         renderClose(event, firstPerson, color)

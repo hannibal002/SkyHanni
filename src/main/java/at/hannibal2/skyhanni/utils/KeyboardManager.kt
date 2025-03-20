@@ -15,6 +15,9 @@ import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
+//#if MC > 1.21
+//$$ import net.minecraft.client.util.InputUtil
+//#endif
 
 @SkyHanniModule
 object KeyboardManager {
@@ -55,6 +58,7 @@ object KeyboardManager {
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick(event: SkyHanniTickEvent) {
+        //#if MC < 1.16
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
         if (isConfigScreen) return
@@ -86,6 +90,9 @@ object KeyboardManager {
         if (Keyboard.getEventKey() == 0) {
             postEvent(Keyboard.getEventCharacter().code + 256)
         }
+        //#else
+        //$$ // todo use fabric event or whatnot
+        //#endif
     }
 
     private fun postEvent(keyCode: Int) {
@@ -99,6 +106,7 @@ object KeyboardManager {
     }
 
     fun KeyBinding.isActive(): Boolean {
+        //#if MC < 1.16
         if (!Keyboard.isCreated()) return false
         try {
             if (keyCode.isKeyHeld()) return true
@@ -110,10 +118,12 @@ object KeyboardManager {
             )
             return false
         }
+        //#endif
         return this.isKeyDown || this.isPressed
     }
 
     fun Int.isKeyHeld(): Boolean = when {
+        //#if MC < 1.16
         this == 0 -> false
         this < 0 -> MouseCompat.isButtonDown(this + 100)
         this >= Keyboard.KEYBOARD_SIZE -> {
@@ -122,6 +132,10 @@ object KeyboardManager {
         }
 
         else -> Keyboard.isKeyDown(this)
+        //#else
+        //$$ this == -1 || this == 0 -> false
+        //$$ else -> InputUtil.isKeyPressed(MinecraftClient.getInstance().window.handle, this)
+        //#endif
     }
 
     private val pressedKeys = mutableMapOf<Int, Boolean>()
