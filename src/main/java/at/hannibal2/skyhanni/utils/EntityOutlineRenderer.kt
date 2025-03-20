@@ -291,7 +291,7 @@ object EntityOutlineRenderer {
         if (entity === mc.renderViewEntity &&
             !(
                 mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
-                    mc.gameSettings.thirdPersonView != 0
+                    !PlayerUtils.isFirstPersonView()
                 )
         ) {
             false
