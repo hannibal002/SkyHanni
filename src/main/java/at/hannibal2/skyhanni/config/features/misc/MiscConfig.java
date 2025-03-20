@@ -183,11 +183,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\n" +
         "Except in Catacombs & Rift.\nBest used with the option below.")
-    @SearchTag("skyblockxp")
-    @SearchTag("level")
-    @SearchTag("skyblock level")
-    @SearchTag("skyblocklevel")
-    @SearchTag("skyblock lvl")
+    @SearchTag("skyblockxp skyblocklevel level lvl")
     @ConfigEditorBoolean
     @FeatureToggle
     // TODO rename to skyblockXPBar
