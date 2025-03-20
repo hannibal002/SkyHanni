@@ -41,7 +41,6 @@ class SimpleStringTypeAdapter<T>(
                         enumValueOf(this.replace(" ", "_").uppercase())
                     } catch (e: IllegalArgumentException) {
                         enumReplacementMap[defaultValue] = this
-                        println("setting enumReplacementMap[$defaultValue] = $this")
                         defaultValue
                     }
                 },
