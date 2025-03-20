@@ -217,9 +217,9 @@ private fun isHardstoneMineshaft(state: IBlockState): Boolean =
 private fun isRedSand(state: IBlockState): Boolean =
     //#if MC < 1.16
     (state.block == Blocks.sand && state.getValue(BlockSand.VARIANT) == BlockSand.EnumType.RED_SAND)
-    //#else
-    //$$ state.block == Blocks.RED_SAND
-    //#endif
+//#else
+//$$ state.block == Blocks.RED_SAND
+//#endif
 
 private fun isLowTierUmber(state: IBlockState): Boolean =
     state.block == Blocks.hardened_clay
@@ -227,23 +227,23 @@ private fun isLowTierUmber(state: IBlockState): Boolean =
 private fun isMidTierUmber(state: IBlockState): Boolean =
     //#if MC < 1.16
     (state.block == Blocks.stained_hardened_clay && state.getValue(BlockColored.COLOR) == EnumDyeColor.BROWN)
-    //#else
-    //$$ state.block == Blocks.BROWN_TERRACOTTA
-    //#endif
+//#else
+//$$ state.block == Blocks.BROWN_TERRACOTTA
+//#endif
 
 private fun isHighTierUmber(state: IBlockState): Boolean =
     //#if MC < 1.16
     (state.block == Blocks.double_stone_slab2 && state.getValue(BlockStoneSlabNew.VARIANT) == BlockStoneSlabNew.EnumType.RED_SANDSTONE)
-    //#else
-    //$$ state.block == Blocks.RED_SANDSTONE_SLAB
-    //#endif
+//#else
+//$$ state.block == Blocks.RED_SANDSTONE_SLAB
+//#endif
 
 private fun isLowTierTungstenTunnels(state: IBlockState): Boolean =
     //#if MC < 1.16
     state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.COBBLESTONE
-    //#else
-    //$$ state.block == Blocks.INFESTED_COBBLESTONE
-    //#endif
+//#else
+//$$ state.block == Blocks.INFESTED_COBBLESTONE
+//#endif
 
 private fun isLowTierTungstenMineshaft(state: IBlockState): Boolean = when (state.block) {
     //#if MC < 1.16

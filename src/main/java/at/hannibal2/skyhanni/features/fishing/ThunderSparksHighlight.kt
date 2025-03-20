@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.init.Blocks
 
 @SkyHanniModule
 object ThunderSparksHighlight {

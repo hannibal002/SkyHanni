@@ -42,7 +42,6 @@ object ItemTipHelper {
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return
-        val chest = gui.inventorySlots as ContainerChest
         val inventoryName = InventoryUtils.openInventoryName()
 
         val guiLeft = (gui as AccessorGuiContainer).guiLeft
