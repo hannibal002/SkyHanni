@@ -66,7 +66,7 @@ object FishingApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityFishHook>) {
         if (!holdingRod) return
-        if (!event.entity.angler.isLocalPlayer) return
+        if (event.entity.angler?.isLocalPlayer == false) return
 
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
