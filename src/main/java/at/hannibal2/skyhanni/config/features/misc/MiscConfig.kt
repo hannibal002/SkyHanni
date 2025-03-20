@@ -20,6 +20,7 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class MiscConfig {
+
     @Expose
     @Category(name = "Pets", desc = "Pets Settings")
     var pets: PetConfig = PetConfig()
