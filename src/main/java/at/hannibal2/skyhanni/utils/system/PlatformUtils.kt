@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils.system
 
+import net.minecraftforge.fml.common.ModContainer
+//#if MC < 1.16
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.utils.DelayedRun
-import net.minecraftforge.fml.common.ModContainer
 import kotlin.time.Duration.Companion.INFINITE
-//#if MC < 1.16
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.Loader
@@ -65,6 +65,7 @@ object PlatformUtils {
 
     @JvmStatic
     fun checkIfNeuIsLoaded() {
+        //#if MC < 1.16
         try {
             Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates")
         } catch (e: Throwable) {
@@ -92,6 +93,7 @@ object PlatformUtils {
             "§cPlease update NotEnoughUpdates",
         )
         DelayedRun.runNextTick { NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true)) }
+        //#endif
     }
 
 }
