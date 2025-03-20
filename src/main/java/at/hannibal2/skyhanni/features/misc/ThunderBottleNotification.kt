@@ -25,7 +25,7 @@ object ThunderBottleNotification {
     private val STORM_IN_A_BOTTLE = "STORM_IN_A_BOTTLE".toInternalName()
     private val HURRICANE_IN_A_BOTTLE = "HURRICANE_IN_A_BOTTLE".toInternalName()
 
-    private val bottles = listOf(THUNDER_IN_A_BOTTLE, STORM_IN_A_BOTTLE, HURRICANE_IN_A_BOTTLE)
+    private val bottles = setOf(THUNDER_IN_A_BOTTLE, STORM_IN_A_BOTTLE, HURRICANE_IN_A_BOTTLE)
 
     private var lastChecked = SimpleTimeMark.farPast()
 
@@ -33,12 +33,14 @@ object ThunderBottleNotification {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (lastChecked.passedSince() < 10.seconds) return
+
         lastChecked = SimpleTimeMark.now()
         if (!isFishing) return
         val bottlesInInventory = bottles.filter { InventoryUtils.isItemInInventory(it) }
             .map { it.itemNameWithoutColor }
         if (bottlesInInventory.isEmpty()) return
         val size = bottlesInInventory.size
+
         ChatUtils.clickableChat(
             "You are currently fishing, but " +
                 "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(size, "is", "are")} full. " +
