@@ -45,7 +45,7 @@ class OrderedWaypointsConfig {
     var traceLineThickness: Float = 1.0f
 
     @Expose
-    @ConfigOption(name = "Show Text", desc = "Whether the distance for ordered waypoints should be shown.")
+    @ConfigOption(name = "Show Distance", desc = "Whether the distance for ordered waypoints should be shown.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showDistance: Boolean = true

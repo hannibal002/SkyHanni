@@ -88,7 +88,7 @@ object OrderedWaypoints {
                 alpha
             )
 
-            val name = if (config.showAll || (i < 3 && config.setupMode)) {
+            val name = if (config.showAll || i < 3) {
                 orderedWaypointsList[renderWaypoints[i]].options["name"]
             } else {
                 ""
