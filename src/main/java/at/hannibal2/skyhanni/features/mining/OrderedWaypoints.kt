@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.mining
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -10,6 +9,7 @@ import at.hannibal2.skyhanni.data.model.SoopyWaypoint
 import at.hannibal2.skyhanni.data.model.SoopyWaypointList
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
@@ -35,7 +35,7 @@ object OrderedWaypoints {
     private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
 
     private var orderedWaypointsList = SoopyWaypointList()
-    private var renderWaypoints: MutableList<Int> = mutableListOf()
+    private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0
     private var lastCloser = 0
     private var enabled = true
@@ -244,7 +244,7 @@ object OrderedWaypoints {
 
     private fun load(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            val res = if (args.isEmpty()) WaypointLoader.getWaypoints(ClipboardUtils.readFromClipboard() ?: "")
+            val res = if (args.isEmpty()) WaypointLoader.getWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
             else {
                 ProfileStorageData.playerSpecific?.routes?.get(args[0])?.let {
                     WaypointLoader.getWaypoints(it.toJson(), "soopy")
@@ -395,7 +395,9 @@ object OrderedWaypoints {
         }
         val waypoints = SoopyWaypointList(orderedWaypointsList)
 
-        ProfileStorageData.playerSpecific?.routes!![args[0]] = waypoints
+        ProfileStorageData.playerSpecific?.routes?.let {
+            it[args[0]] = waypoints
+        }
 
         ChatUtils.chat("Route saved as ${args[0]}. Do /shorderedimport ${args[0]} to import it.")
     }
