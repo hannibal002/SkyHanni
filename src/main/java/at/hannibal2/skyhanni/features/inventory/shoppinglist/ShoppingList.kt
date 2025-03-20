@@ -35,7 +35,7 @@ object ShoppingList {
     val config get() = SkyHanniMod.feature.inventory.shoppingList
 
     private val categories: MutableList<ShoppingListCategory> = mutableListOf()
-    private var items: ShoppingListCategory = ShoppingListCategory("Items")
+    private val items: ShoppingListCategory = ShoppingListCategory("Items")
 
     // TODO soon: somehow also make it searchable?
     private var display: List<Renderable> = listOf()
