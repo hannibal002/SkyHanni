@@ -153,7 +153,7 @@ object HoppityEggLocator {
             if (lastPoint.distanceSq(event.location) > 4) return
         }
 
-        if (EntityUtils.getEntitiesNearby<EntityFishHook>(event.location, 1.0).any()) {
+        if (EntityUtils.getEntitiesNearby<EntityFishHook>(event.location, 0.3).any()) {
             return
         }
 
