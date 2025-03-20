@@ -9,7 +9,14 @@ import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.*
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
+import io.github.notenoughupdates.moulconfig.annotations.Category
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class MiscConfig {
@@ -187,7 +194,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "XP in Inventory",
-        desc = "Show your current XP in inventory lore that would use your XP.\nE.g. when hovering over the anvil combine button."
+        desc = "Show your current XP in inventory lore that would use your XP.\nE.g. when hovering over the anvil combine button.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -258,7 +265,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Frog Mask Display",
-        desc = "Displays information about the active §2Frog Mask§7 region. §eRequires a Frog Mask in inventory."
+        desc = "Displays information about the active §2Frog Mask§7 region. §eRequires a Frog Mask in inventory.",
     )
     @ConfigEditorDropdown
     var frogMaskDisplay: FrogMaskCondition = FrogMaskCondition.DISABLED
@@ -432,7 +439,7 @@ class MiscConfig {
     @ConfigOption(
         name = "Computer Time Offset Warning",
         desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" +
-                "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly.",
+            "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
