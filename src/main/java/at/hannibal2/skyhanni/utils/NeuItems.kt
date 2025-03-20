@@ -236,7 +236,6 @@ object NeuItems {
         return false
     }
 
-    // Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
         val jsonObject = EnoughUpdatesManager.stackToJson(item)
         if (!jsonObject.has("internalname")) {
