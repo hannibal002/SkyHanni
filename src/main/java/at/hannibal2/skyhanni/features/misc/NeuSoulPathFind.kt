@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.BlockPos
 import java.util.TreeMap
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -46,6 +48,8 @@ object NeuSoulPathFind {
         currentIndex = 0
     }
 
+    private var lastFastReminder = SimpleTimeMark.farPast()
+
     @JvmStatic
     fun updateList(allSouls: List<BlockPos>, missingSouls: TreeMap<Double, BlockPos>) {
         val graph = IslandGraphs.currentIslandGraph ?: return
@@ -53,6 +57,8 @@ object NeuSoulPathFind {
         if (!config.neuSoulsPathFind) return
         // we dont need neu souls if fast souls is enabled
         if (config.fastFairySouls) return
+
+        remindFast()
 
         val missingLocally = mutableMapOf<LorenzVec, GraphNode>()
         var foundLocally = 0
@@ -95,6 +101,19 @@ object NeuSoulPathFind {
             LorenzColor.DARK_PURPLE.toColor(),
             condition = { config.neuSoulsPathFind && lastRender.passedSince() < 300.milliseconds },
         )
+    }
+
+    private fun remindFast() {
+        if (lastFastReminder.passedSince() > 1.hours) {
+            lastFastReminder = SimpleTimeMark.now()
+            ChatUtils.clickableChat(
+                "SkyHanni has a even faster fairy soul pathfinding logic. click here to enable it.",
+                onClick = {
+                    config.neuSoulsPathFind = false
+                    config.fastFairySouls = true
+                },
+            )
+        }
     }
 
     // TODO write villager hub feature later, fix duplicate andrew
