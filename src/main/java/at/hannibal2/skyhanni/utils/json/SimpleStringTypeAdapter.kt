@@ -22,21 +22,19 @@ class SimpleStringTypeAdapter<T>(
 
         inline fun <reified T : Enum<T>> forEnum(): SimpleStringTypeAdapter<T> {
             return SimpleStringTypeAdapter(
-                { name },
-                { enumValueOf(this.replace(" ", "_").uppercase()) },
+                serializer = { name },
+                deserializer = { enumValueOf(this.replace(" ", "_").uppercase()) },
             )
         }
 
         inline fun <reified T : Enum<T>> forEnum(defaultValue: T): SimpleStringTypeAdapter<T> {
             return SimpleStringTypeAdapter(
-                {
+                serializer = {
                     if (this == defaultValue) {
                         enumReplacementMap[defaultValue] ?: name
-                    } else {
-                        name
-                    }
+                    } else name
                 },
-                {
+                deserializer = {
                     try {
                         enumValueOf(this.replace(" ", "_").uppercase())
                     } catch (e: IllegalArgumentException) {
