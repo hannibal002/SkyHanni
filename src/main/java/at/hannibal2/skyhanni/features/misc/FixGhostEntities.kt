@@ -62,7 +62,7 @@ object FixGhostEntities {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
-        if (!config.hideTemporaryArmorstands) return
+        if (!config.hideTemporaryArmorStands) return
         with(event.entity) {
             if (ticksExisted < 10 && isDefaultValue() && getWholeInventory().all { it == null }) event.cancel()
         }

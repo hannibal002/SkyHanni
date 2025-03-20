@@ -153,7 +153,6 @@ class MiscConfig {
     @FeatureToggle
     var hideExpBottles: Boolean = false
 
-    // TODO rename to hideTemporaryArmorStands
     @Expose
     @ConfigOption(
         name = "Armor Stands",
@@ -161,7 +160,7 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideTemporaryArmorstands: Boolean = true
+    var hideTemporaryArmorStands: Boolean = true
 
     @Expose
     var collectionCounterPos: Position = Position(10, 10, false, true)
@@ -180,7 +179,6 @@ class MiscConfig {
     @ConfigEditorBoolean
     var crashOnDeath: Boolean = false
 
-    // TODO rename to skyblockXPBar
     @Expose
     @ConfigOption(
         name = "SkyBlock XP Bar",
@@ -189,7 +187,7 @@ class MiscConfig {
     @SearchTag("skyblockxp skyblocklevel level lvl")
     @ConfigEditorBoolean
     @FeatureToggle
-    var skyblockXpBar: Boolean = false
+    var skyblockXPBar: Boolean = false
 
     @Expose
     @ConfigOption(
