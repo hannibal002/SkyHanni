@@ -95,4 +95,15 @@ public class FishingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactDoubleHook = true;
+
+    @Expose
+    @ConfigOption(name = "Hotspot Radar Guesser", desc = "Shows where the closest Fishing Hotspot is when using the §9Hotspot Radar§7.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean guessHotspotRadar = true;
+
+    @Expose
+    @ConfigOption(name = "Pathfind to Hotspots", desc = "When the Hotspot Radar Guesser feature finds a target, shows a pathfind to that Fishing Hotspot.")
+    @ConfigEditorBoolean
+    public boolean guessHotspotRadarPathFind = true;
 }

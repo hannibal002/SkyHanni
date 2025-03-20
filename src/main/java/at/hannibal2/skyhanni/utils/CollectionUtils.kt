@@ -337,13 +337,21 @@ object CollectionUtils {
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
         highlight: Boolean = false,
-        scale: Double = NeuItems.itemFontSize,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it
             itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
         }
         add(Renderable.itemStack(itemStack, scale = scale))
+    }
+
+    fun MutableList<Renderable>.addHorizontalSpacer(width: Int = 3) {
+        add(Renderable.placeholder(width, 0))
+    }
+
+    fun MutableList<Renderable>.addVerticalSpacer(height: Int = 10) {
+        add(Renderable.placeholder(0, height))
     }
 
     fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {

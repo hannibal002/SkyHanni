@@ -47,7 +47,7 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderOverlayPre(event: RenderGameOverlayEvent.Pre) {
-        if (GameOverlayRenderPreEvent(event.type, event.resolution).post()) {
+        if (GameOverlayRenderPreEvent(event.type).post()) {
             event.isCanceled = true
         }
     }

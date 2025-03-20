@@ -85,9 +85,7 @@ object CorpseTracker {
         for ((itemName, amount) in event.loot) {
             if (itemName.removeColor().trim() == "Glacite Powder") continue
             NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
-                tracker.modify {
-                    it.addItem(event.corpseType, item, amount)
-                }
+                tracker.addItem(event.corpseType, item, amount, message = false)
             }
         }
     }
