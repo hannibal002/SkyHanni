@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.entity.EntityOtherPlayerMP
 
 @SkyHanniModule
@@ -117,7 +117,7 @@ object MarkedPlayerManager {
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        if (Minecraft.getMinecraft().thePlayer == null) return
+        if (!MinecraftCompat.localPlayerExists) return
 
         markedPlayers.clear()
         if (config.markOwnName.get()) {

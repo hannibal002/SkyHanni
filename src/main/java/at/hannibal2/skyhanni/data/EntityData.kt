@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
@@ -27,6 +26,7 @@ object EntityData {
     private val maxHealthMap = mutableMapOf<Int, Int>()
     private val nametagCache = TimeLimitedCache<Entity, ChatComponentText>(50.milliseconds)
     private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
+    private val lastVisibilityCheck = TimeLimitedCache<Entity, Pair<SimpleTimeMark, Boolean>>(500.milliseconds)
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -72,16 +72,6 @@ object EntityData {
         val event = EntityHealthDisplayEvent(text)
         event.post()
         event.text
-    }
-
-    private val lastVisibilityCheck = mutableMapOf<Entity, Pair<SimpleTimeMark, Boolean>>()
-
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        val now = SimpleTimeMark.now()
-        lastVisibilityCheck.entries.removeIf { entry ->
-            now - entry.value.first > 500.milliseconds
-        }
     }
 
     @JvmStatic

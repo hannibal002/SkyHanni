@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -53,7 +52,7 @@ object UserLuckBreakdown {
     private val skillsID = Items.diamond_sword
     private const val SKILLS_NAME = "§a✴ Category: Skills"
 
-    private lateinit var jerryItem: ItemStack
+    private var jerryItem: ItemStack? = null
     private val jerryID = Items.paper
     private const val JERRY_NAME = "§a✴ Statspocalypse"
 
@@ -107,7 +106,7 @@ object UserLuckBreakdown {
 
             10 -> event.replace(skillsItem)
             11 -> event.replace(limboItem)
-            12 -> event.replace(jerryItem)
+            12 -> jerryItem?.let { event.replace(it) }
 
             in validItemSlots -> event.remove()
 
@@ -125,7 +124,7 @@ object UserLuckBreakdown {
             inMiscStats = false
             return
         }
-        val inventoryName = event.inventoryItems[4]?.name.orEmpty()
+        val inventoryName = event.inventoryItems[4]?.displayName.orEmpty()
         if (inventoryName != "§dMisc Stats") return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItems)
@@ -151,7 +150,7 @@ object UserLuckBreakdown {
         for (slot in input.keys) {
             if (slot !in validItemSlots && slot < 44) continue
             val itemStack = input[slot]
-            if (itemStack?.name == " ") {
+            if (itemStack?.displayName == " ") {
                 return slot
             }
         }

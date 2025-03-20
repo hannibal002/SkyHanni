@@ -31,11 +31,20 @@ object FairySoulPathFind {
 
         val souls = mutableMapOf<LorenzVec, GraphNode>()
 
+        var skipped = 0
         for (pos in list) {
             val vec = pos.toLorenzVec()
             val node = graph.minBy { it.position.distance(vec) }
-            souls[vec] = node
+            val distance = node.position.distance(vec)
+            if (distance > 15) {
+                // we skip some souls that are too far away from the closest node, especially for dwarven mines/glacite tunnels
+                skipped++
+            } else {
+                souls[vec] = node
+            }
         }
+        // stopped bc we are done already
+        if (souls.isEmpty()) return
 
         val playerNode = graph.minBy { it.position.distanceSqToPlayer() }
 
@@ -46,8 +55,10 @@ object FairySoulPathFind {
             distances[location] = distance + lastDistance
         }
 
-        val percentage = (found.toDouble() / total) * 100
-        val label = "§b$found/$total (${percentage.roundTo(1)}%)"
+        val displayTotal = total - skipped
+
+        val percentage = (found.toDouble() / displayTotal) * 100
+        val label = "§b$found/$displayTotal (${percentage.roundTo(1)}%)"
 
         val closest = distances.minBy { it.value }.key
         IslandGraphs.pathFind(

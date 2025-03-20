@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -41,7 +42,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
-import net.minecraft.util.ChatComponentText
 import java.util.EnumMap
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -88,8 +88,10 @@ object PestProfitTracker {
 
     class BucketData : BucketedItemTrackerData<PestType>() {
         override fun resetItems() {
+            @Suppress("DEPRECATION")
             totalPestsKills = 0L
             pestKills.clear()
+            spraysUsed.clear()
         }
 
         override fun getDescription(bucket: PestType?, timesGained: Long): List<String> {
@@ -113,6 +115,7 @@ object PestProfitTracker {
 
         override fun PestType.isBucketSelectable() = this in PestType.filterableEntries
 
+        @Suppress("DEPRECATION")
         fun getTotalPestCount(): Long =
             if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
             else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
@@ -138,7 +141,6 @@ object PestProfitTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.enabled) return
         event.checkPestChats()
         event.checkSprayChats()
     }
@@ -153,13 +155,14 @@ object PestProfitTracker {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val amount = group("amount").toInt().fixAmount(internalName, pest)
 
+            if (config.hideChat) blockedReason = "pest_drop"
+            if (!config.enabled) return
+
             tracker.addItem(pest, internalName, amount)
 
             // Field Mice drop 6 separate items, but we only want to count the kill once
             if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
             else if (pest != PestType.FIELD_MOUSE) addKill(pest)
-
-            if (config.hideChat) blockedReason = "pest_drop"
         }
         pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
@@ -169,8 +172,11 @@ object PestProfitTracker {
                 if (it == 1) return@also
                 // If the amount was fixed, edit the chat message to reflect the change
                 val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
-                chatComponent = ChatComponentText(fixedString)
+                chatComponent = fixedString.asComponent()
             }
+
+            // Happens here so that the amount is fixed independently of tracker being enabled
+            if (!config.enabled) return
 
             tracker.addItem(pest, internalName, amount)
             // Pests always have guaranteed loot, therefore there's no need to add kill here
@@ -178,6 +184,7 @@ object PestProfitTracker {
     }
 
     private fun SkyHanniChatEvent.checkSprayChats() {
+        if (!config.enabled) return
         sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
             SprayType.getByNameOrNull(it)?.addSprayUsed()
         }
