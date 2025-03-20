@@ -86,7 +86,10 @@ object SkyHanniTypeAdapters {
     val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
-    val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>()
+    val ISLAND_TYPE = SimpleStringTypeAdapter(
+        { name },
+        { IslandType.getByInternalNameOrCreate(this) },
+    )
     val RARITY = SimpleStringTypeAdapter.forEnum<LorenzRarity>()
 
     val LOCALE_DATE = object : TypeAdapter<LocalDate>() {

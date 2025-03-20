@@ -2,40 +2,22 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
-import at.hannibal2.skyhanni.data.IslandType.entries
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
-enum class IslandType(private val nameFallback: String) {
-    PRIVATE_ISLAND("Private Island"),
-    PRIVATE_ISLAND_GUEST("Private Island Guest"),
-    THE_END("The End"),
-    KUUDRA_ARENA("Kuudra"),
-    CRIMSON_ISLE("Crimson Isle"),
-    DWARVEN_MINES("Dwarven Mines"),
-    DUNGEON_HUB("Dungeon Hub"),
-    CATACOMBS("Catacombs"),
+class IslandType(val internalName: String, private val nameFallback: String) {
 
-    HUB("Hub"),
-    DARK_AUCTION("Dark Auction"),
-    THE_FARMING_ISLANDS("The Farming Islands"),
-    CRYSTAL_HOLLOWS("Crystal Hollows"),
-    THE_PARK("The Park"),
-    DEEP_CAVERNS("Deep Caverns"),
-    GOLD_MINES("Gold Mine"),
-    GARDEN("Garden"),
-    GARDEN_GUEST("Garden Guest"),
-    SPIDER_DEN("Spider's Den"),
-    WINTER("Jerry's Workshop"),
-    THE_RIFT("The Rift"),
-    MINESHAFT("Mineshaft"),
-    BACKWATER_BAYOU("Backwater Bayou"),
+    // to allow enum like usage
+    val name get() = internalName
 
-    NONE(""),
-    ANY(""),
-    UNKNOWN("???"),
-    ;
+    init {
+        allIslands.add(this)
+    }
 
     fun guestVariant(): IslandType = when (this) {
         PRIVATE_ISLAND -> PRIVATE_ISLAND_GUEST
@@ -56,6 +38,40 @@ enum class IslandType(private val nameFallback: String) {
 
     @SkyHanniModule
     companion object {
+
+        val allIslands = mutableSetOf<IslandType>()
+
+        // to allow enum like usage
+        val entries get() = allIslands
+
+        val PRIVATE_ISLAND = IslandType("PRIVATE_ISLAND", "Private Island")
+        val PRIVATE_ISLAND_GUEST = IslandType("PRIVATE_ISLAND_GUEST", "Private Island Guest")
+        val THE_END = IslandType("THE_END", "The End")
+        val KUUDRA_ARENA = IslandType("KUUDRA_ARENA", "Kuudra")
+        val CRIMSON_ISLE = IslandType("CRIMSON_ISLE", "Crimson Isle")
+        val DWARVEN_MINES = IslandType("DWARVEN_MINES", "Dwarven Mines")
+        val DUNGEON_HUB = IslandType("DUNGEON_HUB", "Dungeon Hub")
+        val CATACOMBS = IslandType("CATACOMBS", "Catacombs")
+
+        val HUB = IslandType("HUB", "Hub")
+        val DARK_AUCTION = IslandType("DARK_AUCTION", "Dark Auction")
+        val THE_FARMING_ISLANDS = IslandType("THE_FARMING_ISLANDS", "The Farming Islands")
+        val CRYSTAL_HOLLOWS = IslandType("CRYSTAL_HOLLOWS", "Crystal Hollows")
+        val THE_PARK = IslandType("THE_PARK", "The Park")
+        val DEEP_CAVERNS = IslandType("DEEP_CAVERNS", "Deep Caverns")
+        val GOLD_MINES = IslandType("GOLD_MINES", "Gold Mine")
+        val GARDEN = IslandType("GARDEN", "Garden")
+        val GARDEN_GUEST = IslandType("GARDEN_GUEST", "Garden Guest")
+        val SPIDER_DEN = IslandType("SPIDER_DEN", "Spider's Den")
+        val WINTER = IslandType("WINTER", "Jerry's Workshop")
+        val THE_RIFT = IslandType("THE_RIFT", "The Rift")
+        val MINESHAFT = IslandType("MINESHAFT", "Mineshaft")
+        val BACKWATER_BAYOU = IslandType("BACKWATER_BAYOU", "Backwater Bayou")
+
+        val NONE = IslandType("NONE", "")
+        val ANY = IslandType("ANY", "")
+        val UNKNOWN = IslandType("UNKNOWN", "???")
+
         /**
          * The maximum amount of players that can be on an island.
          */
@@ -67,6 +83,11 @@ enum class IslandType(private val nameFallback: String) {
          */
         var maxPlayersMega = 80
             private set
+
+        private val islandTypeRepoCheckPattern by RepoPattern.pattern(
+            "island-type.repo-check",
+            allIslands.joinToString(separator = "|") { it.internalName },
+        )
 
         fun getByName(name: String): IslandType = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
         fun getByNameOrUnknown(name: String): IslandType = getByNameOrNull(name) ?: UNKNOWN
@@ -90,6 +111,26 @@ enum class IslandType(private val nameFallback: String) {
 
             maxPlayers = data.maxPlayers
             maxPlayersMega = data.maxPlayersMega
+        }
+
+        fun getByInternalNameOrNull(name: String): IslandType? = allIslands.firstOrNull { it.internalName == name }
+
+        // used by config type adapter to create a new island type that is not yet known
+        fun getByInternalNameOrCreate(name: String): IslandType {
+            getByInternalNameOrNull(name)?.let {
+                return it
+            }
+
+            if (islandTypeRepoCheckPattern.matches(name)) {
+                return IslandType(name, name.lowercase().allLettersFirstUppercase())
+            }
+
+            ErrorManager.logErrorStateWithData(
+                "could not read island type $name",
+                "tried to create unknown island type, using unknown instead",
+                "name" to name,
+            )
+            return UNKNOWN
         }
     }
 }
