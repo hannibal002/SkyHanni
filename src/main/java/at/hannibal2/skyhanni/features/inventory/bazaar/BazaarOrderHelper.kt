@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOrError
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -52,7 +52,7 @@ object BazaarOrderHelper {
         if (event.gui !is GuiChest) return
 
         val chest = event.container as ContainerChest
-        val inventoryName = chest.getInventoryName()
+        val inventoryName = InventoryUtils.openInventoryName()
         if (!BazaarApi.isBazaarOrderInventory(inventoryName)) return
 
         for ((slot, stack) in chest.getUpperItems()) {

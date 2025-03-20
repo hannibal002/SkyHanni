@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NEUApi
@@ -45,13 +46,13 @@ object GuiData {
     fun onGuiKeyPress(event: GuiKeyPressEvent) {
         val allowedKeys = Minecraft.getMinecraft().gameSettings.let {
             listOf(
-                Keyboard.KEY_ESCAPE,
-                it.keyBindInventory.keyCode,
-                it.keyBindScreenshot.keyCode,
-                it.keyBindFullscreen.keyCode,
+                it.keyBindInventory,
+                it.keyBindScreenshot,
+                it.keyBindFullscreen,
             )
         }
-        if (allowedKeys.any { it.isKeyHeld() }) return
+        if (allowedKeys.any { it.isActive() }) return
+        if (Keyboard.KEY_ESCAPE.isKeyHeld()) return
 
         if (CustomWardrobeKeybinds.allowKeyboardClick()) return
 

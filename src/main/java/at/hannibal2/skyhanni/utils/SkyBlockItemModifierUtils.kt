@@ -242,6 +242,12 @@ object SkyBlockItemModifierUtils {
     //$$ fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
     //#endif
 
+    //#if MC < 1.21
+    fun String.isVanillaItem() = Item.itemRegistry.getObject(ResourceLocation(this)) != null
+    //#else
+    //$$ fun String.isVanillaItem() = Registries.ITEM.get(Identifier.of(vanillaName)) != Items.AIR
+    //#endif
+
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
         for (attributes in it.keySet) {
