@@ -16,11 +16,9 @@ import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.InventoryUtils.closeInventory
 import at.hannibal2.skyhanni.utils.InventoryUtils.inAnyInventory
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
@@ -30,7 +28,6 @@ import at.hannibal2.skyhanni.utils.RecipeType
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.entity.player.InventoryPlayer
-import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -72,17 +69,6 @@ object ShoppingList {
 
     fun resetDisplayItem() {
         displayItem = null
-    }
-
-    fun createDisplayItem() {
-        if (currentlyOpenRecipe == null) return
-        if (displayItem != null && displayItem?.displayName == "§bSelect Recipe") return
-
-        val lore = mutableListOf<String>()
-        lore.add("§7Left click to add the recipe to the shopping list")
-        lore.add("§7Right click to only add the result to the shopping list")
-
-        displayItem = ItemStack(Blocks.diamond_block).setLore(lore).setStackDisplayName("§bAdd Recipe to shopping list")
     }
 
     fun isInventoryOpen() = inventoryOpen
@@ -141,10 +127,13 @@ object ShoppingList {
         clear()
 
         categories.add(ShoppingListCategory("Weapons"))
+        val weapons = "Weapons".getCategory()
+        weapons?.items?.add(ShoppingListItem(testItem1, 2.0, weapons))
+
         categories.add(ShoppingListCategory("Visitors"))
-        "Weapons".getCategory()?.add(testItem1, 2.0)
-        "Visitors".getCategory()?.add(testItem2, 49.0)
-        items.add(testItem3, 136.0)
+        val visitors = "Visitors".getCategory()
+        visitors?.items?.add(ShoppingListItem(testItem2, 49.0, visitors))
+        items.items.add(ShoppingListItem(testItem3, 136.0, items))
 
         update()
 
@@ -205,8 +194,6 @@ object ShoppingList {
 
         currentlyOpenRecipe = PrimitiveRecipe(ingredients, setOf(result ?: return), RecipeType.CRAFTING)
 
-        createDisplayItem()
-
         recheckInInventory()
         update()
     }
@@ -239,21 +226,6 @@ object ShoppingList {
                     return
                 }
             }
-        } else if (event.item.displayName == "§bAdd Recipe to shopping list") {
-            event.cancel()
-            val output = currentlyOpenRecipe.output
-
-            if (output == null) {
-                ChatUtils.chat("Invalid Recipe with no output")
-                return
-            }
-
-            if (event.clickedButton == 2) {
-                items.add(output.internalName, 1.0)
-            } else {
-                items.add(output.internalName, 1.0, recipe = currentlyOpenRecipe)
-            }
-
         }
     }
 

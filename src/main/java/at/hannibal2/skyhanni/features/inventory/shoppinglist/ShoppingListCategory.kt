@@ -1,12 +1,9 @@
 package at.hannibal2.skyhanni.features.inventory.shoppinglist
 
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.ClickTypeWithModifiers
 import net.minecraft.item.ItemStack
@@ -49,48 +46,6 @@ class ShoppingListCategory(
         return items.isEmpty()
     }
 
-    fun add(itemName: NeuInternalName, amount: Double = 1.0, recipe: PrimitiveRecipe? = null) {
-        if (!itemName.isKnownItem()) {
-            ChatUtils.userError("Item ${itemName.itemNameWithoutColor} not found")
-            return
-        }
-
-        var item = items.firstOrNull { it.internalName == itemName } as ShoppingListItem?
-
-        if (item == null) {
-            items.add(ShoppingListItem(itemName, amount, this, recipe = recipe))
-            item = items.firstOrNull { it.internalName == itemName } as ShoppingListItem?
-            if (recipe != null && item != null) {
-                item.breakDownIntoSubitems()
-            }
-
-        } else {
-            item.changeAmountBy(amount)
-            if (item.amount <= 0.0) {
-                items.remove(item)
-                item = null
-            } else if (recipe != null) {
-                item.recipe = recipe
-                item.breakDownIntoSubitems()
-            }
-        }
-    }
-
-    fun set(itemName: NeuInternalName, amount: Double) {
-        if (!itemName.isKnownItem()) {
-            ChatUtils.userError("Item ${itemName.itemNameWithoutColor} not found")
-            return
-        }
-
-        val item = items.firstOrNull { it.internalName == itemName } as ShoppingListItem?
-
-        if (item == null) {
-            items.add(ShoppingListItem(itemName, amount, this))
-        } else {
-            item.changeAmountTo(amount)
-        }
-    }
-
     fun remove(item: ShoppingListItem, amount: Double? = null) {
         if (amount == null) {
             items.remove(item)
@@ -99,21 +54,6 @@ class ShoppingListCategory(
             if (item.amount <= 0.0) {
                 items.remove(item)
             }
-        }
-    }
-
-    fun remove(itemName: NeuInternalName, amount: Double? = null) {
-        if (!itemName.isKnownItem()) {
-            ChatUtils.userError("Item ${itemName.itemNameWithoutColor} not found")
-            return
-        }
-
-        val item = items.firstOrNull { it.internalName == itemName } as ShoppingListItem?
-
-        if (item == null) {
-            ChatUtils.userError("Item ${itemName.itemNameWithoutColor} not found in category $name")
-        } else {
-            remove(item, amount)
         }
     }
 
