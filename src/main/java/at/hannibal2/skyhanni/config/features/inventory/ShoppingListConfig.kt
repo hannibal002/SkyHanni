@@ -17,14 +17,4 @@ class ShoppingListConfig {
     @Expose
     @ConfigLink(owner = ShoppingListConfig::class, field = "enabled")
     var position: Position = Position(10, 10, false, false)
-
-    @Expose
-    @ConfigOption(name = "Show the cost of each item", desc = "Show the cost of each item in the shopping list")
-    @ConfigEditorBoolean
-    var showItemCost: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Show total cost", desc = "Show the total cost of all items in the shopping list")
-    @ConfigEditorBoolean
-    var showTotalCost: Boolean = true
 }
