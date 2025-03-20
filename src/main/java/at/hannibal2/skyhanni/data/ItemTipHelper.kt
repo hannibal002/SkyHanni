@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.inventory.ContainerChest
 
 @SkyHanniModule
 object ItemTipHelper {
