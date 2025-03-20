@@ -222,6 +222,9 @@ object BitsApi {
         }
     }
 
+    /**
+     * @param bits The new amount of bits
+     */
     private fun updateBits(bits: Int, modifyAvailable: Boolean = true, cause: String) {
         ChatUtils.debug("Updating bits to $bits, cause: $cause")
         lastBitUpdates = lastBitUpdates + (cause to bits)
@@ -308,11 +311,10 @@ object BitsApi {
             if (bitsAvailable != amount) {
                 bitsAvailable = amount
                 sendBitsAvailableGainedEvent()
-
-                val difference = bits - bitsAvailable
-                if (difference > 0) {
-                    updateBits(bits + difference, false, "Bits Menu")
-                }
+                /**
+                 * We cant increase [BitsApi.bits] here since that difference is alr accounted for,
+                 * if we do, it will be counted twice
+                 */
             }
         }
         cookieDurationPattern.firstMatcher(lore) {

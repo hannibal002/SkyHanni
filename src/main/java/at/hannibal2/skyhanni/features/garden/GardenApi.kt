@@ -166,7 +166,7 @@ object GardenApi {
 
     fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
-        scale: Double = NeuItems.itemFontSize,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
         highlight: Boolean = false,
     ) {
         addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)
