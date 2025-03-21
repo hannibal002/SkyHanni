@@ -165,8 +165,20 @@ object DragonFeatures {
     private var endPlace = 0
 
     private var currentDamage = 0.0
+        set(value) {
+            if (field != value) display = null
+            field = value
+        }
     private var currentTopDamage = 0.0
+        set(value) {
+            if (field != value) display = null
+            field = value
+        }
     private var currentPlace: Int? = null
+        set(value) {
+            if (field != value) display = null
+            field = value
+        }
     private var widgetActive = false
     var egg = true
     var weight = 0.0
@@ -188,6 +200,7 @@ object DragonFeatures {
         widgetActive = false
         yourEyes = 0
         currentDragonType = null
+        display = null
     }
 
     private fun weightMap(place: Int) = when (place) {
@@ -216,6 +229,8 @@ object DragonFeatures {
         ) + 50 * (
             yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
             ) + if (zealots > 100) 100 else zealots
+
+    private fun displayIsEnabled() = config.display && dragonSpawned
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onChat(event: SkyHanniChatEvent) {
@@ -368,23 +383,22 @@ object DragonFeatures {
         ChatUtils.chat("§f                §r§eYour Weight: §r§a${weight.roundTo(0).addSeparators()}")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onScoreBoard(event: ScoreboardUpdateEvent) {
-        if (!config.display) return
-        val index = event.full.indexOfFirst { scoreDragon.matches(it) }
+        val index = event.new.indexOfFirst { scoreDragon.matches(it) }
         if (index == -1) return
         if (egg) {
             dragonSpawned = true
         }
-        scoreDamage.matchMatcher(event.full[index + 1]) {
+        scoreDamage.matchMatcher(event.new[index + 1]) {
             currentDamage = this.group("Damage").replace(",", "").toDouble()
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onTabList(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.DRAGON)) return
-        if (!(config.display && dragonSpawned)) return
+        if (!displayIsEnabled()) return
         widgetActive = true
         loop@ for (i in 1 until event.lines.size) {
             tabDamage.matchMatcher(event.lines[i]) {
@@ -406,13 +420,13 @@ object DragonFeatures {
 
     private val widgetErrorGUI = listOf(Renderable.string("§cDragon Widget is disabled!"))
 
-    @HandleEvent
+    private var display: List<Renderable>? = null
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onRender(event: GuiRenderEvent) {
-        if (!(config.display && dragonSpawned)) return
-        config.displayPosition.renderRenderables(
-            if (!widgetActive) widgetErrorGUI else display(),
-            posLabel = "Dragon Weight",
-        )
+        if (!displayIsEnabled()) return
+        val display = display ?: (if (!widgetActive) widgetErrorGUI else display()).also { display = it }
+        config.displayPosition.renderRenderables(display, posLabel = "Dragon Weight")
     }
 
     private fun display() = listOf(
