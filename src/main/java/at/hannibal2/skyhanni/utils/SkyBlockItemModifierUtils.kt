@@ -17,9 +17,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import java.util.Locale
-//#if FORGE
-import net.minecraftforge.common.util.Constants
-//#elseif MC > 1.21
+//#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
 //#endif
@@ -165,7 +163,7 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.hasKey("attributes", Constants.NBT.TAG_COMPOUND) }
+        ?.takeIf { it.hasKey("attributes", 10) }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
