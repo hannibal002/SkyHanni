@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -30,7 +29,7 @@ import kotlin.time.Duration.Companion.seconds
 object TitleManager {
 
     private val titleLocationQueues: MutableMap<TitleLocation, CollectionUtils.OrderedQueue<TitleData>> = enumMapOf()
-    private val currentTitles: MutableMap<TitleLocation, TitleData> = enumMapOf()
+    private val currentTitles: MutableMap<TitleLocation, TitleData?> = enumMapOf()
 
     private data class TitleData(
         var text: String = "",
@@ -92,6 +91,7 @@ object TitleManager {
         when (location) {
             null -> {
                 currentTitles.forEach { (_, title) ->
+                    if (title == null) return@forEach
                     if (condition(title.text)) {
                         title.endTime = SimpleTimeMark.now()
                     }
@@ -137,6 +137,7 @@ object TitleManager {
         when (location) {
             null -> {
                 currentTitles.forEach { (_, title) ->
+                    if (title == null) return@forEach
                     title.endTime = SimpleTimeMark.now()
                 }
             }
@@ -146,15 +147,20 @@ object TitleManager {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        currentTitles.forEach { (location, title) ->
-            if (title.endTime.isInFuture()) return@forEach
-            dequeueNextTitle(location)
+        TitleLocation.entries.forEach { location ->
+            when (val currentTitle = currentTitles[location]) {
+                null -> dequeueNextTitle(location)
+                else -> {
+                    if (currentTitle.endTime.isInFuture()) return@forEach
+                    dequeueNextTitle(location)
+                }
+            }
         }
     }
 
     private fun dequeueNextTitle(location: TitleLocation) {
-        val titleQueue = titleLocationQueues[location]?.takeIfNotEmpty() ?: return
-        val title = titleQueue.pollOrNull() ?: return
+        val titleQueue = titleLocationQueues[location]
+        val title = titleQueue?.pollOrNull()
         currentTitles[location] = title
     }
 
@@ -173,9 +179,15 @@ object TitleManager {
         val renderer = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.pushMatrix()
-        GlStateManager.translate((guiWidth / 2).toFloat(), (guiHeight / height).toFloat(), 3.0f)
+        GlStateManager.translate(((guiWidth / 2) - 200).toFloat(), (guiHeight / height).toFloat(), 3.0f)
         GlStateManager.scale(fontSize, fontSize, fontSize)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(display, renderer, 0f, 0f, true, 75, 0)
+        Renderable.wrappedString(
+            display.replace("§6", "§b"),
+            width = 200,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        ).render(posX = 0, posY = 0)
+        // Todo: Fix above and remove this
+        // TextRenderUtils.drawStringCenteredScaledMaxWidth(display, renderer, 0f, 0f, true, 75, 0)
         GlStateManager.popMatrix()
     }
 
