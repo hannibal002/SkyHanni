@@ -111,13 +111,18 @@ object TitleManager {
         event.register("shsendtitle") {
             description = "Display a title on the screen with the specified settings."
             category = CommandCategory.DEVELOPER_TEST
-            callback { command(it) }
+            callback { command(it, this.name) }
+        }
+        event.register("shsendinventorytitle") {
+            description = "Display a title on the inventory screen with the specified settings."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { command(it, this.name, TitleLocation.INVENTORY) }
         }
     }
 
-    private fun command(args: Array<String>) {
+    private fun command(args: Array<String>, command: String, location: TitleLocation = TitleLocation.GLOBAL) {
         if (args.size < 4) {
-            ChatUtils.userError("Usage: /shsendtitle <duration> <height> <fontSize> <text ..>")
+            ChatUtils.userError("Usage: /$command <duration> <height> <fontSize> <text ..>")
             return
         }
 
@@ -126,7 +131,7 @@ object TitleManager {
         val fontSize = args[2].toFloat()
         val title = "§6" + args.drop(3).joinToString(" ").replace("&", "§")
 
-        sendTitle(title, duration, height, fontSize)
+        sendTitle(title, duration, height, fontSize, location)
     }
 
     @HandleEvent
