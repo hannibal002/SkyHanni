@@ -16,7 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 object CurrentPing {
 
     private var lastPingRequested = SimpleTimeMark.farPast()
-    private val previousPings = mutableListOf<Long>()
+    val previousPings = mutableListOf<Long>()
     private var waitingForPacket = false
     var averagePing = Duration.ZERO
         private set
