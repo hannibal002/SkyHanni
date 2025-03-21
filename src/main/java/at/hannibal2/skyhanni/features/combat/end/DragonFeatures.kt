@@ -382,7 +382,7 @@ object DragonFeatures {
     private fun printWeight(weight: Double) {
         ChatUtils.chat(
             "§f${
-                " ".repeat(if (config.skyhanniMessageTag) 16 else 28)
+                " ".repeat(if (config.skyhanniMessageTag) 16 else 30)
             }§r§eYour Weight: §r§a${
                 weight.roundTo(0).addSeparators()
             }",
