@@ -39,7 +39,7 @@ public class NextJacobContestConfig {
     public boolean fetchAutomatically = true;
 
     @Expose
-    @ConfigOption(name = "Alternative Boosted Highlight", desc = "Highlight the current boosted crop with an highlight in addition to the enchant glint.")
+    @ConfigOption(name = "Alternative Boosted Highlight", desc = "Highlight the current boosted crop with an outline in addition to the enchant glint.")
     @ConfigEditorBoolean
     public boolean differentBoostedHighlight = false;
 
