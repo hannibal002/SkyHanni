@@ -33,4 +33,10 @@ class DragonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var chat: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Skyhanni Tag", desc = "Displays the Skyhanni tag in the dragon weight message.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var skyhanniMessageTag: Boolean = true
 }
