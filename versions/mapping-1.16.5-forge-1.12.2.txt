@@ -503,3 +503,5 @@ net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
 net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
 
 net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots
+
+net.minecraft.entity.projectile.EntityArrow owner shootingEntity
