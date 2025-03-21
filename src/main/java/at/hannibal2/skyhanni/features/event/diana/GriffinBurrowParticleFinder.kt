@@ -15,11 +15,11 @@ import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.minutes
@@ -90,7 +90,7 @@ object GriffinBurrowParticleFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick(event: SkyHanniTickEvent) {
-        val isSpade = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem()?.isDianaSpade ?: false
+        val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
         if (isSpade) {
             burrows.filter { (location, burrow) ->
                 burrow.burrowTimeToLive -= 1

@@ -207,7 +207,12 @@ dependencies {
         isTransitive = false
     }
 
-    shadowModImpl(libs.moulconfig)
+    if (target == ProjectTarget.MAIN) {
+        shadowModImpl(libs.moulconfig)
+    } else if (target == ProjectTarget.MODERN) {
+        shadowModImpl(libs.moulconfigModern)
+    }
+
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }

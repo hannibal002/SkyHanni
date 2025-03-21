@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -146,8 +147,7 @@ object QuickModMenuSwitch {
         currentlyOpeningMod = mod.name
         update()
         try {
-            val thePlayer = Minecraft.getMinecraft().thePlayer
-            ClientCommandHandler.instance.executeCommand(thePlayer, "/" + mod.command)
+            ClientCommandHandler.instance.executeCommand(MinecraftCompat.localPlayer, "/" + mod.command)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)
         }
