@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
@@ -21,11 +21,11 @@ object ThunderBottleNotification {
 
     private val config get() = SkyHanniMod.feature.misc
 
-    private val THUNDER_IN_A_BOTTLE = "THUNDER_IN_A_BOTTLE".toInternalName()
-    private val STORM_IN_A_BOTTLE = "STORM_IN_A_BOTTLE".toInternalName()
-    private val HURRICANE_IN_A_BOTTLE = "HURRICANE_IN_A_BOTTLE".toInternalName()
-
-    private val bottles = setOf(THUNDER_IN_A_BOTTLE, STORM_IN_A_BOTTLE, HURRICANE_IN_A_BOTTLE)
+    private val bottles = setOf(
+        "THUNDER_IN_A_BOTTLE",
+        "STORM_IN_A_BOTTLE",
+        "HURRICANE_IN_A_BOTTLE",
+    ).toInternalNames()
 
     private var lastChecked = SimpleTimeMark.farPast()
 
