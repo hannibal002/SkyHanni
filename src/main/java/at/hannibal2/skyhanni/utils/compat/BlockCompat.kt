@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.compat
 import net.minecraft.block.Block
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.init.Blocks
-import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
 fun MutableList<Block>.addLeaves() {
@@ -94,97 +93,97 @@ enum class WoolCompat(
     WHITE(
         15,
         //#if MC > 1.16
-        //$$ Items.WHITE_DYE
+        //$$ Blocks.WHITE_WOOL
         //#endif
     ),
     ORANGE(
         14,
         //#if MC > 1.16
-        //$$ Items.ORANGE_DYE
+        //$$ Blocks.ORANGE_WOOL
         //#endif
     ),
     MAGENTA(
         13,
         //#if MC > 1.16
-        //$$ Items.MAGENTA_DYE
+        //$$ Blocks.MAGENTA_WOOL
         //#endif
     ),
     LIGHT_BLUE(
         12,
         //#if MC > 1.16
-        //$$ Items.LIGHT_BLUE_DYE
+        //$$ Blocks.LIGHT_BLUE_WOOL
         //#endif
     ),
     YELLOW(
         11,
         //#if MC > 1.16
-        //$$ Items.YELLOW_DYE
+        //$$ Blocks.YELLOW_WOOL
         //#endif
     ),
     LIME(
         10,
         //#if MC > 1.16
-        //$$ Items.LIME_DYE
+        //$$ Blocks.LIME_WOOL
         //#endif
     ),
     PINK(
         9,
         //#if MC > 1.16
-        //$$ Items.PINK_DYE
+        //$$ Blocks.PINK_WOOL
         //#endif
     ),
     GRAY(
         8,
         //#if MC > 1.16
-        //$$ Items.GRAY_DYE
+        //$$ Blocks.GRAY_WOOL
         //#endif
     ),
     LIGHT_GRAY(
         7,
         //#if MC > 1.16
-        //$$ Items.LIGHT_GRAY_DYE
+        //$$ Blocks.LIGHT_GRAY_WOOL
         //#endif
     ),
     CYAN(
         6,
         //#if MC > 1.16
-        //$$ Items.CYAN_DYE
+        //$$ Blocks.CYAN_WOOL
         //#endif
     ),
     PURPLE(
         5,
         //#if MC > 1.16
-        //$$ Items.PURPLE_DYE
+        //$$ Blocks.PURPLE_WOOL
         //#endif
     ),
     BLUE(
         4,
         //#if MC > 1.16
-        //$$ Items.BLUE_DYE
+        //$$ Blocks.BLUE_WOOL
         //#endif
     ),
     BROWN(
         3,
         //#if MC > 1.16
-        //$$ Items.BROWN_DYE
+        //$$ Blocks.BROWN_WOOL
         //#endif
     ),
     GREEN(
         2,
         //#if MC > 1.16
-        //$$ Items.GREEN_DYE
+        //$$ Blocks.GREEN_WOOL
         //#endif
     ),
     RED(
         1,
         //#if MC > 1.16
-        //$$ Items.RED_DYE
+        //$$ Blocks.RED_WOOL
         //#endif
     ),
     BLACK(
         0,
         //#if MC > 1.16
-        //$$ Items.BLACK_DYE
+        //$$ Blocks.BLACK_WOOL
         //#endif
     )
     ;
@@ -201,8 +200,8 @@ enum class WoolCompat(
         fun Block.isWool(wool: WoolCompat): Boolean = isWool(wool.woolColor)
 
         /**
-         * Check if the item is a dye.
-         * Enter a metadata to check for a specific dye color.
+         * Check if the item is wool.
+         * Enter a metadata to check for a specific wool color.
          */
         fun Block.isWool(metadata: Int = -1): Boolean {
             if (metadata == -1) {
@@ -214,15 +213,15 @@ enum class WoolCompat(
             }
 
             //#if MC < 1.16
-            return this == Blocks.wool && this.defaultState.getValue(BlockStainedGlass.COLOR)
+            return this == Blocks.wool && this.defaultState.getValue(BlockStainedGlass.COLOR).metadata == metadata
             //#else
-            //$$ return this.item == fromDyeColor(metadata).stackType
+            //$$ return this == fromWoolColor(metadata).stackType
             //#endif
         }
 
-        private fun fromDyeColor(dyeColor: Int): DyeCompat = entries.firstOrNull { it.woolColor == dyeColor } ?: GRAY
+        private fun fromWoolColor(woolColor: Int): WoolCompat = entries.firstOrNull { it.woolColor == woolColor } ?: GRAY
 
-        fun createDyeStack(dyeColor: Int, size: Int = 1): ItemStack =
-            fromDyeColor(dyeColor).createStack(size)
+        fun createWoolBlock(dyeColor: Int, size: Int = 1): ItemStack =
+            fromWoolColor(dyeColor).createStack(size)
     }
 }
