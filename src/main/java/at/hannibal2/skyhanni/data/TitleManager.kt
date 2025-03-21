@@ -40,6 +40,10 @@ object TitleManager {
     ) : ResettableStorageSet() {
         val display = "§f$text"
         var endTime: SimpleTimeMark = SimpleTimeMark.now() + duration
+
+        fun stop() {
+            endTime = SimpleTimeMark.now()
+        }
     }
 
     enum class TitleLocation(private val displayName: String) {
@@ -90,17 +94,14 @@ object TitleManager {
     ) {
         when (location) {
             null -> {
-                currentTitles.forEach { (_, title) ->
-                    if (title == null) return@forEach
-                    if (condition(title.text)) {
-                        title.endTime = SimpleTimeMark.now()
-                    }
-                }
+                currentTitles.values.filterNotNull()
+                    .filter { condition(it.text) }
+                    .forEach { it.stop() }
             }
 
             else -> currentTitles[location]?.let { title ->
                 if (condition(title.text)) {
-                    title.endTime = SimpleTimeMark.now()
+                    title.stop()
                 }
             }
         }
@@ -142,13 +143,11 @@ object TitleManager {
     private fun stop(location: TitleLocation? = null) {
         when (location) {
             null -> {
-                currentTitles.forEach { (_, title) ->
-                    if (title == null) return@forEach
-                    title.endTime = SimpleTimeMark.now()
-                }
+                currentTitles.values.filterNotNull()
+                    .forEach { it.stop() }
             }
 
-            else -> currentTitles[location]?.endTime = SimpleTimeMark.now()
+            else -> currentTitles[location]?.stop()
         }
     }
 
