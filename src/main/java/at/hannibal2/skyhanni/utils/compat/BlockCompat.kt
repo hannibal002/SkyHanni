@@ -1,9 +1,14 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.block.Block
-import net.minecraft.block.BlockStainedGlass
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
+//#if MC > 1.21
+//$$ import net.minecraft.registry.tag.BlockTags
+//#else
+import net.minecraft.block.BlockStainedGlass
+//#endif
+
 
 fun MutableList<Block>.addLeaves() {
     //#if MC < 1.21
@@ -208,7 +213,7 @@ enum class WoolCompat(
                 //#if MC < 1.16
                 return this == Blocks.wool
                 //#else
-                //$$ return this is DyeItem
+                //$$ return this.defaultState.isIn(BlockTags.WOOL)
                 //#endif
             }
 
