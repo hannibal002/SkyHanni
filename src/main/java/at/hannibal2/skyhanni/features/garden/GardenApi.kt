@@ -78,8 +78,6 @@ object GardenApi {
 
     // TODO USE SH-REPO
     private val otherToolsList = listOf(
-        "DAEDALUS_AXE",
-        "STARRED_DAEDALUS_AXE",
         "BASIC_GARDENING_HOE",
         "ADVANCED_GARDENING_AXE",
         "BASIC_GARDENING_AXE",
@@ -168,7 +166,7 @@ object GardenApi {
 
     fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
-        scale: Double = NeuItems.itemFontSize,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
         highlight: Boolean = false,
     ) {
         addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)

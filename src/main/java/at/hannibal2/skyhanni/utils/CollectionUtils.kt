@@ -89,6 +89,21 @@ object CollectionUtils {
         }
     }
 
+    fun <T, R> Sequence<IndexedValue<T>>.runningIndexedFold(initial: R, operation: (R, T) -> R): Sequence<IndexedValue<R>> =
+        map { it.value }.runningFold(initial, operation).zip(map { it.index }) { value, index -> IndexedValue(index, value) }
+
+    fun <T : Any> Sequence<T>.firstTwiceOf(a: (T) -> Boolean, b: (T) -> Boolean): Pair<T?, T?> {
+        var firstA: T? = null
+        var firstB: T? = null
+
+        for (item in this) {
+            if (firstA == null && a(item)) firstA = item
+            if (firstB == null && b(item)) firstB = item
+            if (firstA != null && firstB != null) break
+        }
+        return Pair(firstA, firstB)
+    }
+
     /** Returns a map containing the count of occurrences of each distinct result of the [selector] function. */
     inline fun <T, K> Iterable<T>.countBy(selector: (T) -> K): Map<K, Int> {
         val map = mutableMapOf<K, Int>()
@@ -271,11 +286,9 @@ object CollectionUtils {
         true
     } else false
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? = takeIf { null !in this } as? Iterable<T>
+    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? = if (all { it != null }) filterNotNull() else null
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
+    fun <T> List<T?>.takeIfAllNotNull(): List<T>? = if (all { it != null }) filterNotNull() else null
 
     fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
 
@@ -324,13 +337,21 @@ object CollectionUtils {
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
         highlight: Boolean = false,
-        scale: Double = NeuItems.itemFontSize,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it
             itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
         }
         add(Renderable.itemStack(itemStack, scale = scale))
+    }
+
+    fun MutableList<Renderable>.addHorizontalSpacer(width: Int = 3) {
+        add(Renderable.placeholder(width, 0))
+    }
+
+    fun MutableList<Renderable>.addVerticalSpacer(height: Int = 10) {
+        add(Renderable.placeholder(0, height))
     }
 
     fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {
@@ -492,5 +513,12 @@ object CollectionUtils {
             }
         }
         return null
+    }
+
+    fun <T> List<T>.insertAfterEach(extra: T): List<T> = buildList(size * 2) {
+        for (item in this@insertAfterEach) {
+            add(item)
+            add(extra)
+        }
     }
 }

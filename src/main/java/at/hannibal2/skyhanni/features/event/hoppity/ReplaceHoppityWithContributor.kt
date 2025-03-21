@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CircularList
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -58,7 +57,7 @@ object ReplaceHoppityWithContributor {
         val last = lore.lastOrNull() ?: return
         if (!last.endsWith(" RABBIT")) return
 
-        val realName = itemStack.name
+        val realName = itemStack.displayName
         val cleanName = realName.removeColor()
         val fakeName = replaceMap[cleanName] ?: return
 

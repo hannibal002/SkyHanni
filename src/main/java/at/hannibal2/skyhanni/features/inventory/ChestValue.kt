@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -44,7 +45,7 @@ object ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<Renderable>()
-    private var chestItems = mapOf<String, Item>()
+    private var chestItems = mapOf<String, ChestItem>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
     private val scrollValue = ScrollValue()
@@ -120,10 +121,10 @@ object ChestValue {
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
-            val name = "${stack.itemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+            val name = "${stack.repoItemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay) "$name $price"
-            else "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
+            else "${stack.repoItemName} §7x$amount: §6${total.formatPrice()}"
 
             addLine {
                 val renderable = Renderable.hoverTips(
@@ -168,13 +169,12 @@ object ChestValue {
             scrollValue = scrollValue,
         )
 
-        // TODO add function that expects a boolean
-        addRenderableButton<DisplayType>(
+        addRenderableButton(
             label = "Display Type",
-            current = DisplayType.entries[if (config.alignedDisplay) 1 else 0],
-            getName = { it.type },
+            config = config::alignedDisplay,
+            enabled = "Aligned",
+            disabled = "Normal",
             onChange = {
-                config.alignedDisplay = !config.alignedDisplay
                 update()
             },
             scrollValue = scrollValue,
@@ -188,7 +188,7 @@ object ChestValue {
         } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
             InventoryUtils.getItemsInOpenChest().filter {
-                it.hasStack && it.inventory != Minecraft.getMinecraft().thePlayer.inventory && (!isMinion || it.slotNumber % 9 != 1)
+                it.hasStack && it.inventory != MinecraftCompat.localPlayer.inventory && (!isMinion || it.slotNumber % 9 != 1)
             }
         }
         val stacks = buildMap {
@@ -196,7 +196,7 @@ object ChestValue {
                 put(it.slotIndex, it.stack)
             }
         }
-        val items = mutableMapOf<String, Item>()
+        val items = mutableMapOf<String, ChestItem>()
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
@@ -208,7 +208,7 @@ object ChestValue {
             list.add("§aTotal: §6§l${total.formatPrice()} coins")
             if (total == 0.0) continue
             val item = items.getOrPut(key) {
-                Item(mutableListOf(), 0, stack, 0.0, list)
+                ChestItem(mutableListOf(), 0, stack, 0.0, list)
             }
             item.index.add(i)
             item.amount += stack.stackSize
@@ -225,11 +225,6 @@ object ChestValue {
             NumberFormatEntry.LONG -> this.addSeparators()
             else -> "0"
         }
-    }
-
-    enum class DisplayType(val type: String) {
-        NORMAL("Normal"),
-        COMPACT("Aligned")
     }
 
     private fun isValidStorage(): Boolean {
@@ -275,7 +270,7 @@ object ChestValue {
         return currentString
     }
 
-    data class Item(
+    private data class ChestItem(
         val index: MutableList<Int>,
         var amount: Int,
         val stack: ItemStack,

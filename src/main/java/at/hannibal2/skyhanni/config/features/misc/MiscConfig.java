@@ -181,15 +181,17 @@ public class MiscConfig {
     public boolean crashOnDeath = false;
 
     @Expose
-    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\nExcept in Catacombs & Rift.\nBest used with the option below.")
-    @SearchTag("skyblockxp")
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\n" +
+        "Except in Catacombs & Rift.\nBest used with the option below.")
+    @SearchTag("skyblockxp skyblocklevel level lvl")
     @ConfigEditorBoolean
     @FeatureToggle
     // TODO rename to skyblockXPBar
     public boolean skyblockXpBar = false;
 
     @Expose
-    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventories that would use your XP.")
+    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventory lore that would use your XP.\n" +
+        "E.g. when hovering over the anvil combine button.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean xpInInventory = true;
@@ -374,6 +376,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "NEU Soul Path Find", desc = "When showing §e/neusouls on§7, show a pathfind to the Fairy Souls missing and a percentage of souls done in chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean neuSoulsPathFind = true;
 
     @Expose
     @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")

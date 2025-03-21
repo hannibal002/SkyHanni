@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -32,8 +31,8 @@ object VisitorRewardWarning {
         if (!VisitorApi.inInventory) return
 
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
-        val refuseOfferSlot = event.gui.inventorySlots.getSlot(REFUSE_SLOT)
-        val acceptOfferSlot = event.gui.inventorySlots.getSlot(ACCEPT_SLOT)
+        val refuseOfferSlot = event.container.getSlot(REFUSE_SLOT)
+        val acceptOfferSlot = event.container.getSlot(ACCEPT_SLOT)
         val blockReason = visitor.blockReason ?: return
 
         if (blockReason.blockRefusing) {
@@ -60,8 +59,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
 
-        val isRefuseSlot = stack.name == "§cRefuse Offer"
-        val isAcceptSlot = stack.name == "§aAccept Offer"
+        val isRefuseSlot = stack.displayName == "§cRefuse Offer"
+        val isAcceptSlot = stack.displayName == "§aAccept Offer"
 
         val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
         if (!config.bypassKey.isKeyHeld() && shouldBlock) {
@@ -92,8 +91,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         if (config.bypassKey.isKeyHeld()) return
 
-        val isRefuseSlot = event.itemStack.name == "§cRefuse Offer"
-        val isAcceptSlot = event.itemStack.name == "§aAccept Offer"
+        val isRefuseSlot = event.itemStack.displayName == "§cRefuse Offer"
+        val isAcceptSlot = event.itemStack.displayName == "§aAccept Offer"
 
         val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return

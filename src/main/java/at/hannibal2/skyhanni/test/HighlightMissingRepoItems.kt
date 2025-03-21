@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.inventory.Slot
@@ -24,10 +24,9 @@ object HighlightMissingRepoItems {
         val gui = event.gui
 
         if (gui is GuiChest) {
-            highlightItems(gui.inventorySlots.inventorySlots)
+            highlightItems(event.container.inventorySlots)
         } else if (gui is GuiInventory) {
-            val player = Minecraft.getMinecraft().thePlayer
-            highlightItems(player.inventoryContainer.inventorySlots)
+            highlightItems(InventoryUtils.getSlotsInOwnInventory())
         }
     }
 
@@ -35,8 +34,9 @@ object HighlightMissingRepoItems {
         if (NeuItems.allInternalNames.isEmpty()) return
         for (slot in slots) {
             val internalName = slot.stack?.getInternalNameOrNull() ?: continue
-            if (NeuItems.allInternalNames.contains(internalName)) continue
+
             if (NeuItems.ignoreItemsFilter.match(internalName.asString())) continue
+            if (NeuItems.allInternalNames.contains(internalName)) continue
 
             slot highlight LorenzColor.RED
         }

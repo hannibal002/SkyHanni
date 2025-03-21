@@ -366,26 +366,24 @@ object BestiaryData {
             },
         )
 
-        // TODO add function that expects a boolean
-        addRenderableButton<NumberType>(
+        addRenderableButton(
             label = "Number Type",
-            current = NumberType.entries[if (config.replaceRoman) 0 else 1],
-            getName = { it.type },
+            config = config::replaceRoman,
+            enabled = "Normal (1, 2, 3)",
+            disabled = "Roman (I, II, III)",
             onChange = {
-                config.replaceRoman = !config.replaceRoman
                 update()
-            },
+            }
         )
 
-        // TODO add function that expects a boolean
-        addRenderableButton<HideMaxed>(
+        addRenderableButton(
             label = "Hide Maxed",
-            current = HideMaxed.entries[if (config.hideMaxed) 1 else 0],
-            getName = { it.type },
+            config = config::hideMaxed,
+            enabled = "Hide",
+            disabled = "Show",
             onChange = {
-                config.hideMaxed = !config.hideMaxed
                 update()
-            },
+            }
         )
     }
 
@@ -449,16 +447,6 @@ object BestiaryData {
             }
         }
         return false
-    }
-
-    enum class NumberType(val type: String) {
-        INT("Normal (1, 2, 3)"),
-        ROMAN("Roman (I, II, III)")
-    }
-
-    enum class HideMaxed(val type: String) {
-        NO("Show"),
-        YES("Hide")
     }
 
     private fun Long.formatNumber(): String = when (config.numberFormat) {
