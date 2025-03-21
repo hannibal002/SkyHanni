@@ -353,7 +353,7 @@ public class MiscConfig {
     @ConfigOption(name = "Charge Bottle Notification", desc = "Show a notification when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean chargeBottleNotification = false;
+    public boolean chargeBottleNotification = true;
 
     @Expose
     @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
