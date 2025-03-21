@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -51,7 +52,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.google.gson.JsonArray
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLiving
@@ -153,11 +153,7 @@ object DamageIndicatorManager {
         val sizeBossName: Double
         val sizeFinalResults: Double
         val smallestDistanceVew: Double
-        val thirdPersonView = Minecraft.getMinecraft().gameSettings.thirdPersonView
-        // 0 == normal
-        // 1 == f3 behind
-        // 2 == selfie
-        if (thirdPersonView == 1) {
+        if (PlayerUtils.isThirdPersonView()) {
             sizeHealth = 2.8
             sizeNameAbove = 2.2
             sizeBossName = 2.4
