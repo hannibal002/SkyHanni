@@ -174,20 +174,23 @@ object TitleManager {
         val guiWidth = GuiScreenUtils.scaledWindowWidth
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
+        val globalTitleWidth = 80
+        val horizontalTranslationOffset = (guiWidth - globalTitleWidth) / 2f
+        val verticalTranslationOffset = guiHeight / 2f
+
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        val renderer = Minecraft.getMinecraft().fontRendererObj
-
         GlStateManager.pushMatrix()
-        GlStateManager.translate(((guiWidth / 2) - 200).toFloat(), (guiHeight / height).toFloat(), 3.0f)
+        GlStateManager.translate(horizontalTranslationOffset, verticalTranslationOffset, 3.0f)
         GlStateManager.scale(fontSize, fontSize, fontSize)
+
         Renderable.wrappedString(
             display.replace("§6", "§b"),
-            width = 200,
+            width = 80,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-        ).render(posX = 0, posY = 0)
-        // Todo: Fix above and remove this
-        // TextRenderUtils.drawStringCenteredScaledMaxWidth(display, renderer, 0f, 0f, true, 75, 0)
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+        ).render(0, 0)
+
         GlStateManager.popMatrix()
     }
 
