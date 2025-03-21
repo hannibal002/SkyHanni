@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -30,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.sign
@@ -143,8 +145,18 @@ object HoppityEggLocator {
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (!locatorInHotbar) return
         if (!event.isVillagerParticle()) return
+        if (lastClick.passedSince() > 5.seconds) return
+
+        val lastPoint = bezierFitter.getLastPoint()
+        if (lastPoint != null) {
+            if (lastPoint.distanceSq(event.location) > 4) return
+        }
+
+        if (EntityUtils.getEntitiesNearby<EntityFishHook>(event.location, 0.3).any()) {
+            return
+        }
+
 
         bezierFitter.addPoint(event.location)
 
@@ -193,8 +205,6 @@ object HoppityEggLocator {
     }
 
     private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
-
-    private fun ReceiveParticleEvent.isEnchantmentParticle() = type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
 
     fun isEnabled() =
         LorenzUtils.inSkyBlock && config.waypoints && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) && HoppityApi.isHoppityEvent()
