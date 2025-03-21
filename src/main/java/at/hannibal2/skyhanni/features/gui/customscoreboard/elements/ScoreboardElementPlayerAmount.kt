@@ -12,7 +12,7 @@ object ScoreboardElementPlayerAmount : ScoreboardElement() {
         val max = if (displayConfig.showMaxIslandPlayers) {
             "§7/§a${getMaxPlayersForCurrentServer()}"
         } else ""
-        return CustomScoreboardUtils.formatNumberDisplay("Players", "${getPlayersOnCurrentServer()}/$max", "§a")
+        return CustomScoreboardUtils.formatNumberDisplay("Players", "${getPlayersOnCurrentServer()}$max", "§a")
     }
 
     override val configLine = "§7Players: §a69§7/§a80"
