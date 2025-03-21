@@ -350,7 +350,7 @@ public class MiscConfig {
     public Property<Boolean> replaceRomanNumerals = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Charge Bottle Notification", desc = "Show a notification when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.")
+    @ConfigOption(name = "Charge Bottle Notification", desc = "Send a message when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean chargeBottleNotification = true;
