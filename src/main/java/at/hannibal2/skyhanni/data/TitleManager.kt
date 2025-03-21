@@ -21,6 +21,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
+import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -176,7 +177,11 @@ object TitleManager {
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
         val globalTitleWidth = 80
-        val legacyHeight = guiHeight / height
+        val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(display)
+        var factor = globalTitleWidth / stringWidth.toDouble()
+        factor = min(factor, 1.0)
+
+        val adjustedHeight = (guiHeight / height) * 2
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
@@ -185,10 +190,10 @@ object TitleManager {
         Renderable.wrappedString(
             display,
             width = (globalTitleWidth * fontSize).toInt(),
-            scale = fontSize.toDouble(),
+            scale = factor * fontSize,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).renderXYAligned(0, 50, guiWidth, (legacyHeight * 2).toInt())
+        ).renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
 
         GlStateManager.popMatrix()
     }
