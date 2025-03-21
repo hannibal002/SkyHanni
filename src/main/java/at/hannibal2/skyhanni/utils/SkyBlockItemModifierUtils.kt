@@ -20,6 +20,7 @@ import java.util.Locale
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.item.Items
 //#endif
 
 object SkyBlockItemModifierUtils {
@@ -245,7 +246,7 @@ object SkyBlockItemModifierUtils {
     //#if MC < 1.21
     fun String.isVanillaItem() = Item.itemRegistry.getObject(ResourceLocation(this)) != null
     //#else
-    //$$ fun String.isVanillaItem() = Registries.ITEM.get(Identifier.of(vanillaName)) != Items.AIR
+    //$$ fun String.isVanillaItem() = Registries.ITEM.get(Identifier.of(this)) != Items.AIR
     //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
