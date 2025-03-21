@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import net.minecraft.block.Block
+import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 //#if MC > 1.21
@@ -92,103 +95,120 @@ fun MutableList<Block>.addLavas() {
 enum class WoolCompat(
     private val woolColor: Int,
     //#if MC > 1.16
-    //$$ private val stackType: Block
+    //$$ private val stackType: Block,
+    //$$ private val color: LorenzColor
     //#endif
 ) {
     WHITE(
         15,
         //#if MC > 1.16
-        //$$ Blocks.WHITE_WOOL
+        //$$ Blocks.WHITE_WOOL,
+        //$$ LorenzColor.WHITE
         //#endif
     ),
     ORANGE(
         14,
         //#if MC > 1.16
-        //$$ Blocks.ORANGE_WOOL
+        //$$ Blocks.ORANGE_WOOL,
+        //$$ LorenzColor.GOLD
         //#endif
     ),
     MAGENTA(
         13,
         //#if MC > 1.16
-        //$$ Blocks.MAGENTA_WOOL
+        //$$ Blocks.MAGENTA_WOOL,
+        //$$ LorenzColor.LIGHT_PURPLE
         //#endif
     ),
     LIGHT_BLUE(
         12,
         //#if MC > 1.16
-        //$$ Blocks.LIGHT_BLUE_WOOL
+        //$$ Blocks.LIGHT_BLUE_WOOL,
+        //$$ LorenzColor.AQUA
         //#endif
     ),
     YELLOW(
         11,
         //#if MC > 1.16
-        //$$ Blocks.YELLOW_WOOL
+        //$$ Blocks.YELLOW_WOOL,
+        //$$ LorenzColor.YELLOW
         //#endif
     ),
     LIME(
         10,
         //#if MC > 1.16
-        //$$ Blocks.LIME_WOOL
+        //$$ Blocks.LIME_WOOL,
+        //$$ LorenzColor.GREEN
         //#endif
     ),
     PINK(
         9,
         //#if MC > 1.16
-        //$$ Blocks.PINK_WOOL
+        //$$ Blocks.PINK_WOOL,
+        //$$ LorenzColor.LIGHT_PURPLE
         //#endif
     ),
     GRAY(
         8,
         //#if MC > 1.16
-        //$$ Blocks.GRAY_WOOL
+        //$$ Blocks.GRAY_WOOL,
+        //$$ LorenzColor.GRAY
         //#endif
     ),
     LIGHT_GRAY(
         7,
         //#if MC > 1.16
-        //$$ Blocks.LIGHT_GRAY_WOOL
+        //$$ Blocks.LIGHT_GRAY_WOOL,
+        //$$ LorenzColor.GRAY
         //#endif
     ),
     CYAN(
         6,
         //#if MC > 1.16
-        //$$ Blocks.CYAN_WOOL
+        //$$ Blocks.CYAN_WOOL,
+        //$$ LorenzColor.DARK_AQUA
         //#endif
     ),
     PURPLE(
         5,
         //#if MC > 1.16
-        //$$ Blocks.PURPLE_WOOL
+        //$$ Blocks.PURPLE_WOOL,
+        //$$ LorenzColor.DARK_PURPLE
         //#endif
     ),
     BLUE(
         4,
         //#if MC > 1.16
-        //$$ Blocks.BLUE_WOOL
+        //$$ Blocks.BLUE_WOOL,
+        //$$ LorenzColor.BLUE
         //#endif
     ),
     BROWN(
         3,
         //#if MC > 1.16
-        //$$ Blocks.BROWN_WOOL
+        //$$ Blocks.BROWN_WOOL,
+        //$$ LorenzColor.GOLD
         //#endif
     ),
     GREEN(
         2,
         //#if MC > 1.16
-        //$$ Blocks.GREEN_WOOL
+        //$$ Blocks.GREEN_WOOL,
+        //$$ LorenzColor.DARK_GREEN
         //#endif
     ),
     RED(
         1,
         //#if MC > 1.16
-        //$$ Blocks.RED_WOOL
+        //$$ Blocks.RED_WOOL,
+        //$$ LorenzColor.RED
         //#endif
     ),
     BLACK(
         0,
         //#if MC > 1.16
-        //$$ Blocks.BLACK_WOOL
+        //$$ Blocks.BLACK_WOOL,
+        //$$ LorenzColor.BLACK
         //#endif
     )
     ;
@@ -221,6 +241,14 @@ enum class WoolCompat(
             return this == Blocks.wool && this.defaultState.getValue(BlockStainedGlass.COLOR).metadata == metadata
             //#else
             //$$ return this == fromWoolColor(metadata).stackType
+            //#endif
+        }
+
+        fun IBlockState.getWoolColor(): LorenzColor {
+            //#if MC < 1.21
+            return this.getValue(BlockStainedGlass.COLOR).toLorenzColor()
+            //#else
+            //$$ return WoolCompat.entries.firstOrNull { it.stackType == this.block }?.color ?: LorenzColor.GRAY
             //#endif
         }
 

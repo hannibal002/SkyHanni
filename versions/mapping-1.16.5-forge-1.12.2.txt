@@ -397,6 +397,9 @@ net.minecraft.world.level.block.Blocks MELON MELON_BLOCK
 net.minecraft.world.level.block.Blocks TERRACOTTA HARDENED_CLAY
 net.minecraft.world.level.block.Blocks COBBLESTONE_STAIRS STONE_STAIRS
 
+net.minecraft.world.level.block.StainedGlassBlock net.minecraft.block.BlockStainedGlass
+net.minecraft.world.level.block.StainedGlassPaneBlock net.minecraft.block.BlockStainedGlassPane
+
 net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
 net.minecraft.world.level.block.entity.SignBlockEntity net.minecraft.tileentity.TileEntitySign
