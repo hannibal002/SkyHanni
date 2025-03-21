@@ -657,6 +657,8 @@ object GardenVisitorFeatures {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.shoppingList.display) return
+        val currentScreen = Minecraft.getMinecraft().currentScreen
+        if (currentScreen is GuiEditSign) return
 
         renderDisplay()
     }
