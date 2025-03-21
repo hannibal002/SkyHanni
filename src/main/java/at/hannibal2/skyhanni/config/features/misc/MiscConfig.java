@@ -350,10 +350,10 @@ public class MiscConfig {
     public Property<Boolean> replaceRomanNumerals = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
+    @ConfigOption(name = "Charge Bottle Notification", desc = "Show a notification when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean thunderBottleNotification = true;
+    public boolean chargeBottleNotification = false;
 
     @Expose
     @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")

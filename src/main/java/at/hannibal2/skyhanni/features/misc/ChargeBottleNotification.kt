@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fishing.IsFishingDetection.isFishing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ThunderBottleNotification {
+object ChargeBottleNotification {
 
     private val config get() = SkyHanniMod.feature.misc
 
@@ -45,10 +46,15 @@ object ThunderBottleNotification {
             "You are currently fishing, but " +
                 "${bottlesInInventory.createCommaSeparatedList()} ${StringUtils.pluralize(size, "is", "are")} full. " +
                 "Click here to disable this notification.",
-            { config::thunderBottleNotification.jumpToEditor() },
+            { config::chargeBottleNotification.jumpToEditor() },
             replaceSameMessage = true,
         )
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.thunderBottleNotification
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(76, "misc.thunderBottleNotification", "misc.chargeBottleNotification")
+    }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.chargeBottleNotification
 }
