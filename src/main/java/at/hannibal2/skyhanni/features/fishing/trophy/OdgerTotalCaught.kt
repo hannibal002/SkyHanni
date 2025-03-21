@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -48,7 +47,7 @@ object OdgerTotalCaught {
 
         if (event.toolTip.none { discoveredPattern.matcher(it).find() }) return
 
-        val trophyFishKey = event.itemStack.name
+        val trophyFishKey = event.itemStack.displayName
             .removeColor()
             .lowercase()
             .replace(" ", "")
