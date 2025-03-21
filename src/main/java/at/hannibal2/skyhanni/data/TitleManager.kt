@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
@@ -97,6 +96,7 @@ object TitleManager {
                     }
                 }
             }
+
             else -> currentTitles[location]?.let { title ->
                 if (condition(title.text)) {
                     title.endTime = SimpleTimeMark.now()
@@ -141,6 +141,7 @@ object TitleManager {
                     title.endTime = SimpleTimeMark.now()
                 }
             }
+
             else -> currentTitles[location]?.endTime = SimpleTimeMark.now()
         }
     }
@@ -175,21 +176,19 @@ object TitleManager {
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
         val globalTitleWidth = 80
-        val horizontalTranslationOffset = (guiWidth - globalTitleWidth) / 2f
-        val verticalTranslationOffset = guiHeight / 2f
+        val legacyHeight = guiHeight / height
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.pushMatrix()
-        GlStateManager.translate(horizontalTranslationOffset, verticalTranslationOffset, 3.0f)
-        GlStateManager.scale(fontSize, fontSize, fontSize)
 
         Renderable.wrappedString(
-            display.replace("§6", "§b"),
-            width = 80,
+            display,
+            width = (globalTitleWidth * fontSize).toInt(),
+            scale = fontSize.toDouble(),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).render(0, 0)
+        ).renderXYAligned(0, 50, guiWidth, (legacyHeight * 2).toInt())
 
         GlStateManager.popMatrix()
     }
@@ -210,7 +209,7 @@ object TitleManager {
             ColorUtils.TRANSPARENT_COLOR,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).renderXYAligned(0, 125, gui.width, gui.height)
+        ).renderXYAligned(0, 0, gui.width, gui.height)
 
         GlStateManager.translate(0f, 150f, -500f)
         GlStateManager.popMatrix()
