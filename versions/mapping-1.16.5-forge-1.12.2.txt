@@ -69,6 +69,7 @@ net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOther
 net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
 
 net.minecraft.client.player.LocalPlayer chat() sendChatMessage()
+net.minecraft.client.player.LocalPlayer setExperienceValues() setXPStats()
 
 net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
 
@@ -343,6 +344,8 @@ net.minecraft.world.entity.player.Inventory items mainInventory
 
 net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
 net.minecraft.world.entity.player.Player containerMenu openContainer
+net.minecraft.world.entity.player.Player totalExperience experienceTotal
+net.minecraft.world.entity.player.Player experienceProgress experience
 
 net.minecraft.world.entity.projectile.Arrow net.minecraft.entity.projectile.EntityArrow
 net.minecraft.world.entity.projectile.Fireball net.minecraft.entity.projectile.EntityFireball
