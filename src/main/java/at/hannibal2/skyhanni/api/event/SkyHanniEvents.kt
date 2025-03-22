@@ -17,9 +17,7 @@ object SkyHanniEvents {
     private var disabledHandlers = emptySet<String>()
     private var disabledHandlerInvokers = emptySet<String>()
 
-    fun init(instances: List<Any>) {
-        instances.forEach(::register)
-    }
+    fun init(instances: List<Any>) = instances.forEach(::register)
 
     fun register(instance: Any) {
         instance.javaClass.declaredMethods.forEach {
@@ -27,11 +25,7 @@ object SkyHanniEvents {
         }
     }
 
-    fun unregister(instance: Any) {
-        instance.javaClass.declaredMethods.forEach {
-            unregisterMethod(it, instance)
-        }
-    }
+    fun unregister(instance: Any) = instance.javaClass.declaredMethods.forEach(::unregisterMethod)
 
     @Suppress("UNCHECKED_CAST")
     fun <T : SkyHanniEvent> getEventHandler(event: Class<T>): EventHandler<T> = handlers.getOrPut(event) {
@@ -54,7 +48,7 @@ object SkyHanniEvents {
             .addListener(method, instance, options)
     }
 
-    private fun unregisterMethod(method: Method, instance: Any) {
+    private fun unregisterMethod(method: Method) {
         if (method.parameterCount != 1) return
         method.getAnnotation(HandleEvent::class.java) ?: return
         val event = method.parameterTypes[0]
