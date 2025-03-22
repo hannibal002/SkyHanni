@@ -508,3 +508,7 @@ net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
 net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots
 
 net.minecraft.entity.projectile.EntityArrow owner shootingEntity
+
+com.mojang.blaze3d.systems.RenderSystem enableDepthTest() enableDepth()
+com.mojang.blaze3d.systems.RenderSystem disableDepthTest() disableDepth()
+com.mojang.blaze3d.systems.RenderSystem blendFuncSeparate() tryBlendFuncSeparate()
