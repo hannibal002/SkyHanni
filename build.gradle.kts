@@ -407,7 +407,6 @@ preprocess {
 blossom {
     replaceToken("@MOD_VERSION@", version)
     replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
-    replaceToken("@CONFIG_VERSION@", File("Config_Version").readText().filter { it.isDigit() })
 }
 
 val sourcesJar by tasks.creating(Jar::class) {

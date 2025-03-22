@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object XPInInventories {
@@ -35,9 +35,9 @@ object XPInInventories {
         }
         if (indexOfCost == -1) return
 
-        val playerXP = Minecraft.getMinecraft().thePlayer.experienceLevel
+        val playerXP = MinecraftCompat.localPlayer.experienceLevel
         val color = if (playerXP >= requiredXP) "§a" else "§c"
-        event.toolTip.add(indexOfCost + 1, "§7Your XP: $color${Minecraft.getMinecraft().thePlayer.experienceLevel}")
+        event.toolTip.add(indexOfCost + 1, "§7Your XP: $color$playerXP")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.xpInInventory

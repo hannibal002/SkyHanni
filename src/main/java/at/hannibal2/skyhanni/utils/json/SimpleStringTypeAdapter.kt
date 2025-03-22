@@ -6,7 +6,7 @@ import com.google.gson.stream.JsonWriter
 
 class SimpleStringTypeAdapter<T>(
     val serializer: T.() -> String,
-    val deserializer: String.() -> T
+    val deserializer: String.() -> T,
 ) : TypeAdapter<T>() {
 
     override fun write(writer: JsonWriter, value: T) {
@@ -18,11 +18,30 @@ class SimpleStringTypeAdapter<T>(
     }
 
     companion object {
+        val enumReplacementMap = mutableMapOf<Enum<*>, String>()
 
         inline fun <reified T : Enum<T>> forEnum(): SimpleStringTypeAdapter<T> {
             return SimpleStringTypeAdapter(
-                { name },
-                { enumValueOf(this.replace(" ", "_").uppercase()) }
+                serializer = { name },
+                deserializer = { enumValueOf(this.replace(" ", "_").uppercase()) },
+            )
+        }
+
+        inline fun <reified T : Enum<T>> forEnum(defaultValue: T): SimpleStringTypeAdapter<T> {
+            return SimpleStringTypeAdapter(
+                serializer = {
+                    if (this == defaultValue) {
+                        enumReplacementMap[defaultValue] ?: name
+                    } else name
+                },
+                deserializer = {
+                    try {
+                        enumValueOf(this.replace(" ", "_").uppercase())
+                    } catch (e: IllegalArgumentException) {
+                        enumReplacementMap[defaultValue] = this
+                        defaultValue
+                    }
+                },
             )
         }
     }
