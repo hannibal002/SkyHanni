@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.mining.GemstoneMoneyPerHourConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -42,6 +44,11 @@ object GemstoneMoneyPerHour {
         "§d§lPRISTINE! §r§fYou found §r§a. Flawed (?<gemstone>\\w+) Gemstone §r§8x(?<amount>\\d+)§r§f!"
     )
 
+    private val roughGemstoneNamePattern by RepoPattern.pattern(
+        "mining.roughgemstone",
+        "rough (?<gemstone>\\w+) gem"
+    )
+
     private val config get() = SkyHanniMod.feature.mining.gemstoneMoneyPerHour
 
     private var display: List<Renderable> = listOf()
@@ -49,6 +56,7 @@ object GemstoneMoneyPerHour {
     private var lastMined = SimpleTimeMark.farPast()
     private var coins = 0
     private var lastGemstone: String = ""
+    private var useNextSackChange = false
     private var uptime: Duration = 0.seconds
     private var paused: Boolean = false
 
@@ -58,12 +66,30 @@ object GemstoneMoneyPerHour {
         pristineMessagePattern.matchMatcher(event.message) {
             if (start.isFarPast()) start = SimpleTimeMark.now()
             if (paused) paused = false
+            useNextSackChange = true
             lastMined = SimpleTimeMark.now()
             val gemstone = group("gemstone")
             lastGemstone = gemstone
             val configGemstonePrice = getPrice(convertToInternalName(lastGemstone))
-            val delta = group("amount").toDouble() * getFraction() * configGemstonePrice
+            val delta = group("amount").toDouble() * getFraction(2) * configGemstonePrice
             coins += delta.toInt()
+        }
+    }
+
+    @HandleEvent
+    fun onSackChange(event: SackChangeEvent) {
+        if (!isEnabled() || !useNextSackChange) return
+        useNextSackChange = false
+
+        for (change in event.sackChanges) {
+            if (change.delta < 0) continue
+
+            roughGemstoneNamePattern.matchMatcher(change.internalName.readableInternalName) {
+                val gemstone = group("gemstone")
+                val configGemstonePrice = getPrice(convertToInternalName(gemstone))
+                val delta = change.delta.toDouble() * getFraction(1) * configGemstonePrice
+                coins += delta.toInt()
+            }
         }
     }
 
@@ -76,8 +102,9 @@ object GemstoneMoneyPerHour {
         else maxOf(gemstone.getNpcPrice(), gemstone.getPrice())
     }
 
-    private fun getFraction(): Double {
-        return (80.0).pow(2 - toNum(config.gemstoneType))
+    // Finds number of gemstones needed to craft config.gemstoneType from type
+    private fun getFraction(type: Int): Double {
+        return (80.0).pow(type - toNum(config.gemstoneType))
     }
 
     private fun toNum(type: GemstoneMoneyPerHourConfig.GemstoneType): Int {
