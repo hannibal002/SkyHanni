@@ -174,6 +174,16 @@ public class DamageIndicatorConfig {
     public boolean hideVanillaNametag = false;
 
     @Expose
+    @ConfigOption(name = "Shuriken Indicator", desc = "Indicate if an Extremely Real Shuriken has been used.")
+    @ConfigEditorBoolean
+    public boolean shurikenIndicator = true;
+
+    @Expose
+    @ConfigOption(name = "Twilight Indicator", desc = "Indicate if twilight arrow poison has been used.")
+    @ConfigEditorBoolean
+    public boolean twilightIndicator = true;
+
+    @Expose
     @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.\n" +
         "§eRequires Damage Indicator to be active.")
     @ConfigEditorBoolean

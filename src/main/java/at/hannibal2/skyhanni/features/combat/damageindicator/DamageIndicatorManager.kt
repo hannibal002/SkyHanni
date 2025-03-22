@@ -229,8 +229,23 @@ object DamageIndicatorManager {
             }
             event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
 
+            var icons = ""
+            if (config.shurikenIndicator && entity.getNameTagWith(3, "§b✯") != null) icons += "§b✯"
+            if (config.twilightIndicator && entity.getNameTagWith(3, "§5ᛤ") != null) icons += "§5ᛤ"
+
+            var diff = 9f
+            if (icons.isNotEmpty()) {
+                event.drawDynamicText(
+                    location,
+                    icons,
+                    sizeBossName,
+                    diff,
+                    smallestDistanceVew = smallestDistanceVew
+                )
+                diff += 22f
+            } else diff += 4f
+
             if (config.showDamageOverTime) {
-                var diff = 13f
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
                 if (currentDamage != 0L || currentHealing != 0L) {
