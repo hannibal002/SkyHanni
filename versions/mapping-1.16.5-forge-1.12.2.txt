@@ -512,3 +512,9 @@ net.minecraft.entity.projectile.EntityArrow owner shootingEntity
 com.mojang.blaze3d.systems.RenderSystem enableDepthTest() enableDepth()
 com.mojang.blaze3d.systems.RenderSystem disableDepthTest() disableDepth()
 com.mojang.blaze3d.systems.RenderSystem blendFuncSeparate() tryBlendFuncSeparate()
+
+com.mojang.blaze3d.platform.Lighting net.minecraft.client.renderer.RenderHelper
+
+com.mojang.blaze3d.platform.Lighting turnOff() disableStandardItemLighting()
+com.mojang.blaze3d.platform.Lighting turnBackOn() enableStandardItemLighting()
+com.mojang.blaze3d.platform.Lighting setupFor3DItems() enableGUIStandardItemLighting()
