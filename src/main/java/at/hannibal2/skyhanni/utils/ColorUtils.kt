@@ -44,6 +44,11 @@ object ColorUtils {
         alpha,
     )
 
+    fun Int.darkenColor(): Int {
+        val color = Color(this)
+        return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
+    }
+
     val TRANSPARENT_COLOR = Color(0, 0, 0, 0)
 
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)

@@ -32,6 +32,7 @@ import kotlin.time.Duration.Companion.seconds
  */
 object GuiRenderUtils {
 
+    @Deprecated("Use Renderables instead")
     private fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
@@ -41,20 +42,24 @@ object GuiRenderUtils {
         GL11.glTranslatef(-x2, -y2, 0f)
     }
 
+    @Deprecated("Use Renderables instead")
     fun drawString(str: String, x: Float, y: Float) {
         Minecraft.getMinecraft().fontRendererObj.drawString(str, x, y, 0xffffff, true)
     }
 
+    @Deprecated("Use Renderables instead")
     fun drawString(str: String, x: Int, y: Int) {
         Minecraft.getMinecraft().fontRendererObj.drawString(str, x.toFloat(), y.toFloat(), 0xffffff, true)
     }
 
+    @Deprecated("Use Renderables instead")
     fun drawStringCentered(str: String?, x: Int, y: Int) {
         drawStringCentered(
             str, Minecraft.getMinecraft().fontRendererObj, x.toFloat(), y.toFloat(), true, 0xffffff,
         )
     }
 
+    @Deprecated("Use ItemStack.renderOnScreen instead", ReplaceWith("item.renderOnScreen(x,y)"))
     private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
         val itemRender = Minecraft.getMinecraft().renderItem
         RenderHelper.enableGUIStandardItemLighting()
@@ -107,11 +112,7 @@ object GuiRenderUtils {
         )
     }
 
-    fun Int.darkenColor(): Int {
-        val color = Color(this)
-        return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
-    }
-
+    @Deprecated("")
     fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
         GuiScreen.drawRect(
             (left * inverseScale).toInt(),
@@ -122,6 +123,10 @@ object GuiRenderUtils {
         )
     }
 
+    @Deprecated(
+        "Use Renderable.drawInsideRoundedRect with Renderable.itemStack",
+        replaceWith = ReplaceWith("Renderable.drawInsideRoundedRect(Renderable.itemStack(item),color)"),
+    )
     fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
         renderItemStack(item, x, y)
         GuiScreen.drawRect(x, y, x + 16, y + 16, color)
