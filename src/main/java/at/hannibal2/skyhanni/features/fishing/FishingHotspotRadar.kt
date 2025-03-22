@@ -123,7 +123,7 @@ object FishingHotspotRadar {
         lastAbilityUse = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         hotspotLocation = null
         bezierFitter.reset()
