@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -258,6 +259,7 @@ object SkyHanniDebugsAndTests {
     }
 
     fun reloadListeners() {
+        // TODO: use repo for this and implement it correctly
         val blockedFeatures = try {
             File("config/skyhanni/blocked-features.txt").readLines().toList()
         } catch (e: Exception) {
@@ -269,29 +271,40 @@ object SkyHanniDebugsAndTests {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
             MinecraftForge.EVENT_BUS.unregister(original)
+            SkyHanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
-                modules.add(javaClass)
-                MinecraftForge.EVENT_BUS.register(javaClass)
+                modules.add(original)
+                MinecraftForge.EVENT_BUS.register(original)
+                SkyHanniEvents.register(original)
                 println("Registered listener $simpleName")
             } else {
                 println("Skipped registering listener $simpleName")
             }
         }
-        ChatUtils.chat("reloaded ${modules.size} listener classes.")
+        ChatUtils.chat("Reloaded ${modules.size} listener classes.")
     }
 
     fun stopListeners() {
-        val modules = SkyHanniMod.modules
-        for (original in modules.toMutableList()) {
-            val javaClass = original.javaClass
-            val simpleName = javaClass.simpleName
-            MinecraftForge.EVENT_BUS.unregister(original)
-            println("Unregistered listener $simpleName")
-        }
-        ChatUtils.chat("stopped ${modules.size} listener classes.")
+        ChatUtils.clickableChat(
+            "§cAre you sure you want to stop all listeners? Doing this will make most features not work.",
+            onClick = {
+                val modules = SkyHanniMod.modules
+                for (original in modules.toMutableList()) {
+                    val javaClass = original.javaClass
+                    val simpleName = javaClass.simpleName
+                    MinecraftForge.EVENT_BUS.unregister(original)
+                    SkyHanniEvents.unregister(original)
+                    println("Unregistered listener $simpleName")
+                }
+                ChatUtils.clickableChat(
+                    "Stopped ${modules.size} listener classes. If you want to re-enable them, run /shreloadlisteners or click this message.",
+                    onClick = { reloadListeners() },
+                )
+            },
+        )
     }
 
     fun whereAmI() {
