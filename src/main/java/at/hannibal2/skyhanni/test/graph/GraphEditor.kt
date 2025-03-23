@@ -208,10 +208,20 @@ object GraphEditor {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         input()
+        if (event.isMod(5)) {
+            updateRender()
+        }
         if (nodes.isEmpty()) return
         closestNode = nodes.minBy { distanceToPlayer(it.position) }
         handleAllNodeFind()
+    }
 
+    private fun updateRender() {
+        val maxNodeDistance = config.maxNodeDistance * config.maxNodeDistance
+        val player = LocationUtils.playerLocation()
+        for (node in nodes) {
+            node.rendering = node.position.distanceSq(player) < maxNodeDistance
+        }
     }
 
     private fun handleAllNodeFind() {
@@ -263,7 +273,7 @@ object GraphEditor {
     }
 
     private fun SkyHanniRenderWorldEvent.drawNode(node: GraphingNode) {
-        if (node.position.distanceToPlayer() > config.maxNodeDistance) return
+        if (!node.rendering) return
         this.drawWaypointFilled(
             node.position,
             node.getNodeColor(),
@@ -300,7 +310,7 @@ object GraphEditor {
     }
 
     private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
-        if (edge.node1.position.distanceToPlayer() > config.maxNodeDistance) return
+        if (!edge.node1.rendering && !edge.node2.rendering) return
         val color = when {
             selectedEdge == edge -> edgeSelectedColor
             edge in highlightedEdges -> edgeDijkstraColor
@@ -417,6 +427,12 @@ object GraphEditor {
             if (inTextMode) {
                 inTextMode = false
                 feedBackInTutorial("Exited Text Mode.")
+                activeNode?.let {
+                    handleNameShortcut(it.name)?.let { (tag, name) ->
+                        it.tags.add(tag)
+                        it.name = name
+                    }
+                }
                 return
             }
             if (inEditMode) {
@@ -430,11 +446,7 @@ object GraphEditor {
         if (inTextMode) {
             textBox.handle()
             val text = textBox.finalText()
-            if (text.isEmpty()) {
-                activeNode?.name = null
-            } else {
-                activeNode?.name = text
-            }
+            activeNode?.name = text.ifEmpty { null }
             return
         }
         if (activeNode != null && config.textKey.isKeyClicked()) {
@@ -587,6 +599,12 @@ object GraphEditor {
             activeNode = null
             addEdge(neighbors1, neighbors2, direction)
         }
+    }
+
+    private fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {
+        "fsoul" -> GraphNodeTag.FAIRY_SOUL to "Fairy Soul"
+        "na" -> GraphNodeTag.AREA to "no_area"
+        else -> null
     }
 
     private fun save() {
@@ -834,6 +852,8 @@ class GraphingNode(
     var name: String? = null,
     var tags: MutableList<GraphNodeTag> = mutableListOf(),
 ) {
+
+    var rendering = true
 
     override fun hashCode(): Int {
         return id
