@@ -46,9 +46,12 @@ object FishingProfitTracker {
 
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
 
+    /**
+     * REGEX-TEST: §5⛃ §r§5§lGOOD CATCH! §r§fYou caught §r§636,064 Coins§r§f!
+     */
     private val coinsChatPattern by RepoPattern.pattern(
         "fishing.tracker.chat.coins",
-        ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\.",
+        "§5⛃ §r(?<catch>.*) CATCH! §r§fYou caught §r§6(?<coins>[\\d,]+) Coins§r§f!"
     )
 
     private var lastCatchTime = SimpleTimeMark.farPast()
