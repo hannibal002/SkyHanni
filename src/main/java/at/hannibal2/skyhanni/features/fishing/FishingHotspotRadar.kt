@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
@@ -71,13 +73,12 @@ object FishingHotspotRadar {
             condition = { it.hasTag(GraphNodeTag.FISHING_HOTSPOT) },
             radius = 15.0,
         ) ?: run {
-            // TODO reuse again once this doesnt cause StackOverflowError anymore
-//             ErrorManager.logErrorStateWithData(
-//                 "No path to fishing hotspot found",
-//                 "no node with tag 'fishing hotspot' found near the radar hotspot target",
-//                 "location" to location,
-//                 "island" to LorenzUtils.skyBlockIsland.name,
-//             )
+            ErrorManager.logErrorStateWithData(
+                "No path to fishing hotspot found",
+                "no node with tag 'fishing hotspot' found near the radar hotspot target",
+                "location" to location,
+                "island" to LorenzUtils.skyBlockIsland.name,
+            )
             IslandGraphs.pathFind(
                 location, "§cUnknown Fishing Hotspot", LorenzColor.RED.toColor(),
                 condition = {
@@ -99,6 +100,9 @@ object FishingHotspotRadar {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val location = hotspotLocation ?: return
         val distance = location.distance(event.exactPlayerEyeLocation())
+        if (config.lineToHotspot) {
+            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toColor(), 3, false)
+        }
         if (distance > 10) {
             val formattedDistance = distance.toInt().addSeparators()
             event.drawDynamicText(location.add(-0.5, 1.7, -0.5), "§d§lHOTSPOT", 1.7)
@@ -123,7 +127,7 @@ object FishingHotspotRadar {
         lastAbilityUse = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         hotspotLocation = null
         bezierFitter.reset()
