@@ -14,7 +14,7 @@ class FruitBowlConfig {
 
     @ConfigOption(
         name = "Player Highlighter",
-        desc = "Find players that want you to click on them to collect their profile names in your Fruit Ball.",
+        desc = "Find players that want you to click on them to collect their profile names in your Fruit Bowl.",
     )
     @Expose
     @ConfigEditorBoolean
