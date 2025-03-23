@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -72,7 +73,7 @@ object FastFairySoulsPathfinder {
         "§7Fairy Souls: §e(?<have>.*)§7\\/§d(?<total>.*)",
     )
 
-    class Data(
+    private class Data(
         var found: Int,
         val total: Int,
         val route: MutableList<LorenzVec>,
@@ -190,7 +191,7 @@ object FastFairySoulsPathfinder {
             } ?: continue
 
 
-            if (LorenzUtils.skyBlockIsland == island) {
+            if (island.isInIsland()) {
                 data?.checkHaveAll(have)
             } else {
                 totalFound[island] = have
