@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -127,6 +128,7 @@ object IslandGraphs {
     private var color = Color.WHITE
     private var shouldAllowRerouting = false
     private var onFound: () -> Unit = {}
+    private var onManualCancel: () -> Unit = {}
     private var goal: GraphNode? = null
         set(value) {
             prevGoal = field
@@ -152,7 +154,6 @@ object IslandGraphs {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRepoReload(event: RepositoryReloadEvent) {
-
         loadIsland(LorenzUtils.skyBlockIsland)
     }
 
@@ -224,15 +225,17 @@ object IslandGraphs {
     }
 
     fun setNewGraph(graph: Graph) {
-        reset()
         currentIslandGraph = graph
-
-        // calling various update functions to make swtiching between deep caverns and glacite tunnels bareable
-        handleTick()
-        IslandAreas.nodeMoved()
-        DelayedRun.runDelayed(150.milliseconds) {
-            IslandAreas.updatePosition()
+        if (currentTarget != null) {
+            DelayedRun.runDelayed(500.milliseconds) {
+                handleTick()
+                checkMoved()
+            }
         }
+
+        // calling various update functions to make switching between deep caverns and glacite tunnels bearable
+        handleTick()
+        IslandGraphReloadEvent(graph).post()
     }
 
     private fun reset() {
@@ -262,9 +265,9 @@ object IslandGraphs {
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
-                onFound()
                 "§e[SkyHanni] Navigation reached §r$label§e!".asComponent().send(pathFindMessageId)
                 reset()
+                onFound()
             }
             if (!condition()) {
                 reset()
@@ -360,6 +363,13 @@ object IslandGraphs {
         if (MinecraftCompat.localPlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
         }
+        renderPath(setPath, nodes)
+    }
+
+    fun renderPath(
+        setPath: Boolean = true,
+        nodes: List<GraphNode>,
+    ) {
         if (setPath) {
             this.fastestPath = skipIfCloser(Graph(cutByMaxDistance(nodes, 2.0)))
         }
@@ -409,13 +419,14 @@ object IslandGraphs {
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
         allowRerouting: Boolean = false,
+        onManualCancel: () -> Unit = {},
         condition: () -> Boolean,
     ) {
         if (isActive(position, label)) return
         reset()
         currentTargetNode = this
         shouldAllowRerouting = allowRerouting
-        pathFind0(location = position, label, color, onFound, condition)
+        pathFind0(location = position, label, color, onFound, onManualCancel, condition)
     }
 
     /**
@@ -432,13 +443,14 @@ object IslandGraphs {
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
+        onManualCancel: () -> Unit = {},
         condition: () -> Boolean,
     ) {
         if (isActive(location, label)) return
         require(label.isNotEmpty()) { "Label cannot be empty." }
         reset()
         shouldAllowRerouting = false
-        pathFind0(location, label, color, onFound, condition)
+        pathFind0(location, label, color, onFound, onManualCancel, condition)
     }
 
     private fun pathFind0(
@@ -446,12 +458,14 @@ object IslandGraphs {
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
+        onManualCancel: () -> Unit = {},
         condition: () -> Boolean,
     ) {
         currentTarget = location
         this.label = label
         this.color = color
         this.onFound = onFound
+        this.onManualCancel = onManualCancel
         this.condition = condition
         val graph = currentIslandGraph ?: return
         goal = graph.minBy { it.position.distance(currentTarget!!) }
@@ -488,11 +502,16 @@ object IslandGraphs {
         componentText.onClick(
             onClick = {
                 stop()
+                onManualCancel()
                 "§e[SkyHanni] Navigation stopped!".asComponent().send(pathFindMessageId)
             },
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()
         componentText.send(pathFindMessageId)
+    }
+
+    fun overrideChatMessage(message: String) {
+        message.asComponent().send(pathFindMessageId)
     }
 
     @HandleEvent

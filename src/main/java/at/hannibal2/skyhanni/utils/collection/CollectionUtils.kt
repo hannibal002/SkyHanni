@@ -1,12 +1,5 @@
-package at.hannibal2.skyhanni.utils
+package at.hannibal2.skyhanni.utils.collection
 
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.Searchable
-import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.EnumMap
 import java.util.Queue
@@ -18,16 +11,6 @@ object CollectionUtils {
     inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
         while (true) action(this.poll() ?: break)
         return this
-    }
-
-    inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
-        repeat(amount) { this.poll() ?: return this }
-        return this
-    }
-
-    inline fun <reified E, reified K, reified L : MutableCollection<K>> Queue<E>.drainTo(list: L, action: (E) -> K): L {
-        while (true) list.add(action(this.poll() ?: break))
-        return list
     }
 
     inline fun <reified E, reified L : MutableCollection<E>> Queue<E>.drainTo(list: L): L {
@@ -149,28 +132,6 @@ object CollectionUtils {
         return this.drop(startIndex + skip).take(amount)
     }
 
-    fun List<String>.removeNextAfter(after: String, skip: Int = 1) = removeNextAfter({ it == after }, skip)
-
-    fun List<String>.removeNextAfter(after: (String) -> Boolean, skip: Int = 1): List<String> {
-        val newList = mutableListOf<String>()
-        var missing = -1
-        for (line in this) {
-            if (after(line)) {
-                missing = skip - 1
-                continue
-            }
-            if (missing == 0) {
-                missing--
-                continue
-            }
-            if (missing != -1) {
-                missing--
-            }
-            newList.add(line)
-        }
-        return newList
-    }
-
     inline fun <reified T, reified K : MutableList<T>> K.transformAt(index: Int, transform: T.() -> T): K {
         this[index] = transform(this[index])
         return this
@@ -197,16 +158,6 @@ object CollectionUtils {
     }
 
     operator fun IntRange.contains(range: IntRange): Boolean = range.first in this && range.last in this
-
-    @Deprecated("use Renderable")
-    fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
-        add(Collections.singletonList(text))
-    }
-
-    // TODO move to RenderableUtils
-    fun MutableList<List<Renderable>>.addSingleString(text: String) {
-        add(Collections.singletonList(Renderable.string(text)))
-    }
 
     fun <K, V : Comparable<V>> List<Pair<K, V>>.sorted(): List<Pair<K, V>> {
         return sortedBy { (_, value) -> value }
@@ -253,40 +204,12 @@ object CollectionUtils {
         return collection
     }
 
-    /** Removes the first element that matches the given [predicate] in the list. */
-    fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
-        val mutableList = this.toMutableList()
-        val iterator = mutableList.iterator()
-        while (iterator.hasNext()) {
-            if (predicate(iterator.next())) {
-                iterator.remove()
-                break
-            }
-        }
-        return mutableList.toList()
-    }
-
-    /** Removes the first element that matches the given [predicate] in the map. */
-    fun <K, V> Map<K, V>.removeFirst(predicate: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
-        val mutableMap = this.toMutableMap()
-        val iterator = mutableMap.entries.iterator()
-        while (iterator.hasNext()) {
-            if (predicate(iterator.next())) {
-                iterator.remove()
-                break
-            }
-        }
-        return mutableMap.toMap()
-    }
-
     /** Updates a value if it is present in the set (equals), useful if the newValue is not reference equal with the value in the set */
     inline fun <reified T> MutableSet<T>.refreshReference(newValue: T) = if (this.contains(newValue)) {
         this.remove(newValue)
         this.add(newValue)
         true
     } else false
-
-    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? = if (all { it != null }) filterNotNull() else null
 
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? = if (all { it != null }) filterNotNull() else null
 
@@ -300,90 +223,6 @@ object CollectionUtils {
 
     inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> {
         return EnumMap<K, V>(K::class.java)
-    }
-
-    inline fun <reified K : Enum<K>, V> enumMapOf(initialize: (K) -> V): EnumMap<K, V> {
-        return enumMapOf<K, V>().apply { enumValues<K>().forEach { this[it] = initialize(it) } }
-    }
-
-    inline fun <reified K : Enum<K>, V> enumMapOf(initialize: () -> V): EnumMap<K, V> {
-        return enumMapOf<K, V>().apply { enumValues<K>().forEach { this[it] = initialize() } }
-    }
-
-    inline fun <reified K : Enum<K>, V> enumMapOf(vararg pairs: Pair<K, V>): EnumMap<K, V> {
-        return enumMapOf<K, V>().apply { putAll(pairs) }
-    }
-
-    // TODO add cache
-    fun MutableList<Renderable>.addString(
-        text: String,
-        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
-        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
-    ) {
-        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
-    }
-
-    // TODO add cache
-    fun MutableList<Searchable>.addSearchString(
-        text: String,
-        searchText: String? = null,
-        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
-        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
-    ) {
-        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign).toSearchable(searchText))
-    }
-
-    // TODO add internal name support, and caching
-    fun MutableList<Renderable>.addItemStack(
-        itemStack: ItemStack,
-        highlight: Boolean = false,
-        scale: Double = NeuItems.ITEM_FONT_SIZE,
-    ) {
-        if (highlight) {
-            // Hack to add enchant glint, like Hypixel does it
-            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
-        }
-        add(Renderable.itemStack(itemStack, scale = scale))
-    }
-
-    fun MutableList<Renderable>.addHorizontalSpacer(width: Int = 3) {
-        add(Renderable.placeholder(width, 0))
-    }
-
-    fun MutableList<Renderable>.addVerticalSpacer(height: Int = 10) {
-        add(Renderable.placeholder(0, height))
-    }
-
-    fun MutableList<Renderable>.addItemStack(internalName: NeuInternalName) {
-        addItemStack(internalName.getItemStack())
-    }
-
-    fun takeColumn(start: Int, end: Int, startColumn: Int, endColumn: Int, rowSize: Int = 9) =
-        generateSequence(start) { it + 1 }.map {
-            (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn
-        }.takeWhile { it <= end }
-
-    // TODO move to RenderableUtils
-    fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
-        if (this.isEmpty()) return xSpace
-        val off = RenderableUtils.calculateTableXOffsets(this as List<List<Renderable?>>, 0)
-        val xLength = off.size - 1
-        val emptySpace = xSpace - off.last()
-        if (emptySpace < 0) {
-            //    throw IllegalArgumentException("Not enough space for content")
-        }
-        return emptySpace / (xLength - 1)
-    }
-
-    fun Collection<Collection<Renderable>>.tableStretchYPadding(ySpace: Int): Int {
-        if (this.isEmpty()) return ySpace
-        val off = RenderableUtils.calculateTableYOffsets(this as List<List<Renderable?>>, 0)
-        val yLength = off.size - 1
-        val emptySpace = ySpace - off.last()
-        if (emptySpace < 0) {
-            //    throw IllegalArgumentException("Not enough space for content")
-        }
-        return emptySpace / (yLength - 1)
     }
 
     /** Splits the input into equal sized lists. If the list can't get divided clean by [subs] then the last entry gets reduced. e.g. 13/4 = [4,4,4,1]*/
@@ -437,6 +276,7 @@ object CollectionUtils {
     }
 
     fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
+        @Suppress("UNCHECKED_CAST")
         return filterKeys { it != null } as Map<K, V>
     }
 
@@ -453,7 +293,7 @@ object CollectionUtils {
     /**
      * If there is only one element in the iterator, returns it. Otherwise, returns the [defaultValue].
      */
-    fun <T> getOnlyElement(it: Iterator<T>, defaultValue: T): T {
+    private fun <T> getOnlyElement(it: Iterator<T>, defaultValue: T): T {
         if (!it.hasNext()) return defaultValue
         val ret = it.next()
         if (it.hasNext()) return defaultValue
@@ -513,12 +353,5 @@ object CollectionUtils {
             }
         }
         return null
-    }
-
-    fun <T> List<T>.insertAfterEach(extra: T): List<T> = buildList(size * 2) {
-        for (item in this@insertAfterEach) {
-            add(item)
-            add(extra)
-        }
     }
 }

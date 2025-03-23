@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
@@ -41,13 +41,14 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute x position of the columns in a table*/
-    fun calculateTableXOffsets(content: Collection<List<Renderable?>>, xPadding: Int) = run {
+    fun calculateTableXOffsets(content: Collection<Collection<Renderable?>>, xPadding: Int) = run {
+        val rows: List<List<Renderable?>> = content.map { it.toList() }
         var buffer = 0
         var index = 0
         buildList {
             add(0)
             while (true) {
-                buffer += content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                buffer += rows.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
                     it?.width ?: 0
                 }?.let { it + xPadding } ?: break
                 add(buffer)
@@ -60,7 +61,7 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute y position of the rows in a table*/
-    fun calculateTableYOffsets(content: Collection<List<Renderable?>>, yPadding: Int) = run {
+    fun calculateTableYOffsets(content: Collection<Collection<Renderable?>>, yPadding: Int) = run {
         var buffer = 0
         listOf(0) + (
             content.takeIf { it.isNotEmpty() }?.map { row ->
