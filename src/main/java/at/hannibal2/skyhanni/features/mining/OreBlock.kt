@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.MiningApi.inGlacite
 import at.hannibal2.skyhanni.data.MiningApi.inMineshaft
 import at.hannibal2.skyhanni.data.MiningApi.inSpidersDen
 import at.hannibal2.skyhanni.data.MiningApi.inTunnels
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.addRedstoneOres
 import net.minecraft.block.Block
 import net.minecraft.block.BlockStainedGlass
