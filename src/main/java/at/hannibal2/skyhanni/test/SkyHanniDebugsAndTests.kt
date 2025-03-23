@@ -300,7 +300,8 @@ object SkyHanniDebugsAndTests {
                     println("Unregistered listener $simpleName")
                 }
                 ChatUtils.clickableChat(
-                    "Stopped ${modules.size} listener classes. If you want to re-enable them, run /shreloadlisteners or click this message.",
+                    "Stopped ${modules.size} listener classes. " +
+                        "If you want to re-enable them, run /shreloadlisteners or click this message.",
                     onClick = { reloadListeners() },
                 )
             },
