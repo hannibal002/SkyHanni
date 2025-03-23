@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawRoundRect
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
