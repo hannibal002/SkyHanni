@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -93,8 +93,8 @@ object BingoCardDisplay {
                     tips = listOf("Click to run §e/bingo"),
                     onLeftClick = {
                         HypixelCommands.bingo()
-                    }
-                )
+                    },
+                ),
             )
         } else {
             if (!config.hideCommunityGoals.get()) {
@@ -202,7 +202,7 @@ object BingoCardDisplay {
                         it.highlight = !currentlyHighlighted
                         it.displayName
                         update()
-                    }
+                    },
                 )
             } else {
                 Renderable.string(display)
