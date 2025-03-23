@@ -70,6 +70,11 @@ object SignUtils {
         pasteLastClicked = pasteClicked
     }
 
+    private fun GuiEditSign.getSignLines(): List<String>? {
+        if (this !is AccessorGuiEditSign) return null
+        return (this as AccessorGuiEditSign).text.map { it.unformattedText.removeColor() }
+    }
+
     fun GuiEditSign.isRancherSign(): Boolean {
         val signText = getSignLines() ?: return false
         return signText[1] == "^^^^^^" && signText[2] == "Set your" && signText[3] == "speed cap!"
@@ -80,9 +85,16 @@ object SignUtils {
         return signText[1] == "Set Yaw Above!" && signText[2] == "Set Pitch Below!"
     }
 
-    private fun GuiEditSign.getSignLines(): List<String>? {
-        if (this !is AccessorGuiEditSign) return null
-        return (this as AccessorGuiEditSign).text.map { it.unformattedText.removeColor() }
+    fun GuiEditSign.isBazaarSign(): Boolean {
+        val signText = getSignLines() ?: return false
+        if (signText[1] == "^^^^^^^^^^^^^^^" && signText[2] == "Enter amount" && signText[3] == "to order") return true // Bazaar buy
+        if (signText[1] == "^^^^^^^^^^^^^^^" && signText[2] == "Enter amount" && signText[3] == "to sell") return true // Bazaar sell
+        return false
+    }
+
+    fun GuiEditSign.isSupercraftAmountSetSign(): Boolean {
+        val signText = getSignLines() ?: return false
+        return signText[1] == "^^^^^^" && signText[2] == "Enter amount" && signText[3] == "of crafts"
     }
 
     fun GuiEditSign.isGardenSign(): Boolean {
