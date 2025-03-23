@@ -489,4 +489,12 @@ object StringUtils {
         val clean = removeColor()
         return "§$firstColor§m$clean"
     }
+
+    fun getListOfStringsMatchingLastWord(words: Array<String>, args: Collection<String>): List<String> {
+        val lastWord = words.lastOrNull() ?: return emptyList()
+        val matches = args.filter { it.startsWith(lastWord, ignoreCase = true) }
+        return matches.ifEmpty {
+            listOf()
+        }
+    }
 }
