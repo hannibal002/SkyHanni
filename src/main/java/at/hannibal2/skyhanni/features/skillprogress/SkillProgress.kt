@@ -47,8 +47,8 @@ object SkillProgress {
     val config get() = SkyHanniMod.feature.skillProgress
     private val barConfig get() = config.skillProgressBarConfig
     private val allSkillConfig get() = config.allSkillDisplayConfig
+    private val customGoalConfig get() = config.customGoalConfig
     val etaConfig get() = config.skillETADisplayConfig
-    val customGoalConfig get() = config.customGoalConfig
 
     private var skillExpPercentage = 0.0
     private var display = emptyList<Renderable>()

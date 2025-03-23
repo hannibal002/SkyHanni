@@ -59,19 +59,7 @@ object JacobContestFFNeededDisplay {
         cache.clear()
     }
 
-    private fun MutableList<Renderable>.addTextStackTextHorizontal(
-        textBefore: String,
-        item: ItemStack,
-        textAfter: String,
-    ): Renderable = Renderable.horizontalContainer(
-        listOf(
-            Renderable.string(textBefore),
-            Renderable.itemStack(item),
-            Renderable.string(textAfter),
-        )
-    )
-
-    private fun drawDisplay(contest: FarmingContest) = buildList<Renderable> {
+    private fun drawDisplay(contest: FarmingContest) = buildList {
         addString("§6Minimum Farming Fortune needed")
         addString("")
 
