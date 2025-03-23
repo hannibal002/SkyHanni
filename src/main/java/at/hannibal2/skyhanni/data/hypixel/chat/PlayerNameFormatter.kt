@@ -245,7 +245,7 @@ object PlayerNameFormatter {
         if (config.ignoreYouTube && author.getText().contains("YOUTUBE")) return author
         val (rank, name) = author.splitPlayerNameAndExtras()
         val rankColor =
-            if (rank != null && rank.sampleAtStart() === name.sampleAtStart()) FontRenderer.getFormatFromString(rank.getText()) else ""
+            if (rank != null && rank.sampleAtStart() === name.sampleAtStart()) StringUtils.getFormatFromString(rank.getText()) else ""
         val coloredName = createColoredName(name, levelColor, name.getText().removeColor(), rankColor)
         return if (config.playerRankHider || rank == null) coloredName else rank + coloredName
     }

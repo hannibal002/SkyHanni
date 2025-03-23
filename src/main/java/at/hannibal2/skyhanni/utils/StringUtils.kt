@@ -497,4 +497,32 @@ object StringUtils {
             listOf()
         }
     }
+
+    // Just fully yoinked this one from the font renderer thx dinner bone
+    fun getFormatFromString(text: String): String {
+        val length = text.length
+        var string = ""
+        var i = -1
+
+        while ((text.indexOf(167.toChar(), i + 1).also { i = it }) != -1) {
+            if (i < length - 1) {
+                val c0 = text[i + 1]
+                if (isFormatColor(c0)) {
+                    string = "§$c0"
+                } else if (isFormatSpecial(c0)) {
+                    string = "$string§$c0"
+                }
+            }
+        }
+
+        return string
+    }
+
+    private fun isFormatColor(colorChar: Char): Boolean {
+        return colorChar in '0'..'9' || colorChar in 'a'..'f' || colorChar in 'A'..'F'
+    }
+
+    private fun isFormatSpecial(formatChar: Char): Boolean {
+        return formatChar in 'k'..'o' || formatChar in 'K'..'O' || formatChar in "rR"
+    }
 }
