@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
+import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -44,17 +45,18 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
@@ -171,6 +173,9 @@ class ProfileSpecificStorage {
     // -- winter
     @Expose
     var frozenTreasureTracker: FrozenTreasureTracker.Data = FrozenTreasureTracker.Data()
+
+    @Expose
+    var giftProfitTracker: GiftProfitTracker.Data = GiftProfitTracker.Data()
 
     // -- hoppity
     @Expose
@@ -732,6 +737,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var verminTracker: VerminTracker.Data = VerminTracker.Data()
+
+        @Expose
+        var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
     }
 
     // - slayer
@@ -798,5 +806,16 @@ class ProfileSpecificStorage {
 
         @Expose
         var museumMilestone: Int? = null
+    }
+
+    @Expose
+    var fairySouls: FairySoulsStorage = FairySoulsStorage()
+
+    class FairySoulsStorage {
+        @Expose
+        var totalFound: MutableMap<IslandType, Int> = mutableMapOf()
+
+        @Expose
+        var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
     }
 }

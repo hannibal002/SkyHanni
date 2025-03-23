@@ -8,8 +8,9 @@ import io.gitlab.arturbosch.detekt.api.Severity
 import io.gitlab.arturbosch.detekt.rules.hasAnnotation
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 
-class StorageNeedsExpose(config: Config): SkyHanniRule(config) {
+class StorageNeedsExpose(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
         "StorageNeedsExpose",
         Severity.Defect,
@@ -28,24 +29,35 @@ class StorageNeedsExpose(config: Config): SkyHanniRule(config) {
         super.visitKtFile(file)
     }
 
-    override fun visitProperty(property: KtProperty) {
-        // Skip local variables inside functions
-        if (property.isLocal) return
+    private fun checkProperty(property: KtProperty): Unit {
+        // Skip:
+        //  - Local properties
+        //  - Private properties
+        //  - Values
+        //  - Properties with getters
+        val hasExplicitGetter = property.getter?.hasBody() ?: false
+        val doWeCare = (!property.isLocal && !property.isPrivate() && property.isVar && !hasExplicitGetter)
+
+        // Don't flag @Transient properties
+        val isTransient = property.hasAnnotation("Transient")
+
+        val hasAnnotation = property.hasAnnotation("Expose")
+        if (!doWeCare || hasAnnotation || isTransient) return
 
         // If the property is not annotated with @Expose, report it
-        if (!property.hasAnnotation("Expose")) {
-
-            if (property.hasAnnotation("ConfigOption")) {
-                // Valid reasons to not have the @Expose annotation on a config option:
-                //  - Has the ConfigEditorInfoText annotation
-                //  - Has the ConfigEditorButton annotation
-                if(property.hasAnnotation("ConfigEditorInfoText")) return
-                if(property.hasAnnotation("ConfigEditorButton")) return
-            }
-
-            property.reportIssue("@Expose annotation is missing from property ${property.name}")
+        if (property.hasAnnotation("ConfigOption")) {
+            // Valid reasons to not have the @Expose annotation on a config option:
+            //  - Has the ConfigEditorInfoText annotation
+            //  - Has the ConfigEditorButton annotation
+            if (property.hasAnnotation("ConfigEditorInfoText")) return
+            if (property.hasAnnotation("ConfigEditorButton")) return
         }
 
+        return property.reportIssue("@Expose annotation is missing from property ${property.name}")
+    }
+
+    override fun visitProperty(property: KtProperty) {
+        checkProperty(property)
         super.visitProperty(property)
     }
 }

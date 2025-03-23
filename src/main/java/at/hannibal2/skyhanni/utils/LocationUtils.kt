@@ -1,10 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.time.Duration
 
 object LocationUtils {
@@ -14,9 +20,9 @@ object LocationUtils {
     }
 
     private fun canSee0(a: LorenzVec, b: LorenzVec) =
-        Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
+        MinecraftCompat.localWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
 
-    fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
+    fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 
     fun LorenzVec.distanceToPlayer() = distance(playerLocation())
 
@@ -34,7 +40,7 @@ object LocationUtils {
     fun Entity.distanceToIgnoreY(location: LorenzVec) = getLorenzVec().distanceIgnoreY(location)
 
     fun playerEyeLocation(): LorenzVec {
-        val player = Minecraft.getMinecraft().thePlayer
+        val player = MinecraftCompat.localPlayer
         val vec = player.getLorenzVec()
         return vec.up(player.getEyeHeight().toDouble())
     }
@@ -113,7 +119,7 @@ object LocationUtils {
     }
 
     fun calculatePlayerYaw(): Float {
-        val player = Minecraft.getMinecraft().thePlayer
+        val player = MinecraftCompat.localPlayer
         var yaw = player.rotationYaw % 360
         if (yaw < 0) yaw += 360
         if (yaw > 180) yaw -= 360
@@ -176,5 +182,38 @@ object LocationUtils {
             bottomRightBack to topRightBack,
             bottomRightFront to topRightFront,
         )
+    }
+
+    fun computePitchWeight(derivative: LorenzVec) = sqrt(24 * sin(getPitchFromDerivative(derivative) - PI) + 25)
+
+    private fun getPitchFromDerivative(derivative: LorenzVec): Double {
+        val xzLength = sqrt(derivative.x.pow(2) + derivative.z.pow(2))
+        val pitchRadians = -atan2(derivative.y, xzLength)
+        // Solve y = atan2(sin(x) - 0.75, cos(x)) for x from y
+        var guessPitch = pitchRadians
+        var resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
+        var windowMax = PI / 2
+        var windowMin = -PI / 2
+        repeat(100) {
+            if (resultPitch < pitchRadians) {
+                windowMin = guessPitch
+                guessPitch = (windowMin + windowMax) / 2
+            } else {
+                windowMax = guessPitch
+                guessPitch = (windowMin + windowMax) / 2
+            }
+            resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
+            if (resultPitch == pitchRadians) return guessPitch
+        }
+        return guessPitch
+    }
+
+    fun AxisAlignedBB.getCornersAtHeight(y: Double): List<LorenzVec> {
+        val cornerOne = LorenzVec(minX, y, minZ)
+        val cornerTwo = LorenzVec(minX, y, maxZ)
+        val cornerThree = LorenzVec(maxX, y, maxZ)
+        val cornerFour = LorenzVec(maxX, y, minZ)
+
+        return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
     }
 }

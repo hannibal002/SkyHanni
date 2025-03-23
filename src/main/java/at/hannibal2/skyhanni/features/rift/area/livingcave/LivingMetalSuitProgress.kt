@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getLivingMetalProgress
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addAsSingletonList
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -25,7 +25,7 @@ object LivingMetalSuitProgress {
         if (!isEnabled()) return
         config.position.renderStringsAndItems(
             display,
-            posLabel = "Living Metal Armor Progress"
+            posLabel = "Living Metal Armor Progress",
         )
     }
 
@@ -54,9 +54,9 @@ object LivingMetalSuitProgress {
                     add(
                         progress?.let {
                             drawProgressBar(progress) + " §b${LorenzUtils.formatPercentage(progress)}"
-                        } ?: "§cStart upgrading it!"
+                        } ?: "§cStart upgrading it!",
                     )
-                }
+                },
             )
         }
     }
@@ -71,7 +71,7 @@ object LivingMetalSuitProgress {
                     armor,
                     armor.getLivingMetalProgress()?.toDouble()?.let {
                         it.coerceAtMost(100.0) / 100
-                    }
+                    },
                 )
             }
         }

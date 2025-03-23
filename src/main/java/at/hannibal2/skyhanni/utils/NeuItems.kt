@@ -9,33 +9,23 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GLAllocation
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
-import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
-import org.lwjgl.opengl.GL11
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object NeuItems {
@@ -65,14 +55,16 @@ object NeuItems {
         readAllNeuItems()
     }
 
-    fun readAllNeuItems() {
+    private fun readAllNeuItems() {
         val map = mutableMapOf<String, NeuInternalName>()
+        val names = mutableSetOf<NeuInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             val internalName = rawInternalName.toInternalName()
             var name = internalName.getItemStackOrNull()?.displayName?.lowercase() ?: run {
                 ChatUtils.debug("skipped `$rawInternalName` from readAllNeuItems")
                 continue
             }
+            names.add(internalName)
 
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
@@ -91,7 +83,7 @@ object NeuItems {
             }
             map[name] = internalName
         }
-        allInternalNames = map.values.toSet()
+        allInternalNames = names
         allItemsCache = map
     }
 
@@ -99,9 +91,6 @@ object NeuItems {
         .withCurrentGuiContext()
         .withItemStack(itemStack)
         .resolveInternalName()
-
-    fun getInternalNameOrNull(nbt: NBTTagCompound): NeuInternalName? =
-        ItemResolutionQuery().withItemNbt(nbt).resolveInternalName()?.toInternalName()
 
     fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NeuInternalName? {
         val internalName = hypixelId.replace(':', '-')
@@ -115,6 +104,7 @@ object NeuItems {
     fun transHypixelNameToInternalName(hypixelId: String): NeuInternalName =
         ItemResolutionQuery.transformHypixelBazaarToNeuItemId(hypixelId).toInternalName()
 
+    //  TODO add cache
     fun NeuInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery()
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
@@ -157,79 +147,7 @@ object NeuItems {
         return string.substring(prefix.length).toInternalName()
     }
 
-    const val itemFontSize = 2.0 / 3.0
-
-    fun ItemStack.renderOnScreen(
-        x: Float,
-        y: Float,
-        scaleMultiplier: Double = itemFontSize,
-        rescaleSkulls: Boolean = true,
-    ) {
-        val item = checkBlinkItem()
-        val isSkull = rescaleSkulls && item.item === Items.skull
-
-        val baseScale = (if (isSkull) 4f / 3f else 1f)
-        val finalScale = baseScale * scaleMultiplier
-
-        val translateX: Float
-        val translateY: Float
-        if (isSkull) {
-            val skullDiff = ((scaleMultiplier) * 2.5).toFloat()
-            translateX = x - skullDiff
-            translateY = y - skullDiff
-        } else {
-            translateX = x
-            translateY = y
-        }
-
-        GlStateManager.pushMatrix()
-
-        GlStateManager.translate(translateX, translateY, -19f)
-        GlStateManager.scale(finalScale, finalScale, 0.2)
-        GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
-
-        RenderHelper.enableGUIStandardItemLighting()
-
-        AdjustStandardItemLighting.adjust() // Compensate for z scaling
-
-        try {
-            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
-        } catch (e: Exception) {
-            if (lastWarn.passedSince() > 1.seconds) {
-                lastWarn = SimpleTimeMark.now()
-                println(" ")
-                println("item: $item")
-                println("name: ${item.name}")
-                println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
-                println(" ")
-                ChatUtils.debug("rendering an item has failed.")
-            }
-        }
-        RenderHelper.disableStandardItemLighting()
-
-        GlStateManager.popMatrix()
-    }
-
-    private var lastWarn = SimpleTimeMark.farPast()
-
-    private object AdjustStandardItemLighting {
-
-        private const val lightScaling = 2.47f // Adjust as needed
-        private const val g = 0.6f // Original Value taken from RenderHelper
-        private const val lightIntensity = lightScaling * g
-        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16)
-
-        init {
-            itemLightBuffer.clear()
-            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1.0f)
-            itemLightBuffer.flip()
-        }
-
-        fun adjust() {
-            GL11.glLight(16384, 4609, itemLightBuffer)
-            GL11.glLight(16385, 4609, itemLightBuffer)
-        }
-    }
+    const val ITEM_FONT_SIZE = 2.0 / 3.0
 
     fun allNeuRepoItems(): Map<String, JsonObject> = EnoughUpdatesManager.getItemInformation()
 
@@ -238,7 +156,7 @@ object NeuItems {
             return it
         }
         val result = allNeuRepoItems().filter {
-            Item.getByNameOrId(it.value["itemid"].asString) == item
+            it.value["itemid"].asString.getVanillaItem() == item
         }.keys.map {
             it.toInternalName()
         }
@@ -317,7 +235,6 @@ object NeuItems {
         return false
     }
 
-    // Uses NEU
     fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
         val jsonObject = EnoughUpdatesManager.stackToJson(item)
         if (!jsonObject.has("internalname")) {

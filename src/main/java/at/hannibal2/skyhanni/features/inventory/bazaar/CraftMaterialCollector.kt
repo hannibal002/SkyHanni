@@ -9,12 +9,9 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -22,6 +19,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 @SkyHanniModule
@@ -41,13 +40,13 @@ object CraftMaterialCollector {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         val items = event.inventoryItems
-        val correctItem = items[23]?.name == "§aCrafting Table"
-        val correctSuperCraftItem = items[32]?.name == "§aSupercraft"
+        val correctItem = items[23]?.displayName == "§aCrafting Table"
+        val correctSuperCraftItem = items[32]?.displayName == "§aSupercraft"
 
         inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
 
-        val recipeName = items[25]?.itemName ?: return
+        val recipeName = items[25]?.repoItemName ?: return
         showRecipe(calculateMaterialsNeeded(event.inventoryItemsPrimitive), recipeName)
     }
 
@@ -62,7 +61,7 @@ object CraftMaterialCollector {
             for (item in recipeMaterials) {
                 val material = item.internalName
                 val amount = item.amount
-                var text = "§8${amount.addSeparators()}x " + material.itemName
+                var text = "§8${amount.addSeparators()}x " + material.repoItemName
                 if (material.isBazaarItem() || material.isAuctionHouseItem()) {
                     neededMaterials.add(item)
                     text += " §6${(material.getPrice() * amount).shortFormat()}"
@@ -71,10 +70,10 @@ object CraftMaterialCollector {
             }
             if (neededMaterials.isNotEmpty()) {
                 add(
-                    Renderable.clickAndHover(
+                    Renderable.clickable(
                         "§eAdd to craft material collector!",
-                        listOf("§eClick here to help purchasing the items!"),
-                        onClick = {
+                        tips = listOf("§eClick here to help purchasing the items!"),
+                        onLeftClick = {
                             addToPurchasing(neededMaterials)
                         },
                     ),
@@ -105,23 +104,23 @@ object CraftMaterialCollector {
             add(Renderable.string("§7Buy items:"))
             for ((material, amount) in neededMaterials) {
                 val priceMultiplier = amount * multiplier
-                val itemName = material.itemName
+                val itemName = material.repoItemName
                 val text = "§8${priceMultiplier.addSeparators()}x " + itemName + " §6${
                     (material.getPrice() * priceMultiplier).shortFormat(false)
                 }"
                 add(
-                    Renderable.clickAndHover(
-                        text = text,
-                        onClick = { material.buy(priceMultiplier) },
+                    Renderable.clickable(
+                        text,
                         tips = material.createBuyTip(),
+                        onLeftClick = { material.buy(priceMultiplier) },
                     ),
                 )
             }
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§eStop!",
-                    listOf("§eClick here to stop this view!"),
-                    onClick = {
+                    tips = listOf("§eClick here to stop this view!"),
+                    onLeftClick = {
                         purchasing = false
                         display = emptyList()
                     },
@@ -140,10 +139,10 @@ object CraftMaterialCollector {
             val text = "${nameColor}Mulitply x$m $price"
             if (!isThisMultiply) {
                 add(
-                    Renderable.clickAndHover(
+                    Renderable.clickable(
                         text,
-                        listOf("§eClick here to multiply the items needed times $m!"),
-                        onClick = {
+                        tips = listOf("§eClick here to multiply the items needed times $m!"),
+                        onLeftClick = {
                             multiplier = m
                             updateDisplay()
                         },
