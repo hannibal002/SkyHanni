@@ -239,7 +239,7 @@ object CityProjectFeatures {
             if (lore.isEmpty()) continue
             val last = lore.last()
             if (last == "§eClick to contribute!") {
-                slot highlight LorenzColor.YELLOW
+                slot.highlight(LorenzColor.YELLOW)
             }
         }
     }

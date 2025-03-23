@@ -78,19 +78,19 @@ object RenderUtils {
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
 
-    infix fun Slot.highlight(color: LorenzColor) {
+    fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
     }
 
-    infix fun Slot.highlight(color: Color) {
+    fun Slot.highlight(color: Color) {
         highlight(color, xDisplayPosition, yDisplayPosition)
     }
 
-    infix fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {
+    fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {
         highlight(color.toColor())
     }
 
-    infix fun RenderGuiItemOverlayEvent.highlight(color: Color) {
+    fun RenderGuiItemOverlayEvent.highlight(color: Color) {
         highlight(color, x, y)
     }
 
@@ -106,19 +106,19 @@ object RenderUtils {
         GlStateManager.enableLighting()
     }
 
-    infix fun Slot.drawBorder(color: LorenzColor) {
+    fun Slot.drawBorder(color: LorenzColor) {
         drawBorder(color.toColor())
     }
 
-    infix fun Slot.drawBorder(color: Color) {
+    fun Slot.drawBorder(color: Color) {
         drawBorder(color, xDisplayPosition, yDisplayPosition)
     }
 
-    infix fun RenderGuiItemOverlayEvent.drawBorder(color: LorenzColor) {
+    fun RenderGuiItemOverlayEvent.drawBorder(color: LorenzColor) {
         drawBorder(color.toColor())
     }
 
-    infix fun RenderGuiItemOverlayEvent.drawBorder(color: Color) {
+    fun RenderGuiItemOverlayEvent.drawBorder(color: Color) {
         drawBorder(color, x, y)
     }
 
