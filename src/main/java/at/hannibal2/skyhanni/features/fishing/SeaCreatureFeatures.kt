@@ -46,16 +46,14 @@ object SeaCreatureFeatures {
 
         rareSeaCreatures.add(mob)
 
-        var shouldHighlight = config.highlight
-        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow &&
-            seaCreaturesBosses.any { it.fullName.removeColor() == mob.name }) {
-            shouldHighlight = false
-        }
-        if (shouldHighlight) mob.highlight(LorenzColor.GREEN.toColor())
+        if (!config.highlight) return
+        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES !in damageIndicatorConfig.bossesToShow) return
+        if (seaCreaturesBosses.none { it.fullName.removeColor() == mob.name }) return
+        mob.highlight(LorenzColor.GREEN.toColor())
     }
 
     @HandleEvent
-    fun onMobSpawn(event: MobEvent.FirstSeen.SkyblockMob) {
+    fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
         if (mob !in rareSeaCreatures) return
