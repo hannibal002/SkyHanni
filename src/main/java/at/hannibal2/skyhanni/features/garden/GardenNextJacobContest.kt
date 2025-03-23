@@ -400,8 +400,8 @@ object GardenNextJacobContest {
         for (crop in nextContest.crops) {
             val isBoosted = crop == boostedCrop
             val stack = Renderable.itemStack(crop.icon, 1.0, highlight = isBoosted)
-            if (config.differentBoostedHighlight && isBoosted) {
-                add(stack.renderBounds(config.differentBoostedHighlightColor.toSpecialColor()))
+            if (config.additionalBoostedHighlight && isBoosted) {
+                add(stack.renderBounds(config.additionalBoostedHighlightColor.toSpecialColor()))
             } else add(stack)
             nextContestCrops.add(crop)
         }

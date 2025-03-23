@@ -39,14 +39,14 @@ public class NextJacobContestConfig {
     public boolean fetchAutomatically = true;
 
     @Expose
-    @ConfigOption(name = "Alternative Boosted Highlight", desc = "Highlight the current boosted crop with an outline in addition to the enchant glint.")
+    @ConfigOption(name = "Additional Boosted Highlight", desc = "Highlight the current boosted crop with an outline in addition to the enchant glint.")
     @ConfigEditorBoolean
-    public boolean differentBoostedHighlight = false;
+    public boolean additionalBoostedHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Alternative Boosted Highlight Color", desc = "Set the color of the highlight for the current boosted crop.")
+    @ConfigOption(name = "Additional Boosted Highlight Color", desc = "Set the color of the highlight for the current boosted crop.")
     @ConfigEditorColour
-    public String differentBoostedHighlightColor = "0:80:0:255:0";
+    public String additionalBoostedHighlightColor = "0:80:0:255:0";
 
     @Expose
     @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
