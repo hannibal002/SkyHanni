@@ -3,15 +3,14 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
@@ -21,13 +20,17 @@ import java.util.Base64
 import java.util.NavigableMap
 import java.util.UUID
 import java.util.regex.Matcher
+//#if FORGE
+import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
+//#else
+//$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
+//#endif
 
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
-    private val stringColorPattern = "§[0123456789abcdef].*".toPattern()
     private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
     private val minecraftColorCodesPattern = "(?i)(§[0-9a-fklmnor])+".toPattern()
     private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
@@ -161,58 +164,27 @@ object StringUtils {
         }
     }
 
-    fun getColor(string: String, default: Int, darker: Boolean = true): Int {
-        val matcher = stringColorPattern.matcher(string)
-        if (matcher.matches()) {
-            val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
-            return if (darker) {
-                colorInt.darkenColor()
-            } else {
-                "ff${Integer.toHexString(colorInt)}".toLong(radix = 16).toInt()
-            }
-        }
-        return default
-    }
-
     fun String.substringBeforeLastOrNull(needle: String): String? {
         val index = this.lastIndexOf(needle)
         if (index < 0) return null
         return this.substring(0, index)
     }
 
-    fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
+    fun encodeBase64(input: String): String = Base64.getEncoder().encodeToString(input.toByteArray())
 
     fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
-
-    fun addFormat(text: String, format: String): String {
-        if (text.length < 2) return text
-
-        val rawText = text.substring(2)
-        return if (rawText == text.removeColor()) {
-            val originalColor = text.substring(0, 2)
-            "$originalColor$format$rawText"
-        } else {
-            "$format$text"
-        }
-    }
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
     fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) this.toInt().toString() else this.toString()
 
-    fun String.splitLines(width: Int): String = GuiUtilRenderComponents.splitText(
-        asComponent(),
+    //#if FORGE
+    fun String.splitLines(width: Int): String = ForgeFontRenderer(Minecraft.getMinecraft().fontRendererObj).splitText(
+        //#else
+        //$$ fun String.splitLines(width: Int): String = ModernFontRenderer(MinecraftClient.getInstance().textRenderer).splitText(
+        //#endif
+        this,
         width,
-        Minecraft.getMinecraft().fontRendererObj,
-        false,
-        false,
-    ).joinToString("\n") {
-        val text = it.formattedText
-        val formatCode = Regex("(?:§[a-f0-9l-or]|\\s)*")
-        formatCode.matchAt(text, 0)?.let { matcher ->
-            val codes = matcher.value.replace("\\s".toRegex(), "")
-            codes + text.removeRange(matcher.range)
-        } ?: text
-    }
+    ).joinToString("\n") { it.removePrefix("§r") }
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
@@ -260,7 +232,7 @@ object StringUtils {
     }
 
     fun String.capAtMinecraftLength(limit: Int) =
-        capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
+        capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.toString()) }
 
     private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
         var i = 0
@@ -416,8 +388,13 @@ object StringUtils {
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
         chatComponent = new.asComponent()
-        if (clickEvents.size == 1) chatComponent.chatStyle.chatClickEvent = clickEvents.first()
-        if (hoverEvents.size == 1) chatComponent.chatStyle.chatHoverEvent = hoverEvents.first()
+        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value
+        if (hoverEvents.size == 1) chatComponent.hover =
+            //#if MC < 1.21
+            hoverEvents.first().value
+        //#else
+        //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
+        //#endif
     }
 
     private fun IChatComponent.findAllEvents(
@@ -432,7 +409,15 @@ object StringUtils {
         if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
             clickEvents.add(clickEvent)
         }
-        if (hoverEvent?.action != null && hoverEvents.none { it.value == hoverEvent.value }) {
+
+        if (hoverEvent?.action != null && hoverEvents.none {
+                //#if MC < 1.21
+                it.value == hoverEvent.value
+                //#else
+                //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) == hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
+                //#endif
+            }
+        ) {
             hoverEvents.add(hoverEvent)
         }
     }

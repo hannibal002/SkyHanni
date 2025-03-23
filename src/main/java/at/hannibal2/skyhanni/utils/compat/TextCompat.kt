@@ -159,7 +159,7 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
     //#endif
 }
 
-val defaultStyleConstructor: ChatStyle =
+val defaultStyleConstructor: ChatStyle get() =
     //#if MC < 1.16
     ChatStyle()
 //#else

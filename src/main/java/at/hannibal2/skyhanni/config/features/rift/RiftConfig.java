@@ -55,4 +55,13 @@ public class RiftConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean horsezookaHider = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Temporal Pillar Dodge",
+        desc = "Avoid pathfinding solutions through or near the big enderman that throws you back to the end credits screen and steals so much time."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean temporalPillarDodge = true;
 }
