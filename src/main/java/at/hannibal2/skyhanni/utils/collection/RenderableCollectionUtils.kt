@@ -41,10 +41,6 @@ object RenderableCollectionUtils {
         add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign).toSearchable(searchText))
     }
 
-    fun MutableList<List<Renderable>>.addSingleString(text: String) {
-        add(Collections.singletonList(Renderable.string(text)))
-    }
-
     // TODO add internal name support, and caching
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
