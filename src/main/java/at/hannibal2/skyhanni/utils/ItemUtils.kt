@@ -109,7 +109,7 @@ object ItemUtils {
         if (unknownStats.isNotEmpty()) {
             val name = StringUtils.pluralize(unknownStats.size, "stat", withNumber = true)
             ErrorManager.logErrorStateWithData(
-                "Found unknown skyblock stats on items, please report this in disocrd",
+                "Found unknown skyblock stats on items, please report this in discord",
                 "found $name via Hypixel Item API that are not in enum SkyblockStat",
                 // TODO logErrorStateWithData should accept a map of extra data directly
                 extraData = unknownStats.map { it.key to it.value }.toTypedArray(),

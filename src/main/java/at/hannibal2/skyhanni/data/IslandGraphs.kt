@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -152,7 +153,6 @@ object IslandGraphs {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRepoReload(event: RepositoryReloadEvent) {
-
         loadIsland(LorenzUtils.skyBlockIsland)
     }
 
@@ -224,15 +224,17 @@ object IslandGraphs {
     }
 
     fun setNewGraph(graph: Graph) {
-        reset()
         currentIslandGraph = graph
-
-        // calling various update functions to make swtiching between deep caverns and glacite tunnels bareable
-        handleTick()
-        IslandAreas.nodeMoved()
-        DelayedRun.runDelayed(150.milliseconds) {
-            IslandAreas.updatePosition()
+        if (currentTarget != null) {
+            DelayedRun.runDelayed(500.milliseconds) {
+                handleTick()
+                checkMoved()
+            }
         }
+
+        // calling various update functions to make switching between deep caverns and glacite tunnels bearable
+        handleTick()
+        IslandGraphReloadEvent(graph).post()
     }
 
     private fun reset() {
@@ -262,9 +264,9 @@ object IslandGraphs {
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
-                onFound()
                 "§e[SkyHanni] Navigation reached §r$label§e!".asComponent().send(pathFindMessageId)
                 reset()
+                onFound()
             }
             if (!condition()) {
                 reset()
@@ -360,6 +362,13 @@ object IslandGraphs {
         if (MinecraftCompat.localPlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
         }
+        renderPath(setPath, nodes)
+    }
+
+    fun renderPath(
+        setPath: Boolean = true,
+        nodes: List<GraphNode>,
+    ) {
         if (setPath) {
             this.fastestPath = skipIfCloser(Graph(cutByMaxDistance(nodes, 2.0)))
         }
@@ -493,6 +502,10 @@ object IslandGraphs {
         )
         componentText.hover = "§eClick to stop navigating!".asComponent()
         componentText.send(pathFindMessageId)
+    }
+
+    fun overrideChatMessage(message: String) {
+        message.asComponent().send(pathFindMessageId)
     }
 
     @HandleEvent

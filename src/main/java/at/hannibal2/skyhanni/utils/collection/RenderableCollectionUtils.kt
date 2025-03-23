@@ -13,7 +13,16 @@ import net.minecraft.item.ItemStack
 import java.util.Collections
 
 object RenderableCollectionUtils {
+    @Deprecated("use Renderable")
+    fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
+        add(Collections.singletonList(text))
+    }
 
+    fun MutableList<List<Renderable>>.addSingleString(text: String) {
+        add(Collections.singletonList(Renderable.string(text)))
+    }
+
+    // TODO add cache
     fun MutableList<Renderable>.addString(
         text: String,
         horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
@@ -22,6 +31,7 @@ object RenderableCollectionUtils {
         add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
     }
 
+    // TODO add cache
     fun MutableList<Searchable>.addSearchString(
         text: String,
         searchText: String? = null,
@@ -35,6 +45,7 @@ object RenderableCollectionUtils {
         add(Collections.singletonList(Renderable.string(text)))
     }
 
+    // TODO add internal name support, and caching
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
         highlight: Boolean = false,
