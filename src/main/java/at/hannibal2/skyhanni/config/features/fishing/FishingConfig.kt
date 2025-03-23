@@ -113,7 +113,7 @@ class FishingConfig {
     var guessHotspotRadarPathFind: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Line to Hotspot", desc = "Draws a line towards the Fishing Hotspot")
+    @ConfigOption(name = "Line to Hotspot", desc = "Draws a line towards the Fishing Hotspot.")
     @ConfigEditorBoolean
     @FeatureToggle
     var lineToHotspot: Boolean = false
