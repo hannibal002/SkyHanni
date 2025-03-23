@@ -11,9 +11,6 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.CollectionUtils.contains
-import at.hannibal2.skyhanni.utils.CollectionUtils.firstTwiceOf
-import at.hannibal2.skyhanni.utils.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -28,6 +25,9 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
