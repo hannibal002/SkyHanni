@@ -17,8 +17,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
@@ -49,7 +47,7 @@ object JacobContestTimeNeeded {
         }
 
         display = buildList {
-            addString("§e§lTime Needed for ${currentBracket.displayName} §eMedal!")
+            addString("§e§lTime Needed for ${currentBracket.displayName.firstLetterUppercase()} §eMedal!")
 
             addRenderableButton<ContestBracket>(
                 label = "Bracket",
@@ -160,6 +158,7 @@ object JacobContestTimeNeeded {
                 }
             }
             val line = if (timeInMinutes < 20.minutes) {
+                // TODO use table: first row crop name, second row "in <time>" or error msg
                 "§9${crop.cropName} §7in §b$formatDuration" + marking
             } else {
                 val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0

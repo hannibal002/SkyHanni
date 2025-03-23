@@ -8,6 +8,7 @@
 
 + Added Hotspot Radar Guesser. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3551)
     + Added a waypoint of the Fishing Hotspot when using the Hotspot Radar.
++ Added a line pointing to the detected Hotspot. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3638)
 
 #### Combat
 
@@ -49,11 +50,22 @@
 + Added Temporal Pillar Dodge. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3541)
     + Tweaked pathfinding in the Rift to avoid scary Endermen.
 
+#### Inventory
+
++ Added Moby-Duck to Evolving Items for Item Number and Time Held. - Luna (https://github.com/hannibal002/SkyHanni/pull/3554)
+
 #### Misc
 
 + Added 5 more separators to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3539)
 + Added a dropdown option for changing the display of numbers with their prefix in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2830)
     + Replaced Display Numbers First option.
++ Added Fast Fairy Soul Finder. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3427)
+    + Uses a fast pathfinder route to reach all Fairy Souls on the current island.
+    + Does not require NEU.
++ Improved Damage Indicator to include the Sea Creature Ragnarok. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3617)
++ Improved the full Thunder In A Bottle notification. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3567)
+    + Changed detection of full Thunder in a Bottle, added warning when fishing with a full bottle, and added support for Storm in a Bottle and Hurricane in a Bottle variants.
++ Renamed "Time Pocket Items" to "Evolving Items". - Luna (https://github.com/hannibal002/SkyHanni/pull/3554)
 
 ### Bug Fixes
 
@@ -71,6 +83,8 @@
 + Fixed Sulphur Skitter Box not displaying without lava nearby. - Luna (https://github.com/hannibal002/SkyHanni/pull/3523)
     + The Player must be within 4 blocks, not the bobber, for the box to display.
 + Fixed Trophy Fish features not working after a Hypixel message change. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3620)
++ Fixed Hotspot Radar guesses not disappearing. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3638)
++ Fixed some Sea Creature features working through walls. - Empa (https://github.com/hannibal002/SkyHanni/pull/3634)
 
 #### Mining
 
@@ -99,6 +113,8 @@
 + Fixed `/shupdate` not allowing update to Beta from a full release. - nopo (https://github.com/hannibal002/SkyHanni/pull/3613)
 + Fixed errors when viewing Legacy Fishing Rods with Gemstones. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3621)
 + Fixed random duplication of bits in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3628)
++ Fixed coin catches not counting in the tracker. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3642)
++ Fixed Custom Scoreboard Player amount containing two slashes. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3632)
 
 ### Technical Details
 
@@ -175,6 +191,12 @@
 + Made Keybind Helper work in 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3592)
 + Moved ItemStack.renderOnScreen to be in GuiRenderUtils. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3612)
 + Ported `Fishing` config to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3313)
++ Added `onManualCancel` consumer to island graphs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3428)
++ Added Detekt rule for unnecessary `Expose` in Configs and Storage. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3426)
++ Added ping and TPS to /shdebug network info. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3424)
+    + Uses Hypixel mod API.
++ Converted multiple displays to Renderables. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3307)
++ Moved all `Renderable` list utils to `RenderableCollectionUtils`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3606)
 
 ## Version 2.0.0
 
