@@ -24,11 +24,6 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.addVerticalSpacer
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
@@ -50,6 +45,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
@@ -224,6 +224,7 @@ object ComposterOverlay {
         val matterPer = ComposterApi.organicMatterRequiredPer(null)
         val matterPerPreview = ComposterApi.organicMatterRequiredPer(upgrade)
 
+        // Todo: Extract duplicate code
         val matterMaxDuration = ComposterApi.timePerCompost(null) * floor(maxOrganicMatter / matterPer)
         val matterMaxDurationPreview =
             ComposterApi.timePerCompost(upgrade) * floor(maxOrganicMatterPreview / matterPerPreview)
@@ -371,7 +372,7 @@ object ComposterOverlay {
             }
 
             addString(" §7Time per Compost: §b$format$formatPreview")
-            addString(" §7$compostPerTitle: §e${multiplier.roundTo(2)}$compostPerTitlePreview")
+            addString(" §7$compostPerTitle: §e${multiplier.roundTo(2).addSeparators()}$compostPerTitlePreview")
             addString(" §7Material costs per $timeText: §6${totalCost.shortFormat()}$materialCostFormatPreview")
             addString(" §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview")
             addVerticalSpacer()

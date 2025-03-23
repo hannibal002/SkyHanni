@@ -20,10 +20,9 @@ object SoundUtils {
 
     fun ISound.playSound() {
         DelayedRun.onThread.execute {
-            val gameSettings = Minecraft.getMinecraft().gameSettings
-            val oldLevel = gameSettings.getSoundLevel(SoundCategory.PLAYERS)
+            val oldLevel = Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.PLAYERS)
             if (!SkyHanniMod.feature.misc.maintainGameVolume) {
-                gameSettings.setSoundLevel(SoundCategory.PLAYERS, 1f)
+                Minecraft.getMinecraft().soundHandler.setSoundLevel(SoundCategory.PLAYERS, 1f)
             }
             try {
                 Minecraft.getMinecraft().soundHandler.playSound(this)
@@ -42,7 +41,7 @@ object SoundUtils {
                 )
             } finally {
                 if (!SkyHanniMod.feature.misc.maintainGameVolume) {
-                    gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
+                    Minecraft.getMinecraft().soundHandler.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
                 }
             }
         }

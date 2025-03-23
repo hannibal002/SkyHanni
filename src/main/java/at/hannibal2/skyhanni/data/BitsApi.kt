@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.days
@@ -222,6 +222,9 @@ object BitsApi {
         }
     }
 
+    /**
+     * @param bits The new amount of bits
+     */
     private fun updateBits(bits: Int, modifyAvailable: Boolean = true, cause: String) {
         ChatUtils.debug("Updating bits to $bits, cause: $cause")
         lastBitUpdates = lastBitUpdates + (cause to bits)
@@ -308,11 +311,10 @@ object BitsApi {
             if (bitsAvailable != amount) {
                 bitsAvailable = amount
                 sendBitsAvailableGainedEvent()
-
-                val difference = bits - bitsAvailable
-                if (difference > 0) {
-                    updateBits(bits + difference, false, "Bits Menu")
-                }
+                /**
+                 * We cant increase [BitsApi.bits] here since that difference is alr accounted for,
+                 * if we do, it will be counted twice
+                 */
             }
         }
         cookieDurationPattern.firstMatcher(lore) {

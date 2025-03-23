@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
 import at.hannibal2.skyhanni.utils.ColorUtils.component4
+import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -12,15 +14,18 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -210,5 +215,77 @@ object GuiRenderUtils {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST)
 
         GlStateManager.disableBlend()
+    }
+
+    fun ItemStack.renderOnScreen(
+        x: Float,
+        y: Float,
+        scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
+        rescaleSkulls: Boolean = true,
+    ) {
+        val item = checkBlinkItem()
+        val isSkull = rescaleSkulls && item.item === Items.skull
+
+        val baseScale = (if (isSkull) 4f / 3f else 1f)
+        val finalScale = baseScale * scaleMultiplier
+
+        val translateX: Float
+        val translateY: Float
+        if (isSkull) {
+            val skullDiff = ((scaleMultiplier) * 2.5).toFloat()
+            translateX = x - skullDiff
+            translateY = y - skullDiff
+        } else {
+            translateX = x
+            translateY = y
+        }
+
+        GlStateManager.pushMatrix()
+
+        GlStateManager.translate(translateX, translateY, -19f)
+        GlStateManager.scale(finalScale, finalScale, 0.2)
+        GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
+
+        RenderHelper.enableGUIStandardItemLighting()
+
+        AdjustStandardItemLighting.adjust() // Compensate for z scaling
+
+        try {
+            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        } catch (e: Exception) {
+            if (lastWarn.passedSince() > 1.seconds) {
+                lastWarn = SimpleTimeMark.now()
+                println(" ")
+                println("item: $item")
+                println("name: ${item.displayName}")
+                println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
+                println(" ")
+                ChatUtils.debug("rendering an item has failed.")
+            }
+        }
+        RenderHelper.disableStandardItemLighting()
+
+        GlStateManager.popMatrix()
+    }
+
+    private var lastWarn = SimpleTimeMark.farPast()
+
+    private object AdjustStandardItemLighting {
+
+        private const val lightScaling = 2.47f // Adjust as needed
+        private const val g = 0.6f // Original Value taken from RenderHelper
+        private const val lightIntensity = lightScaling * g
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16)
+
+        init {
+            itemLightBuffer.clear()
+            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1.0f)
+            itemLightBuffer.flip()
+        }
+
+        fun adjust() {
+            GL11.glLight(16384, 4609, itemLightBuffer)
+            GL11.glLight(16385, 4609, itemLightBuffer)
+        }
     }
 }
