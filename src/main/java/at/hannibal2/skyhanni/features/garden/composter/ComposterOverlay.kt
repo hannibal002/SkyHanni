@@ -371,7 +371,7 @@ object ComposterOverlay {
             }
 
             addString(" §7Time per Compost: §b$format$formatPreview")
-            addString(" §7$compostPerTitle: §e${multiplier.roundTo(2)}$compostPerTitlePreview")
+            addString(" §7$compostPerTitle: §e${multiplier.roundTo(2).addSeparators()}$compostPerTitlePreview")
             addString(" §7Material costs per $timeText: §6${totalCost.shortFormat()}$materialCostFormatPreview")
             addString(" §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview")
             addVerticalSpacer()
