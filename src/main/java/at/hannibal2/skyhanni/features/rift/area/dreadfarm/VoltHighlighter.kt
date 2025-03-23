@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -17,8 +16,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -42,7 +42,7 @@ object VoltHighlighter {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onArmorChange(event: EntityEquipmentChangeEvent<Entity>) {
         if (!config.voltWarning) return
-        val player = Minecraft.getMinecraft().thePlayer ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
         if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
             event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
         ) {

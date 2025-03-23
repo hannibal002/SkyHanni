@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
@@ -20,6 +19,7 @@ import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern

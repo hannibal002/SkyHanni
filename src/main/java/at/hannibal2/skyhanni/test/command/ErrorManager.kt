@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
@@ -158,7 +159,7 @@ object ErrorManager {
         if (!condition()) return false
 
         Error(message, throwable).printStackTrace()
-        Minecraft.getMinecraft().thePlayer ?: return false
+        MinecraftCompat.localPlayerOrNull ?: return false
 
         val fullStackTrace: String
         val stackTrace: String

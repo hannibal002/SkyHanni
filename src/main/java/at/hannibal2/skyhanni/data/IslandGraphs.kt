@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -30,11 +30,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import java.awt.Color
 import java.io.File
@@ -99,6 +100,22 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object IslandGraphs {
     var currentIslandGraph: Graph? = null
+    var disabledNodesReason: String? = null
+        private set
+
+    fun disableNodes(reason: String, center: LorenzVec, radius: Double) {
+        val graph = currentIslandGraph ?: return
+        disabledNodesReason = reason
+        for (node in graph.nodes.filter { it.position.distance(center) < radius }) {
+            node.enabled = false
+        }
+    }
+
+    fun enableAllNodes() {
+        disabledNodesReason = null
+        val graph = currentIslandGraph ?: return
+        graph.nodes.forEach { it.enabled = true }
+    }
 
     private var pathfindClosestNode: GraphNode? = null
     var closestNode: GraphNode? = null
@@ -136,12 +153,12 @@ object IslandGraphs {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRepoReload(event: RepositoryReloadEvent) {
-
         loadIsland(LorenzUtils.skyBlockIsland)
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
+        enableAllNodes()
         if (currentIslandGraph != null) return
         if (event.newIsland == IslandType.NONE) return
         loadIsland(event.newIsland)
@@ -207,15 +224,17 @@ object IslandGraphs {
     }
 
     fun setNewGraph(graph: Graph) {
-        reset()
         currentIslandGraph = graph
-
-        // calling various update functions to make swtiching between deep caverns and glacite tunnels bareable
-        handleTick()
-        IslandAreas.nodeMoved()
-        DelayedRun.runDelayed(150.milliseconds) {
-            IslandAreas.updatePosition()
+        if (currentTarget != null) {
+            DelayedRun.runDelayed(500.milliseconds) {
+                handleTick()
+                checkMoved()
+            }
         }
+
+        // calling various update functions to make switching between deep caverns and glacite tunnels bearable
+        handleTick()
+        IslandGraphReloadEvent(graph).post()
     }
 
     private fun reset() {
@@ -228,9 +247,16 @@ object IslandGraphs {
     fun onTick(event: SkyHanniTickEvent) {
         if (currentIslandGraph == null) return
         if (event.isMod(2)) {
-            handleTick()
-            checkMoved()
+            update()
         }
+    }
+
+    fun update(force: Boolean = false) {
+        if (force) {
+            pathfindClosestNode = null
+        }
+        handleTick()
+        checkMoved()
     }
 
     private fun handleTick() {
@@ -238,9 +264,9 @@ object IslandGraphs {
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
-                onFound()
                 "§e[SkyHanni] Navigation reached §r$label§e!".asComponent().send(pathFindMessageId)
                 reset()
+                onFound()
             }
             if (!condition()) {
                 reset()
@@ -277,7 +303,7 @@ object IslandGraphs {
     }
 
     private fun skipIfCloser(graph: Graph): Graph = if (graph.nodes.size > 1) {
-        val hideNearby = if (Minecraft.getMinecraft().thePlayer.onGround) 3 else 5
+        val hideNearby = if (MinecraftCompat.localPlayer.onGround) 3 else 5
         Graph(graph.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
     } else {
         graph
@@ -333,9 +359,16 @@ object IslandGraphs {
         // TODO cleanup
         val (fastestPath, distance) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.nodes.toMutableList()
-        if (Minecraft.getMinecraft().thePlayer.onGround) {
+        if (MinecraftCompat.localPlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
         }
+        renderPath(setPath, nodes)
+    }
+
+    fun renderPath(
+        setPath: Boolean = true,
+        nodes: List<GraphNode>,
+    ) {
         if (setPath) {
             this.fastestPath = skipIfCloser(Graph(cutByMaxDistance(nodes, 2.0)))
         }
@@ -387,6 +420,7 @@ object IslandGraphs {
         allowRerouting: Boolean = false,
         condition: () -> Boolean,
     ) {
+        if (isActive(position, label)) return
         reset()
         currentTargetNode = this
         shouldAllowRerouting = allowRerouting
@@ -409,6 +443,7 @@ object IslandGraphs {
         onFound: () -> Unit = {},
         condition: () -> Boolean,
     ) {
+        if (isActive(location, label)) return
         require(label.isNotEmpty()) { "Label cannot be empty." }
         reset()
         shouldAllowRerouting = false
@@ -469,6 +504,10 @@ object IslandGraphs {
         componentText.send(pathFindMessageId)
     }
 
+    fun overrideChatMessage(message: String) {
+        message.asComponent().send(pathFindMessageId)
+    }
+
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (currentIslandGraph == null) return
@@ -524,4 +563,11 @@ object IslandGraphs {
     }
 
     fun isActive(testTarget: LorenzVec, testLabel: String): Boolean = testTarget == currentTarget && testLabel == label
+
+    fun findClosestNode(location: LorenzVec, condition: (GraphNode) -> Boolean, radius: Double = 100.0): GraphNode? {
+        val graph = currentIslandGraph ?: return null
+
+        val found = graph.nodes.filter { condition(it) }.minBy { it.position.distanceSq(location) }
+        return found.takeIf { it.position.distance(location) < radius }
+    }
 }

@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -27,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -46,9 +46,13 @@ object FishingProfitTracker {
 
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
 
+    /**
+     * REGEX-TEST: §5⛃ §r§5§lGOOD CATCH! §r§fYou caught §r§636,064 Coins§r§f!
+     * REGEX-TEST: §6⛃ §r§6§lGREAT CATCH! §r§fYou caught §r§6133,431 Coins§r§f!
+     */
     private val coinsChatPattern by RepoPattern.pattern(
         "fishing.tracker.chat.coins",
-        ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\.",
+        "§(?<colorCode>.*)⛃ §r(?<catch>.*) CATCH! §r§fYou caught §r§6(?<coins>[\\d,]+) Coins§r§f!"
     )
 
     private var lastCatchTime = SimpleTimeMark.farPast()

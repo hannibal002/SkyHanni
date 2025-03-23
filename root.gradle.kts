@@ -2,9 +2,9 @@ import at.skyhanni.sharedvariables.ProjectTarget
 import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "487f8f1a46"
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor") version "20415a5ee3"
     id("net.kyori.blossom") version "1.3.2" apply false
-    id("gg.essential.loom") version "1.6.+" apply false
+    id("gg.essential.loom") version "1.9.+" apply false
     kotlin("jvm") version "2.0.0" apply false
     kotlin("plugin.power-assert") version "2.0.0" apply false
     id("com.google.devtools.ksp") version "2.0.0-1.0.24" apply false
@@ -21,7 +21,7 @@ allprojects {
      * Beta version
      * Bugfix version
      */
-    version = "2.0.0"
+    version = "2.3.0"
 
     repositories {
         mavenCentral()
@@ -43,6 +43,7 @@ allprojects {
         maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
         maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
         maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
+        maven("https://api.modrinth.com/maven") // Modrinth
     }
 }
 
