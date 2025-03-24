@@ -77,6 +77,9 @@ object SeaCreatureFeatures {
     @HandleEvent
     fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         rareSeaCreatures.remove(event.mob)
+
+        val creature = SeaCreatureManager.allFishingMobs[event.mob.name] ?: return
+        if (!creature.rare) return
         lastRareSeaCreatureDespawn = SimpleTimeMark.now()
     }
 
