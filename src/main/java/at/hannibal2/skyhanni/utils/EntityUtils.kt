@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -8,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
@@ -80,12 +81,12 @@ object EntityUtils {
         return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
-                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
+                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
             if (debugRightEntity && result) {
-                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
+                ChatUtils.consoleLog("mob: " + center.printWithAccuracy(2))
+                ChatUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
+                ChatUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
             }
             result
         }
@@ -105,7 +106,7 @@ object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
-        val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
+        val derpyMultiplier = if (ElectionApi.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
         if (!boss && !DungeonApi.inDungeon()) {

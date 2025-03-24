@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -482,12 +483,12 @@ object BestiaryData {
 
         fun percentToMax() = actualRealTotalKill.toDouble() / killToMax
 
-        fun percentToMaxFormatted() = LorenzUtils.formatPercentage(percentToMax())
+        fun percentToMaxFormatted() = percentToMax().formatPercentage()
 
         fun percentToTier() =
             if (killNeededForNextLevel == 0L) 1.0 else currentKillToNextLevel.toDouble() / killNeededForNextLevel
 
-        fun percentToTierFormatted() = LorenzUtils.formatPercentage(percentToTier())
+        fun percentToTierFormatted() = percentToTier().formatPercentage()
 
         fun getNextLevel() = level.getNextLevel()
     }

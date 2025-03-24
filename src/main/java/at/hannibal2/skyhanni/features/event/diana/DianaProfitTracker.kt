@@ -15,10 +15,10 @@ import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -75,7 +75,7 @@ object DianaProfitTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / burrowsDug
-            val perBurrow = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val perBurrow = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
