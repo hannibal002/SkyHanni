@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import net.minecraft.client.Minecraft
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.Executor
