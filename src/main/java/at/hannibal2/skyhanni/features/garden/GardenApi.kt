@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPr
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -44,6 +43,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -166,7 +166,7 @@ object GardenApi {
 
     fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
-        scale: Double = NeuItems.itemFontSize,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
         highlight: Boolean = false,
     ) {
         addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)
