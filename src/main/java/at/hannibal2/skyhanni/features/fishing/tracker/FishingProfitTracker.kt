@@ -247,7 +247,7 @@ object FishingProfitTracker {
 
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         if (!(FishingApi.isFishing(checkRodInHand = false) ||
-                SeaCreatureFeatures.lastRareSeaCreatureDespawn.passedSince() < 6.seconds)) return
+                SeaCreatureFeatures.lastRareSeaCreatureDespawn.passedSince() < 35.seconds)) return
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return
