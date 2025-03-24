@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -38,7 +37,6 @@ import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ElectionApi {
@@ -285,7 +283,7 @@ object ElectionApi {
 
     }
 
-    val isDerpy by RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
+    val isDerpy get() = Perk.DOUBLE_MOBS_HP.isActive
 
     fun Int.derpy() = if (isDerpy) this / 2 else this
 
