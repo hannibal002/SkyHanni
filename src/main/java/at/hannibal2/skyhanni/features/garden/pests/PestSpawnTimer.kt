@@ -223,14 +223,14 @@ object PestSpawnTimer {
     }
 
     private fun cooldownExpired() {
-        sendTitle("§cPests Cooldown Has Expired!", duration = 3.seconds)
+        sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown has expired!")
         SoundUtils.playPlingSound()
         hasWarned = true
     }
 
     private fun cooldownReminder() {
-        sendTitle("§cPests Cooldown Expires Soon!", duration = 3.seconds)
+        sendTitle("§cPest Cooldown Expires Soon!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown expires in ${pestCooldownEndTime.timeUntil().format()}")
         SoundUtils.playPlingSound()
         hasWarned = true
