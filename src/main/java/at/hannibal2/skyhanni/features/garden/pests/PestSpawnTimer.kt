@@ -74,6 +74,7 @@ object PestSpawnTimer {
             val maxPests = hasGroup("maxPests")
 
             if (ready) {
+                if (pestSpawned) return // prevent warning twice if tablist updates the same time as pest spawn
                 pestCooldownEndTime = SimpleTimeMark.now() - 1.seconds
                 return
             }
@@ -86,9 +87,9 @@ object PestSpawnTimer {
 
             if (shouldSetCooldown(tablistCooldownEnd, minutes, seconds)) {
 
-                // hypixel generally rounds times down to nearest min if over 6 mins, we'll overestimate and add a min
+                // hypixel sometimes rounds down times, we'll assume times are rounded down if seconds are null and add a minute
 
-                pestCooldownEndTime = if (seconds == null && (minutes ?: 0) >= 6) {
+                pestCooldownEndTime = if (seconds == null) {
                     tablistCooldownEnd + 1.minutes
                 } else {
                     tablistCooldownEnd
