@@ -151,6 +151,8 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, 
         tagNames.mapNotNull { GraphNodeTag.byId(it) }
     }
 
+    var enabled = true
+
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */
     lateinit var neighbours: Map<GraphNode, Double>
 
@@ -170,6 +172,8 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, 
     }
 
     fun sameNameAndTags(other: GraphNode): Boolean = name == other.name && allowedTags == other.allowedTags
+
+    fun hasTag(tag: GraphNodeTag): Boolean = tag in tags
 
     private val allowedTags get() = tags.filter { it in NavigationHelper.allowedTags }
 }
