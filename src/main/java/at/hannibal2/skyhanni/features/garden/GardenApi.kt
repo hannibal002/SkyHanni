@@ -24,13 +24,13 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -77,8 +78,6 @@ object GardenApi {
 
     // TODO USE SH-REPO
     private val otherToolsList = listOf(
-        "DAEDALUS_AXE",
-        "STARRED_DAEDALUS_AXE",
         "BASIC_GARDENING_HOE",
         "ADVANCED_GARDENING_AXE",
         "BASIC_GARDENING_AXE",
@@ -167,7 +166,7 @@ object GardenApi {
 
     fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
-        scale: Double = NeuItems.itemFontSize,
+        scale: Double = NeuItems.ITEM_FONT_SIZE,
         highlight: Boolean = false,
     ) {
         addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)
@@ -182,7 +181,8 @@ object GardenApi {
         ChocolateShopPrice.inInventory ||
         ChocolateFactoryApi.inChocolateFactory ||
         ChocolateFactoryApi.chocolateFactoryPaused ||
-        HoppityCollectionStats.inInventory
+        HoppityCollectionStats.inInventory ||
+        PesthunterProfit.isInInventory()
 
     fun resetCropSpeed() {
         storage?.cropsPerSecond?.clear()

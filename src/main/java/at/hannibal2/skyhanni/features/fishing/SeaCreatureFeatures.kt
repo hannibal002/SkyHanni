@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
@@ -34,8 +35,8 @@ object SeaCreatureFeatures {
     private var lastRareCatch = SimpleTimeMark.farPast()
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
+    private val seaCreaturesBosses = BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
 
-    // TODO remove spawn event, check per tick if can see, cache if already warned about
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
@@ -43,27 +44,31 @@ object SeaCreatureFeatures {
         val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
         if (!creature.rare) return
 
+        rareSeaCreatures.add(mob)
+
+        if (!config.highlight) return
+        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES !in damageIndicatorConfig.bossesToShow) return
+        if (seaCreaturesBosses.none { it.fullName.removeColor() == mob.name }) return
+        mob.highlight(LorenzColor.GREEN.toColor())
+    }
+
+    @HandleEvent
+    fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
+        if (!isEnabled()) return
+        val mob = event.mob
+        if (mob !in rareSeaCreatures) return
         val entity = mob.baseEntity
         val shouldNotify = entity.entityId !in entityIds
         entityIds.addIfAbsent(entity.entityId)
-        rareSeaCreatures.add(mob)
-
-        var shouldHighlight = config.highlight
-        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
-            val seaCreaturesBosses =
-                BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
-            if (seaCreaturesBosses.any { it.fullName.removeColor() == mob.name }) {
-                shouldHighlight = false
-            }
-        }
-        if (shouldHighlight) mob.highlight(LorenzColor.GREEN.toColor())
+        val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
+        if (!creature.rare) return
 
         if (lastRareCatch.passedSince() < 1.seconds) return
         if (mob.name == "Water Hydra" && entity.health == (entity.baseMaxHealth.toFloat() / 2)) return
         if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
             else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
-            LorenzUtils.sendTitle(text, 1.5.seconds, 3.6, 7f)
+            TitleManager.sendTitle(text, 1.5.seconds, 3.6, 7f)
             if (config.playSound) SoundUtils.playBeepSound()
         }
     }
@@ -80,7 +85,7 @@ object SeaCreatureFeatures {
         if (event.seaCreature.rare) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
-            LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
+            TitleManager.sendTitle(text, 3.seconds, 2.8, 7f)
             if (config.playSound) SoundUtils.playBeepSound()
             lastRareCatch = SimpleTimeMark.now()
         }
@@ -94,7 +99,7 @@ object SeaCreatureFeatures {
 
     @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
-        if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.XRAY) {
+        if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.NO_XRAY) {
             event.queueEntitiesToOutline(getEntityOutlineColor)
         }
     }

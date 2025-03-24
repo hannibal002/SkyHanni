@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.MiningApi.inGlaciteArea
 import at.hannibal2.skyhanni.data.MiningApi.lastColdReset
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -107,7 +107,7 @@ object MiningNotifications {
 
     private fun sendNotification(type: MiningNotificationList) {
         if (type !in config.notifications) return
-        LorenzUtils.sendTitle(type.notification, 1500.milliseconds)
+        TitleManager.sendTitle(type.notification, 1500.milliseconds)
         if (config.playSound) SoundUtils.playPlingSound()
     }
 }

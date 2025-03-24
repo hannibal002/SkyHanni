@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -15,11 +14,17 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.util.Constants
 import java.util.Locale
+//#if MC > 1.21
+//$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.registry.Registries
+//#endif
 
 object SkyBlockItemModifierUtils {
+
+    fun ItemStack.getCoinsOfAvarice() = getAttributeLong("collected_coins")
 
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
@@ -35,7 +40,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
 
-    fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
+    fun ItemStack.getSilexCount() = getHypixelEnchantments()?.get("efficiency")?.let {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
 
@@ -158,7 +163,7 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.hasKey("attributes", Constants.NBT.TAG_COMPOUND) }
+        ?.takeIf { it.hasKey("attributes", 10) }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
@@ -171,7 +176,7 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
         when {
             it == "pitchin" -> "pitchin_koi"
-            it == "warped" && name.removeColor().startsWith("Hyper ") -> "endstone_geode"
+            it == "warped" && displayName.removeColor().startsWith("Hyper ") -> "endstone_geode"
 
             else -> it
         }
@@ -199,7 +204,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getSecondsHeld() = when (getItemId()) {
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
-        "DARK_CACAO_TRUFFLE" -> getAttributeInt("seconds_held")
+        "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
         else -> null
     }
@@ -210,7 +215,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPersonalCompactorActive() = getAttributeByte("PERSONAL_DELETOR_ACTIVE") == 1.toByte()
 
-    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()
+    fun ItemStack.getHypixelEnchantments(): Map<String, Int>? = getExtraAttributes()
         ?.takeIf { it.hasKey("enchantments") }
         ?.run {
             val enchantments = this.getCompoundTag("enchantments")
@@ -231,7 +236,11 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getItemId() = getAttributeString("id")
 
+    //#if MC < 1.21
     fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as ResourceLocation
+    //#else
+    //$$ fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
+    //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
@@ -249,20 +258,20 @@ object SkyBlockItemModifierUtils {
                 }
 
                 val rawType = key.split("_")[0]
-                val type = GemstoneType.getByName(rawType)
+                val type = GemstoneType.getByNameOrNull(rawType)
 
-                val quality = GemstoneQuality.getByName(value)
+                val quality = GemstoneQuality.getByNameOrNull(value)
                 if (quality == null) {
-                    ChatUtils.debug("Gemstone quality is null for item $name§7: ('$key' = '$value')")
+                    ChatUtils.debug("Gemstone quality is null for item $displayName§7: ('$key' = '$value')")
                     continue
                 }
                 if (type != null) {
                     list.add(GemstoneSlot(type, quality))
                 } else {
                     val newKey = gemstones.getString(key + "_gem")
-                    val newType = GemstoneType.getByName(newKey)
+                    val newType = GemstoneType.getByNameOrNull(newKey)
                     if (newType == null) {
-                        ChatUtils.debug("Gemstone type is null for item $name§7: ('$newKey' with '$key' = '$value')")
+                        ChatUtils.debug("Gemstone type is null for item $displayName§7: ('$newKey' with '$key' = '$value')")
                         continue
                     }
                     list.add(GemstoneSlot(newType, quality))
@@ -287,45 +296,54 @@ object SkyBlockItemModifierUtils {
     private fun ItemStack.getAttributeByte(label: String) =
         getExtraAttributes()?.getByte(label) ?: 0
 
-    fun ItemStack.getExtraAttributes() = tagCompound?.extraAttributes
+    //#if MC < 1.21
+    fun ItemStack.getExtraAttributes(): NBTTagCompound? = tagCompound?.extraAttributes
+    //#else
+    //$$ fun ItemStack.getExtraAttributes(): NbtCompound? = get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
+    //#endif
 
-    class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
-
-        fun getInternalName() = "${quality}_${type}_GEM".toInternalName()
+    class GemstoneSlot(private val type: GemstoneType, private val quality: GemstoneQuality) {
+        fun getInternalName() = "${quality.name}_${type.name}_GEM".toInternalName()
     }
 
-    enum class GemstoneQuality(val displayName: String) {
-        ROUGH("Rough"),
-        FLAWED("Flawed"),
-        FINE("Fine"),
-        FLAWLESS("Flawless"),
-        PERFECT("Perfect"),
+    enum class GemstoneQuality(private val displayName: String, private val color: LorenzColor) {
+        ROUGH("Rough", LorenzColor.WHITE),
+        FLAWED("Flawed", LorenzColor.GREEN),
+        FINE("Fine", LorenzColor.BLUE),
+        FLAWLESS("Flawless", LorenzColor.DARK_PURPLE),
+        PERFECT("Perfect", LorenzColor.GOLD),
         ;
+
+        override fun toString() = displayName
+        fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
 
-            fun getByName(name: String) = entries.firstOrNull { it.name == name }
+            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name.lowercase() == name.lowercase() }
         }
     }
 
-    enum class GemstoneType(val displayName: String) {
-        JADE("Jade"),
-        AMBER("Amber"),
-        TOPAZ("Topaz"),
-        SAPPHIRE("Sapphire"),
-        AMETHYST("Amethyst"),
-        JASPER("Jasper"),
-        RUBY("Ruby"),
-        OPAL("Opal"),
-        ONYX("Onyx"),
-        AQUAMARINE("Aquamarine"),
-        CITRINE("Citrine"),
-        PERIDOT("Peridot"),
+    enum class GemstoneType(val displayName: String, private val color: LorenzColor) {
+        JADE("Jade", LorenzColor.GREEN),
+        AMBER("Amber", LorenzColor.GOLD),
+        TOPAZ("Topaz", LorenzColor.YELLOW),
+        SAPPHIRE("Sapphire", LorenzColor.BLUE),
+        AMETHYST("Amethyst", LorenzColor.DARK_PURPLE),
+        JASPER("Jasper", LorenzColor.LIGHT_PURPLE),
+        RUBY("Ruby", LorenzColor.RED),
+        OPAL("Opal", LorenzColor.WHITE),
+        ONYX("Onyx", LorenzColor.DARK_GRAY),
+        AQUAMARINE("Aquamarine", LorenzColor.AQUA),
+        CITRINE("Citrine", LorenzColor.DARK_RED),
+        PERIDOT("Peridot", LorenzColor.DARK_GREEN),
         ;
+
+        override fun toString() = displayName
+        fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
 
-            fun getByName(name: String) = entries.firstOrNull { it.name == name }
+            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name == name || it.displayName == name }
         }
     }
 

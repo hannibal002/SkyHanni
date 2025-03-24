@@ -34,6 +34,11 @@ object HypixelCommands {
         send("recipe $itemName")
     }
 
+    // opens the crafting table
+    fun craft() {
+        send("craft")
+    }
+
     fun npcOption(npc: String, answer: String) {
         send("selectnpcoption $npc $answer")
     }
@@ -140,6 +145,10 @@ object HypixelCommands {
 
     fun partyChat(message: String) {
         send("pc $message")
+    }
+
+    fun partyInvite(player: String) {
+        send("party $player")
     }
 
     fun allChat(message: String) {

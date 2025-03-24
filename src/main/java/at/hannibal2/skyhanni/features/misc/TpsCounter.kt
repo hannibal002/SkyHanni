@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -65,17 +66,21 @@ object TpsCounter {
         val text = if (timeUntil.isPositive()) {
             "§f(${timeUntil.inWholeSeconds}s)"
         } else {
-            val sum = tpsList.sum().toDouble()
-            val newTps = (sum / tpsList.size).roundTo(1).coerceIn(0.0..20.0)
-            tps = newTps
-            val legacyColor = getColor(newTps)
-            "$legacyColor$newTps"
+            // when in limbo we don't receive any packets
+            if (tpsList.isEmpty()) {
+                "§70 (Limbo?)"
+            } else {
+                val newTps = tpsList.average().roundTo(1).coerceIn(0.0..20.0)
+                tps = newTps
+                val legacyColor = format(newTps)
+                "$legacyColor$newTps"
+            }
         }
         display = "§eTPS: $text"
     }
 
     private fun tpsCommand() {
-        val tpsMessage = tps?.let { "${getColor(it)}$it" } ?: tilCalculated
+        val tpsMessage = tps?.let { "${format(it)}$it" } ?: tilCalculated
         ChatUtils.chat("§eTPS: $tpsMessage")
     }
 
@@ -119,14 +124,18 @@ object TpsCounter {
 
     private fun shouldIgnore() = timeSinceWorldSwitch < ignorePacketDelay
 
-    private fun isEnabled() = LorenzUtils.onHypixel &&
-        config.tpsDisplay &&
+    private fun isEnabled() = LorenzUtils.onHypixel && config.tpsDisplay &&
         (LorenzUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.tpsDisplayEnabled", "gui.tpsDisplay")
         event.move(2, "misc.tpsDisplayPosition", "gui.tpsDisplayPosition")
+    }
+
+    private fun format(tps: Double): String {
+        if (!tps.isFinite()) printError(tps)
+        return getColor(tps)
     }
 
     private fun getColor(tps: Double) = when {
@@ -136,5 +145,18 @@ object TpsCounter {
         tps > 12 -> "§c"
 
         else -> "§4"
+    }
+
+    private fun printError(tps: Double) {
+        ErrorManager.logErrorStateWithData(
+            "TPS calculation got an error",
+            "tps is $tps",
+            "tps" to tps,
+            "packetsFromLastSecond" to packetsFromLastSecond,
+            "hasRemovedFirstSecond" to hasRemovedFirstSecond,
+            "hasReceivedPacket" to hasReceivedPacket,
+            "tpsList" to tpsList,
+            "timeSinceWorldSwitch" to timeSinceWorldSwitch,
+        )
     }
 }

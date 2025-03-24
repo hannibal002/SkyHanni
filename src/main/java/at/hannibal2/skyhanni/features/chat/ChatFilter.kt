@@ -5,19 +5,21 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
+import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatComponentText
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -288,6 +290,7 @@ object ChatFilter {
         "§e[NPC] Jacob§f: §rMy contest has started!",
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
+        "§3[SBE] §a§cUnable to download bin data. This may result in certain features not working!",
     )
 
     private val skymallMessages = listOf(
@@ -312,37 +315,19 @@ object ChatFilter {
     )
 
     // Winter Gift
-    private val winterGiftPatterns = listOf(
-        // winter gifts useless
-        "§f§lCOMMON! §r§3.* XP §r§egift with §r.*§r§e!".toPattern(),
-        "(§f§lCOMMON|§9§lRARE)! §r.* XP Boost .* Potion §r.*§r§e!".toPattern(),
-        "(§f§lCOMMON|§9§lRARE)! §r§6.* coins §r§egift with §r.*§r§e!".toPattern(),
-
-        // enchanted book
-        "§9§lRARE! §r§9Scavenger IV §r§egift with §r.*§r§e!".toPattern(),
-        "§9§lRARE! §r§9Looting IV §r§egift with §r.*§r§e!".toPattern(),
-        "§9§lRARE! §r§9Luck VI §r§egift with §r.*§r§e!".toPattern(),
-
-        // minion skin
-        "§e§lSWEET! §r§f(Grinch|Santa|Gingerbread Man) Minion Skin §r§egift with §r.*§r§e!".toPattern(),
-
-        // rune
-        "§9§lRARE! §r§f◆ Ice Rune §r§egift with §r.*§r§e!".toPattern(),
-
-        // furniture
-        "§e§lSWEET! §r§fTall Holiday Tree §r§egift with §r.*§r§e!".toPattern(),
-        "§e§lSWEET! §r§fNutcracker §r§egift with §r.*§r§e!".toPattern(),
-        "§e§lSWEET! §r§fPresent Stack §r§egift with §r.*§r§e!".toPattern(),
-
-        "§e§lSWEET! §r§9(Winter|Battle) Disc §r§egift with §r.*§r§e!".toPattern(),
-
-        // winter gifts a bit useful
-        "§e§lSWEET! §r§9Winter Sack §r§egift with §r.*§r§e!".toPattern(),
-        "§e§lSWEET! §r§5Snow Suit .* §r§egift with §r.*§r§e!".toPattern(),
-
-        // winter gifts not your gifts
-        "§cThis gift is for §r.*§r§c, sorry!".toPattern(),
-    )
+    private val winterGiftPatterns = buildList {
+        GiftProfitTracker.run {
+            listOf(
+                xpGainedPattern,
+                coinsGainedPattern,
+                northStarsPattern,
+                boostPotionPattern,
+                enchantmentBookPattern,
+                genericRewardPattern
+            ).forEach { add(it) }
+        }
+        addAll(GiftProfitTracker.spamPatterns)
+    }
 
     private val fireSalePattern by RepoPattern.pattern(
         "chat.firesale",
@@ -580,7 +565,7 @@ object ChatFilter {
                 val amountFormat = groupOrNull("amount")?.let {
                     "§a+ §b$it§r"
                 } ?: "§a+§r"
-                event.chatComponent = ChatComponentText("$amountFormat $reward")
+                event.chatComponent = "$amountFormat $reward".asComponent()
             }
             return null
         }
@@ -596,7 +581,7 @@ object ChatFilter {
      */
     private fun crystalNucleusBlock(event: SkyHanniChatEvent): String? {
         val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
-        newMessage?.let { event.chatComponent = ChatComponentText(it) }
+        newMessage?.let { event.chatComponent = it.asComponent() }
         blockCode?.let { return it }
         return null
     }

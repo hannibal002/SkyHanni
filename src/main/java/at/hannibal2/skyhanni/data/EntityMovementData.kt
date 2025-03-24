@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
 import kotlin.time.Duration.Companion.milliseconds
@@ -88,7 +88,7 @@ object EntityMovementData {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
-        addToTrack(Minecraft.getMinecraft().thePlayer)
+        addToTrack(MinecraftCompat.localPlayer)
 
         for (entity in entityLocation.keys) {
             if (entity.isDead) continue

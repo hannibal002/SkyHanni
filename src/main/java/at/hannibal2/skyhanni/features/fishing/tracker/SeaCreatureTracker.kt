@@ -13,13 +13,14 @@ import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -103,7 +104,7 @@ object SeaCreatureTracker {
             }
 
             val percentageSuffix = if (config.showPercentage.get()) {
-                val percentage = LorenzUtils.formatPercentage(amount.toDouble() / total)
+                val percentage = (amount.toDouble() / total).formatPercentage()
                 " §7$percentage"
             } else ""
 
@@ -139,14 +140,15 @@ object SeaCreatureTracker {
         }
 
         if (tracker.isInventoryOpen()) {
-            addButton(
-                prefix = "§7Category: ",
-                getName = currentCategory.allLettersFirstUppercase() + " §7(" + amounts[currentCategory] + ")",
+            addButton<String>(
+                label = "Category",
+                current = currentCategory,
+                getName = { it.allLettersFirstUppercase() + " §7(" + amounts[it] + ")" },
                 onChange = {
-                    val id = list.indexOf(currentCategory)
-                    currentCategory = list[(id + 1) % list.size]
+                    currentCategory = it
                     tracker.update()
                 },
+                universe = list,
             )
         }
 

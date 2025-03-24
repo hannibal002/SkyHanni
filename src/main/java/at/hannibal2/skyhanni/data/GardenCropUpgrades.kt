@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -37,9 +36,8 @@ object GardenCropUpgrades {
 
     private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropUpgrades
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!GardenApi.inGarden()) return
 
         chatUpgradePattern.matchMatcher(event.message) {
             val crop = CropType.getByNameOrNull(group("crop"))
@@ -48,13 +46,12 @@ object GardenCropUpgrades {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!GardenApi.inGarden()) return
         if (event.inventoryName != "Crop Upgrades") return
 
         for (item in event.inventoryItems.values) {
-            val crop = CropType.getByNameOrNull(item.name.removeColor()) ?: continue
+            val crop = CropType.getByNameOrNull(item.displayName.removeColor()) ?: continue
             tierPattern.firstMatcher(item.getLore()) {
                 val level = group("level").formatInt()
                 crop.setUpgradeLevel(level)

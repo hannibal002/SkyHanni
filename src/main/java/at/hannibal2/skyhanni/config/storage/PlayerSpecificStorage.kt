@@ -12,10 +12,10 @@ class PlayerSpecificStorage {
     var profiles: MutableMap<String, ProfileSpecificStorage> = mutableMapOf() // profile name
 
     @Expose
-    var useRomanNumerals: Boolean = true
+    var multipleProfiles: Boolean = false
 
     @Expose
-    var multipleProfiles: Boolean = false
+    var useRomanNumerals: Boolean = true
 
     @Expose
     var gardenCommunityUpgrade: Int = -1
