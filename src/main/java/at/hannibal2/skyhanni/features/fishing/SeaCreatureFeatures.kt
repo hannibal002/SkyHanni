@@ -35,6 +35,7 @@ object SeaCreatureFeatures {
     private var lastRareCatch = SimpleTimeMark.farPast()
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
+    var lastRareSeaCreatureDespawn = SimpleTimeMark.farPast()
     private val seaCreaturesBosses = BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
 
     @HandleEvent
@@ -76,6 +77,7 @@ object SeaCreatureFeatures {
     @HandleEvent
     fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
         rareSeaCreatures.remove(event.mob)
+        lastRareSeaCreatureDespawn = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -95,6 +97,7 @@ object SeaCreatureFeatures {
     fun onWorldChange(event: WorldChangeEvent) {
         rareSeaCreatures.clear()
         entityIds.clear()
+        lastRareSeaCreatureDespawn = SimpleTimeMark.farPast()
     }
 
     @HandleEvent
@@ -110,8 +113,6 @@ object SeaCreatureFeatures {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
-
-    fun existActiveRareSeaCreature() = rareSeaCreatures.isNotEmpty()
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
         (entity as? EntityLivingBase)?.mob?.let { mob ->
