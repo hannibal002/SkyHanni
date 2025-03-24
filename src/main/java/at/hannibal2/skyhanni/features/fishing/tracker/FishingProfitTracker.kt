@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -245,7 +246,7 @@ object FishingProfitTracker {
     }
 
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
-        if (!FishingApi.isFishing(checkRodInHand = false)) return
+        if (!(FishingApi.isFishing(checkRodInHand = false) || SeaCreatureFeatures.existActiveRareSeaCreature())) return
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return

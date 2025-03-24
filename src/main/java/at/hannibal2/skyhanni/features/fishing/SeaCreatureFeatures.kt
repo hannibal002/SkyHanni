@@ -111,6 +111,8 @@ object SeaCreatureFeatures {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
 
+    fun existActiveRareSeaCreature() = rareSeaCreatures.isNotEmpty()
+
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
         (entity as? EntityLivingBase)?.mob?.let { mob ->
             if (mob in rareSeaCreatures && entity.distanceToPlayer() < 30) {
