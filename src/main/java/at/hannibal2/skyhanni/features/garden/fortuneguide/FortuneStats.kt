@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumOfPair
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumOfPair
 
 enum class FortuneStats(
     private val label0: (CropType) -> String,
@@ -11,11 +11,11 @@ enum class FortuneStats(
 ) {
     BASE(
         "§2Universal Farming Fortune",
-        "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" + "§eSee on the grass block page"
+        "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" + "§eSee on the grass block page",
     ),
     CROP_TOTAL(
         { crop -> "§6${crop.niceName.firstLetterUppercase()} Farming Fortune" },
-        { "§7§2Farming fortune for this crop" }
+        { "§7§2Farming fortune for this crop" },
     ),
     ACCESSORY("§2Talisman Bonus", "§7§2Fortune from your talisman\n§2You get 10☘ per talisman tier"),
     CROP_UPGRADE("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n§2You get 5☘ per level"),

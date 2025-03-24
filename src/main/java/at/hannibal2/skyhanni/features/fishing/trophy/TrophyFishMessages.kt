@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
@@ -18,6 +16,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
@@ -26,9 +26,17 @@ import kotlin.time.Duration.Companion.seconds
 object TrophyFishMessages {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.chatMessages
 
+    /**
+     * REGEX-TEST: §6♔ §r§6§lTROPHY FISH! §r§fYou caught a §r§9Lavahorse §r§6§lGOLD§r§f!
+     * REGEX-TEST: §6♔ §r§6§lTROPHY FISH! §r§fYou caught a §r§5Soul Fish §r§8§lBRONZE§r§f!
+     * REGEX-TEST: §6♔ §r§6§lTROPHY FISH! §r§fYou caught a §r§9Mana Ray §r§8§lBRONZE§r§f!
+     * REGEX-TEST: §6♔ §r§6§lTROPHY FISH! §r§fYou caught a §r§fBlobfish §r§7§lSILVER§r§f!
+     * REGEX-TEST: §6♔ §r§6§lTROPHY FISH! §r§fYou caught a §r§6Golden Fish §r§7§lSILVER§r§f!
+     */
+    @Suppress("MaxLineLength")
     val trophyFishPattern by RepoPattern.pattern(
         "fishing.trophy.trophyfish",
-        "§6§lTROPHY FISH! §r§bYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§b\\."
+        "§6♔ §r§6§lTROPHY FISH! §r§fYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§f!"
     )
 
     @HandleEvent(onlyOnSkyblock = true)
