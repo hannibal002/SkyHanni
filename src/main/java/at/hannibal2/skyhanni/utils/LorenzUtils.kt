@@ -4,7 +4,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
@@ -92,13 +91,4 @@ object LorenzUtils {
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
     fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
-
-    // TODO move into mayor api
-    val isDerpy by RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
-
-    // TODO move into mayor api
-    fun Int.derpy() = if (isDerpy) this / 2 else this
-
-    // TODO move into mayor api
-    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
 }
