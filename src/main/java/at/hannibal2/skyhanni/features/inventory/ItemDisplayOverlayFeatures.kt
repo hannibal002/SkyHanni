@@ -359,7 +359,7 @@ object ItemDisplayOverlayFeatures {
         return newList
     }
 
-    private fun migrateTimePocketItems(data: JsonElement): JsonElement {
+    private fun migrateTimePocketItems(data: JsonElement): JsonElement { // TODO Rename to Evolving items
         if (!data.isJsonArray) return data
         val newList = JsonArray()
         val oldValues = setOf("BOTTLE_OF_JYRRE", "DARK_CACAO_TRUFFLE")

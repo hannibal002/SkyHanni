@@ -151,9 +151,12 @@ public class InventoryConfig {
     public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
-    @ConfigOption(name = "Time Pocket Items", desc = "Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck)")
+    @ConfigOption(
+        name = "Evolving Items",
+        desc = "Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck)" // Search terms
+    )
     @Accordion
-    public timePocketItemsConfig timePocketItems = new timePocketItemsConfig();
+    public evolvingItemsConfig evolvingItems = new evolvingItemsConfig();
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
@@ -181,7 +184,7 @@ public class InventoryConfig {
         LARVA_HOOK("§bLarva Hook", 12),
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
-        TIME_POCKET_ITEMS("§bEvolving Items (Jyrre, Truffle, Discrite, Moby Duck)", 15), // TODO: Rename to EVOLVING_ITEMS
+        TIME_POCKET_ITEMS("§bEvolving Items (Jyrre, Truffle, Discrite, Moby-Duck)", 15), // TODO: Rename to EVOLVING_ITEMS
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
