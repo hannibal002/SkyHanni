@@ -125,41 +125,6 @@ object LorenzUtils {
         return Renderable.table(outerList, xPadding = 5, yPadding = padding)
     }
 
-    @Deprecated("Use List<Renderable>.addButton() instead", ReplaceWith(""))
-    inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
-        prefix: String,
-        getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
-    ) {
-        add(buildSelector<T>(prefix, getName, isCurrent, onChange))
-    }
-
-    @Deprecated("do not use", ReplaceWith(""))
-    inline fun <reified T : Enum<T>> buildSelector(
-        prefix: String,
-        getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
-    ) = buildList {
-        add(prefix)
-        for (entry in enumValues<T>()) {
-            val display = getName(entry)
-            if (isCurrent(entry)) {
-                add("§a[$display]")
-            } else {
-                add("§e[")
-                add(
-                    Renderable.link("§e$display") {
-                        onChange(entry)
-                    },
-                )
-                add("§e]")
-            }
-            add(" ")
-        }
-    }
-
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
