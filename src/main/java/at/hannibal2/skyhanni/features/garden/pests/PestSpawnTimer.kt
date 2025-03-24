@@ -235,17 +235,5 @@ object PestSpawnTimer {
         hasWarned = true
     }
 
-    private fun reset() {
-        pestCooldownEndTime = SimpleTimeMark.farPast()
-
-        lastCropBrokenTime = SimpleTimeMark.farPast()
-
-        longestCropBrokenTime = 0.seconds
-
-        pestSpawned = false
-
-        hasWarned = false
-    }
-
     fun isEnabled() = GardenApi.inGarden() && config.enabled
 }
