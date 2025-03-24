@@ -136,7 +136,7 @@ object CollectionTracker {
     private fun setNewCollection(internalName: NeuInternalName, name: String) {
         val foundAmount = CollectionApi.getCollectionCounter(internalName)
         if (foundAmount == null) {
-            ChatUtils.userError("$name boss collection not found. Try to open the collection inventory!")
+            ChatUtils.userError("$name collection not found. Try to open the collection inventory!")
             return
         }
         this.internalName = internalName
