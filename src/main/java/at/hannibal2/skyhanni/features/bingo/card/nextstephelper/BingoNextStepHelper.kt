@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
@@ -133,7 +134,7 @@ object BingoNextStepHelper {
         val having = step.amountHaving
         return if (having > 0) {
             val needed = step.amountNeeded
-            val percentage = LorenzUtils.formatPercentage(having.toDouble() / needed)
+            val percentage = (having.toDouble() / needed).formatPercentage()
             " $percentage (${having.addSeparators()}/${needed.addSeparators()})"
         } else ""
     }

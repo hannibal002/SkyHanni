@@ -36,6 +36,7 @@ object FishingHotspotRadar {
     private val bezierFitter = ParticlePathBezierFitter(3)
     private var hotspotLocation: LorenzVec? = null
     private val HOTSPOT_RADAR = "HOTSPOT_RADAR".toInternalName()
+    private var foundTime = SimpleTimeMark.farPast()
 
     @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -68,6 +69,8 @@ object FishingHotspotRadar {
 
     private fun pathFind(location: LorenzVec) {
         if (!config.guessHotspotRadarPathFind) return
+
+        foundTime = SimpleTimeMark.farFuture()
         val found = IslandGraphs.findClosestNode(
             location,
             condition = { it.hasTag(GraphNodeTag.FISHING_HOTSPOT) },
@@ -82,7 +85,7 @@ object FishingHotspotRadar {
             IslandGraphs.pathFind(
                 location, "§cUnknown Fishing Hotspot", LorenzColor.RED.toColor(),
                 condition = {
-                    config.guessHotspotRadarPathFind
+                    config.guessHotspotRadarPathFind && foundTime.passedSince() < 5.seconds
                 },
             )
             return
@@ -91,7 +94,7 @@ object FishingHotspotRadar {
             "§bFishing Hotspot",
             LorenzColor.AQUA.toColor(),
             condition = {
-                config.guessHotspotRadarPathFind
+                config.guessHotspotRadarPathFind && foundTime.passedSince() < 5.seconds
             },
         )
     }
@@ -101,15 +104,15 @@ object FishingHotspotRadar {
         val location = hotspotLocation ?: return
         val distance = location.distance(event.exactPlayerEyeLocation())
         if (config.lineToHotspot) {
-            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toColor(), 3, false)
+            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toColor(), lineWidth = 3, depth = false)
         }
         if (distance > 10) {
             val formattedDistance = distance.toInt().addSeparators()
             event.drawDynamicText(location.add(-0.5, 1.7, -0.5), "§d§lHOTSPOT", 1.7)
             event.drawDynamicText(location.add(-0.5, 1.6 - distance / (12 * 1.7), -0.5), " §r§e${formattedDistance}m", 1.0)
         } else {
-            hotspotLocation = null
-            bezierFitter.reset()
+            reset()
+            foundTime = SimpleTimeMark.now()
         }
     }
 
@@ -129,9 +132,14 @@ object FishingHotspotRadar {
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
+        reset()
+        foundTime = SimpleTimeMark.farPast()
+        lastAbilityUse = SimpleTimeMark.farPast()
+    }
+
+    private fun reset() {
         hotspotLocation = null
         bezierFitter.reset()
-        lastAbilityUse = SimpleTimeMark.farPast()
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.guessHotspotRadar
