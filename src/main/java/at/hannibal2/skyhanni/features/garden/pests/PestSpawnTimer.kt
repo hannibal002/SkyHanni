@@ -112,10 +112,10 @@ object PestSpawnTimer {
                 pestSpawnTimes.add(spawnTime.inWholeSeconds.toInt())
                 ChatUtils.debug("Added pest spawn time ${spawnTime.format()}")
             }
-        }
 
-        if (config.pestSpawnChatMessage) {
-            ChatUtils.chat("Pests spawned in §b${spawnTime.format()}")
+            if (config.pestSpawnChatMessage) {
+                ChatUtils.chat("Pests spawned in §b${spawnTime.format()}")
+            }
         }
 
         pestSpawned = true
