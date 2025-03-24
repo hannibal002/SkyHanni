@@ -35,8 +35,8 @@ object SeaCreatureFeatures {
     private var lastRareCatch = SimpleTimeMark.farPast()
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
+    private val seaCreaturesBosses = BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
 
-    // TODO remove spawn event, check per tick if can see, cache if already warned about
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
@@ -44,20 +44,24 @@ object SeaCreatureFeatures {
         val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
         if (!creature.rare) return
 
+        rareSeaCreatures.add(mob)
+
+        if (!config.highlight) return
+        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES !in damageIndicatorConfig.bossesToShow) return
+        if (seaCreaturesBosses.none { it.fullName.removeColor() == mob.name }) return
+        mob.highlight(LorenzColor.GREEN.toColor())
+    }
+
+    @HandleEvent
+    fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
+        if (!isEnabled()) return
+        val mob = event.mob
+        if (mob !in rareSeaCreatures) return
         val entity = mob.baseEntity
         val shouldNotify = entity.entityId !in entityIds
         entityIds.addIfAbsent(entity.entityId)
-        rareSeaCreatures.add(mob)
-
-        var shouldHighlight = config.highlight
-        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
-            val seaCreaturesBosses =
-                BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
-            if (seaCreaturesBosses.any { it.fullName.removeColor() == mob.name }) {
-                shouldHighlight = false
-            }
-        }
-        if (shouldHighlight) mob.highlight(LorenzColor.GREEN.toColor())
+        val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
+        if (!creature.rare) return
 
         if (lastRareCatch.passedSince() < 1.seconds) return
         if (mob.name == "Water Hydra" && entity.health == (entity.baseMaxHealth.toFloat() / 2)) return
@@ -95,7 +99,7 @@ object SeaCreatureFeatures {
 
     @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
-        if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.XRAY) {
+        if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.NO_XRAY) {
             event.queueEntitiesToOutline(getEntityOutlineColor)
         }
     }

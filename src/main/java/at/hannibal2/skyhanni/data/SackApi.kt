@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -33,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -100,7 +100,7 @@ object SackApi {
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name",
-        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂α] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?"
+        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂α] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**
@@ -111,7 +111,7 @@ object SackApi {
      */
     private val gemstoneFilterPattern by patternGroup.pattern(
         "gemstone.filter",
-        "(?:§.)+▶ (?<quality>.*)"
+        "(?:§.)+▶ (?<quality>.*)",
     )
     // </editor-fold>
 
@@ -206,7 +206,7 @@ object SackApi {
             val quality: GemstoneQuality = GemstoneQuality.getByNameOrNull(
                 group("quality").takeIf { it != "Amount" }?.uppercase()
                     ?: gemstoneStackFilter?.name
-                    ?: return@matchAll
+                    ?: return@matchAll,
             ) ?: return@matchAll
 
             val (multiplier, priceUpdater) = when (quality) {
@@ -214,14 +214,17 @@ object SackApi {
                     gem.roughPrice = price
                     gem.rough = stored
                 }
+
                 GemstoneQuality.FLAWED -> Pair(80) { price: Long ->
                     gem.flawedPrice = price
                     gem.flawed = stored
                 }
+
                 GemstoneQuality.FINE -> Pair(80 * 80) { price: Long ->
                     gem.finePrice = price
                     gem.fine = stored
                 }
+
                 else -> return@matchAll
             }
 
@@ -284,9 +287,17 @@ object SackApi {
         if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
         for (stackEntry in stackList) {
             when {
-                isGemstoneSack -> { stackEntry.processGemstoneItem(savingSacks) }
-                isRuneSack -> { stackEntry.processRuneItem(savingSacks) }
-                else -> { stackEntry.processOtherItem(savingSacks) }
+                isGemstoneSack -> {
+                    stackEntry.processGemstoneItem(savingSacks)
+                }
+
+                isRuneSack -> {
+                    stackEntry.processRuneItem(savingSacks)
+                }
+
+                else -> {
+                    stackEntry.processOtherItem(savingSacks)
+                }
             }
         }
         if (savingSacks) saveSackData()
