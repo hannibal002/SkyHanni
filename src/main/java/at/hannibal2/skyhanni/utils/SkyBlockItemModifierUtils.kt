@@ -206,7 +206,6 @@ object SkyBlockItemModifierUtils {
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
         "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
-        "MOBY_DUCK" -> getAttributeInt("seconds_held")
         else -> null
     }
 
