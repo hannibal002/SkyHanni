@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -733,7 +734,7 @@ object DamageIndicatorManager {
         val config = config.vampireSlayer
 
         if (config.percentage) {
-            val percentage = LorenzUtils.formatPercentage(health.toDouble() / maxHealth)
+            val percentage = (health.toDouble() / maxHealth).formatPercentage()
             entityData.nameSuffix = " §e$percentage"
         }
 

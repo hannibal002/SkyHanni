@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -103,7 +104,7 @@ object SeaCreatureTracker {
             }
 
             val percentageSuffix = if (config.showPercentage.get()) {
-                val percentage = LorenzUtils.formatPercentage(amount.toDouble() / total)
+                val percentage = (amount.toDouble() / total).formatPercentage()
                 " §7$percentage"
             } else ""
 
