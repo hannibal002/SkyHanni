@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.inventory.AccessoriesUpdatedEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -33,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnrichment
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
@@ -150,7 +150,7 @@ object AccessoryApi {
      */
     val personalXTorPattern by RepoPattern.pattern(
         "accessory.personal-x-tor",
-        "PERSONAL_(?:COMPAC|DELE)TOR_\\d000"
+        "PERSONAL_(?:COMPAC|DELE)TOR_\\d000",
     )
     // </editor-fold>
 
@@ -177,7 +177,7 @@ object AccessoryApi {
                 slayerType = slayerType,
                 level = level,
                 matchLore = matchLore,
-            )
+            ),
         )
     }
 

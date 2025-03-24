@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.cakeBag
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.personalXTorPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName

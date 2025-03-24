@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.isAbiCa
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.isHatPattern
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.repoAccessoryLineage
 import at.hannibal2.skyhanni.features.slayer.SlayerType
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 
 class Accessory(

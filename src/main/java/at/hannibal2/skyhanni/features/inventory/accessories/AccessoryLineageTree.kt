@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.isAcces
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.neuCraftTextSlayerCraftReqPattern
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.repoAccessoryLineage
 import at.hannibal2.skyhanni.features.slayer.SlayerType
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import com.google.gson.JsonObject
 
 class LineageConnection(
