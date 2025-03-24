@@ -63,7 +63,7 @@ object MiningNotifications {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inMiningIsland()) return
+        if (!MiningApi.inMiningIsland()) return
         if (!config.enabled) return
         val message = event.message
         when {

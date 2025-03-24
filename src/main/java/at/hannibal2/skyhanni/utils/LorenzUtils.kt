@@ -175,6 +175,4 @@ object LorenzUtils {
 
     // TODO move into mayor api
     fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
-
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningApi.inAdvancedMiningIsland()
 }
