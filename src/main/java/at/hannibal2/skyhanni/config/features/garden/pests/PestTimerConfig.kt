@@ -29,7 +29,7 @@ class PestTimerConfig {
     @Expose
     @ConfigOption(name = "Pest Timer Text", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var pestDisplay: List<PestTimerTextEntry> = ArrayList(PestTimerTextEntry.defaultList)
+    var pestDisplay: MutableList<PestTimerTextEntry> = mutableListOf()
 
     enum class PestTimerTextEntry(private val displayName: String) {
         PEST_TIMER("§eLast pest spawned: §b8s ago"),
@@ -38,13 +38,6 @@ class PestTimerConfig {
 
         override fun toString(): String {
             return displayName
-        }
-
-        companion object {
-            val defaultList: List<PestTimerTextEntry> = listOf(
-                PEST_TIMER,
-                PEST_COOLDOWN
-            )
         }
     }
 
