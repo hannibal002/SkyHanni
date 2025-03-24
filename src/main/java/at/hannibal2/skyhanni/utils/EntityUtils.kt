@@ -81,12 +81,12 @@ object EntityUtils {
         return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
-                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
+                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
             if (debugRightEntity && result) {
-                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
+                ChatUtils.consoleLog("mob: " + center.printWithAccuracy(2))
+                ChatUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
+                ChatUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
             }
             result
         }

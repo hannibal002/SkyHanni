@@ -84,11 +84,6 @@ object LorenzUtils {
     //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
 
-    // TODO move into chat utils
-    fun consoleLog(text: String) {
-        SkyHanniMod.consoleLog(text)
-    }
-
     fun getPlayerUuid() = getRawPlayerUuid().toDashlessUUID()
 
     fun getRawPlayerUuid(): UUID = MinecraftCompat.localPlayer.uniqueID
