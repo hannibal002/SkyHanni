@@ -156,7 +156,7 @@ object PestSpawnTimer {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (hasWarned || !config.cooldownOverWarning) return
 
-        if ((pestCooldownEndTime - (config.cooldownWarningTime.seconds - 1.seconds)).isInPast()) {
+        if ((pestCooldownEndTime - (config.cooldownWarningTime.seconds)).isInPast()) {
             cooldownReminder()
         }
     }
