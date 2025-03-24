@@ -1,30 +1,22 @@
 package at.hannibal2.skyhanni.utils
 
+//#if MC < 1.21
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.SharedMonsterAttributes
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
 import java.util.UUID
-//#if MC < 1.21
-import net.minecraft.entity.SharedMonsterAttributes
+
 //#else
 //$$ import net.minecraft.entity.attribute.EntityAttributes
 //#endif
