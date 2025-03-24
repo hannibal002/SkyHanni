@@ -149,7 +149,7 @@ object ChatUtils {
      */
     fun clickableChat(
         message: String,
-        onClick: () -> Any,
+        onClick: () -> Unit,
         hover: String = "§eClick here!",
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
