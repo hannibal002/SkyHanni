@@ -11,24 +11,25 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.CollectionUtils.contains
-import at.hannibal2.skyhanni.utils.CollectionUtils.firstTwiceOf
-import at.hannibal2.skyhanni.utils.CollectionUtils.runningIndexedFold
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NeuItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
@@ -88,7 +89,7 @@ interface Renderable {
             }
         }
 
-        fun fromAny(any: Any?, itemScale: Double = NeuItems.itemFontSize): Renderable? = when (any) {
+        fun fromAny(any: Any?, itemScale: Double = NeuItems.ITEM_FONT_SIZE): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
             is String -> string(any)
@@ -418,7 +419,7 @@ interface Renderable {
 
         fun itemStackWithTip(
             item: ItemStack,
-            scale: Double = NeuItems.itemFontSize,
+            scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
             ySpacing: Int = 0,
             rescaleSkulls: Boolean = true,
@@ -440,12 +441,13 @@ interface Renderable {
 
         fun itemStack(
             item: ItemStack,
-            scale: Double = NeuItems.itemFontSize,
+            scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+            highlight: Boolean = false,
         ) = object : Renderable {
             override val width = (15.5 * scale + 0.5).toInt() + xSpacing
             override val height = (15.5 * scale + 0.5).toInt() + ySpacing
@@ -453,6 +455,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
+                if (highlight) {
+                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+                }
                 item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
         }
@@ -839,7 +844,6 @@ interface Renderable {
             }
         }
 
-        // TODO use this to render current boosted crop in next jacob contest crops
         fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor().addAlpha(100)) = object : Renderable {
             override val width = this@renderBounds.width
             override val height = this@renderBounds.height
