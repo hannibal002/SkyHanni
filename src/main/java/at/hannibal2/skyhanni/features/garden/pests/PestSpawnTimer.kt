@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.lastCropBrokenTime
+import at.hannibal2.skyhanni.features.garden.GardenApi.pestCooldownEndTime
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -51,13 +53,9 @@ object PestSpawnTimer {
 
     private val pestSpawnTimes: MutableList<Int> = mutableListOf()
 
-    private var averageSpawnTime: Int = pestSpawnTimes.average().toInt()
+    private val averageSpawnTime: Int get() = pestSpawnTimes.average().toInt()
 
     var lastSpawnTime = SimpleTimeMark.farPast()
-
-    private var pestCooldownEndTime = SimpleTimeMark.farPast()
-
-    private var lastCropBrokenTime = SimpleTimeMark.farPast()
 
     private var longestCropBrokenTime: Duration = 0.seconds
 
@@ -109,22 +107,20 @@ object PestSpawnTimer {
     fun onPestSpawn(event: PestSpawnEvent) {
         val spawnTime = lastSpawnTime.passedSince()
 
-        if (!lastSpawnTime.isFarPast() && !pestSpawned) {
+        if (!lastSpawnTime.isFarPast()) {
             if (longestCropBrokenTime.inWholeSeconds.toInt() <= config.averagePestSpawnTimeout) {
                 pestSpawnTimes.add(spawnTime.inWholeSeconds.toInt())
                 ChatUtils.debug("Added pest spawn time ${spawnTime.format()}")
             }
-
-            if (config.pestSpawnChatMessage) {
-                ChatUtils.chat("Pests spawned in §b${spawnTime.format()}")
-            }
-
-            pestSpawned = true
         }
 
-        longestCropBrokenTime = 0.seconds
+        if (config.pestSpawnChatMessage) {
+            ChatUtils.chat("Pests spawned in §b${spawnTime.format()}")
+        }
 
-        averageSpawnTime = pestSpawnTimes.average().toInt()
+        pestSpawned = true
+
+        longestCropBrokenTime = 0.seconds
 
         lastSpawnTime = SimpleTimeMark.now()
 
@@ -158,10 +154,10 @@ object PestSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (hasWarned || !config.pestCooldownOverWarning) return
+        if (hasWarned || !config.cooldownOverWarning) return
 
         if ((pestCooldownEndTime - (config.cooldownWarningTime.seconds - 1.seconds)).isInPast()) {
-            warn()
+            cooldownReminder()
         }
     }
 
@@ -217,12 +213,12 @@ object PestSpawnTimer {
     }
 
     private fun formatDisplay(lineMap: Map<PestTimerTextEntry, Renderable>): List<Renderable> {
-        return config.defaultDisplay.mapNotNull { lineMap[it] }
+        return config.pestDisplay.mapNotNull { lineMap[it] }
     }
 
-    private fun warn() {
-        sendTitle("§cPests Cooldown Expired!", duration = 3.seconds)
-        ChatUtils.chat("§cPest spawn cooldown has expired!")
+    private fun cooldownReminder() {
+        sendTitle("§cPests Cooldown is Over Soon!", duration = 3.seconds)
+        ChatUtils.chat("§cPest spawn cooldown expires in ${pestCooldownEndTime.timeUntil().format()}")
         SoundUtils.playPlingSound()
         hasWarned = true
     }
