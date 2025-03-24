@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
@@ -34,6 +36,7 @@ object FishingHotspotRadar {
     private val bezierFitter = ParticlePathBezierFitter(3)
     private var hotspotLocation: LorenzVec? = null
     private val HOTSPOT_RADAR = "HOTSPOT_RADAR".toInternalName()
+    private var foundTime = SimpleTimeMark.farPast()
 
     @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -66,22 +69,23 @@ object FishingHotspotRadar {
 
     private fun pathFind(location: LorenzVec) {
         if (!config.guessHotspotRadarPathFind) return
+
+        foundTime = SimpleTimeMark.farFuture()
         val found = IslandGraphs.findClosestNode(
             location,
             condition = { it.hasTag(GraphNodeTag.FISHING_HOTSPOT) },
             radius = 15.0,
         ) ?: run {
-            // TODO reuse again once this doesnt cause StackOverflowError anymore
-//             ErrorManager.logErrorStateWithData(
-//                 "No path to fishing hotspot found",
-//                 "no node with tag 'fishing hotspot' found near the radar hotspot target",
-//                 "location" to location,
-//                 "island" to LorenzUtils.skyBlockIsland.name,
-//             )
+            ErrorManager.logErrorStateWithData(
+                "No path to fishing hotspot found",
+                "no node with tag 'fishing hotspot' found near the radar hotspot target",
+                "location" to location,
+                "island" to LorenzUtils.skyBlockIsland.name,
+            )
             IslandGraphs.pathFind(
                 location, "§cUnknown Fishing Hotspot", LorenzColor.RED.toColor(),
                 condition = {
-                    config.guessHotspotRadarPathFind
+                    config.guessHotspotRadarPathFind && foundTime.passedSince() < 5.seconds
                 },
             )
             return
@@ -90,7 +94,7 @@ object FishingHotspotRadar {
             "§bFishing Hotspot",
             LorenzColor.AQUA.toColor(),
             condition = {
-                config.guessHotspotRadarPathFind
+                config.guessHotspotRadarPathFind && foundTime.passedSince() < 5.seconds
             },
         )
     }
@@ -99,13 +103,16 @@ object FishingHotspotRadar {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val location = hotspotLocation ?: return
         val distance = location.distance(event.exactPlayerEyeLocation())
+        if (config.lineToHotspot) {
+            event.drawLineToEye(location, LorenzColor.LIGHT_PURPLE.toColor(), lineWidth = 3, depth = false)
+        }
         if (distance > 10) {
             val formattedDistance = distance.toInt().addSeparators()
             event.drawDynamicText(location.add(-0.5, 1.7, -0.5), "§d§lHOTSPOT", 1.7)
             event.drawDynamicText(location.add(-0.5, 1.6 - distance / (12 * 1.7), -0.5), " §r§e${formattedDistance}m", 1.0)
         } else {
-            hotspotLocation = null
-            bezierFitter.reset()
+            reset()
+            foundTime = SimpleTimeMark.now()
         }
     }
 
@@ -123,11 +130,16 @@ object FishingHotspotRadar {
         lastAbilityUse = SimpleTimeMark.now()
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
+        reset()
+        foundTime = SimpleTimeMark.farPast()
+        lastAbilityUse = SimpleTimeMark.farPast()
+    }
+
+    private fun reset() {
         hotspotLocation = null
         bezierFitter.reset()
-        lastAbilityUse = SimpleTimeMark.farPast()
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.guessHotspotRadar
