@@ -4,11 +4,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AttributeGoodRollsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsIgnoreOrder
-import at.hannibal2.skyhanni.utils.CollectionUtils.toPair
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsIgnoreOrder
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toPair
 import net.minecraft.item.ItemStack
 import java.util.regex.Pattern
 
