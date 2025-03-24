@@ -156,6 +156,11 @@ object PestSpawnTimer {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (hasWarned || !config.cooldownOverWarning) return
 
+        if (pestCooldownEndTime.isFarPast()) {
+            cooldownExpired()
+            return
+        }
+
         if ((pestCooldownEndTime - (config.cooldownWarningTime.seconds)).isInPast()) {
             cooldownReminder()
         }
@@ -216,8 +221,15 @@ object PestSpawnTimer {
         return config.pestDisplay.mapNotNull { lineMap[it] }
     }
 
+    private fun cooldownExpired() {
+        sendTitle("§cPests Cooldown Has Expired!", duration = 3.seconds)
+        ChatUtils.chat("§cPest spawn cooldown has expired!")
+        SoundUtils.playPlingSound()
+        hasWarned = true
+    }
+
     private fun cooldownReminder() {
-        sendTitle("§cPests Cooldown is Over Soon!", duration = 3.seconds)
+        sendTitle("§cPests Cooldown Expires Soon!", duration = 3.seconds)
         ChatUtils.chat("§cPest spawn cooldown expires in ${pestCooldownEndTime.timeUntil().format()}")
         SoundUtils.playPlingSound()
         hasWarned = true
