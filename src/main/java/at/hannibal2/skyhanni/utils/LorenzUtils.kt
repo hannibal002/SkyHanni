@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-//#if MC < 1.21
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
@@ -11,12 +10,12 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.SharedMonsterAttributes
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
 import java.util.UUID
-
+//#if MC < 1.21
+import net.minecraft.entity.SharedMonsterAttributes
 //#else
 //$$ import net.minecraft.entity.attribute.EntityAttributes
 //#endif
