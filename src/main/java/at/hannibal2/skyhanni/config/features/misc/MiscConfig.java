@@ -350,10 +350,10 @@ public class MiscConfig {
     public Property<Boolean> replaceRomanNumerals = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
+    @ConfigOption(name = "Charge Bottle Notification", desc = "Send a message when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean thunderBottleNotification = true;
+    public boolean chargeBottleNotification = true;
 
     @Expose
     @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
@@ -378,10 +378,15 @@ public class MiscConfig {
     public boolean maintainGameVolume = false;
 
     @Expose
-    @ConfigOption(name = "NEU Soul Path Find", desc = "When showing §e/neusouls on§7, show a pathfind to the Fairy Souls missing and a percentage of souls done in chat.")
+    @ConfigOption(name = "NEU Soul Path Find", desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean neuSoulsPathFind = true;
+
+    @Expose
+    @ConfigOption(name = "Fast Fairy Souls", desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island. §eDoes not require NEU. ")
+    @ConfigEditorBoolean
+    public boolean fastFairySouls = false;
 
     @Expose
     @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")
@@ -393,6 +398,7 @@ public class MiscConfig {
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to userLuck
     public boolean userluckEnabled = true;
 
     @Expose
