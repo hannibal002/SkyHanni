@@ -12,12 +12,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.entity.EntityLivingBase
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
 import java.util.UUID
-import kotlin.time.Duration.Companion.seconds
 //#if MC < 1.21
 import net.minecraft.entity.SharedMonsterAttributes
 //#else
@@ -83,11 +81,6 @@ object LorenzUtils {
     //#else
     //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
-
-    // TODO move into chat utils
-    fun consoleLog(text: String) {
-        SkyHanniMod.consoleLog(text)
-    }
 
     fun getPlayerUuid() = getRawPlayerUuid().toDashlessUUID()
 
