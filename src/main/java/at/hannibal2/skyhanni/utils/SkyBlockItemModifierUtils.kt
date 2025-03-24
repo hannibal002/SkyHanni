@@ -204,7 +204,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getSecondsHeld() = when (getItemId()) {
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
-        "DARK_CACAO_TRUFFLE" -> getAttributeInt("seconds_held")
+        "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
         else -> null
     }

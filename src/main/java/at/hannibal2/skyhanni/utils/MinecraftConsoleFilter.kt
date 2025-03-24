@@ -202,14 +202,14 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         if (config.logUnfilteredFile) {
             loggerUnfiltered.log(text)
         } else {
-            LorenzUtils.consoleLog(text)
+            ChatUtils.consoleLog(text)
         }
     }
 
     private fun filterConsole(message: String) {
         loggerFiltered.log(message)
         if (config.printFilteredReason) {
-            LorenzUtils.consoleLog("filtered console: $message")
+            ChatUtils.consoleLog("filtered console: $message")
         }
     }
 

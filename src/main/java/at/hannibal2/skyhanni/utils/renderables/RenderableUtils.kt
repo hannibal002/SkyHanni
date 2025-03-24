@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -326,6 +329,29 @@ internal object RenderableUtils {
 
     fun MutableList<Renderable>.addCenteredString(string: String) =
         this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
+
+    fun fillTable(
+        data: List<DisplayTableEntry>,
+        padding: Int = 1,
+        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
+    ): Renderable {
+        val sorted = data.sortedByDescending { it.sort }
+
+        val outerList = mutableListOf<List<Renderable>>()
+        for (entry in sorted) {
+            val item = entry.item.getItemStackOrNull()?.let {
+                Renderable.itemStack(it, scale = itemScale)
+            } ?: continue
+            val left = hoverTips(
+                entry.left,
+                tips = entry.hover,
+                highlightsOnHoverSlots = entry.highlightsOnHoverSlots,
+            )
+            val right = Renderable.string(entry.right)
+            outerList.add(listOf(item, left, right))
+        }
+        return Renderable.table(outerList, xPadding = 5, yPadding = padding)
+    }
 }
 
 fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
