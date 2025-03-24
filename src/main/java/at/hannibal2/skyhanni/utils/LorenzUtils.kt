@@ -84,12 +84,6 @@ object LorenzUtils {
     //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
 
-    // TODO create extension function
-    fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
-
-    fun formatPercentage(percentage: Double, format: String?): String =
-        DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
-
     // TODO move into chat utils
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)
