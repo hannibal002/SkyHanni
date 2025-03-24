@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
 class SkyHanniTickEvent(private val tick: Int) : SkyHanniEvent() {
 
+    override val primaryFunctionName: String = "onTick"
+
     fun isMod(i: Int, offset: Int = 0) = (tick + offset) % i == 0
 
     /**

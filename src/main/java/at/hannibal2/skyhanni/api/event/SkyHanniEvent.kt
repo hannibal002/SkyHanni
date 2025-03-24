@@ -5,6 +5,14 @@ package at.hannibal2.skyhanni.api.event
  */
 abstract class SkyHanniEvent protected constructor() {
 
+    /**
+     * This is used in parameterless @HandleEvent annotations.
+     * e.g., IslandChangEvent -> onIslandChange to allow for
+     * @HandleEvent
+     * fun onIslandChange() { ... }
+     */
+    open val primaryFunctionName: String? = null
+
     // TODO: This should only be accessible in the cancellable interface
     var isCancelled: Boolean = false
         private set

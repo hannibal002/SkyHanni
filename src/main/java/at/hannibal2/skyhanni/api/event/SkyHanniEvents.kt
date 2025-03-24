@@ -37,8 +37,29 @@ object SkyHanniEvents {
 
     private fun registerMethod(method: Method, instance: Any) {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return
+        registerNoEventType(options, method, instance)
         registerSingleEventType(options, method, instance)
         registerMultipleEventTypes(options, method, instance)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private val eventPrimaryFunctionNames: Map<Class<out SkyHanniEvent>, String> by lazy {
+        getEventClasses(SkyHanniEvent::class.java).mapNotNull {
+            val eventClass =  it as Class<out SkyHanniEvent>
+            val primaryFunctionName = it.getDeclaredMethod("primaryFunctionName").invoke(null) as String?
+                ?: return@mapNotNull null
+            eventClass to primaryFunctionName
+        }.toMap()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun registerNoEventType(options: HandleEvent, method: Method, instance: Any) {
+        val eventType = eventPrimaryFunctionNames.entries.firstOrNull {
+            it.value == method.name
+        }?.javaClass ?: return
+        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
+        listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
+            .addListener(method, instance, options)
     }
 
     @Suppress("UNCHECKED_CAST")
