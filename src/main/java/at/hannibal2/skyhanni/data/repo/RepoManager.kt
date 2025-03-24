@@ -153,7 +153,7 @@ object RepoManager {
             ) {
                 if (command) {
                     ChatUtils.hoverableChat(
-                        "§7The repo is already up to date! (hover for infos)",
+                        "§7The repo is already up to date! (hover for info)",
                         hover = buildList {
                             add("§7latest commit sha: §e$currentDownloadedCommit")
                             latestRepoCommitTime?.let { latestTime ->
@@ -168,7 +168,7 @@ object RepoManager {
             }
             if (command) {
                 ChatUtils.hoverableChat(
-                    "Repo is outdated, updating.. (hover for infos)",
+                    "Repo is outdated, updating.. (hover for info)",
                     hover = buildList {
                         add("§7local commit sha: §e$latestRepoCommit")
                         currentDownloadedCommitTime?.let { localTime ->
