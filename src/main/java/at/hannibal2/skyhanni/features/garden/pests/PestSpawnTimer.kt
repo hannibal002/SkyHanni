@@ -163,7 +163,7 @@ object PestSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onIslandChange(event: IslandChangeEvent) {
-        reset()
+        longestCropBrokenTime = lastCropBrokenTime.passedSince()
     }
 
     private fun shouldSetCooldown(tabCooldownEnd: SimpleTimeMark, minutes: Int?, seconds: Int?): Boolean {
