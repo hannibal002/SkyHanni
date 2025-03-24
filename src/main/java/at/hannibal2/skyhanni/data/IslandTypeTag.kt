@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import com.google.gson.reflect.TypeToken
 import java.util.EnumSet
@@ -30,7 +31,7 @@ class IslandTypeTag internal constructor(name: String, private val types: EnumSe
     private fun update(newValues: List<String>) {
         types.clear()
         newValues.forEach { island ->
-            LorenzUtils.enumValueOfOrNull<IslandType>(island.uppercase())?.let {
+            EnumUtils.enumValueOfOrNull<IslandType>(island.uppercase())?.let {
                 types.add(it)
             }
         }
