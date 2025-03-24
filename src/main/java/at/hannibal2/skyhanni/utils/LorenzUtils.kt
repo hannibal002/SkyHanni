@@ -7,10 +7,8 @@ import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.entity.EntityLivingBase
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -87,30 +85,6 @@ object LorenzUtils {
     fun getRawPlayerUuid(): UUID = MinecraftCompat.localPlayer.uniqueID
 
     fun getPlayerName(): String = MinecraftCompat.localPlayer.name
-
-    // TODO move into renderable utils
-    fun fillTable(
-        data: List<DisplayTableEntry>,
-        padding: Int = 1,
-        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
-    ): Renderable {
-        val sorted = data.sortedByDescending { it.sort }
-
-        val outerList = mutableListOf<List<Renderable>>()
-        for (entry in sorted) {
-            val item = entry.item.getItemStackOrNull()?.let {
-                Renderable.itemStack(it, scale = itemScale)
-            } ?: continue
-            val left = Renderable.hoverTips(
-                entry.left,
-                tips = entry.hover,
-                highlightsOnHoverSlots = entry.highlightsOnHoverSlots,
-            )
-            val right = Renderable.string(entry.right)
-            outerList.add(listOf(item, left, right))
-        }
-        return Renderable.table(outerList, xPadding = 5, yPadding = padding)
-    }
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
