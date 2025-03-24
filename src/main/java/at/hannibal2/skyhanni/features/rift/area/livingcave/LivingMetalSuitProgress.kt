@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getLivingMetalProgress
@@ -43,7 +43,7 @@ object LivingMetalSuitProgress {
         if (progressMap.isEmpty()) return@buildList
 
         val totalProgress = progressMap.values.map { it ?: 1.0 }.average().roundTo(1)
-        val formatPercentage = LorenzUtils.formatPercentage(totalProgress)
+        val formatPercentage = totalProgress.formatPercentage()
         addString("§7Living Metal Suit Progress: ${if (isMaxed) "§a§lMAXED!" else "§a$formatPercentage"}")
 
         if (config.compactWhenMaxed && isMaxed) return@buildList
@@ -55,7 +55,7 @@ object LivingMetalSuitProgress {
                 addString("${stack.displayName}: ")
                 addString(
                     progress?.let {
-                        drawProgressBar(it) + " §b${LorenzUtils.formatPercentage(it)}"
+                        drawProgressBar(it) + " §b${it.formatPercentage()}"
                     } ?: "§cStart upgrading it!",
                 )
             }
