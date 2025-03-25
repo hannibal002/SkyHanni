@@ -30,6 +30,7 @@ enum class IslandType(private val nameFallback: String) {
     WINTER("Jerry's Workshop"),
     THE_RIFT("The Rift"),
     MINESHAFT("Mineshaft"),
+    BACKWATER_BAYOU("Backwater Bayou"),
 
     NONE(""),
     ANY(""),

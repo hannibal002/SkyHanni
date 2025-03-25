@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import net.minecraft.item.Item
 
 data class NeuReforgeJson(
     @Expose val internalName: NeuInternalName?,
@@ -54,7 +54,7 @@ data class NeuReforgeJson(
                     val map = any as? Map<String, List<String>> ?: return type to emptyList()
                     val internalNames = map["internalName"]?.toInternalNames().orEmpty()
                     val itemType = map["itemid"]?.map {
-                        NeuItems.getInternalNamesForItemId(Item.getByNameOrId(it) ?: return@map emptyList())
+                        NeuItems.getInternalNamesForItemId(it.getVanillaItem() ?: return@map emptyList())
                     }?.flatten().orEmpty()
                     type to (internalNames + itemType)
                 }

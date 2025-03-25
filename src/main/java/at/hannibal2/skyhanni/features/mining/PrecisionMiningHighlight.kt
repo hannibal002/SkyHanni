@@ -28,7 +28,7 @@ object PrecisionMiningHighlight {
     private var deleteTime: SimpleTimeMark? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onParticle(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!(event.type == EnumParticleTypes.CRIT || event.type == EnumParticleTypes.VILLAGER_HAPPY) ||
             !Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown

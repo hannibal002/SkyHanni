@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -35,7 +34,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getRawBaseStats
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -53,13 +52,17 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -77,7 +80,7 @@ object SkyHanniDebugsAndTests {
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
-    var displayList = emptyList<List<Any>>()
+    var displayList = emptyList<Renderable>()
 
     var globalRender = true
 
@@ -218,37 +221,33 @@ object SkyHanniDebugsAndTests {
             return
         }
 
-        val bigList = mutableListOf<List<Any>>()
-        var list = mutableListOf<Any>()
-        var i = 0
         var errors = 0
-        for (item in GardenVisitorColorNames.visitorItems) {
-            val name = item.key
-            i++
-            if (i == 5) {
-                i = 0
-                bigList.add(list)
-                list = mutableListOf()
-            }
 
-            val coloredName = GardenVisitorColorNames.getColoredName(name)
-            list.add("$coloredName§7 (")
-            for (itemName in item.value) {
-                try {
-                    val internalName = NeuInternalName.fromItemName(itemName)
-                    list.add(internalName.getItemStack())
-                } catch (e: Error) {
-                    ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
-                    errors++
+        displayList = buildList {
+            for (item in GardenVisitorColorNames.visitorItems) {
+                val name = item.key
+
+                addLine {
+                    val coloredName = GardenVisitorColorNames.getColoredName(name)
+                    addString("$coloredName§7 (")
+
+                    for (itemName in item.value) {
+                        try {
+                            val internalName = NeuInternalName.fromItemName(itemName)
+                            addItemStack(internalName.getItemStack())
+                        } catch (e: Error) {
+                            ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
+                            errors++
+                        }
+                    }
+                    if (item.value.isEmpty()) {
+                        addString("Any")
+                    }
+                    addString("§7) ")
                 }
             }
-            if (item.value.isEmpty()) {
-                list.add("Any")
-            }
-            list.add("§7) ")
         }
-        bigList.add(list)
-        displayList = bigList
+
         if (errors == 0) {
             ChatUtils.debug("Test garden visitor renderer: no errors")
         } else {
@@ -366,7 +365,7 @@ object SkyHanniDebugsAndTests {
     @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
-        val focussedSlot = event.guiContainer.slotUnderMouse ?: return
+        val focussedSlot = slotUnderCursor() ?: return
         val stack = focussedSlot.stack ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
@@ -455,7 +454,7 @@ object SkyHanniDebugsAndTests {
             event.toolTip.add("Item name: no item.")
             return
         }
-        val name = itemStack.itemName
+        val name = itemStack.repoItemName
         event.toolTip.add("Item name: '$name§7'")
     }
 
@@ -497,7 +496,7 @@ object SkyHanniDebugsAndTests {
         if (displayLine.isNotEmpty()) {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
-        config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
+        config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
     }
 
     @HandleEvent
