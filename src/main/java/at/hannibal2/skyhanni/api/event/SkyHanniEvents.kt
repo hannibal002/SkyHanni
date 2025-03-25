@@ -45,7 +45,7 @@ object SkyHanniEvents {
     @Suppress("UNCHECKED_CAST")
     private val eventPrimaryFunctionNames: Map<String, Class<SkyHanniEvent>> by lazy {
         getEventClasses(SkyHanniEvent::class.java).mapNotNull {
-            val eventClass =  it as Class<SkyHanniEvent>
+            val eventClass = it as Class<SkyHanniEvent>
             val primaryFunctionName = it.getDeclaredMethod("primaryFunctionName").invoke(null) as String?
                 ?: return@mapNotNull null
             primaryFunctionName to eventClass

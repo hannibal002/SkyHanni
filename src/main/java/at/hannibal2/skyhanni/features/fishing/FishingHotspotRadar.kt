@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -83,7 +82,7 @@ object FishingHotspotRadar {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         hotspotLocation = null
         bezierFitter.reset()
         lastAbilityUse = SimpleTimeMark.farPast()

@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
@@ -53,7 +52,7 @@ object KeyboardManager {
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
         if (isConfigScreen) return

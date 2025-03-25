@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingLaneSwitchEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneApi.getValue
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneApi.setValue
@@ -62,7 +61,7 @@ object FarmingLaneFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
 
         if (!calculateDistance()) return
