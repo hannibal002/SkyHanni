@@ -43,7 +43,6 @@ object ShortenCoins {
         }
     }
 
-
     fun Number.formatChatCoins(): String {
         return "§6" + if (config.shortenCoinAmounts) {
             shortFormat()
