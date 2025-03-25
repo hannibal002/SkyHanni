@@ -11,11 +11,16 @@ at/hannibal2/skyhanni/api/minecraftevents/ClientEvents.kt
 at/hannibal2/skyhanni/utils/ReflectionUtils.kt
 at/hannibal2/skyhanni/config/HasLegacyId.java
 
-
+# at/hannibal2/skyhanni/utils/compat/MinecraftCompat.kt
 # at/hannibal2/skyhanni/utils/compat/InventoryCompat.kt
 # at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
 
+# at/hannibal2/skyhanni/mixins/transformers/MixinClientConnection.java
+
 at/hannibal2/skyhanni/TestingModFeatures.kt
+
+at/hannibal2/skyhanni/mixins/init/SkyhanniMixinPlugin.java
+at/hannibal2/skyhanni/mixins/init/BeforeForLoopInjectionPoint.java
 
 at/hannibal2/skyhanni/SkyHanniModLoader.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/AnitaUpgradeCostsJson.kt

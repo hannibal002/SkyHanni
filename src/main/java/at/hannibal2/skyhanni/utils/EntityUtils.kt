@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -8,8 +10,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.getHandItem
@@ -42,7 +44,7 @@ object EntityUtils {
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
-        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers().orEmpty()) {
+        for (entity in MinecraftCompat.localWorldOrNull?.getLoadedPlayers().orEmpty()) {
             if (!entity.isNpc() && entity is EntityOtherPlayerMP) {
                 list.add(entity)
             }
@@ -79,12 +81,12 @@ object EntityUtils {
         return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
-                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
+                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
             if (debugRightEntity && result) {
-                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
+                ChatUtils.consoleLog("mob: " + center.printWithAccuracy(2))
+                ChatUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
+                ChatUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
             }
             result
         }
@@ -95,8 +97,12 @@ object EntityUtils {
         val b = center.add(radius, radius + 3, radius)
         val alignedBB = a.axisAlignedTo(b)
         val clazz = EntityArmorStand::class.java
-        val worldObj = Minecraft.getMinecraft().theWorld ?: return emptyList()
-        return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
+        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
+        //#if MC < 1.21
+        return world.getEntitiesWithinAABB(clazz, alignedBB)
+        //#else
+        //$$ return world.getEntitiesByClass(clazz, alignedBB, net.minecraft.predicate.entity.EntityPredicates.EXCEPT_SPECTATOR)
+        //#endif
     }
 
     @Deprecated("Old. Instead use entity detection feature instead.")
@@ -104,7 +110,7 @@ object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
-        val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
+        val derpyMultiplier = if (ElectionApi.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
         if (!boss && !DungeonApi.inDungeon()) {
@@ -164,20 +170,20 @@ object EntityUtils {
     //$$ entitiesForRendering()
     //#endif
 
-    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft().theWorld?.getAllEntities()?.let {
+    fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.getAllEntities()?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it
         // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
         //  but *does* make crashes because of it rarer.
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
-    fun getAllTileEntities(): Sequence<TileEntity> = Minecraft.getMinecraft().theWorld?.loadedTileEntityList?.let {
+    fun getAllTileEntities(): Sequence<TileEntity> = MinecraftCompat.localWorldOrNull?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
 
-    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.getEntityLevel()?.getEntityByID(entityId)
+    fun getEntityByID(entityId: Int) = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()

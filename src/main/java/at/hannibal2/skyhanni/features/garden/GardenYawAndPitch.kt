@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,7 +29,7 @@ object GardenYawAndPitch {
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null && !config.showWithoutTool) return
 
-        val player = Minecraft.getMinecraft().thePlayer
+        val player = MinecraftCompat.localPlayer
         val yaw = LocationUtils.calculatePlayerYaw()
         val pitch = player.rotationPitch
 
