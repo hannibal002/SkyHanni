@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.api.event
 /**
  * Use @[HandleEvent]
  */
-abstract class SkyHanniEvent protected constructor() {
+abstract class SkyHanniEvent protected constructor(primaryName: String? = null) {
 
     /**
      * This is used in parameterless @HandleEvent annotations.
@@ -11,7 +11,7 @@ abstract class SkyHanniEvent protected constructor() {
      * @HandleEvent
      * fun onIslandChange() { ... }
      */
-    open val primaryFunctionName: String? = null
+    open val primaryFunctionName: String? = primaryName
 
     // TODO: This should only be accessible in the cancellable interface
     var isCancelled: Boolean = false
