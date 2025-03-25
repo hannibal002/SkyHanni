@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
@@ -15,5 +16,5 @@ object ScoreboardEventRedstone : ScoreboardEvent() {
 
     override val elementPatterns = listOf(ScoreboardPattern.redstonePattern)
 
-    override fun showIsland() = IslandType.PRIVATE_ISLAND.isInIsland()
+    override fun showIsland() = LorenzUtils.inAnyIsland(IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST)
 }
