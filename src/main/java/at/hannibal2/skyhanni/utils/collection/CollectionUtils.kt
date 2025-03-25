@@ -226,6 +226,14 @@ object CollectionUtils {
         return EnumMap<K, V>(K::class.java)
     }
 
+    inline fun <reified E : Enum<E>> enumSetOf(): EnumSet<E> = EnumSet.noneOf(E::class.java)
+
+    fun <E : Enum<E>> enumSetOf(element: E): EnumSet<E> = EnumSet.of(element)
+
+    fun <E : Enum<E>> enumSetOf(vararg elements: E): EnumSet<E> = elements.toList().toEnumSet()
+
+    fun <E : Enum<E>> Collection<E>.toEnumSet(): EnumSet<E> = EnumSet.copyOf(this)
+
     /** Splits the input into equal sized lists. If the list can't get divided clean by [subs] then the last entry gets reduced. e.g. 13/4 = [4,4,4,1]*/
     fun <T> Collection<T>.split(subs: Int = 2): List<List<T>> {
         if (this.isEmpty()) return listOf(emptyList())

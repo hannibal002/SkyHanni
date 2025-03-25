@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.api.event.predicates
 
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.utils.CollectionUtils.toEnumSet
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getAnnotation
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toEnumSet
 
 /**
  * [WidgetUpdateEvent]s annotated with this will only receive updates of the specified widgets.
