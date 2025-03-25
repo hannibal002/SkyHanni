@@ -84,7 +84,6 @@ object SulphurSkitterBox {
                 event.drawFilledBoundingBox(
                     axis,
                     color,
-                    renderRelativeToCamera = false,
                 )
             }
 

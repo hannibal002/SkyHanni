@@ -1347,7 +1347,7 @@ object RenderUtils {
          * If set to `true`, renders the box relative to the camera instead of relative to the world.
          * If set to `false`, will be relativized to [RenderUtils.getViewerPos].
          */
-        renderRelativeToCamera: Boolean = true,
+        renderRelativeToCamera: Boolean = false,
         drawVerticalBarriers: Boolean = true,
     ) {
         GlStateManager.enableBlend()

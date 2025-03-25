@@ -70,7 +70,6 @@ object NucleusBarriersBox {
                     event.drawFilledBoundingBox(
                         crystal.boundingBox,
                         crystal.configColorOption.get().toSpecialColor(),
-                        renderRelativeToCamera = false,
                     )
                 }
 

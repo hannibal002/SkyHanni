@@ -91,7 +91,6 @@ object WorldEdit {
             event.drawFilledBoundingBox(
                 it.expandBlock(),
                 Color.CYAN.addAlpha(60),
-                renderRelativeToCamera = false,
             )
         }
     }
