@@ -214,7 +214,6 @@ object ComposterOverlay {
         }
 
 
-
     private fun drawUpgradeStats(): Renderable {
         val upgrade = if (!maxLevel) extraComposterUpgrade else null
 
