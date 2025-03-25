@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -13,6 +14,8 @@ import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
+import java.util.LinkedList
+import java.util.Queue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,6 +27,24 @@ object TitleManager {
     private var endTime = SimpleTimeMark.farPast()
     private var heightModifier = 1.8
     private var fontSizeModifier = 4f
+
+    private val titleQueue: Queue<DisplayTitleData> = LinkedList()
+    private val sortTitleQueue: Queue<Map<DisplayTitleData, Double>> = LinkedList()
+
+    data class DisplayTitleData(
+        val text: String,
+        val duration: Duration,
+        val height: Double = 1.8,
+        val fontSize: Float = 4f
+    )
+
+    fun queueSortTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f, value: Double) {
+        sortTitleQueue.add(mapOf(DisplayTitleData(text, duration, height, fontSize) to value))
+    }
+
+    fun queueTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
+        titleQueue.add(DisplayTitleData(text, duration, height, fontSize))
+    }
 
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
         currentText = text
@@ -86,6 +107,28 @@ object TitleManager {
             description = "Display a title on the screen with the specified settings."
             category = CommandCategory.DEVELOPER_TEST
             callback { command(it) }
+        }
+    }
+
+    private fun showNextTitle() {
+        if (titleQueue.isNotEmpty()) {
+            val title = titleQueue.poll()
+            sendTitle(title.text, title.duration, title.height, title.fontSize)
+        }
+    }
+
+    private fun sortTitles() {
+        if (sortTitleQueue.isNotEmpty()) {
+            val sorted = sortTitleQueue.poll().toList().sortedBy { it.second }
+            titleQueue.add(sorted.first().first)
+        }
+    }
+
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (endTime.isInPast()) {
+            sortTitles()
+            showNextTitle()
         }
     }
 }
