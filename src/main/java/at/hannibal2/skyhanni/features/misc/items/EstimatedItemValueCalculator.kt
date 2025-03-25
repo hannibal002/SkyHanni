@@ -152,6 +152,14 @@ object EstimatedItemValueCalculator {
 
     fun getTotalPrice(stack: ItemStack): Double = calculate(stack, mutableListOf()).first
 
+    fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean): Double? {
+        val (value, base) = calculate(stack, mutableListOf())
+        if (ignoreBasePrice && value == base) {
+            return null
+        }
+        return value
+    }
+
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
         val totalPrice = additionalCostFunctions.fold(basePrice) { total, function -> total + function(stack, list) }
