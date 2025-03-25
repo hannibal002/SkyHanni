@@ -39,6 +39,7 @@
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
+    <ID>LongMethod:RepoManager.kt$RepoManager$private fun doTheFetching(command: Boolean)</ID>
     <ID>LongMethod:VisualWordGui.kt$VisualWordGui$override fun drawScreen(unusedX: Int, unusedY: Int, partialTicks: Float)</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt$AdvancedPlayerList$for</ID>
     <ID>LoopWithTooManyJumpStatements:CropMoneyDisplay.kt$CropMoneyDisplay$for</ID>
@@ -134,7 +135,6 @@
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tablist.cropspecific", " (?&lt;crop&gt;Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?&lt;fortune&gt;\\d+)", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tablist.universal", " Farming Fortune: §r§6☘(?&lt;fortune&gt;\\d+)", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt$FarmingFortuneDisplay$by patternGroup.pattern( "tooltip.new", "^§7Farming Fortune: §a\\+(?&lt;display&gt;[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?&lt;reforge&gt;\\d+)\\))?(?: §d\\(\\+(?&lt;gemstone&gt;\\d+)\\))?\$", )</ID>
-    <ID>RepoPatternRegexTestMissing:FishingProfitTracker.kt$FishingProfitTracker$by RepoPattern.pattern( "fishing.tracker.chat.coins", ".* CATCH! §r§bYou found §r§6(?&lt;coins&gt;.*) Coins§r§b\\.", )</ID>
     <ID>RepoPatternRegexTestMissing:GardenCropMilestoneFix.kt$GardenCropMilestoneFix$by patternGroup.pattern( "levelup", " {2}§r§b§lGARDEN MILESTONE §3(?&lt;crop&gt;.*) §8.*➜§3(?&lt;tier&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "chat.increase", " {4}§r§8\\+§r§2(?&lt;exp&gt;.*) §r§7Garden Experience", )</ID>
     <ID>RepoPatternRegexTestMissing:GardenLevelDisplay.kt$GardenLevelDisplay$by patternGroup.pattern( "inventory.levelprogress", "§7Progress to Level (?&lt;currentLevel&gt;[^:]*).*", )</ID>
@@ -209,7 +209,6 @@
     <ID>RepoPatternRegexTestMissing:TestCopyBestiaryValues.kt$TestCopyBestiaryValues$by RepoPattern.pattern( "test.bestiary.type", "\\[Lv(?&lt;lvl&gt;.*)] (?&lt;text&gt;.*)" )</ID>
     <ID>RepoPatternRegexTestMissing:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "owner", "§7Owner: §e(?&lt;owner&gt;.+)" )</ID>
     <ID>RepoPatternRegexTestMissing:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "timeremaining", "§7Remaining: §e(?:(?&lt;min&gt;\\d+)m )?(?&lt;sec&gt;\\d+)s" )</ID>
-    <ID>RepoPatternRegexTestMissing:TrophyFishMessages.kt$TrophyFishMessages$by RepoPattern.pattern( "fishing.trophy.trophyfish", "§6§lTROPHY FISH! §r§bYou caught an? §r(?&lt;displayName&gt;§[0-9a-f](?:§k)?[\\w -]+) §r(?&lt;displayRarity&gt;§[0-9a-f]§l\\w+)§r§b\\." )</ID>
     <ID>RepoPatternRegexTestMissing:TunnelsMaps.kt$TunnelsMaps$by RepoPattern.pattern( "mining.commisson.collector", "§9(?&lt;what&gt;\\w+(?: \\w+)?) Collector", )</ID>
     <ID>RepoPatternRegexTestMissing:TunnelsMaps.kt$TunnelsMaps$by RepoPattern.pattern( "mining.commisson.collector.invalid", "Glacite|Scrap", )</ID>
     <ID>RepoPatternRegexTestMissing:TunnelsMaps.kt$TunnelsMaps$by RepoPattern.pattern( "mining.tunnels.maps.gem.new", ".*(?:Aquamarine|Onyx|Citrine|Peridot).*", )</ID>
