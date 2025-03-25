@@ -122,8 +122,7 @@ object TpsCounter {
 
     private fun shouldIgnore() = timeSinceWorldSwitch < ignorePacketDelay
 
-    private fun isEnabled() = LorenzUtils.onHypixel &&
-        config.tpsDisplay &&
+    private fun isEnabled() = LorenzUtils.onHypixel && config.tpsDisplay &&
         (LorenzUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
 
     @HandleEvent

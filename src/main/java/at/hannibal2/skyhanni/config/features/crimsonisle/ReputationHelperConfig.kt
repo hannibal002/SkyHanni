@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
@@ -42,6 +43,11 @@ class ReputationHelperConfig {
     @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
     @ConfigEditorDropdown
     var showLocation: ShowLocationEntry = ShowLocationEntry.ONLY_HOTKEY
+
+    @Expose
+    @ConfigOption(name = "Rescue Mission", desc = "")
+    @Accordion
+    var rescueMission: RescueMissionConfig = RescueMissionConfig()
 
     enum class ShowLocationEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         ALWAYS("Always", 0),
