@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.even
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigEventElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 
 // everything
 // whenever an event gets updated

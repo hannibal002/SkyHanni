@@ -102,7 +102,14 @@ enum class GraphNodeTag(
         "Fishing Hotspot",
         "A possible hotspot where you can fish",
         onlyIslands = setOf(IslandType.BACKWATER_BAYOU, IslandType.HUB, IslandType.CRIMSON_ISLE),
-    )
+    ),
+
+    FAIRY_SOUL(
+        "fairy_soul",
+        LorenzColor.DARK_PURPLE,
+        "Fairy Soul",
+        "A Fairy Soul.",
+    ),
 
     ;
 

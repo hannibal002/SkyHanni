@@ -23,23 +23,23 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experimentsDropPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.inventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -76,7 +76,7 @@ object ExperimentsProfitTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / experimentsDone
-            val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$dropRate.",
