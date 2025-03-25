@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
@@ -31,7 +32,7 @@ import kotlin.time.Duration.Companion.seconds
 object DragonFeatures {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
-    private val leechBool get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
+    private val trackerConfig get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
     private val configProtector get() = SkyHanniMod.feature.combat.endIsland.endstoneProtectorChat
 
     private val dragonNames: List<String> = DragonType.entries
@@ -118,7 +119,7 @@ object DragonFeatures {
      * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lProtector Dragon§r§d§l has spawned!
      * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lYoung Dragon§r§d§l has spawned!
      */
-    private val dragonSpawn by chatGroup.pattern(
+    private val dragonSpawnPattern by chatGroup.pattern(
         "spawn",
         "§5☬ §r§d§lThe §r§5§c§l(?<dragon>$dragonNamesAsRegex) Dragon§r§d§l has spawned!",
     )
@@ -126,12 +127,12 @@ object DragonFeatures {
     /**
      * REGEX-TEST: Your Damage: §c2,003.2
      */
-    private val scoreDamage by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<damage>[\\w,.]+)")
+    private val scoreDamagePattern by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<damage>[\\w,.]+)")
 
     /**
      * REGEX-TEST: Dragon HP: §a14,659,354 §c❤
      */
-    private val scoreDragon by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
+    private val scoreDragonPattern by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
 
     // private val scoreProtector by protectorRepoGroup.pattern("scoreboard.protector", "Protector HP: .*")
 
@@ -205,7 +206,7 @@ object DragonFeatures {
         display = null
     }
 
-    private fun weightMap(place: Int) = when (place) {
+    private fun getWeightForPlacement(place: Int) = when (place) {
         -1 -> 10
         1 -> 200
         2 -> 175
@@ -219,14 +220,14 @@ object DragonFeatures {
     }
 
     private fun calculateDragonWeight(eyes: Int, place: Int, firstDamage: Double, yourDamage: Double) =
-        weightMap(
+        getWeightForPlacement(
             if (yourDamage == 0.0) -1 else place,
         ) + 100 * (
             eyes + yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
             )
 
     private fun calculateProtectorWeight(zealots: Int, place: Int, firstDamage: Double, yourDamage: Double) =
-        weightMap(
+        getWeightForPlacement(
             if (yourDamage == 0.0) -1 else place,
         ) + 50 * (
             yourDamage / (firstDamage.takeIf { it != 0.0 } ?: 1.0)
@@ -245,20 +246,15 @@ object DragonFeatures {
         if (!config.chat && !config.display && !configProtector) return
 
         if (handleEyeEvents(message)) return
-
         if (handleEggSpawn(message)) return
-
         if (handleEndStart(message)) return
-
         if (handleEndLeaderboard(message)) return
-
         if (handleEndPosition(message)) return
-
         if (handleZealots(message)) return
     }
 
     private fun handleDragonSpawn(message: String): Boolean {
-        dragonSpawn.matchMatcher(message) {
+        dragonSpawnPattern.matchMatcher(message) {
             dragonSpawned = true
             currentDragonType = DragonType.valueOf(group("dragon").uppercase())
         } ?: return false
@@ -329,7 +325,7 @@ object DragonFeatures {
                 weight = calculateDragonWeight(yourEyes, endPlace, endTopDamage, endDamage)
 
                 if (endDamage > 0) {
-                    if (!(yourEyes == 0 && !leechBool.countLeechedDragons)) {
+                    if (!(yourEyes == 0 && !trackerConfig.countLeechedDragons)) {
                         DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
                         DragonProfitTracker.addDragonLoot(
                             currentDragonType ?: DragonType.UNKNOWN,
@@ -388,13 +384,12 @@ object DragonFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onScoreBoard(event: ScoreboardUpdateEvent) {
-        val index = event.new.indexOfFirst { scoreDragon.matches(it) }
-        if (index == -1) return
+        val index = event.new.indexOfFirstOrNull { scoreDragonPattern.matches(it) } ?: return
         if (eggSpawned) {
             dragonSpawned = true
         }
-        scoreDamage.matchMatcher(event.new[index + 1]) {
-            currentDamage = group("Damage").formatDouble()
+        scoreDamagePattern.matchMatcher(event.new[index + 1]) {
+            currentDamage = group("damage").formatDouble()
         }
     }
 
