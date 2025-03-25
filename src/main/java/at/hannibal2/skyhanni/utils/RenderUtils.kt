@@ -72,7 +72,6 @@ object RenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
-    private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
 
@@ -1019,11 +1018,6 @@ object RenderUtils {
         }
     }
 
-    fun SkyHanniRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
-        LineDrawer.draw3D(partialTicks) {
-            draw3DLine(p1, p2, color, lineWidth, depth)
-        }
-
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
@@ -1056,90 +1050,9 @@ object RenderUtils {
         return LorenzVec(x, y, z)
     }
 
-    private fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
-        GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.disableTexture2D()
-        val tessellator = Tessellator.getInstance()
-        val worldRenderer = tessellator.worldRenderer
-        GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
-
-        // vertical
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        tessellator.draw()
-        GlStateManager.color(
-            c.red / 255f * 0.8f,
-            c.green / 255f * 0.8f,
-            c.blue / 255f * 0.8f,
-            c.alpha / 255f * alphaMultiplier,
-        )
-
-        // x
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        tessellator.draw()
-        GlStateManager.color(
-            c.red / 255f * 0.9f,
-            c.green / 255f * 0.9f,
-            c.blue / 255f * 0.9f,
-            c.alpha / 255f * alphaMultiplier,
-        )
-        // z
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        tessellator.draw()
-        GlStateManager.enableTexture2D()
-        GlStateManager.disableBlend()
-    }
-
-    // TODO nea please merge with 'drawFilledBoundingBox'
-    fun SkyHanniRenderWorldEvent.drawFilledBoundingBoxNea(
-        aabb: AxisAlignedBB,
-        c: Color,
-        alphaMultiplier: Float = 1f,
-        /**
-         * If set to `true`, renders the box relative to the camera instead of relative to the world.
-         * If set to `false`, will be relativized to [RenderUtils.getViewerPos].
-         */
-        renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true,
-    ) {
-        drawFilledBoundingBoxNea(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
-    }
-
-    fun drawWireframeBoundingBoxNea(
+    fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
         aabb: AxisAlignedBB,
         color: Color,
-        partialTicks: Float,
     ) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
@@ -1426,18 +1339,16 @@ object RenderUtils {
         }
     }
 
-    fun drawFilledBoundingBoxNea(
+    fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
         aabb: AxisAlignedBB,
         c: Color,
         alphaMultiplier: Float = 1f,
         /**
          * If set to `true`, renders the box relative to the camera instead of relative to the world.
-         * If set to `false`, will be relativized to [RenderUtils.getViewerPos]. Setting this to `false` requires
-         * specifying [partialTicks]]
+         * If set to `false`, will be relativized to [RenderUtils.getViewerPos].
          */
         renderRelativeToCamera: Boolean = true,
         drawVerticalBarriers: Boolean = true,
-        partialTicks: Float = 0F,
     ) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
@@ -1535,8 +1446,7 @@ object RenderUtils {
         this.draw3DLine(cornerFour, cornerOne, color, lineWidth, depth)
     }
 
-    // TODO nea please merge with 'draw3DLine'
-    fun SkyHanniRenderWorldEvent.draw3DLineNea(
+    fun SkyHanniRenderWorldEvent.draw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,
