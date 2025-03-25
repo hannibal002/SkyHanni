@@ -47,8 +47,9 @@ object SeaCreatureFeatures {
         rareSeaCreatures.add(mob)
 
         if (!config.highlight) return
-        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES !in damageIndicatorConfig.bossesToShow) return
-        if (seaCreaturesBosses.none { it.fullName.removeColor() == mob.name }) return
+        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
+            if (seaCreaturesBosses.none { it.fullName.removeColor() == mob.name }) return
+        }
         mob.highlight(LorenzColor.GREEN.toColor())
     }
 

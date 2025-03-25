@@ -98,7 +98,11 @@ object EntityUtils {
         val alignedBB = a.axisAlignedTo(b)
         val clazz = EntityArmorStand::class.java
         val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
+        //#if MC < 1.21
         return world.getEntitiesWithinAABB(clazz, alignedBB)
+        //#else
+        //$$ return world.getEntitiesByClass(clazz, alignedBB, net.minecraft.predicate.entity.EntityPredicates.EXCEPT_SPECTATOR)
+        //#endif
     }
 
     @Deprecated("Old. Instead use entity detection feature instead.")
