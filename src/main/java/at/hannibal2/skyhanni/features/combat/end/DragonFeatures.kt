@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -51,7 +52,7 @@ object DragonFeatures {
      * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7(§r§a8§r§7/§r§a8§r§7)
      */
     @Suppress("MaxLineLength")
-    private val eyePlaced by chatGroup.pattern(
+    private val eyePlacedPattern by chatGroup.pattern(
         "eye.placed.you",
         "§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)",
     )
@@ -59,25 +60,25 @@ object DragonFeatures {
     /**
      * REGEX-TEST: §5You recovered a Summoning Eye!
      */
-    private val eyeRemoved by chatGroup.pattern("eye.removed.you", "§5You recovered a Summoning Eye!")
+    private val eyeRemovedPattern by chatGroup.pattern("eye.removed.you", "§5You recovered a Summoning Eye!")
 
     /**
      * REGEX-TEST: §5☬ §r§dThe Dragon Egg has spawned!
      */
-    private val eggSpawned by chatGroup.pattern("egg.spawn", "§5☬ §r§dThe Dragon Egg has spawned!")
+    private val eggSpawnedPattern by chatGroup.pattern("egg.spawn", "§5☬ §r§dThe Dragon Egg has spawned!")
 
     /**
      * REGEX-TEST: §f                      §r§6§lPROTECTOR DRAGON DOWN!
      */
-    private val endStartLineDragon by chatGroup.pattern(
+    private val endStartLineDragonPattern by chatGroup.pattern(
         "end.boss",
-        "§f +§r§6§l(?<Dragon>$dragonNamesAsRegexUppercase) DRAGON DOWN!",
+        "§f +§r§6§l(?<dragon>$dragonNamesAsRegexUppercase) DRAGON DOWN!",
     )
 
     /**
      * REGEX-TEST: §f                    §r§6§lENDSTONE PROTECTOR DOWN!
      */
-    private val endStartLineProtector by protectorRepoGroup.pattern(
+    private val endStartLineProtectorPattern by protectorRepoGroup.pattern(
         "chat.end.boss",
         "§f +§r§6§lENDSTONE PROTECTOR DOWN!",
     )
@@ -87,9 +88,9 @@ object DragonFeatures {
      * REGEX-TEST: §f                 §r§eYour Damage: §r§a3,198,068 §r§7(Position #1)
      */
     @Suppress("MaxLineLength")
-    private val endPosition by chatGroup.pattern(
+    private val endPositionPattern by chatGroup.pattern(
         "end.position",
-        "§f +§r§eYour Damage: §r§a(?<Damage>[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?<Position>\\d+)\\)",
+        "§f +§r§eYour Damage: §r§a(?<damage>[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?<position>\\d+)\\)",
     )
 
     // val endFinalHit by chatGroup.pattern("end.final", "§f                 §r§b[^ ]+ (?<Name>.*)§r§f §r§7dealt the final blow.")
@@ -100,15 +101,15 @@ object DragonFeatures {
      * REGEX-TEST: §f              §r§e§l1st Damager §r§7- §r§a[VIP] filip_zd§r§f §r§7- §r§e3,965,533
      */
     @Suppress("MaxLineLength")
-    private val endLeaderboard by chatGroup.pattern(
+    private val endLeaderboardPattern by chatGroup.pattern(
         "end.place",
-        "§f +§r§.§l(?<Position>\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?<Name>.*)§r§. §r§7- §r§e(?<Damage>[\\d.,]+)",
+        "§f +§r§.§l(?<position>\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?<name>.*)§r§. §r§7- §r§e(?<damage>[\\d.,]+)",
     )
 
     /**
      * REGEX-TEST: §f                       §r§eZealots Contributed: §r§a27§r§e/100
      */
-    private val endZealots by protectorRepoGroup.pattern(
+    private val endZealotsPattern by protectorRepoGroup.pattern(
         "chat.end.zealot",
         "§f +§r§eZealots Contributed: §r§a(?<Amount>\\d+)§r§e/100",
     )
@@ -119,13 +120,13 @@ object DragonFeatures {
      */
     private val dragonSpawn by chatGroup.pattern(
         "spawn",
-        "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>$dragonNamesAsRegex) Dragon§r§d§l has spawned!",
+        "§5☬ §r§d§lThe §r§5§c§l(?<dragon>$dragonNamesAsRegex) Dragon§r§d§l has spawned!",
     )
 
     /**
      * REGEX-TEST: Your Damage: §c2,003.2
      */
-    private val scoreDamage by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<Damage>[\\w,.]+)")
+    private val scoreDamage by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<damage>[\\w,.]+)")
 
     /**
      * REGEX-TEST: Dragon HP: §a14,659,354 §c❤
@@ -151,7 +152,7 @@ object DragonFeatures {
         set(value) {
             field = value
             if (dragonSpawned) {
-                egg = false
+                eggSpawned = false
             }
         }
 
@@ -181,7 +182,7 @@ object DragonFeatures {
             field = value
         }
     private var widgetActive = false
-    var egg = true
+    var eggSpawned = true
     var weight = 0.0
     private var currentDragonType: DragonType? = null
 
@@ -259,7 +260,7 @@ object DragonFeatures {
     private fun handleDragonSpawn(message: String): Boolean {
         dragonSpawn.matchMatcher(message) {
             dragonSpawned = true
-            currentDragonType = DragonType.valueOf(group("Dragon").uppercase())
+            currentDragonType = DragonType.valueOf(group("dragon").uppercase())
         } ?: return false
 
         ChatUtils.debug("Dragon Type: $currentDragonType")
@@ -273,12 +274,12 @@ object DragonFeatures {
     }
 
     private fun handleEyeEvents(message: String): Boolean = when {
-        eyePlaced.matches(message) -> {
+        eyePlacedPattern.matches(message) -> {
             yourEyes++
             true
         }
 
-        eyeRemoved.matches(message) -> {
+        eyeRemovedPattern.matches(message) -> {
             yourEyes--
             true
         }
@@ -288,7 +289,7 @@ object DragonFeatures {
 
     private fun handleEndStart(message: String): Boolean {
         when {
-            endStartLineDragon.matches(message) -> {
+            endStartLineDragonPattern.matches(message) -> {
                 if (!config.chat) {
                     reset()
                 } else {
@@ -297,7 +298,7 @@ object DragonFeatures {
                 return true
             }
 
-            endStartLineProtector.matches(message) -> {
+            endStartLineProtectorPattern.matches(message) -> {
                 if (!configProtector) return false
                 endType = EndType.GOLEM
                 return true
@@ -307,20 +308,20 @@ object DragonFeatures {
     }
 
     private fun handleEndLeaderboard(message: String): Boolean {
-        return endLeaderboard.matchMatcher(message) {
+        return endLeaderboardPattern.matchMatcher(message) {
             if (endType == null) return false
-            if (group("Position") != "1") return false
+            if (group("position") != "1") return false
 
-            endTopDamage = group("Damage").replace(",", "").toDouble()
+            endTopDamage = group("damage").formatDouble()
             true
         } ?: false
     }
 
     private fun handleEndPosition(message: String): Boolean {
         val endType = endType ?: return false
-        endPosition.matchMatcher(message) {
-            endPlace = group("Position")?.toInt() ?: -1
-            endDamage = group("Damage").replace(",", "").toDouble()
+        endPositionPattern.matchMatcher(message) {
+            endPlace = group("position").formatInt()
+            endDamage = group("damage").formatDouble()
         } ?: return false
 
         when (endType) {
@@ -356,8 +357,8 @@ object DragonFeatures {
     private fun handleZealots(message: String): Boolean {
         if (endType != EndType.GOLEM) return false
 
-        val zealots = endZealots.matchMatcher(message) {
-            group("Amount").toInt()
+        val zealots = endZealotsPattern.matchMatcher(message) {
+            group("amount").toInt()
         } ?: return false
 
         val weight = calculateProtectorWeight(zealots, endPlace, endTopDamage, endDamage)
@@ -369,21 +370,19 @@ object DragonFeatures {
     }
 
     private fun handleEggSpawn(message: String): Boolean {
-        if (eggSpawned.matches(message)) {
-            egg = true
+        if (eggSpawnedPattern.matches(message)) {
+            eggSpawned = true
             return true
         }
         return false
     }
 
     private fun printWeight(weight: Double) {
+        val space = " ".repeat(if (config.skyhanniMessagePrefix) 16 else 30)
+        val weightString = weight.roundTo(0).addSeparators()
         ChatUtils.chat(
-            "§f${
-                " ".repeat(if (config.skyhanniMessageTag) 16 else 30)
-            }§r§eYour Weight: §r§a${
-                weight.roundTo(0).addSeparators()
-            }",
-            config.skyhanniMessageTag,
+            "§f$space§r§eYour Weight: §r§a$weightString",
+            prefix = config.skyhanniMessagePrefix,
         )
     }
 
@@ -391,11 +390,11 @@ object DragonFeatures {
     fun onScoreBoard(event: ScoreboardUpdateEvent) {
         val index = event.new.indexOfFirst { scoreDragon.matches(it) }
         if (index == -1) return
-        if (egg) {
+        if (eggSpawned) {
             dragonSpawned = true
         }
         scoreDamage.matchMatcher(event.new[index + 1]) {
-            currentDamage = this.group("Damage").replace(",", "").toDouble()
+            currentDamage = group("Damage").formatDouble()
         }
     }
 
@@ -444,6 +443,6 @@ object DragonFeatures {
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         reset()
-        egg = true
+        eggSpawned = true
     }
 }
