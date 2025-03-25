@@ -165,19 +165,21 @@ object DragonFeatures {
     private var endDamage = 0.0
     private var endPlace = 0
 
+    private var dirty = false
+
     private var currentDamage = 0.0
         set(value) {
-            if (field != value) display = null
+            if (field != value) dirty = true
             field = value
         }
     private var currentTopDamage = 0.0
         set(value) {
-            if (field != value) display = null
+            if (field != value) dirty = true
             field = value
         }
     private var currentPlace: Int? = null
         set(value) {
-            if (field != value) display = null
+            if (field != value) dirty = true
             field = value
         }
     private var widgetActive = false
@@ -421,6 +423,7 @@ object DragonFeatures {
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onRender(event: GuiRenderEvent) {
         if (!displayIsEnabled()) return
+        if (dirty) display = null
         val display = display ?: (if (!widgetActive) widgetErrorGUI else display()).also { display = it }
         config.displayPosition.renderRenderables(display, posLabel = "Dragon Weight")
     }
