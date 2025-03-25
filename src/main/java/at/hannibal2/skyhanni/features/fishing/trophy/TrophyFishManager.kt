@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
@@ -165,7 +166,7 @@ object TrophyFishManager {
 
     fun getTooltip(internalName: String): ChatStyle? {
         val display = TrophyFishApi.hoverInfo(internalName) ?: return null
-        return ChatStyle().setChatHoverEvent(
+        return defaultStyleConstructor.setChatHoverEvent(
             HoverEvent(HoverEvent.Action.SHOW_TEXT, display.asComponent()),
         )
     }

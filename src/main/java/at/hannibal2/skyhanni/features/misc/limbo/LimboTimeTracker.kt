@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.util.AxisAlignedBB
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -51,7 +51,7 @@ object LimboTimeTracker {
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
-            onFire = Minecraft.getMinecraft().thePlayer.isBurning
+            onFire = MinecraftCompat.localPlayer.isBurning
         }
     }
 

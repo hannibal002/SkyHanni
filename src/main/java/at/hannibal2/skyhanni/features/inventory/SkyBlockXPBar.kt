@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 
 @SkyHanniModule
@@ -25,7 +25,7 @@ object SkyBlockXPBar {
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
         val (level, xp) = SkyBlockXPApi.levelXPPair ?: return
 
-        with(Minecraft.getMinecraft().thePlayer) {
+        with(MinecraftCompat.localPlayer) {
             cache = OriginalValues(experience, experienceTotal, experienceLevel)
             setXPStats(xp / 100f, 100, level)
         }
@@ -35,7 +35,7 @@ object SkyBlockXPBar {
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderGameOverlayEvent.ElementType.EXPERIENCE) return
         with(cache ?: return) {
-            Minecraft.getMinecraft().thePlayer.setXPStats(currentXP, maxXP, level)
+            MinecraftCompat.localPlayer.setXPStats(currentXP, maxXP, level)
             cache = null
         }
     }

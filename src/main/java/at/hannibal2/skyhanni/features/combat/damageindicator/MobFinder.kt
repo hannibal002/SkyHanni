@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
+import at.hannibal2.skyhanni.data.ElectionApi.ignoreDerpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
@@ -12,8 +14,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
-import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -333,6 +333,7 @@ class MobFinder {
         entity.name == "Minos Inquisitor" -> EntityResult(bossType = BossType.MINOS_INQUISITOR)
         entity.name == "Minos Champion" -> EntityResult(bossType = BossType.MINOS_CHAMPION)
         entity.name == "Minotaur " -> EntityResult(bossType = BossType.MINOTAUR)
+        entity.name == "Ragnarok" -> EntityResult(bossType = BossType.RAGNAROK)
 
         else -> null
     }

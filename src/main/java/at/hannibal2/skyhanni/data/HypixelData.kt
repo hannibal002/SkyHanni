@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
@@ -491,14 +492,14 @@ object HypixelData {
     private fun checkHypixel() {
         if (!hasScoreboardUpdated) return
         val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
 
         var hypixel = false
 
         //#if MC < 1.21
         val clientBrand = player.clientBrand
         //#else
-        //$$ val clientBrand = MinecraftClient.getInstance().networkHandler?.brand
+        //$$ val clientBrand = mc.networkHandler?.brand
         //#endif
         clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
@@ -595,8 +596,7 @@ object HypixelData {
     }
 
     private fun checkScoreboard(): Boolean {
-        val minecraft = Minecraft.getMinecraft()
-        val world = minecraft.theWorld ?: return false
+        val world = MinecraftCompat.localWorldOrNull ?: return false
 
         val objective = world.scoreboard.getSidebarObjective() ?: return false
         val displayName = objective.displayName

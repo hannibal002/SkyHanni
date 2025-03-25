@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -38,9 +37,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
 import org.lwjgl.input.Keyboard
@@ -181,9 +180,9 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
-        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val newLocation = event.guessLocation
-        val playerLocation = Minecraft.getMinecraft().thePlayer.getLorenzVec()
+        val playerLocation = LocationUtils.playerLocation()
 
         if (newLocation.distance(playerLocation) < 6) return
 
@@ -209,7 +208,7 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
-        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val burrowLocation = event.burrowLocation
         particleBurrows = particleBurrows.editCopy { this[burrowLocation] = event.type }
 
@@ -505,7 +504,7 @@ object GriffinBurrowHelper {
             }
         }
 
-        EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val location = LocationUtils.playerLocation().roundLocation()
         particleBurrows = particleBurrows.editCopy { this[location] = type }
         update()
