@@ -172,7 +172,7 @@ object FossilSolverDisplay {
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotIndex == slotToClick) {
-                slot highlight LorenzColor.GREEN.toColor().addAlpha(90)
+                slot.highlight(LorenzColor.GREEN.toColor().addAlpha(90))
             }
         }
     }

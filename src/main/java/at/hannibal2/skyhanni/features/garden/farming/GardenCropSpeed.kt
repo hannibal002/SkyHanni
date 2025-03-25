@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import kotlin.concurrent.fixedRateTimer
 
 @SkyHanniModule
@@ -47,7 +47,7 @@ object GardenCropSpeed {
             if (isEnabled()) {
                 if (GardenApi.mushroomCowPet) {
                     CropType.MUSHROOM.setCounter(
-                        CropType.MUSHROOM.getCounter() + blocksBroken * (lastBrokenCrop?.multiplier ?: 1)
+                        CropType.MUSHROOM.getCounter() + blocksBroken * (lastBrokenCrop?.multiplier ?: 1),
                     )
                 }
                 checkSpeed()

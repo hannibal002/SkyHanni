@@ -12,7 +12,7 @@ object MinecraftCompat {
 
     val localPlayerOrNull get(): EntityPlayerSP? = Minecraft.getMinecraft().thePlayer
 
-    val Entity.isLocalPlayer get(): Boolean = this == localPlayerOrNull
+    val Entity?.isLocalPlayer get(): Boolean = this == localPlayerOrNull && this != null
 
     val localPlayerExists get(): Boolean = localPlayerOrNull != null
 
