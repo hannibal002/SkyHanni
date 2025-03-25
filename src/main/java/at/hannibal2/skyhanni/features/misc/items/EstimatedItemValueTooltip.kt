@@ -14,10 +14,8 @@ object EstimatedItemValueTooltip {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ItemHoverEvent) {
         if (!SkyHanniMod.feature.inventory.estimatedItemValues.showTooltip) return
-        val internalName = event.itemStack.getInternalNameOrNull() ?: return
 
         val total = EstimatedItemValueCalculator.getTotalPrice(event.itemStack, true) ?: return
-        if (internalName.getPrice() == total) return
         event.toolTip.add("§e§lEstimated Value: §6§l${total.addSeparators()} coins")
     }
 }
