@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
@@ -55,7 +56,7 @@ object ChatUtils {
         replaceSameMessage: Boolean = false,
     ) {
         if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
-            LorenzUtils.consoleLog("[Debug] $message")
+            consoleLog("[Debug] $message")
         }
     }
 
@@ -127,7 +128,7 @@ object ChatUtils {
         log.log(formattedMessage)
 
         if (!MinecraftCompat.localPlayerExists) {
-            LorenzUtils.consoleLog(formattedMessage.removeColor())
+            consoleLog(formattedMessage.removeColor())
             return false
         }
 
@@ -393,5 +394,9 @@ object ChatUtils {
     //$$ val ChatHudLine.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
     //$$ fun ChatHudLine.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
     //#endif
+
+    fun consoleLog(text: String) {
+        SkyHanniMod.consoleLog(text)
+    }
 
 }
