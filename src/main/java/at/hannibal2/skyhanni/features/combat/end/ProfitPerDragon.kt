@@ -24,13 +24,13 @@ object ProfitPerDragon {
     private fun scanForLoot() {
         val entities = EntityUtils.getEntities<EntityArmorStand>()
 
-        scannedLootUUIDs.forEach { uuid ->
+        for (uuid in scannedLootUUIDs) {
             if (entities.none { it.uniqueID == uuid }) {
                 scannedLootUUIDs.remove(uuid)
             }
         }
 
-        entities.forEach { entity ->
+        for (entity in entities) {
             val entityName = entity.name
             val amount: Int = entityName.split("§8x").last().toIntOrNull() ?: 1
             val internalNameFromEntityName = NeuInternalName.fromItemNameOrNull(entityName)
@@ -38,9 +38,9 @@ object ProfitPerDragon {
             if (internalNameFromEntityName in DragonProfitTracker.allowedItems.keys) {
                 if (internalNameFromEntityName == null) {
                     ChatUtils.debug("Could not find internal name for entity name: $entityName")
-                    return@forEach
+                    continue
                 }
-                if (entity.uniqueID in scannedLootUUIDs) return@forEach
+                if (entity.uniqueID in scannedLootUUIDs) continue
 
                 ChatUtils.debug("Adding $internalNameFromEntityName x$amount to dragon loot")
 
