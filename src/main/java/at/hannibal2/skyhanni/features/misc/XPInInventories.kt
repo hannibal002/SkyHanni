@@ -20,8 +20,7 @@ object XPInInventories {
      */
     private val xpLevelsPattern by RepoPattern.list(
         "misc.xp-in-inventory.exp-levels",
-        "(?:§.)*(?<xp>\\d+) Exp Levels",
-        "(?:§.)*(?<xp>\\d+) XP Levels",
+        "(?:§.)*(?<xp>\\d+) (Exp|XP) Levels",
         "(?:§.)*Starting cost: §b(?<xp>\\d+) XP Levels",
     )
 
