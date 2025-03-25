@@ -25,9 +25,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
@@ -173,7 +171,7 @@ object RenderUtils {
             realAlpha,
         )
         GlStateManager.disableTexture2D()
-        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
         if (seeThroughBlocks) {
@@ -181,23 +179,6 @@ object RenderUtils {
         }
         GlStateManager.enableCull()
     }
-
-    val absoluteTranslation
-        get() = run {
-            matrixBuffer.clear()
-
-            GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer)
-
-            val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
-
-            val xTranslate = read[12].toInt()
-            val yTranslate = read[13].toInt()
-            val zTranslate = read[14].toInt()
-
-            matrixBuffer.flip()
-
-            Triple(xTranslate, yTranslate, zTranslate)
-        }
 
     fun getViewerPos(partialTicks: Float) =
         Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
@@ -211,13 +192,12 @@ object RenderUtils {
      * @author Moulberry
      * @author Mojang
      */
-    private fun renderBeaconBeam(
+    private fun SkyHanniRenderWorldEvent.renderBeaconBeam(
         x: Double,
         y: Double,
         z: Double,
         rgb: Int,
         alphaMultiplier: Float,
-        partialTicks: Float,
     ) {
         val height = 300
         val bottomOffset = 0
@@ -342,7 +322,7 @@ object RenderUtils {
             else (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha),
         )
         GlStateManager.disableTexture2D()
-        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
         GlStateManager.enableCull()
@@ -437,72 +417,6 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    /**
-     * @author Mojang
-     */
-    fun drawLabel(
-        pos: LorenzVec,
-        text: String,
-        partialTicks: Float,
-        shadow: Boolean = false,
-        scale: Float = 1f,
-        yOff: Float = 0f,
-        debug: Boolean = false,
-    ) {
-        val minecraft = Minecraft.getMinecraft()
-        val player = MinecraftCompat.localPlayer
-        val x =
-            pos.x - player.lastTickPosX + (pos.x - player.posX - (pos.x - player.lastTickPosX)) * partialTicks
-        val y =
-            pos.y - player.lastTickPosY + (pos.y - player.posY - (pos.y - player.lastTickPosY)) * partialTicks
-        val z =
-            pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
-
-        // 7 – 25
-
-        val translate = LorenzVec(x, y, z)
-        val length = translate.length().toFloat()
-
-        var finalText = text
-        var factor = 1f
-        var finalScale = scale
-        if (debug) {
-            finalText = "$text ${length.toInt()}"
-            if (length < 8) {
-                factor = 8 / length
-            }
-            if (length > 15) {
-                factor = 15 / length
-            }
-            finalScale = scale * sqrt(factor.toDouble()).toFloat()
-        }
-
-        val f1 = 0.0266666688
-
-        val width = minecraft.fontRendererObj.getStringWidth(finalText) / 2
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, z)
-        GL11.glNormal3f(0f, 1f, 0f)
-        val renderManager = minecraft.renderManager
-        GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
-        GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
-        GlStateManager.scale(-f1, -f1, -f1)
-        GlStateManager.scale(finalScale, finalScale, finalScale)
-        GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.enableTexture2D()
-        minecraft.fontRendererObj.drawString(
-            finalText,
-            (-width).toFloat(),
-            yOff,
-            LorenzColor.WHITE.toColor().rgb,
-            shadow,
-        )
-        GlStateManager.disableBlend()
-        GlStateManager.popMatrix()
-    }
-
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
         return lastValue + (currentValue - lastValue) * multiplier
     }
@@ -539,7 +453,6 @@ object RenderUtils {
         } else {
             renderer.drawStringWithShadow(display, 0f, 0f, 0)
         }
-
 
         GlStateManager.popMatrix()
 
@@ -654,24 +567,6 @@ object RenderUtils {
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
 
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NeuItems.ITEM_FONT_SIZE): Int {
-        GlStateManager.pushMatrix()
-        val (x, y) = transform()
-        GlStateManager.translate(0f, offsetY.toFloat(), 0F)
-        var offsetX = 0
-        Renderable.withMousePosition(x, y) {
-            for (any in line) {
-                val renderable = Renderable.fromAny(any, itemScale = itemScale)
-                    ?: throw RuntimeException("Unknown render object: $any")
-                renderable.render(offsetX, offsetY)
-                offsetX += renderable.width
-                GlStateManager.translate(renderable.width.toFloat(), 0F, 0F)
-            }
-        }
-        GlStateManager.popMatrix()
-        return offsetX
-    }
-
     // totally not modified Autumn Client's TargetStrafe
     fun drawCircle(entity: Entity, partialTicks: Float, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
@@ -729,7 +624,7 @@ object RenderUtils {
         radius: Float,
         height: Float,
     ) {
-        drawCylinderInWorld(color, location.x, location.y, location.z, radius, height, partialTicks)
+        drawCylinderInWorld(color, location.x, location.y, location.z, radius, height)
     }
 
     fun SkyHanniRenderWorldEvent.drawPyramid(
@@ -808,16 +703,13 @@ object RenderUtils {
         }
     }
 
-    // Todo: Gauge whether or not partialTicks is actually necessary, or if it can be removed
-    @Suppress("UnusedParameter")
-    fun drawCylinderInWorld(
+    fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
         x: Double,
         y: Double,
         z: Double,
         radius: Float,
         height: Float,
-        partialTicks: Float,
     ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0.0f, 1.0f, 0.0f)
@@ -1009,21 +901,6 @@ object RenderUtils {
         GlStateManager.translate(-viewer, -viewY, -viewZ)
     }
 
-    fun drawStringScaledMaxWidth(
-        str: String?,
-        fr: FontRenderer,
-        x: Float,
-        y: Float,
-        shadow: Boolean,
-        len: Int,
-        color: Int,
-    ) {
-        val strLen = fr.getStringWidth(str)
-        var factor = len / strLen.toFloat()
-        factor = 1f.coerceAtMost(factor)
-        TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, color, factor)
-    }
-
     fun SkyHanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
         text: String,
@@ -1072,10 +949,10 @@ object RenderUtils {
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        render(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
+        renderText(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
     }
 
-    private fun render(
+    private fun renderText(
         location: LorenzVec,
         text: String,
         scale: Double,
@@ -1179,7 +1056,7 @@ object RenderUtils {
         return LorenzVec(x, y, z)
     }
 
-    fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
+    private fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
@@ -1327,21 +1204,6 @@ object RenderUtils {
     }
 
     fun WorldRenderer.pos(vec: LorenzVec) = this.pos(vec.x, vec.y, vec.z)
-
-    fun draw3DQuad(
-        middlePoint: LorenzVec,
-        sidePoint1: LorenzVec,
-        sidePoint2: LorenzVec,
-        c: Color,
-        partialTicks: Float = 0F,
-    ) = QuadDrawer.draw3D(partialTicks) {
-        draw(
-            middlePoint,
-            sidePoint1,
-            sidePoint2,
-            c,
-        )
-    }
 
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
         path: Graph,
