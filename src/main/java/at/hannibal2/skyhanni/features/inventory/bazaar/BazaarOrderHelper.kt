@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -52,13 +51,12 @@ object BazaarOrderHelper {
         if (!SkyHanniMod.feature.inventory.bazaar.orderHelper) return
         if (event.gui !is GuiChest) return
 
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
         val inventoryName = chest.getInventoryName()
         if (!BazaarApi.isBazaarOrderInventory(inventoryName)) return
 
         for ((slot, stack) in chest.getUpperItems()) {
-            bazaarItemNamePattern.matchMatcher(stack.name) {
+            bazaarItemNamePattern.matchMatcher(stack.displayName) {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
                 if (buyOrSell.let { !it.first && !it.second }) return
 
@@ -73,14 +71,14 @@ object BazaarOrderHelper {
         val itemLore = slot.stack.getLore()
         for (line in itemLore) {
             filledPattern.matchMatcher(line) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
                 return
             }
 
             pricePattern.matchMatcher(line) {
                 val price = group("number").formatDouble()
                 if (buyOrSell.first && price < data.instantBuyPrice || buyOrSell.second && price > data.sellOfferPrice) {
-                    slot highlight LorenzColor.GOLD
+                    slot.highlight(LorenzColor.GOLD)
                     return
                 }
             }

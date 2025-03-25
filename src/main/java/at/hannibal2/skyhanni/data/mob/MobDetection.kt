@@ -14,13 +14,14 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
-import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
-import at.hannibal2.skyhanni.utils.CollectionUtils.put
-import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.refreshReference
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
@@ -69,7 +70,7 @@ object MobDetection {
 
     // TODO this is a unused debug function. maybe connect with a debug commmand or remove
     private fun watchdog() {
-        val world = LorenzUtils.getPlayer()?.worldObj ?: return
+        val world = MinecraftCompat.localWorldOrNull ?: return
         if (MobData.retries.any { it.value.entity.worldObj != world }) {
             ChatUtils.chat("Watchdog: Retires")
         }
