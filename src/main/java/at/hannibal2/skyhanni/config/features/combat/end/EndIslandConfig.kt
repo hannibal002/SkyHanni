@@ -14,11 +14,6 @@ class EndIslandConfig {
     var draconicSacrificeTracker: DraconicSacrificeTrackerConfig = DraconicSacrificeTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Dragon Profit Tracker", desc = "")
-    @Accordion
-    var dragonProfitTracker: DragonProfitTrackerConfig = DragonProfitTrackerConfig()
-
-    @Expose
     @ConfigOption(name = "Dragon Features", desc = "")
     @Accordion
     var dragon: DragonConfig = DragonConfig()

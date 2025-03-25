@@ -33,7 +33,7 @@ import java.util.EnumMap
 
 @SkyHanniModule
 object DragonProfitTracker {
-    private val config get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
+    private val config get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
 
     private var lastPlaced: Int = 0
     private val SUMMONING_EYE = "SUMMONING_EYE".toInternalName()

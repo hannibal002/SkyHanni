@@ -77,7 +77,7 @@ object ProfitPerDragon {
         weight -= fragAmount * fragmentWeight
         ChatUtils.debug("Weight: $weight after frags(${fragAmount.toInt()} frags)")
 
-        dragonLoot.addOrPut(type.fragment, fragAmount.toInt())
+        if (type != DragonType.UNKNOWN) dragonLoot.addOrPut(type.fragment, fragAmount.toInt())
 
         val enchantedEnderPearlWeight = 15
         var enchantedEnderPearlAmount = floor(weight / enchantedEnderPearlWeight)

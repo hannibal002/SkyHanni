@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -32,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 object DragonFeatures {
 
     private val config get() = SkyHanniMod.feature.combat.endIsland.dragon
-    private val trackerConfig get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
+    private val trackerConfig get() = SkyHanniMod.feature.combat.endIsland.dragon.dragonProfitTracker
     private val configProtector get() = SkyHanniMod.feature.combat.endIsland.endstoneProtectorChat
 
     private val dragonNames: List<String> = DragonType.entries
@@ -94,7 +95,6 @@ object DragonFeatures {
         "§f +§r§eYour Damage: §r§a(?<damage>[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?<position>\\d+)\\)",
     )
 
-    // val endFinalHit by chatGroup.pattern("end.final", "§f                 §r§b[^ ]+ (?<Name>.*)§r§f §r§7dealt the final blow.")
     /**
      * REGEX-TEST: §f             §r§e§l1st Damager §r§7- §r§a[VIP] Jarre07§r§f §r§7- §r§e9,659,033
      * REGEX-TEST: §f          §r§6§l2nd Damager §r§7- §r§b[MVP§r§9+§r§b] FlamingZoom§r§f §r§7- §r§e1,459,691
@@ -133,8 +133,6 @@ object DragonFeatures {
      * REGEX-TEST: Dragon HP: §a14,659,354 §c❤
      */
     private val scoreDragonPattern by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
-
-    // private val scoreProtector by protectorRepoGroup.pattern("scoreboard.protector", "Protector HP: .*")
 
     /**
      * REGEX-TEST:  §r§bJamBeastie: §r§c7.4M❤
@@ -257,6 +255,12 @@ object DragonFeatures {
         dragonSpawnPattern.matchMatcher(message) {
             dragonSpawned = true
             currentDragonType = DragonType.valueOf(group("dragon").uppercase())
+            if (currentDragonType?.equals(DragonType.UNKNOWN) == true) {
+                ErrorManager.logErrorWithData(
+                    IllegalStateException("Unknown Dragon Type: '${group("dragon")}'"),
+                    "Unknown Dragon Type: '${group("dragon")}'",
+                )
+            }
         } ?: return false
 
         ChatUtils.debug("Dragon Type: $currentDragonType")
