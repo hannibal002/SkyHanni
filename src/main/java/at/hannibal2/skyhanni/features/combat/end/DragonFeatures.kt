@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -32,7 +33,7 @@ object DragonFeatures {
     private val leechBool get() = SkyHanniMod.feature.combat.endIsland.dragonProfitTracker
     private val configProtector get() = SkyHanniMod.feature.combat.endIsland.endstoneProtectorChat
 
-    private val dragonNames = DragonType.entries
+    private val dragonNames: List<String> = DragonType.entries
         .filter { it != DragonType.UNKNOWN }
         .map { it.name.firstLetterUppercase() }
 
@@ -139,9 +140,9 @@ object DragonFeatures {
      * REGEX-TEST:  §r§bItsJxxxxx2001: §r§c457k❤
      * REGEX-TEST:  §r§bThunderblade73: §r§c12.3k❤
      */
-    private val tabDamage by tabListGroup.pattern(
+    private val tabDamagePattern by tabListGroup.pattern(
         "fight.player",
-        ".*§r§.(?<Name>.+): §r§c(?<Damage>[\\d.]+)(?<Unit>[kM])?❤",
+        ".*§r§.(?<name>.+): §r§c(?<damage>[\\d.]+[kM]?)❤",
     )
 
     private var yourEyes = 0
@@ -258,31 +259,31 @@ object DragonFeatures {
     private fun handleDragonSpawn(message: String): Boolean {
         dragonSpawn.matchMatcher(message) {
             dragonSpawned = true
-            currentDragonType = DragonType.valueOf(this.group("Dragon").uppercase())
-            ChatUtils.debug("Dragon Type: $currentDragonType")
+            currentDragonType = DragonType.valueOf(group("Dragon").uppercase())
+        } ?: return false
 
-            if (config.superiorNotify && currentDragonType == DragonType.SUPERIOR) {
-                TitleManager.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
-            }
+        ChatUtils.debug("Dragon Type: $currentDragonType")
 
-            DragonProfitTracker.addEyes(yourEyes)
-            return true
+        if (config.superiorNotify && currentDragonType == DragonType.SUPERIOR) {
+            TitleManager.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
         }
-        return false
+
+        DragonProfitTracker.addEyes(yourEyes)
+        return true
     }
 
-    private fun handleEyeEvents(message: String): Boolean {
-        when {
-            eyePlaced.matches(message) -> {
-                yourEyes++
-                return true
-            }
-            eyeRemoved.matches(message) -> {
-                yourEyes--
-                return true
-            }
+    private fun handleEyeEvents(message: String): Boolean = when {
+        eyePlaced.matches(message) -> {
+            yourEyes++
+            true
         }
-        return false
+
+        eyeRemoved.matches(message) -> {
+            yourEyes--
+            true
+        }
+
+        else -> false
     }
 
     private fun handleEndStart(message: String): Boolean {
@@ -290,11 +291,12 @@ object DragonFeatures {
             endStartLineDragon.matches(message) -> {
                 if (!config.chat) {
                     reset()
-                    return true
+                } else {
+                    endType = EndType.DRAGON
                 }
-                endType = EndType.DRAGON
                 return true
             }
+
             endStartLineProtector.matches(message) -> {
                 if (!configProtector) return false
                 endType = EndType.GOLEM
@@ -305,70 +307,65 @@ object DragonFeatures {
     }
 
     private fun handleEndLeaderboard(message: String): Boolean {
-        endLeaderboard.matchMatcher(message) {
-            if (endType == null) return@matchMatcher
-            if (this.group("Position") != "1") return@matchMatcher
+        return endLeaderboard.matchMatcher(message) {
+            if (endType == null) return false
+            if (group("Position") != "1") return false
 
-            endTopDamage = this.group("Damage").replace(",", "").toDouble()
-            return true
-        }
-        return false
+            endTopDamage = group("Damage").replace(",", "").toDouble()
+            true
+        } ?: false
     }
 
     private fun handleEndPosition(message: String): Boolean {
+        val endType = endType ?: return false
         endPosition.matchMatcher(message) {
-            if (endType == null) return@matchMatcher
+            endPlace = group("Position")?.toInt() ?: -1
+            endDamage = group("Damage").replace(",", "").toDouble()
+        } ?: return false
 
-            endPlace = this.group("Position")?.toInt() ?: -1
-            endDamage = this.group("Damage").replace(",", "").toDouble()
+        when (endType) {
+            EndType.DRAGON -> {
+                weight = calculateDragonWeight(yourEyes, endPlace, endTopDamage, endDamage)
 
-            when (endType) {
-                EndType.DRAGON -> {
-                    weight = calculateDragonWeight(yourEyes, endPlace, endTopDamage, endDamage)
-
-                    if (endDamage > 0) {
-                        if (!(yourEyes == 0 && !leechBool.countLeechedDragons)) {
-                            DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
-                            DragonProfitTracker.addDragonLoot(
-                                currentDragonType ?: DragonType.UNKNOWN,
-                                "ESSENCE_DRAGON".toInternalName(),
-                                if (currentDragonType == DragonType.SUPERIOR) 10 else 5
-                            )
-                        }
+                if (endDamage > 0) {
+                    if (!(yourEyes == 0 && !leechBool.countLeechedDragons)) {
+                        DragonProfitTracker.addDragonKill(currentDragonType ?: DragonType.UNKNOWN)
+                        DragonProfitTracker.addDragonLoot(
+                            currentDragonType ?: DragonType.UNKNOWN,
+                            "ESSENCE_DRAGON".toInternalName(),
+                            if (currentDragonType == DragonType.SUPERIOR) 10 else 5,
+                        )
                     }
-
-                    DragonProfitTracker.lastDragonPlacement = endPlace
-                    ChatUtils.debug("Dragon type: $currentDragonType, placement: ${DragonProfitTracker.lastDragonPlacement}")
-
-                    printWeight(weight)
-                    ProfitPerDragon.finishedLoot = false
-                    DragonFeatures.reset()
                 }
 
-                EndType.GOLEM -> {
-                    // NO reset because of Zealot Line
-                }
+                DragonProfitTracker.lastDragonPlacement = endPlace
+                ChatUtils.debug("Dragon type: $currentDragonType, placement: ${DragonProfitTracker.lastDragonPlacement}")
 
-                null -> return@matchMatcher
+                printWeight(weight)
+                ProfitPerDragon.finishedLoot = false
+                reset()
             }
-            return true
+
+            EndType.GOLEM -> {
+                // NO reset because of Zealot Line
+            }
         }
-        return false
+        return true
     }
 
     private fun handleZealots(message: String): Boolean {
-        endZealots.matchMatcher(message) {
-            if (endType != EndType.GOLEM) return@matchMatcher
+        if (endType != EndType.GOLEM) return false
 
-            val zealots = this.group("Amount").toInt()
-            val weight = calculateProtectorWeight(zealots, endPlace, endTopDamage, endDamage)
+        val zealots = endZealots.matchMatcher(message) {
+            group("Amount").toInt()
+        } ?: return false
 
-            printWeight(weight)
-            resetEnd()
+        val weight = calculateProtectorWeight(zealots, endPlace, endTopDamage, endDamage)
 
-            return true
-        }
-        return false
+        printWeight(weight)
+        resetEnd()
+
+        return true
     }
 
     private fun handleEggSpawn(message: String): Boolean {
@@ -386,7 +383,7 @@ object DragonFeatures {
             }§r§eYour Weight: §r§a${
                 weight.roundTo(0).addSeparators()
             }",
-            config.skyhanniMessageTag
+            config.skyhanniMessageTag,
         )
     }
 
@@ -407,18 +404,12 @@ object DragonFeatures {
         if (!event.isWidget(TabWidget.DRAGON)) return
         if (!displayIsEnabled()) return
         widgetActive = true
-        loop@ for (i in 1 until event.lines.size) {
-            tabDamage.matchMatcher(event.lines[i]) {
+        for (i in 1 until event.lines.size) {
+            tabDamagePattern.matchMatcher(event.lines[i]) {
                 if (i == 1) {
-                    currentTopDamage = this.group("Damage").toDouble() * this.group("Unit").let {
-                        when (it) {
-                            "k" -> 1_000
-                            "M" -> 1_000_000
-                            else -> 1
-                        }
-                    }
+                    currentTopDamage = group("damage").formatDouble()
                 }
-                if (this.group("Name") == LorenzUtils.getPlayerName()) {
+                if (group("name") == LorenzUtils.getPlayerName()) {
                     currentPlace = if (i > 3) null else i
                 }
             }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
 enum class DragonType(
@@ -34,6 +35,8 @@ enum class DragonType(
     );
 
     val displayName: String = "${name.firstLetterUppercase()} Dragon"
+
+    val fragment by lazy { "${name}_FRAGMENT".toInternalName() }
 
     override fun toString(): String = displayName
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,6 +21,9 @@ object ProfitPerDragon {
 
     private val scannedLootUUIDs = mutableSetOf<UUID>()
     private val dragonLoot = mutableMapOf<NeuInternalName, Int>()
+
+    private val ENCHANTED_ENDER_PEARL = "ENCHANTED_ENDER_PEARL".toInternalName()
+    private val ENDER_PEARL = "ENDER_PEARL".toInternalName()
 
     private fun scanForLoot() {
         val entities = EntityUtils.getEntities<EntityArmorStand>()
@@ -66,36 +70,36 @@ object ProfitPerDragon {
 
     private fun calculateNonUniqueLoot(weightIn: Double) {
         var weight = weightIn
-        val dragType = DragonProfitTracker.lastDragonKill ?: DragonType.UNKNOWN
+        val type = DragonProfitTracker.lastDragonKill ?: DragonType.UNKNOWN
 
         val fragmentWeight = 22
         val fragAmount = floor(weight / fragmentWeight)
         weight -= fragAmount * fragmentWeight
         ChatUtils.debug("Weight: $weight after frags(${fragAmount.toInt()} frags)")
 
-        dragonLoot.addOrPut("${dragType}_FRAGMENT".toInternalName(), fragAmount.toInt())
+        dragonLoot.addOrPut(type.fragment, fragAmount.toInt())
 
         val enchantedEnderPearlWeight = 15
         var enchantedEnderPearlAmount = floor(weight / enchantedEnderPearlWeight)
         weight -= enchantedEnderPearlAmount * enchantedEnderPearlWeight
-        enchantedEnderPearlAmount += enchantedEnderPearlMap(DragonProfitTracker.lastDragonPlacement ?: 0)
+        enchantedEnderPearlAmount += getStandardEnchantedEnderPearlAmount(DragonProfitTracker.lastDragonPlacement ?: 0)
 
         ChatUtils.debug(
-            "Weight: $weight after enchanted ender pearls (${enchantedEnderPearlAmount.toInt()} epearls)"
+            "Weight: $weight after enchanted ender pearls (${enchantedEnderPearlAmount.toInt()} epearls)",
         )
 
-        dragonLoot.addOrPut("ENCHANTED_ENDER_PEARL".toInternalName(), enchantedEnderPearlAmount.toInt())
+        dragonLoot.addOrPut(ENCHANTED_ENDER_PEARL, enchantedEnderPearlAmount.toInt())
 
         val enderPearlWeight = 5
         var enderPearlAmount = floor(weight / enderPearlWeight)
         weight -= enderPearlAmount * enderPearlWeight
-        enderPearlAmount += enderPearlMap(DragonProfitTracker.lastDragonPlacement ?: 0)
+        enderPearlAmount += getStandardEnderPearlAmount(DragonProfitTracker.lastDragonPlacement ?: 0)
 
         ChatUtils.debug("Weight: $weight after ender pearls (${enderPearlAmount.toInt()} pearls)")
 
-        dragonLoot.addOrPut("ENDER_PEARL".toInternalName(), enderPearlAmount.toInt())
+        dragonLoot.addOrPut(ENDER_PEARL, enderPearlAmount.toInt())
 
-        DragonProfitTracker.addDragonLootFromList(dragType, dragonLoot.toList())
+        DragonProfitTracker.addDragonLootFromList(type, dragonLoot.toList())
 
         dragonLoot.clear()
         finishedLoot = true
@@ -106,8 +110,7 @@ object ProfitPerDragon {
         dragonLoot.clear()
     }
 
-    // MAP: PLACEMENT -> Standard Ender Pearl Amount
-    private fun enderPearlMap(place: Int) = when (place) {
+    private fun getStandardEnderPearlAmount(placement: Int) = when (placement) {
         1 -> 30
         2 -> 25
         3 -> 22
@@ -119,8 +122,7 @@ object ProfitPerDragon {
         else -> 5
     }
 
-    // MAP: PLACEMENT -> Standard Enchanted Ender Pearl Amount
-    private fun enchantedEnderPearlMap(place: Int) = when (place) {
+    private fun getStandardEnchantedEnderPearlAmount(placement: Int) = when (placement) {
         1 -> 7
         2 -> 6
         3 -> 5
@@ -133,7 +135,7 @@ object ProfitPerDragon {
 
     private var lastScanned = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onTick(e: SkyHanniTickEvent) {
         if (lastScanned.passedSince() >= 1.seconds && !DragonFeatures.egg && !finishedLoot) {
             scanForLoot()
