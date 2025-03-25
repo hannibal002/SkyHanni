@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.entity.EntityPlayerSP
 
 @SkyHanniModule
@@ -49,7 +49,7 @@ object MobDebug {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (config.showRayHit || config.showInvisible) {
-            lastRayHit = MobUtils.rayTraceForMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)
+            lastRayHit = MobUtils.rayTraceForMobs(MinecraftCompat.localPlayer, event.partialTicks)
                 ?.firstOrNull { it.canBeSeen() && (!config.showInvisible || !it.isInvisible()) }
         }
 
