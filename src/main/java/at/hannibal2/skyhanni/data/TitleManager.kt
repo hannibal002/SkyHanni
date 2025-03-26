@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
@@ -37,8 +38,11 @@ object TitleManager {
         var height: Double = 1.8,
         var fontSize: Float = 4f,
         val weight: Double = 1.0,
+        val color: LorenzColor = LorenzColor.WHITE,
     ) : ResettableStorageSet() {
-        val display = "§f$text"
+        val display: String
+            get() = "${color.chatColorCode}$text"
+
         var endTime: SimpleTimeMark = SimpleTimeMark.now() + duration
 
         fun stop() {
@@ -80,7 +84,7 @@ object TitleManager {
             val currentTitle = currentTitles[location]
             if (currentTitle != null && !currentTitle.endTime.isInPast()) {
                 // Push back into the queue
-                targetQueue.add(currentTitle, weight)
+                targetQueue.add(currentTitle, currentTitle.weight)
                 currentTitle.applyFromOther(newTitle)
             } else {
                 currentTitles[location] = newTitle
@@ -142,11 +146,7 @@ object TitleManager {
 
     private fun stop(location: TitleLocation? = null) {
         when (location) {
-            null -> {
-                currentTitles.values.filterNotNull()
-                    .forEach { it.stop() }
-            }
-
+            null -> currentTitles.values.filterNotNull().forEach { it.stop() }
             else -> currentTitles[location]?.stop()
         }
     }
@@ -214,7 +214,7 @@ object TitleManager {
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, -150f, 500f)
         Renderable.drawInsideRoundedRect(
-            Renderable.string(text, 1.5),
+            Renderable.string(display, 1.5),
             ColorUtils.TRANSPARENT_COLOR,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
