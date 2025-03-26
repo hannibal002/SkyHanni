@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TextInput
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -56,6 +57,37 @@ object KeyboardManager {
      */
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
+    private data class EventKey(val key: Int, val pressed: Boolean)
+
+    private fun getEventKey(): EventKey? {
+        if (MouseCompat.getEventButton() != -1) {
+            val key = MouseCompat.getEventButton() - 100
+            lastClickedMouseButton = key
+            return EventKey(key, MouseCompat.getEventButtonState())
+        }
+
+        if (Keyboard.getEventKey() != 0) {
+            lastClickedMouseButton = -1
+            return EventKey(Keyboard.getEventKey(), Keyboard.getEventKeyState())
+        }
+
+        if (MouseCompat.getEventButton() == -1 && lastClickedMouseButton != -1) {
+            if (lastClickedMouseButton.isKeyHeld()) {
+                return EventKey(lastClickedMouseButton, true)
+            } else {
+                lastClickedMouseButton = -1
+            }
+        }
+
+        // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
+        if (Keyboard.getEventKey() == 0) {
+            return EventKey(Keyboard.getEventCharacter().code + 256, Keyboard.getEventKeyState())
+        }
+        return null
+    }
+
+    val clickedKeys = mutableSetOf<Int>()
+
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick(event: SkyHanniTickEvent) {
         //#if MC < 1.16
@@ -64,44 +96,39 @@ object KeyboardManager {
         if (isConfigScreen) return
         if (currentScreen is GuiChat) return
 
+        val (key, pressed) = getEventKey() ?: return
 
-        if (MouseCompat.getEventButtonState() && MouseCompat.getEventButton() != -1) {
-            val key = MouseCompat.getEventButton() - 100
-            postEvent(key)
-            lastClickedMouseButton = key
-            return
-        }
-
-        if (Keyboard.getEventKeyState() && Keyboard.getEventKey() != 0) {
-            postEvent(Keyboard.getEventKey())
-            lastClickedMouseButton = -1
-            return
-        }
-
-        if (MouseCompat.getEventButton() == -1 && lastClickedMouseButton != -1) {
-            if (lastClickedMouseButton.isKeyHeld()) {
-                postEvent(lastClickedMouseButton)
-                return
+        if (pressed) {
+            postKeyPressEvent(key)
+            if (!clickedKeys.contains(key)) {
+                postKeyDownEvent(key)
+                clickedKeys.add(key)
             }
-            lastClickedMouseButton = -1
-        }
-
-        // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
-        if (Keyboard.getEventKey() == 0) {
-            postEvent(Keyboard.getEventCharacter().code + 256)
+        } else {
+            clickedKeys.remove(key)
         }
         //#else
         //$$ // todo use fabric event or whatnot
         //#endif
     }
 
-    private fun postEvent(keyCode: Int) {
+    private fun postKeyPressEvent(keyCode: Int) {
         // This cooldown is here to make sure the Text input features in graph editor
         // and in renderable calls have time to react first,
         // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyPressEvent(keyCode).post()
+        }
+    }
+
+    private fun postKeyDownEvent(keyCode: Int) {
+        // This cooldown is here to make sure the Text input features in graph editor
+        // and in renderable calls have time to react first,
+        // and lock this key press event properly
+        DelayedRun.runDelayed(50.milliseconds) {
+            if (TextInput.isActive()) return@runDelayed
+            KeyDownEvent(keyCode).post()
         }
     }
 
