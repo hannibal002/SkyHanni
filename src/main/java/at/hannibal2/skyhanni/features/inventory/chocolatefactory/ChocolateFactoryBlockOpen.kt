@@ -56,12 +56,7 @@ object ChocolateFactoryBlockOpen {
         if (!openCfItemPattern.matches(slotDisplayName)) return
         if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 
-        val blockResult = tryBlock().takeIf { it != TryBlockResult.SUCCESS }
-        TitleManager.sendTitle(
-            "§cBlocked opening the Chocolate Factory",
-            subtitleText = "$blockResult",
-            location = TitleManager.TitleLocation.INVENTORY
-        )
+        tryBlock().takeIf { it != TryBlockResult.SUCCESS } ?: return
         event.cancel()
     }
 
@@ -71,10 +66,9 @@ object ChocolateFactoryBlockOpen {
         if (commandSentTimer.passedSince() < 5.seconds) return
         if (LorenzUtils.isBingoProfile) return
 
-        if (tryBlock() != TryBlockResult.SUCCESS) {
-            commandSentTimer = SimpleTimeMark.now()
-            event.cancel()
-        }
+        tryBlock().takeIf { it != TryBlockResult.SUCCESS } ?: return
+        commandSentTimer = SimpleTimeMark.now()
+        event.cancel()
     }
 
     private enum class TryBlockResult(private val displayName: String) {
@@ -94,6 +88,7 @@ object ChocolateFactoryBlockOpen {
                 actionName = "open pets menu",
                 action = { HypixelCommands.pet() },
             )
+            trySendFailureTitle(TryBlockResult.FAIL_NO_RABBIT)
             return TryBlockResult.FAIL_NO_RABBIT
         } else if (config.boosterCookieRequirement) {
             profileStorage?.boosterCookieExpiryTime?.let {
@@ -109,9 +104,20 @@ object ChocolateFactoryBlockOpen {
                         }
                     },
                 )
+                trySendFailureTitle(TryBlockResult.FAIL_NO_BOOSTER_COOKIE)
                 return TryBlockResult.FAIL_NO_BOOSTER_COOKIE
             }
         }
         return TryBlockResult.SUCCESS
+    }
+
+    private fun trySendFailureTitle(result: TryBlockResult) {
+        if (result == TryBlockResult.SUCCESS) return
+        val titleLocation = if (InventoryUtils.inInventory()) TitleManager.TitleLocation.INVENTORY else TitleManager.TitleLocation.GLOBAL
+        TitleManager.sendTitle(
+            "§cBlocked opening the Chocolate Factory",
+            subtitleText = "$result",
+            location = titleLocation,
+        )
     }
 }
