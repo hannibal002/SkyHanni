@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.EmojiJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.texture.TextureManager
-import net.minecraft.util.ResourceLocation
 import org.lwjgl.input.Keyboard
 import org.lwjgl.opengl.GL11
 import org.lwjgl.util.Color
@@ -29,7 +29,7 @@ object EmojiReplacer {
     private var emojiEnd = -1
     private var renderedString: String = ""
     private var isShadow = false
-    private val emojiResource = ResourceLocation("skyhanni:emoji/emoji_table.png")
+    private val emojiResource = createResourceLocation("skyhanni:emoji/emoji_table.png")
     private const val EMOJI_WIDTH = 72.0f
     private const val EMOJI_DISPLAY_WIDTH = 8.0f
     private const val EMOJI_SPRITESHEET_COUNT = 42

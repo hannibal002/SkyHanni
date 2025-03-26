@@ -48,3 +48,5 @@ Are you interested in writing your own SkyHanni feature? Do you want to fix that
 ---
 
 **SkyHanni is part of an active modding community. Explore other useful mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/) for even more SkyBlock features!**
+
+SkyHanni uses [Twemoji](https://github.com/jdecked/twemoji) for emoji rendering
