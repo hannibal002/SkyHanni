@@ -15,14 +15,16 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.launchwrapper.Launch
-import net.minecraftforge.fml.common.FMLCommonHandler
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
 import java.util.TreeMap
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
+//#if FORGE
+import net.minecraft.launchwrapper.Launch
+import net.minecraftforge.fml.common.FMLCommonHandler
+//#endif
 
 /**
  * Manages [RepoPattern]s.
@@ -43,7 +45,7 @@ object RepoPatternManager {
     private val remotePattern: NavigableMap<String, String>
         get() = TreeMap(
             if (localLoading) mapOf()
-            else regexes?.regexes.orEmpty()
+            else regexes?.regexes.orEmpty(),
         )
 
     /**
@@ -59,7 +61,12 @@ object RepoPatternManager {
 
     private var wasPreInitialized = false
 
-    private val insideTest = Launch.blackboard == null
+    private val insideTest =
+        //#if FORGE
+        Launch.blackboard == null
+    //#else
+    //$$ false
+    //#endif
 
     var inTestDuplicateUsage = true
 
@@ -98,7 +105,7 @@ object RepoPatternManager {
                         crash(
                             "Non unique access to regex at \"$key\". " +
                                 "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
-                                "tried to use at ${owner.ownerClass} / ${owner.property}"
+                                "tried to use at ${owner.ownerClass} / ${owner.property}",
                         )
                 } else {
                     exclusivity[key] = owner
