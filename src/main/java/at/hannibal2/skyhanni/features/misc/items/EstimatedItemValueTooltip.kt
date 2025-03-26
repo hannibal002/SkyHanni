@@ -15,7 +15,7 @@ object EstimatedItemValueTooltip {
         if (!SkyHanniMod.feature.inventory.estimatedItemValues.showTooltip) return
         event.itemStack.getInternalNameOrNull() ?: return
 
-        val total = EstimatedItemValueCalculator.getTotalPrice(event.itemStack, true) ?: return
+        val total = EstimatedItemValueCalculator.getTotalPrice(event.itemStack, ignoreBasePrice = true) ?: return
         event.toolTip.add("§e§lEstimated Value: §6§l${total.addSeparators()} coins")
     }
 }

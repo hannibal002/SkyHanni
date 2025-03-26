@@ -150,14 +150,12 @@ object EstimatedItemValueCalculator {
     private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
     private val MITHRIL_INFUSION = "MITHRIL_INFUSION".toInternalName()
 
-    fun getTotalPrice(stack: ItemStack): Double = calculate(stack, mutableListOf()).first
-
-    fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean): Double? {
-        val (value, base) = calculate(stack, mutableListOf())
-        if (ignoreBasePrice && value == base) {
+    fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean = false): Double? {
+        val (totalPrice, basePrice) = calculate(stack, mutableListOf())
+        if (ignoreBasePrice && totalPrice == basePrice) {
             return null
         }
-        return value
+        return totalPrice
     }
 
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {

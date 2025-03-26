@@ -25,11 +25,11 @@ object AuctionsHighlighter {
     private val patternGroup = RepoPattern.group("auctions.highlight")
     val buyItNowPattern by patternGroup.pattern(
         "buyitnow",
-        "§7Buy it now: §6(?<coins>.*) coins"
+        "§7Buy it now: §6(?<coins>.*) coins",
     )
     val auctionPattern by patternGroup.pattern(
         "auction",
-        "§7(?:Starting bid|Top bid): §6(?<coins>.*) coins"
+        "§7(?:Starting bid|Top bid): §6(?<coins>.*) coins",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -53,9 +53,10 @@ object AuctionsHighlighter {
             if (config.highlightAuctionsUnderbid) {
                 buyItNowPattern.firstMatcher(lore) {
                     val coins = group("coins").formatLong()
-                    val totalPrice = EstimatedItemValueCalculator.getTotalPrice(stack)
-                    if (coins > totalPrice) {
-                        slot.highlight(LorenzColor.GOLD)
+                    EstimatedItemValueCalculator.getTotalPrice(stack)?.let { totalPrice ->
+                        if (coins > totalPrice) {
+                            slot.highlight(LorenzColor.GOLD)
+                        }
                     }
                 }
             }
