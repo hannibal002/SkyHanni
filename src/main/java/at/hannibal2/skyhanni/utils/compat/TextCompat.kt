@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.features.misc.EmojiReplacer.replaceEmojis
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -130,7 +131,7 @@ var IChatComponent.url: String?
 
 fun IChatComponent.appendString(text: String): IChatComponent =
     //#if MC < 1.16
-    this.appendText(text)
+    this.appendText(replaceEmojis(text))
 //#else
 //$$ (this as MutableComponent).append(text)
 //#endif
