@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.chat
 
-import at.hannibal2.skyhanni.features.misc.EmojiReplacer.replaceEmojis
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.appendString
@@ -26,7 +25,7 @@ object TextHelper {
 
     //#if MC < 1.16
     fun text(text: String, init: IChatComponent.() -> Unit = {}) = text.asComponent(init)
-    fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(replaceEmojis(this)).also(init)
+    fun String.asComponent(init: IChatComponent.() -> Unit = {}) = ChatComponentText(this).also(init)
     //#elseif MC < 1.21
     //$$ fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     //$$ fun String.asComponent(init: MutableComponent.() -> Unit = {}) = (TextComponent(this) as MutableComponent).also(init)
