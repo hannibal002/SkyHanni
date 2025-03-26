@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.shader.CircleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
@@ -88,7 +88,7 @@ object ShaderManager {
                     "GLSL Compilation Error:\n" to errorLog,
                 )
             } else {
-                LorenzUtils.consoleLog("$errorMessage $errorLog")
+                ChatUtils.consoleLog("$errorMessage $errorLog")
             }
 
             return -1

@@ -86,6 +86,7 @@ object ComposterDisplay {
                 addHorizontalSpacer()
                 addNotNull(DataType.FUEL.labeledWithData(tabListData))
             }
+            addNotNull(DataType.STORED_COMPOST.labeledWithData(tabListData))
             add(composterEmptyTime(composterEmptyTime))
         }
     }

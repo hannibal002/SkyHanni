@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -349,7 +350,7 @@ object GardenNextJacobContest {
         if (inCalendar) {
             val size = contests.size
             val percentage = size.toDouble() / MAX_CONTESTS_PER_YEAR
-            val formatted = LorenzUtils.formatPercentage(percentage)
+            val formatted = percentage.formatPercentage()
             addString("§eDetected $formatted of farming contests this year")
             return@line
         }

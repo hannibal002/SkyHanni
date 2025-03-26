@@ -43,11 +43,11 @@ object AuctionsHighlighter {
         for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()
             if (lore.any { it == "§7Status: §aSold!" }) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
                 continue
             }
             if (lore.any { it == "§7Status: §cExpired!" }) {
-                slot highlight LorenzColor.RED
+                slot.highlight(LorenzColor.RED)
                 continue
             }
             if (config.highlightAuctionsUnderbid) {
@@ -55,7 +55,7 @@ object AuctionsHighlighter {
                     val coins = group("coins").formatLong()
                     val totalPrice = EstimatedItemValueCalculator.getTotalPrice(stack)
                     if (coins > totalPrice) {
-                        slot highlight LorenzColor.GOLD
+                        slot.highlight(LorenzColor.GOLD)
                     }
                 }
             }

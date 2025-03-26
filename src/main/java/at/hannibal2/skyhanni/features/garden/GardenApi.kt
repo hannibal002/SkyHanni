@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -50,6 +51,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object GardenApi {
@@ -73,6 +75,7 @@ object GardenApi {
                 storage?.experience = it
             }
         }
+    private val cropIconCache: TimeLimitedCache<CropType, ItemStack> = TimeLimitedCache(10.minutes)
 
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
@@ -169,7 +172,8 @@ object GardenApi {
         scale: Double = NeuItems.ITEM_FONT_SIZE,
         highlight: Boolean = false,
     ) {
-        addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)
+        val cropIcon = cropIconCache.getOrPut(crop) { crop.icon.copy() }
+        addItemStack(cropIcon, highlight = highlight, scale = scale)
     }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory ||
