@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.utils
 
-//#if MC < 1.21
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
-import net.minecraft.client.audio.PositionedSound
 import net.minecraft.client.audio.SoundCategory
 import net.minecraft.util.ResourceLocation
 
+//#if MC < 1.21
+import net.minecraft.client.audio.PositionedSound
 //#else
 //$$ import net.minecraft.client.sound.PositionedSoundInstance
 //$$ import net.minecraft.sound.SoundEvent

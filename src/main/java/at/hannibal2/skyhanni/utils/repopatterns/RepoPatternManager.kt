@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
-//#if FORGE
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -16,15 +15,15 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.launchwrapper.Launch
-import net.minecraftforge.fml.common.FMLCommonHandler
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
 import java.util.TreeMap
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
-
+//#if FORGE
+import net.minecraft.launchwrapper.Launch
+import net.minecraftforge.fml.common.FMLCommonHandler
 //#endif
 
 /**

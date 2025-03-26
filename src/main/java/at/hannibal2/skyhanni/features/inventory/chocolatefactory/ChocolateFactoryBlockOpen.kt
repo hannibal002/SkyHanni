@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
@@ -55,7 +56,13 @@ object ChocolateFactoryBlockOpen {
         if (!openCfItemPattern.matches(slotDisplayName)) return
         if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 
-        if (checkIsBlocked()) event.cancel()
+        val blockResult = tryBlock().takeIf { it != TryBlockResult.SUCCESS }
+        TitleManager.sendTitle(
+            "§cBlocked opening the Chocolate Factory",
+            subtitleText = "$blockResult",
+            location = TitleManager.TitleLocation.INVENTORY
+        )
+        event.cancel()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -64,18 +71,19 @@ object ChocolateFactoryBlockOpen {
         if (commandSentTimer.passedSince() < 5.seconds) return
         if (LorenzUtils.isBingoProfile) return
 
-        if (checkIsBlocked()) {
+        if (tryBlock() != TryBlockResult.SUCCESS) {
             commandSentTimer = SimpleTimeMark.now()
             event.cancel()
         }
     }
 
-    private fun checkIsBlocked() = tryBlock() != TryBlockResult.SUCCESS
+    private enum class TryBlockResult(private val displayName: String) {
+        SUCCESS(""),
+        FAIL_NO_RABBIT("§7without a §dMythic Rabbit Pet §7equipped"),
+        FAIL_NO_BOOSTER_COOKIE("§7without a §dBooster Cookie §7active"),
+        ;
 
-    private enum class TryBlockResult {
-        SUCCESS,
-        FAIL_NO_RABBIT,
-        FAIL_NO_BOOSTER_COOKIE,
+        override fun toString() = displayName
     }
 
     private fun tryBlock(): TryBlockResult {
