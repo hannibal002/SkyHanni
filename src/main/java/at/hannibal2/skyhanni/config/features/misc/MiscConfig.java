@@ -402,6 +402,16 @@ public class MiscConfig {
     public boolean userluckEnabled = true;
 
     @Expose
+    @ConfigOption(
+        name = "SkyHanni DVD Logo",
+        desc = "Adds a bouncing SkyHanni Logo to your screen.\n" +
+            "Every time you hit a corner you will gain 1 SkyHanni User Luck."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean dvdLogoEnabled = false;
+
+    @Expose
     @ConfigOption(name = "Computer Time Offset Warning",
         desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" +
             "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly."
