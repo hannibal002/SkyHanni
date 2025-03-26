@@ -239,7 +239,7 @@ object TitleManager {
 
         val heightTranslation = when (subtitleText) {
             null -> 150f
-            else -> 250f
+            else -> 200f
         }
 
         GlStateManager.pushMatrix()

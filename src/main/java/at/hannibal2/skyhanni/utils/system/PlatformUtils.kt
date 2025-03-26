@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.utils.system
 
+import net.minecraftforge.fml.common.ModContainer
 //#if MC < 1.16
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.utils.DelayedRun
+import kotlin.time.Duration.Companion.INFINITE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.ModContainer
-import kotlin.time.Duration.Companion.INFINITE
-
 //#elseif FORGE
 //$$ import net.minecraftforge.fml.loading.FMLEnvironment
 //#else

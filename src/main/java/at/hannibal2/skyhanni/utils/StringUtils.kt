@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-//#if FORGE
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -11,7 +10,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.hover
-import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -22,7 +20,8 @@ import java.util.Base64
 import java.util.NavigableMap
 import java.util.UUID
 import java.util.regex.Matcher
-
+//#if FORGE
+import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //#else
 //$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
 //#endif

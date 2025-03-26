@@ -1,17 +1,16 @@
 package at.hannibal2.skyhanni.utils.chat
 
-//#if MC < 1.21
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.client.Minecraft
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
-
+//#if MC < 1.21
+import net.minecraft.util.ChatComponentText
 //#endif
 //#if MC > 1.16
 //$$ import net.minecraft.network.chat.MutableComponent
