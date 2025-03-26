@@ -94,7 +94,7 @@ object HoppityRabbitTheFishChecker {
         val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
         if (!shouldContinue) {
             TitleManager.sendTitle(
-                "§cFish the Rabbit Prevented Close",
+                "§cRabbit the Fish Prevented Close",
                 subtitleText = "§7Hold §eShift §7to bypass",
                 duration = 5.seconds,
                 location = TitleManager.TitleLocation.INVENTORY

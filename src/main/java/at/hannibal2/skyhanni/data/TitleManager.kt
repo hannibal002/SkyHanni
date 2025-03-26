@@ -231,7 +231,8 @@ object TitleManager {
                     listOf(
                         baseStringRenderable,
                         Renderable.string(displaySubText, 1.0)
-                    )
+                    ),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
                 )
             }
         }
