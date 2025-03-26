@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 @SkyHanniModule

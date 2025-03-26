@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
-import kotlin.time.Duration.Companion.seconds
 
 object TrevorSolver {
 

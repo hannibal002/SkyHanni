@@ -39,7 +39,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object IslandAreas {

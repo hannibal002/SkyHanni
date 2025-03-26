@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MinionCraftHelper {

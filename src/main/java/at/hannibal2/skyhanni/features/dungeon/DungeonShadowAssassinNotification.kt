@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.network.play.server.S44PacketWorldBorder
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DungeonShadowAssassinNotification {

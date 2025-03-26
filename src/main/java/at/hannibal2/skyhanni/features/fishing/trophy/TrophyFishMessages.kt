@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TrophyFishMessages {
@@ -36,7 +35,7 @@ object TrophyFishMessages {
     @Suppress("MaxLineLength")
     val trophyFishPattern by RepoPattern.pattern(
         "fishing.trophy.trophyfish",
-        "§6♔ §r§6§lTROPHY FISH! §r§fYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§f!"
+        "§6♔ §r§6§lTROPHY FISH! §r§fYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§f!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)

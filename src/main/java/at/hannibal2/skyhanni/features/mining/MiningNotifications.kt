@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
