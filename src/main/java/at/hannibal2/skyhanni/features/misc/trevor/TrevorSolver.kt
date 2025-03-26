@@ -72,7 +72,7 @@ object TrevorSolver {
                     val canSee = entity.canBeSeen() && dist < currentMob.renderDistance
                     if (canSee) {
                         if (mobLocation != TrapperMobArea.FOUND) {
-                            TitleManager.sendTitle("§2Saw ${currentMob.mobName}!", 3.seconds)
+                            TitleManager.sendTitle("§2Saw ${currentMob.mobName}!")
                         }
                         mobLocation = TrapperMobArea.FOUND
                         mobCoordinates = entity.position.toLorenzVec()

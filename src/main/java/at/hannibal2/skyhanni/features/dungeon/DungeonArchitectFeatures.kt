@@ -54,7 +54,7 @@ object DungeonArchitectFeatures {
                 "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)"
         )
 
-        TitleManager.sendTitle("§c§lPUZZLE FAILED!", 3.seconds)
+        TitleManager.sendTitle("§c§lPUZZLE FAILED!")
         event.blockedReason = "puzzle_fail"
     }
 

@@ -81,7 +81,7 @@ object CarryTracker {
         carry.done++
         if (carry.done == carry.requested) {
             ChatUtils.chat("Carry done for ${customer.name}!")
-            TitleManager.sendTitle("§eCarry done!", 3.seconds)
+            TitleManager.sendTitle("§eCarry done!")
         }
         update()
     }

@@ -65,7 +65,7 @@ object TitleManager {
     fun sendTitle(
         text: String,
         subtext: String? = null,
-        duration: Duration,
+        duration: Duration = 3.seconds,
         height: Double = 1.8,
         fontSize: Float = 4f,
         location: TitleLocation = TitleLocation.GLOBAL,
