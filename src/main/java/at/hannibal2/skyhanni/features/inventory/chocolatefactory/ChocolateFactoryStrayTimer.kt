@@ -97,7 +97,8 @@ object ChocolateFactoryStrayTimer {
         val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || !ChocolateFactoryApi.inChocolateFactory
         if (!shouldContinue) {
             TitleManager.sendTitle(
-                "§cStray Rabbit Prevented Close\n§eHold §cShift §eto bypass",
+                "§cStray Timer Prevented Close",
+                subtext = "§7Hold §eShift §7to bypass",
                 duration = 5.seconds,
                 location = TitleManager.TitleLocation.INVENTORY
             )

@@ -175,7 +175,8 @@ object ChocolateFactoryStrayWarning {
         val shouldContinue = !keycode.isInventoryClosure() || !warningConfig.blockClosing || activeStraySlots.isEmpty()
         if (!shouldContinue) {
             TitleManager.sendTitle(
-                "§cStray Rabbit Prevented Close\n§eHold §cShift §eto bypass",
+                "§cStray Rabbit Prevented Close",
+                subtext = "§7Hold §eShift §7to bypass",
                 duration = 5.seconds,
                 location = TitleManager.TitleLocation.INVENTORY
             )
