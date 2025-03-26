@@ -90,7 +90,4 @@ object LorenzUtils {
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
     fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
-    fun formatPercentage(coerceAtMost: Double): Any {
-
-    }
 }
