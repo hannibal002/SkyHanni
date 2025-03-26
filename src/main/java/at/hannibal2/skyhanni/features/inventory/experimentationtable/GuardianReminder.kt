@@ -52,7 +52,7 @@ object GuardianReminder {
         if (ExperimentationTableApi.hasGuardianPet()) return
 
         TitleManager.sendTitle(
-            text = "§cWrong Pet equipped!",
+            titleText = "§cWrong Pet equipped!",
             duration = 2.seconds,
             location = TitleManager.TitleLocation.INVENTORY,
         )

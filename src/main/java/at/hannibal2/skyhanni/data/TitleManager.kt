@@ -32,8 +32,8 @@ object TitleManager {
     private val currentTitles: MutableMap<TitleLocation, TitleData?> = enumMapOf()
 
     private data class TitleData(
-        var text: String = "",
-        var subText: String? = null,
+        var titleText: String = "",
+        var subtitleText: String? = null,
         var duration: Duration = 0.seconds,
         var height: Double = 1.8,
         var fontSize: Float = 4f,
@@ -63,16 +63,16 @@ object TitleManager {
     }
 
     fun sendTitle(
-        text: String,
-        subtext: String? = null,
-        duration: Duration,
+        titleText: String,
+        subtitleText: String? = null,
+        duration: Duration = 3.seconds,
         height: Double = 1.8,
         fontSize: Float = 4f,
         location: TitleLocation = TitleLocation.GLOBAL,
         addType: TitleAddType = TitleAddType.QUEUE,
         weight: Double = 1.0,
     ) {
-        val newTitle = TitleData(text, subtext, duration, height, fontSize, weight)
+        val newTitle = TitleData(titleText, subtitleText, duration, height, fontSize, weight)
         val targetQueue = titleLocationQueues.getOrPut(location) { CollectionUtils.OrderedQueue() }
 
         if (addType == TitleAddType.QUEUE) {
@@ -96,12 +96,12 @@ object TitleManager {
         when (location) {
             null -> {
                 currentTitles.values.filterNotNull()
-                    .filter { condition(it.text) }
+                    .filter { condition(it.titleText) }
                     .forEach { it.stop() }
             }
 
             else -> currentTitles[location]?.let { title ->
-                if (condition(title.text)) {
+                if (condition(title.titleText)) {
                     title.stop()
                 }
             }
@@ -178,7 +178,7 @@ object TitleManager {
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
         val globalTitleWidth = 80
-        val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)
+        val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(titleText)
         var factor = globalTitleWidth / stringWidth.toDouble()
         factor = min(factor, 1.0)
 
@@ -188,13 +188,27 @@ object TitleManager {
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.pushMatrix()
 
-        Renderable.wrappedString(
-            text,
-            width = (globalTitleWidth * fontSize).toInt(),
+        val mainTextRenderable = Renderable.string(
+            titleText,
             scale = factor * fontSize,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+        )
+
+        if (subtitleText == null) mainTextRenderable.renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+        else {
+            val subText: String = subtitleText ?: return
+            val subtitleScale = factor * fontSize * 0.75f
+            val subtitleRenderable = Renderable.wrappedString(
+                subText,
+                width = (globalTitleWidth * fontSize).toInt(),
+                scale = subtitleScale,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            )
+            val container = Renderable.verticalContainer(listOf(mainTextRenderable, subtitleRenderable))
+            container.renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+        }
 
         GlStateManager.popMatrix()
     }
@@ -208,22 +222,27 @@ object TitleManager {
     private fun TitleData.tryRenderInventoryTitle() {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
-        val baseStringRenderable = Renderable.string(text, fontSize.toDouble())
-        val stringRenderable = when (subText) {
+        val baseStringRenderable = Renderable.string(titleText, 1.5)
+        val stringRenderable = when (subtitleText) {
             null -> baseStringRenderable
             else -> {
-                val displaySubText = subText ?: return
+                val displaySubText = subtitleText ?: return
                 Renderable.verticalContainer(
                     listOf(
                         baseStringRenderable,
-                        Renderable.string(displaySubText, (fontSize.toDouble() * 0.8))
+                        Renderable.string(displaySubText, 1.0)
                     )
                 )
             }
         }
 
+        val heightTranslation = when (subtitleText) {
+            null -> 150f
+            else -> 250f
+        }
+
         GlStateManager.pushMatrix()
-        GlStateManager.translate(0f, -150f, 500f)
+        GlStateManager.translate(0f, -(heightTranslation), 500f)
         Renderable.drawInsideRoundedRect(
             stringRenderable,
             ColorUtils.TRANSPARENT_COLOR,
@@ -231,7 +250,7 @@ object TitleManager {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 0, gui.width, gui.height)
 
-        GlStateManager.translate(0f, 150f, -500f)
+        GlStateManager.translate(0f, heightTranslation, -500f)
         GlStateManager.popMatrix()
     }
 }

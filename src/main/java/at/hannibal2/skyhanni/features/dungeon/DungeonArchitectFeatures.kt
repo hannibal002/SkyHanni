@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DungeonArchitectFeatures {
@@ -21,11 +20,11 @@ object DungeonArchitectFeatures {
 
     private val puzzleFailPattern by patternGroup.pattern(
         "puzzle.fail.normal",
-        "(?:§c§lPUZZLE FAIL!|§4) §.§.(?<name>\\S*) .*"
+        "(?:§c§lPUZZLE FAIL!|§4) §.§.(?<name>\\S*) .*",
     )
     private val quizPuzzleFailPattern by patternGroup.pattern(
         "puzzle.fail.quiz",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?<name>\\S*) (?:§.)*chose the wrong .*"
+        "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?<name>\\S*) (?:§.)*chose the wrong .*",
     )
 
     private val architectsFirstDraftItem = "ARCHITECT_FIRST_DRAFT".toInternalName()
@@ -51,10 +50,10 @@ object DungeonArchitectFeatures {
         GetFromSackApi.getFromChatMessageSackItems(
             architectsFirstDraft,
             "§c§lPUZZLE FAILED! §r§b$name §r§efailed a puzzle. \n" +
-                "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)"
+                "§eClick here to get §5Architect's First Draft §7(§e${architectItemAmount}x left§7)",
         )
 
-        TitleManager.sendTitle("§c§lPUZZLE FAILED!", 3.seconds)
+        TitleManager.sendTitle("§c§lPUZZLE FAILED!")
         event.blockedReason = "puzzle_fail"
     }
 
