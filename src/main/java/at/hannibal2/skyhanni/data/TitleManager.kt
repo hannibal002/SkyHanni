@@ -231,14 +231,15 @@ object TitleManager {
                     listOf(
                         baseStringRenderable,
                         Renderable.string(displaySubText, 1.0)
-                    )
+                    ),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
                 )
             }
         }
 
         val heightTranslation = when (subtitleText) {
             null -> 150f
-            else -> 250f
+            else -> 200f
         }
 
         GlStateManager.pushMatrix()
