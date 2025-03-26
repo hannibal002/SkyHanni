@@ -95,7 +95,7 @@ object HoppityRabbitTheFishChecker {
         if (!shouldContinue) {
             TitleManager.sendTitle(
                 "§cFish the Rabbit Prevented Close",
-                subtext = "§7Hold §eShift §7to bypass",
+                subtitleText = "§7Hold §eShift §7to bypass",
                 duration = 5.seconds,
                 location = TitleManager.TitleLocation.INVENTORY
             )

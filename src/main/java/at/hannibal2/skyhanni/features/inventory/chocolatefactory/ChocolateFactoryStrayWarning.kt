@@ -176,7 +176,7 @@ object ChocolateFactoryStrayWarning {
         if (!shouldContinue) {
             TitleManager.sendTitle(
                 "§cStray Rabbit Prevented Close",
-                subtext = "§7Hold §eShift §7to bypass",
+                subtitleText = "§7Hold §eShift §7to bypass",
                 duration = 5.seconds,
                 location = TitleManager.TitleLocation.INVENTORY
             )

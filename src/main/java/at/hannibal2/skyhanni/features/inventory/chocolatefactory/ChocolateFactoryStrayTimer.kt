@@ -98,7 +98,7 @@ object ChocolateFactoryStrayTimer {
         if (!shouldContinue) {
             TitleManager.sendTitle(
                 "§cStray Timer Prevented Close",
-                subtext = "§7Hold §eShift §7to bypass",
+                subtitleText = "§7Hold §eShift §7to bypass",
                 duration = 5.seconds,
                 location = TitleManager.TitleLocation.INVENTORY
             )
