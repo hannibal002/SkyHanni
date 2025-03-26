@@ -10,9 +10,11 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,6 +48,7 @@ object AbiphoneFeatures {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
+        if (InventoryUtils.inInventory()) return
         if (config.abiphoneAcceptKey == Keyboard.KEY_NONE || config.abiphoneAcceptKey != event.keyCode) return
         val acceptUUID = acceptUUID ?: return
         HypixelCommands.callback(acceptUUID)
