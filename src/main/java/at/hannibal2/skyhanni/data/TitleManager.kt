@@ -10,19 +10,19 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
+import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,9 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 object TitleManager {
 
     private val titleLocationQueues: MutableMap<TitleLocation, CollectionUtils.OrderedQueue<TitleData>> = enumMapOf()
-    private val currentTitles: MutableMap<TitleLocation, TitleData> = enumMapOf()
-    private val currentGlobalTitle: TitleData? get() = currentTitles[TitleLocation.GLOBAL]?.takeIf { it.endTime.isInFuture() }
-    private val currentInventoryTitle get() = currentTitles[TitleLocation.INVENTORY]?.takeIf { it.endTime.isInFuture() }
+    private val currentTitles: MutableMap<TitleLocation, TitleData?> = enumMapOf()
 
     private data class TitleData(
         var text: String = "",
@@ -40,9 +38,16 @@ object TitleManager {
         var height: Double = 1.8,
         var fontSize: Float = 4f,
         val weight: Double = 1.0,
+        val color: LorenzColor = LorenzColor.WHITE,
     ) : ResettableStorageSet() {
-        val display = "§f$text"
+        val display: String
+            get() = "${color.chatColorCode}$text"
+
         var endTime: SimpleTimeMark = SimpleTimeMark.now() + duration
+
+        fun stop() {
+            endTime = SimpleTimeMark.now()
+        }
     }
 
     enum class TitleLocation(private val displayName: String) {
@@ -67,7 +72,7 @@ object TitleManager {
         height: Double = 1.8,
         fontSize: Float = 4f,
         location: TitleLocation = TitleLocation.GLOBAL,
-        addType: TitleAddType = TitleAddType.FORCE_FIRST,
+        addType: TitleAddType = TitleAddType.QUEUE,
         weight: Double = 1.0,
     ) {
         val newTitle = TitleData(text, duration, height, fontSize, weight)
@@ -79,7 +84,7 @@ object TitleManager {
             val currentTitle = currentTitles[location]
             if (currentTitle != null && !currentTitle.endTime.isInPast()) {
                 // Push back into the queue
-                targetQueue.add(currentTitle, weight)
+                targetQueue.add(currentTitle, currentTitle.weight)
                 currentTitle.applyFromOther(newTitle)
             } else {
                 currentTitles[location] = newTitle
@@ -87,14 +92,42 @@ object TitleManager {
         }
     }
 
-    fun optionalResetTitle(condition: (String) -> Boolean) {
-        currentGlobalTitle?.let { if (condition(it.text)) stop(TitleLocation.GLOBAL) }
-        currentInventoryTitle?.let { if (condition(it.text)) stop(TitleLocation.INVENTORY) }
+    fun optionalResetTitle(
+        location: TitleLocation? = TitleLocation.GLOBAL,
+        condition: (String) -> Boolean,
+    ) {
+        when (location) {
+            null -> {
+                currentTitles.values.filterNotNull()
+                    .filter { condition(it.text) }
+                    .forEach { it.stop() }
+            }
+
+            else -> currentTitles[location]?.let { title ->
+                if (condition(title.text)) {
+                    title.stop()
+                }
+            }
+        }
     }
 
-    private fun command(args: Array<String>) {
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shsendtitle") {
+            description = "Display a title on the screen with the specified settings."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { command(it, this.name) }
+        }
+        event.register("shsendinventorytitle") {
+            description = "Display a title on the inventory screen with the specified settings."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { command(it, this.name, TitleLocation.INVENTORY) }
+        }
+    }
+
+    private fun command(args: Array<String>, command: String, location: TitleLocation = TitleLocation.GLOBAL) {
         if (args.size < 4) {
-            ChatUtils.userError("Usage: /shsendtitle <duration> <height> <fontSize> <text ..>")
+            ChatUtils.userError("Usage: /$command <duration> <height> <fontSize> <text ..>")
             return
         }
 
@@ -103,7 +136,7 @@ object TitleManager {
         val fontSize = args[2].toFloat()
         val title = "§6" + args.drop(3).joinToString(" ").replace("&", "§")
 
-        sendTitle(title, duration, height, fontSize)
+        sendTitle(title, duration, height, fontSize, location)
     }
 
     @HandleEvent
@@ -113,41 +146,33 @@ object TitleManager {
 
     private fun stop(location: TitleLocation? = null) {
         when (location) {
-            null -> {
-                titleLocationQueues.clear()
-                currentTitles.clear()
-            }
-            TitleLocation.GLOBAL -> currentGlobalTitle?.endTime = SimpleTimeMark.now()
-            TitleLocation.INVENTORY -> currentInventoryTitle?.endTime = SimpleTimeMark.now()
+            null -> currentTitles.values.filterNotNull().forEach { it.stop() }
+            else -> currentTitles[location]?.stop()
         }
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsendtitle") {
-            description = "Display a title on the screen with the specified settings."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { command(it) }
-        }
-    }
-
-    private fun dequeueNextTitle(location: TitleLocation) {
-        val titleQueue = titleLocationQueues[location]?.takeIfNotEmpty() ?: return
-        val title = titleQueue.pollOrNull() ?: return
-        currentTitles[location] = title
     }
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        currentTitles.forEach { (location, title) ->
-            if (title.endTime.isInFuture()) return@forEach
-            dequeueNextTitle(location)
+        TitleLocation.entries.forEach { location ->
+            when (val currentTitle = currentTitles[location]) {
+                null -> dequeueNextTitle(location)
+                else -> {
+                    if (currentTitle.endTime.isInFuture()) return@forEach
+                    dequeueNextTitle(location)
+                }
+            }
         }
+    }
+
+    private fun dequeueNextTitle(location: TitleLocation) {
+        val titleQueue = titleLocationQueues[location]
+        val title = titleQueue?.pollOrNull()
+        currentTitles[location] = title
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        val globalTitle = currentGlobalTitle ?: return
+        val globalTitle = currentTitles[TitleLocation.GLOBAL] ?: return
         globalTitle.tryRenderGlobalTitle()
     }
 
@@ -155,20 +180,31 @@ object TitleManager {
         val guiWidth = GuiScreenUtils.scaledWindowWidth
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
+        val globalTitleWidth = 80
+        val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(display)
+        var factor = globalTitleWidth / stringWidth.toDouble()
+        factor = min(factor, 1.0)
+
+        val adjustedHeight = (guiHeight / height) * 2
+
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        val renderer = Minecraft.getMinecraft().fontRendererObj
-
         GlStateManager.pushMatrix()
-        GlStateManager.translate((guiWidth / 2).toFloat(), (guiHeight / height).toFloat(), 3.0f)
-        GlStateManager.scale(fontSize, fontSize, fontSize)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(display, renderer, 0f, 0f, true, 75, 0)
+
+        Renderable.wrappedString(
+            display,
+            width = (globalTitleWidth * fontSize).toInt(),
+            scale = factor * fontSize,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+        ).renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+
         GlStateManager.popMatrix()
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        val inventoryTitle = currentInventoryTitle ?: return
+        val inventoryTitle = currentTitles[TitleLocation.INVENTORY] ?: return
         inventoryTitle.tryRenderInventoryTitle()
     }
 
@@ -178,11 +214,11 @@ object TitleManager {
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, -150f, 500f)
         Renderable.drawInsideRoundedRect(
-            Renderable.string(text, 1.5),
+            Renderable.string(display, 1.5),
             ColorUtils.TRANSPARENT_COLOR,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).renderXYAligned(0, 125, gui.width, gui.height)
+        ).renderXYAligned(0, 0, gui.width, gui.height)
 
         GlStateManager.translate(0f, 150f, -500f)
         GlStateManager.popMatrix()
