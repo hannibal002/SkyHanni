@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KeyboardManager.isInventoryClosure
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -16,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import org.lwjgl.input.Keyboard
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityRabbitTheFishChecker {
@@ -88,13 +91,11 @@ object HoppityRabbitTheFishChecker {
         }
     }
 
-    private fun Int.isInventoryClosure(): Boolean =
-        this == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || this == Keyboard.KEY_ESCAPE
-
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
         val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
         if (!shouldContinue) SoundUtils.playErrorSound()
+        TitleManager.sendTitle("§cFish the Rabbit Prevented Close\n§eHold §cShift §eto bypass", 5.seconds)
         return shouldContinue
     }
 

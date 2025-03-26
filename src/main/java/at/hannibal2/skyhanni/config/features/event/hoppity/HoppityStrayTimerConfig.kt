@@ -21,6 +21,14 @@ class HoppityStrayTimerConfig {
 
     @Expose
     @ConfigOption(
+        name = "Block Closing",
+        desc = "Block closing the Chocolate Factory while the timer is active.\n" +
+            "§eHold §cShift §eto bypass"
+    )
+    var blockClosing: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Ding For Timer",
         desc = "Play a ding sound when the timer drops below this number. Set to 0 to disable.",
     )

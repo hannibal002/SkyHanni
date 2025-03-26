@@ -50,6 +50,9 @@ object KeyboardManager {
 
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
+    fun Int.isInventoryClosure(): Boolean =
+        this == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || this == Keyboard.KEY_ESCAPE
+
     /**
      * TODO make use of this function unnecessary: Try to avoid using `isModifierKeyDown` as the only option,
      * allow the user to set a different option instead and just set the default key to isModifierKeyDown

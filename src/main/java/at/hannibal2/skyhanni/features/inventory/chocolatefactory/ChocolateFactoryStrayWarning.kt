@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryStrayRabbitWarningConfig.StrayTypeEntry
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryStrayWarningConfig
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.KeyboardManager.isInventoryClosure
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -30,6 +32,9 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import kotlin.math.sin
+import kotlin.time.Duration.Companion.seconds
+
+private typealias StrayTypeEntry = ChocolateFactoryStrayWarningConfig.StrayTypeEntry
 
 @SkyHanniModule
 object ChocolateFactoryStrayWarning {
@@ -165,5 +170,13 @@ object ChocolateFactoryStrayWarning {
         val color = (alpha shl 24) or (toUse.toSpecialColorInt() and 0xFFFFFF)
         Gui.drawRect(0, 0, minecraft.displayWidth, minecraft.displayHeight, color)
         GlStateManager.color(1F, 1F, 1F, 1F)
+    }
+
+    @JvmStatic
+    fun shouldContinueWithKeypress(keycode: Int): Boolean {
+        val shouldContinue = !keycode.isInventoryClosure() || !warningConfig.blockClosing || activeStraySlots.isEmpty()
+        if (!shouldContinue) SoundUtils.playErrorSound()
+        TitleManager.sendTitle("§cStray Rabbit Prevented Close\n§eHold §cShift §eto bypass", 5.seconds)
+        return shouldContinue
     }
 }

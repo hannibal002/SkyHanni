@@ -11,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import java.util.*
 
 class ChocolateFactoryConfig {
     @Expose
@@ -55,7 +54,7 @@ class ChocolateFactoryConfig {
     @Expose
     @ConfigOption(name = "Stray Rabbit Warning", desc = "")
     @Accordion
-    var rabbitWarning: ChocolateFactoryStrayRabbitWarningConfig = ChocolateFactoryStrayRabbitWarningConfig()
+    var rabbitWarning: ChocolateFactoryStrayWarningConfig = ChocolateFactoryStrayWarningConfig()
 
     @Expose
     @ConfigOption(name = "Upgrade Warnings", desc = "")
@@ -100,8 +99,9 @@ class ChocolateFactoryConfig {
 
     @Expose
     @ConfigOption(
-        name = "Highlight Upgrades", desc = """Highlight any upgrades that you can afford.
-The upgrade with a star is the most optimal and the lightest color of green is the most optimal you can afford."""
+        name = "Highlight Upgrades",
+        desc = "Highlight any upgrades that you can afford.\n" +
+            "The upgrade with a star is the most optimal and the lightest color of green is the most optimal you can afford."
     )
     @ConfigEditorBoolean
     var highlightUpgrades: Boolean = true
