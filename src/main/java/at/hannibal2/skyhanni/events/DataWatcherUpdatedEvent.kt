@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import net.minecraft.entity.Entity
 //#if MC < 1.12
 import net.minecraft.entity.DataWatcher
-
 //#else
 //$$ import net.minecraft.network.datasync.EntityDataManager
 //#endif

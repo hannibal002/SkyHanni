@@ -1,10 +1,5 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
-//#if MC > 1.21
-//$$ import net.minecraft.registry.Registries
-//$$ import net.minecraft.util.Identifier
-//$$ import net.minecraft.nbt.NbtString
-//#else
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
