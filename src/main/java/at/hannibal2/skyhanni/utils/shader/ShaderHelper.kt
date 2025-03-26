@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.shader
 
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import org.lwjgl.opengl.ARBFragmentShader
 import org.lwjgl.opengl.ARBShaderObjects
 import org.lwjgl.opengl.ARBVertexShader
@@ -66,7 +66,7 @@ object ShaderHelper {
             GL_FRAGMENT_SHADER = GL11.GL_FALSE
         }
 
-        LorenzUtils.consoleLog(log)
+        ChatUtils.consoleLog(log)
     }
 
     fun glLinkProgram(program: Int) {

@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -116,7 +116,7 @@ object MythologicalCreatureTracker {
         val total = data.count.sumAllValues()
         for ((creatureType, amount) in data.count.entries.sortedByDescending { it.value }) {
             val percentageSuffix = if (config.showPercentage.get()) {
-                val percentage = LorenzUtils.formatPercentage(amount.toDouble() / total)
+                val percentage = (amount.toDouble() / total).formatPercentage()
                 " §7$percentage"
             } else ""
 

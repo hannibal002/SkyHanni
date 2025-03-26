@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
@@ -72,7 +73,8 @@ object ChocolateFactoryBlockOpen {
         if (!openCfItemPattern.matches(slotDisplayName)) return
         if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 
-        if (checkIsBlocked()) event.cancel()
+        tryBlock().takeIf { it != TryBlockResult.SUCCESS } ?: return
+        event.cancel()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -81,19 +83,19 @@ object ChocolateFactoryBlockOpen {
         if (commandSentTimer.passedSince() < 5.seconds) return
         if (LorenzUtils.isBingoProfile) return
 
-        if (checkIsBlocked()) {
-            commandSentTimer = SimpleTimeMark.now()
-            event.cancel()
-        }
+        tryBlock().takeIf { it != TryBlockResult.SUCCESS } ?: return
+        commandSentTimer = SimpleTimeMark.now()
+        event.cancel()
     }
 
-    private fun checkIsBlocked() = tryBlock() != TryBlockResult.SUCCESS
+    private enum class TryBlockResult(private val displayName: String) {
+        SUCCESS(""),
+        FAIL_NO_RABBIT("§7without a §dMythic Rabbit Pet §7equipped"),
+        FAIL_NO_BOOSTER_COOKIE("§7without a §dBooster Cookie §7active"),
+        FAIL_NO_MIXIN("§7without a §6Hot Chocolate Mixin §7active")
+        ;
 
-    private enum class TryBlockResult {
-        SUCCESS,
-        FAIL_NO_RABBIT,
-        FAIL_NO_BOOSTER_COOKIE,
-        FAIL_NO_MIXIN,
+        override fun toString() = displayName
     }
 
     private fun tryBlock(): TryBlockResult {
@@ -104,6 +106,7 @@ object ChocolateFactoryBlockOpen {
                 actionName = "open pets menu",
                 action = { HypixelCommands.pet() },
             )
+            trySendFailureTitle(TryBlockResult.FAIL_NO_RABBIT)
             TryBlockResult.FAIL_NO_RABBIT
         } else if (config.boosterCookieRequirement) {
             profileStorage?.bits?.boosterCookieExpiryTime?.let {
@@ -119,6 +122,7 @@ object ChocolateFactoryBlockOpen {
                         }
                     },
                 )
+                trySendFailureTitle(TryBlockResult.FAIL_NO_BOOSTER_COOKIE)
                 TryBlockResult.FAIL_NO_BOOSTER_COOKIE
             } ?: TryBlockResult.SUCCESS
         } else if (config.hotChocolateMixinRequirement) {
@@ -132,6 +136,7 @@ object ChocolateFactoryBlockOpen {
                     actionName = "search AH for mixin",
                     action = { HypixelCommands.auctionSearch("hot chocolate mixin") },
                 )
+                trySendFailureTitle(TryBlockResult.FAIL_NO_MIXIN)
                 TryBlockResult.FAIL_NO_MIXIN
             } else if (godPotExpiryTime.isInPast()) {
                 ChatUtils.clickToActionOrDisable(
@@ -141,8 +146,19 @@ object ChocolateFactoryBlockOpen {
                     actionName = "search AH for god potion",
                     action = { HypixelCommands.auctionSearch("god potion") },
                 )
+                trySendFailureTitle(TryBlockResult.FAIL_NO_MIXIN)
                 TryBlockResult.FAIL_NO_MIXIN
             } else TryBlockResult.SUCCESS
         } else TryBlockResult.SUCCESS
+    }
+
+    private fun trySendFailureTitle(result: TryBlockResult) {
+        if (result == TryBlockResult.SUCCESS) return
+        val titleLocation = if (InventoryUtils.inInventory()) TitleManager.TitleLocation.INVENTORY else TitleManager.TitleLocation.GLOBAL
+        TitleManager.sendTitle(
+            "§cBlocked opening the Chocolate Factory",
+            subtitleText = "$result",
+            location = titleLocation,
+        )
     }
 }

@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 @SkyHanniModule
@@ -115,7 +114,7 @@ object BroodmotherFeatures {
             feature = config::alertOnSpawn
             val alertSound = SoundUtils.createSound(spawnAlertConfig.alertSound, spawnAlertConfig.pitch)
             SoundUtils.repeatSound(100, spawnAlertConfig.repeatSound, alertSound)
-            TitleManager.sendTitle(spawnAlertConfig.text.replace("&", "§"), 3.seconds)
+            TitleManager.sendTitle(spawnAlertConfig.text.replace("&", "§"))
         } else {
             feature = config::stages
         }
