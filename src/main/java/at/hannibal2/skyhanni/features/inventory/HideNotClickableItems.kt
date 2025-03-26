@@ -119,9 +119,9 @@ object HideNotClickableItems {
 
         for ((slot, stack) in chest.getLowerItems()) {
             if (hide(chestName, stack)) {
-                slot highlight LorenzColor.DARK_GRAY.addOpacity(config.opacity)
+                slot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.opacity))
             } else if (showGreenLine && config.itemsGreenLine) {
-                slot drawBorder LorenzColor.GREEN.addOpacity(200)
+                slot.drawBorder(LorenzColor.GREEN.addOpacity(200))
             }
         }
     }

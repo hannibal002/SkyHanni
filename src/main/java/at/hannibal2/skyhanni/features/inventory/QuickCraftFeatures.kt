@@ -65,7 +65,7 @@ object QuickCraftFeatures {
             if (inventoryType.ignoreSlot(slot.slotNumber)) continue
             if (stack.displayName == "§cQuick Crafting Slot") continue
             if (needsQuickCraftConfirmation(stack)) {
-                slot highlight LorenzColor.DARK_GRAY.addOpacity(180)
+                slot.highlight(LorenzColor.DARK_GRAY.addOpacity(180))
             }
         }
     }
