@@ -83,7 +83,7 @@ object CroesusChestTracker {
                 val state = run.openState ?: OpenedState.UNOPENED
 
                 if (state != OpenedState.KEY_USED) {
-                    slot highlight if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE
+                    slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
                 }
             }
         }
@@ -146,7 +146,7 @@ object CroesusChestTracker {
                     "Croesus Chest couldn't be read correctly.",
                     "Open state check failed for chest.",
                     "run" to run,
-                    "lore" to lore
+                    "lore" to lore,
                 ).run { null }
             }
         }
