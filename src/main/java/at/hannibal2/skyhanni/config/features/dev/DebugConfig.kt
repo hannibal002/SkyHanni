@@ -171,7 +171,6 @@ class DebugConfig {
     @ConfigEditorBoolean
     val powderMessages: Boolean = false
 
-
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
