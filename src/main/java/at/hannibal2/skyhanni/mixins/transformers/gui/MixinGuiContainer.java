@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTimer;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayWarning;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -29,7 +31,11 @@ public abstract class MixinGuiContainer extends GuiScreen {
 
     @Inject(method = "keyTyped", at = @At("HEAD"), cancellable = true)
     private void onKeyTyped(char typedChar, int keyCode, CallbackInfo ci) {
-        if (!HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode)) {
+        boolean shouldHoppityRabbitTheFishContinue = HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode);
+        boolean shouldCfStrayWarningContinue = ChocolateFactoryStrayWarning.shouldContinueWithKeypress(keyCode);
+        boolean shouldCfStrayTimerContinue = ChocolateFactoryStrayTimer.shouldContinueWithKeypress(keyCode);
+
+        if (!shouldHoppityRabbitTheFishContinue || !shouldCfStrayWarningContinue || !shouldCfStrayTimerContinue) {
             ci.cancel();
         }
     }

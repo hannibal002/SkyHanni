@@ -74,7 +74,6 @@ object ChocolateFactoryStrayWarning {
         StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.displayName) || isSpecial(item)
 
         StrayTypeEntry.NONE -> false
-        else -> false
     }
 
     private fun handleRabbitWarnings(item: ItemStack) {
@@ -144,7 +143,6 @@ object ChocolateFactoryStrayWarning {
                 }
 
                 StrayTypeEntry.NONE -> false
-                else -> false
             }
         }
     }
@@ -175,8 +173,14 @@ object ChocolateFactoryStrayWarning {
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
         val shouldContinue = !keycode.isInventoryClosure() || !warningConfig.blockClosing || activeStraySlots.isEmpty()
-        if (!shouldContinue) SoundUtils.playErrorSound()
-        TitleManager.sendTitle("§cStray Rabbit Prevented Close\n§eHold §cShift §eto bypass", 5.seconds)
+        if (!shouldContinue) {
+            TitleManager.sendTitle(
+                "§cStray Rabbit Prevented Close\n§eHold §cShift §eto bypass",
+                duration = 5.seconds,
+                location = TitleManager.TitleLocation.INVENTORY
+            )
+            SoundUtils.playErrorSound()
+        }
         return shouldContinue
     }
 }

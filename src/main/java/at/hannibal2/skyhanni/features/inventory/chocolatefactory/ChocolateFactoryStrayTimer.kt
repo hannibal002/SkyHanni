@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -11,6 +12,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.KeyboardManager.isInventoryClosure
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -89,6 +91,20 @@ object ChocolateFactoryStrayTimer {
             "§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s"
         ).map { Renderable.string(it) }
     )
+
+    @JvmStatic
+    fun shouldContinueWithKeypress(keycode: Int): Boolean {
+        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || !ChocolateFactoryApi.inChocolateFactory
+        if (!shouldContinue) {
+            TitleManager.sendTitle(
+                "§cStray Rabbit Prevented Close\n§eHold §cShift §eto bypass",
+                duration = 5.seconds,
+                location = TitleManager.TitleLocation.INVENTORY
+            )
+            SoundUtils.playErrorSound()
+        }
+        return shouldContinue
+    }
 
     private fun isEnabled() = eventConfig.enabled && timer > Duration.ZERO
 }

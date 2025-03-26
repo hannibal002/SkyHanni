@@ -94,8 +94,14 @@ object HoppityRabbitTheFishChecker {
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
         val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
-        if (!shouldContinue) SoundUtils.playErrorSound()
-        TitleManager.sendTitle("§cFish the Rabbit Prevented Close\n§eHold §cShift §eto bypass", 5.seconds)
+        if (!shouldContinue) {
+            TitleManager.sendTitle(
+                "§cFish the Rabbit Prevented Close\n§eHold §cShift §eto bypass",
+                duration = 5.seconds,
+                location = TitleManager.TitleLocation.INVENTORY
+            )
+            SoundUtils.playErrorSound()
+        }
         return shouldContinue
     }
 
