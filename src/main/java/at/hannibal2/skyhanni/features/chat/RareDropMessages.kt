@@ -106,7 +106,8 @@ object RareDropMessages {
         petPatterns.matchMatchers(event.message) {
             var start = group("start")
             val rarityColor = group("rarityColor")
-            val rarityName = LorenzRarity.colorCodeToRarity(rarityColor.first()).uppercase()
+            val rarity = LorenzRarity.getByColorCode(rarityColor.first()) ?: return@matchMatchers
+            val rarityName = rarity.formattedName.uppercase()
             val petName = group("petName")
             val end = group("end")
             if (start.endsWith("a ") && rarityName.first().isVowel())

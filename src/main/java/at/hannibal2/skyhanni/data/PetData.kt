@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.CurrentPetApi.petDespawnMenuPattern
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -29,9 +29,9 @@ data class PetData(
     val level: Int? = null, // The current level of the pet as an integer, e.g., `100`
     val xp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
 ) {
-    val displayName = petItem?.itemName
+    val displayName = petItem?.repoItemName
     val formattedName = "${rarity?.chatColorCode}$cleanName"
-    // private val skinName = skinItem?.itemName?.takeIf { it.isNotEmpty() }?.let { " §r$it" }.orEmpty()
+    // private val skinName = skinItem?.repoItemName?.takeIf { it.isNotEmpty() }?.let { " §r$it" }.orEmpty()
 
     // Please god only use this for UI, not for comparisons
     fun getUserFriendlyName(
