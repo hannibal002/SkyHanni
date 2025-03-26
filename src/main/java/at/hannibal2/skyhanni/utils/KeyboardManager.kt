@@ -42,6 +42,7 @@ object KeyboardManager {
     fun isDeleteLineDown() =
         Keyboard.KEY_BACK.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown() && isShiftKeyDown()
 
+    @JvmStatic
     fun isShiftKeyDown() = Keyboard.KEY_LSHIFT.isKeyHeld() || Keyboard.KEY_RSHIFT.isKeyHeld()
 
     fun isPastingKeysDown() = isModifierKeyDown() && Keyboard.KEY_V.isKeyHeld()
