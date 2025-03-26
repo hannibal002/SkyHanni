@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
@@ -34,15 +33,12 @@ object TitleManager {
 
     private data class TitleData(
         var text: String = "",
+        var subText: String? = null,
         var duration: Duration = 0.seconds,
         var height: Double = 1.8,
         var fontSize: Float = 4f,
         val weight: Double = 1.0,
-        val color: LorenzColor = LorenzColor.WHITE,
     ) : ResettableStorageSet() {
-        val display: String
-            get() = "${color.chatColorCode}$text"
-
         var endTime: SimpleTimeMark = SimpleTimeMark.now() + duration
 
         fun stop() {
@@ -68,6 +64,7 @@ object TitleManager {
 
     fun sendTitle(
         text: String,
+        subtext: String? = null,
         duration: Duration,
         height: Double = 1.8,
         fontSize: Float = 4f,
@@ -75,7 +72,7 @@ object TitleManager {
         addType: TitleAddType = TitleAddType.QUEUE,
         weight: Double = 1.0,
     ) {
-        val newTitle = TitleData(text, duration, height, fontSize, weight)
+        val newTitle = TitleData(text, subtext, duration, height, fontSize, weight)
         val targetQueue = titleLocationQueues.getOrPut(location) { CollectionUtils.OrderedQueue() }
 
         if (addType == TitleAddType.QUEUE) {
@@ -136,7 +133,7 @@ object TitleManager {
         val fontSize = args[2].toFloat()
         val title = "§6" + args.drop(3).joinToString(" ").replace("&", "§")
 
-        sendTitle(title, duration, height, fontSize, location)
+        sendTitle(title, null, duration, height, fontSize, location)
     }
 
     @HandleEvent
@@ -181,7 +178,7 @@ object TitleManager {
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
         val globalTitleWidth = 80
-        val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(display)
+        val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(text)
         var factor = globalTitleWidth / stringWidth.toDouble()
         factor = min(factor, 1.0)
 
@@ -192,7 +189,7 @@ object TitleManager {
         GlStateManager.pushMatrix()
 
         Renderable.wrappedString(
-            display,
+            text,
             width = (globalTitleWidth * fontSize).toInt(),
             scale = factor * fontSize,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
@@ -211,10 +208,24 @@ object TitleManager {
     private fun TitleData.tryRenderInventoryTitle() {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
+        val baseStringRenderable = Renderable.string(text, fontSize.toDouble())
+        val stringRenderable = when (subText) {
+            null -> baseStringRenderable
+            else -> {
+                val displaySubText = subText ?: return
+                Renderable.verticalContainer(
+                    listOf(
+                        baseStringRenderable,
+                        Renderable.string(displaySubText, (fontSize.toDouble() * 0.8))
+                    )
+                )
+            }
+        }
+
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, -150f, 500f)
         Renderable.drawInsideRoundedRect(
-            Renderable.string(display, 1.5),
+            stringRenderable,
             ColorUtils.TRANSPARENT_COLOR,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
