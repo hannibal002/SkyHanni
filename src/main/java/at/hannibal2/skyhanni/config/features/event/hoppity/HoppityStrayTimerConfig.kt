@@ -25,6 +25,7 @@ class HoppityStrayTimerConfig {
         desc = "Block closing the Chocolate Factory while the timer is active.\n" +
             "§eHold §cShift §eto bypass"
     )
+    @ConfigEditorBoolean
     var blockClosing: Boolean = false
 
     @Expose
