@@ -36,7 +36,7 @@ class ChocolateFactoryStrayWarningConfig {
     @ConfigOption(
         name = "Warning Sound",
         desc = "The sound that plays for a special rabbit.\n" +
-        "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" +
+            "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" +
             "§eThen write §bskyhanni:yourfilename\n" +
             "§cMust be a .ogg file"
     )

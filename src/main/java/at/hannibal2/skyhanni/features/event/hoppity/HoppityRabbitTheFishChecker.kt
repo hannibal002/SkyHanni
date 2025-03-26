@@ -16,8 +16,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SoundUtils
-import net.minecraft.client.Minecraft
-import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
