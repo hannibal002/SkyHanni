@@ -17,10 +17,7 @@ open class ResettableStorageSet {
         if (this::class != other::class) return
         mutableMemberProperties.forEach { prop ->
             try {
-                val wasAccessible = prop.isAccessible
-                prop.isAccessible = true
-                prop.set(this, prop.get(other))
-                prop.isAccessible = wasAccessible
+                prop.forceSet(prop.get(other))
             } catch (e: Exception) {
                 e.printStackTrace()
                 ErrorManager.skyHanniError(
@@ -30,10 +27,17 @@ open class ResettableStorageSet {
         }
     }
 
+    private fun KMutableProperty1<Any, Any?>.forceSet(value: Any?) {
+        val wasAccessible = this.isAccessible
+        this.isAccessible = true
+        this.set(this@ResettableStorageSet, value)
+        this.isAccessible = wasAccessible
+    }
+
     override fun toString(): String = mutableMemberProperties.joinToString("\n") { prop ->
-            val wasAccessible = prop.isAccessible
-            prop.isAccessible = true
-            "${prop.name} = ${(prop as KProperty1<Any, Any?>).get(this)}"
-                .also { prop.isAccessible = wasAccessible }
-        }
+        val wasAccessible = prop.isAccessible
+        prop.isAccessible = true
+        "${prop.name} = ${(prop as KProperty1<Any, Any?>).get(this)}"
+            .also { prop.isAccessible = wasAccessible }
+    }
 }
