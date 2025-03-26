@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class RiftInventoryValueConfig {
     @Expose
@@ -20,7 +21,7 @@ public class RiftInventoryValueConfig {
     @ConfigOption(name = "Number Format Type", desc = "Short: 1.2M\n" +
         "Long: 1,200,000")
     @ConfigEditorDropdown
-    public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
+    public Property<NumberFormatEntry> formatType = Property.of(NumberFormatEntry.SHORT);
 
     public enum NumberFormatEntry implements HasLegacyId {
         SHORT("Short", 0),

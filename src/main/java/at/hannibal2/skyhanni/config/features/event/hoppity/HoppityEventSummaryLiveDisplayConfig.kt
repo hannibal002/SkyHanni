@@ -18,7 +18,6 @@ class HoppityEventSummaryLiveDisplayConfig {
     @FeatureToggle
     var enabled: Boolean = false
 
-    @Expose
     @ConfigOption(
         name = "Note",
         desc = "§cNote§7: This card will mirror the stat list that is defined in the Hoppity Event Summary config."
