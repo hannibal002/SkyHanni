@@ -44,6 +44,9 @@
 
 + Added pathfinding to Hotspots. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3599)
     + Displays pathfinding to fishing hotspots when Hotspot Radar Guesser detects them.
++ Automatically disables the Fishing Hotspot pathfinding when finding the spot. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3643)
++ Fishing Hotspots now warn in chat when an unknown Hotspot Location was found. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3649)
+    + Clicking on the message allows sharing the data in Discord, so we can easily fix the bug.
 
 #### The Rift
 
@@ -66,6 +69,10 @@
 + Improved the full Thunder In A Bottle notification. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3567)
     + Changed detection of full Thunder in a Bottle, added warning when fishing with a full bottle, and added support for Storm in a Bottle and Hurricane in a Bottle variants.
 + Renamed "Time Pocket Items" to "Evolving Items". - Luna (https://github.com/hannibal002/SkyHanni/pull/3554)
++ Added command `/shreportlocation`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3649)
+    + Allows reporting an error with pathfinding at the current location.
+    + Useful when the pathfinding goes through walls, misses paths, or for any location in `/shnavigate`.
++ Command `/shrepoupdate` now shows on hover exact information on the old and new repo state. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3649)
 
 ### Bug Fixes
 
@@ -73,6 +80,8 @@
 
 + Fixed Garden Commands issue preventing warp (barn/home) and sethome hotkeys from triggering within 2 seconds. - Luna (https://github.com/hannibal002/SkyHanni/pull/3529)
 + Fixed Visitor Shopping List disappearing during supercrafting. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3562)
++ Fixed performance issues with Garden GUIs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3650)
++ Fixed stored compost not displaying. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3644)
 
 #### The Rift
 
@@ -85,6 +94,7 @@
 + Fixed Trophy Fish features not working after a Hypixel message change. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3620)
 + Fixed Hotspot Radar guesses not disappearing. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3638)
 + Fixed some Sea Creature features working through walls. - Empa (https://github.com/hannibal002/SkyHanni/pull/3634)
++ Fixed Sea Creature Highlight not showing up when Damage Indicator is disabled for Sea Creatures. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3653)
 
 #### Mining
 
@@ -94,6 +104,7 @@
 
 + Fixed incorrect Hitman times when eggs were claimable. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3573)
 + Prevented Egglocator from guessing incorrectly around Fishing Bobbers in Hotspots. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3623)
++ Fixed EggLocator particles being discarded when too close. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3652)
 
 #### Chat
 
@@ -102,6 +113,7 @@
 #### Inventory
 
 + Fixed Superpairs XP overlay not working. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3591)
++ Fixed XP in Inventory not displaying for Renew Experiments menu. - aphased (https://github.com/hannibal002/SkyHanni/pull/3648)
 
 #### Misc
 
@@ -115,6 +127,7 @@
 + Fixed random duplication of bits in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3628)
 + Fixed coin catches not counting in the tracker. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3642)
 + Fixed Custom Scoreboard Player amount containing two slashes. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3632)
++ Fixed `/shrepoupdate` displaying "Repo updated successfully" even when no update is necessary. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3649)
 
 ### Technical Details
 
@@ -197,6 +210,12 @@
     + Uses Hypixel mod API.
 + Converted multiple displays to Renderables. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3307)
 + Moved all `Renderable` list utils to `RenderableCollectionUtils`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3606)
++ Added `IslandGraphs.reportLocation()`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3649)
+    + Allows sending a custom location error in chat for easy copy-pasting.
++ Makes mixins work with our mixin plugin on modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3654)
++ More preprocessing for 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3627)
++ Moved formatPercentage, consoleLog, fillTable, addSelector, buildSelector, isDerpy, derpy, ignoreDerpy and inMiningIsland away from `LorenzUtils`. - nopo (https://github.com/hannibal002/SkyHanni/pull/3646)
++ Removed infix functions from RenderUtils. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3641)
 
 ## Version 2.0.0
 
