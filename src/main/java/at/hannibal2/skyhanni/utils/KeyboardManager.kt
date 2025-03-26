@@ -16,6 +16,7 @@ import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
+
 //#if MC > 1.21
 //$$ import net.minecraft.client.util.InputUtil
 //#endif
