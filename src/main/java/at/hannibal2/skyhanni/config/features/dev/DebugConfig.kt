@@ -164,13 +164,12 @@ class DebugConfig {
     @Expose
     @ConfigOption(name = "Pet Event Messages", desc = "Shows debug messages every time the Pet Event happens.")
     @ConfigEditorBoolean
-    public boolean petEventMessages = false;
+    var petEventMessages: Boolean = false
 
     @Expose
     @ConfigOption(name = "Powder Messages", desc = "Shows debug messages every time Hotm Powder changes.")
     @ConfigEditorBoolean
     val powderMessages: Boolean = false
-
 
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
