@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.misc.EmojiReplacer.replaceEmojis
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -106,7 +107,7 @@ object ChatUtils {
         onlySendOnce: Boolean = false,
         messageId: Int? = null,
     ): Boolean {
-        val text = message.asComponent()
+        val text = replaceEmojis(message).asComponent()
         if (onlySendOnce) {
             if (message in messagesThatAreOnlySentOnce) {
                 return false
