@@ -104,7 +104,7 @@ object TrophyFishMessages {
 
     private fun sendTitle(displayName: String, displayRarity: String?, amount: Int) {
         val text = "$displayName $displayRarity §8$amount§c!"
-        TitleManager.sendTitle(text, 3.seconds, 2.8, 7f)
+        TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
     }
 
     val regex = "[- ]".toRegex()
