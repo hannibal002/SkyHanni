@@ -25,6 +25,6 @@ object MythicRabbitPetWarning {
 
     private fun warn() {
         ChatUtils.chat("Use a §dMythic Rabbit Pet §efor more chocolate!")
-        TitleManager.sendTitle("§cNo Rabbit Pet!", 3.seconds)
+        TitleManager.sendTitle("§cNo Rabbit Pet!")
     }
 }
