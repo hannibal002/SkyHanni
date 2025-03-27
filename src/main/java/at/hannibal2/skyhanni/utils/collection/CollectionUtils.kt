@@ -356,11 +356,13 @@ object CollectionUtils {
         return null
     }
 
-    fun <T> List<T>.insertAfterEach(extra: T): List<T> = buildList(size * 2) {
-        for (item in this@insertAfterEach) {
-            add(item)
-            add(extra)
-        }
+    class OrderedQueue<T> : PriorityQueue<WeightedItem<T>>() {
+        fun add(item: T, weight: Double): Boolean = super.add(WeightedItem(item, weight))
+        fun pollOrNull(): T? = poll()?.item
+    }
+
+    data class WeightedItem<T>(val item: T, val weight: Double) : Comparable<WeightedItem<T>> {
+        override fun compareTo(other: WeightedItem<T>): Int = this.weight.compareTo(other.weight)
     }
 
     class ObservableMutableMap<K, V>(
