@@ -220,7 +220,7 @@ object NonGodPotEffectDisplay {
         effectDuration.sorted().forEach { (effect, time) ->
             if (time.remaining.inWholeSeconds != config.expireWarnTime.toLong()) return
 
-            if (effectWarning) TitleManager.sendTitle(effect.tabListName, 3.seconds)
+            if (effectWarning) TitleManager.sendTitle(effect.tabListName)
             if (effectSound) repeat(5) { playPlingSound() }
         }
     }
