@@ -94,8 +94,8 @@ object SeaCreatureFeatures {
                 lastRareCatch = SimpleTimeMark.now()
             }
             if (config.announceRare && PartyApi.partyMembers.size > 0) {
-                if (config.creatureName) HypixelCommands.partyChat("A ${event.seaCreature.name} has spawned!")
-                else HypixelCommands.partyChat("A rare sea creature has spawned!")
+                if (config.creatureName) HypixelCommands.partyChat("I caught a ${event.seaCreature.name}!")
+                else HypixelCommands.partyChat("I caught a rare sea creature!")
             }
         }
     }
