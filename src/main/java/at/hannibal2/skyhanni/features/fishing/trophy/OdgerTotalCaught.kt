@@ -62,11 +62,7 @@ object OdgerTotalCaught {
 
         if (event.toolTip.none { discoveredPattern.matcher(it).find() }) return
 
-        val trophyFishKey = event.itemStack.displayName
-            .removeColor()
-            .lowercase()
-            .replace(" ", "")
-            .replace(Regex("^obfuscated(\\d+)$"), "obfuscatedfish$1")
+        val trophyFishKey = TrophyFishApi.getInternalName(event.itemStack.displayName)
 
         val counts = TrophyFishManager.fish?.get(trophyFishKey) ?: return
         val bestFishObtained = counts.filter { it.value > 0 }.keys.maxOrNull() ?: TrophyRarity.BRONZE

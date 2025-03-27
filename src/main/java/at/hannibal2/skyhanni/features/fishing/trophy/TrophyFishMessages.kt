@@ -46,7 +46,7 @@ object TrophyFishMessages {
                 group("displayRarity")
         } ?: return
 
-        val internalName = getInternalName(displayName)
+        val internalName = TrophyFishApi.getInternalName(displayName)
         val rarity = TrophyRarity.getByName(displayRarity.lowercase().removeColor()) ?: return
 
         val trophyFishes = TrophyFishManager.fish ?: return
@@ -108,11 +108,6 @@ object TrophyFishMessages {
     }
 
     val regex = "[- ]".toRegex()
-
-    fun getInternalName(displayName: String): String {
-        return displayName.replace("Obfuscated", "Obfuscated Fish")
-            .replace(regex, "").lowercase().removeColor()
-    }
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
         config.bronzeHider &&
