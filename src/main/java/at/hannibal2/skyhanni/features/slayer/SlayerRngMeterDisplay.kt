@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.math.ceil
@@ -115,7 +116,7 @@ object SlayerRngMeterDisplay {
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
                 ChatUtils.userError("No Slayer RNG Meter Item selected!")
-                TitleManager.sendTitle("§cNo RNG Meter Item!", 3.seconds)
+                TitleManager.sendTitle("§cNo RNG Meter Item!")
             }
             var blockChat = config.hideChat && hasItemSelected
             val diff = currentMeter - old
@@ -129,7 +130,7 @@ object SlayerRngMeterDisplay {
 
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
-                val percentage = LorenzUtils.formatPercentage(rawPercentage)
+                val percentage = rawPercentage.formatPercentage()
                 if (storage.goalNeeded == -1L) {
                     ErrorManager.logErrorStateWithData(
                         "Error Calculating Slayer RNG Meter",

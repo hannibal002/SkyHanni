@@ -74,7 +74,11 @@ object MobUtils {
 
     fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
+        //#if MC < 1.21
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
+        //#else
+        //$$ val look = entity.rotationVector.toLorenzVec().normalize()
+        //#endif
         val possibleEntities = MobData.entityToMob.filterKeys {
             it !is EntityArmorStand &&
                 it.entityBoundingBox.rayIntersects(
