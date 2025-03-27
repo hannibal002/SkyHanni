@@ -1179,7 +1179,7 @@ interface Renderable {
             val window = scroll.asInt()..(end + negativeSpace1 + negativeSpace2)
 
             for (renderable in list) {
-                if ((virtualY..(virtualY + renderable.height)) in window) {
+                if ((virtualY..virtualY + renderable.height) in window) {
                     renderable.renderXAligned(posX, posY + renderY, width)
                     GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
                     renderY += renderable.height
