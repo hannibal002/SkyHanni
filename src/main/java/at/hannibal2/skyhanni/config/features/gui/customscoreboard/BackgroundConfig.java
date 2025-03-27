@@ -6,7 +6,6 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 

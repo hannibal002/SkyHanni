@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MinionCraftHelper {
@@ -253,7 +252,7 @@ object MinionCraftHelper {
     private fun notify(minionName: String) {
         if (alreadyNotified.contains(minionName)) return
 
-        TitleManager.sendTitle("Can craft $minionName", 3.seconds)
+        TitleManager.sendTitle("Can craft $minionName")
         alreadyNotified.add(minionName)
     }
 

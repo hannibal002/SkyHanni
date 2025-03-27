@@ -228,7 +228,7 @@ object DragonFeatures {
         dragonSpawn.matchMatcher(message) {
             dragonSpawned = true
             if (config.superiorNotify && this.group("Dragon") == "Superior") {
-                TitleManager.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
+                TitleManager.sendTitle("§6Superior Dragon Spawned!", duration = 1.5.seconds)
             }
             return
         }

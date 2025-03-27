@@ -139,7 +139,7 @@ object ComposterDisplay {
 
         if (ComposterApi.getOrganicMatter() <= config.notifyLow.organicMatter && storage.informedAboutLowMatter.isInPast()) {
             if (config.notifyLow.title) {
-                TitleManager.sendTitle("§cYour Organic Matter is low", 4.seconds)
+                TitleManager.sendTitle("§cYour Organic Matter is low", duration = 4.seconds)
             }
             ChatUtils.chat("§cYour Organic Matter is low!")
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
@@ -147,7 +147,7 @@ object ComposterDisplay {
 
         if (ComposterApi.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()) {
             if (config.notifyLow.title) {
-                TitleManager.sendTitle("§cYour Fuel is low", 4.seconds)
+                TitleManager.sendTitle("§cYour Fuel is low", duration = 4.seconds)
             }
             ChatUtils.chat("§cYour Fuel is low!")
             storage.informedAboutLowFuel = 5.0.minutes.fromNow()
@@ -211,7 +211,7 @@ object ComposterDisplay {
                 action = { HypixelCommands.warp("garden") },
             )
         }
-        TitleManager.sendTitle("§eComposter Warning!", 3.seconds)
+        TitleManager.sendTitle("§eComposter Warning!")
     }
 
     @HandleEvent

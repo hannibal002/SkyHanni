@@ -25,7 +25,7 @@ object ShyCruxWarnings {
 
     private fun checkForShy() {
         if (EntityUtils.getAllEntities().any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
-            TitleManager.sendTitle("§eLook away!", 150.milliseconds)
+            TitleManager.sendTitle("§eLook away!", duration = 150.milliseconds)
         }
     }
 
