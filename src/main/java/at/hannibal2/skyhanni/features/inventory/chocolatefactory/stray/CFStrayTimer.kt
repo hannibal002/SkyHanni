@@ -62,6 +62,7 @@ object CFStrayTimer {
         if (!isEnabled()) return
         // Reset the timer when the inventory is closed prematurely
         timer = 30.seconds
+        lastTimerSubtraction = null
     }
 
     @HandleEvent

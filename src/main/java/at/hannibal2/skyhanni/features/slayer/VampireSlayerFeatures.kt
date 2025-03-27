@@ -143,8 +143,8 @@ object VampireSlayerFeatures {
                     if (nextClawSend < System.currentTimeMillis()) {
                         TitleManager.sendTitle(
                             "§6§lTWINCLAWS",
-                            (1750 - config.twinclawsDelay).milliseconds,
-                            2.6,
+                            duration = (1750 - config.twinclawsDelay).milliseconds,
+                            height = 2.6,
                         )
                         nextClawSend = System.currentTimeMillis() + 5_000
                     }
@@ -180,7 +180,7 @@ object VampireSlayerFeatures {
                 else canUseSteak && configCoopBoss.steakAlert && containCoop
 
             if (shouldSendSteakTitle) {
-                TitleManager.sendTitle("§c§lSTEAK!", 300.milliseconds, 2.6)
+                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds, height = 2.6)
             }
 
             if (shouldRender) {
