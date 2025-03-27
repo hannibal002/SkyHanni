@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
@@ -92,7 +93,7 @@ object SeaCreatureFeatures {
                 if (config.playSound) SoundUtils.playBeepSound()
                 lastRareCatch = SimpleTimeMark.now()
             }
-            if (config.announceRare) {
+            if (config.announceRare && PartyApi.partyMembers.size > 0) {
                 if (config.creatureName) HypixelCommands.partyChat("A ${event.seaCreature.name} has spawned!")
                 else HypixelCommands.partyChat("A rare sea creature has spawned!")
             }
