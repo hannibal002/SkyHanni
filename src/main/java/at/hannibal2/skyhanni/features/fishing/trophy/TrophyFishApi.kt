@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages.regex
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
@@ -25,6 +24,8 @@ object TrophyFishApi {
                 |§7Total: ${bestFishObtained.formatCode}${counts.values.sum().addSeparators()}
         """.trimMargin()
     }
+
+    private val regex = "[- ]".toRegex()
 
     fun getInternalName(displayName: String): String {
         return displayName.replace("Obfuscated", "Obfuscated Fish")

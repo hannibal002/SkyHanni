@@ -107,8 +107,6 @@ object TrophyFishMessages {
         TitleManager.sendTitle(text, 3.seconds, 2.8, 7f)
     }
 
-    val regex = "[- ]".toRegex()
-
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
         config.bronzeHider &&
             rarity == TrophyRarity.BRONZE &&
