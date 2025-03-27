@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -18,20 +19,25 @@ object OdgerTotalCaught {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
     private val patternGroup = RepoPattern.group("fishing.trophy.odger")
 
-
     /**
-     * REGEX-TEST: §5§o§8Bronze §7Trophy Fish Caught: 1
+     * REGEX-TEST: Trophy Fishing
      */
     private val inventoryPattern by patternGroup.pattern(
         "inventory",
         "Trophy Fishing",
     )
 
+    /**
+     * REGEX-TEST: §aDiscovered
+     */
     private val discoveredPattern by patternGroup.pattern(
         "discovered",
         "§aDiscovered",
     )
 
+    /**
+     * REGEX-TEST: §5§o§8Bronze §a✔§7 (4)
+     */
     private val bronzePattern by patternGroup.pattern(
         "bronze",
         "^§5§o§8Bronze.*",
