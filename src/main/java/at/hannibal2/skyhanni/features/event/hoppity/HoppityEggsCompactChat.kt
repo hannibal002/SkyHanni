@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.HoppityStateDataSet
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFTimeTowerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -22,7 +22,7 @@ typealias RarityType = HoppityEggsConfig.CompactRarityTypes
 object HoppityEggsCompactChat {
 
     private var hoppityDataSet = HoppityStateDataSet()
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = CFApi.config
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
     private val rarityConfig get() = HoppityEggsManager.config.rarityInCompact
 
@@ -62,7 +62,7 @@ object HoppityEggsCompactChat {
         return if (hoppityDataSet.duplicate) {
             val dupeChocAmount = hoppityDataSet.lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormat = hoppityDataSet.lastDuplicateAmount?.let {
-                ChocolateFactoryApi.timeUntilNeed(it).format(maxUnits = 2)
+                CFApi.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
             val dupeNumberFormat = if (eventConfig.showDuplicateNumber) {
                 (HoppityCollectionStats.getRabbitCount(hoppityDataSet.lastName)).takeIf { it > 0 }?.let {
@@ -71,7 +71,7 @@ object HoppityEggsCompactChat {
             } else ""
 
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormat§7" else ""
-            val dupeChocColor = if (eventConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) "§d" else "§6"
+            val dupeChocColor = if (eventConfig.recolorTTChocolate && CFTimeTowerManager.timeTowerActive()) "§d" else "§6"
 
             val dupeChocFormat = " §7(§6+$dupeChocColor$dupeChocAmount §6Chocolate§7$timeStr)"
 

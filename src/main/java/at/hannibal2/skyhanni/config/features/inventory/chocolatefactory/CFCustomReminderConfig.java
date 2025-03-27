@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class ChocolateFactoryCustomReminderConfig {
+public class CFCustomReminderConfig {
 
     @Expose
     @ConfigOption(
@@ -32,6 +32,6 @@ public class ChocolateFactoryCustomReminderConfig {
     public boolean hideChat = true;
 
     @Expose
-    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "customReminder")
+    @ConfigLink(owner = CFConfig.class, field = "customReminder")
     public Position position = new Position(390, 90, 1f, true);
 }

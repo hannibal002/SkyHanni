@@ -1,8 +1,9 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.data
 
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 
-data class ChocolateFactoryUpgrade(
+data class CFUpgrade(
     val slotIndex: Int,
     val level: Int,
     val price: Long?,
@@ -67,10 +68,10 @@ data class ChocolateFactoryUpgrade(
 
         fun updateIgnoredSlots() {
             ignoredSlotIndexes = listOf(
-                ChocolateFactoryApi.prestigeIndex,
-                ChocolateFactoryApi.handCookieIndex,
-                ChocolateFactoryApi.shrineIndex,
-                ChocolateFactoryApi.barnIndex,
+                CFApi.prestigeIndex,
+                CFApi.handCookieIndex,
+                CFApi.shrineIndex,
+                CFApi.barnIndex,
             )
         }
     }

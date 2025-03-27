@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class ChocolateShopPriceConfig {
+public class CFShopPriceConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show chocolate to coin prices inside the Chocolate Shop inventory.")
@@ -17,7 +17,7 @@ public class ChocolateShopPriceConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "chocolateShopPrice")
+    @ConfigLink(owner = CFConfig.class, field = "chocolateShopPrice")
     public Position position = new Position(200, 150, false, true);
 
     @Expose

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -12,7 +12,8 @@ import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -43,9 +44,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ChocolateFactoryStrayTracker {
+object CFStrayTracker {
 
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = CFApi.config
     private val claimedStraysSlots = mutableListOf<Int>()
 
     // <editor-fold desc="Patterns">
@@ -54,7 +55,7 @@ object ChocolateFactoryStrayTracker {
      * REGEX-TEST: §6§lGolden Rabbit §d§lCAUGHT!
      * REGEX-TEST: §fAudi §d§lCAUGHT!
      */
-    val strayCaughtPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val strayCaughtPattern by CFApi.patternGroup.pattern(
         "stray.caught",
         "^(?:§.)*(?<name>.*) §d§lCAUGHT!",
     )
@@ -63,7 +64,7 @@ object ChocolateFactoryStrayTracker {
      * REGEX-TEST: §7You caught a stray §fMandy §7and §7gained §6+283,574 Chocolate§7!
      * REGEX-TEST: §7You caught a stray §aSven §7and gained §7§6+397,004 Chocolate§7!
      */
-    private val strayLorePattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val strayLorePattern by CFApi.patternGroup.pattern(
         "stray.loreinfo",
         "§7You caught a stray (?<rabbit>(?<name>§[^§]*)) .* (?:§7)?§6\\+(?<amount>[\\d,]*) Chocolate§7!",
     )
@@ -71,7 +72,7 @@ object ChocolateFactoryStrayTracker {
     /**
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You gained §6+13,566,571 Chocolate§7!
      */
-    private val goldenStrayJackpotMountainPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val goldenStrayJackpotMountainPattern by CFApi.patternGroup.pattern(
         "stray.goldenrawchoc",
         "§7You caught a stray §6§lGolden Rabbit§7! §7You gained §6\\+(?<amount>[\\d,]*) Chocolate§7!",
     )
@@ -81,7 +82,7 @@ object ChocolateFactoryStrayTracker {
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado §7- quite the elusive rabbit!
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado§7! Since you §7already have captured him before, §7you gained §6+324,364,585 Chocolate§7.
      */
-    val strayDoradoPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val strayDoradoPattern by CFApi.patternGroup.pattern(
         "stray.dorado",
         ".*§7You caught a stray.*§6El Dorado(?:.*?§6\\+?(?<amount>[\\d,]+) Chocolate)?.*",
     )
@@ -89,7 +90,7 @@ object ChocolateFactoryStrayTracker {
     /**
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7A hoard of §aStray Rabbits §7has §7appeared!
      */
-    private val strayHoardPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val strayHoardPattern by CFApi.patternGroup.pattern(
         "stray.hoard",
         ".*(?:§r)?§7A hoard of (?:§r)?§aStray Rabbits (?:§r)?§7has.*",
     )
@@ -97,7 +98,7 @@ object ChocolateFactoryStrayTracker {
     /**
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You gained §6+5 Chocolate §7until the §7end of the SkyBlock year!
      */
-    private val goldenStrayClick by ChocolateFactoryApi.patternGroup.pattern(
+    private val goldenStrayClick by CFApi.patternGroup.pattern(
         "stray.goldenclick",
         "§7You caught a stray §6§lGolden Rabbit§7! §7You gained §6\\+5 Chocolate §7until the §7end of the SkyBlock year!",
     )
@@ -107,7 +108,7 @@ object ChocolateFactoryStrayTracker {
      * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7!
      */
     @Suppress("MaxLineLength")
-    private val fishTheRabbitPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val fishTheRabbitPattern by CFApi.patternGroup.pattern(
         "stray.fish",
         "§7You caught a stray (?<color>§.)Fish the Rabbit§7!(?: §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!|.*)?",
     )
@@ -115,7 +116,7 @@ object ChocolateFactoryStrayTracker {
     /**
      * REGEX-TEST: §7You have already found §9Fish the
      */
-    val duplicatePseudoStrayPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val duplicatePseudoStrayPattern by CFApi.patternGroup.pattern(
         "stray.pseudoduplicate",
         "(?:§.)*You have already found.*",
     )
@@ -123,7 +124,7 @@ object ChocolateFactoryStrayTracker {
     /**
      * REGEX-TEST: §7already have captured him before
      */
-    val duplicateDoradoStrayPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val duplicateDoradoStrayPattern by CFApi.patternGroup.pattern(
         "stray.doradoduplicate",
         "(?:§.)*already have captured him before.*",
     )
@@ -132,7 +133,7 @@ object ChocolateFactoryStrayTracker {
      * REGEX-TEST: §7but he escaped and left behind
      * REGEX-TEST: §7§6Legend of §6El Dorado §7grows!
      */
-    val doradoEscapeStrayPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val doradoEscapeStrayPattern by CFApi.patternGroup.pattern(
         "stray.doradoescape",
         ".*(?:§.)*(?:but he escaped and left behind|Legend of (?:§.)*El Dorado (?:§.)*grows!).*",
     )
@@ -161,7 +162,7 @@ object ChocolateFactoryStrayTracker {
 
     private fun incrementRarity(rarity: LorenzRarity, chocAmount: Long = 0) {
         tracker.modify { it.straysCaught.addOrPut(rarity, 1) }
-        val extraTime = ChocolateFactoryApi.timeUntilNeed(chocAmount + 1)
+        val extraTime = CFApi.timeUntilNeed(chocAmount + 1)
         tracker.modify { it.straysExtraChocMs.addOrPut(rarity, extraTime.inWholeMilliseconds) }
         if (!HoppityApi.isHoppityEvent()) return
         HoppityEventSummary.addStrayCaught(rarity, chocAmount)
@@ -247,7 +248,7 @@ object ChocolateFactoryStrayTracker {
         // Golden Strays, Jackpot and Mountain, raw choc only reward.
         goldenStrayJackpotMountainPattern.matchMatcher(loreLine) {
             val amount = group("amount").formatLong().also { am -> incrementRarity(LEGENDARY, am) }
-            val multiplier = amount / ChocolateFactoryApi.chocolatePerSecond
+            val multiplier = amount / CFApi.chocolatePerSecond
             when (multiplier) {
                 in 479.0..481.0 -> incrementGoldenType("jackpot")
                 in 1499.0..1501.0 -> incrementGoldenType("mountain")
@@ -305,7 +306,7 @@ object ChocolateFactoryStrayTracker {
     init {
         tracker.initRenderer(
             { config.strayRabbitTrackerPosition },
-            ChocolateFactoryApi.mainInventory,
+            CFApi.mainInventory,
         ) { isEnabled() }
     }
 
@@ -313,7 +314,7 @@ object ChocolateFactoryStrayTracker {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         // Force a refresh for party mode
-        if (ChocolateFactoryApi.inChocolateFactory && config.partyMode.get()) tracker.update()
+        if (CFApi.inChocolateFactory && config.partyMode.get()) tracker.update()
         tracker.firstUpdate()
     }
 
@@ -363,5 +364,5 @@ object ChocolateFactoryStrayTracker {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.strayRabbitTracker && ChocolateFactoryApi.inChocolateFactory
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.strayRabbitTracker && CFApi.inChocolateFactory
 }

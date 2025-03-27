@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
-public class ChocolateFactoryKeybindsConfig {
+public class CFKeybindsConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "In the Chocolate Factory, press buttons with your number row on the keyboard to upgrade the rabbits.")
     @ConfigEditorBoolean

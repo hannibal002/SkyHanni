@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ChocolateFactoryConfig {
+public class CFConfig {
 
     @Expose
     @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all chocolate factory features.")
@@ -36,50 +36,50 @@ public class ChocolateFactoryConfig {
         desc = "Drag text to change what displays in the chocolate factory stats list and what order the text appears in."
     )
     @ConfigEditorDraggableList
-    public List<ChocolateFactoryStat> statsDisplayList = new ArrayList<>(Arrays.asList(
-        ChocolateFactoryStat.HEADER,
-        ChocolateFactoryStat.CURRENT,
-        ChocolateFactoryStat.THIS_PRESTIGE,
-        ChocolateFactoryStat.ALL_TIME,
-        ChocolateFactoryStat.TIME_TO_PRESTIGE,
-        ChocolateFactoryStat.EMPTY,
-        ChocolateFactoryStat.PER_SECOND,
-        ChocolateFactoryStat.PER_MINUTE,
-        ChocolateFactoryStat.PER_HOUR,
-        ChocolateFactoryStat.PER_DAY,
-        ChocolateFactoryStat.EMPTY_2,
-        ChocolateFactoryStat.MULTIPLIER,
-        ChocolateFactoryStat.BARN,
-        ChocolateFactoryStat.TIME_TOWER,
-        ChocolateFactoryStat.TIME_TOWER_FULL,
-        ChocolateFactoryStat.LEADERBOARD_POS,
-        ChocolateFactoryStat.TIME_TO_BEST_UPGRADE
+    public List<CFStat> statsDisplayList = new ArrayList<>(Arrays.asList(
+        CFStat.HEADER,
+        CFStat.CURRENT,
+        CFStat.THIS_PRESTIGE,
+        CFStat.ALL_TIME,
+        CFStat.TIME_TO_PRESTIGE,
+        CFStat.EMPTY,
+        CFStat.PER_SECOND,
+        CFStat.PER_MINUTE,
+        CFStat.PER_HOUR,
+        CFStat.PER_DAY,
+        CFStat.EMPTY_2,
+        CFStat.MULTIPLIER,
+        CFStat.BARN,
+        CFStat.TIME_TOWER,
+        CFStat.TIME_TOWER_FULL,
+        CFStat.LEADERBOARD_POS,
+        CFStat.TIME_TO_BEST_UPGRADE
     ));
 
     @Expose
     @ConfigOption(name = "Stray Rabbit Warning", desc = "")
     @Accordion
-    public ChocolateFactoryStrayRabbitWarningConfig rabbitWarning = new ChocolateFactoryStrayRabbitWarningConfig();
+    public CFStrayRabbitWarningConfig rabbitWarning = new CFStrayRabbitWarningConfig();
 
     @Expose
     @ConfigOption(name = "Upgrade Warnings", desc = "")
     @Accordion
-    public ChocolateFactoryUpgradeWarningsConfig chocolateUpgradeWarnings = new ChocolateFactoryUpgradeWarningsConfig();
+    public CFUpgradeWarningsConfig chocolateUpgradeWarnings = new CFUpgradeWarningsConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
     @Accordion
-    public ChocolateShopPriceConfig chocolateShopPrice = new ChocolateShopPriceConfig();
+    public CFShopPriceConfig chocolateShopPrice = new CFShopPriceConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Factory Keybinds", desc = "")
     @Accordion
-    public ChocolateFactoryKeybindsConfig keybinds = new ChocolateFactoryKeybindsConfig();
+    public CFKeybindsConfig keybinds = new CFKeybindsConfig();
 
     @Expose
     @ConfigOption(name = "Chocolate Factory Custom Reminder", desc = "")
     @Accordion
-    public ChocolateFactoryCustomReminderConfig customReminder = new ChocolateFactoryCustomReminderConfig();
+    public CFCustomReminderConfig customReminder = new CFCustomReminderConfig();
 
     @Expose
     @ConfigOption(name = "Hoppity Collection Stats", desc = "")
@@ -155,7 +155,7 @@ public class ChocolateFactoryConfig {
     public boolean timeTowerReminder = true;
 
     @Expose
-    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "statsDisplay")
+    @ConfigLink(owner = CFConfig.class, field = "statsDisplay")
     public Position position = new Position(163, 160, false, true);
 
     @Expose
@@ -176,7 +176,7 @@ public class ChocolateFactoryConfig {
     public boolean tooltipMove = false;
 
     @Expose
-    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "tooltipMove")
+    @ConfigLink(owner = CFConfig.class, field = "tooltipMove")
     public Position tooltipMovePosition = new Position(-380, 150, false, true);
 
     @Expose
@@ -213,7 +213,7 @@ public class ChocolateFactoryConfig {
     public boolean strayRabbitTracker = true;
 
     @Expose
-    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "strayRabbitTracker")
+    @ConfigLink(owner = CFConfig.class, field = "strayRabbitTracker")
     public Position strayRabbitTrackerPosition = new Position(300, 300, false, true);
 
     @Expose
@@ -223,7 +223,7 @@ public class ChocolateFactoryConfig {
     public boolean hitmanCosts = true;
 
     @Expose
-    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "hitmanCosts")
+    @ConfigLink(owner = CFConfig.class, field = "hitmanCosts")
     public Position hitmanCostsPosition = new Position(300, 300, false, true);
 
     @Expose

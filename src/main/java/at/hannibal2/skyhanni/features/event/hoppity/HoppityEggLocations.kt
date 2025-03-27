@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -27,9 +27,9 @@ object HoppityEggLocations {
 
     // TODO add gui/command to show total data/missing islands
     private var collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
-        get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
+        get() = CFApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
         set(value) {
-            ChocolateFactoryApi.profileStorage?.collectedEggLocations = value
+            CFApi.profileStorage?.collectedEggLocations = value
         }
 
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
