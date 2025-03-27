@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.collection
 
 import java.util.Collections
 import java.util.EnumMap
+import java.util.PriorityQueue
 import java.util.Queue
 import java.util.WeakHashMap
 import kotlin.math.ceil
@@ -213,7 +214,7 @@ object CollectionUtils {
 
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? = if (all { it != null }) filterNotNull() else null
 
-    fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
+    fun <T, C : Collection<T>> C.takeIfNotEmpty(): C? = takeIf { it.isNotEmpty() }
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 

@@ -66,6 +66,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import com.mojang.authlib.GameProfile
 //$$ import java.util.UUID
 //$$ import com.mojang.authlib.properties.Property
+//$$ import net.minecraft.component.type.ItemEnchantmentsComponent
 //$$ import net.minecraft.component.type.ProfileComponent
 //#endif
 
