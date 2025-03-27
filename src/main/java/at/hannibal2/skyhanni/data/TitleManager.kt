@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -128,12 +129,15 @@ object TitleManager {
             return
         }
 
-        val duration = args[0].toInt().seconds
+        val duration = TimeUtils.getDurationOrNull(args[0]) ?: run {
+            ChatUtils.userError("Invalid duration format `${args[0]}`! Use e.g. 10s, or 20m or 30h")
+            return
+        }
         val height = args[1].toDouble()
         val fontSize = args[2].toFloat()
         val title = "§6" + args.drop(3).joinToString(" ").replace("&", "§")
 
-        sendTitle(title, null, duration, height, fontSize, location)
+        sendTitle(title, subtitleText = null, duration, height, fontSize, location)
     }
 
     @HandleEvent
@@ -230,9 +234,9 @@ object TitleManager {
                 Renderable.verticalContainer(
                     listOf(
                         baseStringRenderable,
-                        Renderable.string(displaySubText, 1.0)
+                        Renderable.string(displaySubText, 1.0),
                     ),
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 )
             }
         }
