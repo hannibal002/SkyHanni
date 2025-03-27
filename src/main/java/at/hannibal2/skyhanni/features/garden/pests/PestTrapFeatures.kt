@@ -76,7 +76,7 @@ object PestTrapFeatures {
         val activeWarnings = applicableWarnings.map { it.warningString }
 
         warningSound?.playSound()
-        if (titleWarnEnabled) TitleManager.sendTitle(activeWarnings.first(), 3.seconds, 2.8, 7f)
+        if (titleWarnEnabled) TitleManager.sendTitle(activeWarnings.first(), height = 2.8, fontSize = 7f)
         if (chatWarnEnabled) activeWarnings.forEach { ChatUtils.chat(it) }
 
         nextWarningMark = getNextWarningMark()
