@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 object HoppityEggLocations {
 
     // TODO add gui/command to show total data/missing islands
+    @Suppress("VarCouldBeVal")
     private var collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
         get() = CFApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
         set(value) {

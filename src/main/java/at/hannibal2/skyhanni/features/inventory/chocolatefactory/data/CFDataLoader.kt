@@ -552,7 +552,7 @@ object CFDataLoader {
         isRabbit: Boolean,
     ) {
         val extra = (newAverageChocolate - averageChocolate).roundTo(2)
-        val effectiveCost = (upgradeCost!! / extra).roundTo(2)
+        val effectiveCost = ((upgradeCost ?: 0) / extra).roundTo(2)
         val upgrade = CFUpgrade(slotIndex, level, upgradeCost, extra, effectiveCost, isRabbit = isRabbit)
         list.add(upgrade)
     }
