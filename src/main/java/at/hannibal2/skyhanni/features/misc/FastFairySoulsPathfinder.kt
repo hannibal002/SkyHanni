@@ -191,11 +191,10 @@ object FastFairySoulsPathfinder {
             } ?: continue
 
 
-            if (island.isInIsland()) {
-                data?.checkHaveAll(have)
-            } else {
+            if (island.isInIsland()) data?.checkHaveAll(have)
+            else {
                 totalFound[island] = have
-                ChatUtils.chat("set ${island.name} to $have")
+                ChatUtils.debug("set ${island.name} to $have")
             }
         }
     }
@@ -321,7 +320,7 @@ object FastFairySoulsPathfinder {
 
     private fun onFoundAllCommand() {
         if (isDisabledCommand()) return
-        ChatUtils.chat("Mark all Fairy Souls as found on ${LorenzUtils.skyBlockIsland.displayName}.")
+        ChatUtils.chat("Marked all Fairy Souls as found on ${LorenzUtils.skyBlockIsland.displayName}.")
         data?.allFound()
         reload()
     }
@@ -338,8 +337,6 @@ object FastFairySoulsPathfinder {
     }
 
     private fun localFoundSouls(): MutableSet<LorenzVec> = foundSouls.getOrPut(LorenzUtils.skyBlockIsland) { mutableSetOf() }
-
-    private fun totalFoundSouls(): Int = totalFound[LorenzUtils.skyBlockIsland] ?: 0
 
     private fun getTargetNodes(nodes: List<GraphNode>): List<GraphNode> = nodes.filter { it.hasTag(GraphNodeTag.FAIRY_SOUL) }
 

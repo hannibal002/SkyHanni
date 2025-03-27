@@ -71,14 +71,14 @@ object BazaarOrderHelper {
         val itemLore = slot.stack.getLore()
         for (line in itemLore) {
             filledPattern.matchMatcher(line) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
                 return
             }
 
             pricePattern.matchMatcher(line) {
                 val price = group("number").formatDouble()
                 if (buyOrSell.first && price < data.instantBuyPrice || buyOrSell.second && price > data.sellOfferPrice) {
-                    slot highlight LorenzColor.GOLD
+                    slot.highlight(LorenzColor.GOLD)
                     return
                 }
             }
