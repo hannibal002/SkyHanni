@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -106,7 +105,7 @@ object MiningNotifications {
 
     private fun sendNotification(type: MiningNotificationList) {
         if (type !in config.notifications) return
-        TitleManager.sendTitle(type.notification, 1500.milliseconds)
+        TitleManager.sendTitle(type.notification, duration = 1.5.seconds)
         if (config.playSound) SoundUtils.playPlingSound()
     }
 }
