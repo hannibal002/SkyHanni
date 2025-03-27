@@ -33,7 +33,7 @@ object GardenBurrowingSporesNotifier {
         if (!titleEnabled && !blinkEnabled) return
         if (!sporeDropMessage.matches(event.message)) return
 
-        if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!", 5.seconds)
+        if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!", duration = 5.seconds)
         if (blinkEnabled) ItemBlink.setBlink(NeuItems.getItemStackOrNull("BURROWING_SPORES"), 5_000)
     }
 }

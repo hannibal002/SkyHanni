@@ -196,7 +196,7 @@ object PestFinder {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.noPestTitle) return
 
-        if (PestApi.noPestsChatPattern.matches(event.message)) TitleManager.sendTitle("§eNo pests!", 2.seconds)
+        if (PestApi.noPestsChatPattern.matches(event.message)) TitleManager.sendTitle("§eNo pests!", duration = 2.seconds)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

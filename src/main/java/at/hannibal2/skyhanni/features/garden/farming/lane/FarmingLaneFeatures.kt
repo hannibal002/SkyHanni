@@ -118,14 +118,14 @@ object FarmingLaneFeatures {
         return true
     }
 
-    private fun calculateDirection(newPositon: Double): Int? {
+    private fun calculateDirection(newPosition: Double): Int? {
         val position = currentPositon ?: run {
-            currentPositon = newPositon
+            currentPositon = newPosition
             return null
         }
-        currentPositon = newPositon
+        currentPositon = newPosition
 
-        val diff = position - newPositon
+        val diff = position - newPosition
         return if (diff > 0) {
             1
         } else if (diff < 0) {
@@ -138,7 +138,7 @@ object FarmingLaneFeatures {
     private fun showWarning() {
         with(config.laneSwitchNotification) {
             if (enabled) {
-                TitleManager.sendTitle(text.replace("&", "§"), 2.seconds)
+                TitleManager.sendTitle(text.replace("&", "§"))
                 if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
                     lastPlaySound = SimpleTimeMark.now()
                     playUserSound()
