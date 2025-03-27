@@ -61,9 +61,8 @@ object AuctionHousePriceComparison {
     }
 
     private fun MutableMap<Int, Long>.add(stack: ItemStack, binPrice: Long, slot: Int) {
-        val (totalPrice, basePrice) = EstimatedItemValueCalculator.calculate(stack, mutableListOf())
-        if (totalPrice == basePrice) return
-        val estimatedPrice = totalPrice.toLong()
+        val price = EstimatedItemValueCalculator.getTotalPrice(stack, ignoreBasePrice = true) ?: return
+        val estimatedPrice = price.toLong()
 
         val diff = estimatedPrice - binPrice
         this[slot] = diff
