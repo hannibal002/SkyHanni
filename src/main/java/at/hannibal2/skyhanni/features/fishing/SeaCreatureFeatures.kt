@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -50,6 +51,10 @@ object SeaCreatureFeatures {
         // if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
         //     if (seaCreaturesBosses.none { it.fullName.removeColor() == mob.name }) return
         // }
+
+        ChatUtils.debug("Highlighting ${mob.name}")
+        println(mob)
+
         mob.highlight(LorenzColor.GREEN.toColor())
     }
 
