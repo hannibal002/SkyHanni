@@ -83,14 +83,16 @@ object SeaCreatureFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!config.alertOwnCatches) return
+        if (!config.alertOwnCatches && !config.announceRare) return
 
         if (event.seaCreature.rare) {
-            val text = if (config.creatureName) "${event.seaCreature.displayName}!"
-            else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
-            TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
-            if (config.playSound) SoundUtils.playBeepSound()
-            lastRareCatch = SimpleTimeMark.now()
+            if (config.alertOwnCatches) {
+                val text = if (config.creatureName) "${event.seaCreature.displayName}!"
+                else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
+                TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
+                if (config.playSound) SoundUtils.playBeepSound()
+                lastRareCatch = SimpleTimeMark.now()
+            }
             if (config.announceRare) {
                 if (config.creatureName) HypixelCommands.partyChat("A ${event.seaCreature.name} has spawned!")
                 else HypixelCommands.partyChat("A rare sea creature has spawned!")
