@@ -193,7 +193,7 @@ object BazaarApi {
             }
 
             if (stack.displayName.removeColor() == currentSearchedItem) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }

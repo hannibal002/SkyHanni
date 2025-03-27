@@ -251,7 +251,7 @@ object HoppityEggsManager {
                 action = action,
             )
         } else ChatUtils.chat(message, replaceSameMessage = true)
-        TitleManager.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
+        TitleManager.sendTitle("§e$amount Hoppity Eggs!", duration = 5.seconds)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 

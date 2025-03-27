@@ -6,9 +6,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
-import net.minecraft.client.audio.PositionedSound
 import net.minecraft.client.audio.SoundCategory
 import net.minecraft.util.ResourceLocation
+//#if MC < 1.21
+import net.minecraft.client.audio.PositionedSound
+//#else
+//$$ import net.minecraft.client.sound.PositionedSoundInstance
+//$$ import net.minecraft.sound.SoundEvent
+//#endif
 
 object SoundUtils {
 
@@ -48,6 +53,7 @@ object SoundUtils {
     }
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
+        //#if MC < 1.21
         val sound: ISound = object : PositionedSound(ResourceLocation(name)) {
             init {
                 this.volume = volume
@@ -58,6 +64,9 @@ object SoundUtils {
             }
         }
         return sound
+        //#else
+        //$$ return PositionedSoundInstance.master(SoundEvent.of(Identifier.of(name)), pitch, volume)
+        //#endif
     }
 
     fun playBeepSound() {

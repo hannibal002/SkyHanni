@@ -10,9 +10,6 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -74,6 +71,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
@@ -150,7 +150,13 @@ object EstimatedItemValueCalculator {
     private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
     private val MITHRIL_INFUSION = "MITHRIL_INFUSION".toInternalName()
 
-    fun getTotalPrice(stack: ItemStack): Double = calculate(stack, mutableListOf()).first
+    fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean = false): Double? {
+        val (totalPrice, basePrice) = calculate(stack, mutableListOf())
+        if (ignoreBasePrice && totalPrice == basePrice) {
+            return null
+        }
+        return totalPrice
+    }
 
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
