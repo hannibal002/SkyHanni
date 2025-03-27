@@ -808,6 +808,7 @@ class ProfileSpecificStorage {
         var museumMilestone: Int? = null
     }
 
+    @Expose
     var fairySouls: FairySoulsStorage = FairySoulsStorage()
 
     class FairySoulsStorage {
@@ -817,7 +818,7 @@ class ProfileSpecificStorage {
         @Expose
         var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
     }
-    
+
     @Expose
     var cakeCounterData: CakeCounterData = CakeCounterData()
 

@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class CakeCounterConfig {
 
-    @Expose
     @ConfigOption(
         name = "Note",
         desc = "§cNote§7: The following features require a Cake Counter to be placed on your Private Island." +
