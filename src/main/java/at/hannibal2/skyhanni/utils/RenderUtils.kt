@@ -72,8 +72,31 @@ object RenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
-    private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+    private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
+    private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+
+    //#if MC < 1.8.9
+    /**
+     * Used for some debugging purposes.
+     */
+    val absoluteTranslation
+        get() = run {
+            matrixBuffer.clear()
+
+            GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer)
+
+            val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
+
+            val xTranslate = read[12].toInt()
+            val yTranslate = read[13].toInt()
+            val zTranslate = read[14].toInt()
+
+            matrixBuffer.flip()
+
+            Triple(xTranslate, yTranslate, zTranslate)
+        }
+    //#endif
 
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -294,7 +317,6 @@ object RenderUtils {
 
         GlStateManager.disableCull()
         drawFilledBoundingBox(
-            @Suppress("ktlint:standard:argument-list-wrapping")
             AxisAlignedBB(
                 x - extraSize, y - extraSizeBottomY, z - extraSize,
                 x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize,
@@ -302,6 +324,7 @@ object RenderUtils {
             color,
             if (inverseAlphaScale) (1.0f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
             else (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha),
+             renderRelativeToCamera = true,
         )
         GlStateManager.disableTexture2D()
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb)
@@ -1044,7 +1067,6 @@ object RenderUtils {
         GlStateManager.disableCull()
         val vp = getViewerPos(partialTicks)
 
-        @Suppress("ktlint:standard:argument-list-wrapping")
         val effectiveAABB = AxisAlignedBB(
             aabb.minX - vp.x, aabb.minY - vp.y, aabb.minZ - vp.z,
             aabb.maxX - vp.x, aabb.maxY - vp.y, aabb.maxZ - vp.z,
@@ -1435,42 +1457,8 @@ object RenderUtils {
         color: Color,
         lineWidth: Int,
         depth: Boolean,
-    ) {
-        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
-        GlStateManager.disableCull()
-
-        val worldRenderer = Tessellator.getInstance().worldRenderer
-        val realX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-        val realY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-        val realZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(-realX, -realY, -realZ)
-        GlStateManager.disableTexture2D()
-        GlStateManager.enableBlend()
-        GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GL11.glLineWidth(lineWidth.toFloat())
-        if (!depth) {
-            GL11.glDisable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(false)
-        }
-        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
-        worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
-        Tessellator.getInstance().draw()
-        GlStateManager.translate(realX, realY, realZ)
-        if (!depth) {
-            GL11.glEnable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(true)
-        }
-        GlStateManager.disableBlend()
-        GlStateManager.enableAlpha()
-        GlStateManager.enableTexture2D()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
-        GlStateManager.popMatrix()
-        GlStateManager.disableLighting()
-        GlStateManager.enableCull()
+    ) = LineDrawer.draw3D(partialTicks) {
+        draw3DLine(p1, p2, color, lineWidth, depth)
     }
 
     fun SkyHanniRenderWorldEvent.drawHitbox(
