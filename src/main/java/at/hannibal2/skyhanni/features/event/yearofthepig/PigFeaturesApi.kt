@@ -46,6 +46,11 @@ object PigFeaturesApi {
             shinyOrbLocationCache = it
             it
         }
+
+        override fun reset() {
+            shinyOrbLocationCache = null
+            super.reset()
+        }
     }
 
     private val patternGroup = RepoPattern.group("event.year-of-the-pig")
