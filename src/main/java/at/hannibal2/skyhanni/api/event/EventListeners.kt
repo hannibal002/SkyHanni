@@ -23,6 +23,10 @@ class EventListeners private constructor(val name: String, private val isGeneric
         GenericSkyHanniEvent::class.java.isAssignableFrom(event),
     )
 
+    fun removeListener(listener: Any) {
+        listeners.removeIf { it.invoker == listener }
+    }
+
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
         val name = buildListenerName(method)
         val eventConsumer = createEventConsumer(method, instance, options)

@@ -30,10 +30,8 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.JsonToNBT
-import net.minecraft.nbt.NBTException
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
-import net.minecraft.nbt.NBTTagString
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
@@ -43,6 +41,10 @@ import kotlin.math.floor
 //#if MC > 1.21
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
+//$$ import net.minecraft.nbt.NbtString
+//#else
+import net.minecraft.nbt.NBTTagString
+import net.minecraft.nbt.NBTException
 //#endif
 
 // Most functions are taken from NotEnoughUpdates
@@ -160,9 +162,11 @@ object EnoughUpdatesManager {
         val json = JsonObject()
         json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.displayName)
-        // todo nbt tag doesnt exist on modern
-        json.addProperty("nbttag", tag.toString())
-        json.addProperty("damage", stack.itemDamage)
+        //#if MC < 1.21
+        //$$ // todo nbt tag doesnt exist on modern
+        //$$ json.addProperty("nbttag", tag.toString())
+        //$$ json.addProperty("damage", stack.itemDamage)
+        //#endif
 
         val jsonLore = JsonArray()
         for (line in lore) {
@@ -173,6 +177,7 @@ object EnoughUpdatesManager {
     }
 
     fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {
+        //#if MC < 1.21
         json ?: return ItemStack(Items.painting)
         var usingCache = useCache && !useReplacements
         val internalName = json["internalname"].asString
@@ -199,7 +204,7 @@ object EnoughUpdatesManager {
 
         var replacements = mapOf<String, String>()
         if (useReplacements) {
-            replacements = getPetLoreReplacements(stack.tagCompound, -1)
+            replacements = getPetLoreReplacements(stack, -1)
             json["displayname"]?.asString?.let {
                 var name = it
                 for ((key, value) in replacements) {
@@ -220,14 +225,18 @@ object EnoughUpdatesManager {
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
+        //#else
+        //$$ // todo clearly this isnt correct but this is lot that has to change and this works for now
+        //$$ return ItemStack(Items.PAINTING)
+        //#endif
     }
 
-    private fun getPetLoreReplacements(tag: NBTTagCompound?, level: Int): Map<String, String> {
-        tag ?: return emptyMap()
+    private fun getPetLoreReplacements(stack: ItemStack?, level: Int): Map<String, String> {
+        stack?.tagCompound ?: return emptyMap()
         var petName: String? = null
         var tier: String? = null
 
-        val extraAttributes = tag.extraAttributes
+        val extraAttributes = stack.extraAttributes
         if (extraAttributes.hasKey("petInfo")) {
             val petInfoStr = extraAttributes.getString("petInfo")
             val petInfo = ConfigManager.gson.fromJson(petInfoStr, JsonObject::class.java)
@@ -351,7 +360,11 @@ object EnoughUpdatesManager {
             for ((key, value) in replacements) {
                 loreLine.replace("{$key}", value)
             }
+            //#if MC < 1.21
             loreList.appendTag(NBTTagString(loreLine))
+            //#else
+            //$$ loreList.add(NbtString.of(loreLine))
+            //#endif
         }
         return loreList
     }
