@@ -73,9 +73,9 @@ object OdgerTotalCaught {
         val bronzeLineIndex = event.toolTip.indexOfFirst { bronzePattern.matcher(it).find() }
 
         if (bronzeLineIndex > 0) {
-            event.toolTip.add("")
+            event.toolTip.add(bronzeLineIndex + 1, "")
             event.toolTip.add(
-                bronzeLineIndex - 1,
+                bronzeLineIndex + 2,
                 "§7Total: ${bestFishObtained.formatCode}${counts.values.sum().addSeparators()}"
             )
         }
