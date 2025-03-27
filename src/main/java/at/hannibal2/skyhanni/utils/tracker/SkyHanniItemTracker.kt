@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -43,7 +43,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         addItem(SKYBLOCK_COIN, amount, command)
     }
 
-    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
+    open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean = true) {
         modify {
             it.addItem(internalName, amount, command)
         }
@@ -62,7 +62,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
             return
         }
-        handlePossibleRareDrop(internalName, amount)
+        handlePossibleRareDrop(internalName, amount, message)
     }
 
     private fun NeuInternalName.getCleanName(

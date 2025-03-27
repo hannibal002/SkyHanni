@@ -21,6 +21,7 @@ net.minecraft.client.Options keyUse keyBindUseItem
 net.minecraft.client.Options keyInventory keyBindInventory
 net.minecraft.client.Options keyScreenshot keyBindScreenshot
 net.minecraft.client.Options keyFullscreen keyBindFullscreen
+net.minecraft.client.Options getSoundSourceVolume() getSoundLevel()
 
 net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
 net.minecraft.client.Minecraft setScreen() displayGuiScreen()
@@ -35,6 +36,7 @@ net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNe
 net.minecraft.client.gui.components.ChatComponent allMessages chatLines
 net.minecraft.client.gui.components.ChatComponent trimmedMessages drawnChatLines
 net.minecraft.client.gui.components.ChatComponent rescaleChat() refreshChat()
+net.minecraft.client.gui.components.ChatComponent getWidth() getChatWidth()
 
 net.minecraft.client.gui.screens.ChatScreen net.minecraft.client.gui.GuiChat
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
@@ -47,6 +49,9 @@ net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
 net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiChest
 net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
 net.minecraft.client.gui.screens.inventory.SignEditScreen net.minecraft.client.gui.inventory.GuiEditSign
+
+net.minecraft.client.gui.screens.inventory.SignEditScreen sign tileSign
+net.minecraft.client.gui.screens.inventory.SignEditScreen line editLine
 
 net.minecraft.client.multiplayer.ClientLevel net.minecraft.client.multiplayer.WorldClient
 net.minecraft.client.multiplayer.ClientPacketListener net.minecraft.client.network.NetHandlerPlayClient
@@ -98,6 +103,7 @@ net.minecraft.core.particles.ParticleTypes WITCH SPELL_WITCH
 
 net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
 net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
+net.minecraft.nbt.ListTag add() appendTag()
 net.minecraft.nbt.StringTag net.minecraft.nbt.NBTTagString
 
 net.minecraft.nbt.CompoundTag getCompound() getCompoundTag()
@@ -114,14 +120,22 @@ net.minecraft.nbt.CompoundTag remove() removeTag()
 
 net.minecraft.nbt.ListTag getSize() tagCount()
 net.minecraft.nbt.ListTag getString() getStringTagAt()
+net.minecraft.nbt.ListTag getCompound() getCompoundTagAt()
 
 net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent
 net.minecraft.network.chat.Style net.minecraft.util.text.Style
 net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
+net.minecraft.network.chat.BaseComponent net.minecraft.util.text.TextComponentBase
 
 net.minecraft.network.chat.Component copy() createCopy()
 
+net.minecraft.network.chat.BaseComponent append() appendSibling()
+net.minecraft.network.chat.MutableComponent append() appendSibling()
+
 net.minecraft.network.chat.Style withColor() setColor()
+net.minecraft.network.chat.Style withItalic() setItalic()
+net.minecraft.network.chat.Style withBold() setBold()
+net.minecraft.network.chat.Style applyTo() setParentStyle()
 
 net.minecraft.network.protocol.Packet net.minecraft.network.Packet
 
@@ -253,6 +267,7 @@ net.minecraft.world.entity.Entity yo posY
 net.minecraft.world.entity.Entity zOld prevPosZ
 net.minecraft.world.entity.Entity zo posZ
 net.minecraft.world.entity.Entity isOnGround onGround
+net.minecraft.world.entity.Entity getVehicle() getRidingEntity()
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
@@ -306,6 +321,7 @@ net.minecraft.world.entity.monster.MagmaCube net.minecraft.entity.monster.Entity
 net.minecraft.world.entity.monster.Silverfish net.minecraft.entity.monster.EntitySilverfish
 net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntitySkeleton
 net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
+net.minecraft.world.entity.monster.Slime getSize() getSlimeSize()
 net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
 net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch
 net.minecraft.world.entity.monster.WitherSkeleton net.minecraft.entity.monster.EntityWitherSkeleton
@@ -326,6 +342,7 @@ net.minecraft.world.entity.player.Inventory getSelected() getCurrentItem()
 net.minecraft.world.entity.player.Inventory items mainInventory
 
 net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
+net.minecraft.world.entity.player.Player containerMenu openContainer
 
 net.minecraft.world.entity.projectile.Arrow net.minecraft.entity.projectile.EntityArrow
 net.minecraft.world.entity.projectile.Fireball net.minecraft.entity.projectile.EntityFireball
@@ -335,9 +352,12 @@ net.minecraft.world.entity.projectile.SmallFireball net.minecraft.entity.project
 net.minecraft.world.entity.projectile.FishingHook getPlayerOwner() getAngler()
 
 net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
+net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
+
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.Slot getItem() getStack()
+net.minecraft.world.inventory.Slot hasItem() getHasStack()
 net.minecraft.world.inventory.Slot index slotNumber
 net.minecraft.world.inventory.Slot x xPos
 net.minecraft.world.inventory.Slot y yPos
@@ -347,6 +367,7 @@ net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
 net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
 net.minecraft.world.item.ItemStack isEnchanted() isItemEnchanted()
+net.minecraft.world.item.ItemStack getTag() getTagCompound()
 net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 
 net.minecraft.world.item.Item byBlock() getItemFromBlock()
@@ -362,8 +383,10 @@ net.minecraft.world.item.enchantment.Enchantments net.minecraft.init.Enchantment
 
 net.minecraft.world.item.enchantment.Enchantments ALL_DAMAGE_PROTECTION PROTECTION
 
+net.minecraft.world.level.Level net.minecraft.world.World
 net.minecraft.world.level.Level getEntity() getEntityByID()
 net.minecraft.world.level.Level getBlockEntity() getTileEntity()
+net.minecraft.world.level.Level getDayTime() getWorldTime()
 
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
 net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
@@ -374,9 +397,15 @@ net.minecraft.world.level.block.Blocks MELON MELON_BLOCK
 
 net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
+net.minecraft.world.level.block.entity.SignBlockEntity net.minecraft.tileentity.TileEntitySign
 net.minecraft.world.level.block.entity.SkullBlockEntity net.minecraft.tileentity.TileEntitySkull
 
 net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
+
+net.minecraft.world.level.block.state.properties.IntegerProperty net.minecraft.block.properties.PropertyInteger
+net.minecraft.world.level.block.state.properties.EnumProperty net.minecraft.block.properties.PropertyEnum
+net.minecraft.world.level.block.state.properties.BooleanProperty net.minecraft.block.properties.PropertyBool
+net.minecraft.world.level.block.state.properties.DirectionProperty net.minecraft.block.properties.PropertyDirection
 
 net.minecraft.world.phys.Vec3 net.minecraft.util.math.Vec3d
 
@@ -462,8 +491,6 @@ org.lwjgl.glfw.GLFW GLFW_KEY_W KEY_W
 org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
-
-at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer net.minecraft.client.gui.inventory.GuiContainer
 
 net.minecraft.world.inventory.AbstractContainerMenu net.minecraft.inventory.Container
 
