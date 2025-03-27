@@ -70,7 +70,7 @@ object OdgerTotalCaught {
             .replace(Regex("^obfuscated(\\d+)$"), "obfuscatedfish$1")
 
         val counts = TrophyFishManager.fish?.get(trophyFishKey) ?: return
-        val bestFishObtained = counts.filter { it.value != 0 }.keys.maxOrNull() ?: TrophyRarity.BRONZE
+        val bestFishObtained = counts.filter { it.value > 0 }.keys.maxOrNull() ?: TrophyRarity.BRONZE
         val bronzeLineIndex = event.toolTip.indexOfFirst { bronzePattern.matcher(it).find() }
 
         if (bronzeLineIndex > 0) {
