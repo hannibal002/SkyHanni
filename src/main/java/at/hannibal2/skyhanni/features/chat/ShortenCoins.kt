@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.replace
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.util.ChatComponentText
 
 @SkyHanniModule
 object ShortenCoins {
@@ -36,7 +36,11 @@ object ShortenCoins {
             "§6${group("amount").formatDouble().shortFormat()}"
         }.takeIf { it != message } ?: return
 
-        event.chatComponent = ChatComponentText(modifiedMessage)
+        val originalComponent = event.chatComponent.siblings.firstOrNull() ?: event.chatComponent
+
+        event.chatComponent = modifiedMessage.asComponent().apply {
+            chatStyle = originalComponent.chatStyle
+        }
     }
 
     fun Number.formatChatCoins(): String {
