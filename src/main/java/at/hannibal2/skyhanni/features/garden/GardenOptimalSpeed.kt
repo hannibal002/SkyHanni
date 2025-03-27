@@ -191,7 +191,7 @@ object GardenOptimalSpeed {
         if (!ranchersEquipped && config.onlyWarnRanchers) return
 
         lastWarnTime = SimpleTimeMark.now()
-        TitleManager.sendTitle("§cWrong speed!", 3.seconds)
+        TitleManager.sendTitle("§cWrong speed!")
         val cropInHand = cropInHand ?: return
 
         val text = "§cWrong speed while farming ${cropInHand.cropName} detected!" +

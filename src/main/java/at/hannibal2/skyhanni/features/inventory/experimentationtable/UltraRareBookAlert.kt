@@ -37,7 +37,7 @@ object UltraRareBookAlert {
         if (lastNotificationTime.passedSince() > 5.seconds) return
 
         TitleManager.sendTitle(
-            text = "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX",
+            titleText = "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX",
             duration = 2.seconds,
             location = TitleManager.TitleLocation.INVENTORY,
         )

@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -33,16 +33,13 @@ object TitleManager {
     private val currentTitles: MutableMap<TitleLocation, TitleData?> = enumMapOf()
 
     private data class TitleData(
-        var text: String = "",
+        var titleText: String = "",
+        var subtitleText: String? = null,
         var duration: Duration = 0.seconds,
         var height: Double = 1.8,
         var fontSize: Float = 4f,
         val weight: Double = 1.0,
-        val color: LorenzColor = LorenzColor.WHITE,
     ) : ResettableStorageSet() {
-        val display: String
-            get() = "${color.chatColorCode}$text"
-
         var endTime: SimpleTimeMark = SimpleTimeMark.now() + duration
 
         fun stop() {
@@ -67,15 +64,16 @@ object TitleManager {
     }
 
     fun sendTitle(
-        text: String,
-        duration: Duration,
+        titleText: String,
+        subtitleText: String? = null,
+        duration: Duration = 3.seconds,
         height: Double = 1.8,
         fontSize: Float = 4f,
         location: TitleLocation = TitleLocation.GLOBAL,
         addType: TitleAddType = TitleAddType.QUEUE,
         weight: Double = 1.0,
     ) {
-        val newTitle = TitleData(text, duration, height, fontSize, weight)
+        val newTitle = TitleData(titleText, subtitleText, duration, height, fontSize, weight)
         val targetQueue = titleLocationQueues.getOrPut(location) { CollectionUtils.OrderedQueue() }
 
         if (addType == TitleAddType.QUEUE) {
@@ -99,12 +97,12 @@ object TitleManager {
         when (location) {
             null -> {
                 currentTitles.values.filterNotNull()
-                    .filter { condition(it.text) }
+                    .filter { condition(it.titleText) }
                     .forEach { it.stop() }
             }
 
             else -> currentTitles[location]?.let { title ->
-                if (condition(title.text)) {
+                if (condition(title.titleText)) {
                     title.stop()
                 }
             }
@@ -131,12 +129,15 @@ object TitleManager {
             return
         }
 
-        val duration = args[0].toInt().seconds
+        val duration = TimeUtils.getDurationOrNull(args[0]) ?: run {
+            ChatUtils.userError("Invalid duration format `${args[0]}`! Use e.g. 10s, or 20m or 30h")
+            return
+        }
         val height = args[1].toDouble()
         val fontSize = args[2].toFloat()
         val title = "§6" + args.drop(3).joinToString(" ").replace("&", "§")
 
-        sendTitle(title, duration, height, fontSize, location)
+        sendTitle(title, subtitleText = null, duration, height, fontSize, location)
     }
 
     @HandleEvent
@@ -181,7 +182,7 @@ object TitleManager {
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
         val globalTitleWidth = 80
-        val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(display)
+        val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(titleText)
         var factor = globalTitleWidth / stringWidth.toDouble()
         factor = min(factor, 1.0)
 
@@ -191,13 +192,27 @@ object TitleManager {
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.pushMatrix()
 
-        Renderable.wrappedString(
-            display,
-            width = (globalTitleWidth * fontSize).toInt(),
+        val mainTextRenderable = Renderable.string(
+            titleText,
             scale = factor * fontSize,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+        )
+
+        if (subtitleText == null) mainTextRenderable.renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+        else {
+            val subText: String = subtitleText ?: return
+            val subtitleScale = factor * fontSize * 0.75f
+            val subtitleRenderable = Renderable.wrappedString(
+                subText,
+                width = (globalTitleWidth * fontSize).toInt(),
+                scale = subtitleScale,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            )
+            val container = Renderable.verticalContainer(listOf(mainTextRenderable, subtitleRenderable))
+            container.renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+        }
 
         GlStateManager.popMatrix()
     }
@@ -211,16 +226,36 @@ object TitleManager {
     private fun TitleData.tryRenderInventoryTitle() {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
+        val baseStringRenderable = Renderable.string(titleText, 1.5)
+        val stringRenderable = when (subtitleText) {
+            null -> baseStringRenderable
+            else -> {
+                val displaySubText = subtitleText ?: return
+                Renderable.verticalContainer(
+                    listOf(
+                        baseStringRenderable,
+                        Renderable.string(displaySubText, 1.0),
+                    ),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                )
+            }
+        }
+
+        val heightTranslation = when (subtitleText) {
+            null -> 150f
+            else -> 200f
+        }
+
         GlStateManager.pushMatrix()
-        GlStateManager.translate(0f, -150f, 500f)
+        GlStateManager.translate(0f, -(heightTranslation), 500f)
         Renderable.drawInsideRoundedRect(
-            Renderable.string(display, 1.5),
+            stringRenderable,
             ColorUtils.TRANSPARENT_COLOR,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 0, gui.width, gui.height)
 
-        GlStateManager.translate(0f, 150f, -500f)
+        GlStateManager.translate(0f, heightTranslation, -500f)
         GlStateManager.popMatrix()
     }
 }
