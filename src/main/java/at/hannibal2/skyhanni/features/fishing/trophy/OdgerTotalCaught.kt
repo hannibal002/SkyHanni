@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -25,6 +27,11 @@ object OdgerTotalCaught {
     private val discoveredPattern by patternGroup.pattern(
         "discovered",
         "§aDiscovered",
+    )
+
+    private val bronzePattern by patternGroup.pattern(
+        "bronze",
+        "^§5§o§8Bronze.*",
     )
 
     private var inInventory = false
@@ -53,8 +60,16 @@ object OdgerTotalCaught {
             .replace(" ", "")
             .replace(Regex("^obfuscated(\\d+)$"), "obfuscatedfish$1")
 
-        val totalFishCaught = TrophyFishManager.fish?.get(trophyFishKey)?.values?.sum() ?: return
+        val counts = TrophyFishManager.fish?.get(trophyFishKey) ?: return
+        val bestFishObtained = counts.filter { it.value != 0 }.keys.maxOrNull() ?: TrophyRarity.BRONZE
+        val bronzeLineIndex = event.toolTip.indexOfFirst { bronzePattern.matcher(it).find() }
 
-        event.toolTip[0] += " §7($totalFishCaught)"
+        if (bronzeLineIndex > 0) {
+            event.toolTip.add("")
+            event.toolTip.add(
+                bronzeLineIndex - 1,
+                "§7Total: ${bestFishObtained.formatCode}${counts.values.sum().addSeparators()}"
+            )
+        }
     }
 }
