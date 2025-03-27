@@ -75,9 +75,11 @@ class RenderDisplayHelper(
         false
     }
 
-    private fun render() = try {
-        onRender()
-    } catch (e: Exception) {
-        ErrorManager.logErrorWithData(e, "Failed to render a display")
+    private fun render() {
+        try {
+            onRender()
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Failed to render a display")
+        }
     }
 }

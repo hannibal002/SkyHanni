@@ -4,11 +4,12 @@ moulconfig = "3.5.0"
 headlessLwjgl = "1.7.2"
 jbAnnotations = "24.1.0"
 hypixelmodapi = "1.0.1.1"
-gson = "2.10.1"
+modmenu = "13.0.3"
 
 
 [libraries]
 moulconfig = { module = "org.notenoughupdates.moulconfig:legacy", version.ref = "moulconfig" }
+moulconfigModern = { module = "org.notenoughupdates.moulconfig:modern", version.ref = "moulconfig" }
 libautoupdate = { module = "moe.nea:libautoupdate", version.ref = "libautoupdate" }
 headlessLwjgl = { module = "com.github.3arthqu4ke.HeadlessMc:headlessmc-lwjgl", version.ref = "headlessLwjgl" }
 jbAnnotations = { module = "org.jetbrains:annotations", version.ref = "jbAnnotations" }
@@ -17,5 +18,5 @@ autoservice_ksp = {module="dev.zacsweers.autoservice:auto-service-ksp",version="
 autoservice_annotations = {module="com.google.auto.service:auto-service-annotations",version="1.1.1"}
 hypixelmodapi = { module = "net.hypixel:mod-api-forge", version.ref = "hypixelmodapi" }
 hypixelmodapitweaker = { module = "net.hypixel:mod-api-forge-tweaker", version.ref = "hypixelmodapi" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
+modmenu = { module = "maven.modrinth:modmenu", version.ref = "modmenu" }

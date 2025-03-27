@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.seconds
@@ -70,6 +70,9 @@ object GardenVisitorSupercraft {
     }
 
     private fun getSupercraftForSacks(internalName: NeuInternalName, amount: Int) {
+        val amountInSacks = internalName.getAmountInSacks()
+        if (amountInSacks >= amount) return
+
         val ingredients = NeuItems.getRecipes(internalName)
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
@@ -82,7 +85,7 @@ object GardenVisitorSupercraft {
         for ((key, value) in requiredIngredients) {
             val sackItem = key.getAmountInSacks()
             lastSuperCraftMaterial = internalName.asString()
-            if (sackItem < value * amount) {
+            if (sackItem < value * (amount - amountInSacks)) {
                 hasIngredients = false
                 break
             }

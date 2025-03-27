@@ -53,7 +53,6 @@ import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -115,6 +114,7 @@ object Commands {
         event.register("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             category = CommandCategory.USERS_ACTIVE
+            aliases = listOf("shlockmouse")
             callback { LockMouseLook.toggleLock() }
         }
         event.register("shsensreduce") {
@@ -249,11 +249,6 @@ object Commands {
             description = "Download the SkyHanni repo again"
             category = CommandCategory.USERS_BUG_FIX
             callback { RepoManager.updateRepo() }
-        }
-        event.register("shtogglehypixelapierrors") {
-            description = "Show/hide hypixel api error messages in chat"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { ApiUtils.toggleApiErrorMessages() }
         }
         event.register("shfixminions") {
             description = "Removed bugged minion locations from your private island"
@@ -451,12 +446,12 @@ object Commands {
             callback { SkyHanniDebugsAndTests.waypoint(it) }
         }
         event.register("shstoplisteners") {
-            description = "Unregistering all loaded forge event listeners"
+            description = "Unregistering all loaded event listeners"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.stopListeners() }
         }
         event.register("shreloadlisteners") {
-            description = "Trying to load all forge event listeners again. Might not work at all"
+            description = "Reloads all event listeners again"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.reloadListeners() }
         }

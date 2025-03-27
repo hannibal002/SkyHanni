@@ -2,11 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatCurrentTime
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.attribute.BasicFileAttributes
 import java.text.SimpleDateFormat
 import java.util.logging.FileHandler
 import java.util.logging.Formatter
@@ -66,32 +63,7 @@ class LorenzLogger(filePath: String) {
 
         if (!hasDone && LorenzUtils.onHypixel) {
             hasDone = true
-            val directoryFiles = LOG_DIRECTORY.listFiles() ?: run {
-                println("log directory has no files")
-                return logger
-            }
-            SkyHanniMod.coroutineScope.launch {
-                val timeToDelete = SkyHanniMod.feature.dev.logExpiryTime.days
-
-                for (file in directoryFiles) {
-                    val path = file.toPath()
-                    try {
-                        val attributes = Files.readAttributes(path, BasicFileAttributes::class.java)
-                        val creationTime = attributes.creationTime().toMillis()
-                        val timeSinceCreation = SimpleTimeMark(creationTime).passedSince()
-                        if (timeSinceCreation > timeToDelete) {
-                            if (!file.deleteRecursively()) {
-                                println("failed to delete directory: ${file.name}")
-                            }
-                        }
-                    } catch (e: SecurityException) {
-                        e.printStackTrace()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                        println("Error: Unable to get creation date.")
-                    }
-                }
-            }
+            OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
         }
 
         return logger
