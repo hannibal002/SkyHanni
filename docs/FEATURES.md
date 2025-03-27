@@ -1532,6 +1532,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added NEU-Souls Pathfinder. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3350)
     + When using `/neusouls`, displays a pathfinding line to the nearest missing Fairy Soul.
     + Shows the progress of Souls found of the current island in chat.
++ Added Estimated Item Value in Tooltip. - nopo (https://github.com/hannibal002/SkyHanni/pull/3631)
+    + Displayed total Estimated Item Value as a single line in the item tooltip.
 
 </details>
 <details open><summary>

@@ -235,7 +235,7 @@ object GraphEditor {
         if (nodesToFind.isEmpty()) {
             currentNodeToFind = null
             ChatUtils.chat("Found all nodes on this island")
-            TitleManager.sendTitle("§eAll Found!", 3.seconds)
+            TitleManager.sendTitle("§eAll Found!")
             active = false
             return
         }
