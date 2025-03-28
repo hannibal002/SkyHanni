@@ -6,18 +6,20 @@ import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
+import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -48,34 +50,34 @@ object ChocolateFactoryBlockOpen {
 
     private var commandSentTimer = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         val slotDisplayName = event.slot?.stack?.displayName ?: return
         if (!openCfItemPattern.matches(slotDisplayName)) return
+        if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
 
-        if (checkIsBlocked()) event.cancel()
+        tryBlock().takeIf { it != TryBlockResult.SUCCESS } ?: return
+        event.cancel()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCommandSend(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!commandPattern.matches(event.message)) return
         if (commandSentTimer.passedSince() < 5.seconds) return
         if (LorenzUtils.isBingoProfile) return
 
-        if (checkIsBlocked()) {
-            commandSentTimer = SimpleTimeMark.now()
-            event.cancel()
-        }
+        tryBlock().takeIf { it != TryBlockResult.SUCCESS } ?: return
+        commandSentTimer = SimpleTimeMark.now()
+        event.cancel()
     }
 
-    private fun checkIsBlocked() = tryBlock() != TryBlockResult.SUCCESS
+    private enum class TryBlockResult(private val displayName: String) {
+        SUCCESS(""),
+        FAIL_NO_RABBIT("§7without a §dMythic Rabbit Pet §7equipped"),
+        FAIL_NO_BOOSTER_COOKIE("§7without a §dBooster Cookie §7active"),
+        ;
 
-    private enum class TryBlockResult {
-        SUCCESS,
-        FAIL_NO_RABBIT,
-        FAIL_NO_BOOSTER_COOKIE,
+        override fun toString() = displayName
     }
 
     private fun tryBlock(): TryBlockResult {
@@ -86,6 +88,7 @@ object ChocolateFactoryBlockOpen {
                 actionName = "open pets menu",
                 action = { HypixelCommands.pet() },
             )
+            trySendFailureTitle(TryBlockResult.FAIL_NO_RABBIT)
             return TryBlockResult.FAIL_NO_RABBIT
         } else if (config.boosterCookieRequirement) {
             profileStorage?.boosterCookieExpiryTime?.let {
@@ -101,9 +104,20 @@ object ChocolateFactoryBlockOpen {
                         }
                     },
                 )
+                trySendFailureTitle(TryBlockResult.FAIL_NO_BOOSTER_COOKIE)
                 return TryBlockResult.FAIL_NO_BOOSTER_COOKIE
             }
         }
         return TryBlockResult.SUCCESS
+    }
+
+    private fun trySendFailureTitle(result: TryBlockResult) {
+        if (result == TryBlockResult.SUCCESS) return
+        val titleLocation = if (InventoryUtils.inInventory()) TitleManager.TitleLocation.INVENTORY else TitleManager.TitleLocation.GLOBAL
+        TitleManager.sendTitle(
+            "§cBlocked opening the Chocolate Factory",
+            subtitleText = "$result",
+            location = titleLocation,
+        )
     }
 }

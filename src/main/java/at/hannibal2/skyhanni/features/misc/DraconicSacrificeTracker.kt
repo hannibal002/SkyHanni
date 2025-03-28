@@ -5,19 +5,18 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -26,7 +25,6 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DraconicSacrificeTracker {
@@ -69,7 +67,7 @@ object DraconicSacrificeTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / itemsSacrificed
-            val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$dropRate.",
@@ -101,7 +99,7 @@ object DraconicSacrificeTracker {
             Renderable.hoverTips(
                 "§b${data.itemsSacrificed.addSeparators()} §6Items Sacrificed",
                 data.sacrificedItemsMap.map { (item, amount) -> "$item: §b$amount" },
-            ).toSearchable()
+            ).toSearchable(),
         )
 
         add(tracker.addTotalProfit(profit, data.itemsSacrificed, "sacrifice"))
@@ -109,8 +107,8 @@ object DraconicSacrificeTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         sacrificeLoot.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val item = group("item")
@@ -124,18 +122,21 @@ object DraconicSacrificeTracker {
         bonusLoot.matchMatcher(event.message) {
             val item = group("item")
             val amount = groupOrNull("amount")?.toInt() ?: 1
-            val internalName = NEUInternalName.fromItemNameOrNull(item) ?: return
+            val internalName = NeuInternalName.fromItemNameOrNull(item) ?: return
             tracker.addItem(internalName, amount, command = false)
         }
         tracker.update()
     }
 
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (config.onlyInVoidSlate && !altarArea.isPlayerInside()) return
+    init {
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!isEnabled()) return false
+        if (config.onlyInVoidSlate && !altarArea.isPlayerInside()) return false
+
+        return true
     }
 
     @HandleEvent

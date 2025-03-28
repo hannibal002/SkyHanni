@@ -1,23 +1,26 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
+import at.hannibal2.skyhanni.features.bingo.BingoApi
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -33,10 +36,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -200,6 +204,7 @@ object HypixelData {
 
         TabWidget.SERVER.matchMatcherFirstLine {
             serverId = group("serverid")
+            HypixelLocationApi.checkEquals()
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
             lastSuccessfulServerIdFetchType = "tab list"
             failedServerIdFetchCounter = 0
@@ -209,6 +214,7 @@ object HypixelData {
         serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             val serverType = if (group("servertype") == "M") "mega" else "mini"
             serverId = "$serverType${group("serverid")}"
+            HypixelLocationApi.checkEquals()
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
             lastSuccessfulServerIdFetchType = "scoreboard"
             failedServerIdFetchCounter = 0
@@ -261,7 +267,7 @@ object HypixelData {
             playerAmountPattern,
             playerAmountGuestingPattern,
         )
-        if (DungeonAPI.inDungeon()) {
+        if (DungeonApi.inDungeon()) {
             playerPatternList.add(dungeonPartyAmountPattern)
         }
 
@@ -285,14 +291,10 @@ object HypixelData {
         scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             return group("maxamount").toInt() + playerAmountOnIsland
         }
-
-        return when (skyBlockIsland) {
-            IslandType.MINESHAFT -> 4
-            IslandType.CATACOMBS -> 5
-            IslandType.CRYSTAL_HOLLOWS -> 24
-            IslandType.CRIMSON_ISLE -> 24
-            else -> if (serverId?.startsWith("mega") == true) 80 else 26
+        if (serverId?.startsWith("mega") == true) {
+            return IslandType.maxPlayersMega
         }
+        return skyBlockIsland.islandData?.maxPlayers ?: IslandType.maxPlayers
     }
 
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
@@ -321,14 +323,15 @@ object HypixelData {
                 }
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
+                return
             }
         }
     }
 
     private val loggerIslandChange = LorenzLogger("debug/island_change")
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         locrawData = null
         skyBlock = false
         inLimbo = false
@@ -358,8 +361,8 @@ object HypixelData {
         hasScoreboardUpdated = true
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.onHypixel) return
 
         val message = event.message.removeColor().lowercase()
@@ -382,7 +385,7 @@ object HypixelData {
         TabWidget.PROFILE.matchMatcherFirstLine {
             var newProfile = group("profile").lowercase()
             // Hypixel shows the profile name reversed while in the Rift
-            if (RiftAPI.inRift()) newProfile = newProfile.reversed()
+            if (RiftApi.inRift()) newProfile = newProfile.reversed()
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).post()
@@ -390,8 +393,8 @@ object HypixelData {
     }
 
     // TODO rewrite everything in here
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
             sendLocraw()
         }
@@ -414,13 +417,23 @@ object HypixelData {
             checkProfileName()
         }
 
-        if (!LorenzUtils.onHypixel) {
-            checkHypixel()
-            if (LorenzUtils.onHypixel) {
+        val wasOnHypixel = LorenzUtils.onHypixel
+        checkHypixel()
+        val nowOnHypixel = LorenzUtils.onHypixel
+        when {
+            !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
-                SkyHanniMod.repo.displayRepoStatus(true)
+                RepoManager.displayRepoStatus(true)
+            }
+            wasOnHypixel && !nowOnHypixel -> {
+                if (skyBlock) {
+                    skyBlock = false
+                    SkyBlockLeaveEvent.post()
+                }
+                HypixelLeaveEvent.post()
             }
         }
+
         if (!LorenzUtils.onHypixel) return
 
         if (!event.isMod(5)) return
@@ -429,10 +442,15 @@ object HypixelData {
         if (inSkyBlock) {
             checkSidebar()
             checkCurrentServerId()
+        } else {
+            if (!skyBlock) {
+                SkyBlockLeaveEvent.post()
+            }
         }
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+        HypixelLocationApi.checkEquals()
     }
 
     private fun sendLocraw() {
@@ -443,7 +461,16 @@ object HypixelData {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onSkyBlockLeave(event: SkyBlockLeaveEvent) {
+        val oldIsland = skyBlockIsland
+        if (oldIsland != IslandType.NONE) {
+            skyBlockIsland = IslandType.NONE
+            IslandChangeEvent(IslandType.NONE, oldIsland)
+        }
+    }
+
+    @HandleEvent
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
             TabWidget.PROFILE -> checkProfile()
@@ -465,11 +492,16 @@ object HypixelData {
     private fun checkHypixel() {
         if (!hasScoreboardUpdated) return
         val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
 
         var hypixel = false
 
-        player.clientBrand?.let {
+        //#if MC < 1.21
+        val clientBrand = player.clientBrand
+        //#else
+        //$$ val clientBrand = mc.networkHandler?.brand
+        //#endif
+        clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
                 hypixel = true
             }
@@ -492,6 +524,7 @@ object HypixelData {
         }
 
         hypixelLive = hypixel && !hypixelAlpha
+        HypixelLocationApi.checkEquals()
     }
 
     private fun checkSidebar() {
@@ -500,7 +533,7 @@ object HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            if (BingoAPI.getRankFromScoreboard(line) != null) {
+            if (BingoApi.getRankFromScoreboard(line) != null) {
                 bingo = true
             }
             when (line) {
@@ -539,6 +572,7 @@ object HypixelData {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland
             IslandChangeEvent(newIsland, oldIsland).post()
+            HypixelLocationApi.checkEquals()
 
             if (newIsland == IslandType.UNKNOWN) {
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
@@ -562,10 +596,9 @@ object HypixelData {
     }
 
     private fun checkScoreboard(): Boolean {
-        val minecraft = Minecraft.getMinecraft()
-        val world = minecraft.theWorld ?: return false
+        val world = MinecraftCompat.localWorldOrNull ?: return false
 
-        val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
+        val objective = world.scoreboard.getSidebarObjective() ?: return false
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)

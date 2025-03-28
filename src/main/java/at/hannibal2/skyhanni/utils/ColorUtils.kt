@@ -14,13 +14,19 @@ object ColorUtils {
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
 
+    fun getAlpha(color: Int) = color shr 24 and 0xFF
+
     fun getRed(color: Int) = color shr 16 and 0xFF
 
     fun getGreen(color: Int) = color shr 8 and 0xFF
 
     fun getBlue(color: Int) = color and 0xFF
 
-    fun getAlpha(color: Int) = color shr 24 and 0xFF
+    // I think you need to manually import these
+    operator fun Color.component1(): Float = this.alpha / 255f
+    operator fun Color.component2(): Float = this.red / 255f
+    operator fun Color.component3(): Float = this.green / 255f
+    operator fun Color.component4(): Float = this.blue / 255f
 
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),

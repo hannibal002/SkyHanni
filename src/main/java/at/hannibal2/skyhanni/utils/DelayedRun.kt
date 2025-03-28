@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import net.minecraft.client.Minecraft
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.Executor
@@ -14,13 +14,13 @@ object DelayedRun {
 
     fun runDelayed(duration: Duration, run: () -> Unit): SimpleTimeMark {
         val time = SimpleTimeMark.now() + duration
-        futureTasks.add(Pair(run, time))
+        futureTasks.add(run to time)
         return time
     }
 
     /** Runs in the next full Tick so the delay is between 50ms to 100ms**/
     fun runNextTick(run: () -> Unit) {
-        futureTasks.add(Pair(run, SimpleTimeMark.farPast()))
+        futureTasks.add(run to SimpleTimeMark.farPast())
     }
 
     fun checkRuns() {

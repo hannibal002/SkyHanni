@@ -1,22 +1,24 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.getPlayerNames
+import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
+import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
-import net.minecraft.scoreboard.Score
+import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.ScorePlayerTeam
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ScoreboardData {
@@ -26,7 +28,7 @@ object ScoreboardData {
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
     val objectiveTitle: String get() =
-        Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName.orEmpty()
+        MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -68,16 +70,25 @@ object ScoreboardData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
-        if (event.packet is S3CPacketUpdateScore) {
-            if (event.packet.objectiveName == "update") {
-                dirty = true
-                monitor()
+        val packet = event.packet
+        when (packet) {
+            is S3CPacketUpdateScore -> {
+                if (packet.objectiveName == "update") {
+                    dirty = true
+                }
             }
-        }
-        if (event.packet is S3EPacketTeams) {
-            if (event.packet.name.startsWith("team_")) {
-                dirty = true
-                monitor()
+            is S3EPacketTeams -> {
+                if (packet.name.startsWith("team_")) {
+                    dirty = true
+                }
+            }
+            is S3BPacketScoreboardObjective -> {
+                val type = packet.func_179817_d()
+                if (type != IScoreObjectiveCriteria.EnumRenderType.INTEGER) return
+                val objectiveName = packet.func_149339_c()
+                if (objectiveName == "health") return
+                val objectiveValue = packet.func_149337_d()
+                ScoreboardTitleUpdateEvent(objectiveValue, objectiveName).post()
             }
         }
     }
@@ -101,8 +112,8 @@ object ScoreboardData {
         println(" ")
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onTick(event: SkyHanniTickEvent) {
         if (!dirty) return
         dirty = false
         monitor()
@@ -130,17 +141,17 @@ object ScoreboardData {
 
     }
 
-    private fun cleanSB(scoreboard: String): String {
-        return scoreboard.toCharArray().filter { it.code in 21..126 || it.code == 167 }.joinToString(separator = "")
-    }
+    private fun cleanSB(scoreboard: String) = scoreboard.toCharArray().filter {
+        // 10735 = Rift Blood Effigies symbol
+        it.code in 21..126 || it.code == 167 || it.code == 10735
+    }.joinToString(separator = "")
 
     private fun fetchScoreboardLines(): List<String> {
-        val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
-        val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
+        val scoreboard = MinecraftCompat.localWorldOrNull?.scoreboard ?: return emptyList()
+        val objective = scoreboard.getSidebarObjective() ?: return emptyList()
         var scores = scoreboard.getSortedScores(objective)
-        val list = scores.filter { input: Score? ->
-            input != null && input.playerName != null && !input.playerName.startsWith("#")
-        }
+        val list = scores.getPlayerNames(scoreboard)
+        //#if MC < 1.21
         scores = if (list.size > 15) {
             list.drop(15)
         } else {
@@ -149,6 +160,9 @@ object ScoreboardData {
         return scores.map {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
+        //#else
+        //$$ return list.map { it.formattedTextCompat() }
+        //#endif
     }
 
     // TODO USE SH-REPO

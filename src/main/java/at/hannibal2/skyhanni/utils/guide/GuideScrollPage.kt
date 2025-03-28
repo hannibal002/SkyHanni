@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.guide
 
-import at.hannibal2.skyhanni.utils.CollectionUtils.tableStretchXPadding
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.tableStretchXPadding
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 

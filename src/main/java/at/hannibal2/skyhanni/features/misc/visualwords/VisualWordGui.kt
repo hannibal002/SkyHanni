@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -25,7 +26,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -380,12 +380,12 @@ open class VisualWordGui : GuiScreen() {
     override fun handleMouseInput() {
         super.handleMouseInput()
 
-        if (Mouse.getEventButtonState()) {
+        if (MouseCompat.getEventButtonState()) {
             mouseClickEvent()
         }
-        if (!Mouse.getEventButtonState()) {
-            if (Mouse.getEventDWheel() != 0) {
-                lastMouseScroll = Mouse.getEventDWheel()
+        if (!MouseCompat.getEventButtonState()) {
+            if (MouseCompat.getScrollDelta() != 0) {
+                lastMouseScroll = MouseCompat.getScrollDelta()
                 noMouseScrollFrames = 0
             }
         }
@@ -469,7 +469,7 @@ open class VisualWordGui : GuiScreen() {
             val importY = guiTop + sizeY - 10
             if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) {
                 SoundUtils.playClickSound()
-                tryImportFromSBE()
+                tryImportFromSbe()
             }
         }
     }
@@ -573,7 +573,7 @@ open class VisualWordGui : GuiScreen() {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Updated visual words")
     }
 
-    private fun tryImportFromSBE() {
+    private fun tryImportFromSbe() {
         if (!drawImport) return
         try {
             val reader = InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8)

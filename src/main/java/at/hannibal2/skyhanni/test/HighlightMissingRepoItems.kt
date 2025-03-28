@@ -5,44 +5,40 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HighlightMissingRepoItems {
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST, onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dev.debug.highlightMissingRepo) return
 
         val gui = event.gui
 
         if (gui is GuiChest) {
-            highlightItems(gui.inventorySlots.inventorySlots)
+            highlightItems(event.container.inventorySlots)
         } else if (gui is GuiInventory) {
-            val player = Minecraft.getMinecraft().thePlayer
-            highlightItems(player.inventoryContainer.inventorySlots)
+            highlightItems(InventoryUtils.getSlotsInOwnInventory())
         }
     }
 
     private fun highlightItems(slots: Iterable<Slot>) {
-        if (NEUItems.allInternalNames.isEmpty()) return
+        if (NeuItems.allInternalNames.isEmpty()) return
         for (slot in slots) {
             val internalName = slot.stack?.getInternalNameOrNull() ?: continue
-            if (NEUItems.allInternalNames.contains(internalName)) continue
-            if (NEUItems.ignoreItemsFilter.match(internalName.asString())) continue
 
-            slot highlight LorenzColor.RED
+            if (NeuItems.ignoreItemsFilter.match(internalName.asString())) continue
+            if (NeuItems.allInternalNames.contains(internalName)) continue
+
+            slot.highlight(LorenzColor.RED)
         }
     }
 

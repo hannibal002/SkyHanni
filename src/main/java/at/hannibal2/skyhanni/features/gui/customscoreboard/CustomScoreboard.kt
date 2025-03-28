@@ -2,7 +2,6 @@
  * TODO LIST
  *  - countdown events like fishing festival + fiesta when its not on tablist
  *  - improve hide coin difference to also work with bits, motes, etc
- *  - color options in the purse etc lines
  *  - choose the amount of decimal places in shorten nums
  *  - heavily optimize elements and events by only updating them when absolutely needed
  */
@@ -11,24 +10,22 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementTitle
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -39,8 +36,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,13 +52,16 @@ object CustomScoreboard {
     var currentIslandEvents = listOf<ScoreboardEvent>()
         private set
 
+    var activePatterns = listOf<Pattern>()
+        private set
+
     private const val GUI_NAME = "Custom Scoreboard"
 
     private var nextScoreboardUpdate = SimpleTimeMark.farFuture()
 
     private var dirty = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         display ?: return
@@ -103,8 +104,8 @@ object CustomScoreboard {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
         if (dirty || nextScoreboardUpdate.isInPast()) {
@@ -117,7 +118,8 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines) UnknownLinesHandler.handleUnknownLines()
+        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines && LorenzUtils.lastWorldSwitch.passedSince() > 7.seconds)
+            UnknownLinesHandler.handleUnknownLines()
     }
 
     @HandleEvent
@@ -192,27 +194,27 @@ object CustomScoreboard {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         runDelayed(2.seconds) {
-            if (!LorenzUtils.inSkyBlock || !(LorenzUtils.onHypixel && OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
+            if (!LorenzUtils.inSkyBlock || !(LorenzUtils.onHypixel && OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
         }
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.NONE) {
-            updateIslandEntries()
-
-            runDelayed(3.seconds) {
-                updateIslandEntries()
-            }
-        }
+        updateIslandEntries()
     }
 
     private fun updateIslandEntries() {
         currentIslandEntries = config.scoreboardEntries.get().map { it.element }.filter { it.showIsland() }
         currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }.filter { it.showIsland() }
+
+        activePatterns = (ScoreboardConfigElement.getElements() + ScoreboardConfigEventElement.getEvents())
+            .filter { it.showIsland() }
+            .flatMap { it.elementPatterns }
+            .distinct()
+        activePatterns += ScoreboardPattern.brokenPatterns
     }
 
     @HandleEvent
@@ -227,6 +229,9 @@ object CustomScoreboard {
 
                 add("Custom Scoreboard Events:")
                 addAll(formatEntriesDebug(eventsConfig.eventEntries.get().map { it.name to it.event }, currentIslandEvents))
+
+                add("Active Patterns (${activePatterns.size}):")
+                activePatterns.forEach { add("   $it") }
 
                 allUnknownLines.takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")
@@ -256,7 +261,7 @@ object CustomScoreboard {
     }
 
     private fun isEnabled() =
-        (LorenzUtils.inSkyBlock || (OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected() && LorenzUtils.onHypixel)) && config.enabled.get()
+        (LorenzUtils.inSkyBlock || (OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected() && LorenzUtils.onHypixel)) && config.enabled.get()
 
     @JvmStatic
     fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()

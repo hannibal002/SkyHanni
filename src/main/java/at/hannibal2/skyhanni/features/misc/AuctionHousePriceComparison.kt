@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -32,11 +32,10 @@ object AuctionHousePriceComparison {
     private var worstPrice = 0L
     private var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        inInventory = false
-        if (!event.inventoryName.startsWith("Auctions")) return
-        inInventory = true
+        inInventory = event.inventoryName.startsWith("Auctions")
+        if (!inInventory) return
 
         bestPrice = 0L
         worstPrice = 0L
@@ -56,10 +55,14 @@ object AuctionHousePriceComparison {
         this.slotPriceMap = map
     }
 
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        inInventory = false
+    }
+
     private fun MutableMap<Int, Long>.add(stack: ItemStack, binPrice: Long, slot: Int) {
-        val (totalPrice, basePrice) = EstimatedItemValueCalculator.calculate(stack, mutableListOf())
-        if (totalPrice == basePrice) return
-        val estimatedPrice = totalPrice.toLong()
+        val price = EstimatedItemValueCalculator.getTotalPrice(stack, ignoreBasePrice = true) ?: return
+        val estimatedPrice = price.toLong()
 
         val diff = estimatedPrice - binPrice
         this[slot] = diff
@@ -74,7 +77,7 @@ object AuctionHousePriceComparison {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
@@ -88,7 +91,7 @@ object AuctionHousePriceComparison {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val diff = slotPriceMap[slot.slotIndex] ?: continue
             if (diff == 0L) {
-                slot highlight good
+                slot.highlight(good)
                 continue
             }
             val isGood = diff >= 0
@@ -102,12 +105,12 @@ object AuctionHousePriceComparison {
             } else {
                 getColorInBetween(bad, veryBad, percentage)
             }
-            slot highlight color
+            slot.highlight(color)
         }
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
 
         val diff = slotPriceMap[event.slot.slotIndex] ?: return

@@ -34,7 +34,7 @@ public class BazaarConfig {
     @Expose
     @ConfigOption(name = "Cancelled Buy Order Clipboard",
         desc = "Send missing items from cancelled buy orders in chat.\n" +
-        "Click on the message to quickly order the same item and amount again.")
+            "Click on the message to quickly order the same item and amount again.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean cancelledBuyOrderClipboard = false;
@@ -56,9 +56,13 @@ public class BazaarConfig {
     public Position maxPurseItemsPosition = new Position(346, 90, true, false);
 
     @Expose
-    @ConfigOption(name = "Craft Materials Bazaar", desc = "In the crafting view, offer a shopping list of required materials for the craft along with a convenient shortcut for purchasing them from the Bazaar.")
+    @ConfigOption(
+        name = "Craft Materials Bazaar",
+        desc = "In the crafting view, offer a shopping list of required materials for the craft along with a shortcut for purchasing them from the Bazaar or Auction House."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename and move
     public boolean craftMaterialsFromBazaar = false;
 
     @Expose

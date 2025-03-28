@@ -50,15 +50,15 @@ public class ChocolateFactoryStrayRabbitWarningConfig {
         ALL("All"),
         NONE("None"),
         ;
-        private final String str;
+        private final String displayName;
 
-        StrayTypeEntry(String str) {
-            this.str = str;
+        StrayTypeEntry(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -69,6 +69,6 @@ public class ChocolateFactoryStrayRabbitWarningConfig {
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
-    public Runnable sounds = () -> OSUtils.openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments");
+    public Runnable sounds = OSUtils::openSoundsListInBrowser;
 
 }

@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SuperpairsClicksAlert {
@@ -22,7 +21,7 @@ object SuperpairsClicksAlert {
     private val currentRoundRegex = Regex("""Round: (\d+)""")
     private val targetInventoryNames = arrayOf("Chronomatron", "Ultrasequencer")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!config.superpairsClicksAlert) return
         if (!targetInventoryNames.any { event.inventoryName.contains(it) }) return
@@ -41,7 +40,7 @@ object SuperpairsClicksAlert {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!config.superpairsClicksAlert) return
         if (roundsNeeded == -1) return
@@ -70,7 +69,8 @@ object SuperpairsClicksAlert {
         event.inventoryName.contains("Ultrasequencer") &&
             event.inventoryItems.entries
                 .filter { it.key < 45 }
-                .any { it.value.stackSize > roundsNeeded }
+                // We subtract 1 due to a Hypixel bug causing one less round to be required
+                .any { it.value.stackSize > roundsNeeded - 1 }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

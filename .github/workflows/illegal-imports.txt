@@ -10,3 +10,4 @@ at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.events.ReplaceItemEv
 at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.util.Constants
 at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.util.Utils
 at/hannibal2/skyhanni/ java.util.function.Supplier
+at/hannibal2/skyhanni/ com.mojang.realmsclient.

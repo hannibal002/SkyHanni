@@ -1,21 +1,24 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenCropMilestones {
@@ -39,7 +42,7 @@ object GardenCropMilestones {
         "§7Total: §a(?<name>.*)",
     )
 
-    private val config get() = GardenAPI.config.cropMilestones
+    private val config get() = GardenApi.config.cropMilestones
 
     fun getCropTypeByLore(itemStack: ItemStack): CropType? {
         cropPattern.firstMatcher(itemStack.getLore()) {
@@ -49,8 +52,8 @@ object GardenCropMilestones {
         return null
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Milestones") return
 
         for ((_, stack) in event.inventoryItems) {
@@ -77,9 +80,10 @@ object GardenCropMilestones {
         }
 
         val cropName = crop.cropName
+        val levelUpLine = "§r§b§lGARDEN MILESTONE §3$cropName §8$oldLevel➜§3$newLevel§r"
         val messages = listOf(
             "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
-            "  §r§b§lGARDEN MILESTONE §3$cropName §8$oldLevel➜§3$newLevel§r",
+            "  $levelUpLine",
             if (goalReached)
                 listOf(
                     "",
@@ -93,7 +97,12 @@ object GardenCropMilestones {
             "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
         )
 
-        chat(messages.joinToString("\n"), false)
+        clickableChat(
+            messages.joinToString("\n"),
+            { ClipboardUtils.copyToClipboard(levelUpLine.removeColor()) },
+            "Click to copy!",
+            prefix = false
+        )
 
         val message = "§e§lYou have reached your milestone goal of §b§l$customGoalLevel " +
             "§e§lin the §b§l$cropName §e§lcrop!"
@@ -106,7 +115,7 @@ object GardenCropMilestones {
 
     var cropMilestoneData: Map<CropType, List<Int>> = emptyMap()
 
-    val cropCounter: MutableMap<CropType, Long>? get() = GardenAPI.storage?.cropCounter
+    val cropCounter: MutableMap<CropType, Long>? get() = GardenApi.storage?.cropCounter
 
     // TODO make nullable
     fun CropType.getCounter() = cropCounter?.get(this) ?: 0
@@ -192,7 +201,7 @@ object GardenCropMilestones {
         return (progress - startCrops).toDouble() / (end - startCrops)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         cropMilestoneData = event.getConstant<GardenJson>("Garden").cropMilestones
     }
