@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.loreCosts
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.addStrikethorugh
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -110,7 +111,7 @@ object ChocolateShopPrice {
             val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != 0.0 }
             val canBeBought = lore.any { it == "§eClick to trade!" }
 
-            newProducts.add(Product(slot, item.itemName, internalName, chocolate, itemPrice, otherItemsPrice, canBeBought))
+            newProducts.add(Product(slot, item.repoItemName, internalName, chocolate, itemPrice, otherItemsPrice, canBeBought))
         }
         products = newProducts
     }
@@ -168,7 +169,7 @@ object ChocolateShopPrice {
             add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
             // TODO add chocolate spend needed for next milestone
             add(Renderable.string("§eChocolate spent: §6${chocolateSpent.addSeparators()}"))
-            add(LorenzUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
+            add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
         }
     }
 

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -18,12 +17,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -61,9 +61,9 @@ object AnitaMedalProfit {
                 readItem(slot, item, table)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
-                    e, "Error in AnitaMedalProfit while reading item '${item.itemName}'",
+                    e, "Error in AnitaMedalProfit while reading item '${item.repoItemName}'",
                     "item" to item,
-                    "name" to item.itemName,
+                    "name" to item.repoItemName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                 )
             }
@@ -71,7 +71,7 @@ object AnitaMedalProfit {
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eProfit per Bronze Medal"))
-        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
+        newList.add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }
 
@@ -151,7 +151,7 @@ object AnitaMedalProfit {
         val name = item.displayName
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
-            item.itemName
+            item.repoItemName
         } else name
     }
 
