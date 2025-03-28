@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.cakeBag
 import at.hannibal2.skyhanni.features.inventory.accessories.AccessoryApi.personalXTorPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -142,7 +142,7 @@ object AccessoryOverviewDisplay {
                 textInput = getSearchInputForTab(currentTab),
                 searchPrefix = "Accessory Overview",
                 onUpdateSize = { rebuildCaches() },
-            )
+            ),
         ) else add(toggleContainer)
 
         val mainContent = renderCache[currentTab] ?: listOf(noDataWarning)
@@ -153,7 +153,7 @@ object AccessoryOverviewDisplay {
         buildList {
             addTabToggle()
             addTabSpecificToggles()
-        }
+        },
     )
 
     private fun MutableList<Renderable>.addTabToggle() =
@@ -301,7 +301,7 @@ object AccessoryOverviewDisplay {
         val clickable = Renderable.clickable(
             render = labelledIcon,
             onAnyClick = mapOf(
-                LEFT_MOUSE to { ChatUtils.chat("$internalName clicked") }
+                LEFT_MOUSE to { ChatUtils.chat("$internalName clicked") },
             ), // todo
             tips = tipCache[this@buildMissingAccRow.hashCode()] ?: buildMissingAccTips().also {
                 tipCache[this@buildMissingAccRow.hashCode()] = it
