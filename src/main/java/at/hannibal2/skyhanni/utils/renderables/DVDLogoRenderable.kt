@@ -15,7 +15,7 @@ enum class LogoVelocity(var x: Int, val y: Int) {
 
     enum class ApplicatorDirection { LEFT, RIGHT, UP, DOWN }
 
-    fun invert(): LogoVelocity = of(-1 * abs(x), -1 * abs(y))
+    fun invert(): LogoVelocity = of(-x, -y)
 
     fun applyApplicator(direction: ApplicatorDirection): LogoVelocity = when (direction) {
         ApplicatorDirection.LEFT -> of(-1 * abs(x), y)
@@ -108,7 +108,7 @@ class DVDLogoRenderable(
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(position.x.toFloat(), position.y.toFloat(), 0f)
-        renderable.render(posX, posY)
+        renderable.render(posX + position.x, posY + position.y)
         GlStateManager.popMatrix()
     }
 }
