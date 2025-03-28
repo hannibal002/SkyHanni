@@ -99,10 +99,10 @@ class DVDLogoRenderable(
     fun render() = handlerRenderCall()
 
     private fun handlerRenderCall() {
-        val nextVelocity = generateNextVelocity()
-        val nextPosition = generateNextPosition(nextVelocity)
-        val (newPosX, newPosY) = nextPosition.let { it.x to it.y }
+        val nextVelocity = generateNextVelocity().also { velocity = it }
+        val nextPosition = generateNextPosition(nextVelocity).also { position = it }
 
+        val (newPosX, newPosY) = nextPosition.let { it.x to it.y }
         renderable.render(newPosX, newPosY)
     }
 }
