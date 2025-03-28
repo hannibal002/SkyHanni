@@ -75,7 +75,7 @@ class About {
         @ConfigEditorButton(buttonText = "GitHub")
         var discordRPC: Runnable = Runnable { openBrowser("https://github.com/jagrosh/DiscordIPC") }
 
-        @ConfigOption(name = "Twemoji", desc = "Twemoji is available under a modified version of the Creative Commons Attribution 4.0 Licence (CC-BY-4.0)")
+        @ConfigOption(name = "Twemoji", desc = "Twemoji is available under the Creative Commons Attribution 4.0 Licence (CC-BY-4.0)")
         @ConfigEditorButton(buttonText = "Source")
         var twomoji: Runnable = Runnable { openBrowser("https://github.com/jdecked/Twemoji") }
     }
