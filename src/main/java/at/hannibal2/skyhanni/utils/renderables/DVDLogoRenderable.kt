@@ -13,19 +13,9 @@ enum class LogoVelocity(var x: Int, val y: Int) {
     DOWN_LEFT(-1, 1),
     ;
 
-    companion object {
-        fun of(x: Int, y: Int): LogoVelocity = when {
-            x > 0 && y < 0 -> UP_RIGHT
-            x < 0 && y < 0 -> UP_LEFT
-            x > 0 && y > 0 -> DOWN_RIGHT
-            x < 0 && y > 0 -> DOWN_LEFT
-            else -> throw IllegalArgumentException("Invalid velocity: ($x, $y)")
-        }
-    }
+    enum class ApplicatorDirection { LEFT, RIGHT, UP, DOWN }
 
-    enum class ApplicatorDirection {
-        LEFT, RIGHT, UP, DOWN
-    }
+    fun invert(): LogoVelocity = of(-1 * abs(x), -1 * abs(y))
 
     fun applyApplicator(direction: ApplicatorDirection): LogoVelocity = when (direction) {
         ApplicatorDirection.LEFT -> of(-1 * abs(x), y)
@@ -34,11 +24,14 @@ enum class LogoVelocity(var x: Int, val y: Int) {
         ApplicatorDirection.DOWN -> of(x, abs(y))
     }
 
-    fun invert(): LogoVelocity = when (this) {
-        UP_RIGHT -> DOWN_LEFT
-        UP_LEFT -> DOWN_RIGHT
-        DOWN_RIGHT -> UP_LEFT
-        DOWN_LEFT -> UP_RIGHT
+    companion object {
+        private fun of(x: Int, y: Int): LogoVelocity = when {
+            x > 0 && y < 0 -> UP_RIGHT
+            x < 0 && y < 0 -> UP_LEFT
+            x > 0 && y > 0 -> DOWN_RIGHT
+            x < 0 && y > 0 -> DOWN_LEFT
+            else -> throw IllegalArgumentException("Invalid velocity: ($x, $y)")
+        }
     }
 }
 
