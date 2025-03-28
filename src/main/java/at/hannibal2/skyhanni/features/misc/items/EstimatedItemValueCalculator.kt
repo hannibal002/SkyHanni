@@ -504,9 +504,7 @@ object EstimatedItemValueCalculator {
             kuudraTiers.getOrNull(index)?.let { tierName ->
                 EstimatedItemValue.prestigeCosts[tierName]
             }
-        }
-            .flatMap { costMap -> costMap.entries }
-            .sumByKey()
+        }.sumByKey()
 
         val (totalPrice, names) = getTotalAndNames(allTiersCost)
 
