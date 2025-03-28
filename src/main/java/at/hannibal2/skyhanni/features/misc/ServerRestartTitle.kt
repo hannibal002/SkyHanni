@@ -44,7 +44,7 @@ object ServerRestartTitle {
             val totalTime = minutes + seconds
             if (totalTime > 2.minutes && totalTime.inWholeSeconds % 30 != 0L) return
             val time = totalTime.format()
-            TitleManager.sendTitle("§cServer Restart in §b$time", 2.seconds)
+            TitleManager.sendTitle("§cServer Restart in §b$time", duration = 2.seconds)
         }
     }
 }
