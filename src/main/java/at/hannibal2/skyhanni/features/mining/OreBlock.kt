@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.data.MiningApi.inGlacite
 import at.hannibal2.skyhanni.data.MiningApi.inMineshaft
 import at.hannibal2.skyhanni.data.MiningApi.inSpidersDen
 import at.hannibal2.skyhanni.data.MiningApi.inTunnels
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import net.minecraft.block.Block
 import net.minecraft.block.BlockColored
 import net.minecraft.block.BlockSand
@@ -102,8 +102,8 @@ enum class OreBlock(
     JADE(EnumDyeColor.LIME, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
     SAPPHIRE(EnumDyeColor.LIGHT_BLUE, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
     TOPAZ(EnumDyeColor.YELLOW, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
-    JASPER(EnumDyeColor.MAGENTA, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
-    OPAL(EnumDyeColor.WHITE, { inGlacite || inCrimsonIsle }, OreCategory.GEMSTONE),
+    JASPER(EnumDyeColor.MAGENTA, { inCrystalHollows || inMineshaft }, OreCategory.GEMSTONE),
+    OPAL(EnumDyeColor.WHITE, { inMineshaft || inCrimsonIsle }, OreCategory.GEMSTONE),
     AQUAMARINE(EnumDyeColor.BLUE, { inGlacite }, OreCategory.GEMSTONE),
     CITRINE(EnumDyeColor.BROWN, { inGlacite }, OreCategory.GEMSTONE),
     ONYX(EnumDyeColor.BLACK, { inGlacite }, OreCategory.GEMSTONE),

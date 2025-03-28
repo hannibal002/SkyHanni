@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockCarpet
 import net.minecraft.block.state.IBlockState
@@ -108,7 +109,7 @@ object MiningCommissionsBlocksColor {
 
         if (enabled) {
             if (config.sneakQuickToggle.get()) {
-                val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
+                val sneaking = MinecraftCompat.localPlayer.isSneaking
                 if (sneaking != oldSneakState) {
                     oldSneakState = sneaking
                     if (oldSneakState) {

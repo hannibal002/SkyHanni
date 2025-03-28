@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 object RaycastUtils {
 
@@ -25,7 +25,7 @@ object RaycastUtils {
     fun createPlayerLookDirectionRay(): Ray {
         return Ray(
             LocationUtils.playerEyeLocation(),
-            Minecraft.getMinecraft().thePlayer.lookVec.toLorenzVec()
+            MinecraftCompat.localPlayer.lookVec.toLorenzVec()
         )
     }
 
@@ -66,6 +66,7 @@ object RaycastUtils {
         }
     }
 
+    // TODO make private or no longer generic
     fun <T : Any> List<T>.findClosestPointToRay(ray: Ray, positionExtractor: (T) -> LorenzVec): T? {
         return minByOrNull(createDistanceToRayEstimator(ray, positionExtractor))
     }

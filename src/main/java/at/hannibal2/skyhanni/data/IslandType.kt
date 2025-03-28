@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
-import at.hannibal2.skyhanni.data.IslandType.entries
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -30,6 +29,7 @@ enum class IslandType(private val nameFallback: String) {
     WINTER("Jerry's Workshop"),
     THE_RIFT("The Rift"),
     MINESHAFT("Mineshaft"),
+    BACKWATER_BAYOU("Backwater Bayou"),
 
     NONE(""),
     ANY(""),
