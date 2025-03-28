@@ -119,12 +119,12 @@ object FlareDisplay {
                 }
 
                 FlareConfig.AlertType.TITLE -> {
-                    TitleManager.sendTitle(message, 1.seconds)
+                    TitleManager.sendTitle(message, duration = 1.seconds)
                 }
 
                 FlareConfig.AlertType.CHAT_TITLE -> {
                     ChatUtils.chat(message)
-                    TitleManager.sendTitle(message, 1.seconds)
+                    TitleManager.sendTitle(message, duration = 1.seconds)
                 }
 
                 else -> {}

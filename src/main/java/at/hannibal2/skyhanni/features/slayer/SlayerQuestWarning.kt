@@ -109,7 +109,7 @@ object SlayerQuestWarning {
         ChatUtils.chat(chatMessage)
 
         if (config.questWarningTitle) {
-            TitleManager.sendTitle("§e$titleMessage", 2.seconds)
+            TitleManager.sendTitle("§e$titleMessage", duration = 2.seconds)
         }
     }
 
