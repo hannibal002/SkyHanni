@@ -88,13 +88,13 @@ object FishingBaitWarnings {
 
     private fun showBaitChangeWarning(before: String, after: String) {
         SoundUtils.playClickSound()
-        TitleManager.sendTitle("§eBait changed!", 2.seconds)
+        TitleManager.sendTitle("§eBait changed!", duration = 2.seconds)
         ChatUtils.chat("Fishing Bait changed: $before §e-> $after")
     }
 
     private fun showNoBaitWarning() {
         SoundUtils.playErrorSound()
-        TitleManager.sendTitle("§cNo bait is used!", 2.seconds)
+        TitleManager.sendTitle("§cNo bait is used!", duration = 2.seconds)
         ChatUtils.chat("You're not using any fishing baits!")
     }
 }

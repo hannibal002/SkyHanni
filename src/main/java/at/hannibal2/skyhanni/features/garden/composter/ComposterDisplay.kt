@@ -12,10 +12,6 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addHorizontalSpacer
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -26,6 +22,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.time.Duration
@@ -86,6 +86,7 @@ object ComposterDisplay {
                 addHorizontalSpacer()
                 addNotNull(DataType.FUEL.labeledWithData(tabListData))
             }
+            addNotNull(DataType.STORED_COMPOST.labeledWithData(tabListData))
             add(composterEmptyTime(composterEmptyTime))
         }
     }
@@ -138,7 +139,7 @@ object ComposterDisplay {
 
         if (ComposterApi.getOrganicMatter() <= config.notifyLow.organicMatter && storage.informedAboutLowMatter.isInPast()) {
             if (config.notifyLow.title) {
-                TitleManager.sendTitle("§cYour Organic Matter is low", 4.seconds)
+                TitleManager.sendTitle("§cYour Organic Matter is low", duration = 4.seconds)
             }
             ChatUtils.chat("§cYour Organic Matter is low!")
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
@@ -146,7 +147,7 @@ object ComposterDisplay {
 
         if (ComposterApi.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()) {
             if (config.notifyLow.title) {
-                TitleManager.sendTitle("§cYour Fuel is low", 4.seconds)
+                TitleManager.sendTitle("§cYour Fuel is low", duration = 4.seconds)
             }
             ChatUtils.chat("§cYour Fuel is low!")
             storage.informedAboutLowFuel = 5.0.minutes.fromNow()
@@ -210,7 +211,7 @@ object ComposterDisplay {
                 action = { HypixelCommands.warp("garden") },
             )
         }
-        TitleManager.sendTitle("§eComposter Warning!", 3.seconds)
+        TitleManager.sendTitle("§eComposter Warning!")
     }
 
     @HandleEvent

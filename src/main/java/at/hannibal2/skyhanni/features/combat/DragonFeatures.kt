@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -228,7 +228,7 @@ object DragonFeatures {
         dragonSpawn.matchMatcher(message) {
             dragonSpawned = true
             if (config.superiorNotify && this.group("Dragon") == "Superior") {
-                TitleManager.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
+                TitleManager.sendTitle("§6Superior Dragon Spawned!", duration = 1.5.seconds)
             }
             return
         }
@@ -361,7 +361,7 @@ object DragonFeatures {
             listOf(
                 "Eyes: $yourEyes",
                 "Place: ${currentPlace ?: if (currentDamage != 0.0) "unknown, assuming 6th" else "not damaged yet"}",
-                "Damage Ratio: ${formatPercentage(currentDamage / (currentTopDamage.takeIf { it != 0.0 } ?: 1.0))}",
+                "Damage Ratio: ${(currentDamage / (currentTopDamage.takeIf { it != 0.0 } ?: 1.0)).formatPercentage()}",
             ),
         ),
     )

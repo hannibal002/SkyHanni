@@ -97,6 +97,7 @@ enum class BossType(
 
     THUNDER("§cThunder", Type.SEA_CREATURES),
     LORD_JAWBUS("§cLord Jawbus", Type.SEA_CREATURES),
+    RAGNAROK("§cRagnarok", Type.SEA_CREATURES),
 
     DUMMY("Dummy", Type.DUMMY),
     ARACHNE_SMALL("§cSmall Arachne", Type.ARACHNE),
