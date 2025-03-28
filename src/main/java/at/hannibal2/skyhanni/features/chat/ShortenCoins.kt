@@ -36,7 +36,11 @@ object ShortenCoins {
             "§6${group("amount").formatDouble().shortFormat()}"
         }.takeIf { it != message } ?: return
 
-        event.chatComponent = modifiedMessage.asComponent()
+        val originalComponent = event.chatComponent.siblings.firstOrNull() ?: event.chatComponent
+
+        event.chatComponent = modifiedMessage.asComponent().apply {
+            chatStyle = originalComponent.chatStyle
+        }
     }
 
     fun Number.formatChatCoins(): String {

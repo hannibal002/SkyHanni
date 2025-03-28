@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.mixins.transformers.AccessorWorldBorderPacket
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.network.play.server.S44PacketWorldBorder
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DungeonShadowAssassinNotification {
@@ -26,7 +25,7 @@ object DungeonShadowAssassinNotification {
         val warningTime = packet.warningTime
 
         if (action == S44PacketWorldBorder.Action.INITIALIZE && warningTime == 10000) {
-            TitleManager.sendTitle("§cShadow Assassin Jumping!", 2.seconds, 3.6, 7.0f)
+            TitleManager.sendTitle("§cShadow Assassin Jumping!", height = 3.6, fontSize = 7.0f)
             SoundUtils.playBeepSound()
         }
     }
