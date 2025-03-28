@@ -268,7 +268,7 @@ object DragonFeatures {
         ChatUtils.debug("Dragon Type: $currentDragonType")
 
         if (config.superiorNotify && currentDragonType == DragonType.SUPERIOR) {
-            TitleManager.sendTitle("§6Superior Dragon Spawned!", 1.5.seconds)
+            TitleManager.sendTitle("§6Superior Dragon Spawned!", duration = 1.5.seconds)
         }
 
         DragonProfitTracker.addEyes(yourEyes)
