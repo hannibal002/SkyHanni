@@ -1,8 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import at.hannibal2.skyhanni.utils.compat.containerSlots
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
@@ -11,6 +17,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.client.resources.I18n
 import net.minecraft.entity.player.InventoryPlayer
@@ -51,15 +58,13 @@ object InventoryUtils {
             .filter { it.inventory is InventoryPlayer && it.stack != null }
     }
 
-    // TODO add cache that persists until the next gui/window open/close packet is sent/received
-    fun openInventoryName(): String = Minecraft.getMinecraft().currentScreen.let {
-        if (it is GuiChest) {
-            val chest = it.inventorySlots as ContainerChest
-            chest.getInventoryName()
-        } else ""
-    }
+    fun openInventoryName(): String = InventoryCompat.getOpenChestName()
 
     fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
+
+    fun inOwnInventory() = Minecraft.getMinecraft().currentScreen is GuiInventory
+
+    fun inAnyInventory() = inInventory() || inOwnInventory()
 
     fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
 
@@ -69,7 +74,7 @@ object InventoryUtils {
         getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
 
     fun getItemsInOwnInventoryWithNull(): Array<ItemStack?>? =
-        Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory?.normalizeAsArray()
+        MinecraftCompat.localPlayerOrNull?.inventory?.mainInventory?.normalizeAsArray()
 
     // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
     fun getItemsInHotbar(): List<ItemStack> =
@@ -86,14 +91,22 @@ object InventoryUtils {
             it.contains("Ender Chest") || it.contains("Backpack")
     }
 
-    fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer?.heldItem
+    fun getItemInHand(): ItemStack? = MinecraftCompat.localPlayerOrNull?.heldItem
 
-    fun getArmor(): Array<ItemStack?> = Minecraft.getMinecraft().thePlayer?.getArmorInventory() ?: arrayOfNulls(4)
+    fun getArmor(): Array<ItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
 
     fun getHelmet(): ItemStack? = getArmor()[3]
     fun getChestplate(): ItemStack? = getArmor()[2]
     fun getLeggings(): ItemStack? = getArmor()[1]
     fun getBoots(): ItemStack? = getArmor()[0]
+
+    fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
+        if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
+        slot?.slotNumber?.let { slotNumber ->
+            clickInventorySlot(slotNumber, container.windowId, 0, 1)
+            this.cancel()
+        }
+    }
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
         if (!PlatformUtils.isNeuLoaded()) {
@@ -158,6 +171,8 @@ object InventoryUtils {
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+
+    fun NeuInternalName.getAmountInInventoryAndSacks(): Int = getAmountInInventory() + getAmountInSacks()
 
     fun Slot.isTopInventory() = inventory.isTopInventory()
 

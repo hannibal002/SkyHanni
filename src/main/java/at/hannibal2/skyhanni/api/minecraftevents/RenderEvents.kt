@@ -47,7 +47,7 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderOverlayPre(event: RenderGameOverlayEvent.Pre) {
-        if (GameOverlayRenderPreEvent(event.type, event.resolution).post()) {
+        if (GameOverlayRenderPreEvent(event.type).post()) {
             event.isCanceled = true
         }
     }
@@ -72,7 +72,7 @@ object RenderEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onMouseInput(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (GuiMouseInputEvent.post()) {
+        if (GuiMouseInputEvent().post()) {
             event.isCanceled = true
         }
     }

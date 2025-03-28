@@ -1,34 +1,36 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 
 object ColorFormattingHelper {
     fun printColorCodeList() {
-        ChatUtils.chat(
-            "§c=================== General Colors ===================\n" +
-                "§f&0 = §0Black              §f&1 = §1Dark Blue\n" +
-                "§f&2 = §2Dark Green      §f&3 = §3Dark Aqua\n" +
-                "§f&4 = §4Dark Red         §f&5 = §5Dark Purple\n" +
-                "§f&6 = §6Gold               §f&7 = §7Gray\n" +
-                "§f&8 = §8Dark Gray       §f&9 = §9Blue\n" +
-                "§f&a = §aGreen            §f&b = §bAqua\n" +
-                "§f&c = §cRed               §f&d = §dLight Purple\n" +
-                "§f&e = §eYellow            §f&f = §fWhite\n" +
-                "§f&Z = §zChroma §r(needs to enable chroma setting)\n" +
-                "§c================= Formatting Codes ==================\n" +
-                "§f&k = Obfuscated (like this: §khellspawn§r)\n" +
-                "§f&l = §lBold           §r&m = §mStrikethrough \n" +
-                "§f&o = §oItalic            §r&n = §nUnderline\n" +
-                "§f&r = Reset\n" +
-                "§c===================================================".asComponent(),
-        )
-        ChatUtils.clickableChat(
-            "§eClick to view extra info about colors and formatting.",
-            onClick = { printColorCodesExtra() },
-            "§eClick to see more!",
-            prefix = false,
-        )
+        val text = mutableListOf<String>()
+        text.add("§c=================== General Colors ===================")
+        text.add("§f&0 = §0Black              §f&1 = §1Dark Blue")
+        text.add("§f&2 = §2Dark Green      §f&3 = §3Dark Aqua")
+        text.add("§f&4 = §4Dark Red         §f&5 = §5Dark Purple")
+        text.add("§f&6 = §6Gold               §f&7 = §7Gray")
+        text.add("§f&8 = §8Dark Gray       §f&9 = §9Blue")
+        text.add("§f&a = §aGreen            §f&b = §bAqua")
+        text.add("§f&c = §cRed               §f&d = §dLight Purple")
+        text.add("§f&e = §eYellow            §f&f = §fWhite")
+        text.add("§f&Z = §zChroma §r(needs to enable chroma setting)")
+        text.add("§c================= Formatting Codes ==================")
+        text.add("§f&k = Obfuscated (like this: §khellspawn§r)")
+        text.add("§f&l = §lBold           §r&m = §mStrikethrough ")
+        text.add("§f&o = §oItalic            §r&n = §nUnderline")
+        text.add("§f&r = Reset")
+        text.add("§c===================================================")
+        text.add("§eClick to view extra info about colors and formatting.")
+
+        val fullText = TextHelper.multiline(text)
+        fullText.onHover("§eClick to see more!")
+        fullText.onClick { printColorCodesExtra() }
+        fullText.send()
     }
 
     private fun printColorCodesExtra() {

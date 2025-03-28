@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.Highli
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -31,8 +32,6 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -59,9 +58,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SignUtils
+import at.hannibal2.skyhanni.utils.SignUtils.isBazaarSign
+import at.hannibal2.skyhanni.utils.SignUtils.isSupercraftAmountSetSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -527,7 +530,7 @@ object GardenVisitorFeatures {
         val recentWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince() < 2.seconds
 
         if (config.notificationTitle && !recentWorldSwitch) {
-            LorenzUtils.sendTitle("§eNew Visitor", 5.seconds)
+            TitleManager.sendTitle("§eNew Visitor", duration = 5.seconds)
         }
         if (config.notificationChat) {
             val displayName = GardenVisitorColorNames.getColoredName(name)
@@ -636,28 +639,28 @@ object GardenVisitorFeatures {
         return ready
     }
 
+    private fun renderDisplay() {
+        if (showGui() && shouldShowShoppingList()) {
+            config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
+        }
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!config.shoppingList.display) return
         val gui = event.gui
         if (gui !is GuiEditSign) return
 
-        if (config.shoppingList.onlyWhenClose && !GardenApi.onBarnPlot) return
-
-        if (!hideExtraGuis() && shouldShowShoppingList()) {
-            config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
-        }
+        renderDisplay()
     }
-
-    private fun hideExtraGuis() = GardenApi.hideExtraGuis() && !VisitorApi.inInventory
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.shoppingList.display) return
+        val currentScreen = Minecraft.getMinecraft().currentScreen
+        if (currentScreen is GuiEditSign) return
 
-        if (showGui() && shouldShowShoppingList()) {
-            config.shoppingList.pos.renderStringsAndItems(display, posLabel = "Visitor Shopping List")
-        }
+        renderDisplay()
     }
 
     private fun shouldShowShoppingList(): Boolean {
@@ -666,9 +669,12 @@ object GardenVisitorFeatures {
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return true
         val isInOwnInventory = currentScreen is GuiInventory
         if (isInOwnInventory) return true
+        if (currentScreen is GuiEditSign && (currentScreen.isBazaarSign() || currentScreen.isSupercraftAmountSetSign())) return true
 
         return false
     }
+
+    private fun hideExtraGuis() = GardenApi.hideExtraGuis() && !VisitorApi.inInventory
 
     private fun showGui(): Boolean {
         if (IslandType.HUB.isInIsland()) {
