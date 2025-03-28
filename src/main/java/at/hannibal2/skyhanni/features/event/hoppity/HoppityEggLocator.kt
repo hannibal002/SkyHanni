@@ -150,7 +150,7 @@ object HoppityEggLocator {
 
         val lastPoint = bezierFitter.getLastPoint()
         if (lastPoint != null) {
-            if (lastPoint.distanceSq(event.location) > 4) return
+            if (lastPoint.distanceSq(event.location) > 9) return
         }
 
         if (EntityUtils.getEntitiesNearby<EntityFishHook>(event.location, 0.3).any()) {
