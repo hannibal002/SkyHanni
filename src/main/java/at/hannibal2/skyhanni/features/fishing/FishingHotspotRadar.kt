@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -37,6 +37,8 @@ object FishingHotspotRadar {
     private var hotspotLocation: LorenzVec? = null
     private val HOTSPOT_RADAR = "HOTSPOT_RADAR".toInternalName()
     private var foundTime = SimpleTimeMark.farPast()
+    private var lastUpdate = SimpleTimeMark.farPast()
+    private var isUnknown = false
 
     @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -60,10 +62,10 @@ object FishingHotspotRadar {
         bezierFitter.addPoint(currLoc)
 
         hotspotLocation = bezierFitter.solve() ?: return
+        isUnknown = false
+        lastUpdate = SimpleTimeMark.now()
         hotspotLocation?.let {
-            DelayedRun.runNextTick {
-                pathFind(it)
-            }
+            DelayedRun.runNextTick { pathFind(it) }
         }
     }
 
@@ -76,13 +78,8 @@ object FishingHotspotRadar {
             condition = { it.hasTag(GraphNodeTag.FISHING_HOTSPOT) },
             radius = 15.0,
         ) ?: run {
-            ErrorManager.logErrorStateWithData(
-                "No path to fishing hotspot found",
-                "no node with tag 'fishing hotspot' found near the radar hotspot target",
-                "location" to location,
-                "island" to LorenzUtils.skyBlockIsland.name,
-            )
-            IslandGraphs.pathFind(
+            isUnknown = true
+            pathFind(
                 location, "§cUnknown Fishing Hotspot", LorenzColor.RED.toColor(),
                 condition = {
                     config.guessHotspotRadarPathFind && foundTime.passedSince() < 5.seconds
@@ -96,6 +93,18 @@ object FishingHotspotRadar {
             condition = {
                 config.guessHotspotRadarPathFind && foundTime.passedSince() < 5.seconds
             },
+        )
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onSecondPassed(event: SecondPassedEvent) {
+        val location = hotspotLocation ?: return
+        if (!isUnknown || lastUpdate.passedSince() < 3.seconds) return
+        IslandGraphs.reportLocation(
+            location,
+            userFacingReason = "Found no path to fishing hotspot",
+            additionalInternalInfo = "no node with tag 'fishing hotspot' found near the radar hotspot target",
+            ignoreCache = true
         )
     }
 

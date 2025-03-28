@@ -256,7 +256,7 @@ object GoldenFishTimer {
     private fun rodWarning() {
         if (!config.throwRodWarning || hasWarnedRod) return
         hasWarnedRod = true
-        TitleManager.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
+        TitleManager.sendTitle("§cThrow your rod!", duration = 5.seconds, height = 3.6, fontSize = 7.0f)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
