@@ -30,6 +30,11 @@
 + Added Timite Tracker for the Rift. - nopo (https://github.com/hannibal002/SkyHanni/pull/3102)
     + Shows collected ores, time gained from mining, profit for raw ores, and Highlite profit.
 
+#### Misc
+
++ Added Estimated Item Value in Tooltip. - nopo (https://github.com/hannibal002/SkyHanni/pull/3631)
+    + Displayed total Estimated Item Value as a single line in the item tooltip.
+
 ### Improvements
 
 #### Garden
@@ -82,6 +87,8 @@
 + Fixed Visitor Shopping List disappearing during supercrafting. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3562)
 + Fixed performance issues with Garden GUIs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3650)
 + Fixed stored compost not displaying. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3644)
++ Fixed Garden `/sethome` Hotkey triggering multiple times. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3666)
++ Fixed Visitor Shopping List not working inside signs. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3633)
 
 #### The Rift
 
@@ -109,6 +116,7 @@
 #### Chat
 
 + Fixed SkyBlock Level not displaying in `/show` messages with Custom Chat Formatting enabled. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3519)
++ Fixed non-clickable chat messages caused by Shortened Coin Amounts. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3662)
 
 #### Inventory
 
@@ -128,6 +136,8 @@
 + Fixed coin catches not counting in the tracker. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3642)
 + Fixed Custom Scoreboard Player amount containing two slashes. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3632)
 + Fixed `/shrepoupdate` displaying "Repo updated successfully" even when no update is necessary. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3649)
++ Fixed chat spam in Fairy Souls menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3660)
++ Fixed stray timer not resetting correctly on inventory closure. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3663)
 
 ### Technical Details
 
@@ -216,6 +226,13 @@
 + More preprocessing for 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3627)
 + Moved formatPercentage, consoleLog, fillTable, addSelector, buildSelector, isDerpy, derpy, ignoreDerpy and inMiningIsland away from `LorenzUtils`. - nopo (https://github.com/hannibal002/SkyHanni/pull/3646)
 + Removed infix functions from RenderUtils. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3641)
++ Added option to disable Hypixel API Ping packet. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3671)
++ CollectionUtils' `takeIfNotEmpty()` now returns the input type. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3618)
++ Created `KeyDownEvent`. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3666)
+    + Replaced `KeyPressEvent` with `.isKeyClicked()`.
++ Fixed Jasper and Opal being detected only in Glacite Mineshafts instead of Glacite Tunnels. - Luna (https://github.com/hannibal002/SkyHanni/pull/3665)
++ Fixed keyboard manager again. - nopo (https://github.com/hannibal002/SkyHanni/pull/3668)
++ Overhauled `TitleManager`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3618)
 
 ## Version 2.0.0
 
