@@ -26,7 +26,7 @@ object AuctionOutbidWarning {
         if (!SkyHanniMod.feature.inventory.auctions.auctionOutbid) return
         if (!outbidPattern.matches(event.message)) return
 
-        TitleManager.sendTitle("§cYou have been outbid!", 5.seconds, 3.6, 7.0f)
+        TitleManager.sendTitle("§cYou have been outbid!", duration = 5.seconds, height = 3.6, fontSize = 7f)
         SoundUtils.playBeepSound()
     }
 }

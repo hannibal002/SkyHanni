@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
@@ -16,6 +17,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.client.resources.I18n
 import net.minecraft.entity.player.InventoryPlayer
@@ -59,6 +61,10 @@ object InventoryUtils {
     fun openInventoryName(): String = InventoryCompat.getOpenChestName()
 
     fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
+
+    fun inOwnInventory() = Minecraft.getMinecraft().currentScreen is GuiInventory
+
+    fun inAnyInventory() = inInventory() || inOwnInventory()
 
     fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
 
@@ -165,6 +171,8 @@ object InventoryUtils {
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+
+    fun NeuInternalName.getAmountInInventoryAndSacks(): Int = getAmountInInventory() + getAmountInSacks()
 
     fun Slot.isTopInventory() = inventory.isTopInventory()
 
