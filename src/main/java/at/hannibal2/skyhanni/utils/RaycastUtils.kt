@@ -66,6 +66,7 @@ object RaycastUtils {
         }
     }
 
+    // TODO make private or no longer generic
     fun <T : Any> List<T>.findClosestPointToRay(ray: Ray, positionExtractor: (T) -> LorenzVec): T? {
         return minByOrNull(createDistanceToRayEstimator(ray, positionExtractor))
     }
