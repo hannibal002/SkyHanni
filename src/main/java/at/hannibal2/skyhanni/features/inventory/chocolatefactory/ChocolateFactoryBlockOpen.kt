@@ -92,7 +92,7 @@ object ChocolateFactoryBlockOpen {
         SUCCESS(""),
         FAIL_NO_RABBIT("§7without a §dMythic Rabbit Pet §7equipped"),
         FAIL_NO_BOOSTER_COOKIE("§7without a §dBooster Cookie §7active"),
-        FAIL_NO_MIXIN("§7without a §6Hot Chocolate Mixin §7active")
+        FAIL_NO_MIXIN("§7without a §6Hot Chocolate Mixin §7active"),
         ;
 
         override fun toString() = displayName
