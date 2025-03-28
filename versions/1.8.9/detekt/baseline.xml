@@ -117,8 +117,8 @@
     <ID>RepoPatternRegexTestMissing:DicerRngDropTracker.kt$DicerRngDropTracker$by pumpkinPatternGroup.pattern( "uncommon", "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a\\d+x §r§aEnchanted Pumpkin§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:DojoRankDisplay.kt$DojoRankDisplay$by patternGroup.pattern( "name", "(?&lt;color&gt;§\\w)Test of (?&lt;name&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:DojoRankDisplay.kt$DojoRankDisplay$by patternGroup.pattern( "rank", "(?:§\\w)+Your Rank: (?&lt;rank&gt;§\\w.) §8\\((?&lt;score&gt;\\d+)\\)", )</ID>
-    <ID>RepoPatternRegexTestMissing:DungeonArchitectFeatures.kt$DungeonArchitectFeatures$by patternGroup.pattern( "puzzle.fail.normal", "(?:§c§lPUZZLE FAIL!|§4) §.§.(?&lt;name&gt;\\S*) .*" )</ID>
-    <ID>RepoPatternRegexTestMissing:DungeonArchitectFeatures.kt$DungeonArchitectFeatures$by patternGroup.pattern( "puzzle.fail.quiz", "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?&lt;name&gt;\\S*) (?:§.)*chose the wrong .*" )</ID>
+    <ID>RepoPatternRegexTestMissing:DungeonArchitectFeatures.kt$DungeonArchitectFeatures$by patternGroup.pattern( "puzzle.fail.normal", "(?:§c§lPUZZLE FAIL!|§4) §.§.(?&lt;name&gt;\\S*) .*", )</ID>
+    <ID>RepoPatternRegexTestMissing:DungeonArchitectFeatures.kt$DungeonArchitectFeatures$by patternGroup.pattern( "puzzle.fail.quiz", "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?&lt;name&gt;\\S*) (?:§.)*chose the wrong .*", )</ID>
     <ID>RepoPatternRegexTestMissing:DungeonCopilot.kt$DungeonCopilot$by patternGroup.pattern( "countdown", ".* has started the dungeon countdown. The dungeon will begin in 1 minute.", )</ID>
     <ID>RepoPatternRegexTestMissing:DungeonFinderFeatures.kt$DungeonFinderFeatures$by patternGroup.pattern( "nonpug", "(?i).*(?:PERM|VC|DISCORD).*", )</ID>
     <ID>RepoPatternRegexTestMissing:EnchantParser.kt$EnchantParser$by patternGroup.pattern( "enchants.new", "(?:§7§l|§d§l|§9|§7)(?&lt;enchant&gt;[A-Za-z][A-Za-z '-]+) (?&lt;levelNumeral&gt;[IVXLCDM]+|[0-9]+)(?&lt;stacking&gt;(?:§r)?§9, |\$| §8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)", )</ID>

@@ -69,7 +69,7 @@ object SeaCreatureFeatures {
         if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
             else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
-            TitleManager.sendTitle(text, 1.5.seconds, 3.6, 7f)
+            TitleManager.sendTitle(text, duration = 1.5.seconds, height = 3.6, fontSize = 7f)
             if (config.playSound) SoundUtils.playBeepSound()
         }
     }
@@ -86,7 +86,7 @@ object SeaCreatureFeatures {
         if (event.seaCreature.rare) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
-            TitleManager.sendTitle(text, 3.seconds, 2.8, 7f)
+            TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
             if (config.playSound) SoundUtils.playBeepSound()
             lastRareCatch = SimpleTimeMark.now()
         }

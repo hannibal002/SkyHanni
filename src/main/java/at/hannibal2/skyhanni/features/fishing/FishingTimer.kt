@@ -80,7 +80,7 @@ object FishingTimer {
         if (config.wormLimitAlert && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             if (currentCount >= 20) {
                 playSound()
-                TitleManager.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
+                TitleManager.sendTitle("§cWORM CAP FULL!!!", duration = 2.seconds)
             }
         } else if (config.fishingCapAlert && currentCount >= currentCap) {
             playSound()
