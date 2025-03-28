@@ -59,51 +59,63 @@ class DVDLogoRenderable(
     override val width: Int = renderable.width
     override val height: Int = renderable.height
 
-    private val leftLimit = 0 + width
-    private val rightLimit = GuiScreenUtils.scaledWindowWidth - width
-    private val topLimit = 0 + height
-    private val bottomLimit = GuiScreenUtils.scaledWindowHeight - height
-
-    private fun generateNextVelocity(): LogoVelocity {
-        val posXAtLeftEdge = (position.x <= leftLimit)
-        val posXAtRightEdge = (position.x >= rightLimit)
-        val posYAtTopEdge = (position.y <= topLimit)
-        val posYAtBottomEdge = (position.y >= bottomLimit)
-        val posXAtEdge = posXAtLeftEdge || posXAtRightEdge
-        val posYAtEdge = posYAtTopEdge || posYAtBottomEdge
-
-        return if (posXAtEdge && posYAtEdge) {
+    private fun generateNextVelocity(
+        posXAtEdge: Boolean,
+        posXAtLeftEdge: Boolean,
+        posYAtEdge: Boolean,
+        posYAtTopEdge: Boolean
+    ): LogoVelocity = when {
+        posXAtEdge && posYAtEdge -> {
             onCornerHit.invoke(this.renderable)
             velocity.invert()
-        } else if (posXAtEdge) {
+        }
+        posXAtEdge -> {
             onBounce.invoke(this.renderable)
             velocity.applyApplicator(
                 if (posXAtLeftEdge) LogoVelocity.ApplicatorDirection.RIGHT
                 else LogoVelocity.ApplicatorDirection.LEFT
             )
-        } else if (posYAtEdge) {
+        }
+        posYAtEdge -> {
             onBounce.invoke(this.renderable)
             velocity.applyApplicator(
                 if (posYAtTopEdge) LogoVelocity.ApplicatorDirection.DOWN
                 else LogoVelocity.ApplicatorDirection.UP
             )
-        } else velocity
+        }
+        else -> velocity
     }
 
-    private fun generateNextPosition(nextVelocity: LogoVelocity): Position = Position(
-        x = (position.x + nextVelocity.x).coerceIn(leftLimit, rightLimit),
-        y = (position.y + nextVelocity.y).coerceIn(topLimit, bottomLimit)
+    private fun generateNextPosition(): Position = Position(
+        x = position.x + velocity.x,
+        y = position.y + velocity.y
     )
 
     override fun render(posX: Int, posY: Int) {
-        velocity = generateNextVelocity()
-        position = generateNextPosition(velocity)
+        val (offsetX, offsetY, _) = RenderUtils.absoluteTranslation
+
+        val absoluteX = position.x + offsetX
+        val absoluteY = position.y + offsetY
+
+        val leftEdge = 0
+        val rightEdge = GuiScreenUtils.scaledWindowWidth
+        val topEdge = 0
+        val bottomEdge = GuiScreenUtils.scaledWindowHeight
+
+        val posXAtLeftEdge = absoluteX <= leftEdge
+        val posXAtRightEdge = absoluteX + width >= rightEdge
+        val posYAtTopEdge = absoluteY <= topEdge
+        val posYAtBottomEdge = absoluteY + height >= bottomEdge
+
+        val posXAtEdge = posXAtLeftEdge || posXAtRightEdge
+        val posYAtEdge = posYAtTopEdge || posYAtBottomEdge
+
+        velocity = generateNextVelocity(posXAtEdge, posXAtLeftEdge, posYAtEdge, posYAtTopEdge)
+        position = generateNextPosition()
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(position.x.toFloat(), position.y.toFloat(), 0f)
-
         renderable.render(posX, posY)
-
         GlStateManager.popMatrix()
     }
 }
