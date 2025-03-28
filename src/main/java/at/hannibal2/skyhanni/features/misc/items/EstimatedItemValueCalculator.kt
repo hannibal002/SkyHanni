@@ -75,6 +75,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
@@ -505,8 +506,7 @@ object EstimatedItemValueCalculator {
             }
         }
             .flatMap { costMap -> costMap.entries }
-            .groupingBy { (material, _) -> material }
-            .fold(0.0) { total, (_, cost) -> total + cost.toDouble() }
+            .sumByKey()
 
         val (totalPrice, names) = getTotalAndNames(allTiersCost)
 
