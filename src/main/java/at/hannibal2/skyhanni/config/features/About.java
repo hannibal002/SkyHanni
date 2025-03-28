@@ -90,6 +90,6 @@ public class About {
 
         @ConfigOption(name = "Twemoji", desc = "Twemoji is available under a modified version of the Creative Commons Attribution 4.0 Licence (CC-BY-4.0)")
         @ConfigEditorButton(buttonText = "Source")
-        public Runnable twomoji= () -> OSUtils.openBrowser("https://github.com/jdecked/Twemoji");
+        public Runnable twomoji = () -> OSUtils.openBrowser("https://github.com/jdecked/Twemoji");
     }
 }
