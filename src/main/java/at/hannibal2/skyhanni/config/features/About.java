@@ -87,5 +87,9 @@ public class About {
         @ConfigOption(name = "DiscordIPC", desc = "DiscordIPC is available under the Apache License 2.0")
         @ConfigEditorButton(buttonText = "GitHub")
         public Runnable discordRPC = () -> OSUtils.openBrowser("https://github.com/jagrosh/DiscordIPC");
+
+        @ConfigOption(name = "Twemoji", desc = "Twemoji is available under a modified version of the Creative Commons Attribution 4.0 Licence (CC-BY-4.0)")
+        @ConfigEditorButton(buttonText = "Source")
+        public Runnable twomoji= () -> OSUtils.openBrowser("https://github.com/jdecked/Twemoji");
     }
 }
