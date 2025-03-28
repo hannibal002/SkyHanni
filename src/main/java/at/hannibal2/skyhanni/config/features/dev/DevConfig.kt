@@ -130,6 +130,11 @@ class DevConfig {
     var hypixelModApi: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Hypixel Ping API", desc = "Use the Hypixel Mod API for calculating the ping.")
+    @ConfigEditorBoolean
+    var hypixelPingApi: Boolean = true
+
+    @Expose
     @ConfigOption(
         name = "Damage Indicator",
         desc = "Enable the backend of the Damage Indicator. §cOnly disable when you know what you are doing!"
