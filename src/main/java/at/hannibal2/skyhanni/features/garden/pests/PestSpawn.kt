@@ -98,7 +98,7 @@ object PestSpawn {
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"
 
         if (config.showTitle) {
-            TitleManager.sendTitle(message, 7.seconds)
+            TitleManager.sendTitle(message, duration = 7.seconds)
         }
 
         if (config.chatMessageFormat == PestSpawnConfig.ChatMessageFormatEntry.COMPACT) {
