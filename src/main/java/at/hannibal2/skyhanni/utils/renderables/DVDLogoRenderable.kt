@@ -52,6 +52,8 @@ class DVDLogoRenderable(
     private var velocity: LogoVelocity = LogoVelocity.entries.random(),
     override val horizontalAlign: RenderUtils.HorizontalAlignment,
     override val verticalAlign: RenderUtils.VerticalAlignment,
+    private val onBounce: (Renderable) -> Unit = {},
+    private val onCornerHit: (Renderable) -> Unit = {},
 ) : Renderable {
     override val width: Int = renderable.width
     override val height: Int = renderable.height
@@ -70,13 +72,16 @@ class DVDLogoRenderable(
         val posYAtEdge = posYAtTopEdge || posYAtBottomEdge
 
         return if (posXAtEdge && posYAtEdge) {
+            onCornerHit.invoke(this.renderable)
             velocity.invert()
         } else if (posXAtEdge) {
+            onBounce.invoke(this.renderable)
             velocity.applyApplicator(
                 if (posXAtLeftEdge) LogoVelocity.ApplicatorDirection.RIGHT
                 else LogoVelocity.ApplicatorDirection.LEFT
             )
         } else if (posYAtEdge) {
+            onBounce.invoke(this.renderable)
             velocity.applyApplicator(
                 if (posYAtTopEdge) LogoVelocity.ApplicatorDirection.DOWN
                 else LogoVelocity.ApplicatorDirection.UP
