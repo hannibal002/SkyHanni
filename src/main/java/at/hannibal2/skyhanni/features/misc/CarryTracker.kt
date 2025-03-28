@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * TODO more carry features
@@ -81,7 +80,7 @@ object CarryTracker {
         carry.done++
         if (carry.done == carry.requested) {
             ChatUtils.chat("Carry done for ${customer.name}!")
-            TitleManager.sendTitle("§eCarry done!", 3.seconds)
+            TitleManager.sendTitle("§eCarry done!")
         }
         update()
     }
