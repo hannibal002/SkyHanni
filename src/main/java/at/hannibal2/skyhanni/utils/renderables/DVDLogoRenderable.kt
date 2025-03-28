@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import net.minecraft.client.renderer.GlStateManager
 import kotlin.math.abs
 
 enum class LogoVelocity(var x: Int, val y: Int) {
@@ -94,15 +95,15 @@ class DVDLogoRenderable(
         y = (position.y + nextVelocity.y).coerceIn(topLimit, bottomLimit)
     )
 
-    // We don't care about posX and posY since we are using our own position
-    override fun render(posX: Int, posY: Int) = handlerRenderCall()
-    fun render() = handlerRenderCall()
+    override fun render(posX: Int, posY: Int) {
+        velocity = generateNextVelocity()
+        position = generateNextPosition(velocity)
 
-    private fun handlerRenderCall() {
-        val nextVelocity = generateNextVelocity().also { velocity = it }
-        val nextPosition = generateNextPosition(nextVelocity).also { position = it }
+        GlStateManager.pushMatrix()
+        GlStateManager.translate(position.x.toFloat(), position.y.toFloat(), 0f)
 
-        val (newPosX, newPosY) = nextPosition.let { it.x to it.y }
-        renderable.render(newPosX, newPosY)
+        renderable.render(posX, posY)
+
+        GlStateManager.popMatrix()
     }
 }
