@@ -324,7 +324,7 @@ object RenderUtils {
             color,
             if (inverseAlphaScale) (1.0f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
             else (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha),
-             renderRelativeToCamera = true,
+            renderRelativeToCamera = true,
         )
         GlStateManager.disableTexture2D()
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb)
