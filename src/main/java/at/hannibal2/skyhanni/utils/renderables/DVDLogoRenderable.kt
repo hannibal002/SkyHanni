@@ -51,8 +51,8 @@ class DVDLogoRenderable(
     private val renderable: Renderable,
     private var position: Position = renderable.generateRandomStartingPosition(),
     private var velocity: LogoVelocity = LogoVelocity.entries.random(),
-    override val horizontalAlign: RenderUtils.HorizontalAlignment,
-    override val verticalAlign: RenderUtils.VerticalAlignment,
+    override val horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER,
+    override val verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
     private val onBounce: (Renderable) -> Unit = {},
     private val onCornerHit: (Renderable) -> Unit = {},
 ) : Renderable {
