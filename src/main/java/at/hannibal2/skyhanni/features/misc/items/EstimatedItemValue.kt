@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.KuudraPrestigeCostsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -49,7 +48,7 @@ object EstimatedItemValue {
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
-    var prestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
+    var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
     private var currentlyShowing = false
 
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
@@ -68,9 +67,7 @@ object EstimatedItemValue {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
-
-        val prestigeData = event.getConstant<KuudraPrestigeCostsJson>("KuudraPrestigeCosts")
-        prestigeCosts = prestigeData.kuudraPrestigeCosts
+        crimsonPrestigeCosts = data.crimsonPrestigeCosts
     }
 
     private fun isInNeuOverlay(): Boolean {

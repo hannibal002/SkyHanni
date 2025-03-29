@@ -502,7 +502,7 @@ object EstimatedItemValueCalculator {
 
         val allTiersCost = (0 until tierIndex).mapNotNull { index ->
             kuudraTiers.getOrNull(index)?.let { tierName ->
-                EstimatedItemValue.prestigeCosts[tierName]
+                EstimatedItemValue.crimsonPrestigeCosts[tierName]
             }
         }.sumByKey()
 
