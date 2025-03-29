@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.properties.Delegates
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -150,9 +151,7 @@ object DragonFeatures {
     private var dragonSpawned = false
         set(value) {
             field = value
-            if (dragonSpawned) {
-                eggSpawned = false
-            }
+            if (value) eggSpawned = false
         }
 
     private enum class EndType {
@@ -167,21 +166,15 @@ object DragonFeatures {
 
     private var dirty = false
 
-    private var currentDamage = 0.0
-        set(value) {
-            if (field != value) dirty = true
-            field = value
+    private fun <T> dirtyTracking(initial: T): kotlin.properties.ReadWriteProperty<Any?, T> =
+        Delegates.observable(initial) { _, old, new ->
+            if (old != new) dirty = true
         }
-    private var currentTopDamage = 0.0
-        set(value) {
-            if (field != value) dirty = true
-            field = value
-        }
-    private var currentPlace: Int? = null
-        set(value) {
-            if (field != value) dirty = true
-            field = value
-        }
+
+    private var currentDamage by dirtyTracking(0.0)
+    private var currentTopDamage by dirtyTracking(0.0)
+    private var currentPlace by dirtyTracking<Int?>(null)
+
     private var widgetActive = false
     var eggSpawned = true
     var weight = 0.0
@@ -203,7 +196,7 @@ object DragonFeatures {
         widgetActive = false
         yourEyes = 0
         currentDragonType = null
-        display = null
+        display = emptyList()
     }
 
     private fun getWeightForPlacement(place: Int) = when (place) {
@@ -256,11 +249,13 @@ object DragonFeatures {
     private fun handleDragonSpawn(message: String): Boolean {
         dragonSpawnPattern.matchMatcher(message) {
             dragonSpawned = true
-            currentDragonType = DragonType.valueOf(group("dragon").uppercase())
+            val dragon = group("dragon")
+            currentDragonType = DragonType.valueOf(dragon.uppercase())
             if (currentDragonType?.equals(DragonType.UNKNOWN) == true) {
-                ErrorManager.logErrorWithData(
-                    IllegalStateException("Unknown Dragon Type: '${group("dragon")}'"),
-                    "Unknown Dragon Type: '${group("dragon")}'",
+                ErrorManager.logErrorStateWithData(
+                    userMessage = "Could not read dragon type from spawn message",
+                    internalMessage = "DragonType enum is unknown",
+                    "dragon" to dragon,
                 )
             }
         } ?: return false
@@ -416,15 +411,16 @@ object DragonFeatures {
         }
     }
 
-    private val widgetErrorGUI = listOf(Renderable.string("§cDragon Widget is disabled!"))
+    private val widgetErrorMessage = listOf(Renderable.string("§cDragon Widget is disabled!"))
 
-    private var display: List<Renderable>? = null
+    private var display = listOf<Renderable>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onRender(event: GuiRenderEvent) {
         if (!displayIsEnabled()) return
-        if (dirty) display = null
-        val display = display ?: (if (!widgetActive) widgetErrorGUI else display()).also { display = it }
+        if (dirty) {
+            display = if (widgetActive) display() else widgetErrorMessage
+        }
         config.displayPosition.renderRenderables(display, posLabel = "Dragon Weight")
     }
 
