@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
 import java.time.Instant
@@ -123,7 +123,8 @@ object HoppityCallWarning {
         val randomizationAlphaInt = randomizationAlphaDouble.toInt().coerceIn(0..255)
         // Shift the alpha value 24 bits to the left to position it in the color's alpha channel.
         val shiftedRandomAlpha = randomizationAlphaInt shl 24
-        Gui.drawRect(
+        GuiRenderUtils.drawRect(
+            event.context,
             0,
             0,
             GuiScreenUtils.displayWidth,
