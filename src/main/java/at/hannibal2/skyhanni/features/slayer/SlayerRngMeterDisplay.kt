@@ -116,7 +116,7 @@ object SlayerRngMeterDisplay {
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
                 ChatUtils.userError("No Slayer RNG Meter Item selected!")
-                TitleManager.sendTitle("§cNo RNG Meter Item!", 3.seconds)
+                TitleManager.sendTitle("§cNo RNG Meter Item!")
             }
             var blockChat = config.hideChat && hasItemSelected
             val diff = currentMeter - old
