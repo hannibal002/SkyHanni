@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -26,59 +25,34 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
-import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
 /**
  * Some functions taken from NotEnoughUpdates
  */
-@Suppress("UnusedParameter")
 object GuiRenderUtils {
 
-    private val fr: FontRenderer get() = Minecraft.getMinecraft().fontRendererObj
-
-    private fun drawStringCentered(context: DrawContext, str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
-        str ?: return
+    private fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, color: Int) {
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
-        //#if MC < 1.21
-        fr.drawString(str, x2, y2, color, shadow)
-        //#else
-        //$$ context.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
-        //#endif
+        GL11.glTranslatef(x2, y2, 0f)
+        fr.drawString(str, 0f, 0f, color, shadow)
+        GL11.glTranslatef(-x2, -y2, 0f)
     }
 
-    fun drawStringCentered(context: DrawContext, str: String?, x: Int, y: Int) {
+    fun drawString(str: String, x: Float, y: Float) {
+        Minecraft.getMinecraft().fontRendererObj.drawString(str, x, y, 0xffffff, true)
+    }
+
+    fun drawString(str: String, x: Int, y: Int) {
+        Minecraft.getMinecraft().fontRendererObj.drawString(str, x.toFloat(), y.toFloat(), 0xffffff, true)
+    }
+
+    fun drawStringCentered(str: String?, x: Int, y: Int) {
         drawStringCentered(
-            context, str, x.toFloat(), y.toFloat(), true, 0xffffff,
+            str, Minecraft.getMinecraft().fontRendererObj, x.toFloat(), y.toFloat(), true, 0xffffff,
         )
-    }
-
-    fun drawStringCenteredScaledMaxWidth(context: DrawContext, text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
-        context.matrices.pushMatrix()
-        val strLength = fr.getStringWidth(text)
-        val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
-        context.matrices.translate(x, y, 0f)
-        context.matrices.scale(factor, factor, 1f)
-        drawString(context, text, -strLength / 2, -fr.FONT_HEIGHT / 2, color, shadow)
-        context.matrices.popMatrix()
-    }
-
-    fun drawString(context: DrawContext, str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
-        //#if MC < 1.21
-        fr.drawString(str, x, y, color, shadow)
-        //#else
-        //$$ context.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
-        //#endif
-    }
-
-    fun drawString(context: DrawContext, str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
-        //#if MC < 1.21
-        fr.drawString(str, x.toFloat(), y.toFloat(), color, shadow)
-        //#else
-        //$$ context.drawText(fr, str, x, y, color, shadow)
-        //#endif
     }
 
     private fun renderItemStack(item: ItemStack, x: Int, y: Int) {

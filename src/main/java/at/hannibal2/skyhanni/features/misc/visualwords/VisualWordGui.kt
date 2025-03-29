@@ -121,14 +121,14 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             val x = guiLeft + 180
             val y = guiTop + 170
 
-            drawUnmodifiedStringCentered(context, "§aAdd New", x, y)
+            drawUnmodifiedStringCentered("§aAdd New", x, y)
             val color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
             drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
             if (shouldDrawImport) {
                 val importX = guiLeft + sizeX - 45
                 val importY = guiTop + sizeY - 10
-                GuiRenderUtils.drawStringCentered(context, "§aImport from SBE", importX, importY)
+                GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
                 val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) colorA else colorB
                 drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
             }
@@ -136,10 +136,12 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             context.matrices.scale(scale, scale, 1f)
 
             drawUnmodifiedStringCentered(
-                context, "§7Modify Words. Replaces the top with the bottom", (guiLeft + 180) * inverseScale, (guiTop + 9) * inverseScale,
+                "§7Modify Words. Replaces the top with the bottom",
+                (guiLeft + 180) * inverseScale,
+                (guiTop + 9) * inverseScale,
             )
-            drawUnmodifiedString(context, "§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
-            drawUnmodifiedString(context, "§bStatus", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
+            drawUnmodifiedString("§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
+            drawUnmodifiedString("§bStatus", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
 
             for ((index, phrase) in modifiedWords.withIndex()) {
                 if (adjustedY + 30 * index < guiTop + 20) continue
@@ -155,7 +157,6 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 }
 
                 drawUnmodifiedString(
-                    context,
                     "${index + 1}.",
                     (guiLeft + 5) * inverseScale,
                     (adjustedY + 10 + 30 * index) * inverseScale,
@@ -220,26 +221,22 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
                 if (inBox) {
                     drawUnmodifiedString(
-                        context,
                         phrase.phrase,
                         (guiLeft + 15) * inverseScale,
                         (adjustedY + 5 + 30 * index) * inverseScale,
                     )
                     drawUnmodifiedString(
-                        context,
                         phrase.replacement,
                         (guiLeft + 15) * inverseScale,
                         (adjustedY + 15 + 30 * index) * inverseScale,
                     )
                 } else {
                     drawUnmodifiedString(
-                        context,
                         phrase.phrase.convertToFormatted(),
                         (guiLeft + 15) * inverseScale,
                         (adjustedY + 5 + 30 * index) * inverseScale,
                     )
                     drawUnmodifiedString(
-                        context,
                         phrase.replacement.convertToFormatted(),
                         (guiLeft + 15) * inverseScale,
                         (adjustedY + 15 + 30 * index) * inverseScale,
@@ -262,11 +259,11 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         } else {
             var x = guiLeft + 180
             var y = guiTop + 140
-            drawUnmodifiedStringCentered(context, "§cDelete", x, y)
+            drawUnmodifiedStringCentered("§cDelete", x, y)
             var color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
             drawRect(x - 30, y - 10, x + 30, y + 10, color)
             y += 30
-            drawUnmodifiedStringCentered(context, "§eBack", x, y)
+            drawUnmodifiedStringCentered("§eBack", x, y)
             color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
             drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
@@ -274,20 +271,20 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 val currentPhrase = modifiedWords[currentIndex]
 
                 x -= 100
-                drawUnmodifiedStringCentered(context, "§bReplacement Enabled", x, y - 20)
+                drawUnmodifiedStringCentered("§bReplacement Enabled", x, y - 20)
                 var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
-                drawUnmodifiedStringCentered(context, status, x, y)
+                drawUnmodifiedStringCentered(status, x, y)
                 color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
                 drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
                 x += 200
-                drawUnmodifiedStringCentered(context, "§bCase Sensitive", x, y - 20)
+                drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
                 status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
-                drawUnmodifiedStringCentered(context, status, x, y)
+                drawUnmodifiedStringCentered(status, x, y)
                 color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
                 drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
-                drawUnmodifiedString(context, "§bIs replaced by:", guiLeft + 30, guiTop + 75)
+                drawUnmodifiedString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
 
                 if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
                     drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
@@ -307,29 +304,44 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
                 // TODO remove more code duplication
                 drawUnmodifiedString(
-                    context, "§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale,
+                    "§bThe top line of each section",
+                    (guiLeft + 10) * inverseScale,
+                    (guiTop + 12) * inverseScale,
                 )
                 drawUnmodifiedString(
-                    context, "§bis the preview of the bottom text", (guiLeft + 10) * inverseScale, (guiTop + 22) * inverseScale,
+                    "§bis the preview of the bottom text",
+                    (guiLeft + 10) * inverseScale,
+                    (guiTop + 22) * inverseScale,
                 )
 
-                drawUnmodifiedString(context, "§bTo get the Minecraft", (guiLeft + 220) * inverseScale, (guiTop + 12) * inverseScale)
                 drawUnmodifiedString(
-                    context, "§b formatting character use \"&&\"", (guiLeft + 220) * inverseScale, (guiTop + 22) * inverseScale,
+                    "§bTo get the Minecraft",
+                    (guiLeft + 220) * inverseScale,
+                    (guiTop + 12) * inverseScale,
+                )
+                drawUnmodifiedString(
+                    "§b formatting character use \"&&\"",
+                    (guiLeft + 220) * inverseScale,
+                    (guiTop + 22) * inverseScale,
                 )
 
                 drawUnmodifiedString(
-                    context, currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale,
+                    currentPhrase.phrase.convertToFormatted(),
+                    (guiLeft + 30) * inverseScale,
+                    (guiTop + 40) * inverseScale,
                 )
-                drawUnmodifiedString(context, currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
+                drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
 
                 drawUnmodifiedString(
-                    context,
                     currentPhrase.replacement.convertToFormatted(),
                     (guiLeft + 30) * inverseScale,
                     (guiTop + 95) * inverseScale,
                 )
-                drawUnmodifiedString(context, currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
+                drawUnmodifiedString(
+                    currentPhrase.replacement,
+                    (guiLeft + 30) * inverseScale,
+                    (guiTop + 110) * inverseScale,
+                )
 
                 context.matrices.scale(inverseScale, inverseScale, 1f)
             }
@@ -592,20 +604,20 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
     }
 
-    private fun drawUnmodifiedString(context: DrawContext, str: String, x: Float, y: Float) {
-        GuiRenderUtils.drawString(context, "§§$str", x, y)
+    private fun drawUnmodifiedString(str: String, x: Float, y: Float) {
+        GuiRenderUtils.drawString("§§$str", x, y)
     }
 
-    private fun drawUnmodifiedString(context: DrawContext, str: String, x: Int, y: Int) {
-        drawUnmodifiedString(context, str, x.toFloat(), y.toFloat())
+    private fun drawUnmodifiedString(str: String, x: Int, y: Int) {
+        drawUnmodifiedString(str, x.toFloat(), y.toFloat())
     }
 
-    private fun drawUnmodifiedStringCentered(context: DrawContext, str: String?, x: Int, y: Int) {
-        GuiRenderUtils.drawStringCentered(context, "§§$str", x, y)
+    private fun drawUnmodifiedStringCentered(str: String?, x: Int, y: Int) {
+        GuiRenderUtils.drawStringCentered("§§$str", x, y)
     }
 
-    private fun drawUnmodifiedStringCentered(context: DrawContext, str: String?, x: Float, y: Float) {
-        drawUnmodifiedStringCentered(context, str, x.toInt(), y.toInt())
+    private fun drawUnmodifiedStringCentered(str: String?, x: Float, y: Float) {
+        drawUnmodifiedStringCentered(str, x.toInt(), y.toInt())
     }
 }
 

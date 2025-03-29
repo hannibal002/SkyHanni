@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
@@ -8,6 +7,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
 import io.github.notenoughupdates.moulconfig.internal.RenderUtils
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.gui.ScaledResolution
 import kotlin.math.max
 import kotlin.math.min
@@ -59,9 +59,9 @@ class DefaultConfigOptionGui(
         context.matrices.pushMatrix()
         context.matrices.translate(width / 2F, (height - ySize) / 2F, 0F)
         context.matrices.scale(2f, 2f, 1f)
-        GuiRenderUtils.drawStringCenteredScaledMaxWidth(
-            context,
+        TextRenderUtils.drawStringCenteredScaledMaxWidth(
             title,
+            mc.fontRendererObj,
             0F,
             mc.fontRendererObj.FONT_HEIGHT.toFloat(),
             false,
@@ -90,8 +90,7 @@ class DefaultConfigOptionGui(
                 }
             }
             RenderUtils.drawFloatingRectDark(i - 1, -3, width + 4, 14)
-            GuiRenderUtils.drawString(
-                context,
+            mc.fontRendererObj.drawString(
                 title,
                 2 + i.toFloat(),
                 0F,
@@ -155,7 +154,7 @@ class DefaultConfigOptionGui(
             drawRect(0, 0, 1, cardHeight, 0xFF808080.toInt())
             drawRect(xSize - padding * 2 - 1, 0, xSize - padding * 2, cardHeight, 0xFF808080.toInt())
 
-            GuiRenderUtils.drawString(context, "§e${cat.name} ${suggestionState.label}", 4, 4)
+            mc.fontRendererObj.drawString("§e${cat.name} ${suggestionState.label}", 4, 4, -1)
             mc.fontRendererObj.drawSplitString("§7${cat.description}", 4, 14, xSize - padding * 2 - 8, -1)
 
             if (isMouseInScrollArea && y in 0..cardHeight) {
