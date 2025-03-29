@@ -60,7 +60,7 @@ object GriffinPetWarning {
         )
         if (lastWarnTime.passedSince() > 30.seconds) {
             lastWarnTime = SimpleTimeMark.now()
-            TitleManager.sendTitle("§cGriffin Pet!", 3.seconds)
+            TitleManager.sendTitle("§cGriffin Pet!")
         }
     }
 }

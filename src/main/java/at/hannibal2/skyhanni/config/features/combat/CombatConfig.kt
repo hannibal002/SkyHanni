@@ -50,12 +50,6 @@ class CombatConfig {
     @Accordion
     var bestiary: BestiaryConfig = BestiaryConfig()
 
-    // TODO move into end island config
-    @Expose
-    @ConfigOption(name = "Ender Node Tracker", desc = "")
-    @Accordion
-    var enderNodeTracker: EnderNodeConfig = EnderNodeConfig()
-
     @Expose
     @ConfigOption(name = "Ferocity Display", desc = "")
     @Accordion
