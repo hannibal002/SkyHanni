@@ -4,12 +4,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.BitsAvailableUpdateEvent
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.days
@@ -30,6 +32,9 @@ import kotlin.time.Duration.Companion.days
 object BitsApi {
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
     private val playerStorage get() = ProfileStorageData.playerSpecific
+
+    // TODO: remove once issue is tracked down
+    private var lastBitUpdates = mapOf<String, Int>()
 
     var bits: Int
         get() = profileStorage?.bits ?: 0
@@ -210,12 +215,13 @@ object BitsApi {
 
             bitsScoreboardPattern.matchMatcher(message) {
                 val amount = group("amount").formatInt()
-                updateBits(amount)
+                updateBits(amount, cause = "Scoreboard update, $message")
             }
         }
     }
 
-    private fun updateBits(amount: Int, modifyAvailable: Boolean = true) {
+    private fun updateBits(amount: Int, modifyAvailable: Boolean = true, cause: String) {
+        ChatUtils.debug("Updating bits to $amount, cause: $cause")
         val diff = amount - bits
         if (diff == 0) return
 
@@ -301,11 +307,10 @@ object BitsApi {
             if (bitsAvailable != amount) {
                 bitsAvailable = amount
                 sendBitsAvailableGainedEvent()
-
-                val difference = bits - bitsAvailable
-                if (difference > 0) {
-                    bits += difference
-                }
+                /**
+                 * We cant increase [BitsApi.bits] here since that difference is alr accounted for,
+                 * if we do, it will be counted twice
+                 */
             }
         }
         cookieDurationPattern.firstMatcher(lore) {
@@ -361,7 +366,7 @@ object BitsApi {
             if (!foundBits) bitsPurseMenuPattern.findMatcher(line) {
                 foundBits = true
                 val amount = group("amount").formatInt()
-                updateBits(amount, false)
+                updateBits(amount, false, "Bits Stack")
             }
 
             if (!foundAvailable) bitsAvailableMenuPattern.matchMatcher(line) {
@@ -411,6 +416,19 @@ object BitsApi {
     private fun sendBitsAvailableGainedEvent() = BitsAvailableUpdateEvent(bitsAvailable).post()
 
     fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && profileStorage != null
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Bits API")
+        event.addIrrelevant {
+            add("Bits: $bits")
+            add("Bits Available: $bitsAvailable")
+            add("Cookie Buff Time: $cookieBuffTime")
+            add("Current Fame Rank: $currentFameRank")
+            add("Last Bit Updates: $lastBitUpdates")
+            add("Bits per Cookie: ${bitsPerCookie()}")
+        }
+    }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

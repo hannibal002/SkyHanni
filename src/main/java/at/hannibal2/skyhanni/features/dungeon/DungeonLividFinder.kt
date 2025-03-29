@@ -26,15 +26,15 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.block.BlockStainedGlass
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
 import net.minecraft.init.Blocks
@@ -170,7 +170,7 @@ object DungeonLividFinder {
         if (event.entity.mob in fakeLivids) event.cancel()
     }
 
-    private fun isCurrentlyBlind() = (Minecraft.getMinecraft().thePlayer?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
+    private fun isCurrentlyBlind() = (MinecraftCompat.localPlayerOrNull?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
 
     private fun Mob.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()
@@ -191,7 +191,7 @@ object DungeonLividFinder {
         event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
 
         val color = lorenzColor.toColor()
-        event.drawFilledBoundingBoxNea(boundingBox, color, 0.5f)
+        event.drawFilledBoundingBox(boundingBox, color, 0.5f)
 
         if (location.distanceSqToPlayer() > 50) {
             event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)

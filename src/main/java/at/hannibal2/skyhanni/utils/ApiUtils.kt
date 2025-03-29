@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.google.gson.JsonSyntaxException
 import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
@@ -99,7 +98,7 @@ object ApiUtils {
                     val returnedData = inputStream.bufferedReader().use { it.readText() }
                     try {
                         return parser.parse(returnedData)
-                    } catch (e: JsonSyntaxException) {
+                    } catch (e: Exception) {
                         val name = e.javaClass.name
                         val message = "$name: ${e.message}"
                         if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
@@ -108,7 +107,7 @@ object ApiUtils {
                             ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
                         } else if (returnedData.contains("<center><h1>502 Bad Gateway</h1></center>")) {
                             ErrorManager.skyHanniError(
-                                "Error connecting to $apiName API!",
+                                "Error fetching data from $apiName API!",
                                 "error message" to "$message(502 Bad Gateway)",
                                 "api name" to apiName,
                                 "url" to url,
@@ -116,7 +115,7 @@ object ApiUtils {
                             )
                         } else {
                             ErrorManager.skyHanniError(
-                                "Error connecting to $apiName API!",
+                                "Error fetching data from $apiName API!",
                                 "error message" to message,
                                 "api name" to apiName,
                                 "url" to url,
@@ -133,7 +132,7 @@ object ApiUtils {
             val name = e.javaClass.name
             val errorMessage = "$name: ${e.message}"
             ErrorManager.skyHanniError(
-                "Error connecting to $apiName API!",
+                "Error fetching data from $apiName API!",
                 "api name" to apiName,
                 "error message" to errorMessage,
                 "url" to url,
@@ -144,11 +143,11 @@ object ApiUtils {
         return JsonObject()
     }
 
-    fun postJSON(urlString: String, body: String, silentError: Boolean = false): ApiResponse {
+    fun postJSON(url: String, body: String, apiName: String): ApiResponse {
         val client = builder.build()
 
         try {
-            val method = HttpPost(urlString)
+            val method = HttpPost(url)
             method.entity = StringEntity(body, ContentType.APPLICATION_JSON)
 
             client.execute(method).use { response ->
@@ -160,23 +159,24 @@ object ApiUtils {
                     return ApiResponse(true, "Request successful", data)
                 }
 
-                val message = "POST request to '$urlString' returned status ${status.statusCode}"
+                val message = "POST request to '$url' returned status ${status.statusCode}"
                 ErrorManager.logErrorStateWithData(
-                    "Error communicating with API",
-                    "APIUtil POST request returned an error code",
-                    "statusCode" to status.statusCode,
-                    "urlString" to urlString,
+                    "Error sending data to $apiName API!",
+                    "statusCode is ${status.statusCode}",
+                    "error message" to "$message(502 Bad Gateway)",
+                    "api name" to apiName,
+                    "url" to url,
+                    "status code" to status.statusCode,
                     "body" to body,
                 )
                 return ApiResponse(false, message, JsonObject())
             }
         } catch (throwable: Throwable) {
-            if (silentError) {
-                throw throwable
-            }
             ErrorManager.logErrorWithData(
-                throwable, "SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource",
-                "urlString" to urlString,
+                throwable,
+                "Error sending data to $apiName API!",
+                "api name" to apiName,
+                "url" to url,
                 "body" to body,
             )
             return ApiResponse(false, throwable.message, JsonObject())
@@ -199,17 +199,18 @@ object ApiUtils {
         }
     }
 
-    fun postJSONIsSuccessful(url: String, body: String, silentError: Boolean = false): Boolean {
-        val response = postJSON(url, body, silentError)
+    fun postJSONIsSuccessful(url: String, body: String, apiName: String): Boolean {
+        val response = postJSON(url, body, apiName)
 
         if (response.success) {
             return true
         }
 
         ErrorManager.logErrorStateWithData(
-            "An error occurred during the API request",
+            "An error occurred during the $apiName API request!",
             "unsuccessful API response",
             "url" to url,
+            "apiName" to apiName,
             "body" to body,
             "message" to response.message,
             "response" to response,

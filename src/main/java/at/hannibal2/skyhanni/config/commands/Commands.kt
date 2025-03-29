@@ -114,6 +114,7 @@ object Commands {
         event.register("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             category = CommandCategory.USERS_ACTIVE
+            aliases = listOf("shlockmouse")
             callback { LockMouseLook.toggleLock() }
         }
         event.register("shsensreduce") {
@@ -445,12 +446,12 @@ object Commands {
             callback { SkyHanniDebugsAndTests.waypoint(it) }
         }
         event.register("shstoplisteners") {
-            description = "Unregistering all loaded forge event listeners"
+            description = "Unregistering all loaded event listeners"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.stopListeners() }
         }
         event.register("shreloadlisteners") {
-            description = "Trying to load all forge event listeners again. Might not work at all"
+            description = "Reloads all event listeners again"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.reloadListeners() }
         }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -157,7 +159,7 @@ object GoldenFishTimer {
             return
         }
         TrophyFishMessages.trophyFishPattern.matchMatcher(event.message) {
-            val internalName = TrophyFishMessages.getInternalName(group("displayName"))
+            val internalName = TrophyFishApi.getInternalName(group("displayName"))
             if (internalName != "goldenfish") return@matchMatcher
             timePossibleSpawn = ServerTimeMark.now() + minimumSpawnTime
             removeGoldenFish()
@@ -216,7 +218,7 @@ object GoldenFishTimer {
                     add("§7Can spawn since: §b${timePossibleSpawn.passedSince().formatTime()}")
                     val diff = maximumSpawnTime - minimumSpawnTime
                     val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / diff.inWholeSeconds
-                    add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}")
+                    add("§7Chance: §b${chance.coerceAtMost(1.0).formatPercentage()}")
                 }
             } else {
                 add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
@@ -254,7 +256,7 @@ object GoldenFishTimer {
     private fun rodWarning() {
         if (!config.throwRodWarning || hasWarnedRod) return
         hasWarnedRod = true
-        LorenzUtils.sendTitle("§cThrow your rod!", 5.seconds, 3.6, 7.0f)
+        TitleManager.sendTitle("§cThrow your rod!", duration = 5.seconds, height = 3.6, fontSize = 7.0f)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 

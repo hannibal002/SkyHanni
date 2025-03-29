@@ -13,9 +13,9 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.getPrevLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.projectile.EntityArrow
 import java.util.LinkedList
 import kotlin.time.DurationUnit
@@ -43,7 +43,7 @@ object ArrowTrail {
 
         for (arrow in EntityUtils.getEntities<EntityArrow>()) {
             val line = Line(arrow.getPrevLorenzVec(), arrow.getLorenzVec(), deathTime)
-            if (arrow.shootingEntity == Minecraft.getMinecraft().thePlayer) {
+            if (arrow.shootingEntity.isLocalPlayer) {
                 listYourArrow.add(line)
             } else {
                 listAllArrow.add(line)
