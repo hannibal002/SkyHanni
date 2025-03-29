@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
@@ -18,7 +16,11 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
 
-//#if MC > 1.21
+//#if MC < 1.21
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
+//#else
+//$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
 //#endif
 
