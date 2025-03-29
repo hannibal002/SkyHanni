@@ -13,7 +13,7 @@ object KuudraProfileViewerBlocker {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
-    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
+    @HandleEvent(onlyOnIsland = IslandType.KUUDRA_ARENA)
     fun onClickEntity(event: EntityClickEvent) {
         if (!config.kuudraProfileViewer) return
 
