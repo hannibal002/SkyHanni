@@ -114,8 +114,8 @@ object DragonProfitTracker {
     var lastDragonPlacement: Int? = null
 
     @HandleEvent
-    fun onRepoReload(e: RepositoryReloadEvent) {
-        allowedItems = e.getConstant<DragonProfitTrackerItemsJson>("DragonProfitTrackerItems").items
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        allowedItems = event.getConstant<DragonProfitTrackerItemsJson>("DragonProfitTrackerItems").items
     }
 
     @HandleEvent

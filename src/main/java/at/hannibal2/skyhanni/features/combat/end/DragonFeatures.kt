@@ -446,8 +446,8 @@ object DragonFeatures {
     }
 
     @HandleEvent
-    fun configFixEvent(e: ConfigUpdaterMigrator.ConfigFixEvent) {
-        e.move(78, "combat.dragon", "combat.endIsland.dragon")
-        e.move(78, "combat.endstoneProtectorChat", "combat.endIsland.endstoneProtectorChat")
+    fun configFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(78, "combat.dragon", "combat.endIsland.dragon")
+        event.move(78, "combat.endstoneProtectorChat", "combat.endIsland.endstoneProtectorChat")
     }
 }
