@@ -26,6 +26,12 @@ class CrimsonIsleConfig {
     var matriarchHelper: MatriarchHelperConfig = MatriarchHelperConfig()
 
     @Expose
+    @ConfigOption(name = "Block Profile Viewer in Kuudra", desc = "Prevent interacting with players while in the Kuudra boss fight.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var kuudraProfileViewer: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Miniboss Respawn Timer", desc = "Shows a timer for when minibosses will respawn.")
     @ConfigEditorBoolean
     @FeatureToggle
