@@ -25,9 +25,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
@@ -75,8 +73,30 @@ object RenderUtils {
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
-    private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
+    private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+
+    //#if MC < 1.8.9
+    /**
+     * Used for some debugging purposes.
+     */
+    val absoluteTranslation
+        get() = run {
+            matrixBuffer.clear()
+
+            GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer)
+
+            val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
+
+            val xTranslate = read[12].toInt()
+            val yTranslate = read[13].toInt()
+            val zTranslate = read[14].toInt()
+
+            matrixBuffer.flip()
+
+            Triple(xTranslate, yTranslate, zTranslate)
+        }
+    //#endif
 
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -173,7 +193,7 @@ object RenderUtils {
             realAlpha,
         )
         GlStateManager.disableTexture2D()
-        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
         if (seeThroughBlocks) {
@@ -181,23 +201,6 @@ object RenderUtils {
         }
         GlStateManager.enableCull()
     }
-
-    val absoluteTranslation
-        get() = run {
-            matrixBuffer.clear()
-
-            GlStateManager.getFloat(GL11.GL_MODELVIEW_MATRIX, matrixBuffer)
-
-            val read = generateSequence(0) { it + 1 }.take(16).map { matrixBuffer.get() }.toList()
-
-            val xTranslate = read[12].toInt()
-            val yTranslate = read[13].toInt()
-            val zTranslate = read[14].toInt()
-
-            matrixBuffer.flip()
-
-            Triple(xTranslate, yTranslate, zTranslate)
-        }
 
     fun getViewerPos(partialTicks: Float) =
         Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
@@ -211,13 +214,11 @@ object RenderUtils {
      * @author Moulberry
      * @author Mojang
      */
-    private fun renderBeaconBeam(
+    private fun SkyHanniRenderWorldEvent.renderBeaconBeam(
         x: Double,
         y: Double,
         z: Double,
         rgb: Int,
-        alphaMultiplier: Float,
-        partialTicks: Float,
     ) {
         val height = 300
         val bottomOffset = 0
@@ -253,59 +254,43 @@ object RenderUtils {
         val d14 = -1.0 + d1
         val d15 = height.toDouble() * 2.5 + d14
         worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR)
-        worldRenderer.pos(x + d4, y + topOffset, z + d5).tex(1.0, d15).color(r, g, b, 1.0f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + d4, y + topOffset, z + d5).tex(1.0, d15).color(r, g, b, 1.0f).endVertex()
         worldRenderer.pos(x + d4, y + bottomOffset, z + d5).tex(1.0, d14).color(r, g, b, 1.0f).endVertex()
         worldRenderer.pos(x + d6, y + bottomOffset, z + d7).tex(0.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d6, y + topOffset, z + d7).tex(0.0, d15).color(r, g, b, 1.0f * alphaMultiplier)
-            .endVertex()
-        worldRenderer.pos(x + d10, y + topOffset, z + d11).tex(1.0, d15).color(r, g, b, 1.0f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + d6, y + topOffset, z + d7).tex(0.0, d15).color(r, g, b, 1.0f).endVertex()
+        worldRenderer.pos(x + d10, y + topOffset, z + d11).tex(1.0, d15).color(r, g, b, 1.0f).endVertex()
         worldRenderer.pos(x + d10, y + bottomOffset, z + d11).tex(1.0, d14).color(r, g, b, 1.0f).endVertex()
         worldRenderer.pos(x + d8, y + bottomOffset, z + d9).tex(0.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d8, y + topOffset, z + d9).tex(0.0, d15).color(r, g, b, 1.0f * alphaMultiplier)
-            .endVertex()
-        worldRenderer.pos(x + d6, y + topOffset, z + d7).tex(1.0, d15).color(r, g, b, 1.0f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + d8, y + topOffset, z + d9).tex(0.0, d15).color(r, g, b, 1.0f).endVertex()
+        worldRenderer.pos(x + d6, y + topOffset, z + d7).tex(1.0, d15).color(r, g, b, 1.0f).endVertex()
         worldRenderer.pos(x + d6, y + bottomOffset, z + d7).tex(1.0, d14).color(r, g, b, 1.0f).endVertex()
         worldRenderer.pos(x + d10, y + bottomOffset, z + d11).tex(0.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d10, y + topOffset, z + d11).tex(0.0, d15).color(r, g, b, 1.0f * alphaMultiplier)
-            .endVertex()
-        worldRenderer.pos(x + d8, y + topOffset, z + d9).tex(1.0, d15).color(r, g, b, 1.0f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + d10, y + topOffset, z + d11).tex(0.0, d15).color(r, g, b, 1.0f).endVertex()
+        worldRenderer.pos(x + d8, y + topOffset, z + d9).tex(1.0, d15).color(r, g, b, 1.0f).endVertex()
         worldRenderer.pos(x + d8, y + bottomOffset, z + d9).tex(1.0, d14).color(r, g, b, 1.0f).endVertex()
         worldRenderer.pos(x + d4, y + bottomOffset, z + d5).tex(0.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d4, y + topOffset, z + d5).tex(0.0, d15).color(r, g, b, 1.0f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + d4, y + topOffset, z + d5).tex(0.0, d15).color(r, g, b, 1.0f).endVertex()
         tessellator.draw()
         GlStateManager.disableCull()
         val d12 = -1.0 + d1
         val d13 = height + d12
         worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR)
-        worldRenderer.pos(x + 0.2, y + topOffset, z + 0.2).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + 0.2, y + topOffset, z + 0.2).tex(1.0, d13).color(r, g, b, 0.25f).endVertex()
         worldRenderer.pos(x + 0.2, y + bottomOffset, z + 0.2).tex(1.0, d12).color(r, g, b, 0.25f).endVertex()
         worldRenderer.pos(x + 0.8, y + bottomOffset, z + 0.2).tex(0.0, d12).color(r, g, b, 0.25f).endVertex()
-        worldRenderer.pos(x + 0.8, y + topOffset, z + 0.2).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
-        worldRenderer.pos(x + 0.8, y + topOffset, z + 0.8).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + 0.8, y + topOffset, z + 0.2).tex(0.0, d13).color(r, g, b, 0.25f).endVertex()
+        worldRenderer.pos(x + 0.8, y + topOffset, z + 0.8).tex(1.0, d13).color(r, g, b, 0.25f).endVertex()
         worldRenderer.pos(x + 0.8, y + bottomOffset, z + 0.8).tex(1.0, d12).color(r, g, b, 0.25f).endVertex()
         worldRenderer.pos(x + 0.2, y + bottomOffset, z + 0.8).tex(0.0, d12).color(r, g, b, 0.25f).endVertex()
-        worldRenderer.pos(x + 0.2, y + topOffset, z + 0.8).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
-        worldRenderer.pos(x + 0.8, y + topOffset, z + 0.2).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + 0.2, y + topOffset, z + 0.8).tex(0.0, d13).color(r, g, b, 0.25f).endVertex()
+        worldRenderer.pos(x + 0.8, y + topOffset, z + 0.2).tex(1.0, d13).color(r, g, b, 0.25f).endVertex()
         worldRenderer.pos(x + 0.8, y + bottomOffset, z + 0.2).tex(1.0, d12).color(r, g, b, 0.25f).endVertex()
         worldRenderer.pos(x + 0.8, y + bottomOffset, z + 0.8).tex(0.0, d12).color(r, g, b, 0.25f).endVertex()
-        worldRenderer.pos(x + 0.8, y + topOffset, z + 0.8).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
-        worldRenderer.pos(x + 0.2, y + topOffset, z + 0.8).tex(1.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + 0.8, y + topOffset, z + 0.8).tex(0.0, d13).color(r, g, b, 0.25f).endVertex()
+        worldRenderer.pos(x + 0.2, y + topOffset, z + 0.8).tex(1.0, d13).color(r, g, b, 0.25f).endVertex()
         worldRenderer.pos(x + 0.2, y + bottomOffset, z + 0.8).tex(1.0, d12).color(r, g, b, 0.25f).endVertex()
         worldRenderer.pos(x + 0.2, y + bottomOffset, z + 0.2).tex(0.0, d12).color(r, g, b, 0.25f).endVertex()
-        worldRenderer.pos(x + 0.2, y + topOffset, z + 0.2).tex(0.0, d13).color(r, g, b, 0.25f * alphaMultiplier)
-            .endVertex()
+        worldRenderer.pos(x + 0.2, y + topOffset, z + 0.2).tex(0.0, d13).color(r, g, b, 0.25f).endVertex()
         tessellator.draw()
     }
 
@@ -332,7 +317,6 @@ object RenderUtils {
 
         GlStateManager.disableCull()
         drawFilledBoundingBox(
-            @Suppress("ktlint:standard:argument-list-wrapping")
             AxisAlignedBB(
                 x - extraSize, y - extraSizeBottomY, z - extraSize,
                 x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize,
@@ -340,9 +324,10 @@ object RenderUtils {
             color,
             if (inverseAlphaScale) (1.0f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
             else (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha),
+            renderRelativeToCamera = true,
         )
         GlStateManager.disableTexture2D()
-        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
         GlStateManager.enableCull()
@@ -437,72 +422,6 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    /**
-     * @author Mojang
-     */
-    fun drawLabel(
-        pos: LorenzVec,
-        text: String,
-        partialTicks: Float,
-        shadow: Boolean = false,
-        scale: Float = 1f,
-        yOff: Float = 0f,
-        debug: Boolean = false,
-    ) {
-        val minecraft = Minecraft.getMinecraft()
-        val player = MinecraftCompat.localPlayer
-        val x =
-            pos.x - player.lastTickPosX + (pos.x - player.posX - (pos.x - player.lastTickPosX)) * partialTicks
-        val y =
-            pos.y - player.lastTickPosY + (pos.y - player.posY - (pos.y - player.lastTickPosY)) * partialTicks
-        val z =
-            pos.z - player.lastTickPosZ + (pos.z - player.posZ - (pos.z - player.lastTickPosZ)) * partialTicks
-
-        // 7 – 25
-
-        val translate = LorenzVec(x, y, z)
-        val length = translate.length().toFloat()
-
-        var finalText = text
-        var factor = 1f
-        var finalScale = scale
-        if (debug) {
-            finalText = "$text ${length.toInt()}"
-            if (length < 8) {
-                factor = 8 / length
-            }
-            if (length > 15) {
-                factor = 15 / length
-            }
-            finalScale = scale * sqrt(factor.toDouble()).toFloat()
-        }
-
-        val f1 = 0.0266666688
-
-        val width = minecraft.fontRendererObj.getStringWidth(finalText) / 2
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(x, y, z)
-        GL11.glNormal3f(0f, 1f, 0f)
-        val renderManager = minecraft.renderManager
-        GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
-        GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
-        GlStateManager.scale(-f1, -f1, -f1)
-        GlStateManager.scale(finalScale, finalScale, finalScale)
-        GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.enableTexture2D()
-        minecraft.fontRendererObj.drawString(
-            finalText,
-            (-width).toFloat(),
-            yOff,
-            LorenzColor.WHITE.toColor().rgb,
-            shadow,
-        )
-        GlStateManager.disableBlend()
-        GlStateManager.popMatrix()
-    }
-
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
         return lastValue + (currentValue - lastValue) * multiplier
     }
@@ -539,7 +458,6 @@ object RenderUtils {
         } else {
             renderer.drawStringWithShadow(display, 0f, 0f, 0)
         }
-
 
         GlStateManager.popMatrix()
 
@@ -654,24 +572,6 @@ object RenderUtils {
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
 
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NeuItems.ITEM_FONT_SIZE): Int {
-        GlStateManager.pushMatrix()
-        val (x, y) = transform()
-        GlStateManager.translate(0f, offsetY.toFloat(), 0F)
-        var offsetX = 0
-        Renderable.withMousePosition(x, y) {
-            for (any in line) {
-                val renderable = Renderable.fromAny(any, itemScale = itemScale)
-                    ?: throw RuntimeException("Unknown render object: $any")
-                renderable.render(offsetX, offsetY)
-                offsetX += renderable.width
-                GlStateManager.translate(renderable.width.toFloat(), 0F, 0F)
-            }
-        }
-        GlStateManager.popMatrix()
-        return offsetX
-    }
-
     // totally not modified Autumn Client's TargetStrafe
     fun drawCircle(entity: Entity, partialTicks: Float, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
@@ -729,7 +629,7 @@ object RenderUtils {
         radius: Float,
         height: Float,
     ) {
-        drawCylinderInWorld(color, location.x, location.y, location.z, radius, height, partialTicks)
+        drawCylinderInWorld(color, location.x, location.y, location.z, radius, height)
     }
 
     fun SkyHanniRenderWorldEvent.drawPyramid(
@@ -808,16 +708,13 @@ object RenderUtils {
         }
     }
 
-    // Todo: Gauge whether or not partialTicks is actually necessary, or if it can be removed
-    @Suppress("UnusedParameter")
-    fun drawCylinderInWorld(
+    fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
         x: Double,
         y: Double,
         z: Double,
         radius: Float,
         height: Float,
-        partialTicks: Float,
     ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0.0f, 1.0f, 0.0f)
@@ -1009,21 +906,6 @@ object RenderUtils {
         GlStateManager.translate(-viewer, -viewY, -viewZ)
     }
 
-    fun drawStringScaledMaxWidth(
-        str: String?,
-        fr: FontRenderer,
-        x: Float,
-        y: Float,
-        shadow: Boolean,
-        len: Int,
-        color: Int,
-    ) {
-        val strLen = fr.getStringWidth(str)
-        var factor = len / strLen.toFloat()
-        factor = 1f.coerceAtMost(factor)
-        TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, color, factor)
-    }
-
     fun SkyHanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
         text: String,
@@ -1072,10 +954,10 @@ object RenderUtils {
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        render(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
+        renderText(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
     }
 
-    private fun render(
+    private fun renderText(
         location: LorenzVec,
         text: String,
         scale: Double,
@@ -1142,11 +1024,6 @@ object RenderUtils {
         }
     }
 
-    fun SkyHanniRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
-        LineDrawer.draw3D(partialTicks) {
-            draw3DLine(p1, p2, color, lineWidth, depth)
-        }
-
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
@@ -1179,90 +1056,9 @@ object RenderUtils {
         return LorenzVec(x, y, z)
     }
 
-    fun drawFilledBoundingBox(aabb: AxisAlignedBB, c: Color, alphaMultiplier: Float = 1f) {
-        GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.disableTexture2D()
-        val tessellator = Tessellator.getInstance()
-        val worldRenderer = tessellator.worldRenderer
-        GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f * alphaMultiplier)
-
-        // vertical
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        tessellator.draw()
-        GlStateManager.color(
-            c.red / 255f * 0.8f,
-            c.green / 255f * 0.8f,
-            c.blue / 255f * 0.8f,
-            c.alpha / 255f * alphaMultiplier,
-        )
-
-        // x
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        tessellator.draw()
-        GlStateManager.color(
-            c.red / 255f * 0.9f,
-            c.green / 255f * 0.9f,
-            c.blue / 255f * 0.9f,
-            c.alpha / 255f * alphaMultiplier,
-        )
-        // z
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.minZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex()
-        tessellator.draw()
-        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.minY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.maxX, aabb.maxY, aabb.maxZ).endVertex()
-        worldRenderer.pos(aabb.minX, aabb.maxY, aabb.maxZ).endVertex()
-        tessellator.draw()
-        GlStateManager.enableTexture2D()
-        GlStateManager.disableBlend()
-    }
-
-    // TODO nea please merge with 'drawFilledBoundingBox'
-    fun SkyHanniRenderWorldEvent.drawFilledBoundingBoxNea(
-        aabb: AxisAlignedBB,
-        c: Color,
-        alphaMultiplier: Float = 1f,
-        /**
-         * If set to `true`, renders the box relative to the camera instead of relative to the world.
-         * If set to `false`, will be relativized to [RenderUtils.getViewerPos].
-         */
-        renderRelativeToCamera: Boolean = false,
-        drawVerticalBarriers: Boolean = true,
-    ) {
-        drawFilledBoundingBoxNea(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
-    }
-
-    fun drawWireframeBoundingBoxNea(
+    fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
         aabb: AxisAlignedBB,
         color: Color,
-        partialTicks: Float,
     ) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
@@ -1271,7 +1067,6 @@ object RenderUtils {
         GlStateManager.disableCull()
         val vp = getViewerPos(partialTicks)
 
-        @Suppress("ktlint:standard:argument-list-wrapping")
         val effectiveAABB = AxisAlignedBB(
             aabb.minX - vp.x, aabb.minY - vp.y, aabb.minZ - vp.z,
             aabb.maxX - vp.x, aabb.maxY - vp.y, aabb.maxZ - vp.z,
@@ -1327,21 +1122,6 @@ object RenderUtils {
     }
 
     fun WorldRenderer.pos(vec: LorenzVec) = this.pos(vec.x, vec.y, vec.z)
-
-    fun draw3DQuad(
-        middlePoint: LorenzVec,
-        sidePoint1: LorenzVec,
-        sidePoint2: LorenzVec,
-        c: Color,
-        partialTicks: Float = 0F,
-    ) = QuadDrawer.draw3D(partialTicks) {
-        draw(
-            middlePoint,
-            sidePoint1,
-            sidePoint2,
-            c,
-        )
-    }
 
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
         path: Graph,
@@ -1564,18 +1344,16 @@ object RenderUtils {
         }
     }
 
-    fun drawFilledBoundingBoxNea(
+    fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
         aabb: AxisAlignedBB,
         c: Color,
         alphaMultiplier: Float = 1f,
         /**
          * If set to `true`, renders the box relative to the camera instead of relative to the world.
-         * If set to `false`, will be relativized to [RenderUtils.getViewerPos]. Setting this to `false` requires
-         * specifying [partialTicks]]
+         * If set to `false`, will be relativized to [RenderUtils.getViewerPos].
          */
-        renderRelativeToCamera: Boolean = true,
+        renderRelativeToCamera: Boolean = false,
         drawVerticalBarriers: Boolean = true,
-        partialTicks: Float = 0F,
     ) {
         GlStateManager.enableBlend()
         GlStateManager.disableLighting()
@@ -1673,49 +1451,14 @@ object RenderUtils {
         this.draw3DLine(cornerFour, cornerOne, color, lineWidth, depth)
     }
 
-    // TODO nea please merge with 'draw3DLine'
-    fun SkyHanniRenderWorldEvent.draw3DLineNea(
+    fun SkyHanniRenderWorldEvent.draw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,
         lineWidth: Int,
         depth: Boolean,
-    ) {
-        val viewer = Minecraft.getMinecraft().renderViewEntity ?: return
-        GlStateManager.disableCull()
-
-        val worldRenderer = Tessellator.getInstance().worldRenderer
-        val realX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
-        val realY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
-        val realZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(-realX, -realY, -realZ)
-        GlStateManager.disableTexture2D()
-        GlStateManager.enableBlend()
-        GlStateManager.disableAlpha()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GL11.glLineWidth(lineWidth.toFloat())
-        if (!depth) {
-            GL11.glDisable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(false)
-        }
-        GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-        worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-        worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
-        worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
-        Tessellator.getInstance().draw()
-        GlStateManager.translate(realX, realY, realZ)
-        if (!depth) {
-            GL11.glEnable(GL11.GL_DEPTH_TEST)
-            GlStateManager.depthMask(true)
-        }
-        GlStateManager.disableBlend()
-        GlStateManager.enableAlpha()
-        GlStateManager.enableTexture2D()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
-        GlStateManager.popMatrix()
-        GlStateManager.disableLighting()
-        GlStateManager.enableCull()
+    ) = LineDrawer.draw3D(partialTicks) {
+        draw3DLine(p1, p2, color, lineWidth, depth)
     }
 
     fun SkyHanniRenderWorldEvent.drawHitbox(
