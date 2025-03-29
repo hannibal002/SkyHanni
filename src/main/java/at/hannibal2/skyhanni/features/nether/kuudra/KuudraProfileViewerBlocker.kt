@@ -14,9 +14,9 @@ object KuudraProfileViewerBlocker {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
-    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.KUUDRA_ARENA)
+    @HandleEvent(onlyOnIsland = IslandType.KUUDRA_ARENA)
     fun onClickEntity(event: PacketSentEvent) {
-        if(!config.kuudraProfileViewer) return
+        if (!config.kuudraProfileViewer) return
 
         val world = MinecraftCompat.localWorldOrNull ?: return
         val packet = event.packet as? C02PacketUseEntity ?: return
