@@ -223,7 +223,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 
-### Compatability with modern versions
+### Compatibility with modern versions
 As SkyHanni gets closer to supporting multiple Minecraft versions, there are a few additional coding conventions to follow. Below are some
 of the main conventions to follow to ensure that code you write should work on both 1.8.9 and modern versions. Remember that the best
 way to ensure you are writing the correct code is to look at existing code for similar features and then try to follow that code. Also
