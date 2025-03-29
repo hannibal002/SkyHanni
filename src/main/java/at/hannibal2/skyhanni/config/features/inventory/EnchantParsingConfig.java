@@ -47,8 +47,7 @@ public class EnchantParsingConfig {
     @Expose
     @ConfigOption(name = "Perfect Enchantment Bold", desc = "Enchantments at max level will be bold.")
     @ConfigEditorBoolean
-    @FeatureToggle
-    public Property<Boolean> boldPerfectEnchant = Property.of(true);
+    public Property<Boolean> boldPerfectEnchant = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Great Enchantment Color", desc = "The color an enchantment will be at a great level.")
