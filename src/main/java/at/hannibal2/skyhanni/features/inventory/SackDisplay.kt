@@ -63,7 +63,7 @@ object SackDisplay {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.stack.getLore()
             if (lore.any { it.startsWith("§7Stored: §a") }) {
-                slot.highlight(LorenzColor.RED)
+                slot.highlight(event.context, LorenzColor.RED)
             }
         }
     }

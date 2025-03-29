@@ -379,7 +379,7 @@ object DungeonFinderFeatures {
         if (!inInventory) return
 
         event.gui.inventorySlots.inventorySlots.associateWith { highlightParty[it.slotNumber] }.forEach { (slot, color) ->
-            color?.let { slot.highlight(it) }
+            color?.let { slot.highlight(event.context, it) }
         }
     }
 

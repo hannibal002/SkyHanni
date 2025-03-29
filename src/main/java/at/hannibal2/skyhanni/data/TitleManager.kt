@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
@@ -174,10 +175,10 @@ object TitleManager {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         val globalTitle = currentTitles[TitleLocation.GLOBAL] ?: return
-        globalTitle.tryRenderGlobalTitle()
+        globalTitle.tryRenderGlobalTitle(event.context)
     }
 
-    private fun TitleData.tryRenderGlobalTitle() {
+    private fun TitleData.tryRenderGlobalTitle(context: DrawContext) {
         val guiWidth = GuiScreenUtils.scaledWindowWidth
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
@@ -190,7 +191,7 @@ object TitleManager {
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
 
         val mainTextRenderable = Renderable.string(
             titleText,
@@ -214,16 +215,16 @@ object TitleManager {
             container.renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
         }
 
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         val inventoryTitle = currentTitles[TitleLocation.INVENTORY] ?: return
-        inventoryTitle.tryRenderInventoryTitle()
+        inventoryTitle.tryRenderInventoryTitle(event.context)
     }
 
-    private fun TitleData.tryRenderInventoryTitle() {
+    private fun TitleData.tryRenderInventoryTitle(context: DrawContext) {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         val baseStringRenderable = Renderable.string(titleText, 1.5)
@@ -246,8 +247,8 @@ object TitleManager {
             else -> 200f
         }
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(0f, -(heightTranslation), 500f)
+        context.matrices.pushMatrix()
+        context.matrices.translate(0f, -(heightTranslation), 500f)
         Renderable.drawInsideRoundedRect(
             stringRenderable,
             ColorUtils.TRANSPARENT_COLOR,
@@ -255,7 +256,7 @@ object TitleManager {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 0, gui.width, gui.height)
 
-        GlStateManager.translate(0f, heightTranslation, -500f)
-        GlStateManager.popMatrix()
+        context.matrices.translate(0f, heightTranslation, -500f)
+        context.matrices.popMatrix()
     }
 }

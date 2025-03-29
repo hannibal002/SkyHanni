@@ -97,7 +97,7 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
             ).renderXYAligned(0, 0, sizeX, sizeY)
 
             val page = pageList[currentPage]
-            page?.drawPage(relativeMouseX, relativeMouseY)
+            page?.drawPage(context, relativeMouseX, relativeMouseY)
 
             context.matrices.translate(-guiLeft.toFloat(), -guiTop.toFloat(), 0f)
         }

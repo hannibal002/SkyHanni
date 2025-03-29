@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -38,7 +39,7 @@ object TabListRenderer {
 
         if (config.toggleTab) return
 
-        drawTabList()
+        drawTabList(event.context)
     }
 
     private var isPressed = false
@@ -60,16 +61,16 @@ object TabListRenderer {
         }
 
         if (isTabToggled) {
-            drawTabList()
+            drawTabList(event.context)
         }
     }
 
-    private fun drawTabList() {
+    private fun drawTabList(context: DrawContext) {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
 
-        GlStateManager.translate(0f, 0f, TAB_Z_OFFSET)
+        context.matrices.translate(0f, 0f, TAB_Z_OFFSET)
 
         var maxLines = 0
         var totalWidth = 0 - COLUMN_SPACING
@@ -137,7 +138,7 @@ object TabListRenderer {
                 footerY += LINE_HEIGHT
             }
         }
-        GlStateManager.translate(0f, 0f, -TAB_Z_OFFSET)
+        context.matrices.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
     private fun drawColumms(x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -60,25 +61,25 @@ object BazaarOrderHelper {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
                 if (buyOrSell.let { !it.first && !it.second }) return
 
-                highlightItem(group("name"), slot, buyOrSell)
+                highlightItem(event.context, group("name"), slot, buyOrSell)
             }
         }
     }
 
-    private fun highlightItem(itemName: String, slot: Slot, buyOrSell: Pair<Boolean, Boolean>) {
+    private fun highlightItem(context: DrawContext, itemName: String, slot: Slot, buyOrSell: Pair<Boolean, Boolean>) {
         val data = NeuInternalName.fromItemName(itemName).getBazaarDataOrError()
 
         val itemLore = slot.stack.getLore()
         for (line in itemLore) {
             filledPattern.matchMatcher(line) {
-                slot.highlight(LorenzColor.GREEN)
+                slot.highlight(context, LorenzColor.GREEN)
                 return
             }
 
             pricePattern.matchMatcher(line) {
                 val price = group("number").formatDouble()
                 if (buyOrSell.first && price < data.instantBuyPrice || buyOrSell.second && price > data.sellOfferPrice) {
-                    slot.highlight(LorenzColor.GOLD)
+                    slot.highlight(context, LorenzColor.GOLD)
                     return
                 }
             }
