@@ -39,4 +39,10 @@ enum class DragonType(
     val fragment by lazy { "${name}_FRAGMENT".toInternalName() }
 
     override fun toString(): String = displayName
+
+    companion object {
+        fun getByName(name: String): DragonType {
+            return entries.firstOrNull { it.name == name } ?: UNKNOWN
+        }
+    }
 }

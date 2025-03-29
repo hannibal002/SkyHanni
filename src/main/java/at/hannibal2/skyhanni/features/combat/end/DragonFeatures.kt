@@ -250,7 +250,7 @@ object DragonFeatures {
         dragonSpawnPattern.matchMatcher(message) {
             dragonSpawned = true
             val dragon = group("dragon")
-            currentDragonType = DragonType.valueOf(dragon.uppercase())
+            currentDragonType = DragonType.getByName(dragon.uppercase())
             if (currentDragonType?.equals(DragonType.UNKNOWN) == true) {
                 ErrorManager.logErrorStateWithData(
                     userMessage = "Could not read dragon type from spawn message",
