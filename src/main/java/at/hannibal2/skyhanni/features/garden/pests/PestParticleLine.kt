@@ -11,12 +11,11 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLineNea
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -49,7 +48,7 @@ object PestParticleLine {
         // TODO time in config
         if (lastPestTrackerUse.passedSince() > 5.seconds) return
 
-        if (event.type.isAnyOf(EnumParticleTypes.ENCHANTMENT_TABLE, EnumParticleTypes.VILLAGER_ANGRY)) {
+        if (event.type == EnumParticleTypes.ENCHANTMENT_TABLE || event.type == EnumParticleTypes.VILLAGER_ANGRY) {
             if (config.hideParticles) event.cancel()
         }
 
@@ -110,7 +109,7 @@ object PestParticleLine {
             // TODO time in config
             if (next.spawnTime.passedSince() > 5.seconds) continue
             val location = next.location
-            event.draw3DLineNea(
+            event.draw3DLine(
                 prev.location,
                 location,
                 color,

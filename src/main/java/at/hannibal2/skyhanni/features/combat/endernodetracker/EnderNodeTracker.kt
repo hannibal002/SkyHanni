@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry
+import at.hannibal2.skyhanni.config.features.combat.end.EnderNodeConfig.EnderNodeDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -14,8 +14,6 @@ import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -29,17 +27,18 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object EnderNodeTracker {
 
-    private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
+    private val config get() = SkyHanniMod.feature.combat.endIsland.enderNodeTracker
 
     private var miteGelInInventory = 0
 
@@ -163,9 +162,10 @@ object EnderNodeTracker {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        val newMiteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter {
-            it?.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
+        val newMiteGelInInventory = InventoryUtils.getItemsInOwnInventory().filter {
+            it.getInternalNameOrNull() == EnderNode.MITE_GEL.internalName
         }.sumOf { it.stackSize }
+
         val change = newMiteGelInInventory - miteGelInInventory
         if (change > 0) {
             tracker.modify { storage ->
@@ -193,6 +193,7 @@ object EnderNodeTracker {
         event.transform(11, "combat.enderNodeTracker.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, EnderNodeDisplayEntry::class.java)
         }
+        event.move(77, "combat.enderNodeTracker", "combat.endIsland.enderNodeTracker")
     }
 
     private fun getLootProfit(storage: Data): Map<EnderNode, Double> {

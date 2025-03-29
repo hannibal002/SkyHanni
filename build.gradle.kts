@@ -207,7 +207,12 @@ dependencies {
         isTransitive = false
     }
 
-    shadowModImpl(libs.moulconfig)
+    if (target == ProjectTarget.MAIN) {
+        shadowModImpl(libs.moulconfig)
+    } else if (target == ProjectTarget.MODERN) {
+        shadowModImpl(libs.moulconfigModern)
+    }
+
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
@@ -297,7 +302,7 @@ fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
     if (buildPathsFile.exists()) {
         sourceSet.get().apply {
             val buildPaths = buildPathsFile.readText().lineSequence()
-                .map { it.substringBefore("#").trim() }
+                .map { it.substringBefore("#").trim().replace(Regex("\\.(?!kt|java|\\()"), "/") }
                 .filter { it.isNotBlank() }
                 .toSet()
             kotlin.include(buildPaths)

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
@@ -28,7 +28,7 @@ object PrecisionMiningHighlight {
     private var deleteTime: SimpleTimeMark? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onParticle(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!(event.type == EnumParticleTypes.CRIT || event.type == EnumParticleTypes.VILLAGER_HAPPY) ||
             !Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown
@@ -53,7 +53,7 @@ object PrecisionMiningHighlight {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val particleBoundingBox = lastParticle ?: return
 
-        event.drawFilledBoundingBoxNea(particleBoundingBox, if (lookingAtParticle) Color.GREEN else Color.CYAN)
+        event.drawFilledBoundingBox(particleBoundingBox, if (lookingAtParticle) Color.GREEN else Color.CYAN)
     }
 
     @HandleEvent

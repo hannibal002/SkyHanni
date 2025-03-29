@@ -8,11 +8,9 @@ import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -26,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getAttributeFromShard
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
@@ -73,6 +72,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
@@ -104,6 +107,7 @@ object EstimatedItemValueCalculator {
         ::addMithrilInfusion,
 
         // counted
+        ::addCrimsonPrestige,
         ::addStars, // crimson, dungeon
         ::addMasterStars,
         ::addHotPotatoBooks,
@@ -149,7 +153,13 @@ object EstimatedItemValueCalculator {
     private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
     private val MITHRIL_INFUSION = "MITHRIL_INFUSION".toInternalName()
 
-    fun getTotalPrice(stack: ItemStack): Double = calculate(stack, mutableListOf()).first
+    fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean = false): Double? {
+        val (totalPrice, basePrice) = calculate(stack, mutableListOf())
+        if (ignoreBasePrice && totalPrice == basePrice) {
+            return null
+        }
+        return totalPrice
+    }
 
     fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
@@ -482,6 +492,26 @@ object EstimatedItemValueCalculator {
 
     private fun formatProgress(label: String, have: Int, max: Int, price: Number): String {
         return "§7$label: §e$have§7/§e$max ${price.formatCoinWithBrackets()}"
+    }
+
+    private fun addCrimsonPrestige(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getInternalNameOrNull() ?: return 0.0
+        if (!internalName.isKuudraArmor()) return 0.0
+        val tierIndex = internalName.getKuudraTier()?.takeIf { it > 1 } ?: return 0.0
+        val armorTier = kuudraTiers.getOrNull(tierIndex - 1) ?: return 0.0
+
+        val allTiersCost = (0 until tierIndex).mapNotNull { index ->
+            kuudraTiers.getOrNull(index)?.let { tierName ->
+                EstimatedItemValue.crimsonPrestigeCosts[tierName]
+            }
+        }.sumByKey()
+
+        val (totalPrice, names) = getTotalAndNames(allTiersCost)
+
+        list.add("§7Prestige Tier: ${armorTier.lowercase().allLettersFirstUppercase()} ${totalPrice.formatCoinWithBrackets()}")
+        list.addAll(names)
+
+        return totalPrice
     }
 
     private fun addStars(stack: ItemStack, list: MutableList<String>): Double {
@@ -871,6 +901,8 @@ object EstimatedItemValueCalculator {
 
         val internalName = getInternalName()
         if (internalName !in EstimatedItemValue.gemstoneUnlockCosts) {
+            // Do not error out on items if their data was changed.
+            if (getLore().any { it.contains("This item has unused Gemstones!") }) return null
             ErrorManager.logErrorStateWithData(
                 "Could not find gemstone slot price for $displayName",
                 "EstimatedItemValue has no gemstoneUnlockCosts for $internalName",
