@@ -209,13 +209,13 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 context.matrices.scale(inverseScale, inverseScale, 1f)
 
                 if (index != 0) {
-                    GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, top, colorA)
+                    GuiRenderUtils.renderItemAndBackground(context, itemUp, guiLeft + 295, top, colorA)
                 }
                 if (index != modifiedWords.size - 1) {
-                    GuiRenderUtils.renderItemAndBackground(itemDown, guiLeft + 315, top, colorA)
+                    GuiRenderUtils.renderItemAndBackground(context, itemDown, guiLeft + 315, top, colorA)
                 }
 
-                GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, top, colorA)
+                GuiRenderUtils.renderItemAndBackground(context, statusBlock, guiLeft + 335, top, colorA)
 
                 context.matrices.scale(scale, scale, 1f)
 

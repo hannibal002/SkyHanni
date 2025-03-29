@@ -152,9 +152,9 @@ object GuiRenderUtils {
         //#endif
     }
 
-    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
+    fun renderItemAndBackground(context: DrawContext, item: ItemStack, x: Int, y: Int, color: Int) {
         renderItemStack(item, x, y)
-        GuiScreen.drawRect(x, y, x + 16, y + 16, color)
+        drawRect(context, x, y, x + 16, y + 16, color)
     }
 
     /** @Mojang */
