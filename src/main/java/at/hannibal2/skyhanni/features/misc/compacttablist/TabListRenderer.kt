@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
@@ -103,7 +104,8 @@ object TabListRenderer {
         val x = screenWidth - totalWidth / 2
         val y = 10
 
-        Gui.drawRect(
+        GuiRenderUtils.drawRect(
+            context,
             x - COLUMN_SPACING,
             y - TAB_PADDING,
             screenWidth + totalWidth / 2 + COLUMN_SPACING,
@@ -124,7 +126,7 @@ object TabListRenderer {
             }
         }
 
-        drawColumms(x, headerY, columns, minecraft)
+        drawColumns(context, x, headerY, columns, minecraft)
 
         if (footer.isNotEmpty()) {
             var footerY = y + totalHeight - footer.size * LINE_HEIGHT + TAB_PADDING / 2 + 1
@@ -141,7 +143,7 @@ object TabListRenderer {
         context.matrices.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
-    private fun drawColumms(x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {
+    private fun drawColumns(context: DrawContext, x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {
         var middleX = x
         var lastTitle: TabLine? = null
         var lastSubTitle: TabLine? = null
@@ -159,7 +161,8 @@ object TabListRenderer {
                 !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post()
             }.let(::RenderColumn)
 
-            Gui.drawRect(
+            GuiRenderUtils.drawRect(
+                context,
                 middleX - TAB_PADDING + 1,
                 middleY - TAB_PADDING + 1,
                 middleX + column.getMaxWidth() + TAB_PADDING - 2,
