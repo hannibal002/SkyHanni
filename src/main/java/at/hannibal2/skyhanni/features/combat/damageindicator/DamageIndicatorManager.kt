@@ -226,15 +226,22 @@ object DamageIndicatorManager {
             }
             event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
 
-            var icons = ""
-            if (config.shurikenIndicator && entity.getNameTagWith(3, "§b✯") != null) icons += "§b✯"
-            if (config.twilightIndicator && entity.getNameTagWith(3, "§5ᛤ") != null) icons += "§5ᛤ"
+            val icons: MutableList<String> = mutableListOf()
+            if (config.shurikenIndicator && entity.getNameTagWith(3, "§b✯") != null) {
+                icons += if (config.compactName) "§b✯"
+                else "§bShuriken"
+            }
+            if (config.twilightIndicator && entity.getNameTagWith(3, "§5ᛤ") != null) {
+                icons += if (config.compactName) "§5ᛤ"
+                else "§5Twilight"
+            }
 
+            val iconString = icons.joinToString(if (config.compactName) "" else " ")
             var diff = 9f
             if (icons.isNotEmpty()) {
                 event.drawDynamicText(
                     location,
-                    icons,
+                    iconString,
                     sizeBossName,
                     diff,
                     smallestDistanceVew = smallestDistanceVew

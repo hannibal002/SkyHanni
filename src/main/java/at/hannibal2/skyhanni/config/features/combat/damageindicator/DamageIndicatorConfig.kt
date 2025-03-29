@@ -117,6 +117,11 @@ class DamageIndicatorConfig {
     var twilightIndicator: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Compact", desc = "Use the icons for the shuriken and twilight instead of their names.")
+    @ConfigEditorBoolean
+    var compactName: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Time to Kill",
         desc = "Show the time it takes to kill the slayer boss.\n" +
