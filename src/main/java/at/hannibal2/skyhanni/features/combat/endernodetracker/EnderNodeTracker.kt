@@ -193,7 +193,7 @@ object EnderNodeTracker {
         event.transform(11, "combat.enderNodeTracker.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, EnderNodeDisplayEntry::class.java)
         }
-        event.move(76, "combat.enderNodeTracker", "combat.endIsland.enderNodeTracker")
+        event.move(77, "combat.enderNodeTracker", "combat.endIsland.enderNodeTracker")
     }
 
     private fun getLootProfit(storage: Data): Map<EnderNode, Double> {
