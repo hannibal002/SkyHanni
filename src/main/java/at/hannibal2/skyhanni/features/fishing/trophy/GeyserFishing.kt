@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
@@ -61,7 +61,7 @@ object GeyserFishing {
         if (config.onlyWithRod && !FishingApi.holdingLavaRod) return
 
         val color = config.boxColor.toSpecialColor()
-        event.drawFilledBoundingBoxNea(geyserBox, color)
+        event.drawFilledBoundingBox(geyserBox, color)
     }
 
     private fun hideGeyserParticles(event: ReceiveParticleEvent) {

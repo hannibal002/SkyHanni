@@ -73,6 +73,9 @@ object CollectionUtils {
         }
     }
 
+    fun <K, V : Number> List<Map<K, V>>.sumByKey(): Map<K, Double> =
+        flatMap { it.entries }.groupBy({ it.key }, { it.value.toDouble() }).mapValues { (_, values) -> values.sum() }
+
     fun <T, R> Sequence<IndexedValue<T>>.runningIndexedFold(initial: R, operation: (R, T) -> R): Sequence<IndexedValue<R>> =
         map { it.value }.runningFold(initial, operation).zip(map { it.index }) { value, index -> IndexedValue(index, value) }
 
