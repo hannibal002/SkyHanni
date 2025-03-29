@@ -40,8 +40,8 @@ object ShortenCoins {
 
         val originalComponent = event.chatComponent.siblings.firstOrNull() ?: event.chatComponent
 
-        event.chatComponent = modifiedMessage.asComponent().style {
-            originalComponent.chatStyle
+        event.chatComponent = modifiedMessage.asComponent {
+            chatStyle = originalComponent.chatStyle
         }
     }
 
