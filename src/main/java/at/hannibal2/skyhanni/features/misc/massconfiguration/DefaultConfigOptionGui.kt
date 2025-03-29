@@ -150,10 +150,10 @@ class DefaultConfigOptionGui(
         for ((cat) in orderedOptions.entries) {
             val suggestionState = resetSuggestionState[cat]!!
 
-            drawRect(0, 0, xSize - padding * 2, 1, 0xFF808080.toInt())
-            drawRect(0, 30, xSize - padding * 2, cardHeight + 1, 0xFF808080.toInt())
-            drawRect(0, 0, 1, cardHeight, 0xFF808080.toInt())
-            drawRect(xSize - padding * 2 - 1, 0, xSize - padding * 2, cardHeight, 0xFF808080.toInt())
+            GuiRenderUtils.drawRect(context, 0, 0, xSize - padding * 2, 1, 0xFF808080.toInt())
+            GuiRenderUtils.drawRect(context, 0, 30, xSize - padding * 2, cardHeight + 1, 0xFF808080.toInt())
+            GuiRenderUtils.drawRect(context, 0, 0, 1, cardHeight, 0xFF808080.toInt())
+            GuiRenderUtils.drawRect(context, xSize - padding * 2 - 1, 0, xSize - padding * 2, cardHeight, 0xFF808080.toInt())
 
             GuiRenderUtils.drawString(context, "§e${cat.name} ${suggestionState.label}", 4, 4)
             mc.fontRendererObj.drawSplitString("§7${cat.description}", 4, 14, xSize - padding * 2 - 8, -1)

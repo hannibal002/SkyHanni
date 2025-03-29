@@ -108,7 +108,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         mouseY = GuiScreenUtils.mouseY
 
         context.matrices.pushMatrix()
-        drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
+        GuiRenderUtils.drawRect(context, guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
         val scale = 0.75f
         val inverseScale = 1 / scale
 
@@ -123,14 +123,14 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
             drawUnmodifiedStringCentered(context, "§aAdd New", x, y)
             val color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, color)
+            GuiRenderUtils.drawRect(context, x - 30, y - 10, x + 30, y + 10, color)
 
             if (shouldDrawImport) {
                 val importX = guiLeft + sizeX - 45
                 val importY = guiTop + sizeY - 10
                 GuiRenderUtils.drawStringCentered(context, "§aImport from SBE", importX, importY)
                 val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) colorA else colorB
-                drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
+                GuiRenderUtils.drawRect(context, importX - 45, importY - 10, importX + 45, importY + 10, importColor)
             }
 
             context.matrices.scale(scale, scale, 1f)
@@ -190,6 +190,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
                 if (inBox) {
                     GuiRenderUtils.drawScaledRec(
+                        context,
                         guiLeft,
                         adjustedY + 30 * index,
                         guiLeft + sizeX,
@@ -264,11 +265,11 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             var y = guiTop + 140
             drawUnmodifiedStringCentered(context, "§cDelete", x, y)
             var color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, color)
+            GuiRenderUtils.drawRect(context, x - 30, y - 10, x + 30, y + 10, color)
             y += 30
             drawUnmodifiedStringCentered(context, "§eBack", x, y)
             color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, color)
+            GuiRenderUtils.drawRect(context, x - 30, y - 10, x + 30, y + 10, color)
 
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
                 val currentPhrase = modifiedWords[currentIndex]
@@ -278,29 +279,29 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
                 drawUnmodifiedStringCentered(context, status, x, y)
                 color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                drawRect(x - 30, y - 10, x + 30, y + 10, color)
+                GuiRenderUtils.drawRect(context, x - 30, y - 10, x + 30, y + 10, color)
 
                 x += 200
                 drawUnmodifiedStringCentered(context, "§bCase Sensitive", x, y - 20)
                 status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
                 drawUnmodifiedStringCentered(context, status, x, y)
                 color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                drawRect(x - 30, y - 10, x + 30, y + 10, color)
+                GuiRenderUtils.drawRect(context, x - 30, y - 10, x + 30, y + 10, color)
 
                 drawUnmodifiedString(context, "§bIs replaced by:", guiLeft + 30, guiTop + 75)
 
                 if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
+                    GuiRenderUtils.drawRect(context, guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
                 }
                 if (currentTextBox == SelectedTextBox.PHRASE) {
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
+                    GuiRenderUtils.drawRect(context, guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
                 }
 
                 if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
+                    GuiRenderUtils.drawRect(context, guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
                 }
                 if (currentTextBox == SelectedTextBox.REPLACEMENT) {
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
+                    GuiRenderUtils.drawRect(context, guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
                 }
 
                 context.matrices.scale(0.75f, 0.75f, 1f)

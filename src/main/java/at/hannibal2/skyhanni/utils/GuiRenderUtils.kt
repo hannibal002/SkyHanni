@@ -133,19 +133,23 @@ object GuiRenderUtils {
         )
     }
 
-    fun Int.darkenColor(): Int {
-        val color = Color(this)
-        return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
-    }
-
-    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
-        GuiScreen.drawRect(
+    fun drawScaledRec(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
+        drawRect(
+            context,
             (left * inverseScale).toInt(),
             (top * inverseScale).toInt(),
             (right * inverseScale).toInt(),
             (bottom * inverseScale).toInt(),
             color,
         )
+    }
+
+    fun drawRect(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int, color: Int) {
+        //#if MC < 1.21
+        GuiScreen.drawRect(left, top, right, bottom, color)
+        //#else
+        //$$ context.fill(left, top, right, bottom, color)
+        //#endif
     }
 
     fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {

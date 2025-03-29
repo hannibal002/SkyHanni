@@ -114,7 +114,14 @@ class GuiPositionEditor(
 
             elementWidth = position.getDummySize().x
             elementHeight = position.getDummySize().y
-            drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
+            GuiRenderUtils.drawRect(
+                context,
+                x - border,
+                y - border,
+                x + elementWidth + border * 2,
+                y + elementHeight + border * 2,
+                -0x7fbfbfc0,
+            )
 
             if (GuiRenderUtils.isPointInRect(
                     mouseX,
