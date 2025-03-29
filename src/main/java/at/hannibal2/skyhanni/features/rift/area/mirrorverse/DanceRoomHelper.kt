@@ -92,6 +92,7 @@ object DanceRoomHelper {
         if (!config.enabled) return
         if (!inRoom) return
         config.position.renderStrings(
+            event.context,
             display,
             config.extraSpace,
             posLabel = "Dance Room Helper",

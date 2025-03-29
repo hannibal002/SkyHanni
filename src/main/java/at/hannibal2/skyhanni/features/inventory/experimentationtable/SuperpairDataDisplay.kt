@@ -59,13 +59,17 @@ object SuperpairDataDisplay {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "Experimentation Table") {
             // Render here so they can move it around.
-            config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
+            config.superpairDisplayPosition.renderString(
+                event.context,
+                "§6Superpair Experimentation Data",
+                posLabel = "Superpair Experimentation Data",
+            )
         }
         if (ExperimentationTableApi.currentExperiment == null) return
 
         if (display.isEmpty()) display = drawDisplay()
 
-        config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experimentation Data")
+        config.superpairDisplayPosition.renderStrings(event.context, display, posLabel = "Superpair Experimentation Data")
     }
 
     @HandleEvent

@@ -212,7 +212,7 @@ object FarmingLaneFeatures {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.distanceDisplay) return
 
-        config.distanceDisplayPosition.renderStrings(display, posLabel = "Lane Display")
+        config.distanceDisplayPosition.renderStrings(event.context, display, posLabel = "Lane Display")
     }
 
     @JvmStatic

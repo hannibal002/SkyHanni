@@ -36,7 +36,7 @@ object ArmorStackDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.position.renderString(display, posLabel = "Armor Stack Display")
+        config.position.renderString(event.context, display, posLabel = "Armor Stack Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

@@ -82,7 +82,7 @@ object QuiverDisplay {
         ) {
             val content =
                 Renderable.horizontalContainer(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
-            config.quiverDisplayPos.renderRenderables(listOf(content), posLabel = "Quiver Display")
+            config.quiverDisplayPos.renderRenderables(event.context, listOf(content), posLabel = "Quiver Display")
         }
     }
 

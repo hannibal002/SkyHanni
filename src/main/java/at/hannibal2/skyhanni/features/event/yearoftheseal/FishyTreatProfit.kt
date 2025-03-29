@@ -208,8 +208,8 @@ object FishyTreatProfit {
         RenderDisplayHelper(
             condition = { config.fishyTreatProfit },
             inventory = inventory,
-        ) {
-            config.fishyTreatProfitPosition.renderRenderables(display, posLabel = "Fishy Treat Profit")
+        ) { context ->
+            config.fishyTreatProfitPosition.renderRenderables(context, display, posLabel = "Fishy Treat Profit")
         }
     }
 }

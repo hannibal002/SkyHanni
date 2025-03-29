@@ -136,7 +136,7 @@ object GraphEditor {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.infoDisplay.renderStrings(buildDisplay(), posLabel = "Graph Info")
+        config.infoDisplay.renderStrings(event.context, buildDisplay(), posLabel = "Graph Info")
     }
 
     private fun buildDisplay(): List<String> = buildList {

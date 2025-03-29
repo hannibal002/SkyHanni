@@ -66,6 +66,7 @@ enum class TabWidgetDisplay(
             if (config?.displayPositions == null) return
             config.display.forEach { widget ->
                 widget.position.renderStrings(
+                    event.context,
                     widget.widgets.flatMap { subWidget ->
                         subWidget.lines
                     },

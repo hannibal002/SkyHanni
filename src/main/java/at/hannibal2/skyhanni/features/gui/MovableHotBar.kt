@@ -26,7 +26,7 @@ object MovableHotBar {
         event.context.matrices.pushMatrix()
         val x = GuiScreenUtils.scaledWindowWidth / 2 - 91
         val y = GuiScreenUtils.scaledWindowHeight - 22
-        config.hotbar.transform()
+        config.hotbar.transform(event.context)
         event.context.matrices.translate(-x.toFloat(), -y.toFloat(), 0f) // Must be after transform to work with scaling
         GuiEditManager.add(config.hotbar, "Hotbar", 182 - 1, 22 - 1) // -1 since the editor for some reason add +1
     }

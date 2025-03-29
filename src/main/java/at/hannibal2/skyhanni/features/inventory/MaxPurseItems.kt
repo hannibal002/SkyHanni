@@ -85,6 +85,7 @@ object MaxPurseItems {
         } ?: 0
 
         config.maxPurseItemsPosition.renderStrings(
+            event.context,
             listOf(
                 "§7Max items with purse",
                 "§7Buy order +0.1: §e${buyOrders.addSeparators()}x",

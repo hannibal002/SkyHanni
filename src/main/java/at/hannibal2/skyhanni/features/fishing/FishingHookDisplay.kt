@@ -78,7 +78,7 @@ object FishingHookDisplay {
         if (!armorStand.hasCustomName()) return
         val alertText = if (armorStand.name == "§c§l!!!") config.customAlertText.replace("&", "§") else armorStand.name
 
-        config.position.renderString(alertText, posLabel = "Fishing Hook Display")
+        config.position.renderString(event.context, alertText, posLabel = "Fishing Hook Display")
     }
 
     @HandleEvent

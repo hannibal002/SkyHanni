@@ -110,7 +110,7 @@ object TpsCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")
+        config.tpsDisplayPosition.renderString(event.context, display, posLabel = "Tps Display")
     }
 
     @HandleEvent

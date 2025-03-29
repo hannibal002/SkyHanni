@@ -143,7 +143,7 @@ object FarmingFortuneDisplay {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null) return
-        config.pos.renderRenderables(display, posLabel = "True Farming Fortune")
+        config.pos.renderRenderables(event.context, display, posLabel = "True Farming Fortune")
     }
 
     private fun update() {

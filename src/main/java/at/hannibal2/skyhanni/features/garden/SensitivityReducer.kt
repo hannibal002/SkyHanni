@@ -110,7 +110,7 @@ object SensitivityReducer {
         if (!(isToggled || isManualToggle)) return
         if (!config.showGUI) return
         if (LockMouseLook.lockedMouse) return
-        config.position.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
+        config.position.renderString(event.context, "§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
     }
 
     private fun isHoldingTool(): Boolean {

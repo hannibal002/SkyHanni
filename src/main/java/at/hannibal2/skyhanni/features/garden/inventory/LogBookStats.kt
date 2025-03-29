@@ -96,6 +96,7 @@ object LogBookStats {
         if (IslandType.GARDEN_GUEST.isInIsland()) return
         if (inInventory && config.showLogBookStats) {
             config.logBookStatsPos.renderRenderables(
+                event.context,
                 display,
                 extraSpace = 5,
                 posLabel = "Visitor's LogBook Stats",

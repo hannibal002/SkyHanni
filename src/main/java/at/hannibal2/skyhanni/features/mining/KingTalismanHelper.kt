@@ -225,7 +225,7 @@ object KingTalismanHelper {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.position.renderStrings(display, posLabel = "King Talisman Helper")
+        config.position.renderStrings(event.context, display, posLabel = "King Talisman Helper")
     }
 
     @HandleEvent

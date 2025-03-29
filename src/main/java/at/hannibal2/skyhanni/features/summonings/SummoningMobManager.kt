@@ -129,7 +129,7 @@ object SummoningMobManager {
         }.map { Renderable.string(it) }
 
         val renderable = Renderable.verticalContainer(list)
-        config.summoningMobDisplayPos.renderRenderable(renderable, posLabel = "Summoning Mob Display")
+        config.summoningMobDisplayPos.renderRenderable(event.context, renderable, posLabel = "Summoning Mob Display")
     }
 
     @HandleEvent

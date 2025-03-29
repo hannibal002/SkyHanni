@@ -163,14 +163,14 @@ object DianaProfitTracker {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { config.enabled },
-            onRender = {
+            onRender = { context ->
                 val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
                 if (!DianaApi.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
                 if (spadeInHand) {
                     tracker.firstUpdate()
                 }
 
-                tracker.renderDisplay(config.position)
+                tracker.renderDisplay(context, config.position)
             },
         )
     }

@@ -104,7 +104,7 @@ object StereoHarmonyDisplay {
         if (display.isEmpty()) return
         val content = Renderable.horizontalContainer(display, 1, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
         val renderables = listOf(content)
-        config.position.renderRenderables(renderables, posLabel = "Stereo Harmony Display")
+        config.position.renderRenderables(event.context, renderables, posLabel = "Stereo Harmony Display")
     }
 
     @HandleEvent

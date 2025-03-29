@@ -329,7 +329,7 @@ object GardenVisitorDropStatistics {
         if (!config.enabled) return
         if (GardenApi.hideExtraGuis()) return
         if (config.onlyOnBarn && !GardenApi.onBarnPlot) return
-        config.pos.renderRenderables(display, posLabel = "Visitor Stats")
+        config.pos.renderRenderables(event.context, display, posLabel = "Visitor Stats")
     }
 
     @HandleEvent

@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.time.Duration
@@ -160,13 +161,13 @@ object ComposterDisplay {
         if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
 
         if (GardenApi.inGarden() && config.displayEnabled) {
-            config.displayPos.renderRenderable(display, posLabel = "Composter Display")
+            config.displayPos.renderRenderable(event.context, display, posLabel = "Composter Display")
         }
 
-        checkWarningsAndOutsideGarden()
+        checkWarningsAndOutsideGarden(event.context)
     }
 
-    private fun checkWarningsAndOutsideGarden() {
+    private fun checkWarningsAndOutsideGarden(context: DrawContext) {
         val format = GardenApi.storage?.let {
             if (!it.composterEmptyTime.isFarPast()) {
                 val duration = it.composterEmptyTime.timeUntil()
@@ -189,7 +190,7 @@ object ComposterDisplay {
                 addItemStack(bucket)
                 addString("§b$format")
             }
-            config.outsideGardenPos.renderRenderable(outsideGardenDisplay, posLabel = "Composter Outside Garden")
+            config.outsideGardenPos.renderRenderable(context, outsideGardenDisplay, posLabel = "Composter Outside Garden")
         }
     }
 

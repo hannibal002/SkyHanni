@@ -113,7 +113,7 @@ object ItemPickupLog {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        display?.let { config.pos.renderRenderable(it, posLabel = "Item Pickup Log Display") }
+        display?.let { config.pos.renderRenderable(event.context, it, posLabel = "Item Pickup Log Display") }
     }
 
     @HandleEvent

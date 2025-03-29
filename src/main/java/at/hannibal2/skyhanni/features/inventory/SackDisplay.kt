@@ -49,8 +49,9 @@ object SackDisplay {
         RenderDisplayHelper(
             inventory = SackApi.inventory,
             condition = { isEnabled() },
-        ) {
+        ) { context ->
             config.position.renderRenderables(
+                context,
                 display, extraSpace = config.extraSpace, posLabel = "Sacks Items",
             )
         }

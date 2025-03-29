@@ -62,6 +62,7 @@ object ChestValue {
 
         if (inInventory) {
             config.position.renderRenderables(
+                event.context,
                 display,
                 extraSpace = -1,
                 posLabel = featureName(),

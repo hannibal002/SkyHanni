@@ -78,7 +78,7 @@ object FlareDisplay {
         }
 
         if (config.displayType == FlareConfig.DisplayType.WORLD) return
-        config.position.renderRenderables(display, posLabel = "Flare Timer")
+        config.position.renderRenderables(event.context, display, posLabel = "Flare Timer")
     }
 
     @HandleEvent(onlyOnSkyblock = true)

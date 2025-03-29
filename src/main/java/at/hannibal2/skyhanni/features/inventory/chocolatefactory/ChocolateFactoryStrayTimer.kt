@@ -81,7 +81,7 @@ object ChocolateFactoryStrayTimer {
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled() || !ChocolateFactoryApi.inChocolateFactory) return
-        eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
+        eventConfig.strayTimerPosition.renderRenderable(event.context, getTimerRenderable(), posLabel = "Stray Timer")
     }
 
     private fun getTimerRenderable(): Renderable = Renderable.verticalContainer(

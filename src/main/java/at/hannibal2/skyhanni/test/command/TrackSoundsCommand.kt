@@ -105,7 +105,7 @@ object TrackSoundsCommand {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (cutOffTime.isInPast()) return
-        position.renderRenderables(display, posLabel = "Track sound log")
+        position.renderRenderables(event.context, display, posLabel = "Track sound log")
     }
 
     @HandleEvent

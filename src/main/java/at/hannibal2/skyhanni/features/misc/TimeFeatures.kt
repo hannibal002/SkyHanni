@@ -42,7 +42,7 @@ object TimeFeatures {
                 SimpleDateFormat("HH:mm${if (config.realTimeShowSeconds) ":ss" else ""}")
             }
             val currentTime = timeFormat.format(System.currentTimeMillis())
-            config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
+            config.realTimePosition.renderString(event.context, currentTime, posLabel = "Real Time")
         }
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
@@ -54,7 +54,7 @@ object TimeFeatures {
             } else {
                 "§fJerry's Workshop §ecloses in §b${timeTillNextYear.format()}"
             }
-            winterConfig.islandCloseTimePosition.renderString(text, posLabel = "Winter Time")
+            winterConfig.islandCloseTimePosition.renderString(event.context, text, posLabel = "Winter Time")
         }
     }
 

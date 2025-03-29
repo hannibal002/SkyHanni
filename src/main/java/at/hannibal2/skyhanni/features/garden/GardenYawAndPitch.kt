@@ -48,9 +48,9 @@ object GardenYawAndPitch {
             "§aPitch: §f$pitchText",
         )
         if (GardenApi.inGarden()) {
-            config.pos.renderStrings(displayList, posLabel = "Yaw and Pitch")
+            config.pos.renderStrings(event.context, displayList, posLabel = "Yaw and Pitch")
         } else {
-            config.posOutside.renderStrings(displayList, posLabel = "Yaw and Pitch")
+            config.posOutside.renderStrings(event.context, displayList, posLabel = "Yaw and Pitch")
         }
     }
 

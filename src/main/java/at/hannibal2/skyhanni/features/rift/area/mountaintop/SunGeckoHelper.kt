@@ -184,7 +184,7 @@ object SunGeckoHelper {
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !inTimeChamber) return
 
-        config.position.renderStrings(display, 0, "Sun Gecko Helper")
+        config.position.renderStrings(event.context, display, 0, "Sun Gecko Helper")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)

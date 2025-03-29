@@ -162,7 +162,7 @@ object QuickModMenuSwitch {
         if (!isEnabled()) return
 
         event.context.matrices.pushMatrix()
-        config.pos.renderRenderables(display, posLabel = "Quick Mod Menu Switch")
+        config.pos.renderRenderables(event.context, display, posLabel = "Quick Mod Menu Switch")
         event.context.matrices.popMatrix()
     }
 

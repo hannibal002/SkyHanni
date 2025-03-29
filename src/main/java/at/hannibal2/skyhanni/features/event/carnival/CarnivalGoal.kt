@@ -204,7 +204,7 @@ enum class CarnivalGoal(
                 }
                 dirty = false
             }
-            config.goalsPosition.renderRenderables(display, posLabel = "Carnival Goals")
+            config.goalsPosition.renderRenderables(event.context, display, posLabel = "Carnival Goals")
         }
 
         @HandleEvent

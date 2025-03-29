@@ -230,10 +230,10 @@ object FishingProfitTracker {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { isEnabled() },
-            onRender = {
+            onRender = { context ->
                 val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
                 if (recentPickup || FishingApi.isFishing(checkRodInHand = false)) {
-                    tracker.renderDisplay(config.position)
+                    tracker.renderDisplay(context, config.position)
                 }
             },
         )

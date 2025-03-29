@@ -167,7 +167,7 @@ object CraftMaterialCollector {
         if (!isEnabled()) return
         if (!inRecipeInventory && !purchasing) return
 
-        config.craftMaterialsFromBazaarPosition.renderRenderables(display, posLabel = "Craft Material Collector")
+        config.craftMaterialsFromBazaarPosition.renderRenderables(event.context, display, posLabel = "Craft Material Collector")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.craftMaterialsFromBazaar

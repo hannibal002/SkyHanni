@@ -97,6 +97,7 @@ object BestiaryData {
         if (!isEnabled()) return
         if (inInventory) {
             config.position.renderRenderables(
+                event.context,
                 display, extraSpace = -1, posLabel = "Bestiary Data",
             )
         }

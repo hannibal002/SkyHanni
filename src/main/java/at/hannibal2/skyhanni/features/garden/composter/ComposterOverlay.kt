@@ -592,10 +592,12 @@ object ComposterOverlay {
 
         if (inInventory) {
             config.overlayOrganicMatterPos.renderRenderable(
+                event.context,
                 organicMatterDisplay,
                 posLabel = "Composter Overlay Organic Matter",
             )
             config.overlayFuelExtrasPos.renderRenderable(
+                event.context,
                 fuelExtraDisplay,
                 posLabel = "Composter Overlay Fuel Extras",
             )

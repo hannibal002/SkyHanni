@@ -138,7 +138,7 @@ object TrevorTracker {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
-        config.position.renderRenderables(display, posLabel = "Trevor Tracker")
+        config.position.renderRenderables(event.context, display, posLabel = "Trevor Tracker")
     }
 
     private fun shouldDisplay(): Boolean {

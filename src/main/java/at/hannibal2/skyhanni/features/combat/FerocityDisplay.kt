@@ -17,7 +17,7 @@ object FerocityDisplay {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         SkyblockStat.FEROCITY.displayValue?.let {
-            config.position.renderString(it, posLabel = "Ferocity Display")
+            config.position.renderString(event.context, it, posLabel = "Ferocity Display")
         }
     }
 

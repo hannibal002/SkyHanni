@@ -43,7 +43,7 @@ object ChocolateFactoryTooltipCompact {
         if (!ChocolateFactoryApi.inChocolateFactory) return
         if (config.tooltipMove) {
             if (lastHover.passedSince() < 1.seconds) {
-                config.tooltipMovePosition.renderStrings(tooltipToHover, posLabel = "Tooltip Move")
+                config.tooltipMovePosition.renderStrings(event.context, tooltipToHover, posLabel = "Tooltip Move")
             }
         }
     }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 
@@ -24,7 +25,7 @@ class RenderDisplayHelper(
     private val outsideInventory: Boolean = false,
     private val inOwnInventory: Boolean = false,
     private val condition: () -> Boolean,
-    private val onRender: () -> Unit,
+    private val onRender: (DrawContext) -> Unit,
 ) {
 
     init {
@@ -52,7 +53,7 @@ class RenderDisplayHelper(
             val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
             for (display in currentlyVisibleDisplays) {
                 if (display.renderIn(isInOwnInventory)) {
-                    display.render()
+                    display.render(event.context)
                 }
             }
         }
@@ -62,7 +63,7 @@ class RenderDisplayHelper(
             val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
             for (display in currentlyVisibleDisplays) {
                 if (display.outsideInventory && !display.renderIn(isInOwnInventory)) {
-                    display.render()
+                    display.render(event.context)
                 }
             }
         }
@@ -75,9 +76,9 @@ class RenderDisplayHelper(
         false
     }
 
-    private fun render() {
+    private fun render(context: DrawContext) {
         try {
-            onRender()
+            onRender(context)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Failed to render a display")
         }

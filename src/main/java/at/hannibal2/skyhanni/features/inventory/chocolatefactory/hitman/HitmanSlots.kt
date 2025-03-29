@@ -49,6 +49,7 @@ object HitmanSlots {
         if (!config.hitmanCosts || slotPricesLeft.isEmpty()) return
         if (!inInventory) return
         config.hitmanCostsPosition.renderRenderable(
+            event.context,
             getSlotPriceRenderable(),
             posLabel = "Hitman Slot Costs",
         )

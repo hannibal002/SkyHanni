@@ -103,6 +103,7 @@ object SkyBlockKickDuration {
 
         val format = lastKickTime.passedSince().format()
         config.position.renderString(
+            event.context,
             "§cLast kicked from SkyBlock §b$format ago",
             posLabel = "SkyBlock Kick Duration",
         )

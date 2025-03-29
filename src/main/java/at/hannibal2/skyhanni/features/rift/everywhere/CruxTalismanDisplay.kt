@@ -45,6 +45,7 @@ object CruxTalismanDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderRenderables(
+            event.context,
             display,
             posLabel = "Crux Talisman Display",
         )

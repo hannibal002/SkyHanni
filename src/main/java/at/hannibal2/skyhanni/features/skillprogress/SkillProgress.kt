@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
 import kotlin.math.ceil
@@ -65,15 +66,15 @@ object SkillProgress {
         if (display.isEmpty()) return
 
         if (showDisplay) {
-            renderDisplay()
+            renderDisplay(event.context)
 
             if (barConfig.enabled.get()) {
-                renderBar()
+                renderBar(event.context)
             }
         }
 
         if (etaConfig.enabled.get()) {
-            config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
+            config.etaPosition.renderRenderables(event.context, etaDisplay, posLabel = "Skill ETA")
         }
     }
 
@@ -83,7 +84,7 @@ object SkillProgress {
         if (display.isEmpty()) return
 
         if (etaConfig.enabled.get()) {
-            config.etaPosition.renderRenderables(etaDisplay, posLabel = "Skill ETA")
+            config.etaPosition.renderRenderables(event.context, etaDisplay, posLabel = "Skill ETA")
         }
     }
 
@@ -93,15 +94,15 @@ object SkillProgress {
         if (display.isEmpty()) return
 
         if (allSkillConfig.enabled.get()) {
-            config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
+            config.allSkillPosition.renderRenderables(event.context, allDisplay, posLabel = "All Skills Display")
         }
     }
 
-    private fun renderDisplay() {
+    private fun renderDisplay(context: DrawContext) {
         when (val textAlignment = config.textAlignmentProperty.get()) {
             SkillProgressConfig.TextAlignment.NONE -> {
                 val content = horizontalContainer(display)
-                config.displayPosition.renderRenderable(content, posLabel = "Skill Progress")
+                config.displayPosition.renderRenderable(context, content, posLabel = "Skill Progress")
             }
 
             SkillProgressConfig.TextAlignment.CENTERED,
@@ -111,14 +112,14 @@ object SkillProgress {
                 val horizontalAlignment = textAlignment.alignment ?: RenderUtils.HorizontalAlignment.LEFT
                 val content = horizontalContainer(display, horizontalAlign = horizontalAlignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
-                config.displayPosition.renderRenderables(renderables, posLabel = "Skill Progress")
+                config.displayPosition.renderRenderables(context, renderables, posLabel = "Skill Progress")
             }
 
             else -> {}
         }
     }
 
-    private fun renderBar() {
+    private fun renderBar(context: DrawContext) {
         val progress = if (barConfig.useTexturedBar.get()) {
             val factor = (skillExpPercentage.toFloat().coerceAtMost(1f)) * 182
             maxWidth = 182
@@ -142,7 +143,7 @@ object SkillProgress {
             )
         }
 
-        config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
+        config.barPosition.renderRenderables(context, listOf(progress), posLabel = "Skill Progress Bar")
     }
 
     @HandleEvent

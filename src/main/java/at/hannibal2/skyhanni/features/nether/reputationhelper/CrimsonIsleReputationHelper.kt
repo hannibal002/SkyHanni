@@ -141,6 +141,7 @@ object CrimsonIsleReputationHelper {
         }
 
         config.position.renderRenderables(
+            event.context,
             display,
             posLabel = "Crimson Isle Reputation Helper",
         )

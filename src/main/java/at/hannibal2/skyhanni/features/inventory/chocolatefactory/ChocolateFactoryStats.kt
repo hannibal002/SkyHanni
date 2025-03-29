@@ -44,7 +44,7 @@ object ChocolateFactoryStats {
         if (!config.statsDisplay) return
 
         display?.let {
-            config.position.renderRenderable(it, posLabel = "Chocolate Factory Stats")
+            config.position.renderRenderable(event.context, it, posLabel = "Chocolate Factory Stats")
         }
     }
 

@@ -69,6 +69,7 @@ object UniqueGiftCounter {
         if (!isEnabled()) return
 
         config.position.renderString(
+            event.context,
             display,
             posLabel = "Unique Gift Counter",
         )

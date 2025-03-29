@@ -349,7 +349,7 @@ object DragonFeatures {
     fun onRender(event: GuiRenderEvent) {
         if (!displayIsEnabled()) return
         val display = display ?: (if (!widgetActive) widgetErrorGUI else display()).also { display = it }
-        config.displayPosition.renderRenderables(display, posLabel = "Dragon Weight")
+        config.displayPosition.renderRenderables(event.context, display, posLabel = "Dragon Weight")
     }
 
     private fun display() = listOf(

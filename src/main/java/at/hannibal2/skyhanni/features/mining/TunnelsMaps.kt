@@ -271,7 +271,7 @@ object TunnelsMaps {
         RenderDisplayHelper(
             condition = { isEnabled() },
             inOwnInventory = true,
-        ) {
+        ) { context ->
             val display = buildList {
                 if (active.isNotEmpty()) {
                     if (goal == campfire && active != campfire.name) {
@@ -294,7 +294,7 @@ object TunnelsMaps {
                 }
                 addAll(locationDisplay)
             }
-            config.position.renderRenderables(display, posLabel = "Tunnels Maps")
+            config.position.renderRenderables(context, display, posLabel = "Tunnels Maps")
         }
     }
 

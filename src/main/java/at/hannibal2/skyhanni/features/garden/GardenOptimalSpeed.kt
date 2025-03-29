@@ -117,6 +117,7 @@ object GardenOptimalSpeed {
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign()) return
         config.signPosition.renderRenderables(
+            event.context,
             display,
             posLabel = "Optimal Speed Rancher Overlay",
         )
@@ -177,7 +178,7 @@ object GardenOptimalSpeed {
 
         val colorCode = if (recentlySwitchedTool || recentlyStartedSneaking) "7" else if (speed != currentSpeed) "c" else "a"
 
-        if (config.showOnHUD) config.pos.renderString("§$colorCode$text", posLabel = "Garden Optimal Speed")
+        if (config.showOnHUD) config.pos.renderString(event.context, "§$colorCode$text", posLabel = "Garden Optimal Speed")
         if (speed != currentSpeed && !recentlySwitchedTool && !recentlyStartedSneaking) warn(speed)
     }
 

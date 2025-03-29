@@ -27,6 +27,7 @@ object LivingMetalSuitProgress {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderRenderables(
+            event.context,
             display,
             posLabel = "Living Metal Armor Progress",
         )

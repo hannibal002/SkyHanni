@@ -465,6 +465,7 @@ object HoppityCollectionStats {
         if (!inInventory || !collectionConfig.enabled) return
 
         collectionConfig.position.renderRenderables(
+            event.context,
             display,
             extraSpace = 5,
             posLabel = "Hoppity's Collection Stats",

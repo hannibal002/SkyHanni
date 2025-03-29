@@ -246,7 +246,7 @@ object MinionCraftHelper {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 
-        config.minionCraftHelperPos.renderStrings(display, posLabel = "Minion Craft Helper")
+        config.minionCraftHelperPos.renderStrings(event.context, display, posLabel = "Minion Craft Helper")
     }
 
     private fun notify(minionName: String) {

@@ -233,7 +233,7 @@ object CollectionTracker {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         display?.let {
-            SkyHanniMod.feature.misc.collectionCounterPos.renderRenderable(it, posLabel = "Collection Tracker")
+            SkyHanniMod.feature.misc.collectionCounterPos.renderRenderable(event.context, it, posLabel = "Collection Tracker")
         }
     }
 

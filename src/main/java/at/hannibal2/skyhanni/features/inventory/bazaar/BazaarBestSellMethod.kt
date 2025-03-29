@@ -70,7 +70,7 @@ object BazaarBestSellMethod {
         if (!isEnabled()) return
         if (display.isEmpty()) return
 
-        config.bestSellMethodPos.renderString(display, posLabel = "Bazaar Best Sell Method")
+        config.bestSellMethodPos.renderString(event.context, display, posLabel = "Bazaar Best Sell Method")
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)

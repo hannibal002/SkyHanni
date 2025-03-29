@@ -227,8 +227,8 @@ object SlayerProfitTracker {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { shouldShowDisplay() },
-            onRender = {
-                getTracker()?.renderDisplay(config.pos)
+            onRender = { context ->
+                getTracker()?.renderDisplay(context, config.pos)
             },
         )
     }

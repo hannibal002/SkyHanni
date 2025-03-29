@@ -154,7 +154,7 @@ object BroodmotherFeatures {
             display = "§4Broodmother spawning now!"
         }
 
-        config.countdownPosition.renderString(display, posLabel = "Broodmother Countdown")
+        config.countdownPosition.renderString(event.context, display, posLabel = "Broodmother Countdown")
     }
 
     @HandleEvent

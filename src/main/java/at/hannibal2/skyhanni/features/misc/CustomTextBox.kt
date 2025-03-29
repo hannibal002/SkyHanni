@@ -33,7 +33,7 @@ object CustomTextBox {
         if (!config.onlyInGUI) return
         if (!isEnabled()) return
 
-        config.position.renderStrings(display, posLabel = "Custom Text Box")
+        config.position.renderStrings(event.context, display, posLabel = "Custom Text Box")
     }
 
     @HandleEvent
@@ -41,7 +41,7 @@ object CustomTextBox {
         if (config.onlyInGUI) return
         if (!isEnabled()) return
 
-        config.position.renderStrings(display, posLabel = "Custom Text Box")
+        config.position.renderStrings(event.context, display, posLabel = "Custom Text Box")
     }
 
     private fun isEnabled() =

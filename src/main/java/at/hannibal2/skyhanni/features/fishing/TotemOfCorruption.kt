@@ -61,7 +61,7 @@ object TotemOfCorruption {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isOverlayEnabled() || display.isEmpty()) return
-        config.position.renderStrings(display, posLabel = "Totem of Corruption")
+        config.position.renderStrings(event.context, display, posLabel = "Totem of Corruption")
     }
 
     @HandleEvent

@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -196,7 +197,7 @@ object CakeTracker {
         val inAuctionWithCakes = inAuctionHouse && (slotHighlightCache.isNotEmpty() || searchingForCakes)
         if (!inInvWithCakes && !inAuctionWithCakes) return
 
-        reRenderDisplay()
+        reRenderDisplay(event.context)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -220,8 +221,9 @@ object CakeTracker {
         inAuctionHouse = checkAuctionCakes(event)
     }
 
-    private fun reRenderDisplay() {
+    private fun reRenderDisplay(context: DrawContext) {
         config.cakeTrackerPosition.renderRenderables(
+            context,
             drawDisplay(storage ?: return),
             posLabel = "New Year Cake Tracker",
         )

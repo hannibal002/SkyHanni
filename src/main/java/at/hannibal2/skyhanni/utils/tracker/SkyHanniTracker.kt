@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
@@ -92,7 +93,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    fun renderDisplay(position: Position) {
+    fun renderDisplay(context: DrawContext, position: Position) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
@@ -119,7 +120,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
         wasSearchEnabled = searchEnabled
 
-        position.renderRenderables(display, posLabel = name)
+        position.renderRenderables(context, display, posLabel = name)
     }
 
     fun update() {
@@ -207,8 +208,8 @@ open class SkyHanniTracker<Data : TrackerData>(
             outsideInventory = true,
             inOwnInventory = true,
             condition = condition,
-            onRender = {
-                renderDisplay(position())
+            onRender = { context ->
+                renderDisplay(context, position())
             },
         )
     }

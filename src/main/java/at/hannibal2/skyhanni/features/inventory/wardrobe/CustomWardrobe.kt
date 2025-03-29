@@ -90,13 +90,13 @@ object CustomWardrobe {
                 scale = activeScale / 100.0,
             )
             loadingPosition.moveTo(position.x + (width - loadingRenderable.width) / 2, position.y - loadingRenderable.height)
-                .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
+                .renderRenderable(event.context, loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
         event.context.matrices.pushMatrix()
         event.context.matrices.translate(0f, 0f, 100f)
 
-        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+        position.renderRenderable(event.context, renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
             event.context.matrices.translate(0f, 0f, 400f)
@@ -117,7 +117,7 @@ object CustomWardrobe {
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
         val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
         inventoryButtonPosition.moveTo(posX, posY)
-            .renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+            .renderRenderable(event.context, renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
     @HandleEvent

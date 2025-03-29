@@ -83,6 +83,7 @@ object DungeonMilestonesDisplay {
         if (!isEnabled()) return
 
         config.showMileStonesDisplayPos.renderString(
+            event.context,
             color + display,
             posLabel = "Dungeon Milestone",
         )

@@ -82,7 +82,7 @@ object InGameDateDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.position.renderString(display, posLabel = "In-game Date Display")
+        config.position.renderString(event.context, display, posLabel = "In-game Date Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

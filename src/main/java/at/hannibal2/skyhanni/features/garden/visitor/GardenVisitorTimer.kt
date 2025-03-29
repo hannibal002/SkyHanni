@@ -190,8 +190,8 @@ object GardenVisitorTimer {
             condition = { isEnabled() },
             outsideInventory = true,
             inOwnInventory = true,
-        ) {
-            config.pos.renderRenderable(display, posLabel = "Garden Visitor Timer")
+        ) { context ->
+            config.pos.renderRenderable(context, display, posLabel = "Garden Visitor Timer")
         }
     }
 

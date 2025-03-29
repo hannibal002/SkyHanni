@@ -130,6 +130,7 @@ object PesthunterProfit {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory) return
         config.profitPosition.renderRenderables(
+            event.context,
             display,
             extraSpace = 5,
             posLabel = "Pesthunter Profit",

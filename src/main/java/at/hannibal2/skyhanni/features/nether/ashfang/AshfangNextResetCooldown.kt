@@ -25,6 +25,7 @@ object AshfangNextResetCooldown {
         else "§b${nextSpawn.timeUntil().format(TimeUnit.SECOND, showMilliSeconds = true)}"
 
         config.nextResetCooldownPos.renderString(
+            event.context,
             "§cAshfang next reset in: $format",
             posLabel = "Ashfang Reset Cooldown",
         )

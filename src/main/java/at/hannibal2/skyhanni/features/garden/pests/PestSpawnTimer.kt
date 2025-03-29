@@ -33,7 +33,7 @@ object PestSpawnTimer {
             "§eLast pest spawned §b$timeSinceLastPest ago"
         }
 
-        config.position.renderString(display, posLabel = "Pest Spawn Timer")
+        config.position.renderString(event.context, display, posLabel = "Pest Spawn Timer")
     }
 
     fun isEnabled() = GardenApi.inGarden() && config.enabled

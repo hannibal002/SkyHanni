@@ -219,7 +219,7 @@ object PunchcardHighlight {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
 
-        config.position.renderRenderable(display, "Punchcard Overlay")
+        config.position.renderRenderable(event.context, display, "Punchcard Overlay")
     }
 
     private fun drawDisplay(): Renderable {

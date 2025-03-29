@@ -67,7 +67,7 @@ object MovementSpeedDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.playerMovementSpeedPos.renderString(display, posLabel = "Movement Speed")
+        config.playerMovementSpeedPos.renderString(event.context, display, posLabel = "Movement Speed")
     }
 
     fun isEnabled() = LorenzUtils.onHypixel &&

@@ -220,6 +220,7 @@ object AnitaMedalProfit {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory || VisitorApi.inInventory) return
         config.medalProfitPos.renderRenderables(
+            event.context,
             display,
             extraSpace = 5,
             posLabel = "Anita Medal Profit",

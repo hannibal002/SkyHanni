@@ -427,51 +427,49 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
-    fun Position.transform(): Pair<Int, Int> {
-        GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
-        GlStateManager.scale(effectiveScale, effectiveScale, 1F)
+    fun Position.transform(context: DrawContext): Pair<Int, Int> {
+        context.matrices.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
+        context.matrices.scale(effectiveScale, effectiveScale, 1F)
         val x = ((GuiScreenUtils.mouseX - getAbsX()) / effectiveScale).toInt()
         val y = ((GuiScreenUtils.mouseY - getAbsY()) / effectiveScale).toInt()
         return x to y
     }
 
-    fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
+    fun Position.renderString(context: DrawContext, string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
         if (string.isNullOrBlank()) return
-        val x = renderString0(string, offsetX, offsetY, centerX)
+        val x = renderString0(context, string, offsetX, offsetY, centerX)
         GuiEditManager.add(this, posLabel, x, 10)
     }
 
-    private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
+    private fun Position.renderString0(context: DrawContext, string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
         val display = "§f$string"
-        GlStateManager.pushMatrix()
-        transform()
+        context.matrices.pushMatrix()
+        transform(context)
         val minecraft = Minecraft.getMinecraft()
         val renderer = minecraft.renderManager.fontRenderer
 
-        GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
+        context.matrices.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
             val strLen: Int = renderer.getStringWidth(string)
             val x2 = offsetX - strLen / 2f
-            GL11.glTranslatef(x2, 0f, 0f)
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
-            GL11.glTranslatef(-x2, 0f, 0f)
+            renderer.drawStringWithShadow(display, x2, 0f, 0)
         } else {
             renderer.drawStringWithShadow(display, 0f, 0f, 0)
         }
 
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
 
         return renderer.getStringWidth(display)
     }
 
-    fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
+    fun Position.renderStrings(context: DrawContext, list: List<String>, extraSpace: Int = 0, posLabel: String) {
         if (list.isEmpty()) return
 
         var offsetY = 0
         var longestX = 0
         for (s in list) {
-            val x = renderString0(s, offsetY = offsetY, centered = false)
+            val x = renderString0(context, s, offsetY = offsetY, centered = false)
             if (x > longestX) {
                 longestX = x
             }
@@ -481,6 +479,7 @@ object RenderUtils {
     }
 
     fun Position.renderRenderables(
+        context: DrawContext,
         renderables: List<Renderable>,
         extraSpace: Int = 0,
         posLabel: String,
@@ -490,37 +489,39 @@ object RenderUtils {
         var longestY = 0
         val longestX = renderables.maxOf { it.width }
         for (line in renderables) {
-            GlStateManager.pushMatrix()
-            val (x, y) = transform()
-            GlStateManager.translate(0f, longestY.toFloat(), 0F)
+            context.matrices.pushMatrix()
+            val (x, y) = transform(context)
+            context.matrices.translate(0f, longestY.toFloat(), 0F)
             Renderable.withMousePosition(x, y) {
                 line.renderXAligned(0, longestY, longestX)
             }
 
             longestY += line.height + extraSpace + 2
 
-            GlStateManager.popMatrix()
+            context.matrices.popMatrix()
         }
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
     fun Position.renderRenderable(
+        context: DrawContext,
         renderable: Renderable?,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
         if (renderable == null) return
-        GlStateManager.pushMatrix()
-        val (x, y) = transform()
+        context.matrices.pushMatrix()
+        val (x, y) = transform(context)
         Renderable.withMousePosition(x, y) {
             renderable.render(0, 0)
         }
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
     /** This function is discouraged to be used. Please use renderRenderables with List<Renderable> instead with horizontal container.*/
     private fun Position.renderRenderablesDouble(
+        context: DrawContext,
         renderables: List<List<Renderable>>,
         extraSpace: Int = 0,
         posLabel: String,
@@ -529,25 +530,25 @@ object RenderUtils {
         if (renderables.isEmpty()) return
         var longestY = 0
         var longestX = 0
-        GlStateManager.pushMatrix()
-        val (x, y) = transform()
+        context.matrices.pushMatrix()
+        val (x, y) = transform(context)
         Renderable.withMousePosition(x, y) {
             for (line in renderables) {
-                GlStateManager.pushMatrix()
-                GlStateManager.translate(0f, longestY.toFloat(), 0F)
+                context.matrices.pushMatrix()
+                context.matrices.translate(0f, longestY.toFloat(), 0F)
                 val lineY = line.maxOf { it.height }
                 var lineX = 0
                 for (element in line) {
                     element.renderYAligned(lineX, longestY, lineY)
-                    GlStateManager.translate(element.width.toFloat(), 0f, 0f)
+                    context.matrices.translate(element.width.toFloat(), 0f, 0f)
                     lineX += element.width
                 }
                 longestY += lineY + extraSpace + 2
                 longestX = max(longestX, lineX)
-                GlStateManager.popMatrix()
+                context.matrices.popMatrix()
             }
         }
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
@@ -570,7 +571,7 @@ object RenderUtils {
             }
         }
 
-        this.renderRenderablesDouble(render, extraSpace, posLabel, true)
+        this.renderRenderablesDouble(DrawContext(), render, extraSpace, posLabel, true)
     }
 
     // totally not modified Autumn Client's TargetStrafe

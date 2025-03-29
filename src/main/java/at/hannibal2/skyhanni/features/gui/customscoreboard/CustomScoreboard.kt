@@ -77,7 +77,7 @@ object CustomScoreboard {
 
         RenderBackground.updatePosition(finalRenderable)
 
-        config.position.renderRenderable(finalRenderable, posLabel = GUI_NAME)
+        config.position.renderRenderable(event.context, finalRenderable, posLabel = GUI_NAME)
     }
 
     @HandleEvent

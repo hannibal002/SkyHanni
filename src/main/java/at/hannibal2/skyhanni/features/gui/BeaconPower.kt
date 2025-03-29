@@ -97,7 +97,7 @@ object BeaconPower {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.beaconPowerPosition.renderString(display, posLabel = "Beacon Power")
+        config.beaconPowerPosition.renderString(event.context, display, posLabel = "Beacon Power")
     }
 
     @HandleEvent
