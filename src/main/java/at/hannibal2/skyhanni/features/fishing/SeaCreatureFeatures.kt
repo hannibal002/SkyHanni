@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.Entity
@@ -83,20 +84,17 @@ object SeaCreatureFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!config.alertOwnCatches && !config.announceRare) return
-
-        if (event.seaCreature.rare) {
-            if (config.alertOwnCatches) {
-                val text = if (config.creatureName) "${event.seaCreature.displayName}!"
-                else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
-                TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
-                if (config.playSound) SoundUtils.playBeepSound()
-                lastRareCatch = SimpleTimeMark.now()
-            }
-            if (config.announceRare && PartyApi.partyMembers.size > 0) {
-                if (config.creatureName) HypixelCommands.partyChat("I caught a ${event.seaCreature.name}!")
-                else HypixelCommands.partyChat("I caught a rare sea creature!")
-            }
+        if (!event.seaCreature.rare) return
+        if (config.alertOwnCatches) {
+            val text = if (config.creatureName) "${event.seaCreature.displayName}!"
+            else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
+            TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
+            if (config.playSound) SoundUtils.playBeepSound()
+            lastRareCatch = SimpleTimeMark.now()
+        }
+        if (config.announceRareInParty && PartyApi.isInParty()) {
+            val name = event.seaCreature.name
+            HypixelCommands.partyChat("I caught ${StringUtils.optionalAn(name)} $name!")
         }
     }
 
