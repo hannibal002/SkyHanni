@@ -17,8 +17,8 @@ import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
 
 //#if MC < 1.21
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 //#else
 //$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
@@ -61,6 +61,7 @@ object KeyboardManager {
      */
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
+    //#if MC < 1.21
     private data class EventKey(val key: Int, val pressed: Boolean)
 
     private fun getEventKey(): EventKey? {
@@ -85,6 +86,7 @@ object KeyboardManager {
     }
 
     private val clickedKeys = mutableSetOf<Int>()
+    //#endif
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick(event: SkyHanniTickEvent) {
