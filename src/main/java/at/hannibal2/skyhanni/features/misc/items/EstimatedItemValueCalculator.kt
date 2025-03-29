@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
@@ -74,6 +75,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
@@ -105,6 +107,7 @@ object EstimatedItemValueCalculator {
         ::addMithrilInfusion,
 
         // counted
+        ::addCrimsonPrestige,
         ::addStars, // crimson, dungeon
         ::addMasterStars,
         ::addHotPotatoBooks,
@@ -489,6 +492,26 @@ object EstimatedItemValueCalculator {
 
     private fun formatProgress(label: String, have: Int, max: Int, price: Number): String {
         return "§7$label: §e$have§7/§e$max ${price.formatCoinWithBrackets()}"
+    }
+
+    private fun addCrimsonPrestige(stack: ItemStack, list: MutableList<String>): Double {
+        val internalName = stack.getInternalNameOrNull() ?: return 0.0
+        if (!internalName.isKuudraArmor()) return 0.0
+        val tierIndex = internalName.getKuudraTier()?.takeIf { it > 1 } ?: return 0.0
+        val armorTier = kuudraTiers.getOrNull(tierIndex - 1) ?: return 0.0
+
+        val allTiersCost = (0 until tierIndex).mapNotNull { index ->
+            kuudraTiers.getOrNull(index)?.let { tierName ->
+                EstimatedItemValue.crimsonPrestigeCosts[tierName]
+            }
+        }.sumByKey()
+
+        val (totalPrice, names) = getTotalAndNames(allTiersCost)
+
+        list.add("§7Prestige Tier: ${armorTier.lowercase().allLettersFirstUppercase()} ${totalPrice.formatCoinWithBrackets()}")
+        list.addAll(names)
+
+        return totalPrice
     }
 
     private fun addStars(stack: ItemStack, list: MutableList<String>): Double {
