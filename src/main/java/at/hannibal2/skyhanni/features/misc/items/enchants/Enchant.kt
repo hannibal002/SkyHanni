@@ -48,6 +48,11 @@ open class Enchant : Comparable<Enchant> {
 
         // TODO when chroma is disabled maybe use the neu chroma style instead of gold
         if (color.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
+
+        if ((level >= maxLevel || color == config.perfectEnchantColor) && config.boldPerfectEnchant.get()) {
+            return color.get().getBoldChatColor()
+        }
+
         return color.get().getChatColor()
     }
 

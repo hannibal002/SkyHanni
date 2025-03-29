@@ -38,6 +38,8 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     fun getChatColor(): String = "§$chatColorCode"
 
+    fun getBoldChatColor(): String = getChatColor() + "§l"
+
     fun toColor(): Color = color
 
     fun addOpacity(opacity: Int): Color {
