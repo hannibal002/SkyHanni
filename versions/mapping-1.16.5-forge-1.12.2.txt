@@ -269,6 +269,8 @@ net.minecraft.world.entity.Entity zOld prevPosZ
 net.minecraft.world.entity.Entity zo posZ
 net.minecraft.world.entity.Entity isOnGround onGround
 net.minecraft.world.entity.Entity getVehicle() getRidingEntity()
+net.minecraft.world.entity.Entity setCustomName() setCustomNameTag()
+net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
