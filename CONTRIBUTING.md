@@ -236,6 +236,9 @@ closely resemble modern rendering code. You will notice that we pass around both
 these objects both hold a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack,
 translating and scaling. Where possible you should use these objects instead of the `GlStateManager` directly. If you are unsure, make sure
 to look at existing code to see how it is done and if you are still unsure, ask for help.
+- When making GUI screens or other GUI elements, you should try to use Renderables where possible as these should already account for
+most modern rendering changes. If you are making a new GUI screen, make sure to extend `SkyHanniBaseScreen` instead of `GuiScreen` to ensure
+compatibility for modern versions.
 
 ## Additional Useful Development Tools
 
