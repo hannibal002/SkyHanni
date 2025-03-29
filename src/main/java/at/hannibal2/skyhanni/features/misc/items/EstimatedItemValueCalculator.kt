@@ -107,7 +107,7 @@ object EstimatedItemValueCalculator {
         ::addMithrilInfusion,
 
         // counted
-        ::addPrestige,
+        ::addCrimsonPrestige,
         ::addStars, // crimson, dungeon
         ::addMasterStars,
         ::addHotPotatoBooks,
@@ -494,7 +494,7 @@ object EstimatedItemValueCalculator {
         return "§7$label: §e$have§7/§e$max ${price.formatCoinWithBrackets()}"
     }
 
-    private fun addPrestige(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addCrimsonPrestige(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalNameOrNull() ?: return 0.0
         if (!internalName.isKuudraArmor()) return 0.0
         val tierIndex = internalName.getKuudraTier()?.takeIf { it > 1 } ?: return 0.0
@@ -508,7 +508,7 @@ object EstimatedItemValueCalculator {
 
         val (totalPrice, names) = getTotalAndNames(allTiersCost)
 
-        list.add("§7Tier: ${armorTier.lowercase().allLettersFirstUppercase()} ${totalPrice.formatCoinWithBrackets()}")
+        list.add("§7Prestige Tier: ${armorTier.lowercase().allLettersFirstUppercase()} ${totalPrice.formatCoinWithBrackets()}")
         list.addAll(names)
 
         return totalPrice
