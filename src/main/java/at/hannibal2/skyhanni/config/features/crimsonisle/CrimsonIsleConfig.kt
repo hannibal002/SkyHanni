@@ -26,7 +26,10 @@ class CrimsonIsleConfig {
     var matriarchHelper: MatriarchHelperConfig = MatriarchHelperConfig()
 
     @Expose
-    @ConfigOption(name = "Block Profile Viewer in Kuudra", desc = "Prevent interacting with players while in the Kuudra boss fight.")
+    @ConfigOption(
+        name = "Disable Profile Viewer in Kuudra",
+        desc = "Prevent player interactions during the Kuudra boss fight to stop Profile Viewer from opening."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var kuudraProfileViewer: Boolean = false

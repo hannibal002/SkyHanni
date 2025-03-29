@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.style
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -38,8 +39,8 @@ object ShortenCoins {
 
         val originalComponent = event.chatComponent.siblings.firstOrNull() ?: event.chatComponent
 
-        event.chatComponent = modifiedMessage.asComponent().apply {
-            chatStyle = originalComponent.chatStyle
+        event.chatComponent = modifiedMessage.asComponent().style {
+            originalComponent.chatStyle
         }
     }
 
