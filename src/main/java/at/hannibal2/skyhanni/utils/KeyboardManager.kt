@@ -15,7 +15,6 @@ import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
-
 //#if MC < 1.21
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
