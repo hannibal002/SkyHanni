@@ -424,7 +424,7 @@ object BitsApi {
             add("Bits: $bits")
             add("Bits Available: $bitsAvailable")
             add("Cookie Buff Time: $cookieBuffTime")
-            add("Current Fame Rank: $currentFameRank")
+            add("Current Fame Rank: $fameRank")
             add("Last Bit Updates: $lastBitUpdates")
             add("Bits per Cookie: ${bitsPerCookie()}")
         }
