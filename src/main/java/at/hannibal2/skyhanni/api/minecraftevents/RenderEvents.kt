@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.WorldRenderContext
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -32,29 +34,29 @@ object RenderEvents {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        SkyHanniRenderWorldEvent(event.partialTicks).post()
+        SkyHanniRenderWorldEvent(WorldRenderContext(), event.partialTicks).post()
     }
 
     @SubscribeEvent
     fun onGuiRender(event: DrawScreenEvent.Post) {
-        ScreenDrawnEvent(event.gui).post()
+        ScreenDrawnEvent(DrawContext(), event.gui).post()
     }
 
     @SubscribeEvent
     fun onPostRenderTick(event: RenderTickEvent) {
-        RenderingTickEvent(event.phase == TickEvent.Phase.START).post()
+        RenderingTickEvent(DrawContext(), event.phase == TickEvent.Phase.START).post()
     }
 
     @SubscribeEvent
     fun onRenderOverlayPre(event: RenderGameOverlayEvent.Pre) {
-        if (GameOverlayRenderPreEvent(event.type).post()) {
+        if (GameOverlayRenderPreEvent(DrawContext(), event.type).post()) {
             event.isCanceled = true
         }
     }
 
     @SubscribeEvent
     fun onRenderOverlayPost(event: RenderGameOverlayEvent.Post) {
-        GameOverlayRenderPostEvent(event.type).post()
+        GameOverlayRenderPostEvent(DrawContext(), event.type).post()
     }
 
     @SubscribeEvent
@@ -86,7 +88,7 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
-        DrawBackgroundEvent.post()
+        DrawBackgroundEvent(DrawContext()).post()
     }
 
     @SubscribeEvent

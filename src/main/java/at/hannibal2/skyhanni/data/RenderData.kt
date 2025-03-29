@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -26,9 +25,9 @@ object RenderData {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
-        GlStateManager.translate(0f, 0f, -3f)
-        renderOverlay()
-        GlStateManager.translate(0f, 0f, 3f)
+        event.context.matrices.translate(0f, 0f, -3f)
+        renderOverlay(event.context)
+        event.context.matrices.translate(0f, 0f, 3f)
     }
 
     @HandleEvent
@@ -39,35 +38,27 @@ object RenderData {
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 
-        GlStateManager.pushMatrix()
+        event.context.matrices.pushMatrix()
         GlStateManager.enableDepth()
 
         if (GuiEditManager.isInGui()) {
-            GlStateManager.translate(0f, 0f, -3f)
-            renderOverlay()
-            GlStateManager.translate(0f, 0f, 3f)
+            event.context.matrices.translate(0f, 0f, -3f)
+            renderOverlay(event.context)
+            event.context.matrices.translate(0f, 0f, 3f)
         }
 
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().post()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent(event.context).post()
 
-        GlStateManager.popMatrix()
+        event.context.matrices.popMatrix()
     }
 
-    private fun canRender(): Boolean = Minecraft.getMinecraft()?.renderManager?.fontRenderer != null
-
-    // TODO find better spot for this
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(17, "chroma.chromaDirection") { element ->
-            ConfigUtils.migrateIntToEnum(element, ChromaConfig.Direction::class.java)
-        }
-    }
+    private fun canRender(): Boolean = MinecraftCompat.localWorldExists && MinecraftCompat.localPlayerExists
 
     var outsideInventory = false
 
-    fun renderOverlay() {
+    fun renderOverlay(context: DrawContext) {
         outsideInventory = true
-        GuiRenderEvent.GuiOverlayRenderEvent().post()
+        GuiRenderEvent.GuiOverlayRenderEvent(context).post()
         outsideInventory = false
     }
 }
