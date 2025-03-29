@@ -28,13 +28,13 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
-import java.io.IOException
 
 class GuiPositionEditor(
     private val positions: List<Position>,
@@ -46,8 +46,7 @@ class GuiPositionEditor(
     private var grabbedY = 0
     private var clickedPos = -1
 
-    override fun onGuiClosed() {
-        super.onGuiClosed()
+    override fun guiClosed() {
         clickedPos = -1
         for (position in positions) {
             position.clicked = false
@@ -55,7 +54,7 @@ class GuiPositionEditor(
         OtherInventoryData.close()
     }
 
-    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+    override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         // Items aren't drawn due to a bug in neu rendering
         drawDefaultBackground()
         if (oldScreen != null) {
@@ -63,10 +62,8 @@ class GuiPositionEditor(
             accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
         }
 
-        super.drawScreen(mouseX, mouseY, partialTicks)
-
         GlStateManager.disableLighting()
-        val hoveredPos = renderRectangles()
+        val hoveredPos = renderRectangles(context)
 
         renderLabels(hoveredPos)
     }
@@ -109,9 +106,9 @@ class GuiPositionEditor(
             )
     }
 
-    private fun renderRectangles(): Int {
+    private fun renderRectangles(context: DrawContext): Int {
         var hoveredPos = -1
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
         width = getScaledWidth()
         height = getScaledHeight()
 
@@ -143,17 +140,14 @@ class GuiPositionEditor(
                 hoveredPos = index
             }
         }
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
         return hoveredPos
     }
 
     private fun getScaledHeight() = GuiScreenUtils.scaledWindowHeight
     private fun getScaledWidth() = GuiScreenUtils.scaledWindowWidth
 
-    @Throws(IOException::class)
-    override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
-        super.mouseClicked(originalX, priginalY, mouseButton)
-
+    override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
         val (mouseX, mouseY) = GuiScreenUtils.mousePos
 
         for (i in positions.indices.reversed()) {
@@ -185,10 +179,7 @@ class GuiPositionEditor(
         }
     }
 
-    @Throws(IOException::class)
-    override fun keyTyped(typedChar: Char, keyCode: Int) {
-        super.keyTyped(typedChar, keyCode)
-
+    override fun onKeyTyped(typedChar: Char, keyCode: Int) {
         if (clickedPos == -1) return
         val position = positions[clickedPos]
         if (position.clicked) return
@@ -208,17 +199,13 @@ class GuiPositionEditor(
         }
     }
 
-    override fun mouseReleased(mouseX: Int, mouseY: Int, state: Int) {
-        super.mouseReleased(mouseX, mouseY, state)
-
+    override fun onMouseReleased(originalMouseX: Int, originalMouseY: Int, state: Int) {
         for (position in positions) {
             position.clicked = false
         }
     }
 
-    override fun mouseClickMove(originalX: Int, priginalY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
-        super.mouseClickMove(originalX, priginalY, clickedMouseButton, timeSinceLastClick)
-
+    override fun onMouseClickMove(originalMouseX: Int, originalMouseY: Int, clickedMouseButton: Int, timeSinceLastClick: Long) {
         for (position in positions) {
             if (!position.clicked) continue
 
@@ -232,8 +219,7 @@ class GuiPositionEditor(
         }
     }
 
-    override fun handleMouseInput() {
-        super.handleMouseInput()
+    override fun onHandleMouseInput() {
         val mw = MouseCompat.getScrollDelta()
         if (mw == 0) return
 

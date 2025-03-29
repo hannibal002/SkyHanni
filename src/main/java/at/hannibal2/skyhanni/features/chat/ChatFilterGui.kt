@@ -5,19 +5,20 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
 import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
 
-class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult>) : GuiScreen() {
+class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
 
     private var scroll = -1.0
     private val w = 500
@@ -32,16 +33,15 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
     private val historySize =
         history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
 
-    override fun drawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        super.drawScreen(originalMouseX, originalMouseY, partialTicks)
+    override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         drawDefaultBackground()
         var queuedTooltip: List<String>? = null
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
         val l = (width / 2.0 - w / 2.0).toInt()
         val t = (height / 2.0 - h / 2.0).toInt()
-        GlStateManager.translate(l + 0.0, t + 0.0, 0.0)
+        context.matrices.translate(l + 0.0, t + 0.0, 0.0)
         RenderUtils.drawFloatingRectDark(0, 0, w, h)
-        GlStateManager.translate(5.0, 5.0 - scroll, 0.0)
+        context.matrices.translate(5.0, 5.0 - scroll, 0.0)
         val mouseX = originalMouseX - l
         val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)
         var mouseY = originalMouseY - (t - scroll).toInt()
@@ -51,20 +51,14 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         for (msg in history) {
             drawString(fontRenderer(), msg.actionKind.renderedString, 0, 0, -1)
             drawString(fontRenderer(), msg.actionReason, ChatManager.ActionKind.maxLength + 5, 0, -1)
-            var size = drawMultiLineText(
-                msg.message,
-                ChatManager.ActionKind.maxLength + reasonMaxLength + 10,
-            )
+            var size = drawMultiLineText(context, msg.message, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             msg.modified?.let {
                 drawString(
                     fontRenderer(),
                     "§e§lNEW TEXT",
                     0, 0, -1,
                 )
-                size += drawMultiLineText(
-                    it,
-                    ChatManager.ActionKind.maxLength + reasonMaxLength + 10,
-                )
+                size += drawMultiLineText(context, it, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             }
             val isHovered = mouseX in 0..w && mouseY in 0..(size * 10)
             if (isHovered && msg.hoverInfo.isNotEmpty())
@@ -85,7 +79,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         }
         GlScissorStack.pop(sr)
         wasMouseButtonDown = isMouseButtonDown
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
         queuedTooltip?.let { tooltip ->
             RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
         }
@@ -102,8 +96,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         )
     }
 
-    override fun initGui() {
-        super.initGui()
+    override fun onInitGui() {
         if (this.scroll < 0) {
             setScroll(1000000000.0)
         }
@@ -113,7 +106,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         this.scroll = newScroll.coerceAtMost(historySize - h + 10.0).coerceAtLeast(0.0)
     }
 
-    private fun drawMultiLineText(comp: IChatComponent, xPos: Int): Int {
+    private fun drawMultiLineText(context: DrawContext, comp: IChatComponent, xPos: Int): Int {
         val modifiedSplitText = splitLine(comp)
         for (line in modifiedSplitText) {
             drawString(
@@ -123,15 +116,14 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
                 0,
                 -1,
             )
-            GlStateManager.translate(0F, 10F, 0F)
+            context.matrices.translate(0F, 10F, 0F)
         }
         return modifiedSplitText.size
     }
 
     private fun fontRenderer() = Minecraft.getMinecraft().fontRendererObj
 
-    override fun handleMouseInput() {
-        super.handleMouseInput()
+    override fun onHandleMouseInput() {
         setScroll(scroll - MouseCompat.getScrollDelta())
     }
 }
