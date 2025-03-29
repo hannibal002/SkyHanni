@@ -44,11 +44,11 @@ object GuiData {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onGuiKeyPress(event: GuiKeyPressEvent) {
-        val allowedKeys = Minecraft.getMinecraft().gameSettings.let {
+        val allowedKeys = with(Minecraft.getMinecraft().gameSettings) {
             listOf(
-                it.keyBindInventory,
-                it.keyBindScreenshot,
-                it.keyBindFullscreen,
+                keyBindInventory,
+                keyBindScreenshot,
+                keyBindFullscreen,
             )
         }
         if (allowedKeys.any { it.isActive() }) return
