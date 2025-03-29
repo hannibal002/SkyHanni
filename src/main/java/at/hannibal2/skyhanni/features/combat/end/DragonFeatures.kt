@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -442,5 +443,11 @@ object DragonFeatures {
     fun onIslandChange(event: IslandChangeEvent) {
         reset()
         eggSpawned = true
+    }
+
+    @HandleEvent
+    fun configFixEvent(e: ConfigUpdaterMigrator.ConfigFixEvent) {
+        e.move(78, "combat.dragon", "combat.endIsland.dragon")
+        e.move(78, "combat.endstoneProtectorChat", "combat.endIsland.endstoneProtectorChat")
     }
 }
