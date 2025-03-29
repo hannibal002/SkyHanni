@@ -200,7 +200,7 @@ object TitleManager {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         )
 
-        if (subtitleText == null) mainTextRenderable.renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+        if (subtitleText == null) mainTextRenderable.renderXYAligned(context, 0, 50, guiWidth, adjustedHeight.toInt())
         else {
             val subText: String = subtitleText ?: return
             val subtitleScale = factor * fontSize * 0.75f
@@ -212,7 +212,7 @@ object TitleManager {
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             )
             val container = Renderable.verticalContainer(listOf(mainTextRenderable, subtitleRenderable))
-            container.renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+            container.renderXYAligned(context, 0, 50, guiWidth, adjustedHeight.toInt())
         }
 
         context.matrices.popMatrix()
@@ -254,7 +254,7 @@ object TitleManager {
             ColorUtils.TRANSPARENT_COLOR,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        ).renderXYAligned(0, 0, gui.width, gui.height)
+        ).renderXYAligned(context, 0, 0, gui.width, gui.height)
 
         context.matrices.translate(0f, heightTranslation, -500f)
         context.matrices.popMatrix()

@@ -493,7 +493,7 @@ object RenderUtils {
             val (x, y) = transform(context)
             context.matrices.translate(0f, longestY.toFloat(), 0F)
             Renderable.withMousePosition(x, y) {
-                line.renderXAligned(0, longestY, longestX)
+                line.renderXAligned(context, 0, longestY, longestX)
             }
 
             longestY += line.height + extraSpace + 2
@@ -513,7 +513,7 @@ object RenderUtils {
         context.matrices.pushMatrix()
         val (x, y) = transform(context)
         Renderable.withMousePosition(x, y) {
-            renderable.render(0, 0)
+            renderable.render(context, 0, 0)
         }
         context.matrices.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
@@ -539,7 +539,7 @@ object RenderUtils {
                 val lineY = line.maxOf { it.height }
                 var lineX = 0
                 for (element in line) {
-                    element.renderYAligned(lineX, longestY, lineY)
+                    element.renderYAligned(context, lineX, longestY, lineY)
                     context.matrices.translate(element.width.toFloat(), 0f, 0f)
                     lineX += element.width
                 }

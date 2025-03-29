@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import net.minecraft.client.Minecraft
@@ -23,7 +24,7 @@ object RenderableTooltips {
         if (event.startPhase) {
             tooltip = null
         } else {
-            drawHoveringText()
+            drawHoveringText(event.context)
         }
     }
 
@@ -37,7 +38,7 @@ object RenderableTooltips {
         tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfToLong, spacedTitle)
     }
 
-    private fun drawHoveringText() {
+    private fun drawHoveringText(context: DrawContext) {
         val tooltip = tooltip ?: return
         val tips = tooltip.tips
         if (tips.isEmpty()) return
@@ -82,7 +83,7 @@ object RenderableTooltips {
 
         var yTranslateSum = 0
         tips.forEachIndexed { index, line ->
-            line.renderXAligned(tooltipX, tooltipY, tooltipTextWidth)
+            line.renderXAligned(context, tooltipX, tooltipY, tooltipTextWidth)
             var yShift = line.height
             if (index == 0 && isSpacedTitle) yShift += 2
             GlStateManager.translate(0f, yShift.toFloat(), 0f)

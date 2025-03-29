@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.utils.guide
 
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import net.minecraft.client.gui.Gui
 import net.minecraft.item.ItemStack
 
 class GuideTab(
@@ -53,9 +54,9 @@ class GuideTab(
                 item, 1.0, horizontalAlign = HorizontalAlignment.CENTER, verticalAlign = VerticalAlignment.CENTER
             )
 
-            override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, selectColor)
-                itemRender.renderXYAligned(posX, posY, width, height)
+            override fun render(context: DrawContext, posX: Int, posY: Int) {
+                GuiRenderUtils.drawRect(context, 0, 0, width, height, selectColor)
+                itemRender.renderXYAligned(context, posX, posY, width, height)
             }
         },
         tips = listOf(tip),
@@ -65,7 +66,7 @@ class GuideTab(
         }
     )
 
-    fun render(posX: Int, posY: Int) {
-        renderable.render(posX, posY)
+    fun render(context: DrawContext, posX: Int, posY: Int) {
+        renderable.render(context, posX, posY)
     }
 }

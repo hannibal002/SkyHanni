@@ -54,7 +54,7 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
         var offset = Pair(TAB_SPACING.toFloat() * 3f, -TAB_LONG_SIDE.toFloat())
         context.matrices.translate(offset.first, offset.second, 0f)
         for (tab in horizontalTabs) {
-            tab.render(offset.first.toInt(), offset.second.toInt())
+            tab.render(context, offset.first.toInt(), offset.second.toInt())
             val xShift = (TAB_SHORT_SIDE + TAB_SPACING).toFloat()
             offset = offset.first + xShift to offset.second
             context.matrices.translate(xShift, 0f, 0f)
@@ -66,7 +66,7 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
         var offset = Pair(-TAB_LONG_SIDE.toFloat(), TAB_SPACING.toFloat() * 3f)
         context.matrices.translate(offset.first, offset.second, 0f)
         for (tab in verticalTabs) {
-            tab.render(offset.first.toInt(), offset.second.toInt())
+            tab.render(context, offset.first.toInt(), offset.second.toInt())
             val yShift = (TAB_SHORT_SIDE + TAB_SPACING).toFloat()
             offset = offset.first to offset.second + yShift
             context.matrices.translate(0f, yShift, 0f)
@@ -94,7 +94,7 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
                 "§7SkyHanni ",
                 horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
-            ).renderXYAligned(0, 0, sizeX, sizeY)
+            ).renderXYAligned(context, 0, 0, sizeX, sizeY)
 
             val page = pageList[currentPage]
             page?.drawPage(context, relativeMouseX, relativeMouseY)

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -11,11 +12,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
 import kotlin.reflect.KMutableProperty0
 
@@ -94,38 +94,43 @@ internal object RenderableUtils {
         else -> 0
     }
 
-    fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
+    fun Renderable.renderXYAligned(context: DrawContext, posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         val yOffset = calculateAlignmentYOffset(this, ySpace)
-        GlStateManager.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
-        this.render(posX + xOffset, posY + yOffset)
-        GlStateManager.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
+        context.matrices.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
+        this.render(context, posX + xOffset, posY + yOffset)
+        context.matrices.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
         return xOffset to yOffset
     }
 
-    fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int): Int {
+    fun Renderable.renderXAligned(context: DrawContext, posX: Int, posY: Int, xSpace: Int): Int {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
-        GlStateManager.translate(xOffset.toFloat(), 0f, 0f)
-        this.render(posX + xOffset, posY)
-        GlStateManager.translate(-xOffset.toFloat(), 0f, 0f)
+        context.matrices.translate(xOffset.toFloat(), 0f, 0f)
+        this.render(context, posX + xOffset, posY)
+        context.matrices.translate(-xOffset.toFloat(), 0f, 0f)
         return xOffset
     }
 
-    fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int): Int {
+    fun Renderable.renderYAligned(context: DrawContext, posX: Int, posY: Int, ySpace: Int): Int {
         val yOffset = calculateAlignmentYOffset(this, ySpace)
-        GlStateManager.translate(0f, yOffset.toFloat(), 0f)
-        this.render(posX, posY + yOffset)
-        GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
+        context.matrices.translate(0f, yOffset.toFloat(), 0f)
+        this.render(context, posX, posY + yOffset)
+        context.matrices.translate(0f, -yOffset.toFloat(), 0f)
         return yOffset
     }
 
-    inline fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
-        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
-        GlStateManager.translate(1.0, 1.0, 0.0)
-        GlStateManager.scale(scale, scale, 1.0)
-        fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
-        GlStateManager.scale(inverseScale, inverseScale, 1.0)
-        GlStateManager.translate(-1.0, -1.0, 0.0)
+    inline fun renderString(
+        context: DrawContext,
+        text: String,
+        scale: Double = 1.0,
+        color: Color = Color.WHITE,
+        inverseScale: Double = 1 / scale,
+    ) {
+        context.matrices.translate(1.0, 1.0, 0.0)
+        context.matrices.scale(scale.toFloat(), scale.toFloat(), 1f)
+        GuiRenderUtils.drawString(context, text, 0f, 0f, color.rgb)
+        context.matrices.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
+        context.matrices.translate(-1.0, -1.0, 0.0)
     }
 
     inline fun <T> MutableList<Searchable>.addNullableButton(

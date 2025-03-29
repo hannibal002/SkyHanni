@@ -12,7 +12,7 @@ abstract class GuideRenderablePage(
 
     final override fun drawPage(context: DrawContext, mouseX: Int, mouseY: Int) {
         context.matrices.translate(paddingX.toFloat(), paddingY.toFloat(), 0f)
-        renderable?.render(paddingX, paddingY)
+        renderable?.render(context, paddingX, paddingY)
         context.matrices.translate(-paddingX.toFloat(), -paddingY.toFloat(), 0f)
     }
 

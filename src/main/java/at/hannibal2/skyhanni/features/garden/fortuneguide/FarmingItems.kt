@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.gui.GuiScreen
@@ -109,7 +110,7 @@ enum class FarmingItems(
         override val horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
         override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-        override fun render(posX: Int, posY: Int) {
+        override fun render(context: DrawContext, posX: Int, posY: Int) {
             GuiScreen.drawRect(
                 0,
                 0,
@@ -117,7 +118,7 @@ enum class FarmingItems(
                 height,
                 if (selectedState) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt(),
             )
-            content.render(posX, posY)
+            content.render(context, posX, posY)
         }
     }
 
