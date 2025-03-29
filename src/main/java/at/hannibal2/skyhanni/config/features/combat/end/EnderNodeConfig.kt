@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.combat
+package at.hannibal2.skyhanni.config.features.combat.end
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId

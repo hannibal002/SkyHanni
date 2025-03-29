@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.combat.EnderNodeConfig.EnderNodeDisplayEntry
+import at.hannibal2.skyhanni.config.features.combat.end.EnderNodeConfig.EnderNodeDisplayEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -38,7 +38,7 @@ import com.google.gson.annotations.Expose
 @SkyHanniModule
 object EnderNodeTracker {
 
-    private val config get() = SkyHanniMod.feature.combat.enderNodeTracker
+    private val config get() = SkyHanniMod.feature.combat.endIsland.enderNodeTracker
 
     private var miteGelInInventory = 0
 
@@ -193,6 +193,7 @@ object EnderNodeTracker {
         event.transform(11, "combat.enderNodeTracker.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, EnderNodeDisplayEntry::class.java)
         }
+        event.move(77, "combat.enderNodeTracker", "combat.endIsland.enderNodeTracker")
     }
 
     private fun getLootProfit(storage: Data): Map<EnderNode, Double> {

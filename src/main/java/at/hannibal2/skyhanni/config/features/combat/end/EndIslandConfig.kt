@@ -23,4 +23,9 @@ class EndIslandConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var endstoneProtectorChat: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Ender Node Tracker", desc = "")
+    @Accordion
+    var enderNodeTracker: EnderNodeConfig = EnderNodeConfig()
 }
