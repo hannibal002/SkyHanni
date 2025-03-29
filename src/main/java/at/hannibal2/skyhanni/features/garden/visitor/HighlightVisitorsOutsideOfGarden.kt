@@ -2,12 +2,13 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
+import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,7 +26,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.network.play.client.C02PacketUseEntity
 
 @SkyHanniModule
 object HighlightVisitorsOutsideOfGarden {
@@ -89,21 +89,18 @@ object HighlightVisitorsOutsideOfGarden {
         EntityUtils.getEntitiesNearby<EntityLivingBase>(location, 2.0).any { isVisitor(it) }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onClickEntity(event: PacketSentEvent) {
+    fun onClickEntity(event: EntityClickEvent) {
         if (!shouldBlock) return
-        val world = MinecraftCompat.localWorldOrNull ?: return
-        val player = MinecraftCompat.localPlayerOrNull ?: return
-        if (player.isSneaking) return
-        val packet = event.packet as? C02PacketUseEntity ?: return
-        val entity = packet.getEntityFromWorld(world) ?: return
+        if (MinecraftCompat.localPlayer.isSneaking) return
+        val entity = event.clickedEntity ?: return
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
-            event.cancel()
-            if (packet.action == C02PacketUseEntity.Action.INTERACT) {
+            if (event.clickType == ClickType.RIGHT_CLICK) {
                 ChatUtils.chatAndOpenConfig(
                     "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
                     GardenApi.config.visitors::blockInteracting,
                 )
             }
+            event.cancel()
         }
     }
 }
