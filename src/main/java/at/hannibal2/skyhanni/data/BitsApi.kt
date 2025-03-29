@@ -34,7 +34,7 @@ object BitsApi {
     private val playerStorage get() = ProfileStorageData.playerSpecific
 
     // TODO: remove once issue is tracked down
-    private var lastBitUpdates = mapOf<String, Int>()
+    private val lastBitUpdates = mutableMapOf<String, Int>()
 
     var bits: Int
         get() = profileStorage?.bits ?: 0
@@ -222,6 +222,7 @@ object BitsApi {
 
     private fun updateBits(amount: Int, modifyAvailable: Boolean = true, cause: String) {
         ChatUtils.debug("Updating bits to $amount, cause: $cause")
+        lastBitUpdates[cause] = bits
         val diff = amount - bits
         if (diff == 0) return
 
