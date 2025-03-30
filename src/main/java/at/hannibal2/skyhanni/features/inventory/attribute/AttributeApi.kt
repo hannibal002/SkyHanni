@@ -13,14 +13,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toPair
 import net.minecraft.item.ItemStack
 import java.util.regex.Pattern
 
-enum class RollType {
-    GOOD_ROLL,
-    PARTIAL_ROLL,
-    BAD_ROLL,
-}
-
-data class Attribute(val type: AttributeType, val level: Int)
-
 @SkyHanniModule
 object AttributeApi {
 
@@ -129,3 +121,11 @@ object AttributeApi {
         } ?: false
 
 }
+
+enum class RollType {
+    GOOD_ROLL,
+    PARTIAL_ROLL,
+    BAD_ROLL,
+}
+
+data class Attribute(val type: AttributeType, val level: Int)
