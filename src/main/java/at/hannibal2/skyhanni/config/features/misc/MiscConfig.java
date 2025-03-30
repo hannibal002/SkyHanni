@@ -411,7 +411,7 @@ public class MiscConfig {
     public boolean warnAboutPcTimeOffset = true;
 
     @Expose
-    @ConfigOption(name = "Revert Tooltip Fix", desc = "Reverts the tooltip fix. §cFUN!")
+    @ConfigOption(name = "Revert Tooltip Fix", desc = "This makes tooltips rendered by SkyHanni Transparent. §cFUN!")
     @ConfigEditorBoolean
     public boolean revertTooltipFix = false;
 }
