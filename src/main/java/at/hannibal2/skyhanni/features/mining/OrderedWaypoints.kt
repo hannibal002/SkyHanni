@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.SoopyWaypoint
 import at.hannibal2.skyhanni.data.model.SoopyWaypointList
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -13,13 +12,11 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -79,13 +76,6 @@ object OrderedWaypoints {
                 Color(r, g, b),
                 1,
                 false
-            )
-            // Block color
-            event.drawColor(
-                orderedWaypointsList[renderWaypoints[i]].location,
-                Color(r, g, b),
-                false,
-                alpha
             )
 
             val name = if (config.showAll || i < 3) {
@@ -206,13 +196,6 @@ object OrderedWaypoints {
             aliases = generateAliases(listOf("add", "insert"))
         }
 
-        event.register("shorderedetherwarp") {
-            description = "Marks a vein as etherwarp."
-            category = CommandCategory.USERS_ACTIVE
-            callback { etherwarp(it) }
-            aliases = generateAliases(listOf("etherwarp"))
-        }
-
         event.register("shorderedexport") {
             description = "Exports the loaded ordered waypoints to clipboard."
             category = CommandCategory.USERS_ACTIVE
@@ -313,6 +296,7 @@ object OrderedWaypoints {
         if (orderedWaypointsList.size > 1) {
             currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex, orderedWaypointsList.size)
         }
+        ChatUtils.chat("Unskipped to $currentOrderedWaypointIndex.")
     }
 
     private fun enable() {
@@ -367,20 +351,6 @@ object OrderedWaypoints {
         ChatUtils.chat("Inserted waypoint $wNum at ${waypoint.toCleanString()}!")
     }
 
-    private fun etherwarp(args: Array<String>) {
-        if (args.isEmpty()) {
-            return ChatUtils.chat("Marks a vein as etherwarp. Usage: /shorderedetherwarp (number).")
-        }
-        val wNum = args[0].toIntOrNull() ?: return
-        if (orderedWaypointsList.getOrNull(wNum) == null) {
-            return ChatUtils.chat("Vein does not exist.")
-        }
-        orderedWaypointsList[wNum].options["clip"] = (!orderedWaypointsList[wNum].options["ether"].toBoolean()).toString()
-        val which = if (orderedWaypointsList[wNum].options["ether"].toBoolean()) "enabled"
-        else "disabled"
-        ChatUtils.chat("Waypoint $wNum is now $which to etherwarp.")
-    }
-
     private fun export() {
         SkyHanniMod.coroutineScope.launch {
             val route = orderedWaypointsList.toJson()
@@ -428,9 +398,6 @@ object OrderedWaypoints {
             distanceTo2 = nextWaypoint.location.distanceToPlayer()
 
             nextWaypoint.options["name"]?.let { renderWaypoints.add(it.toInt() - 1) }
-            if (nextWaypoint.options["ether"]?.toBoolean() == true) {
-                TitleManager.sendTitle("§eETHERWARP", 1.seconds)
-            }
         }
 
         if (lastCloser == currentOrderedWaypointIndex && distanceTo1 > distanceTo2 && distanceTo2 < config.waypointRange) {
