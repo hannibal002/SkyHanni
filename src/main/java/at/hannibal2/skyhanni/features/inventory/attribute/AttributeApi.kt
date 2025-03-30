@@ -115,11 +115,7 @@ object AttributeApi {
     }
 
     fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NeuInternalName): Boolean =
-        goodRolls.firstOrNull { it.regex.matches(internalName.asString()) }?.let { goodRoll ->
-            val attributes = first.type to second.type
-            goodRoll.attributes.any { it.equalsIgnoreOrder(attributes) }
-        } ?: false
-
+        getRollType(internalName) == RollType.GOOD_ROLL
 }
 
 enum class RollType {
