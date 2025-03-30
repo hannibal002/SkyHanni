@@ -10,12 +10,14 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,11 +40,11 @@ object HoppityEggsCompactChat {
     }
 
     private fun sendCompact() {
-        if (hoppityDataSet.lastMeal?.let { it == HoppityEggType.HITMAN } == true) handleCompactHitman()
-        else sendNonHitman()
+        if (hoppityDataSet.lastMeal?.let { it == HoppityEggType.HITMAN } == true) compactMultipleFinds()
+        else sendSingularFind()
     }
 
-    private fun sendNonHitman() {
+    private fun sendSingularFind() {
         if (HoppityEggType.resettingEntries.contains(hoppityDataSet.lastMeal) && waypointsConfig.shared) {
             DelayedRun.runDelayed(5.milliseconds) {
                 createWaypointShareCompactMessage(HoppityEggsManager.getAndDisposeWaypointOnclick())
@@ -56,9 +58,10 @@ object HoppityEggsCompactChat {
         }
     }
 
-    private fun handleCompactHitman() {
-        if (!chatConfig.compactHitman) {
-            sendNonHitman()
+    private fun compactMultipleFinds() {
+        val inClaimAll = InventoryUtils.openInventoryName() == "Claim All"
+        if (!chatConfig.compactHitman || !inClaimAll) {
+            sendSingularFind()
             return
         }
 
@@ -66,16 +69,18 @@ object HoppityEggsCompactChat {
             hitmanCompactDataSets.add(it.copy())
             it.reset()
         }
-        val sizeNow = hitmanCompactDataSets.size
-        DelayedRun.runDelayed(750.milliseconds) {
-            if (hitmanCompactDataSets.size != sizeNow) return@runDelayed
-
-            if (hitmanCompactDataSets.size == 1) {
-                hoppityDataSet = hitmanCompactDataSets.first() // Pop back out the stored data
-                sendNonHitman()
-            } else sendHitmanSummary()
+        val expectedHitmanFinds = InventoryUtils.getItemsInOpenChest().count { it.stack.item == Items.skull }
+        val hitmanFindsNow = hitmanCompactDataSets.size
+        if (hitmanFindsNow >= expectedHitmanFinds) {
+            sendHitmanSummary()
+            hitmanCompactDataSets.clear()
+        } else DelayedRun.runDelayed(2.seconds) {
+            // Runaway check to make sure data doesn't sit still if expected finds don't calculate correctly
+            if (hitmanCompactDataSets.size == hitmanFindsNow) {
+                sendHitmanSummary()
+                hitmanCompactDataSets.clear()
+            }
         }
-
     }
 
     private fun sendHitmanSummary() {
@@ -130,8 +135,10 @@ object HoppityEggsCompactChat {
 
     private fun HoppityStateDataSet.getNameFormat(): String =
         lastName.takeIf { it.isNotEmpty() } ?: "§C§L???"
+
     private fun HoppityStateDataSet.getRarityString(): String =
         lastRarity?.let { "${it.chatColorCode}§l${it.rawName}" } ?: "§C§L???"
+
     private fun HoppityStateDataSet.getRarityFormat(): String = when {
         hoppityDataSet.duplicate && chatConfig.rarityInCompact in listOf(RarityType.BOTH, RarityType.DUPE) -> "${getRarityString()} "
         !hoppityDataSet.duplicate && chatConfig.rarityInCompact in listOf(RarityType.BOTH, RarityType.NEW) -> "${getRarityString()} "
