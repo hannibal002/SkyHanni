@@ -45,7 +45,6 @@ object OrderedWaypoints {
             var r = 0
             var g = 0
             var b = 0
-            var alpha = 0.4f
             if (!config.showAll) {
                 if (i == 0) {
                     wpColor = config.previousWaypointColor.toSpecialColor()
@@ -63,7 +62,6 @@ object OrderedWaypoints {
                 r = wpColor.red
                 g = wpColor.green
                 b = wpColor.blue
-                alpha = wpColor.alpha / 255.0f
             }
             if (orderedWaypointsList.getOrNull(renderWaypoints[i]) == null) {
                 ChatUtils.debug("${renderWaypoints[i]} $i")
@@ -78,18 +76,14 @@ object OrderedWaypoints {
                 false
             )
 
-            val name = if (config.showAll || i < 3) {
-                orderedWaypointsList[renderWaypoints[i]].options["name"]
-            } else {
-                ""
-            }
-
             // Waypoint name (number)
-            event.drawString(
-                orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
-                "§b$name",
-                seeThroughBlocks = true
-            )
+            if (config.showAll || i < 3) {
+                event.drawString(
+                    orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
+                    "§b${orderedWaypointsList[renderWaypoints[i]].options["name"]}",
+                    seeThroughBlocks = true
+                )
+            }
 
             if (config.showDistance) {
                 // Distance
