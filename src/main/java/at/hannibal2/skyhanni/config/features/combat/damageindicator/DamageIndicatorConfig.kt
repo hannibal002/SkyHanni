@@ -8,7 +8,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class DamageIndicatorConfig {
     @Expose
@@ -112,18 +111,18 @@ class DamageIndicatorConfig {
     var shurikenIndicator: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Twilight Indicator", desc = "Indicate if twilight arrow poison has been used.")
+    @ConfigOption(name = "Twilight Indicator", desc = "Indicate if Twilight Arrow Poison has been used.")
     @ConfigEditorBoolean
     var twilightIndicator: Boolean = true
 
     @Expose
     @ConfigOption(
-        name = "Compact Names",
-        desc = "Use the icons of Extremely Real Shuriken and twilight arrow poison " +
+        name = "Compact Status Effects",
+        desc = "Use the icons of Extremely Real Shuriken and Twilight Arrow Poison " +
             "instead of their names for the indicator."
     )
     @ConfigEditorBoolean
-    var compactName: Boolean = false
+    var compactStatusEffects: Boolean = false
 
     @Expose
     @ConfigOption(

@@ -228,15 +228,15 @@ object DamageIndicatorManager {
 
             val icons: MutableList<String> = mutableListOf()
             if (config.shurikenIndicator && entity.getNameTagWith(3, "§b✯") != null) {
-                icons += if (config.compactName) "§b✯"
+                icons += if (config.compactStatusEffects) "§b✯"
                 else "§bShuriken"
             }
             if (config.twilightIndicator && entity.getNameTagWith(3, "§5ᛤ") != null) {
-                icons += if (config.compactName) "§5ᛤ"
+                icons += if (config.compactStatusEffects) "§5ᛤ"
                 else "§5Twilight"
             }
 
-            val iconString = icons.joinToString(if (config.compactName) "" else " ")
+            val iconString = icons.joinToString(if (config.compactStatusEffects) "" else " ")
             var diff = 9f
             if (icons.isNotEmpty()) {
                 event.drawDynamicText(
