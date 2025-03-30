@@ -11,11 +11,13 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
@@ -193,6 +195,11 @@ object CustomScoreboard {
     }
 
     @HandleEvent
+    fun onHypixelJoin(event: HypixelJoinEvent) {
+        updateAllIslandEntries()
+    }
+
+    @HandleEvent
     fun onWorldChange() {
         runDelayed(2.seconds) {
             if (!LorenzUtils.inSkyBlock || !(LorenzUtils.onHypixel && OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
@@ -201,7 +208,8 @@ object CustomScoreboard {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        updateIslandEntries()
+        if (event.newIsland == IslandType.NONE) updateAllIslandEntries()
+        else updateIslandEntries()
     }
 
     private fun updateIslandEntries() {
@@ -210,6 +218,16 @@ object CustomScoreboard {
 
         activePatterns = (ScoreboardConfigElement.getElements() + ScoreboardConfigEventElement.getEvents())
             .filter { it.showIsland() }
+            .flatMap { it.elementPatterns }
+            .distinct()
+        activePatterns += ScoreboardPattern.brokenPatterns
+    }
+
+    private fun updateAllIslandEntries() {
+        currentIslandEntries = config.scoreboardEntries.get().map { it.element }
+        currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }
+
+        activePatterns = (ScoreboardConfigElement.getElements() + ScoreboardConfigEventElement.getEvents())
             .flatMap { it.elementPatterns }
             .distinct()
         activePatterns += ScoreboardPattern.brokenPatterns

@@ -144,6 +144,8 @@ object PartyApi {
     var partyLeader: String? = null
     var prevPartyLeader: String? = null
 
+    fun isInParty() = partyMembers.isNotEmpty()
+
     private fun listMembers() {
         val size = partyMembers.size
         if (size == 0) {
