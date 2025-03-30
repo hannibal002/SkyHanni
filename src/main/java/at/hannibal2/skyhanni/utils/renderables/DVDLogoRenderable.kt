@@ -8,46 +8,10 @@ import net.minecraft.client.renderer.GlStateManager
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-enum class LogoVelocity(var x: Int, val y: Int) {
-    UP_RIGHT(1, -1),
-    UP_LEFT(-1, -1),
-    DOWN_RIGHT(1, 1),
-    DOWN_LEFT(-1, 1),
-    ;
-
-    enum class ApplicatorDirection {
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN
-    }
-
-    fun invert(): LogoVelocity = of(-x, -y)
-
-    fun applyApplicator(direction: ApplicatorDirection): LogoVelocity = when (direction) {
-        ApplicatorDirection.LEFT -> of(-1 * abs(x), y)
-        ApplicatorDirection.RIGHT -> of(abs(x), y)
-        ApplicatorDirection.UP -> of(x, -1 * abs(y))
-        ApplicatorDirection.DOWN -> of(x, abs(y))
-    }
-
-    companion object {
-        private fun of(x: Int, y: Int): LogoVelocity = when {
-            x > 0 && y < 0 -> UP_RIGHT
-            x < 0 && y < 0 -> UP_LEFT
-            x > 0 && y > 0 -> DOWN_RIGHT
-            x < 0 && y > 0 -> DOWN_LEFT
-            else -> throw IllegalArgumentException("Invalid velocity: ($x, $y)")
-        }
-    }
-}
-
-private fun Renderable.generateRandomStartingPosition() = Position(
-    x = (0..(GuiScreenUtils.scaledWindowWidth - (width * 2))).random().toDouble(),
-    y = (0..(GuiScreenUtils.scaledWindowHeight - (height * 2))).random().toDouble(),
-)
-
-private class Position(val x: Double, val y: Double)
+/**
+ * This is a wrapper for a renderable that moves across the entire display and hits the edges and senses when the edge is hit.
+ * Just like the old DVD logos on old monitors back in the old days. old.
+ */
 
 class DVDLogoRenderable(
     private val renderable: Renderable,
@@ -132,3 +96,44 @@ class DVDLogoRenderable(
         GlStateManager.popMatrix()
     }
 }
+
+enum class LogoVelocity(var x: Int, val y: Int) {
+    UP_RIGHT(1, -1),
+    UP_LEFT(-1, -1),
+    DOWN_RIGHT(1, 1),
+    DOWN_LEFT(-1, 1),
+    ;
+
+    enum class ApplicatorDirection {
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN
+    }
+
+    fun invert(): LogoVelocity = of(-x, -y)
+
+    fun applyApplicator(direction: ApplicatorDirection): LogoVelocity = when (direction) {
+        ApplicatorDirection.LEFT -> of(-1 * abs(x), y)
+        ApplicatorDirection.RIGHT -> of(abs(x), y)
+        ApplicatorDirection.UP -> of(x, -1 * abs(y))
+        ApplicatorDirection.DOWN -> of(x, abs(y))
+    }
+
+    companion object {
+        private fun of(x: Int, y: Int): LogoVelocity = when {
+            x > 0 && y < 0 -> UP_RIGHT
+            x < 0 && y < 0 -> UP_LEFT
+            x > 0 && y > 0 -> DOWN_RIGHT
+            x < 0 && y > 0 -> DOWN_LEFT
+            else -> throw IllegalArgumentException("Invalid velocity: ($x, $y)")
+        }
+    }
+}
+
+private fun Renderable.generateRandomStartingPosition() = Position(
+    x = (0..(GuiScreenUtils.scaledWindowWidth - (width * 2))).random().toDouble(),
+    y = (0..(GuiScreenUtils.scaledWindowHeight - (height * 2))).random().toDouble(),
+)
+
+private class Position(val x: Double, val y: Double)
