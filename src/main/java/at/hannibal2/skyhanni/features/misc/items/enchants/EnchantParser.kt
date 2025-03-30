@@ -247,7 +247,7 @@ object EnchantParser {
         loreList.addAll(startEnchant, insertEnchants)
 
         if (config.stackingEnchantProgress) {
-        // TODO check if SBA's feature is enabled and show a chat prompt to decide what to disable. Maybe use OtherModsSettings.kt
+            // TODO check if SBA's feature is enabled and show a chat prompt to decide what to disable. Maybe use OtherModsSettings.kt
             stackingEnchant?.let { stacking ->
                 currentItem?.let { item ->
                     loreList.add(loreList.size - 1, stacking.progressString(item))
