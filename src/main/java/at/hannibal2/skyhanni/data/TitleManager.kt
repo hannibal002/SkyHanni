@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -173,6 +174,7 @@ object TitleManager {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (InventoryUtils.inInventory()) return
         val globalTitle = currentTitles[TitleLocation.GLOBAL] ?: return
         globalTitle.tryRenderGlobalTitle()
     }
@@ -186,8 +188,6 @@ object TitleManager {
         var factor = globalTitleWidth / stringWidth.toDouble()
         factor = min(factor, 1.0)
 
-        val adjustedHeight = (guiHeight / height) * 2
-
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.pushMatrix()
@@ -199,8 +199,19 @@ object TitleManager {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         )
 
-        if (subtitleText == null) mainTextRenderable.renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
-        else {
+        val renderableWidth = mainTextRenderable.width
+        val renderableHeight = mainTextRenderable.height
+        val posX: Int = (-guiWidth / 2) - renderableWidth
+        val posY = -guiHeight / 2
+
+        // Translate the origin to the adjustedPosition
+        val translationX = (guiWidth / 2f) - (renderableWidth / 2f)
+        val translationY = (guiHeight / 2f) - (renderableHeight * 2f)
+        GlStateManager.translate(translationX, translationY, 0f)
+
+        if (subtitleText == null) {
+            mainTextRenderable.renderXYAligned(posX, posY, guiWidth, guiHeight)
+        } else {
             val subText: String = subtitleText ?: return
             val subtitleScale = factor * fontSize * 0.75f
             val subtitleRenderable = Renderable.wrappedString(
@@ -211,7 +222,7 @@ object TitleManager {
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             )
             val container = Renderable.verticalContainer(listOf(mainTextRenderable, subtitleRenderable))
-            container.renderXYAligned(0, 50, guiWidth, adjustedHeight.toInt())
+            container.renderXYAligned(posX, posY, guiWidth, guiHeight)
         }
 
         GlStateManager.popMatrix()
@@ -219,6 +230,7 @@ object TitleManager {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        if (!InventoryUtils.inInventory()) return
         val inventoryTitle = currentTitles[TitleLocation.INVENTORY] ?: return
         inventoryTitle.tryRenderInventoryTitle()
     }
@@ -234,7 +246,11 @@ object TitleManager {
                 Renderable.verticalContainer(
                     listOf(
                         baseStringRenderable,
-                        Renderable.string(displaySubText, 1.0),
+                        Renderable.string(
+                            displaySubText,
+                            scale = 1.0,
+                            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                        ),
                     ),
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 )
@@ -242,8 +258,8 @@ object TitleManager {
         }
 
         val heightTranslation = when (subtitleText) {
-            null -> 150f
-            else -> 200f
+            null -> 100f
+            else -> 150f
         }
 
         GlStateManager.pushMatrix()
