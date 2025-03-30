@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
-import kotlin.time.Duration.Companion.seconds
 
 object TrevorSolver {
 
@@ -72,7 +71,7 @@ object TrevorSolver {
                     val canSee = entity.canBeSeen() && dist < currentMob.renderDistance
                     if (canSee) {
                         if (mobLocation != TrapperMobArea.FOUND) {
-                            TitleManager.sendTitle("§2Saw ${currentMob.mobName}!", 3.seconds)
+                            TitleManager.sendTitle("§2Saw ${currentMob.mobName}!")
                         }
                         mobLocation = TrapperMobArea.FOUND
                         mobCoordinates = entity.position.toLorenzVec()

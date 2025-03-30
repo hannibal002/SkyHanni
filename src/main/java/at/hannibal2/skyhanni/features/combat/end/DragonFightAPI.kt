@@ -1,12 +1,16 @@
-package at.hannibal2.skyhanni.features.combat
+package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -15,24 +19,24 @@ object DragonFightAPI {
 
     var currentType: String? = null
     var currentHp: Int? = null
-    var yourDamage: Int? = null
+    private var yourDamage: Int? = null
 
     private val group = RepoPattern.group("combat.end-dragon-fight")
 
     /**
-     * REGEX-TEST: ☬ The Wise Dragon has spawned!
+     * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lOld Dragon§r§d§l has spawned!§r
      */
     private val chatSpawnPattern by group.pattern(
         "chat.spawn",
-        "☬ The (?<type>.*) Dragon has spawned!",
+        "§5☬ §r§d§lThe §r§5§c§l(?<type>.*)§r§d§l has spawned!§r",
     )
 
     /**
-     * REGEX-TEST:                           YOUNG DRAGON DOWN!
+     * REGEX-TEST: §r§f                           §r§6§lOLD DRAGON DOWN!§r
      */
     private val chatDeath by group.pattern(
         "chat.death",
-        ".*DRAGON DOWN!",
+        "§r§f {27}§r§6§l(?<type>.*) DOWN!§r",
     )
 
     /**
@@ -50,6 +54,10 @@ object DragonFightAPI {
         "scoreboard.your-damage",
         "Your Damage: (?<damage>.*)",
     )
+
+    private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")
+
+    fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(LorenzUtils.skyBlockArea)
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {
