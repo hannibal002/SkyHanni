@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.WaypointLoader
 import kotlinx.coroutines.launch
 import java.awt.Color
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object OrderedWaypoints {
