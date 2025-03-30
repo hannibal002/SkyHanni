@@ -24,6 +24,14 @@ class RareCatchesConfig {
     var alertOtherCatches: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Announce to Party",
+        desc = "Send a message to your party when you catch a rare sea creature."
+    )
+    @ConfigEditorBoolean
+    var announceRareInParty: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Creature Name", desc = "Say what creature was caught in the alert.")
     @ConfigEditorBoolean
     var creatureName: Boolean = true
