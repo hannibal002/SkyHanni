@@ -27,8 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -38,6 +36,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
+import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
@@ -127,12 +126,12 @@ object RenderUtils {
         GlStateManager.enableLighting()
     }
 
-    fun Slot.drawBorder(color: LorenzColor) {
-        drawBorder(color.toColor())
+    fun Slot.drawBorder(context: DrawContext, color: LorenzColor) {
+        drawBorder(context, color.toColor())
     }
 
-    fun Slot.drawBorder(color: Color) {
-        drawBorder(color, xDisplayPosition, yDisplayPosition)
+    fun Slot.drawBorder(context: DrawContext, color: Color) {
+        drawBorder(context, color, xDisplayPosition, yDisplayPosition)
     }
 
     fun RenderGuiItemOverlayEvent.drawBorder(color: LorenzColor) {
@@ -140,19 +139,19 @@ object RenderUtils {
     }
 
     fun RenderGuiItemOverlayEvent.drawBorder(color: Color) {
-        drawBorder(color, x, y)
+        drawBorder(context, color, x, y)
     }
 
-    fun drawBorder(color: Color, x: Int, y: Int) {
+    fun drawBorder(context: DrawContext, color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        Gui.drawRect(x, y, x + 1, y + 16, color.rgb)
-        Gui.drawRect(x, y, x + 16, y + 1, color.rgb)
-        Gui.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
-        Gui.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
-        GlStateManager.popMatrix()
+        context.matrices.pushMatrix()
+        context.matrices.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        GuiRenderUtils.drawRect(context, x, y, x + 1, y + 16, color.rgb)
+        GuiRenderUtils.drawRect(context, x, y, x + 16, y + 1, color.rgb)
+        GuiRenderUtils.drawRect(context, x, y + 15, x + 16, y + 16, color.rgb)
+        GuiRenderUtils.drawRect(context, x + 15, y, x + 16, y + 16, color.rgb)
+        context.matrices.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
     }
@@ -385,7 +384,7 @@ object RenderUtils {
     /**
      * @author Mojang
      */
-    fun drawNametag(str: String, color: Color?) {
+    private fun SkyHanniRenderWorldEvent.drawNametag(str: String, color: Color?) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         val f1 = 0.02666667f
         GlStateManager.pushMatrix()
@@ -1557,14 +1556,25 @@ object RenderUtils {
      * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
      * It is best kept at its default.
      */
-    fun drawRoundTexturedRect(x: Int, y: Int, width: Int, height: Int, filter: Int, radius: Int = 10, smoothness: Int = 1) {
+    fun drawRoundTexturedRect(
+        context: DrawContext,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        filter: Int,
+        radius: Int = 10,
+        smoothness: Int = 1,
+        texture: ResourceLocation,
+        alpha: Float = 1f,
+    ) {
         // if radius is 0 then just draw a normal textured rect
         if (radius <= 0) {
-            GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
+            GuiRenderUtils.drawTexturedRect(context, x, y, width, height, filter = filter, texture = texture, alpha = alpha)
             return
         }
 
-        val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
+        val scaleFactor = GuiScreenUtils.scaleFactor
         val widthIn = width * scaleFactor
         val heightIn = height * scaleFactor
         val xIn = x * scaleFactor
@@ -1576,13 +1586,13 @@ object RenderUtils {
         RoundedTextureShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedTextureShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
 
-        GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
+        GuiRenderUtils.drawTexturedRect(context, x, y, width, height, filter = filter, texture = texture, alpha = alpha)
 
         ShaderManager.disableShader()
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
     }
 
     /**
@@ -1598,8 +1608,8 @@ object RenderUtils {
      * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
      * It is best kept at its default.
      */
-    fun drawRoundRect(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Int = 1) {
-        val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
+    fun drawRoundRect(context: DrawContext, x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Int = 1) {
+        val scaleFactor = GuiScreenUtils.scaleFactor
         val widthIn = width * scaleFactor
         val heightIn = height * scaleFactor
         val xIn = x * scaleFactor
@@ -1611,13 +1621,13 @@ object RenderUtils {
         RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
 
-        Gui.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
+        GuiRenderUtils.drawRect(context, x - 5, y - 5, x + width + 5, y + height + 5, color)
 
         ShaderManager.disableShader()
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
     }
 
     /**
@@ -1635,6 +1645,7 @@ object RenderUtils {
      * @param blur the amount to blur the outline (default 0.7f)
      */
     fun drawRoundRectOutline(
+        context: DrawContext,
         x: Int,
         y: Int,
         width: Int,
@@ -1645,7 +1656,7 @@ object RenderUtils {
         radius: Int = 10,
         blur: Float = 0.7f,
     ) {
-        val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
+        val scaleFactor = GuiScreenUtils.scaleFactor
         val widthIn = width * scaleFactor
         val heightIn = height * scaleFactor
         val xIn = x * scaleFactor
@@ -1668,6 +1679,7 @@ object RenderUtils {
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
 
         GuiRenderUtils.drawGradientRect(
+            context,
             x - borderAdjustment,
             y - borderAdjustment,
             x + width + borderAdjustment,

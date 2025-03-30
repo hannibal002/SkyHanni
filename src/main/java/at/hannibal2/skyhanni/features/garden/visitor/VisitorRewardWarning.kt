@@ -48,7 +48,7 @@ object VisitorRewardWarning {
             backgroundSlot.highlight(context, LorenzColor.DARK_GRAY.addOpacity(config.opacity))
         }
         if (config.optionOutline && outlineSlot != null) {
-            outlineSlot.drawBorder(outlineColor.addOpacity(200))
+            outlineSlot.drawBorder(context, outlineColor.addOpacity(200))
         }
     }
 

@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
@@ -359,7 +358,7 @@ interface Renderable {
             override val verticalAlign = renderable.verticalAlign
 
             override fun render(context: DrawContext, posX: Int, posY: Int) {
-                Gui.drawRect(0, height, width, 11, color.rgb)
+                GuiRenderUtils.drawRect(context, 0, height, width, 11, color.rgb)
                 GlStateManager.color(1F, 1F, 1F, 1F)
                 renderable.render(context, posX, posY)
             }
@@ -458,7 +457,7 @@ interface Renderable {
                 if (highlight) {
                     item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
                 }
-                item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
+                item.renderOnScreen(context, xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
         }
 
@@ -792,7 +791,7 @@ interface Renderable {
 
             override fun render(context: DrawContext, posX: Int, posY: Int) {
                 if (texture == null) {
-                    Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
+                    GuiRenderUtils.drawRect(context, 0, 0, width, height, 0xFF43464B.toInt())
 
                     if (useChroma) {
                         ChromaShaderManager.begin(ChromaType.STANDARD)
@@ -800,8 +799,8 @@ interface Renderable {
 
                     val factor = 0.2
                     val bgColor = if (useChroma) Color.GRAY.darker() else color
-                    Gui.drawRect(1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
-                    Gui.drawRect(1, 1, progress, height - 1, color.rgb)
+                    GuiRenderUtils.drawRect(context, 1, 1, width - 1, height - 1, bgColor.darker(factor).rgb)
+                    GuiRenderUtils.drawRect(context, 1, 1, progress, height - 1, color.rgb)
 
                     if (useChroma) {
                         ChromaShaderManager.end()
@@ -840,7 +839,7 @@ interface Renderable {
             override val verticalAlign = this@renderBounds.verticalAlign
 
             override fun render(context: DrawContext, posX: Int, posY: Int) {
-                Gui.drawRect(0, 0, width, height, color.rgb)
+                GuiRenderUtils.drawRect(context, 0, 0, width, height, color.rgb)
                 this@renderBounds.render(context, posX, posY)
             }
 
@@ -1509,7 +1508,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(context: DrawContext, posX: Int, posY: Int) {
-                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
+                RenderUtils.drawRoundRect(context, 0, 0, width, height, color.rgb, radius, smoothness)
                 context.matrices.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(context, posX + padding, posY + padding)
                 context.matrices.translate(-padding.toFloat(), -padding.toFloat(), 0f)
@@ -1539,6 +1538,7 @@ interface Renderable {
                 context.matrices.translate(-padding.toFloat(), -padding.toFloat(), 0f)
 
                 RenderUtils.drawRoundRectOutline(
+                    context,
                     0,
                     0,
                     width,
@@ -1567,10 +1567,17 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(context: DrawContext, posX: Int, posY: Int) {
-                Minecraft.getMinecraft().textureManager.bindTexture(texture)
-                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                RenderUtils.drawRoundTexturedRect(0, 0, width, height, GL11.GL_NEAREST, radius)
-                GlStateManager.color(1f, 1f, 1f, 1f)
+                RenderUtils.drawRoundTexturedRect(
+                    context,
+                    0,
+                    0,
+                    width,
+                    height,
+                    GL11.GL_NEAREST,
+                    radius,
+                    texture = texture,
+                    alpha = alpha / 255f,
+                )
 
                 context.matrices.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(context, posX + padding, posY + padding)
@@ -1598,11 +1605,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(context: DrawContext, posX: Int, posY: Int) {
-                Minecraft.getMinecraft().textureManager.bindTexture(texture)
-
-                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
-                GlStateManager.color(1f, 1f, 1f, 1f)
+                GuiRenderUtils.drawTexturedRect(context, 0, 0, width, height, uMin, uMax, vMin, vMax, texture, alpha / 255f)
 
                 context.matrices.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(context, posX + padding, posY + padding)
@@ -1628,10 +1631,7 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(context: DrawContext, posX: Int, posY: Int) {
-                Minecraft.getMinecraft().textureManager.bindTexture(texture)
-                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
-                GlStateManager.color(1f, 1f, 1f, 1f)
+                GuiRenderUtils.drawTexturedRect(context, 0, 0, width, height, uMin, uMax, vMin, vMax, texture, alpha / 255f)
             }
         }
 
@@ -1654,8 +1654,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(context: DrawContext, posX: Int, posY: Int) {
-                RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
+                RenderUtils.drawRoundRect(context, 0, 0, width, height, color.rgb, radius, smoothness)
                 RenderUtils.drawRoundRectOutline(
+                    context,
                     0,
                     0,
                     width,

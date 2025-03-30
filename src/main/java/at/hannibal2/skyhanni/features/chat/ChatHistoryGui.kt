@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
-import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -41,7 +40,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         val l = (width / 2.0 - w / 2.0).toInt()
         val t = (height / 2.0 - h / 2.0).toInt()
         context.matrices.translate(l + 0.0, t + 0.0, 0.0)
-        RenderUtils.drawFloatingRectDark(0, 0, w, h)
+        GuiRenderUtils.drawFloatingRectDark(context, 0, 0, w, h)
         context.matrices.translate(5.0, 5.0 - scroll, 0.0)
         val mouseX = originalMouseX - l
         val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)

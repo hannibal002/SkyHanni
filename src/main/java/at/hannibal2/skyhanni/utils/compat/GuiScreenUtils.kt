@@ -25,6 +25,14 @@ object GuiScreenUtils {
 //$$            mc.window.guiScaledWidth
 //#endif
 
+    val scaleFactor
+        get() =
+//#if MC < 1.16
+            ScaledResolution(mc).scaleFactor
+//#else
+//$$            mc.window.scaleFactor
+//#endif
+
     val displayWidth
         get() =
 //#if MC < 1.16

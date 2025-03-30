@@ -121,7 +121,7 @@ object HideNotClickableItems {
             if (hide(chestName, stack)) {
                 slot.highlight(event.context, LorenzColor.DARK_GRAY.addOpacity(config.opacity))
             } else if (showGreenLine && config.itemsGreenLine) {
-                slot.drawBorder(LorenzColor.GREEN.addOpacity(200))
+                slot.drawBorder(event.context, LorenzColor.GREEN.addOpacity(200))
             }
         }
     }

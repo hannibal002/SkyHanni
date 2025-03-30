@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
-import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.gui.ScaledResolution
 import kotlin.math.max
 import kotlin.math.min
@@ -45,7 +44,7 @@ class DefaultConfigOptionGui(
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         drawDefaultBackground()
-        RenderUtils.drawFloatingRectDark((width - xSize) / 2, (height - ySize) / 2, xSize, ySize)
+        GuiRenderUtils.drawFloatingRectDark(context, (width - xSize) / 2, (height - ySize) / 2, xSize, ySize)
         val scaledResolution = ScaledResolution(mc)
         var hoveringTextToDraw: List<String>? = null
         val x = originalMouseX - ((width - xSize) / 2) - padding
@@ -89,7 +88,7 @@ class DefaultConfigOptionGui(
                     func()
                 }
             }
-            RenderUtils.drawFloatingRectDark(i - 1, -3, width + 4, 14)
+            GuiRenderUtils.drawFloatingRectDark(context, i - 1, -3, width + 4, 14)
             GuiRenderUtils.drawString(
                 context,
                 title,

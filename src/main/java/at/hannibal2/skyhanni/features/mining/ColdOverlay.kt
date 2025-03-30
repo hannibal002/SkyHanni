@@ -40,9 +40,8 @@ object ColdOverlay {
 
         GL11.glDepthMask(false)
         event.context.matrices.translate(0f, 0f, -500f)
-        GlStateManager.color(1f, 1f, 1f, alpha)
+        GuiRenderUtils.drawTexturedRect(event.context, 0f, 0f, textureLocation, alpha)
 
-        GuiRenderUtils.drawTexturedRect(0f, 0f)
         GL11.glDepthMask(true)
 
         event.context.matrices.popMatrix()
