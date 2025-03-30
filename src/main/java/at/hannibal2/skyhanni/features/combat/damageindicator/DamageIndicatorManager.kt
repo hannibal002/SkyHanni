@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.combat.DragonFightAPI
+import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -214,7 +215,6 @@ object DamageIndicatorManager {
                 NameVisibility.HIDDEN -> ""
                 NameVisibility.FULL_NAME -> data.bossType.fullName
                 NameVisibility.SHORT_NAME -> data.bossType.shortName
-                else -> data.bossType.fullName
             }
 
             if (data.namePrefix.isNotEmpty()) {
@@ -287,7 +287,7 @@ object DamageIndicatorManager {
         BossType.SLAYER_BLAZE_QUAZII_4,
 
             // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
-            -> true
+        -> true
 
         else -> false
     }
@@ -733,7 +733,7 @@ object DamageIndicatorManager {
         val config = config.vampireSlayer
 
         if (config.percentage) {
-            val percentage = LorenzUtils.formatPercentage(health.toDouble() / maxHealth)
+            val percentage = (health.toDouble() / maxHealth).formatPercentage()
             entityData.nameSuffix = " §e$percentage"
         }
 

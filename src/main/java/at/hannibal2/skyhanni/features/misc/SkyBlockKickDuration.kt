@@ -109,7 +109,7 @@ object SkyBlockKickDuration {
     }
 
     private fun warn() {
-        TitleManager.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
+        TitleManager.sendTitle("§eTry rejoining SkyBlock now!")
         SoundUtils.playBeepSound()
     }
 

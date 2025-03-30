@@ -74,7 +74,7 @@ object EndermanSlayerFeatures {
                         beaconConfig.highlightBeacon
                     }
                     if (beaconConfig.showWarning) {
-                        TitleManager.sendTitle("§4Beacon", 2.seconds)
+                        TitleManager.sendTitle("§4Beacon", duration = 2.seconds)
                     }
                     logger.log("Added flying beacons at ${entity.getLorenzVec()}")
                 }
