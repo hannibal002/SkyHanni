@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
@@ -24,6 +25,7 @@ import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -192,41 +194,40 @@ object TitleManager {
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.pushMatrix()
 
-        val mainTextRenderable = Renderable.string(
+        val mainTextRenderable = Renderable.wrappedString(
             titleText,
-            scale = factor * fontSize,
+            width = (globalTitleWidth * fontSize).toInt(),
+            scale = (factor * fontSize),
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        )
+
+        val subtitleRenderable: Renderable? = subtitleText?.let {
+            Renderable.wrappedString(
+                it,
+                width = (globalTitleWidth * fontSize * 0.75f).toInt(),
+                scale = (factor * fontSize * 0.75f),
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            )
+        }
+
+        val targetRenderable = if (subtitleRenderable == null) mainTextRenderable
+        else Renderable.verticalContainer(
+            listOf(mainTextRenderable, subtitleRenderable),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         )
 
-        val renderableWidth = mainTextRenderable.width
-        val renderableHeight = mainTextRenderable.height
-        val posX: Int = (-guiWidth / 2) - renderableWidth
-        val posY = -guiHeight / 2
+        val renderableWidth = targetRenderable.width
+        val renderableHeight = targetRenderable.height
 
-        // Translate the origin to the adjustedPosition
-        val translationX = (guiWidth / 2f) - (renderableWidth / 2f)
-        val translationY = (guiHeight / 2f) - (renderableHeight * 2f)
-        GlStateManager.translate(translationX, translationY, 0f)
+        val posX = (guiWidth - renderableWidth) / 2
+        val posY = (guiHeight - (renderableHeight * 4)) / 2
 
-        if (subtitleText == null) {
-            mainTextRenderable.renderXYAligned(posX, posY, guiWidth, guiHeight)
-        } else {
-            val subText: String = subtitleText ?: return
-            val subtitleScale = factor * fontSize * 0.75f
-            val subtitleRenderable = Renderable.wrappedString(
-                subText,
-                width = (globalTitleWidth * fontSize).toInt(),
-                scale = subtitleScale,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            )
-            val container = Renderable.verticalContainer(listOf(mainTextRenderable, subtitleRenderable))
-            container.renderXYAligned(posX, posY, guiWidth, guiHeight)
-        }
-
+        GlStateManager.translate(posX.toFloat(), posY.toFloat(), 0f)
+        targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
         GlStateManager.popMatrix()
     }
+
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
