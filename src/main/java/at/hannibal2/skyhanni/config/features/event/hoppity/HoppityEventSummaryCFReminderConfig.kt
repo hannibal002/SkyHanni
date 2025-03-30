@@ -17,7 +17,6 @@ class HoppityEventSummaryCFReminderConfig {
     @FeatureToggle
     var enabled: Boolean = false
 
-    @Expose
     @ConfigOption(
         name = "Note",
         desc = "§cNote§7: Reminders will only appear if you have added Leaderboard Change to your stat list.",

@@ -38,7 +38,7 @@ object SlayerBossSpawnSoon {
         if (completion > config.percent / 100.0) {
             if (!warned || (config.repeat && completion != lastCompletion)) {
                 SoundUtils.playBeepSound()
-                TitleManager.sendTitle("§eSlayer boss soon!", 2.seconds)
+                TitleManager.sendTitle("§eSlayer boss soon!", duration = 2.seconds)
                 warned = true
             }
         } else {
