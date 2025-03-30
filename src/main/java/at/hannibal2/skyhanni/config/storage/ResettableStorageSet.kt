@@ -2,9 +2,14 @@ package at.hannibal2.skyhanni.config.storage
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
+/**
+ * Provides an open interface for easily resetting a storage or data set to a default state.
+ * All properties that are mutable and do not have the `@Transient` annotation will be reset on call.
+ */
 open class ResettableStorageSet {
     private val mutableMemberProperties: List<KMutableProperty1<Any, Any?>> =
         this::class.memberProperties.filterIsInstance<KMutableProperty1<Any, Any?>>()
@@ -13,7 +18,9 @@ open class ResettableStorageSet {
 
     open fun applyFromOther(other: ResettableStorageSet) {
         if (this::class != other::class) return
-        mutableMemberProperties.forEach { prop ->
+        mutableMemberProperties.filter {
+            !it.hasAnnotation<Transient>()
+        }.forEach { prop ->
             try {
                 prop.forceSet(prop.get(other))
             } catch (e: Exception) {
@@ -26,6 +33,8 @@ open class ResettableStorageSet {
     }
 
     private fun KMutableProperty1<Any, Any?>.forceSet(value: Any?) {
+        // Null as an Any? starts causing issues with casting, so we don't even want to try to set it.
+        if (value == null) return
         val wasAccessible = this.isAccessible
         this.isAccessible = true
         this.set(this@ResettableStorageSet, value)
