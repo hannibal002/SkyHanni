@@ -246,11 +246,13 @@ object EnchantParser {
         // Add our parsed enchants back into the lore
         loreList.addAll(startEnchant, insertEnchants)
 
-        val item = currentItem
-        val stacking = stackingEnchant
-
-        if (config.stackingEnchantProgress && stacking != null && item != null) {
-            loreList.add(loreList.size - 1, stacking.progressString(item))
+        if (config.stackingEnchantProgress) {
+        // TODO check if SBA's feature is enabled and show a chat prompt to decide what to disable. Maybe use OtherModsSettings.kt
+            stackingEnchant?.let { stacking ->
+                currentItem?.let { item ->
+                    loreList.add(loreList.size - 1, stacking.progressString(item))
+                }
+            }
         }
 
         // Cache parsed lore
