@@ -117,7 +117,11 @@ class DamageIndicatorConfig {
     var twilightIndicator: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Compact", desc = "Use the icons for the shuriken and twilight instead of their names.")
+    @ConfigOption(
+        name = "Compact Names",
+        desc = "Use the icons of Extremely Real Shuriken and twilight arrow poison " +
+            "instead of their names for the indicator."
+    )
     @ConfigEditorBoolean
     var compactName: Boolean = false
 
