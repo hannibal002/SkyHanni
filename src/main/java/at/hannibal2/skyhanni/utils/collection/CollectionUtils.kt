@@ -221,7 +221,7 @@ object CollectionUtils {
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
-    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>) = this.toSet() == other.toSet()
 
     fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 

@@ -13,6 +13,7 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
@@ -69,27 +70,21 @@ object KeyboardManager {
             return EventKey(key, MouseCompat.getEventButtonState())
         }
 
-        if (Keyboard.getEventKey() != 0) {
-            lastClickedMouseButton = -1
-            return EventKey(Keyboard.getEventKey(), Keyboard.getEventKeyState())
-        }
-
+        // Directly detect if the previously clicked mouse button is still held down.
         if (MouseCompat.getEventButton() == -1 && lastClickedMouseButton != -1) {
-            if (lastClickedMouseButton.isKeyHeld()) {
-                return EventKey(lastClickedMouseButton, true)
-            } else {
-                lastClickedMouseButton = -1
-            }
+            val originalButton = lastClickedMouseButton + 100
+            if (Mouse.isButtonDown(originalButton)) return EventKey(lastClickedMouseButton, true)
+            else lastClickedMouseButton = -1
         }
 
         // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
-        if (Keyboard.getEventKey() == 0) {
-            return EventKey(Keyboard.getEventCharacter().code + 256, Keyboard.getEventKeyState())
+        return when (Keyboard.getEventKey()) {
+            0 -> EventKey(Keyboard.getEventCharacter().code + 256, Keyboard.getEventKeyState())
+            else -> EventKey(Keyboard.getEventKey(), Keyboard.getEventKeyState()).also { lastClickedMouseButton = -1 }
         }
-        return null
     }
 
-    val clickedKeys = mutableSetOf<Int>()
+    private val clickedKeys = mutableSetOf<Int>()
     //#endif
 
     @HandleEvent(priority = HandleEvent.LOWEST)
