@@ -33,5 +33,5 @@ class DeepCavernsGuideConfig {
     // @Expose
     // @ConfigOption(name = "Highlight all Lines", desc = "Show all lines in gray. Useful for debugging.")
     // @ConfigEditorBoolean
-    // var highlightAllLines: Boolean = false;
+    // var highlightAllLines: Boolean = false
 }
