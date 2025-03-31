@@ -313,8 +313,6 @@ class ProfileSpecificStorage {
     var hoppityStatLiveDisplayToggledOff: Boolean = false
 
     data class HoppityEventStats(
-        var containingYears: MutableSet<Int> = mutableSetOf(),
-
         @Expose var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
         @Expose var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
         @Expose var dupeChocolateGained: Long = 0,
@@ -330,6 +328,8 @@ class ProfileSpecificStorage {
         @Expose var typeCountSnapshot: RabbitData = RabbitData(),
         @Expose var typeCountsSince: RabbitData = RabbitData(),
     ) {
+        var containingYears: MutableSet<Int> = mutableSetOf()
+
         constructor(year: Int) : this() {
             containingYears.add(year)
         }
