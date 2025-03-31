@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CFStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
@@ -34,11 +34,11 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ChocolateFactoryApi {
+object CFApi {
 
     private val chromaEnabled get() = ChromaManager.config.enabled.get()
-    val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
-    val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
+    val config: CFConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
+    val profileStorage: CFStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
 
     // <editor-fold desc="Patterns">
@@ -110,7 +110,7 @@ object ChocolateFactoryApi {
     private var maxPrestige = 6
     var cfShortcutIndex = 16
 
-    val inChocolateFactory get() = mainInventory.isInside()
+    val inCf get() = mainInventory.isInside()
     var chocolateFactoryPaused = false
 
     var currentPrestige = 1
@@ -119,7 +119,7 @@ object ChocolateFactoryApi {
     var leaderboardPercentile: Double? = null
     var chocolateForPrestige = 150_000_000L
 
-    var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
+    var factoryUpgrades = listOf<CFUpgrade>()
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
@@ -132,7 +132,7 @@ object ChocolateFactoryApi {
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
             if (config.enabled) {
                 chocolateFactoryPaused = true
-                ChocolateFactoryStats.updateDisplay()
+                CFStats.updateDisplay()
             }
             return
         }
@@ -141,7 +141,7 @@ object ChocolateFactoryApi {
         if (config.enabled) {
             factoryUpgrades = emptyList()
             DelayedRun.runNextTick {
-                ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
+                CFDataLoader.updateInventoryItems(event.inventoryItems)
             }
         }
     }
@@ -173,7 +173,7 @@ object ChocolateFactoryApi {
         chocolateShopMilestones = data.chocolateShopMilestones.toMutableList()
         specialRabbitTextures = data.specialRabbits
 
-        ChocolateFactoryUpgrade.updateIgnoredSlots()
+        CFUpgrade.updateIgnoredSlots()
     }
 
     @HandleEvent
@@ -241,7 +241,7 @@ object ChocolateFactoryApi {
 
         if (rawChocolatePerSecond == 0) return Duration.INFINITE
 
-        val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
+        val secondsUntilTowerExpires = CFTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
 
         val timeTowerChocPerSecond = rawChocolatePerSecond * (baseMultiplier + timeTowerMultiplier())
 
@@ -268,6 +268,6 @@ object ChocolateFactoryApi {
     } ?: false
 
     fun String.partyModeReplace(): String =
-        if (config.partyMode.get() && inChocolateFactory && chromaEnabled) replace(Regex("§[a-fA-F0-9]"), "§z")
+        if (config.partyMode.get() && inCf && chromaEnabled) replace(Regex("§[a-fA-F0-9]"), "§z")
         else this
 }

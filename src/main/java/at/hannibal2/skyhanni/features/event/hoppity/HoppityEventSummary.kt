@@ -32,8 +32,8 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventEndMark
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventStartMark
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice.menuNamePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -74,7 +74,7 @@ object HoppityEventSummary {
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
      */
-    private val rabbitTheFishPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val rabbitTheFishPattern by CFApi.patternGroup.pattern(
         "rabbit.thefish",
         "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish(?:§.)*!.*",
     )
@@ -85,7 +85,7 @@ object HoppityEventSummary {
      * REGEX-TEST: Chocolate Factory Milestones
      * REGEX-TEST: Chocolate Shop Milestones
      */
-    private val miscCfInventoryPatterns by ChocolateFactoryApi.patternGroup.pattern(
+    private val miscCfInventoryPatterns by CFApi.patternGroup.pattern(
         "cf.inventory",
         "(?:\\(\\d*\\/\\d*\\) )?Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
     )
@@ -118,14 +118,13 @@ object HoppityEventSummary {
         // Get the inventory name and check if it matches any of the specific inventories
         val inventoryName = InventoryUtils.openInventoryName()
 
-        val inChocolateFactory =
-            ChocolateFactoryApi.inChocolateFactory ||
-                menuNamePattern.matches(inventoryName) ||
-                miscCfInventoryPatterns.matches(inventoryName)
+        val inCf = CFApi.inCf ||
+            menuNamePattern.matches(inventoryName) ||
+            miscCfInventoryPatterns.matches(inventoryName)
 
         return if (currentScreen is GuiInventory) {
             HoppityLiveDisplayInventoryType.OWN_INVENTORY in setting
-        } else if (inChocolateFactory) {
+        } else if (inCf) {
             HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY in setting
         } else if (inventoryName == "Hoppity") {
             HoppityLiveDisplayInventoryType.HOPPITY in setting
@@ -153,7 +152,7 @@ object HoppityEventSummary {
     }
 
     private fun MutableList<StatString>.chromafyLiveDisplay(): MutableList<StatString> =
-        if (ChocolateFactoryApi.config.partyMode.get()) map { it.copy(string = it.string.partyModeReplace()) }.toMutableList()
+        if (CFApi.config.partyMode.get()) map { it.copy(string = it.string.partyModeReplace()) }.toMutableList()
         else this
 
     private data class StatString(var string: String, val headed: Boolean = true)
@@ -210,7 +209,7 @@ object HoppityEventSummary {
         if (!liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
-        if (Minecraft.getMinecraft().currentScreen != null && !ChocolateFactoryApi.inChocolateFactory) return
+        if (Minecraft.getMinecraft().currentScreen != null && !CFApi.inCf) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggledOff = !storage.hoppityStatLiveDisplayToggledOff
@@ -256,7 +255,7 @@ object HoppityEventSummary {
         config.eventSummary.statDisplayList.afterChange {
             lastKnownStatHash = 0
         }
-        ChocolateFactoryApi.config.partyMode.afterChange {
+        CFApi.config.partyMode.afterChange {
             lastKnownStatHash = 0
         }
     }
@@ -468,7 +467,7 @@ object HoppityEventSummary {
     private fun getCurrentSBYear() = SkyBlockTime.now().year
 
     private fun checkAddCfTime() {
-        if (!ChocolateFactoryApi.inChocolateFactory) {
+        if (!CFApi.inCf) {
             lastAddedCfMillis = SimpleTimeMark.farPast()
             return
         }
@@ -531,7 +530,7 @@ object HoppityEventSummary {
         val chocFormatLine = buildString {
             append(" §6+${chocGained.addSeparators()} Chocolate")
             if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
-                val timeFormatted = ChocolateFactoryApi.timeUntilNeed(chocGained).format(maxUnits = 2)
+                val timeFormatted = CFApi.timeUntilNeed(chocGained).format(maxUnits = 2)
                 append(" §7(§a+§b$timeFormatted§7)")
             }
         }

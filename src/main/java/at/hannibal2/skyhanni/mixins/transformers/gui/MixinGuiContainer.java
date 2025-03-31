@@ -2,14 +2,13 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTimer;
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayWarning;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStrayTimer;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStrayWarning;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
-import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -37,8 +36,8 @@ public abstract class MixinGuiContainer extends GuiScreen {
         if (KeyboardManager.isShiftKeyDown()) return;
 
         boolean shouldHoppityRabbitTheFishContinue = HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode);
-        boolean shouldCfStrayWarningContinue = ChocolateFactoryStrayWarning.shouldContinueWithKeypress(keyCode);
-        boolean shouldCfStrayTimerContinue = ChocolateFactoryStrayTimer.shouldContinueWithKeypress(keyCode);
+        boolean shouldCfStrayWarningContinue = CFStrayWarning.shouldContinueWithKeypress(keyCode);
+        boolean shouldCfStrayTimerContinue = CFStrayTimer.shouldContinueWithKeypress(keyCode);
 
         if (!shouldHoppityRabbitTheFishContinue || !shouldCfStrayWarningContinue || !shouldCfStrayTimerContinue) {
             ci.cancel();

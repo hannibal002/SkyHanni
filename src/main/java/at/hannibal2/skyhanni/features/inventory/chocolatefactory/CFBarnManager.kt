@@ -18,16 +18,16 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
-object ChocolateFactoryBarnManager {
+object CFBarnManager {
 
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = CFApi.config
     private val hoppityChatConfig get() = HoppityEggsManager.config.chat
-    private val profileStorage get() = ChocolateFactoryApi.profileStorage
+    private val profileStorage get() = CFApi.profileStorage
 
     /**
      * REGEX-TEST: §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
      */
-    private val rabbitCrashedPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val rabbitCrashedPattern by CFApi.patternGroup.pattern(
         "rabbit.crushed",
         "§c§lBARN FULL! §f\\D+ §7got §ccrushed§7! §6\\+(?<amount>[\\d,]+) Chocolate",
     )
@@ -53,7 +53,7 @@ object ChocolateFactoryBarnManager {
             HoppityEggsManager.shareWaypointPrompt()
             val amount = group("amount").formatLong()
             if (config.showDuplicateTime && !hoppityChatConfig.compact) {
-                val format = ChocolateFactoryApi.timeUntilNeed(amount).format(maxUnits = 2)
+                val format = CFApi.timeUntilNeed(amount).format(maxUnits = 2)
                 DelayedRun.runNextTick {
                     ChatUtils.chat("§7(§a+§b$format §aof production§7)")
                 }
@@ -73,7 +73,7 @@ object ChocolateFactoryBarnManager {
                 }
             }
 
-            if (hoppityChatConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) {
+            if (hoppityChatConfig.recolorTTChocolate && CFTimeTowerManager.timeTowerActive()) {
                 // Replace §6\+(?<amount>[\d,]+) Chocolate with §6\+§d(?<amount>[\d,]+) §6Chocolate
                 changedMessage = changedMessage.replace(
                     "§6\\+(?<amount>[\\d,]+) Chocolate",
@@ -96,7 +96,7 @@ object ChocolateFactoryBarnManager {
     }
 
     fun trySendBarnFullMessage(inventory: Boolean) {
-        if (!ChocolateFactoryApi.isEnabled()) return
+        if (!CFApi.isEnabled()) return
 
         if (config.barnCapacityThreshold <= 0) {
             return
@@ -105,7 +105,7 @@ object ChocolateFactoryBarnManager {
         val profileStorage = profileStorage ?: return
 
         // TODO rename maxRabbits to maxUnlockedBarnSpace
-        if (profileStorage.maxRabbits >= ChocolateFactoryApi.maxRabbits) return
+        if (profileStorage.maxRabbits >= CFApi.maxRabbits) return
 
         // when the unlocked barn space has already surpassed the total amount of rabbits
         val alreadyBigEnough = profileStorage.maxRabbits >= HoppityCollectionData.knownRabbitCount

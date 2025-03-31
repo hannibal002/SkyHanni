@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-class ChocolateFactoryStrayWarningConfig {
+class CFStrayWarningConfig {
     @Expose
     @ConfigOption(name = "Warning Level", desc = "Warn when stray rabbits of a certain tier appear.")
     @ConfigEditorDropdown

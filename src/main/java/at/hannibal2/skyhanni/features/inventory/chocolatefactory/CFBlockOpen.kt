@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ChocolateFactoryBlockOpen {
+object CFBlockOpen {
     private val config get() = SkyHanniMod.feature.inventory.chocolateFactory
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
 

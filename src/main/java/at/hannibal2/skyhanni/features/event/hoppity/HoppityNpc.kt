@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -32,9 +32,9 @@ object HoppityNpc {
 
     private var lastReminderSent = SimpleTimeMark.farPast()
     private var hoppityYearOpened
-        get() = ChocolateFactoryApi.profileStorage?.hoppityShopYearOpened ?: -1
+        get() = CFApi.profileStorage?.hoppityShopYearOpened ?: -1
         set(value) {
-            ChocolateFactoryApi.profileStorage?.hoppityShopYearOpened = value
+            CFApi.profileStorage?.hoppityShopYearOpened = value
         }
 
     private val slotsToHighlight = mutableSetOf<Int>()

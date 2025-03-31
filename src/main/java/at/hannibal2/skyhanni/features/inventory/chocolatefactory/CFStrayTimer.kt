@@ -23,7 +23,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ChocolateFactoryStrayTimer {
+object CFStrayTimer {
 
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs.strayTimer
     private var timer: Duration = Duration.ZERO
@@ -68,7 +68,7 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || !ChocolateFactoryApi.inChocolateFactory) return
+        if (!isEnabled() || !CFApi.inCf) return
         lastTimerSubtraction = lastTimerSubtraction?.takeIfInitialized()?.let {
             timer -= it.passedSince()
             if (timer < Duration.ZERO) timer = Duration.ZERO
@@ -82,7 +82,7 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled() || !ChocolateFactoryApi.inChocolateFactory) return
+        if (!isEnabled() || !CFApi.inCf) return
         eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }
 
@@ -95,7 +95,7 @@ object ChocolateFactoryStrayTimer {
 
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || !ChocolateFactoryApi.inChocolateFactory
+        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || !CFApi.inCf
         if (!shouldContinue) {
             TitleManager.sendTitle(
                 "§cStray Timer Prevented Close",
