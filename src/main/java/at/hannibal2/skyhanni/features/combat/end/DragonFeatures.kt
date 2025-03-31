@@ -45,8 +45,8 @@ object DragonFeatures {
     private val dragonNamesAsRegex = dragonNames.joinToString("|")
     private val dragonNamesAsRegexUppercase = dragonNames.joinToString("|") { it.uppercase() }
 
-    private val protectorRepoGroup = RepoPattern.group("combat.boss.protector")
-    private val repoGroup = RepoPattern.group("combat.boss.dragon")
+    private val protectorRepoGroup = RepoPattern.group("combat.boss.protector.1")
+    private val repoGroup = RepoPattern.group("combat.boss.dragon.1")
     private val chatGroup = repoGroup.group("chat")
     private val scoreBoardGroup = repoGroup.group("scoreboard")
     private val tabListGroup = repoGroup.group("tablist")
@@ -114,7 +114,7 @@ object DragonFeatures {
      */
     private val endZealotsPattern by protectorRepoGroup.pattern(
         "chat.end.zealot",
-        "§f +§r§eZealots Contributed: §r§a(?<Amount>\\d+)§r§e/100",
+        "§f +§r§eZealots Contributed: §r§a(?<amount>\\d+)§r§e/100",
     )
 
     /**

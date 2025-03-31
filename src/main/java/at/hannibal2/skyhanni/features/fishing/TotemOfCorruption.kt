@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
+import at.hannibal2.skyhanni.utils.SoundUtils.playBeepSound
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUnit
@@ -159,7 +159,7 @@ object TotemOfCorruption {
 
             val timeToWarn = config.warnWhenAboutToExpire.seconds
             if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && totem.uniqueID !in warnedTotems) {
-                playPlingSound()
+                playBeepSound(0.5f)
                 TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!", duration = 5.seconds)
                 warnedTotems.add(totem.uniqueID)
             }
