@@ -330,9 +330,8 @@ class ProfileSpecificStorage {
     ) {
         var containingYears: MutableSet<Int> = mutableSetOf()
 
-        constructor(year: Int) : this() {
-            containingYears.add(year)
-        }
+        constructor(year: Int) : this() { containingYears.add(year) }
+        constructor(years: Set<Int>) : this() { containingYears = years.toMutableSet() }
 
         operator fun plusAssign(it: HoppityEventStats) {
             it.mealsFound.forEach { (key, value) ->
