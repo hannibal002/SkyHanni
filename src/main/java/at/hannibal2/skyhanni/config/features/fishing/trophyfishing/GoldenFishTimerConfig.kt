@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.fishing.trophyfishing
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -22,13 +21,13 @@ class GoldenFishTimerConfig {
     @ConfigEditorDropdown
     var displayDesign: DesignFormat = DesignFormat.ICON
 
-    enum class DesignFormat(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
-        OFF("Off", 0),
-        COMPACT("Compact", 1),
-        DETAILED("Detailed", 2),
-        ICON("Detailed + Icon", 3);
+    enum class DesignFormat(private val displayName: String) {
+        OFF("Off"),
+        COMPACT("Compact"),
+        DETAILED("Detailed"),
+        ICON("Detailed + Icon"),
+        ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 
