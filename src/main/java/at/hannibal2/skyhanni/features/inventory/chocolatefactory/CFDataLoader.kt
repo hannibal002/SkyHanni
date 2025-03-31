@@ -497,6 +497,8 @@ object CFDataLoader {
 
         val chocolateIncrease = CFApi.rabbitSlots[slotIndex] ?: 0
         val newAverageChocolate = ChocolateAmount.averageChocPerSecond(rawPerSecondIncrease = chocolateIncrease)
+
+        if (upgradeCost == null) return
         addUpgradeToList(list, slotIndex, level, upgradeCost, averageChocolate, newAverageChocolate, isRabbit = true)
     }
 
@@ -534,6 +536,7 @@ object CFDataLoader {
             }
         }
 
+        if (upgradeCost == null) return
         addUpgradeToList(list, slotIndex, level, upgradeCost, averageChocolate, newAverageChocolate, isRabbit = false)
     }
 
@@ -541,13 +544,13 @@ object CFDataLoader {
         list: MutableList<CFUpgrade>,
         slotIndex: Int,
         level: Int,
-        upgradeCost: Long?,
+        upgradeCost: Long,
         averageChocolate: Double,
         newAverageChocolate: Double,
         isRabbit: Boolean,
     ) {
         val extra = (newAverageChocolate - averageChocolate).roundTo(2)
-        val effectiveCost = (upgradeCost!! / extra).roundTo(2)
+        val effectiveCost = (upgradeCost / extra).roundTo(2)
         val upgrade = CFUpgrade(slotIndex, level, upgradeCost, extra, effectiveCost, isRabbit = isRabbit)
         list.add(upgrade)
     }
