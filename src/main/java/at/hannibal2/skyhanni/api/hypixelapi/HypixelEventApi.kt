@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import io.netty.util.IllegalReferenceCountException
 import net.hypixel.data.region.Environment
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
