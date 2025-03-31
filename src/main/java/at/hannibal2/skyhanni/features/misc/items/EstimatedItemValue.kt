@@ -48,6 +48,7 @@ object EstimatedItemValue {
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
+    var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
     private var currentlyShowing = false
 
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
@@ -66,6 +67,7 @@ object EstimatedItemValue {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
+        crimsonPrestigeCosts = data.crimsonPrestigeCosts
     }
 
     private fun isInNeuOverlay(): Boolean {

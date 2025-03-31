@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages.getInternalName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -98,7 +97,7 @@ object TrophyFishManager {
         val savedFishes = fish ?: return
         var updatedFishes = 0
         for (stack in event.inventoryItems.values) {
-            val internalName = getInternalName(stack.displayName.replace("§k", ""))
+            val internalName = TrophyFishApi.getInternalName(stack.displayName.replace("§k", ""))
 
             fun getRarity(rawRarity: String, line: String): TrophyRarity =
                 TrophyRarity.getByName(rawRarity) ?: ErrorManager.skyHanniError(
