@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -20,9 +21,11 @@ object CurrentPing {
     private var waitingForPacket = false
     var averagePing = Duration.ZERO
         private set
+    private val config get() = SkyHanniMod.feature.dev
 
     @Suppress("UNUSED_PARAMETER")
     fun onPingPacket(packet: ClientboundPingPacket) {
+        if (!isEnabled()) return
         waitingForPacket = false
 
         if (previousPings.size > 5) {
@@ -34,6 +37,7 @@ object CurrentPing {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
         if (!event.repeatSeconds(10)) return
         if (lastPingRequested.passedSince() > 20.seconds) waitingForPacket = false
         requestPing()
@@ -45,4 +49,6 @@ object CurrentPing {
         waitingForPacket = true
         HypixelEventApi.sendPacket(ServerboundPingPacket())
     }
+
+    private fun isEnabled() = config.hypixelPingApi
 }

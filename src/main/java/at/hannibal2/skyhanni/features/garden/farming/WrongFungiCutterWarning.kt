@@ -48,7 +48,7 @@ object WrongFungiCutterWarning {
     private fun notifyWrong() {
         if (!GardenApi.config.fungiCutterWarn) return
 
-        TitleManager.sendTitle("§cWrong Fungi Cutter Mode!", 2.seconds)
+        TitleManager.sendTitle("§cWrong Fungi Cutter Mode!", duration = 2.seconds)
         if (System.currentTimeMillis() > lastPlaySoundTime + 3_00) {
             lastPlaySoundTime = System.currentTimeMillis()
             SoundUtils.playBeepSound()
