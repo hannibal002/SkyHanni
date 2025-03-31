@@ -12,10 +12,7 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
 
 class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
@@ -34,7 +31,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
 
     override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground()
+        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
         var queuedTooltip: List<String>? = null
         context.matrices.pushMatrix()
         val l = (width / 2.0 - w / 2.0).toInt()
@@ -45,8 +42,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         val mouseX = originalMouseX - l
         val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)
         var mouseY = originalMouseY - (t - scroll).toInt()
-        val sr = ScaledResolution(mc)
-        GlScissorStack.push(l + 5, t + 5, w + l - 5, h + t - 5, sr)
+        GuiRenderUtils.enableScissor(context, l + 5, t + 5, w + l - 5, h + t - 5)
 
         for (msg in history) {
             GuiRenderUtils.drawString(context, msg.actionKind.renderedString, 0, 0, -1)
@@ -77,13 +73,12 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
             }
             mouseY -= size * 10
         }
-        GlScissorStack.pop(sr)
+        GuiRenderUtils.disableScissor(context)
         wasMouseButtonDown = isMouseButtonDown
         context.matrices.popMatrix()
         queuedTooltip?.let { tooltip ->
             RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
         }
-        GlStateManager.color(1f, 1f, 1f, 1f)
     }
 
     private fun splitLine(comp: IChatComponent): List<String> {

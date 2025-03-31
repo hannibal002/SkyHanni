@@ -293,6 +293,23 @@ object GuiRenderUtils {
         //#endif
     }
 
+    fun enableScissor(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int) {
+        //#if MC < 1.21
+        val sr = net.minecraft.client.gui.ScaledResolution(Minecraft.getMinecraft())
+        io.github.moulberry.notenoughupdates.core.GlScissorStack.push(left, top, right, bottom, sr)
+        //#else
+        //$$ context.enableScissor(left, top, right, bottom)
+        //#endif
+    }
+
+    fun disableScissor(context: DrawContext) {
+        //#if MC < 1.21
+        io.github.moulberry.notenoughupdates.core.GlScissorStack.pop(net.minecraft.client.gui.ScaledResolution(Minecraft.getMinecraft()))
+        //#else
+        //$$ context.disableScissor()
+        //#endif
+    }
+
     fun drawFloatingRectDark(
         context: DrawContext,
         x: Int,

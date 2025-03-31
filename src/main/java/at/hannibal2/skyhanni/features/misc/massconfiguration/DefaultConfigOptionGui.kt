@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
-import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
-import net.minecraft.client.gui.ScaledResolution
 import kotlin.math.max
 import kotlin.math.min
 
@@ -43,9 +41,8 @@ class DefaultConfigOptionGui(
 
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground()
+        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
         GuiRenderUtils.drawFloatingRectDark(context, (width - xSize) / 2, (height - ySize) / 2, xSize, ySize)
-        val scaledResolution = ScaledResolution(mc)
         var hoveringTextToDraw: List<String>? = null
         val x = originalMouseX - ((width - xSize) / 2) - padding
         val isMouseDown = MouseCompat.isButtonDown(0)
@@ -133,12 +130,12 @@ class DefaultConfigOptionGui(
         context.matrices.popMatrix()
 
         context.matrices.pushMatrix()
-        GlScissorStack.push(
+        GuiRenderUtils.enableScissor(
+            context,
             (width - xSize) / 2,
             (height - ySize) / 2 + barSize,
             (width + xSize) / 2,
             (height + ySize) / 2 - barSize,
-            scaledResolution,
         )
         context.matrices.translate(
             (width - xSize) / 2F + padding,
@@ -188,7 +185,7 @@ class DefaultConfigOptionGui(
         }
 
         context.matrices.popMatrix()
-        GlScissorStack.pop(scaledResolution)
+        GuiRenderUtils.disableScissor(context)
         hoveringTextToDraw?.let { tooltip ->
             RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
         }
