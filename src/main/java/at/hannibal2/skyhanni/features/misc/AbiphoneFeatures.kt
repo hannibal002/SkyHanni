@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -30,7 +29,7 @@ object AbiphoneFeatures {
      * REGEX-TEST: §a✆ RING... RING... RING... §r §r§2§l[PICK UP]
      * REGEX-TEST: §a✆ RING... RING... RING...
      */
-    private val callRingPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val callRingPattern by patternGroup.pattern(
         "call.ring",
         "§a✆ (?:RING\\.{3} ?){1,3}(?:§r §r§2§l\\[PICK UP])?",
     )
