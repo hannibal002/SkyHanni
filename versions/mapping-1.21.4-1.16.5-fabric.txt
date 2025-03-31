@@ -18,5 +18,7 @@ net.minecraft.client.gui.DrawContext at.hannibal2.skyhanni.utils.compat.DrawCont
 
 net.minecraft.client.util.math.MatrixStack at.hannibal2.skyhanni.utils.compat.MatrixStack
 
+net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext at.hannibal2.skyhanni.utils.compat.WorldRenderContext
+
 net.minecraft.client.util.math.MatrixStack push() pushMatrix()
 net.minecraft.client.util.math.MatrixStack pop() popMatrix()
