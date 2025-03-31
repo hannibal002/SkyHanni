@@ -121,8 +121,9 @@ object MobFilter {
         "§.§lCOLLECT!",
     )
 
-    /** REGEX-TEST: SHINY PIG
-     * */
+    /**
+     * REGEX-TEST: SHINY PIG
+     */
     val shinyPig by patternGroup.pattern(
         "pattern.shiny",
         "SHINY PIG",
