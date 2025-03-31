@@ -531,11 +531,11 @@ interface Renderable {
             val inverseScale = 1 / scale
 
             override fun render(context: DrawContext, posX: Int, posY: Int) {
-                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
                 context.matrices.translate(1.0, 1.0, 0.0)
                 context.matrices.scale(scale.toFloat(), scale.toFloat(), 1f)
                 map.entries.forEachIndexed { index, (text, size) ->
-                    fontRenderer.drawStringWithShadow(
+                    GuiRenderUtils.drawString(
+                        context,
                         text,
                         RenderableUtils.calculateAlignmentXOffset(size, rawWidth, internalAlign).toFloat(),
                         index * 10.0f,
