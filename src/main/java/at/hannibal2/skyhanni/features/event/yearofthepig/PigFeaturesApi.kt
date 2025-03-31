@@ -37,7 +37,7 @@ object PigFeaturesApi {
     class ShinyOrbDataSet(
         var pigEntityId: Int? = null,
         var shinyOrbEntityId: Int? = null,
-        @field:Transient private var shinyOrbLocationCache: LorenzVec? = null
+        private var shinyOrbLocationCache: LorenzVec? = null
     ) : ResettableStorageSet() {
         private val shinyOrbEntity get() = shinyOrbEntityId?.let {
             EntityUtils.getEntityByID(it) as EntityArmorStand?

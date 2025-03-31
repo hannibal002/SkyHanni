@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.storage
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.createInstance
-import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
 
 /**
  * Provides an open interface for easily resetting a storage or data set to a default state.
@@ -18,8 +18,8 @@ open class ResettableStorageSet {
 
     open fun applyFromOther(other: ResettableStorageSet) {
         if (this::class != other::class) return
-        mutableMemberProperties.filter {
-            !it.hasAnnotation<Transient>()
+        mutableMemberProperties.filter { prop ->
+            prop.javaField != null
         }.forEach { prop ->
             try {
                 prop.forceSet(prop.get(other))
