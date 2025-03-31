@@ -641,9 +641,9 @@ object HoppityEventSummary {
                 else if (year == Int.MAX_VALUE) {
                     stats.containingYears.mapNotNull { containingYear ->
                         if (containingYear < 41) return@mapNotNull null
-                        val yearMealEggs = getYearStats(year)?.getMealEggCount() ?: 0
+                        val yearMealEggs = getYearStats(containingYear)?.getMealEggCount() ?: 0
 
-                        getSpawnedEggCount(year) - yearMealEggs
+                        getSpawnedEggCount(containingYear) - yearMealEggs
                     }.sum()
                 } else trueMissed
 
