@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -34,7 +34,7 @@ object MobDebug {
 
     private fun MobData.MobSet.highlight(event: SkyHanniRenderWorldEvent, color: (Mob) -> (LorenzColor)) {
         for (mob in filter { it.isNotInvisible() }) {
-            event.drawFilledBoundingBoxNea(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
+            event.drawFilledBoundingBox(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
         }
     }
 
@@ -82,7 +82,7 @@ object MobDebug {
         }
         if (config.showRayHit) {
             lastRayHit?.let {
-                event.drawFilledBoundingBoxNea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
+                event.drawFilledBoundingBox(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
             }
         }
     }

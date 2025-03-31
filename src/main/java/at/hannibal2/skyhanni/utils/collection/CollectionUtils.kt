@@ -73,6 +73,9 @@ object CollectionUtils {
         }
     }
 
+    fun <K, V : Number> List<Map<K, V>>.sumByKey(): Map<K, Double> =
+        flatMap { it.entries }.groupBy({ it.key }, { it.value.toDouble() }).mapValues { (_, values) -> values.sum() }
+
     fun <T, R> Sequence<IndexedValue<T>>.runningIndexedFold(initial: R, operation: (R, T) -> R): Sequence<IndexedValue<R>> =
         map { it.value }.runningFold(initial, operation).zip(map { it.index }) { value, index -> IndexedValue(index, value) }
 
@@ -218,7 +221,7 @@ object CollectionUtils {
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
-    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>) = this.toSet() == other.toSet()
 
     fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
