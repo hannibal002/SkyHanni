@@ -521,10 +521,11 @@ object HoppityEventSummary {
 
     private fun getYearStats(year: Int = currentSbYear): HoppityEventStats? =
         if (year == Int.MAX_VALUE) getAllTimeStats()
-        else storage?.hoppityEventStats?.getOrPut(year, ::HoppityEventStats)
+        else storage?.hoppityEventStats?.getOrPut(year) { HoppityEventStats(year) }
 
     private fun getAllTimeStats(): HoppityEventStats {
-        val allTimeStats = HoppityEventStats()
+        val storageYears = storage?.hoppityEventStats?.keys ?: return HoppityEventStats()
+        val allTimeStats = HoppityEventStats(storageYears)
         val statsStorage = storage?.hoppityEventStats ?: return allTimeStats
         statsStorage.values.forEach {
             allTimeStats += it
@@ -633,12 +634,18 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.HITMAN_EGGS) { statList, stats, year ->
+                val spawnedMealEggs = getSpawnedEggCount(year)
+                val trueMissed = spawnedMealEggs - stats.getMealEggCount()
                 // We only want to show events after hitman was added (Hunt #41)
-                if (getHoppityEventNumber(year) < 41) return@put
+                val missedMealEggs = if (year < 41) return@put
+                else if (year == Int.MAX_VALUE) {
+                    stats.containingYears.mapNotNull { containingYear ->
+                        if (containingYear < 41) return@mapNotNull null
+                        trueMissed
+                    }.sum()
+                } else trueMissed
 
                 stats.mealsFound[HoppityEggType.HITMAN]?.let {
-                    val spawnedMealEggs = getSpawnedEggCount(year)
-                    val missedMealEggs = spawnedMealEggs - stats.getMealEggCount()
                     val eggFormat = StringUtils.pluralize(it, "Egg")
                     val divisorFormat = "§b$it§7/§a$missedMealEggs"
                     statList.addStr("§7You recovered $divisorFormat §7missed §6Meal $eggFormat §7from §cRabbit Hitman§7.")

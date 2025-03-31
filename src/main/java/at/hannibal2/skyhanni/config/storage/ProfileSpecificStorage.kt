@@ -56,6 +56,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -313,6 +314,8 @@ class ProfileSpecificStorage {
     var hoppityStatLiveDisplayToggledOff: Boolean = false
 
     data class HoppityEventStats(
+        var containingYears: MutableSet<Int> = mutableSetOf(),
+
         @Expose var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
         @Expose var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
         @Expose var dupeChocolateGained: Long = 0,
@@ -328,6 +331,10 @@ class ProfileSpecificStorage {
         @Expose var typeCountSnapshot: RabbitData = RabbitData(),
         @Expose var typeCountsSince: RabbitData = RabbitData(),
     ) {
+        constructor(year: Int) : this() {
+            containingYears.add(year)
+        }
+
         operator fun plusAssign(it: HoppityEventStats) {
             it.mealsFound.forEach { (key, value) ->
                 mealsFound.merge(key, value, Int::plus)
