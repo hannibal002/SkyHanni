@@ -116,7 +116,8 @@ object TabListRenderer {
         var headerY = y
         if (header.isNotEmpty()) {
             for (line in header) {
-                minecraft.fontRendererObj.drawStringWithShadow(
+                GuiRenderUtils.drawString(
+                    context,
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     headerY.toFloat(),
@@ -131,7 +132,8 @@ object TabListRenderer {
         if (footer.isNotEmpty()) {
             var footerY = y + totalHeight - footer.size * LINE_HEIGHT + TAB_PADDING / 2 + 1
             for (line in footer) {
-                minecraft.fontRendererObj.drawStringWithShadow(
+                GuiRenderUtils.drawString(
+                    context,
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     footerY.toFloat(),
@@ -192,14 +194,16 @@ object TabListRenderer {
                 var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
                 if (text.contains("§l")) text = "§r$text"
                 if (tabLine.type == TabStringType.TITLE) {
-                    minecraft.fontRendererObj.drawStringWithShadow(
+                    GuiRenderUtils.drawString(
+                        context,
                         text,
                         middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
                         0xFFFFFF,
                     )
                 } else {
-                    minecraft.fontRendererObj.drawStringWithShadow(
+                    GuiRenderUtils.drawString(
+                        context,
                         text,
                         middleX.toFloat(),
                         middleY.toFloat(),
