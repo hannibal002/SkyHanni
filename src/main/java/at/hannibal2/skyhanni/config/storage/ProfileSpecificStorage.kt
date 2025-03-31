@@ -328,7 +328,7 @@ class ProfileSpecificStorage {
         @Expose var typeCountSnapshot: RabbitData = RabbitData(),
         @Expose var typeCountsSince: RabbitData = RabbitData(),
     ) {
-        var containingYears: MutableSet<Int> = mutableSetOf()
+        @Transient var containingYears: MutableSet<Int> = mutableSetOf()
 
         constructor(year: Int) : this() { containingYears.add(year) }
         constructor(years: Set<Int>) : this() { containingYears = years.toMutableSet() }
