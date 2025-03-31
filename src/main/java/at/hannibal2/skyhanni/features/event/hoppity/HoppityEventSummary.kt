@@ -633,6 +633,9 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.HITMAN_EGGS) { statList, stats, year ->
+                // We only want to show events after hitman was added (Hunt #41)
+                if (getHoppityEventNumber(year) < 41) return@put
+
                 stats.mealsFound[HoppityEggType.HITMAN]?.let {
                     val spawnedMealEggs = getSpawnedEggCount(year)
                     val missedMealEggs = spawnedMealEggs - stats.getMealEggCount()
