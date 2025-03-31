@@ -30,8 +30,8 @@ class DeepCavernsGuideConfig {
     @ConfigEditorColour
     var monochromeColor: Property<String> = Property.of("0:60:0:0:255")
 
-    //     @Expose
-    //     @ConfigOption(name = "Highlight all Lines", desc = "Show all lines in gray. Useful for debugging.")
-    //     @ConfigEditorBoolean
-    //     public boolean highlightAllLines = false;
+    // @Expose
+    // @ConfigOption(name = "Highlight all Lines", desc = "Show all lines in gray. Useful for debugging.")
+    // @ConfigEditorBoolean
+    // var highlightAllLines: Boolean = false;
 }
