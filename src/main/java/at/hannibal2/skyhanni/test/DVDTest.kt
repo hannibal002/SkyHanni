@@ -18,9 +18,11 @@ object DVDTest {
         )
     }
 
+    private val position = Position(0, 0)
+
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!SkyHanniMod.feature.dev.debug.dvdLogo) return
-        Position(0, 0).renderRenderable(dvdRenderable, posLabel = "DVDTest")
+        position.renderRenderable(dvdRenderable, posLabel = "DVDTest")
     }
 }
