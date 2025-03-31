@@ -215,7 +215,6 @@ object DamageIndicatorManager {
                 NameVisibility.HIDDEN -> ""
                 NameVisibility.FULL_NAME -> data.bossType.fullName
                 NameVisibility.SHORT_NAME -> data.bossType.shortName
-                else -> data.bossType.fullName
             }
 
             if (data.namePrefix.isNotEmpty()) {
@@ -288,7 +287,7 @@ object DamageIndicatorManager {
         BossType.SLAYER_BLAZE_QUAZII_4,
 
             // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
-            -> true
+        -> true
 
         else -> false
     }
