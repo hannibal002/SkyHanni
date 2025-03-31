@@ -35,7 +35,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
 
     override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground()
+        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
         var queuedTooltip: List<String>? = null
         context.matrices.pushMatrix()
         val l = (width / 2.0 - w / 2.0).toInt()
