@@ -99,7 +99,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
     }
 
     override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground()
+        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
         screenHeight = height
         guiLeft = (width - sizeX) / 2
         guiTop = (height - sizeY) / 2

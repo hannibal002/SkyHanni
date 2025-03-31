@@ -44,7 +44,7 @@ class DefaultConfigOptionGui(
 
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground()
+        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
         RenderUtils.drawFloatingRectDark((width - xSize) / 2, (height - ySize) / 2, xSize, ySize)
         val scaledResolution = ScaledResolution(mc)
         var hoveringTextToDraw: List<String>? = null

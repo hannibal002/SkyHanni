@@ -74,7 +74,7 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
     }
 
     override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) = try {
-        drawDefaultBackground()
+        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
         val guiLeft = (width - sizeX) / 2
         val guiTop = (height - sizeY) / 2
 
