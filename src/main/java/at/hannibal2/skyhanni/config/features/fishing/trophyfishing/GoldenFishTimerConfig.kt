@@ -1,19 +1,36 @@
 package at.hannibal2.skyhanni.config.features.fishing.trophyfishing
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class GoldenFishTimerConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable the Golden Fish Timer.")
+    @ConfigOption(name = "Enabled", desc = "Enable the Golden Fish Timer features. This is required for all features.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Display Mode", desc = "Type of display to show for the Golden Fish.")
+    @ConfigEditorDropdown
+    var displayDesign: DesignFormat = DesignFormat.ICON
+
+    enum class DesignFormat(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
+        OFF("Off", 0),
+        COMPACT("Compact", 1),
+        DETAILED("Detailed", 2),
+        ICON("Detailed + Icon", 3);
+
+        override fun getLegacyId() = legacyId
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(
@@ -35,11 +52,6 @@ class GoldenFishTimerConfig {
     )
     @ConfigEditorBoolean
     var throwRodWarning: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Show Head", desc = "Show the Golden Fish head in the Golden Fish Timer GUI.")
-    @ConfigEditorBoolean
-    var showHead: Boolean = true
 
     @Expose
     @ConfigOption(name = "Throw Rod Warning Time", desc = "The time in seconds before the throw rod warning appears.")
