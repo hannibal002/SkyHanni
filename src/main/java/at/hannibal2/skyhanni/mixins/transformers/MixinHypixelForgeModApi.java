@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.utils.ChatUtils;
+import at.hannibal2.skyhanni.features.misc.CurrentPing;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
@@ -23,7 +23,7 @@ public class MixinHypixelForgeModApi {
     )
     private void fixOnChannelRead(ChannelHandlerContext ctx, Packet<?> msg, CallbackInfo ci, S3FPacketCustomPayload packet, String identifier, PacketBuffer buffer) {
         if (buffer.refCnt() <= 0) {
-            ChatUtils.INSTANCE.debug("Stopped HypixelModApi error", false);
+            CurrentPing.fixedModApiKickMessage();
             ci.cancel();
         }
     }
