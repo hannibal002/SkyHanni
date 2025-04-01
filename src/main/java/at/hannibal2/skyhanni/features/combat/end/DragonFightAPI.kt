@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -57,7 +58,7 @@ object DragonFightAPI {
 
     private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")
 
-    fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(LorenzUtils.skyBlockArea)
+    fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(IslandAreas.currentAreaName)
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {
