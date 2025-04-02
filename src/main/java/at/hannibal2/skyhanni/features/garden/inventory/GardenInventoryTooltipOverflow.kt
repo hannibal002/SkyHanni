@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -47,7 +48,7 @@ object GardenInventoryTooltipOverflow {
         for (line in iterator) {
             val maxTierReached = "§7§8Max tier reached!"
             if (line.contains(maxTierReached)) {
-                iterator.set("§7Progress to tier $nextLevel: §e${LorenzUtils.formatPercentage(percentage)}")
+                iterator.set("§7Progress to tier $nextLevel: §e${percentage.formatPercentage()}")
                 event.itemStack.setCustomItemName("§a${crop.cropName} $level")
                 next = true
                 continue

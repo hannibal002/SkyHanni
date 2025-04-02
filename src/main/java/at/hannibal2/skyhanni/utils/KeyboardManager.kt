@@ -2,20 +2,24 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TextInput
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
-//#if MC > 1.21
+//#if MC < 1.21
+import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+//#else
+//$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
 //#endif
 
@@ -56,52 +60,76 @@ object KeyboardManager {
      */
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
 
+    //#if MC < 1.21
+    private data class EventKey(val key: Int, val pressed: Boolean)
+
+    private fun getEventKey(): EventKey {
+        Keyboard.poll()
+        // If there is a keyboard event, process it immediately and clear any lingering mouse event.
+        if (Keyboard.getEventKey() != 0) {
+            // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
+            return when (Keyboard.getEventKey()) {
+                0 -> EventKey(Keyboard.getEventCharacter().code + 256, Keyboard.getEventKeyState())
+                else -> EventKey(Keyboard.getEventKey(), Keyboard.getEventKeyState())
+                    .also { lastClickedMouseButton = -1 }
+            }
+        }
+
+        if (MouseCompat.getEventButton() != -1) {
+            val key = MouseCompat.getEventButton() - 100
+            lastClickedMouseButton = key
+            return EventKey(key, MouseCompat.getEventButtonState())
+        }
+        if (lastClickedMouseButton != -1 && MouseCompat.getEventButton() == -1) {
+            Mouse.poll()
+            val originalButton = lastClickedMouseButton + 100
+            if (Mouse.isButtonDown(originalButton)) return EventKey(lastClickedMouseButton, true)
+            else lastClickedMouseButton = -1
+        }
+
+        return EventKey(0, false)
+    }
+
+    private val clickedKeys = mutableSetOf<Int>()
+    //#endif
+
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick(event: SkyHanniTickEvent) {
         //#if MC < 1.16
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
-        if (isConfigScreen) return
-        if (currentScreen is GuiChat) return
+        if (isConfigScreen || currentScreen is GuiChat) return
 
-
-        if (MouseCompat.getEventButtonState() && MouseCompat.getEventButton() != -1) {
-            val key = MouseCompat.getEventButton() - 100
-            postEvent(key)
-            lastClickedMouseButton = key
-            return
-        }
-
-        if (Keyboard.getEventKeyState() && Keyboard.getEventKey() != 0) {
-            postEvent(Keyboard.getEventKey())
-            lastClickedMouseButton = -1
-            return
-        }
-
-        if (MouseCompat.getEventButton() == -1 && lastClickedMouseButton != -1) {
-            if (lastClickedMouseButton.isKeyHeld()) {
-                postEvent(lastClickedMouseButton)
-                return
+        val (key, pressed) = getEventKey()
+        if (pressed) {
+            postKeyPressEvent(key)
+            if (!clickedKeys.contains(key)) {
+                postKeyDownEvent(key)
+                clickedKeys.add(key)
             }
-            lastClickedMouseButton = -1
-        }
-
-        // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
-        if (Keyboard.getEventKey() == 0) {
-            postEvent(Keyboard.getEventCharacter().code + 256)
-        }
+        } else clickedKeys.remove(key)
         //#else
         //$$ // todo use fabric event or whatnot
         //#endif
     }
 
-    private fun postEvent(keyCode: Int) {
+    private fun postKeyPressEvent(keyCode: Int) {
         // This cooldown is here to make sure the Text input features in graph editor
         // and in renderable calls have time to react first,
         // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyPressEvent(keyCode).post()
+        }
+    }
+
+    private fun postKeyDownEvent(keyCode: Int) {
+        // This cooldown is here to make sure the Text input features in graph editor
+        // and in renderable calls have time to react first,
+        // and lock this key press event properly
+        DelayedRun.runDelayed(50.milliseconds) {
+            if (TextInput.isActive()) return@runDelayed
+            KeyDownEvent(keyCode).post()
         }
     }
 
@@ -140,7 +168,10 @@ object KeyboardManager {
 
     private val pressedKeys = mutableMapOf<Int, Boolean>()
 
-    /** Can only be used once per click. Since the function locks itself until the key is no longer held*/
+    /**
+     * Can only be used once per click, since the function locks itself until the key is no longer held.
+     * Do not use in KeyPressEvent, since it won't be unlocked again, use KeyDownEvent instead.
+     * */
     fun Int.isKeyClicked(): Boolean = if (this.isKeyHeld()) {
         if (pressedKeys[this] != true) {
             pressedKeys[this] = true

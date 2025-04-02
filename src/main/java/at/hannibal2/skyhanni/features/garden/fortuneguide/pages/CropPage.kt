@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneStats
-import at.hannibal2.skyhanni.utils.CollectionUtils.split
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.split
 import at.hannibal2.skyhanni.utils.guide.GuideTablePage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 

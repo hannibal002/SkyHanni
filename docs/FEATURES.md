@@ -410,6 +410,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     +  Primarily used for lava fishing in the Crimson Isle, but can be used anywhere else if the option is enabled.
 + Added Hotspot Radar Guesser. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3551)
     + Added a waypoint of the Fishing Hotspot when using the Hotspot Radar.
++ Added a line pointing to the detected Hotspot. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3638)
++ Added option to display total Trophy Fish count in Odger's inventory. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3526)
++ Added Rare Sea Creature Party Announcer. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/3672)
+    + Sends a message to party chat when a rare sea creature is caught.
 
 </details>
 <details open><summary>
@@ -1182,6 +1186,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows your current Dragon/Protector weight on the HUD during fights in the End.
 + Added Superior Notification. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/844)
     + Notifies via title when a Superior Dragon spawns in the End.
++ Added Dragon Profit Tracker. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3507)
+    + Tracks all loot collected during a dragon fight, records the eyes spent, and calculates overall profit.
 
 </details>
 <details open><summary>
@@ -1531,6 +1537,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added NEU-Souls Pathfinder. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3350)
     + When using `/neusouls`, displays a pathfinding line to the nearest missing Fairy Soul.
     + Shows the progress of Souls found of the current island in chat.
++ Added Estimated Item Value in Tooltip. - nopo (https://github.com/hannibal002/SkyHanni/pull/3631)
+    + Displayed total Estimated Item Value as a single line in the item tooltip.
 
 </details>
 <details open><summary>
