@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.attribute
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AttributeGoodRollsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.AttributeType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -68,8 +69,6 @@ object AttributeApi {
         }
     }
 
-    data class Attribute(val type: AttributeType, val level: Int)
-
     private data class GoodRollItem(val regex: Pattern, val attributes: List<Pair<AttributeType, AttributeType>>)
 
     @HandleEvent
@@ -91,10 +90,38 @@ object AttributeApi {
             AttributeType.getByInternalNameOrNull(name.lowercase())?.let { Attribute(it, level) }
         }?.toPair()
 
-    fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NeuInternalName): Boolean =
-        goodRolls.firstOrNull { it.regex.matches(internalName.asString()) }?.let { goodRoll ->
-            val attributes = first.type to second.type
-            goodRoll.attributes.any { it.equalsIgnoreOrder(attributes) }
-        } ?: false
+    /**
+     * Assumes it's already not a good roll
+     */
+    fun AttributeType.isPartialRoll(internalName: NeuInternalName): Boolean {
+        val rolls = goodRolls.find { it.regex.matches(internalName.asString()) } ?: return false
+        return rolls.attributes.any { it.first == this || it.second == this }
+    }
 
+    fun Pair<Attribute, Attribute>.getRollType(internalName: NeuInternalName): RollType {
+        val rolls = goodRolls.find { it.regex.matches(internalName.asString()) } ?: return RollType.BAD_ROLL
+        val firstType = first.type
+        val secondType = second.type
+        val pair = firstType to secondType
+        var partialRoll = false
+        for (combination in rolls.attributes) {
+            if (pair.equalsIgnoreOrder(combination)) return RollType.GOOD_ROLL
+            val (attr1, attr2) = combination
+            if (attr1 == firstType || attr1 == secondType || attr2 == firstType || attr2 == secondType) {
+                partialRoll = true
+            }
+        }
+        return if (partialRoll) RollType.PARTIAL_ROLL else RollType.BAD_ROLL
+    }
+
+    fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NeuInternalName): Boolean =
+        getRollType(internalName) == RollType.GOOD_ROLL
 }
+
+enum class RollType {
+    GOOD_ROLL,
+    PARTIAL_ROLL,
+    BAD_ROLL,
+}
+
+data class Attribute(val type: AttributeType, val level: Int)

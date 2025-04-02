@@ -132,7 +132,7 @@ object GardenVisitorTimer {
                 if (!sixthVisitorReady) {
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) {
-                        TitleManager.sendTitle("§a6th Visitor Ready", 5.seconds)
+                        TitleManager.sendTitle("§a6th Visitor Ready", duration = 5.seconds)
                         SoundUtils.playBeepSound()
                     }
                 }

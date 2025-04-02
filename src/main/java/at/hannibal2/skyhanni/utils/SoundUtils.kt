@@ -6,13 +6,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
-import net.minecraft.client.audio.PositionedSound
 import net.minecraft.client.audio.SoundCategory
 import net.minecraft.util.ResourceLocation
+//#if MC < 1.21
+import net.minecraft.client.audio.PositionedSound
+//#else
+//$$ import net.minecraft.client.sound.PositionedSoundInstance
+//$$ import net.minecraft.sound.SoundEvent
+//#endif
 
 object SoundUtils {
 
-    private val beepSound by lazy { createSound("random.orb", 1f) }
+    private val beepSoundCache = mutableMapOf<Float, ISound>()
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
     private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
     val plingSound by lazy { createSound("note.pling", 1f) }
@@ -48,6 +53,7 @@ object SoundUtils {
     }
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
+        //#if MC < 1.21
         val sound: ISound = object : PositionedSound(ResourceLocation(name)) {
             init {
                 this.volume = volume
@@ -58,9 +64,13 @@ object SoundUtils {
             }
         }
         return sound
+        //#else
+        //$$ return PositionedSoundInstance.master(SoundEvent.of(Identifier.of(name)), pitch, volume)
+        //#endif
     }
 
-    fun playBeepSound() {
+    fun playBeepSound(pitch: Float = 1f) {
+        val beepSound = beepSoundCache.getOrPut(pitch) { createSound("random.orb", pitch) }
         beepSound.playSound()
     }
 

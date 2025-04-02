@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -70,13 +70,12 @@ object VoltHighlighter {
                     },
                 ) { config.voltMoodMeter }
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
-                RenderUtils.drawCylinderInWorld(
+                event.drawCylinderInWorld(
                     config.voltColour.toSpecialColor(),
                     entity.posX,
                     entity.posY - 4f,
                     entity.posZ,
                     radius = LIGHTNING_DISTANCE,
-                    partialTicks = event.partialTicks,
                     height = 20F,
                 )
                 val dischargingSince = chargingSince.getOrDefault(entity, SimpleTimeMark.farPast())
