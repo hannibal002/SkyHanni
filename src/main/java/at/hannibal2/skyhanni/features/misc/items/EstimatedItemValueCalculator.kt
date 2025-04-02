@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -170,7 +171,9 @@ object EstimatedItemValueCalculator {
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
         val internalName = stack.getInternalName()
-        val internalNameString = internalName.removeKuudraTier().removePrefix("VANQUISHED_").asString()
+        var internalNameString = internalName.removeKuudraTier().removePrefix("VANQUISHED_").asString()
+        if (internalNameString == "INFERNO_ROD" || internalNameString == "HELLFIRE_ROD") internalNameString = "MAGMA_ROD"
+        ChatUtils.debug(internalNameString)
         var genericName = internalNameString
         if (internalName.isKuudraArmor()) {
             genericName = KuudraApi.kuudraSets.fold(internalNameString) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
@@ -182,30 +185,34 @@ object EstimatedItemValueCalculator {
         val basePrice = internalNameString.toInternalName().getPrice()
         var subTotal = 0.0
         val combo = ("$internalNameString+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
-        val comboPrice = combo.toInternalName().getPriceOrNull()
+        val comboPrice = combo.toInternalName().getPriceOrNull()?.minus(basePrice)
 
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
-            val gray = comboPrice <= basePrice || useless
+            val gray = useless
             list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(gray)}")
             if (!useless) {
-                subTotal += addAttributePrice(comboPrice, basePrice)
+                subTotal += comboPrice
             }
         } else {
             list.add("§7Attributes:")
         }
         for (attr in attributes) {
-            val attributeName = "$genericName+ATTRIBUTE_${attr.first}"
-            val price = getPriceOrCompositePriceForAttribute(attributeName, attr.second)
+            val armorWithAttributeName = "$genericName+ATTRIBUTE_${attr.first}"
+            val armorBasedPrice = getPriceOrCompositePriceForAttribute(armorWithAttributeName, attr.second)
+
+            val shardBasedPrice = attr.getAttributePrice()
+
+            val price = listOfNotNull(armorBasedPrice, shardBasedPrice).minOrNull()
+
             var gray = true
-            val useless = isUselessAttribute(attributeName)
+            val useless = isUselessAttribute(armorWithAttributeName)
             val nameColor = if (!useless) "§9" else "§7"
-            if (price != null) {
-                if (price > basePrice && !useless) {
-                    subTotal += addAttributePrice(price, basePrice)
+            price?.let {
+                if (it > 0 && !useless) {
+                    subTotal += addAttributePrice(it, basePrice)
                     gray = false
                 }
-
             }
             val displayName = attr.first.fixMending()
             list.add(
@@ -227,6 +234,7 @@ object EstimatedItemValueCalculator {
     private fun isUselessAttribute(internalName: String): Boolean {
         if (internalName.contains("RESISTANCE")) return true
         if (internalName.contains("FISHING_SPEED")) return false
+        if (internalName.contains("FISHING_EXPERIENCE")) return false
         if (internalName.contains("SPEED")) return true
         if (internalName.contains("EXPERIENCE")) return true
         if (internalName.contains("FORTITUDE")) return true
@@ -238,6 +246,7 @@ object EstimatedItemValueCalculator {
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
+        if (level == 1) return 0.0
         val intRange = if (config.useAttributeComposite.get()) 1..10 else level..level
         return intRange.mapNotNull { lowerLevel ->
             "$attributeName;$lowerLevel".toInternalName().getPriceOrNull()?.let {
