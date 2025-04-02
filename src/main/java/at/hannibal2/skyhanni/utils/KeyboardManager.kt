@@ -63,25 +63,31 @@ object KeyboardManager {
     //#if MC < 1.21
     private data class EventKey(val key: Int, val pressed: Boolean)
 
-    private fun getEventKey(): EventKey? {
+    private fun getEventKey(): EventKey {
+        Keyboard.poll()
+        // If there is a keyboard event, process it immediately and clear any lingering mouse event.
+        if (Keyboard.getEventKey() != 0) {
+            // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
+            return when (Keyboard.getEventKey()) {
+                0 -> EventKey(Keyboard.getEventCharacter().code + 256, Keyboard.getEventKeyState())
+                else -> EventKey(Keyboard.getEventKey(), Keyboard.getEventKeyState())
+                    .also { lastClickedMouseButton = -1 }
+            }
+        }
+
         if (MouseCompat.getEventButton() != -1) {
             val key = MouseCompat.getEventButton() - 100
             lastClickedMouseButton = key
             return EventKey(key, MouseCompat.getEventButtonState())
         }
-
-        // Directly detect if the previously clicked mouse button is still held down.
-        if (MouseCompat.getEventButton() == -1 && lastClickedMouseButton != -1) {
+        if (lastClickedMouseButton != -1 && MouseCompat.getEventButton() == -1) {
+            Mouse.poll()
             val originalButton = lastClickedMouseButton + 100
             if (Mouse.isButtonDown(originalButton)) return EventKey(lastClickedMouseButton, true)
             else lastClickedMouseButton = -1
         }
 
-        // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
-        return when (Keyboard.getEventKey()) {
-            0 -> EventKey(Keyboard.getEventCharacter().code + 256, Keyboard.getEventKeyState())
-            else -> EventKey(Keyboard.getEventKey(), Keyboard.getEventKeyState()).also { lastClickedMouseButton = -1 }
-        }
+        return EventKey(0, false)
     }
 
     private val clickedKeys = mutableSetOf<Int>()
@@ -92,20 +98,16 @@ object KeyboardManager {
         //#if MC < 1.16
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
-        if (isConfigScreen) return
-        if (currentScreen is GuiChat) return
+        if (isConfigScreen || currentScreen is GuiChat) return
 
-        val (key, pressed) = getEventKey() ?: return
-
+        val (key, pressed) = getEventKey()
         if (pressed) {
             postKeyPressEvent(key)
             if (!clickedKeys.contains(key)) {
                 postKeyDownEvent(key)
                 clickedKeys.add(key)
             }
-        } else {
-            clickedKeys.remove(key)
-        }
+        } else clickedKeys.remove(key)
         //#else
         //$$ // todo use fabric event or whatnot
         //#endif

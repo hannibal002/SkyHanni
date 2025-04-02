@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -48,9 +49,12 @@ object TitleManager {
         }
     }
 
-    enum class TitleLocation(private val displayName: String) {
+    enum class TitleLocation(
+        private val displayName: String,
+        val activationRequirement: () -> Boolean = { true },
+    ) {
         GLOBAL("Global"),
-        INVENTORY("Inventory"),
+        INVENTORY("Inventory", activationRequirement = { InventoryUtils.inInventory() }),
         ;
 
         override fun toString() = displayName
@@ -146,6 +150,11 @@ object TitleManager {
         stop()
     }
 
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        stop(TitleLocation.INVENTORY)
+    }
+
     private fun stop(location: TitleLocation? = null) {
         when (location) {
             null -> currentTitles.values.filterNotNull().forEach { it.stop() }
@@ -155,7 +164,9 @@ object TitleManager {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        TitleLocation.entries.forEach { location ->
+        TitleLocation.entries.filter {
+            it.activationRequirement.invoke()
+        }.forEach { location ->
             when (val currentTitle = currentTitles[location]) {
                 null -> dequeueNextTitle(location)
                 else -> {
@@ -183,27 +194,28 @@ object TitleManager {
         val guiWidth = GuiScreenUtils.scaledWindowWidth
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
-        val globalTitleWidth = 80
+        val globalTitleWidth = 200
         val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(titleText)
         var factor = globalTitleWidth / stringWidth.toDouble()
         factor = min(factor, 1.0)
+
+        val mainScalar = factor * fontSize
+        val subScalar = mainScalar * 0.75f
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.pushMatrix()
 
-        val mainTextRenderable = Renderable.wrappedString(
+        val mainTextRenderable = Renderable.string(
             titleText,
-            width = (globalTitleWidth * fontSize).toInt(),
-            scale = (factor * fontSize),
+            scale = mainScalar,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         )
 
         val subtitleRenderable: Renderable? = subtitleText?.let {
-            Renderable.wrappedString(
+            Renderable.string(
                 it,
-                width = (globalTitleWidth * fontSize * 0.75f).toInt(),
-                scale = (factor * fontSize * 0.75f),
+                scale = subScalar,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             )
         }
