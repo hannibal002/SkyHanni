@@ -84,8 +84,6 @@ object DragonProfitTracker {
         addSearchString("§b§lDragon Profit Tracker")
         tracker.addBucketSelector(this, bucketData, "Dragon Type")
 
-        if (bucketData.getTotalDragonCount() == 0L) return@buildList
-
         var profit = tracker.drawItems(bucketData, { true }, this)
 
         val eyePrice = SUMMONING_EYE.getPrice()
