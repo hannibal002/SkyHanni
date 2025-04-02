@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.data.TitleManager.CountdownTitleContext.Companion.fromTitleData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
@@ -46,14 +46,16 @@ object TitleManager {
         var height: Double = 1.8,
         var fontSize: Float = 4f,
         val weight: Double = 1.0,
-    ) : ResettableStorageSet() {
+    ) {
         open var endTime: SimpleTimeMark = SimpleTimeMark.now() + duration
 
         open fun getTitleText(): String = titleText
         open fun getSubtitleText(): String? = subtitleText
-        @Suppress("unused")
         open fun start() { /* No-op */ }
-        open fun stop() { endTime = SimpleTimeMark.farPast() }
+
+        open fun stop() {
+            endTime = SimpleTimeMark.farPast()
+        }
     }
 
     enum class CountdownTitleDisplayType(private val displayName: String) {
@@ -78,6 +80,7 @@ object TitleManager {
             CountdownTitleDisplayType.WHOLE_SECONDS -> virtualEndTime.timeUntil().inWholeSeconds
             CountdownTitleDisplayType.PARTIAL_SECONDS -> virtualEndTime.timeUntil().inPartialSeconds.roundTo(1)
         }.toString()
+
         override var endTime: SimpleTimeMark = SimpleTimeMark.now() + countdownDuration + loomInterval
         private val virtualEndTime: SimpleTimeMark = SimpleTimeMark.now() + countdownDuration
         private var virtualTimeLeftFormat: String = getTimeLeftFormat()
@@ -242,6 +245,11 @@ object TitleManager {
     }
 
     @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        stop()
+    }
+
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         stop()
     }
@@ -286,6 +294,7 @@ object TitleManager {
     private fun dequeueNextTitle(location: TitleLocation) {
         val titleQueue = titleLocationQueues[location]
         val title = titleQueue?.pollOrNull()
+        title?.start()
         currentTitles[location] = title
     }
 
@@ -342,9 +351,7 @@ object TitleManager {
         GlStateManager.translate(posX.toFloat(), posY.toFloat(), 0f)
         targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
         GlStateManager.popMatrix()
-        start()
     }
-
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -391,6 +398,5 @@ object TitleManager {
 
         GlStateManager.translate(0f, heightTranslation, -500f)
         GlStateManager.popMatrix()
-        start()
     }
 }
