@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.ItemSources
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -45,7 +45,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         modify {
             it.addItem(selectedBucket, internalName, amount)
         }
-        if (source == ItemAddManager.Source.COMMAND) {
+        if (source == ItemSources.Source.COMMAND) {
             TrackerManager.commandEditTrackerSuccess = true
             ChatUtils.chat(
                 "Added ${internalName.repoItemName} §e$amount§7x to ($selectedBucket§7)",

@@ -3,11 +3,13 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ItemSources
 import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -140,6 +142,9 @@ object BazaarApi {
             } else if (itemName.contains("BUY")) {
                 // pickup items from bazaar order
                 OwnInventoryData.ignoreItem(1.seconds) { it == internalName }
+                ItemAddEvent(
+                    internalName, item.stackSize, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.BAZAAR,
+                ).post()
                 // prepare for cancel buy order as well
                 orderOptionProduct = internalName
             }
@@ -147,6 +152,12 @@ object BazaarApi {
         if (InventoryUtils.openInventoryName() == "Order options" && itemName == "§cCancel Order") {
             // pickup items from own bazaar order
             OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
+            val orderOptionProduct = orderOptionProduct
+            if (orderOptionProduct != null) {
+                ItemAddEvent(
+                    orderOptionProduct, item.stackSize, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.REFUND,
+                ).post()
+            }
 
         }
 
@@ -154,6 +165,12 @@ object BazaarApi {
             if (item.getLore().lastOrNull()?.removeColor() == "Click to buy now!") {
                 // instant buy
                 OwnInventoryData.ignoreItem(1.seconds) { it == lastOpenedProduct }
+                val lastOpenedProduct = lastOpenedProduct
+                if (lastOpenedProduct != null) {
+                    ItemAddEvent(
+                        lastOpenedProduct, item.stackSize, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.BAZAAR,
+                    ).post()
+                }
             }
         }
     }

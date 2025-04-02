@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.ItemSources
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -93,7 +93,7 @@ object TimiteTracker {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onItem(event: ItemAddEvent) {
         if (event.internalName in validItems) {
-            tracker.addItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
+            tracker.addItem(event.internalName, event.amount, event.source == ItemSources.Source.COMMAND)
         }
     }
 

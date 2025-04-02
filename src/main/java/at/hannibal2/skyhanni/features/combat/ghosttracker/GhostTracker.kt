@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.ItemSources
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -212,7 +212,7 @@ object GhostTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+        if (!isEnabled() || event.source != ItemSources.Source.COMMAND) return
 
         tracker.addItem(event.internalName, event.amount, command = true)
     }

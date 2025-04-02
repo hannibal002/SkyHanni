@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.ItemSources
 import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -200,7 +200,7 @@ object FishingProfitTracker {
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 
-        if (event.source == ItemAddManager.Source.COMMAND) {
+        if (event.source == ItemSources.Source.COMMAND) {
             tryAddItem(event.internalName, event.amount, command = true)
             return
         }

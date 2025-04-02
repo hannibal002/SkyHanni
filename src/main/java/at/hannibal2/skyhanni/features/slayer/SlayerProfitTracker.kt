@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.ItemSources
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -161,7 +161,7 @@ object SlayerProfitTracker {
         if (!SlayerApi.isInCorrectArea) return
         if (!SlayerApi.hasActiveSlayerQuest()) return
 
-        tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
+        tryAddItem(event.internalName, event.amount, event.source == ItemSources.Source.COMMAND)
     }
 
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {

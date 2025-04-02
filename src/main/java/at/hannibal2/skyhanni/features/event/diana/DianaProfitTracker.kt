@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
-import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.ItemSources
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -116,7 +116,7 @@ object DianaProfitTracker {
     fun onItemAdd(event: ItemAddEvent) {
         if (!(DianaApi.isDoingDiana() && config.enabled)) return
 
-        tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
+        tryAddItem(event.internalName, event.amount, event.source == ItemSources.Source.COMMAND)
     }
 
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
@@ -134,7 +135,9 @@ object OwnInventoryData {
             if (itemName == "§cCancel Auction") {
                 val item = InventoryUtils.getItemAtSlotIndex(13)
                 val internalName = item?.getInternalNameOrNull() ?: return
+                val amount = item.stackSize
                 ignoreItem(5.seconds, internalName)
+                ItemAddEvent(internalName, amount, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.REFUND).post()
             }
         }
 
@@ -142,7 +145,9 @@ object OwnInventoryData {
         if (inventoryName == "Confirm Purchase" && itemName == "§aConfirm") {
             val item = InventoryUtils.getItemAtSlotIndex(13)
             val internalName = item?.getInternalNameOrNull() ?: return
+            val amount = item.stackSize
             ignoreItem(5.seconds, internalName)
+            ItemAddEvent(internalName, amount, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.AUCTION).post()
         }
 
         // bought item from normal ah
@@ -150,6 +155,7 @@ object OwnInventoryData {
             val item = InventoryUtils.getItemAtSlotIndex(13)
             val internalName = item?.getInternalNameOrNull() ?: return
             ignoreItem(5.seconds, internalName)
+            ItemAddEvent(internalName, 1, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.AUCTION).post()
         }
 
         // collected all items in "own bins"
@@ -157,7 +163,9 @@ object OwnInventoryData {
             for (stack in InventoryUtils.getItemsInOpenChest().map { it.stack }) {
                 if (stack.getLore().any { it == "§7Status: §aSold!" || it == "7Status: §aEnded!" }) {
                     val internalName = stack.getInternalNameOrNull() ?: return
+                    val amount = stack.stackSize
                     ignoreItem(5.seconds, internalName)
+                    ItemAddEvent(internalName, amount, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.AUCTION).post()
                 }
             }
         }
@@ -166,7 +174,9 @@ object OwnInventoryData {
         if (inventoryName == "Anvil") {
             for (stack in InventoryUtils.getItemsAtSlots(13, 29, 33)) {
                 val internalName = stack.getInternalNameOrNull() ?: continue
+                val amount = stack.stackSize
                 ignoreItem(5.seconds, internalName)
+                ItemAddEvent(internalName, amount, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.ANVIL).post()
             }
         }
     }
@@ -176,6 +186,10 @@ object OwnInventoryData {
         sackToInventoryChatPattern.matchMatcher(event.message) {
             val name = group("name")
             ignoreItem(500.milliseconds) { it.repoItemName.contains(name) }
+            val item = InventoryUtils.getItemAtSlotIndex(13)
+            val internalName = item?.getInternalNameOrNull() ?: return@matchMatcher
+            val amount = item.stackSize
+            ItemAddEvent(internalName, amount, ItemSources.Source.SACKS, ItemSources.ExactSource.SACKS).post()
         }
     }
 

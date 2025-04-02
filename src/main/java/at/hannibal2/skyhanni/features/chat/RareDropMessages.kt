@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.ItemSources
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -118,7 +118,7 @@ object RareDropMessages {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onItemAdd(event: ItemAddEvent) {
-        if (event.amount != 1 || event.source != ItemAddManager.Source.ITEM_ADD) return
+        if (event.amount != 1 || event.source != ItemSources.Source.ITEM_ADD) return
         if (!config.enchantedBook || !config.enchantedBookMissingMessage) return
         val internalName = event.internalName
         val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
