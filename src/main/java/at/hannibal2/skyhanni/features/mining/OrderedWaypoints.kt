@@ -39,30 +39,38 @@ object OrderedWaypoints {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!enabled) return
+
         for (i in renderWaypoints.indices) {
             var wpColor: Color? = null
             var r = 0
             var g = 0
             var b = 0
             if (!config.showAll) {
-                if (i == 0) {
-                    wpColor = config.previousWaypointColor.toSpecialColor()
-                } else if (i == 1) {
-                    wpColor = config.currentWaypointColor.toSpecialColor()
-                } else if (i == 2) {
-                    wpColor = config.nextWaypointColor.toSpecialColor()
-                } else {
-                    r = 255
+                when (i) {
+                    0 -> {
+                        wpColor = config.previousWaypointColor.toSpecialColor()
+                    }
+                    1 -> {
+                        wpColor = config.currentWaypointColor.toSpecialColor()
+                    }
+                    2 -> {
+                        wpColor = config.nextWaypointColor.toSpecialColor()
+                    }
+                    else -> {
+                        r = 255
+                    }
                 }
             } else {
                 wpColor = orderedWaypointsList[renderWaypoints[i]].color
             }
+
             if (wpColor != null) {
                 r = wpColor.red
                 g = wpColor.green
                 b = wpColor.blue
             }
-            if (orderedWaypointsList.getOrNull(renderWaypoints[i]) == null) {
+
+            if (orderedWaypointsList.size <= renderWaypoints[i]) {
                 ChatUtils.debug("${renderWaypoints[i]} $i")
                 continue
             }
@@ -75,8 +83,8 @@ object OrderedWaypoints {
                 false
             )
 
-            // Waypoint name (number)
             if (config.showAll || i < 3) {
+                // Waypoint name (number)
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
                     "§b${orderedWaypointsList[renderWaypoints[i]].options["name"]}",
@@ -150,7 +158,7 @@ object OrderedWaypoints {
         event.register("shorderedskipto") {
             description = "Skips to the <argument> waypoint."
             category = CommandCategory.USERS_ACTIVE
-            callback { skipTo(it) }
+            callback { skipto(it) }
             aliases = generateAliases(listOf("skipto"))
         }
 
@@ -246,9 +254,11 @@ object OrderedWaypoints {
                 for (i in 1 until it.size) {
                     if (it[i].options["name"]?.toInt() != i + 1) {
                         ChatUtils.chat(
-                            "Note: Waypoint ${i + 1} is not in the right order or is not a number!" +
-                                "Current is: ${it[i].options["name"]}"
+                            "Waypoint ${i + 1} is not in the right order or is not a number!" +
+                                "Current is ${it[i].options["name"]}." +
+                                "Changing to ${i + 1}."
                         )
+                        it[i].options["name"] = (i + 1).toString()
                     }
                 }
             }
@@ -264,32 +274,49 @@ object OrderedWaypoints {
     }
 
     private fun skip(args: Array<String>) {
-        val amountToSkip = args.getOrNull(0)?.toIntOrNull() ?: run {
-            return ChatUtils.chat("Argument is not an integer!")
+        if (orderedWaypointsList.isEmpty()) {
+            return ChatUtils.chat("There are no waypoints to skip!")
         }
-        currentOrderedWaypointIndex += amountToSkip
-        if (orderedWaypointsList.size > 1) currentOrderedWaypointIndex %= orderedWaypointsList.size
-        ChatUtils.chat("Skipped $amountToSkip ${StringUtils.pluralize(amountToSkip, "vein")}")
+
+        val amountToSkip = if (args.isNotEmpty()) {
+            args[0].toIntOrNull() ?: run {
+                return ChatUtils.chat("${args[0]} is not an integer!")
+            }
+        } else 1
+
+        incrementIndex(amountToSkip)
+        ChatUtils.chat("Skipped $amountToSkip ${StringUtils.pluralize(amountToSkip, "waypoint")}.")
     }
 
-    private fun skipTo(args: Array<String>) {
-        var newOrderedWaypointIndex = args.getOrNull(0)?.toIntOrNull() ?: return
-        if (newOrderedWaypointIndex > 0 && newOrderedWaypointIndex < orderedWaypointsList.size) {
-            if (newOrderedWaypointIndex == 1) newOrderedWaypointIndex = 2
-            currentOrderedWaypointIndex = newOrderedWaypointIndex - 2
-            ChatUtils.chat("Skipped to $currentOrderedWaypointIndex.")
+    private fun skipto(args: Array<String>) {
+        if (orderedWaypointsList.isEmpty()) {
+            return ChatUtils.chat("There are no waypoints to skip to!")
+        }
+
+        val newOrderedWaypointIndex = args.getOrNull(0)?.toIntOrNull()?.minus(1)
+            ?: return ChatUtils.chat("Please enter a number between between 1 and ${orderedWaypointsList.size}.")
+        if (0 <= newOrderedWaypointIndex && newOrderedWaypointIndex < orderedWaypointsList.size) {
+            currentOrderedWaypointIndex = newOrderedWaypointIndex
+            ChatUtils.chat("Skipped to ${currentOrderedWaypointIndex + 1}.")
+        } else {
+            ChatUtils.chat("${newOrderedWaypointIndex + 1} is not between 1 and ${orderedWaypointsList.size}.")
         }
     }
 
     private fun unskip(args: Array<String>) {
-        val decrement = args.getOrNull(0)?.toIntOrNull() ?: run {
-            return ChatUtils.chat("Not an integer!")
+        if (orderedWaypointsList.isEmpty()) {
+            return ChatUtils.chat("There are no waypoints to unskip!")
         }
-        currentOrderedWaypointIndex -= decrement
-        if (orderedWaypointsList.size > 1) {
-            currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex, orderedWaypointsList.size)
-        }
-        ChatUtils.chat("Unskipped to $currentOrderedWaypointIndex.")
+
+        val decrement = if (args.isNotEmpty()) {
+            args[0].toIntOrNull() ?: run {
+                return ChatUtils.chat("Argument is not an integer!")
+            }
+        } else 1
+
+        incrementIndex(-decrement)
+
+        ChatUtils.chat("Unskipped $decrement waypoints.")
     }
 
     private fun enable() {
@@ -304,7 +331,7 @@ object OrderedWaypoints {
 
     private fun delete(args: Array<String>) {
         if (orderedWaypointsList.isEmpty()) {
-            return ChatUtils.chat("Waypoints have not been loaded!")
+            return ChatUtils.chat("There are no waypoints to delete!")
         }
 
         val wNum = args.getOrNull(0)?.toIntOrNull() ?: run {
@@ -312,7 +339,7 @@ object OrderedWaypoints {
         }
 
         if (wNum < 1 || wNum > orderedWaypointsList.size) {
-            return ChatUtils.chat("Invalid number! Must be in range (1 - ${orderedWaypointsList.size}).")
+            return ChatUtils.chat("Invalid number! Must be between 1 and ${orderedWaypointsList.size}.")
         }
 
         for (i in wNum - 1 until orderedWaypointsList.size) {
@@ -325,23 +352,23 @@ object OrderedWaypoints {
     }
 
     private fun add(args: Array<String>) {
-        if (args.isEmpty()) {
-            return ChatUtils.chat("Stand where you want to add a waypoint (will be block under you) and re-run the command.")
-        }
         val waypoint = LocationUtils.playerLocation().add(0, -1, 0).roundLocationToBlock()
-        val wNum = args[0].toIntOrNull() ?: return ChatUtils.chat("Not a number!")
+        val wNum = args.getOrNull(0)?.toIntOrNull()
+
+        if (wNum == null || wNum < 1 || wNum > orderedWaypointsList.size + 1) {
+            return ChatUtils.chat("Please enter a number between 1 and ${orderedWaypointsList.size + 1})")
+        }
+
         if (wNum == orderedWaypointsList.size + 1) {
             orderedWaypointsList.add(SoopyWaypoint(waypoint, options = mutableMapOf("name" to wNum.toString())))
-            return ChatUtils.chat("Inserted waypoint $wNum at ${waypoint.toCleanString()}.")
+        } else {
+            for (i in wNum - 1 until orderedWaypointsList.size) {
+                orderedWaypointsList[i].options["name"] =
+                    ((orderedWaypointsList[i].options["name"]?.toIntOrNull() ?: (i + 1)).inc()).toString()
+            }
+            orderedWaypointsList.add(wNum - 1, SoopyWaypoint(waypoint, options = mutableMapOf("name" to wNum.toString())))
         }
-        if (wNum < 1 || wNum > orderedWaypointsList.size) {
-            return ChatUtils.chat("Invalid number! Must be in range (1 - ${orderedWaypointsList.size + 1})!")
-        }
-        for (i in wNum - 1 until orderedWaypointsList.size) {
-            orderedWaypointsList[i].options["name"] = ((orderedWaypointsList[i].options["name"]?.toIntOrNull() ?: (i + 1)).inc()).toString()
-        }
-        orderedWaypointsList.add(wNum - 1, SoopyWaypoint(waypoint, options = mutableMapOf("name" to wNum.toString())))
-        ChatUtils.chat("Inserted waypoint $wNum at ${waypoint.toCleanString()}!")
+        ChatUtils.chat("Inserted waypoint $wNum at ${waypoint.toCleanString()}.")
     }
 
     private fun export() {
@@ -358,16 +385,14 @@ object OrderedWaypoints {
         }
         val waypoints = SoopyWaypointList(orderedWaypointsList)
 
-        ProfileStorageData.playerSpecific?.routes?.let {
-            it[args[0]] = waypoints
-        }
+        ProfileStorageData.playerSpecific?.routes?.put(args[0], waypoints)
 
         ChatUtils.chat("Route saved as ${args[0]}. Do /shorderedimport ${args[0]} to import it.")
     }
 
     private fun decideWaypoints() {
         renderWaypoints.clear()
-        if (orderedWaypointsList.size < 1) return
+        if (orderedWaypointsList.isEmpty()) return
 
         val beforeWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex - 1)
         if (beforeWaypoint != null) {
@@ -394,7 +419,7 @@ object OrderedWaypoints {
         }
 
         if (lastCloser == currentOrderedWaypointIndex && distanceTo1 > distanceTo2 && distanceTo2 < config.waypointRange) {
-            return incrementIndex()
+            return incrementIndex(1)
         }
 
         if (distanceTo1 < config.waypointRange.toDouble()) {
@@ -402,7 +427,7 @@ object OrderedWaypoints {
         }
 
         if (distanceTo2 < config.waypointRange.toDouble()) {
-            incrementIndex()
+            incrementIndex(1)
         }
 
         orderedWaypointsList.forEach { waypoint ->
@@ -416,10 +441,7 @@ object OrderedWaypoints {
         }
     }
 
-    private fun incrementIndex() {
-        currentOrderedWaypointIndex++
-        if (orderedWaypointsList.size <= currentOrderedWaypointIndex) {
-            currentOrderedWaypointIndex = 0
-        }
+    private fun incrementIndex(increment: Int) {
+        currentOrderedWaypointIndex = Math.floorMod(currentOrderedWaypointIndex + increment, orderedWaypointsList.size)
     }
 }
