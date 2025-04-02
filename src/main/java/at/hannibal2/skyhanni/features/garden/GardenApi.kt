@@ -40,13 +40,9 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
@@ -76,10 +72,7 @@ object GardenApi {
                 storage?.experience = it
             }
         }
-
-    private data class CropTypeCaller(val cropType: CropType, val caller: String)
-    private val cropIconCache: TimeLimitedCache<CropTypeCaller, ItemStack> = TimeLimitedCache(10.minutes)
-
+    private val cropIconCache: MutableMap<CropType, TimeLimitedCache<String, ItemStack>> = mutableMapOf()
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     // TODO USE SH-REPO
@@ -170,23 +163,9 @@ object GardenApi {
 
     fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter()
 
-    private fun getIconCacheCallerOrRandom(): String {
-        val stack = Thread.currentThread().stackTrace
-        return when (stack.size) {
-            0, 1, 2 -> StringUtils.generateRandomId()
-            else -> stack[3].methodName
-        }
-    }
-
-    fun MutableList<Renderable>.addCropIcon(
-        crop: CropType,
-        scale: Double = NeuItems.ITEM_FONT_SIZE,
-        highlight: Boolean = false,
-    ) {
-        val caller = getIconCacheCallerOrRandom()
-        val cropCaller = CropTypeCaller(crop, caller)
-        val cropIcon = cropIconCache.getOrPut(cropCaller) { crop.icon.copy() }
-        addItemStack(cropIcon, highlight = highlight, scale = scale)
+    fun CropType.getItemStackCopy(iconId: String): ItemStack {
+        val cropCache = cropIconCache.getOrPut(this) { TimeLimitedCache(10.minutes) }
+        return cropCache.getOrPut(iconId) { icon.copy() }
     }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory ||
