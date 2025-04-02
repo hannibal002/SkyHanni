@@ -7,6 +7,9 @@
     "icon": "assets/skyhanni/logo.png",
     "authors": [],
     "environment": "client",
+    "mixins": [
+        "mixins.skyhanni.json"
+    ],
     "entrypoints": {
         "main": [
             "at.hannibal2.skyhanni.SkyHanniModLoader"

@@ -30,7 +30,7 @@ object NoBitsWarning {
                 }, "§eClick to run /bz booster cookie!"
             )
             // TODO use reminder utils
-            TitleManager.sendTitle("§bNo Bits Available", 5.seconds)
+            TitleManager.sendTitle("§bNo Bits Available", duration = 5.seconds)
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
         }
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.collection
 
 import java.util.Collections
 import java.util.EnumMap
+import java.util.PriorityQueue
 import java.util.Queue
 import java.util.WeakHashMap
 import kotlin.math.ceil
@@ -71,6 +72,9 @@ object CollectionUtils {
             else -> values.sumOf { it.toInt() }.toDouble()
         }
     }
+
+    fun <K, V : Number> List<Map<K, V>>.sumByKey(): Map<K, Double> =
+        flatMap { it.entries }.groupBy({ it.key }, { it.value.toDouble() }).mapValues { (_, values) -> values.sum() }
 
     fun <T, R> Sequence<IndexedValue<T>>.runningIndexedFold(initial: R, operation: (R, T) -> R): Sequence<IndexedValue<R>> =
         map { it.value }.runningFold(initial, operation).zip(map { it.index }) { value, index -> IndexedValue(index, value) }
@@ -213,11 +217,11 @@ object CollectionUtils {
 
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? = if (all { it != null }) filterNotNull() else null
 
-    fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
+    fun <T, C : Collection<T>> C.takeIfNotEmpty(): C? = takeIf { it.isNotEmpty() }
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
-    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>) = this.toSet() == other.toSet()
 
     fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
@@ -353,5 +357,21 @@ object CollectionUtils {
             }
         }
         return null
+    }
+
+    fun <T> List<T>.insertAfterEach(extra: T): List<T> = buildList(size * 2) {
+        for (item in this@insertAfterEach) {
+            add(item)
+            add(extra)
+        }
+    }
+
+    class OrderedQueue<T> : PriorityQueue<WeightedItem<T>>() {
+        fun add(item: T, weight: Double): Boolean = super.add(WeightedItem(item, weight))
+        fun pollOrNull(): T? = poll()?.item
+    }
+
+    data class WeightedItem<T>(val item: T, val weight: Double) : Comparable<WeightedItem<T>> {
+        override fun compareTo(other: WeightedItem<T>): Int = this.weight.compareTo(other.weight)
     }
 }
