@@ -46,6 +46,6 @@ object ItemSources {
     }
 
     fun ItemAddEvent.isTrackerRelevant() = { event: ItemAddEvent ->
-        event.source == Source.ITEM_ADD && event.exactSource == ExactSource.NONE
+        event.source == Source.ITEM_ADD && event.exactSource != ExactSource.NONE
     }
 }
