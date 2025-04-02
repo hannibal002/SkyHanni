@@ -24,7 +24,7 @@ class SlayerProfitTrackerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Show Voidgloom Tracker in Dragon's Nest",
+        name = "Voidgloom in Dragon's Nest",
         desc = "Show the Voidgloom Tracker in the Dragon's Nest.",
     )
     @ConfigEditorBoolean
