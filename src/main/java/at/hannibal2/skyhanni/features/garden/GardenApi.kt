@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -75,7 +76,9 @@ object GardenApi {
                 storage?.experience = it
             }
         }
-    private val cropIconCache: TimeLimitedCache<CropType, ItemStack> = TimeLimitedCache(10.minutes)
+
+    private data class CropTypeCaller(val cropType: CropType, val caller: String)
+    private val cropIconCache: TimeLimitedCache<CropTypeCaller, ItemStack> = TimeLimitedCache(10.minutes)
 
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
@@ -167,12 +170,22 @@ object GardenApi {
 
     fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter()
 
+    private fun getIconCacheCallerOrRandom(): String {
+        val stack = Thread.currentThread().stackTrace
+        return when (stack.size) {
+            0, 1, 2 -> StringUtils.generateRandomId()
+            else -> stack[3].methodName
+        }
+    }
+
     fun MutableList<Renderable>.addCropIcon(
         crop: CropType,
         scale: Double = NeuItems.ITEM_FONT_SIZE,
         highlight: Boolean = false,
     ) {
-        val cropIcon = cropIconCache.getOrPut(crop) { crop.icon.copy() }
+        val caller = getIconCacheCallerOrRandom()
+        val cropCaller = CropTypeCaller(crop, caller)
+        val cropIcon = cropIconCache.getOrPut(cropCaller) { crop.icon.copy() }
         addItemStack(cropIcon, highlight = highlight, scale = scale)
     }
 
