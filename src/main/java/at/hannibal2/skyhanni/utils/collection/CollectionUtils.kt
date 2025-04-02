@@ -369,6 +369,7 @@ object CollectionUtils {
     class OrderedQueue<T> : PriorityQueue<WeightedItem<T>>() {
         fun add(item: T, weight: Double): Boolean = super.add(WeightedItem(item, weight))
         fun pollOrNull(): T? = poll()?.item
+        fun getWaitingWeightOrNull(): Double? = peek()?.weight
     }
 
     data class WeightedItem<T>(val item: T, val weight: Double) : Comparable<WeightedItem<T>> {

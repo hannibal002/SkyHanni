@@ -79,7 +79,7 @@ object TitleManager {
             CountdownTitleDisplayType.PARTIAL_SECONDS -> virtualEndTime.timeUntil().inPartialSeconds.roundTo(1)
         }.toString()
         override var endTime: SimpleTimeMark = SimpleTimeMark.now() + countdownDuration + loomInterval
-        private var virtualEndTime: SimpleTimeMark = SimpleTimeMark.now() + countdownDuration
+        private val virtualEndTime: SimpleTimeMark = SimpleTimeMark.now() + countdownDuration
         private var virtualTimeLeftFormat: String = getTimeLeftFormat()
         private val internalUpdateInterval: Duration = 100.milliseconds.takeIf {
             it < updateInterval
@@ -178,19 +178,8 @@ object TitleManager {
         }
 
         val targetQueue = titleLocationQueues.getOrPut(location) { CollectionUtils.OrderedQueue() }
-
-        if (addType == TitleAddType.QUEUE) {
-            targetQueue.add(newTitle, weight)
-        } else {
-            val currentTitle = currentTitles[location]
-            if (currentTitle != null && !currentTitle.endTime.isInPast()) {
-                // Push back into the queue
-                targetQueue.add(currentTitle, currentTitle.weight)
-                currentTitle.applyFromOther(newTitle)
-            } else {
-                currentTitles[location] = newTitle
-            }
-        }
+        val weightOverride = if (addType == TitleAddType.FORCE_FIRST) Double.MAX_VALUE else weight
+        targetQueue.add(newTitle, weightOverride)
 
         return newTitle
     }
@@ -277,6 +266,15 @@ object TitleManager {
             when (val currentTitle = currentTitles[location]) {
                 null -> dequeueNextTitle(location)
                 else -> {
+                    val titleLocationQueue = titleLocationQueues[location]
+                    titleLocationQueue?.getWaitingWeightOrNull()?.let {
+                        if (it <= currentTitle.weight) return@let
+                        currentTitle.stop()
+                        // Re-queue for insertion after the new title
+                        titleLocationQueue.add(currentTitle, currentTitle.weight)
+                        dequeueNextTitle(location)
+                        return
+                    }
                     if (currentTitle.endTime.isInFuture()) return@forEach
                     currentTitle.stop()
                     dequeueNextTitle(location)
