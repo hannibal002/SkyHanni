@@ -120,7 +120,7 @@ object DragonProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!config.enabled || event.source != ItemAddManager.Source.COMMAND) return
+        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
         with(tracker) { event.addItemFromEvent() }
         ChatUtils.debug("Added item to tracker: ${event.internalName} (amount: ${event.amount})")
     }
