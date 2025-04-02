@@ -23,7 +23,7 @@ object BlazeSlayerFirePitsWarning {
     private var lastFirePitsWarning = SimpleTimeMark.farPast()
 
     private fun fireFirePits() {
-        TitleManager.sendTitle("§cFire Pits!", 2.seconds)
+        TitleManager.sendTitle("§cFire Pits!", duration = 2.seconds)
         lastFirePitsWarning = SimpleTimeMark.now()
     }
 

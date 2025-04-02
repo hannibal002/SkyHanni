@@ -50,12 +50,6 @@ class CombatConfig {
     @Accordion
     var bestiary: BestiaryConfig = BestiaryConfig()
 
-    // TODO move into end island config
-    @Expose
-    @ConfigOption(name = "Ender Node Tracker", desc = "")
-    @Accordion
-    var enderNodeTracker: EnderNodeConfig = EnderNodeConfig()
-
     @Expose
     @ConfigOption(name = "Ferocity Display", desc = "")
     @Accordion
@@ -65,17 +59,6 @@ class CombatConfig {
     @ConfigOption(name = "Flare", desc = "")
     @Accordion
     var flare: FlareConfig = FlareConfig()
-
-    @Expose
-    @ConfigOption(name = "Dragon Features", desc = "")
-    @Accordion
-    var dragon: DragonConfig = DragonConfig()
-
-    @Expose
-    @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after it died.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var endstoneProtectorChat: Boolean = true
 
     @Expose
     @ConfigOption(name = "Broodmother", desc = "")

@@ -15,11 +15,12 @@ object XPInInventories {
 
     /**
      * REGEX-TEST: §310 Exp Levels
+     * REGEX-TEST: §310 XP Levels
      * REGEX-TEST:§7Starting cost: §b350 XP Levels
      */
     private val xpLevelsPattern by RepoPattern.list(
         "misc.xp-in-inventory.exp-levels",
-        "(?:§.)*(?<xp>\\d+) Exp Levels",
+        "(?:§.)*(?<xp>\\d+) (Exp|XP) Levels",
         "(?:§.)*Starting cost: §b(?<xp>\\d+) XP Levels",
     )
 

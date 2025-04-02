@@ -257,7 +257,7 @@ object GardenCropMilestoneDisplay {
             SoundUtils.playBeepSound()
         }
         if (!needsInventory) {
-            TitleManager.sendTitle(title, 1.5.seconds)
+            TitleManager.sendTitle(title)
         }
     }
 
