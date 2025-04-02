@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
@@ -7,6 +8,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
@@ -26,6 +28,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerApi {
 
+    private val trackerConfig get() = SkyHanniMod.feature.slayer.itemProfitTracker
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = SimpleTimeMark.farPast()
@@ -130,7 +133,7 @@ object SlayerApi {
     }
 
     // TODO USE SH-REPO
-    fun getSlayerTypeForCurrentArea() = when (LorenzUtils.skyBlockArea) {
+    fun getSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
         "Graveyard",
         "Coal Mine",
         -> SlayerType.REVENANT
@@ -145,10 +148,13 @@ object SlayerApi {
         "Howling Cave",
         -> SlayerType.SVEN
 
-        "The End",
-        "Dragon's Nest",
-        "Void Sepulture",
-        "Zealot Bruiser Hideout",
+        in listOf(
+            "The End",
+            "Void Sepulture",
+            "Zealot Bruiser Hideout"
+        ).let {
+            if (trackerConfig.voidgloomInNest) it + "Dragon's Nest" else it
+        }
         -> SlayerType.VOID
 
         "Stronghold",
@@ -162,4 +168,5 @@ object SlayerApi {
 
         else -> null
     }
+
 }

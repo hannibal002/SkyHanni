@@ -91,7 +91,7 @@ object DragonProfitTracker {
         val eyePrice = SUMMONING_EYE.getPrice()
         val totalEyePrice = eyePrice * bucketData.eyesPlaced
         profit -= totalEyePrice
-        val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §c-${totalEyePrice.shortFormat()}"
+        val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §c${(totalEyePrice*-1).shortFormat()}"
         add(
             Renderable.string(eyeFormat).toSearchable("Summoning Eye"),
         )
