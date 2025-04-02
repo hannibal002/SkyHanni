@@ -246,8 +246,8 @@ object FishingProfitTracker {
     }
 
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
-        val lastRareSeaCreatureDespawnExpired = SeaCreatureFeatures.lastRareSeaCreatureDespawn.passedSince() < 35.seconds
-        if (!FishingApi.isFishing(checkRodInHand = false) && lastRareSeaCreatureDespawnExpired) return
+        val isFightingRareSeaCreature = SeaCreatureFeatures.lastRareSeaCreatureDespawn.passedSince() < 35.seconds
+        if (!FishingApi.isFishing(checkRodInHand = false) && !isFightingRareSeaCreature) return
         if (!isAllowedItem(internalName)) {
             ChatUtils.debug("Ignored non-fishing item pickup: $internalName'")
             return
