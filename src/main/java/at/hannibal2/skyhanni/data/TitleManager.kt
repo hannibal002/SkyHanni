@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -29,6 +30,7 @@ import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import kotlin.math.min
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -51,7 +53,7 @@ object TitleManager {
         open fun getSubtitleText(): String? = subtitleText
         @Suppress("unused")
         open fun start() { /* No-op */ }
-        open fun stop() { endTime = SimpleTimeMark.now() }
+        open fun stop() { endTime = SimpleTimeMark.farPast() }
     }
 
     enum class CountdownTitleDisplayType(private val displayName: String) {
@@ -65,34 +67,48 @@ object TitleManager {
     private data class CountdownTitleContext(
         var formattedTitleText: String = "",
         var formattedSubtitleText: String? = null,
+        var countdownDuration: Duration = 5.seconds,
         var displayType: CountdownTitleDisplayType = CountdownTitleDisplayType.WHOLE_SECONDS,
         var updateInterval: Duration = 1.seconds,
-        var loomInterval: Duration = 1.seconds,
+        var loomInterval: Duration = 250.milliseconds,
         var onInterval: () -> Unit = {},
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
-        private val timeUntilDoneFormat get() = when (displayType) {
-            CountdownTitleDisplayType.WHOLE_SECONDS -> endTime.timeUntil().inWholeSeconds
-            CountdownTitleDisplayType.PARTIAL_SECONDS -> endTime.timeUntil().inPartialSeconds
+        private fun getTimeLeftFormat(): String = when (displayType) {
+            CountdownTitleDisplayType.WHOLE_SECONDS -> virtualEndTime.timeUntil().inWholeSeconds
+            CountdownTitleDisplayType.PARTIAL_SECONDS -> virtualEndTime.timeUntil().inPartialSeconds.roundTo(1)
         }.toString()
+        override var endTime: SimpleTimeMark = SimpleTimeMark.now() + countdownDuration + loomInterval
+        private var virtualEndTime: SimpleTimeMark = SimpleTimeMark.now() + countdownDuration
+        private var virtualTimeLeftFormat: String = getTimeLeftFormat()
+        private val internalUpdateInterval: Duration = 100.milliseconds.takeIf {
+            it < updateInterval
+        } ?: updateInterval
 
-        override var endTime: SimpleTimeMark = SimpleTimeMark.now() + duration + loomInterval
-        override fun getTitleText(): String = formattedTitleText.replace("%t", timeUntilDoneFormat)
-        override fun getSubtitleText(): String? = formattedSubtitleText?.replace("%t", timeUntilDoneFormat)
+        override fun getTitleText(): String = formattedTitleText.replace("%t", virtualTimeLeftFormat)
+        override fun getSubtitleText(): String? = formattedSubtitleText?.replace("%t", virtualTimeLeftFormat)
+
         override fun start() {
             super.start()
+            onIntervalOutward()
             onIntervalInternal()
         }
+
         override fun stop() {
+            super.stop()
             onFinish()
         }
 
-        private fun onIntervalInternal() {
+        private fun onIntervalOutward() {
+            if (endTime.isInPast()) return
             onInterval()
+            DelayedRun.runDelayed(updateInterval) { onIntervalOutward() }
+        }
+
+        private fun onIntervalInternal() {
             if (endTime.isInPast()) return stop()
-            DelayedRun.runDelayed(updateInterval) {
-                onIntervalInternal()
-            }
+            if (virtualEndTime.isInFuture()) virtualTimeLeftFormat = getTimeLeftFormat()
+            DelayedRun.runDelayed(internalUpdateInterval) { onIntervalInternal() }
         }
 
         companion object {
@@ -104,6 +120,7 @@ object TitleManager {
                 onFinish: () -> Unit = {},
             ) = CountdownTitleContext(
                 formattedTitleText = getTitleText(),
+                countdownDuration = duration,
                 formattedSubtitleText = getSubtitleText(),
                 displayType = displayType,
                 updateInterval = updateInterval,
@@ -151,7 +168,7 @@ object TitleManager {
         onInterval: () -> Unit = {},
         onFinish: () -> Unit = {},
         // How long the title will stay around for after the countdown is done.
-        loomInterval: Duration = 1.seconds,
+        loomInterval: Duration = 250.milliseconds,
     ): TitleContext {
         val newTitle = TitleContext(titleText, subtitleText, duration, height, fontSize, weight).let {
             when (countDownDisplayType) {
@@ -203,9 +220,14 @@ object TitleManager {
             category = CommandCategory.DEVELOPER_TEST
             callback { command(it, this.name, TitleLocation.INVENTORY) }
         }
+        event.register("shsendcountdowntitle") {
+            description = "Display a countdown title on the screen with the specified settings."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { command(it, this.name, countdown = true) }
+        }
     }
 
-    private fun command(args: Array<String>, command: String, location: TitleLocation = TitleLocation.GLOBAL) {
+    private fun command(args: Array<String>, command: String, location: TitleLocation = TitleLocation.GLOBAL, countdown: Boolean = false) {
         if (args.size < 4) {
             ChatUtils.userError("Usage: /$command <duration> <height> <fontSize> <text ..>")
             return
@@ -219,7 +241,15 @@ object TitleManager {
         val fontSize = args[2].toFloat()
         val title = "§6" + args.drop(3).joinToString(" ").replace("&", "§")
 
-        sendTitle(title, subtitleText = null, duration, height, fontSize, location)
+        sendTitle(
+            title,
+            subtitleText = null,
+            duration = duration,
+            height,
+            fontSize,
+            location,
+            countDownDisplayType = if (countdown) CountdownTitleDisplayType.PARTIAL_SECONDS else null,
+        )
     }
 
     @HandleEvent

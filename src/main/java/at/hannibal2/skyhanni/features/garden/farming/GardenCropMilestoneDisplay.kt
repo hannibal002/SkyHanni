@@ -248,11 +248,16 @@ object GardenCropMilestoneDisplay {
     }
 
     private fun tryWarn(timeLeft: Duration, title: String) {
-        if (!config.warnClose) return
-        if (GardenCropSpeed.lastBrokenTime.passedSince() > 500.milliseconds) return
-        if (timeLeft > 5.9.seconds) return
+        val isConfigEnabled = config.warnClose
+        val isCropBreakEnabled = (GardenCropSpeed.lastBrokenTime.passedSince() < 500.milliseconds)
+        val isTimeLeftValid = timeLeft <= 6.seconds
 
-        if (countdownTitleContext?.endTime?.isInPast() == true) countdownTitleContext = null
+        if (!isConfigEnabled || !isCropBreakEnabled || !isTimeLeftValid) {
+            countdownTitleContext?.stop()
+            countdownTitleContext = null
+            return
+        }
+
         if (!needsInventory && countdownTitleContext == null) {
             countdownTitleContext = TitleManager.sendTitle(
                 title,
@@ -261,7 +266,7 @@ object GardenCropMilestoneDisplay {
                 countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
                 onInterval = SoundUtils::playBeepSound
             )
-        }
+        } else if (countdownTitleContext?.endTime?.isInPast() == true) countdownTitleContext = null
     }
 
     private fun formatDisplay(lineMap: MutableMap<MilestoneTextEntry, Renderable>): List<Renderable> {
