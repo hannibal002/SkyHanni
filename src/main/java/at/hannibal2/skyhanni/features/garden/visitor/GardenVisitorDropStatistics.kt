@@ -37,9 +37,12 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
+private typealias VisitorDrops = ProfileSpecificStorage.GardenStorage.VisitorDrops
+
 @SkyHanniModule
 object GardenVisitorDropStatistics {
 
+    private val patternGroup = RepoPattern.group("garden.visitor.droptracker")
     private val config get() = GardenApi.config.visitors.dropsStatistics
     private val visitorRarityEntries: List<LorenzRarity> = listOf(
         LorenzRarity.UNCOMMON,
@@ -48,11 +51,11 @@ object GardenVisitorDropStatistics {
         LorenzRarity.MYTHIC,
         LorenzRarity.SPECIAL,
     )
+
     private var display = emptyList<Renderable>()
     private var lastAccept = SimpleTimeMark.farPast()
 
-    private val patternGroup = RepoPattern.group("garden.visitor.droptracker")
-
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: OFFER ACCEPTED with Duke (UNCOMMON)
      */
@@ -108,6 +111,16 @@ object GardenVisitorDropStatistics {
         "powder.gemstone",
         "[+](?<amount>.*) Gemstone Powder",
     )
+    // </editor-fold>
+
+    private val patternStorageAccessorMap: Map<Pattern, (VisitorDrops, Int) -> Unit> = mapOf(
+        copperPattern to { storage, amount -> storage.copper += amount },
+        farmingExpPattern to { storage, amount -> storage.farmingExp += amount },
+        gardenExpPattern to { storage, amount -> storage.gardenExp += amount },
+        bitsPattern to { storage, amount -> storage.bits += amount },
+        mithrilPowderPattern to { storage, amount -> storage.mithrilPowder += amount },
+        gemstonePowderPattern to { storage, amount -> storage.gemstonePowder += amount },
+    )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onVisitorAccepted(event: VisitorAcceptedEvent) {
@@ -131,15 +144,6 @@ object GardenVisitorDropStatistics {
             saveAndUpdate()
         }
     }
-
-    private val patternStorageAccessorMap: Map<Pattern, (ProfileSpecificStorage.GardenStorage.VisitorDrops, Int) -> Unit> = mapOf(
-        copperPattern to { storage, amount -> storage.copper += amount },
-        farmingExpPattern to { storage, amount -> storage.farmingExp += amount },
-        gardenExpPattern to { storage, amount -> storage.gardenExp += amount },
-        bitsPattern to { storage, amount -> storage.bits += amount },
-        mithrilPowderPattern to { storage, amount -> storage.mithrilPowder += amount },
-        gemstonePowderPattern to { storage, amount -> storage.gemstonePowder += amount },
-    )
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -165,17 +169,14 @@ object GardenVisitorDropStatistics {
         }
     }
 
-    private val transformMap: Map<
-        DropsStatisticsTextEntry,
-        (ProfileSpecificStorage.GardenStorage.VisitorDrops, MutableList<Renderable>) -> Unit,
-        > = buildMap {
+    private val transformMap: Map<DropsStatisticsTextEntry, (VisitorDrops, MutableList<Renderable>) -> Unit> = buildMap {
         VisitorReward.entries.forEach { reward ->
             val textEntryOption = reward.toStatsTextEntryOrNull() ?: return@forEach
-            val transFormer: (ProfileSpecificStorage.GardenStorage.VisitorDrops, MutableList<Renderable>) -> Unit = { storage, list ->
+            val transformer: (VisitorDrops, MutableList<Renderable>) -> Unit = { storage, list ->
                 val count = storage.rewardsCount[reward] ?: 0
                 list.addString(format(count, reward.displayName, "§b"))
             }
-            add(Pair(textEntryOption, transFormer))
+            add(textEntryOption to transformer)
         }
 
         addAll(
@@ -300,7 +301,7 @@ object GardenVisitorDropStatistics {
         }
 
         // Was a list of longs, now a map of rarity to count
-        event.transform(79, "#garden.visitorDrops.visitorRarities") { element ->
+        event.transform(79, "#profile.garden.visitorDrops.visitorRarities") { element ->
             val list = element.asJsonArray.map { it.asLong }.toMutableList()
 
             // Adding the mythic rarity between legendary and special, if missing

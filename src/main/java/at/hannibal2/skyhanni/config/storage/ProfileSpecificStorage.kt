@@ -437,6 +437,7 @@ class ProfileSpecificStorage {
         @Expose
         var visitorDrops: VisitorDrops = VisitorDrops()
 
+        // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
         class VisitorDrops {
             @Expose
             var acceptedVisitors: Int = 0
@@ -447,7 +448,7 @@ class ProfileSpecificStorage {
             fun getTotalVisitors() = acceptedVisitors + deniedVisitors
 
             @Expose
-            var visitorRarities: MutableMap<LorenzRarity, Long> = mutableMapOf()
+            var visitorRarities: MutableMap<LorenzRarity, Long> = enumMapOf()
 
             @Expose
             var copper: Int = 0
