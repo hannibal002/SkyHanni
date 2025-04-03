@@ -1,4 +1,6 @@
-package at.hannibal2.skyhanni.features.garden.pests
+package at.hannibal2.skyhanni.features.garden.pests.stereo
+
+import at.hannibal2.skyhanni.utils.NeuInternalName
 
 enum class VinylType(val displayName: String) {
     PRETTY_FLY("Pretty Fly"),
@@ -16,7 +18,9 @@ enum class VinylType(val displayName: String) {
     ;
 
     companion object {
-
         fun getByName(name: String) = VinylType.entries.firstOrNull { it.displayName == name } ?: NONE
+        fun getByInternalNameOrNull(internalName: NeuInternalName) = VinylType.entries.firstOrNull {
+            internalName.asString() == "VINYL_${it.name}"
+        }
     }
 }
