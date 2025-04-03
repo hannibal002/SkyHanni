@@ -15,7 +15,7 @@ open class ResettableStorageSet {
     private val mutableMemberProperties: List<KMutableProperty1<Any, Any?>> =
         this::class.memberProperties.filter {
             it.visibility == KVisibility.PUBLIC
-        } .filterIsInstance<KMutableProperty1<Any, Any?>>()
+        }.filterIsInstance<KMutableProperty1<Any, Any?>>()
 
     open fun reset() = applyFromOther(this::class.createInstance())
 
