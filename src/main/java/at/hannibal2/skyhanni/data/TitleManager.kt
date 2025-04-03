@@ -47,15 +47,11 @@ object TitleManager {
         var fontSize: Float = 4f,
         val weight: Double = 1.0,
     ) {
-        open var endTime: SimpleTimeMark = SimpleTimeMark.now() + duration
-
+        open var endTime: SimpleTimeMark = SimpleTimeMark.farPast()
         open fun getTitleText(): String = titleText
         open fun getSubtitleText(): String? = subtitleText
-        open fun start() { /* No-op */ }
-
-        open fun stop() {
-            endTime = SimpleTimeMark.farPast()
-        }
+        open fun start() { endTime = SimpleTimeMark.now() + duration }
+        open fun stop() { endTime = SimpleTimeMark.farPast() }
     }
 
     enum class CountdownTitleDisplayType(private val displayName: String) {
@@ -66,6 +62,7 @@ object TitleManager {
         override fun toString() = displayName
     }
 
+    // Change: In CountdownTitleContext, make virtualEndTime mutable and set timers on start()
     private data class CountdownTitleContext(
         var formattedTitleText: String = "",
         var formattedSubtitleText: String? = null,
@@ -76,27 +73,28 @@ object TitleManager {
         var onInterval: () -> Unit = {},
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
+
+        // Remove initial timer calculation—these will be set when start() is called.
+        private var virtualEndTime: SimpleTimeMark = SimpleTimeMark.farPast()
+        private var virtualTimeLeftFormat: String = getTimeLeftFormat()
+
+        private val internalUpdateInterval: Duration = 100.milliseconds.takeIf {
+            it < updateInterval
+        } ?: updateInterval
+
         private fun getTimeLeftFormat(): String = when (displayType) {
             CountdownTitleDisplayType.WHOLE_SECONDS -> virtualEndTime.timeUntil().inWholeSeconds
             CountdownTitleDisplayType.PARTIAL_SECONDS -> virtualEndTime.timeUntil().inPartialSeconds.roundTo(1)
         }.toString()
 
-        override var endTime: SimpleTimeMark = SimpleTimeMark.now() + countdownDuration + loomInterval
-        private val virtualEndTime: SimpleTimeMark = SimpleTimeMark.now() + countdownDuration
-        private var virtualTimeLeftFormat: String = getTimeLeftFormat()
-        private val internalUpdateInterval: Duration = 100.milliseconds.takeIf {
-            it < updateInterval
-        } ?: updateInterval
-
         override fun getTitleText(): String = formattedTitleText.replace("%t", virtualTimeLeftFormat)
         override fun getSubtitleText(): String? = formattedSubtitleText?.replace("%t", virtualTimeLeftFormat)
-
         override fun start() {
-            super.start()
+            virtualEndTime = SimpleTimeMark.now() + countdownDuration
+            endTime = virtualEndTime + loomInterval
             onIntervalOutward()
             onIntervalInternal()
         }
-
         override fun stop() {
             super.stop()
             onFinish()
