@@ -228,7 +228,7 @@ object EnderNodeTracker {
         else -> 0.0
     }
 
-    private val transformMap: Map<EnderNodeDisplayEntry, (Data, MutableList<Searchable>, EnderNode) -> Unit> = buildMap {
+    private val transformMap: Map<EnderNodeDisplayEntry, (Data, MutableList<Searchable>, EnderNode?) -> Unit> = buildMap {
         add(EnderNodeDisplayEntry.TITLE to { _, list, _ -> list.addSearchString("§5§lEnder Node Tracker") })
         add(EnderNodeDisplayEntry.NODES_MINED to { data, list, _ ->
             list.addSearchString("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
@@ -242,6 +242,7 @@ object EnderNodeTracker {
         })
 
         addFromNodeEntries(EnderNode.miscEntries) { data, list, nodeItem ->
+            if (nodeItem == null) return@addFromNodeEntries
             val count = (data.lootCount[nodeItem] ?: 0).addSeparators()
             list.addSearchString("§b$count ${nodeItem.displayName}", nodeItem.displayName)
         }
@@ -255,6 +256,7 @@ object EnderNodeTracker {
         })
 
         addFromNodeEntries(EnderNode.armorEntries) { data, list, nodeItem ->
+            if (nodeItem == null) return@addFromNodeEntries
             val lootProfit = getLootProfit(data)
             val count = (data.lootCount[nodeItem] ?: 0).addSeparators()
             val profit = (lootProfit[nodeItem] ?: 0.0).shortFormat()
@@ -269,9 +271,9 @@ object EnderNodeTracker {
         })
     }
 
-    private fun MutableMap<EnderNodeDisplayEntry, (Data, MutableList<Searchable>, EnderNode) -> Unit>.addFromNodeEntries(
+    private fun MutableMap<EnderNodeDisplayEntry, (Data, MutableList<Searchable>, EnderNode?) -> Unit>.addFromNodeEntries(
         entries: List<EnderNode>,
-        invoker: (Data, MutableList<Searchable>, EnderNode) -> Unit,
+        invoker: (Data, MutableList<Searchable>, EnderNode?) -> Unit,
     ) = entries.forEach { node ->
         val configItem = node.toEnderNodeDisplayEntryOrNull() ?: return@forEach
         add(configItem to invoker)
@@ -280,7 +282,7 @@ object EnderNodeTracker {
     private fun drawDisplay(data: Data) = buildList {
         for (enabledOption in config.textFormat.get()) {
             val transformer = transformMap[enabledOption] ?: continue
-            val nodeItem = EnderNode.entries.find { it.toEnderNodeDisplayEntryOrNull() == enabledOption } ?: continue
+            val nodeItem = enabledOption.toEnderNodeOrNull()
             transformer(data, this, nodeItem)
         }
     }

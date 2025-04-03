@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.config.features.combat.end
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNode
+import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -82,6 +84,10 @@ class EnderNodeConfig {
 
         override fun getLegacyId() = legacyId
         override fun toString() = displayName
+
+        fun toEnderNodeOrNull(): EnderNode? = EnderNode.entries.firstOrNull {
+            it.toEnderNodeDisplayEntryOrNull() == this
+        }
     }
 
     @Expose
