@@ -253,6 +253,8 @@ object GardenVisitorDropStatistics {
         val storage = GardenApi.storage?.visitorDrops ?: return
         ChatUtils.clickableChat(
             "Click here to reset Visitor Drops Statistics.",
+            // Todo: Make the storage class extend `ResettableStorageSet`, so this can just be a .reset() call
+            //  This should happen at the same time as the tracker migration - see #profile.garden.visitorDrops
             onClick = {
                 storage.copper = 0
                 storage.bits = 0
