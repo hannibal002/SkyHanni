@@ -10,4 +10,4 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack
  * @param oldStacks The previous stacks of items in the inventory.
  * @param newStacks The current stacks of items in the inventory.
  */
-class InventoryChangeEvent(oldStacks: Array<PrimitiveItemStack?>, newStacks: Array<PrimitiveItemStack?>) : SkyHanniEvent()
+class InventoryChangeEvent(val oldStacks: Array<PrimitiveItemStack?>, val newStacks: Array<PrimitiveItemStack?>) : SkyHanniEvent()
