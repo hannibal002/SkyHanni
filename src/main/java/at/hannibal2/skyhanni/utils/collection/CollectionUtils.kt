@@ -312,6 +312,12 @@ object CollectionUtils {
         this[pair.first] = pair.second
     }
 
+    fun <K, V> MutableMap<K, V>.addAll(vararg pairs: Pair<K, V>) {
+        for (pair in pairs) {
+            this[pair.first] = pair.second
+        }
+    }
+
     fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {
         val iterator = this.iterator()
         while (iterator.hasNext()) {

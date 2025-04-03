@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class DropsStatisticsConfig {
     @Expose
@@ -23,24 +23,25 @@ class DropsStatisticsConfig {
     @Expose
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var textFormat: MutableList<DropsStatisticsTextEntry> = mutableListOf(
-        DropsStatisticsTextEntry.TITLE,
-        DropsStatisticsTextEntry.TOTAL_VISITORS,
-        DropsStatisticsTextEntry.VISITORS_BY_RARITY,
-        DropsStatisticsTextEntry.ACCEPTED,
-        DropsStatisticsTextEntry.DENIED,
-        DropsStatisticsTextEntry.SPACER_1,
-        DropsStatisticsTextEntry.COPPER,
-        DropsStatisticsTextEntry.FARMING_EXP,
-        DropsStatisticsTextEntry.COINS_SPENT,
-        DropsStatisticsTextEntry.OVERGROWN_GRASS,
-        DropsStatisticsTextEntry.GREEN_BANDANA,
-        DropsStatisticsTextEntry.DEDICATION_IV,
-        DropsStatisticsTextEntry.COPPER_DYE
+    var textFormat: Property<MutableList<DropsStatisticsTextEntry>> = Property.of(
+        mutableListOf(
+            DropsStatisticsTextEntry.TITLE,
+            DropsStatisticsTextEntry.TOTAL_VISITORS,
+            DropsStatisticsTextEntry.VISITORS_BY_RARITY,
+            DropsStatisticsTextEntry.ACCEPTED,
+            DropsStatisticsTextEntry.DENIED,
+            DropsStatisticsTextEntry.SPACER_1,
+            DropsStatisticsTextEntry.COPPER,
+            DropsStatisticsTextEntry.FARMING_EXP,
+            DropsStatisticsTextEntry.COINS_SPENT,
+            DropsStatisticsTextEntry.OVERGROWN_GRASS,
+            DropsStatisticsTextEntry.GREEN_BANDANA,
+            DropsStatisticsTextEntry.DEDICATION_IV,
+            DropsStatisticsTextEntry.COPPER_DYE
+        )
     )
 
     /**
-     * Do not change the order of the enums added to that list! New items are to be synced up with the implementation in GardenVisitorDropStatistics.drawDisplay.
      * Generic non VisitorReward stuff belongs in front of the first VisitorReward.
      */
     enum class DropsStatisticsTextEntry
@@ -64,6 +65,7 @@ class DropsStatisticsConfig {
         GEMSTONE_POWDER("§d18k Gemstone Powder", 21),
 
         // VisitorReward items
+        // Todo: Make these names actually in sync with the VisitorReward enum entries
         FLOWERING_BOUQUET("§b23 §9Flowering Bouquet", 9),
         OVERGROWN_GRASS("§b4 §9Overgrown Grass", 10),
         GREEN_BANDANA("§b2 §5Green Bandana", 11),
@@ -74,6 +76,8 @@ class DropsStatisticsConfig {
         REPLENISH_I("§b1 §9Replenish I", 16),
         DELICATE("§b1 §9Delicate V"),
         COPPER_DYE("§b1 §8Copper Dye"),
+        JUNGLE_KEY("§b1 §5Jungle Key"),
+        FRUIT_BOWL("§b1 §9Fruit Bowl"),
         ;
 
         override fun getLegacyId() = legacyId

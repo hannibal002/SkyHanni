@@ -444,6 +444,8 @@ class ProfileSpecificStorage {
             @Expose
             var deniedVisitors: Int = 0
 
+            fun getTotalVisitors() = acceptedVisitors + deniedVisitors
+
             @Expose
             var visitorRarities: MutableMap<LorenzRarity, Long> = mutableMapOf()
 
@@ -469,7 +471,7 @@ class ProfileSpecificStorage {
             var gemstonePowder: Long = 0
 
             @Expose
-            var rewardsCount: Map<VisitorReward, Int> = enumMapOf()
+            var rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
         }
 
         @Expose

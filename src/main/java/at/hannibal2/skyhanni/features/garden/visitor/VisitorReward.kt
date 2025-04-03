@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.HasLegacyId
+import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+
+private typealias StatsEntry = DropsStatisticsConfig.DropsStatisticsTextEntry
 
 enum class VisitorReward(
     rawInternalName: String,
@@ -31,6 +34,21 @@ enum class VisitorReward(
 
     companion object {
         fun getByInternalName(internalName: NeuInternalName) = entries.firstOrNull { it.internalName == internalName }
+    }
+
+    // Todo: Remove this when enum names of this and DropsStatisticsTextEntry are in sync
+    fun toStatsTextEntryOrNull() = when(this) {
+        DEDICATION -> StatsEntry.DEDICATION_IV
+        MUSIC_RUNE -> StatsEntry.MUSIC_RUNE_I
+        CULTIVATING -> StatsEntry.CULTIVATING_I
+        REPLENISH -> StatsEntry.REPLENISH_I
+        else -> {
+            try {
+                StatsEntry.valueOf(name)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
     }
 
     override fun getLegacyId() = legacyId
