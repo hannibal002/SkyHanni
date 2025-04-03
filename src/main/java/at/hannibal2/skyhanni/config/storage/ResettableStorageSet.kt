@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.storage
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KVisibility
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -12,7 +13,9 @@ import kotlin.reflect.jvm.javaField
  */
 open class ResettableStorageSet {
     private val mutableMemberProperties: List<KMutableProperty1<Any, Any?>> =
-        this::class.memberProperties.filterIsInstance<KMutableProperty1<Any, Any?>>()
+        this::class.memberProperties.filter {
+            it.visibility == KVisibility.PUBLIC
+        } .filterIsInstance<KMutableProperty1<Any, Any?>>()
 
     open fun reset() = applyFromOther(this::class.createInstance())
 
