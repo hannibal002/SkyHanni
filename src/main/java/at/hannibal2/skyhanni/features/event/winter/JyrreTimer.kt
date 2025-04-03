@@ -24,9 +24,13 @@ import kotlin.time.Duration.Companion.seconds
 object JyrreTimer {
 
     private val config get() = SkyHanniMod.feature.event.winter.jyrreTimer
+
+    /**
+     * REGEX-TEST: §7You consumed a §r§6Refined Bottle of Jyrre §r§7and gained §r§b+300✎ Intelligence §r§7for §r§a60m§r§7!
+     */
     private val drankBottlePattern by RepoPattern.pattern(
         "event.winter.drank.jyrre",
-        "§aYou drank a §r§6Refined Bottle of Jyrre §r§aand gained §r§b\\+300✎ Intelligence §r§afor §r§b60 minutes§r§a!",
+        "§7You consumed a §r§6Refined Bottle of Jyrre §r§7and gained §r§b\\+300✎ Intelligence §r§7for §r§a60m§r§7!",
     )
     private var display: Renderable? = null
     private var duration = 0.seconds
