@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestProfitTrackerConfig
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemSources
+import at.hannibal2.skyhanni.data.ItemSource
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -135,7 +135,7 @@ object PestProfitTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemAdd(event: ItemAddEvent) {
-        if (!config.enabled || event.source != ItemSources.Source.COMMAND) return
+        if (!config.enabled || event.source != ItemSource.COMMAND) return
         with(tracker) { event.addItemFromEvent() }
     }
 

@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemSources
+import at.hannibal2.skyhanni.data.ItemSource
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -76,7 +76,7 @@ object CorpseTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemSources.Source.COMMAND) return
+        if (!isEnabled() || event.source != ItemSource.COMMAND) return
         with(tracker) { event.addItemFromEvent() }
     }
 

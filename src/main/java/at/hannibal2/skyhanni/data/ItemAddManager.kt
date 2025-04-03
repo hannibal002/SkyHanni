@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ItemSources.ExactSource
-import at.hannibal2.skyhanni.data.ItemSources.Source
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -58,7 +56,7 @@ object ItemAddManager {
             val change = sackChange.delta
             val internalName = sackChange.internalName
             if (change > 0 && internalName !in superCraftedItems) {
-                Source.SACKS.addItem(internalName, change, exactSource = ExactSource.SACKS)
+                ItemSource.SACKS.addItem(internalName, change)
             }
         }
         superCraftedItems.clear()
@@ -74,11 +72,11 @@ object ItemAddManager {
             }
         }
 
-        Source.ITEM_ADD.addItem(internalName, event.amount)
+        ItemSource.UNKNOWN.addItem(internalName, event.amount)
     }
 
-    private fun Source.addItem(internalName: NeuInternalName, amount: Int, exactSource: ExactSource = ExactSource.NONE) {
-        ItemAddEvent(internalName, amount, this, exactSource).post()
+    private fun ItemSource.addItem(internalName: NeuInternalName, amount: Int) {
+        ItemAddEvent(internalName, amount, this).post()
     }
 
     private var lastDiceRoll = SimpleTimeMark.farPast()

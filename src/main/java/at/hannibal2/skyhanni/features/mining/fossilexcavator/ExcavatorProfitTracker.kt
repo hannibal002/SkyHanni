@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemSources
+import at.hannibal2.skyhanni.data.ItemSource
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
@@ -165,7 +165,7 @@ object ExcavatorProfitTracker {
         if (!isEnabled()) return
 
         val internalName = event.internalName
-        if (event.source == ItemSources.Source.COMMAND) {
+        if (event.source == ItemSource.COMMAND) {
             tryAddItem(internalName, event.amount, command = true)
         }
     }

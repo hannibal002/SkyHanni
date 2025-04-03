@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ItemSources
+import at.hannibal2.skyhanni.data.ItemSource
 import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -143,7 +143,7 @@ object BazaarApi {
                 // pickup items from bazaar order
                 OwnInventoryData.ignoreItem(1.seconds) { it == internalName }
                 ItemAddEvent(
-                    internalName, item.stackSize, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.BAZAAR,
+                    internalName, item.stackSize, ItemSource.BAZAAR,
                 ).post()
                 // prepare for cancel buy order as well
                 orderOptionProduct = internalName
@@ -155,7 +155,7 @@ object BazaarApi {
             val orderOptionProduct = orderOptionProduct
             if (orderOptionProduct != null) {
                 ItemAddEvent(
-                    orderOptionProduct, item.stackSize, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.REFUND,
+                    orderOptionProduct, item.stackSize, ItemSource.REFUND,
                 ).post()
             }
 
@@ -168,7 +168,7 @@ object BazaarApi {
                 val lastOpenedProduct = lastOpenedProduct
                 if (lastOpenedProduct != null) {
                     ItemAddEvent(
-                        lastOpenedProduct, item.stackSize, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.BAZAAR,
+                        lastOpenedProduct, item.stackSize, ItemSource.BAZAAR,
                     ).post()
                 }
             }

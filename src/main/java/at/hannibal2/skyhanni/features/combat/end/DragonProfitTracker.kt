@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.ItemSources
+import at.hannibal2.skyhanni.data.ItemSource
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DragonProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -120,7 +120,7 @@ object DragonProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemSources.Source.COMMAND) return
+        if (!isEnabled() || event.source != ItemSource.COMMAND) return
         with(tracker) { event.addItemFromEvent() }
         ChatUtils.debug("Added item to tracker: ${event.internalName} (amount: ${event.amount})")
     }

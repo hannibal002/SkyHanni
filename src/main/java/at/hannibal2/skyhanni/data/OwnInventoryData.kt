@@ -137,7 +137,7 @@ object OwnInventoryData {
                 val internalName = item?.getInternalNameOrNull() ?: return
                 val amount = item.stackSize
                 ignoreItem(5.seconds, internalName)
-                ItemAddEvent(internalName, amount, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.REFUND).post()
+                ItemAddEvent(internalName, amount, ItemSource.REFUND).post()
             }
         }
 
@@ -147,7 +147,7 @@ object OwnInventoryData {
             val internalName = item?.getInternalNameOrNull() ?: return
             val amount = item.stackSize
             ignoreItem(5.seconds, internalName)
-            ItemAddEvent(internalName, amount, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.AUCTION).post()
+            ItemAddEvent(internalName, amount, ItemSource.AUCTION).post()
         }
 
         // bought item from normal ah
@@ -155,7 +155,7 @@ object OwnInventoryData {
             val item = InventoryUtils.getItemAtSlotIndex(13)
             val internalName = item?.getInternalNameOrNull() ?: return
             ignoreItem(5.seconds, internalName)
-            ItemAddEvent(internalName, 1, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.AUCTION).post()
+            ItemAddEvent(internalName, 1, ItemSource.AUCTION).post()
         }
 
         // collected all items in "own bins"
@@ -165,7 +165,7 @@ object OwnInventoryData {
                     val internalName = stack.getInternalNameOrNull() ?: return
                     val amount = stack.stackSize
                     ignoreItem(5.seconds, internalName)
-                    ItemAddEvent(internalName, amount, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.AUCTION).post()
+                    ItemAddEvent(internalName, amount, ItemSource.AUCTION).post()
                 }
             }
         }
@@ -176,7 +176,7 @@ object OwnInventoryData {
                 val internalName = stack.getInternalNameOrNull() ?: continue
                 val amount = stack.stackSize
                 ignoreItem(5.seconds, internalName)
-                ItemAddEvent(internalName, amount, ItemSources.Source.ITEM_ADD, ItemSources.ExactSource.ANVIL).post()
+                ItemAddEvent(internalName, amount, ItemSource.ANVIL).post()
             }
         }
     }
@@ -189,7 +189,7 @@ object OwnInventoryData {
             val item = InventoryUtils.getItemAtSlotIndex(13)
             val internalName = item?.getInternalNameOrNull() ?: return@matchMatcher
             val amount = item.stackSize
-            ItemAddEvent(internalName, amount, ItemSources.Source.SACKS, ItemSources.ExactSource.SACKS).post()
+            ItemAddEvent(internalName, amount, ItemSource.SACKS).post()
         }
     }
 

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ItemSources
+import at.hannibal2.skyhanni.data.ItemSource
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
@@ -46,8 +46,7 @@ object MinionCollectLogic {
             val diff = amount - old
 
             if (diff > 0) {
-                ItemAddEvent(internalId, diff, ItemSources.Source.ITEM_ADD,
-                    ItemSources.ExactSource.MINION).post()
+                ItemAddEvent(internalId, diff, ItemSource.MINION).post()
             }
         }
 

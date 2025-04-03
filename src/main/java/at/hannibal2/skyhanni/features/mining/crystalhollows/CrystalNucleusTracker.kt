@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ItemSources
+import at.hannibal2.skyhanni.data.ItemSource
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -183,7 +183,7 @@ object CrystalNucleusTracker {
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 
-        if (event.source == ItemSources.Source.COMMAND) {
+        if (event.source == ItemSource.COMMAND) {
             tracker.addItem(event.internalName, event.amount, command = true)
         }
     }
