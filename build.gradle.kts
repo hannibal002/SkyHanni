@@ -244,7 +244,7 @@ afterEvaluate {
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
         this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
-        this.options.add(SubpluginOption("apoption", "skyhanni.sourceset=${target.minecraftVersion.versionName}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
         this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
     }
 }
