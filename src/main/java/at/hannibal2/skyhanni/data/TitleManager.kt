@@ -62,7 +62,6 @@ object TitleManager {
         override fun toString() = displayName
     }
 
-    // Change: In CountdownTitleContext, make virtualEndTime mutable and set timers on start()
     private data class CountdownTitleContext(
         var formattedTitleText: String = "",
         var formattedSubtitleText: String? = null,
@@ -73,19 +72,11 @@ object TitleManager {
         var onInterval: () -> Unit = {},
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
-
-        // Remove initial timer calculation—these will be set when start() is called.
         private var virtualEndTime: SimpleTimeMark = SimpleTimeMark.farPast()
         private var virtualTimeLeftFormat: String = getTimeLeftFormat()
-
         private val internalUpdateInterval: Duration = 100.milliseconds.takeIf {
             it < updateInterval
         } ?: updateInterval
-
-        private fun getTimeLeftFormat(): String = when (displayType) {
-            CountdownTitleDisplayType.WHOLE_SECONDS -> virtualEndTime.timeUntil().inWholeSeconds
-            CountdownTitleDisplayType.PARTIAL_SECONDS -> virtualEndTime.timeUntil().inPartialSeconds.roundTo(1)
-        }.toString()
 
         override fun getTitleText(): String = formattedTitleText.replace("%t", virtualTimeLeftFormat)
         override fun getSubtitleText(): String? = formattedSubtitleText?.replace("%t", virtualTimeLeftFormat)
@@ -99,6 +90,11 @@ object TitleManager {
             super.stop()
             onFinish()
         }
+
+        private fun getTimeLeftFormat(): String = when (displayType) {
+            CountdownTitleDisplayType.WHOLE_SECONDS -> virtualEndTime.timeUntil().inWholeSeconds
+            CountdownTitleDisplayType.PARTIAL_SECONDS -> virtualEndTime.timeUntil().inPartialSeconds.roundTo(1)
+        }.toString()
 
         private fun onIntervalOutward() {
             if (endTime.isInPast()) return
