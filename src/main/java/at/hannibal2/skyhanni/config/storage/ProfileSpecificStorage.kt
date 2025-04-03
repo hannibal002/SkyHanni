@@ -445,7 +445,7 @@ class ProfileSpecificStorage {
             var deniedVisitors: Int = 0
 
             @Expose
-            var visitorRarities: MutableList<Long> = mutableListOf()
+            var visitorRarities: MutableMap<LorenzRarity, Long> = mutableMapOf()
 
             @Expose
             var copper: Int = 0

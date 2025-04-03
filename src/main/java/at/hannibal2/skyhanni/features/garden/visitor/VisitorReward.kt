@@ -30,15 +30,9 @@ enum class VisitorReward(
 //     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }
 
     companion object {
-
         fun getByInternalName(internalName: NeuInternalName) = entries.firstOrNull { it.internalName == internalName }
     }
 
-    override fun getLegacyId(): Int {
-        return legacyId
-    }
-
-    override fun toString(): String {
-        return displayName
-    }
+    override fun getLegacyId() = legacyId
+    override fun toString() = displayName
 }

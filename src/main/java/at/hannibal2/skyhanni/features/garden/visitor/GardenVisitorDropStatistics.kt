@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.EnumUtils
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -34,19 +35,27 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenVisitorDropStatistics {
 
     private val config get() = GardenApi.config.visitors.dropsStatistics
+    private val visitorRarityEntries: List<LorenzRarity> = listOf(
+        LorenzRarity.COMMON,
+        LorenzRarity.UNCOMMON,
+        LorenzRarity.RARE,
+        LorenzRarity.EPIC,
+        LorenzRarity.LEGENDARY,
+    )
     private var display = emptyList<Renderable>()
 
     private var acceptedVisitors = 0
-    var deniedVisitors = 0
     private var totalVisitors = 0
-    var coinsSpent = 0L
 
+    var deniedVisitors = 0
+    var coinsSpent = 0L
     var lastAccept = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("garden.visitor.droptracker")
@@ -128,6 +137,15 @@ object GardenVisitorDropStatistics {
         }
     }
 
+    private val patternStorageAccessorMap: Map<Pattern, (ProfileSpecificStorage.GardenStorage.VisitorDrops, Int) -> Unit> = mapOf(
+        copperPattern to { storage, amount -> storage.copper += amount },
+        farmingExpPattern to { storage, amount -> storage.farmingExp += amount },
+        gardenExpPattern to { storage, amount -> storage.gardenExp += amount },
+        bitsPattern to { storage, amount -> storage.bits += amount },
+        mithrilPowderPattern to { storage, amount -> storage.mithrilPowder += amount },
+        gemstonePowderPattern to { storage, amount -> storage.gemstonePowder += amount },
+    )
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!GardenApi.onBarnPlot) return
@@ -137,52 +155,19 @@ object GardenVisitorDropStatistics {
         val message = event.message.removeColor().trim()
         val storage = GardenApi.storage?.visitorDrops ?: return
 
-        copperPattern.matchMatcher(message) {
-            val amount = group("amount").formatInt()
-            storage.copper += amount
-            saveAndUpdate()
+        patternStorageAccessorMap.forEach { (pattern, accessor) ->
+            pattern.matchMatcher(message) {
+                val amount = group("amount").formatInt()
+                accessor.invoke(storage, amount)
+            }
         }
-        farmingExpPattern.matchMatcher(message) {
-            val amount = group("amount").formatInt()
-            storage.farmingExp += amount
-            saveAndUpdate()
-        }
-        gardenExpPattern.matchMatcher(message) {
-            val amount = group("amount").formatInt()
-            if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
-            storage.gardenExp += amount
-            saveAndUpdate()
-        }
-        bitsPattern.matchMatcher(message) {
-            val amount = group("amount").formatInt()
-            storage.bits += amount
-            saveAndUpdate()
-        }
-        mithrilPowderPattern.matchMatcher(message) {
-            val amount = group("amount").formatInt()
-            storage.mithrilPowder += amount
-            saveAndUpdate()
-        }
-        gemstonePowderPattern.matchMatcher(message) {
-            val amount = group("amount").formatInt()
-            storage.gemstonePowder += amount
-            saveAndUpdate()
-        }
-        acceptPattern.matchMatcher(message) {
-            setRarities(group("rarity"))
-            saveAndUpdate()
-        }
-    }
 
-    private fun setRarities(rarity: String) {
-        acceptedVisitors += 1
-        val currentRarity = EnumUtils.enumValueOf<VisitorRarity>(rarity)
-        val visitorRarities = GardenApi.storage?.visitorDrops?.visitorRarities ?: return
-        fixRaritiesSize(visitorRarities)
-        // TODO, change functionality to use enum rather than ordinals
-        val temp = visitorRarities[currentRarity.ordinal] + 1
-        visitorRarities[currentRarity.ordinal] = temp
-        saveAndUpdate()
+        acceptPattern.matchMatcher(message) {
+            acceptedVisitors += 1
+            val rarity = LorenzRarity.getByName(group("rarity")) ?: return@matchMatcher
+            storage.visitorRarities.addOrPut(rarity, 1)
+            saveAndUpdate()
+        }
     }
 
     /**
@@ -192,14 +177,11 @@ object GardenVisitorDropStatistics {
         addString("§e§lVisitor Statistics")
         addString(format(totalVisitors, "Total", "§e", ""))
         val visitorRarities = storage.visitorRarities
-        fixRaritiesSize(visitorRarities)
         if (visitorRarities.isNotEmpty()) {
             addString(
-                "§a${visitorRarities[0].addSeparators()}§f-" +
-                    "§9${visitorRarities[1].addSeparators()}§f-" +
-                    "§6${visitorRarities[2].addSeparators()}§f-" +
-                    "§d${visitorRarities[3].addSeparators()}§f-" +
-                    "§c${visitorRarities[4].addSeparators()}",
+                visitorRarityEntries.joinToString("§f-") { rarity ->
+                    "§${rarity.chatColorCode}${visitorRarities[rarity]?.addSeparators().orEmpty()}"
+                },
             )
         } else {
             addString("§c?")
@@ -240,15 +222,6 @@ object GardenVisitorDropStatistics {
             } else { // No Icons
                 addString(format(count, reward.displayName, "§b"))
             }
-        }
-    }
-
-    // Adding the mythic rarity between legendary and special, if missing
-    private fun fixRaritiesSize(list: MutableList<Long>) {
-        if (list.size == 4) {
-            val special = list.last()
-            list[3] = 0L
-            list.add(special)
         }
     }
 
@@ -296,7 +269,7 @@ object GardenVisitorDropStatistics {
                 storage.gardenExp = 0
                 storage.gemstonePowder = 0
                 storage.mithrilPowder = 0
-                storage.visitorRarities = arrayListOf(0, 0, 0, 0, 0)
+                storage.visitorRarities = mutableMapOf()
                 storage.rewardsCount = mapOf<VisitorReward, Int>()
                 ChatUtils.chat("Visitor Drop Statistics reset!")
                 saveAndUpdate()
@@ -308,14 +281,6 @@ object GardenVisitorDropStatistics {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val storage = GardenApi.storage?.visitorDrops ?: return
-        val visitorRarities = storage.visitorRarities
-        if (visitorRarities.size == 0) {
-            visitorRarities.add(0)
-            visitorRarities.add(0)
-            visitorRarities.add(0)
-            visitorRarities.add(0)
-            visitorRarities.add(0)
-        }
         acceptedVisitors = storage.acceptedVisitors
         deniedVisitors = storage.deniedVisitors
         totalVisitors = acceptedVisitors + deniedVisitors
@@ -346,6 +311,25 @@ object GardenVisitorDropStatistics {
         event.transform(11, "${newPrefix}textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, DropsStatisticsTextEntry::class.java)
         }
+
+        // Was a list of longs, now a map of rarity to count
+        event.transform(79, "#garden.visitorDrops.visitorRarities") { element ->
+            val list = element.asJsonArray.map { it.asLong }.toMutableList()
+
+            // Adding the mythic rarity between legendary and special, if missing
+            if (list.size == 4) {
+                val special = list.last()
+                list[3] = 0L
+                list.add(special)
+            }
+
+            val map = mutableMapOf<LorenzRarity, Long>()
+            for ((index, rarity) in visitorRarityEntries.withIndex()) {
+                map[rarity] = list[index]
+            }
+
+            ConfigManager.gson.toJsonTree(map)
+        }
     }
 
     @HandleEvent
@@ -356,12 +340,4 @@ object GardenVisitorDropStatistics {
             callback { resetCommand() }
         }
     }
-}
-
-enum class VisitorRarity {
-    UNCOMMON,
-    RARE,
-    LEGENDARY,
-    MYTHIC,
-    SPECIAL,
 }
