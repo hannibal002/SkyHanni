@@ -47,6 +47,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
@@ -80,6 +81,8 @@ object DamageIndicatorManager {
 
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
+
+    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
 
     fun isDamageSplash(entity: EntityArmorStand): Boolean {
         if (entity.ticksExisted > 300) return false
@@ -225,8 +228,37 @@ object DamageIndicatorManager {
             }
             event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
 
+            val icons = iconCache.getOrPut(data) {
+                buildList {
+                    if (config.shurikenIndicator && entity.getNameTagWith(3, "§b✯") != null) {
+                        add(
+                            if (config.compactStatusEffects) "§b✯"
+                            else "§bShuriken",
+                        )
+                    }
+                    if (config.twilightIndicator && entity.getNameTagWith(3, "§5ᛤ") != null) {
+                        add(
+                            if (config.compactStatusEffects) "§5ᛤ"
+                            else "§5Twilight",
+                        )
+                    }
+                }
+            }
+
+            val iconString = icons.joinToString(if (config.compactStatusEffects) "" else " ")
+            var diff = 9f
+            if (iconString.isNotEmpty()) {
+                event.drawDynamicText(
+                    location,
+                    iconString,
+                    sizeBossName,
+                    diff,
+                    smallestDistanceVew = smallestDistanceVew,
+                )
+                diff += 22f
+            } else diff += 4f
+
             if (config.showDamageOverTime) {
-                var diff = 13f
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
                 if (currentDamage != 0L || currentHealing != 0L) {
