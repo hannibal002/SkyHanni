@@ -43,7 +43,6 @@ enum class EnderNode(
     companion object {
         val miscEntries = entries.filter { it.dropType == NodeDropType.MISC }
         val armorEntries = entries.filter { it.dropType == NodeDropType.ARMOR }
-        val petEntries = entries.filter { it.dropType == NodeDropType.PET }
     }
 
     // Todo: We really shouldn't have this - the enums should be in sync enough that we can 1:1 go name to name
