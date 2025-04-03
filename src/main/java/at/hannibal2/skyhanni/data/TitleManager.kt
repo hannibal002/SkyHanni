@@ -243,23 +243,25 @@ object TitleManager {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("TitleManager")
         event.addIrrelevant {
-            add("Title Location Queues" + titleLocationQueues.let { queues ->
-                queues.entries.joinToString("\n\n") { queue ->
-                    "${queue.key}:\n" + buildString {
-                        append("Title Queue: ${queue.value.size}\n")
-                        queue.value.forEach { title ->
-                            val titleItem = title.item
-                            append("Title: ${titleItem.getTitleText()}\n")
-                            append("Subtitle: ${titleItem.getSubtitleText()}\n")
-                            append("Duration: ${titleItem.duration.inWholeSeconds}s\n")
-                            append("Height: ${titleItem.height}\n")
-                            append("Font Size: ${titleItem.fontSize}\n")
-                            append("Weight: ${titleItem.weight}\n")
-                            append("End Time: ${titleItem.endTime.timeUntil().inWholeSeconds}s\n")
+            add(
+                "Title Location Queues" + titleLocationQueues.let { queues ->
+                    queues.entries.joinToString("\n\n") { queue ->
+                        "${queue.key}:\n" + buildString {
+                            append("Title Queue: ${queue.value.size}\n")
+                            queue.value.forEach { title ->
+                                val titleItem = title.item
+                                append("Title: ${titleItem.getTitleText()}\n")
+                                append("Subtitle: ${titleItem.getSubtitleText()}\n")
+                                append("Duration: ${titleItem.duration.inWholeSeconds}s\n")
+                                append("Height: ${titleItem.height}\n")
+                                append("Font Size: ${titleItem.fontSize}\n")
+                                append("Weight: ${titleItem.weight}\n")
+                                append("End Time: ${titleItem.endTime.timeUntil().inWholeSeconds}s\n")
+                            }
                         }
                     }
                 }
-            })
+            )
         }
     }
 
