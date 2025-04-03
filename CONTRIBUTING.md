@@ -319,7 +319,7 @@ For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002
 
 We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
 
-## Discord Bot
+### Discord Bot
 
 While not directly part of the Minecraft mod, it is useful to know that we have
 a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
