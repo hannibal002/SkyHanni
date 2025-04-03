@@ -85,8 +85,14 @@ class EnderNodeConfig {
         override fun getLegacyId() = legacyId
         override fun toString() = displayName
 
-        fun toEnderNodeOrNull(): EnderNode? = EnderNode.entries.firstOrNull {
-            it.toEnderNodeDisplayEntryOrNull() == this
+        companion object {
+            private val enderNodeCache: MutableMap<EnderNodeDisplayEntry, EnderNode?> = mutableMapOf()
+        }
+
+        fun toEnderNodeOrNull(): EnderNode? = enderNodeCache.getOrPut(this) {
+            EnderNode.entries.firstOrNull {
+                it.toEnderNodeDisplayEntryOrNull() == this
+            }
         }
     }
 
