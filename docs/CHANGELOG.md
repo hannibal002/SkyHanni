@@ -57,6 +57,7 @@
 + Automatically disables the Fishing Hotspot pathfinding when finding the spot. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3643)
 + Fishing Hotspots now warn in chat when an unknown Hotspot Location was found. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3649)
     + Clicking on the message allows sharing the data in Discord, so we can easily fix the bug.
++ Added Double Hook text to Rare Sea Creature Party Announcer. - Empa (https://github.com/hannibal002/SkyHanni/pull/3697)
 
 #### The Rift
 
@@ -140,6 +141,12 @@
 
 + Fixed Superpairs XP overlay not working. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3591)
 + Fixed XP in Inventory not displaying for Renew Experiments menu. - aphased (https://github.com/hannibal002/SkyHanni/pull/3648)
++ Fixed NEU Item List + Hypixel Item Description showing wrong percentages for Chimera. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3700)
++ Fixed titles in inventories overstaying their welcome. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3692)
+
+#### Dungeon
+
++ Fixed Custom Scoreboard showing the Dungeon Room ID twice. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3690)
 
 #### Misc
 
@@ -158,6 +165,15 @@
 + Fixed stray timer not resetting correctly on inventory closure. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3663)
 + Fixed Custom Scoreboard occasionally breaking completely on SkyBlock join. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3688)
 + Fixed titles appearing in wrong locations. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3686)
++ Fixed Bottle of Jyrre Timer. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3695)
++ Fixed Hypixel Mod API occasionally causing server kicks. - Empa (https://github.com/hannibal002/SkyHanni/pull/3698)
++ Fixed mod-wide keybinds (again). - Daveed (https://github.com/hannibal002/SkyHanni/pull/3691)
++ Fixed outdated spelling of Ironman Mode. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3701)
++ Fixed some waypoints rendering in the wrong position. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3693)
+    + Waypoints for Hoppity, Diana and Clicked Dungeon Blocks.
++ Fixed titles showing up on multiple lines. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3692)
++ Fixed TPS display showing values above 10. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3699)
+    + After the recent patch notes, the TPS is capped at 10 for performance reason reasons.
 
 ### Technical Details
 
