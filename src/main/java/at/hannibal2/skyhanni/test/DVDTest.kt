@@ -14,7 +14,7 @@ object DVDTest {
 
     private val dvdRenderable by lazy {
         DVDLogoRenderable(
-            renderable = Renderable.string("§zTest string", scale = 3.0),
+            renderable = Renderable.string("§zDVD Logo Test", scale = 3.0),
         )
     }
 
