@@ -374,4 +374,7 @@ object CollectionUtils {
     data class WeightedItem<T>(val item: T, val weight: Double) : Comparable<WeightedItem<T>> {
         override fun compareTo(other: WeightedItem<T>): Int = this.weight.compareTo(other.weight)
     }
+
+    fun <K, V> MutableMap<K, V>.countKeys(condition: (K) -> Boolean) = this.count { condition(it.key) }
+    fun <K, V> MutableMap<K, V>.countValues(condition: (V) -> Boolean) = this.count { condition(it.value) }
 }

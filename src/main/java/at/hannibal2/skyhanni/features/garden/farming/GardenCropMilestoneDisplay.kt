@@ -195,8 +195,7 @@ object GardenCropMilestoneDisplay {
                 val missingTime = (missing / farmingFortuneSpeed).seconds
                 val millis = missingTime.inWholeMilliseconds
                 GardenBestCropTime.timeTillNextCrop[crop] = millis
-                // TODO, change functionality to use enum rather than ordinals
-                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
+                val biggestUnit = config.highestTimeFormat.get().timeUnit
                 val duration = missingTime.format(biggestUnit)
                 tryWarn(millis, "§b${crop.cropName} $nextTier in $duration")
 
@@ -313,8 +312,7 @@ object GardenCropMilestoneDisplay {
             val blocksPerSecond = speed * (GardenApi.getCurrentlyFarmedCrop()?.multiplier ?: 1)
 
             val missingTime = (missing / blocksPerSecond).seconds
-            // TODO, change functionality to use enum rather than ordinals
-            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
+            val biggestUnit = config.highestTimeFormat.get().timeUnit
             val duration = missingTime.format(biggestUnit)
             lineMap[MushroomTextEntry.TIME] = Renderable.string("§7In §b$duration")
         }
