@@ -19,6 +19,7 @@ import java.io.OutputStreamWriter
 class ModuleProcessor(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
+    private val modVersion: String,
     private val mcVersion: String,
     private val buildPaths: String?,
 ) : SymbolProcessor {
@@ -35,6 +36,7 @@ class ModuleProcessor(
         if (!processedVersions.add(mcVersion)) {
             return emptyList()
         }
+        generateVersionConstants()
 
         skyHanniEvent =
             resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
@@ -159,5 +161,23 @@ class ModuleProcessor(
         }
 
         logger.warn("Generated LoadedModules file with ${symbols.size} modules")
+    }
+
+    private fun generateVersionConstants() {
+
+        val file = codeGenerator.createNewFile(
+            Dependencies(false),
+            "at.hannibal2.skyhanni.utils",
+            "VersionConstants",
+        )
+
+        OutputStreamWriter(file).use {
+            it.write("package at.hannibal2.skyhanni.utils\n\n")
+            it.write("object VersionConstants {\n")
+            it.write("    const val MOD_VERSION = \"$modVersion\"\n")
+            it.write("    const val MC_VERSION = \"$mcVersion\"\n")
+            it.write("}\n")
+        }
+        logger.warn("Generated VersionConstants file with mod version $modVersion and mc version $mcVersion")
     }
 }
