@@ -78,7 +78,7 @@ object SkyHanniMod {
     }
 
     const val MODID: String = "skyhanni"
-    const val VERSION: String = "@MOD_VERSION@"
+    const val VERSION: String = VersionWorkaround.mcVersion
 
     val modVersion: ModVersion = ModVersion.fromString(VERSION)
 
