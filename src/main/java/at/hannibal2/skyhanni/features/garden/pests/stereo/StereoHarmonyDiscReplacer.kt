@@ -33,7 +33,7 @@ object StereoHarmonyDiscReplacer {
         val vinylType = VinylType.getByInternalNameOrNull(internalName) ?: return
         val cropType = PestType.getByVinylOrNull(vinylType)?.crop ?: return
         val isActiveVinyl = StereoHarmonyDisplay.activeVinyl == vinylType
-        val iconId = "stereo_harmony_replacer:${vinylType.name}-${isActiveVinyl}"
+        val iconId = "stereo_harmony_replacer:${vinylType.name}-$isActiveVinyl"
 
         val replacementStack = iconCache.getOrPut(iconId) {
             cropType.getItemStackCopy(iconId).apply {
