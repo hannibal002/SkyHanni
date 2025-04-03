@@ -109,8 +109,7 @@ object GardenBestCropTime {
     private fun createCropEntry(crop: CropType, index: Int, useOverflow: Boolean, gardenExp: Boolean, currentCrop: CropType?): Renderable? {
         if (crop.isMaxed(useOverflow)) return null
         val millis = timeTillNextCrop[crop]?.milliseconds ?: return null
-        // TODO, change functionality to use enum rather than ordinals
-        val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
+        val biggestUnit = config.highestTimeFormat.get().timeUnit
         val duration = millis.format(biggestUnit, maxUnits = 2)
         val isCurrent = crop == currentCrop
         if (index > config.next.showOnlyBest && (!config.next.showCurrent || !isCurrent)) return null

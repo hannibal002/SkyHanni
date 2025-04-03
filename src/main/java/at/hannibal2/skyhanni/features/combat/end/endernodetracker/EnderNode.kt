@@ -48,7 +48,7 @@ enum class EnderNode(
 
     // Todo: We really shouldn't have this - the enums should be in sync enough that we can 1:1 go name to name
     //  Migrations to actually do this would be hell.
-    fun toEnderNodeDisplayEntryOrNull(): EnderNodeConfig.EnderNodeDisplayEntry? = when(this) {
+    fun toEnderNodeDisplayEntryOrNull(): EnderNodeConfig.EnderNodeDisplayEntry? = when (this) {
         ENCHANTED_ENDSTONE -> EnderNodeConfig.EnderNodeDisplayEntry.ENCHANTED_END_STONE
         ENCHANTED_OBSIDIAN -> EnderNodeConfig.EnderNodeDisplayEntry.ENCHANTED_OBSIDIAN
         ENCHANTED_ENDER_PEARL -> EnderNodeConfig.EnderNodeDisplayEntry.ENCHANTED_ENDER_PEARL

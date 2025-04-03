@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.countKeys
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -229,19 +230,33 @@ object EnderNodeTracker {
     }
 
     private val transformMap: Map<EnderNodeDisplayEntry, (Data, MutableList<Searchable>, EnderNode?) -> Unit> = buildMap {
-        add(EnderNodeDisplayEntry.TITLE to { _, list, _ -> list.addSearchString("§5§lEnder Node Tracker") })
-        add(EnderNodeDisplayEntry.NODES_MINED to { data, list, _ ->
-            list.addSearchString("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
-        })
-        add(EnderNodeDisplayEntry.COINS_MADE to { data, list, _ ->
-            list.addSearchString("§6${getLootProfit(data).values.sum().shortFormat()} Coins made")
-        })
-        add(EnderNodeDisplayEntry.ENDERMITE_NEST to { data, list, _ ->
-            list.addSearchString("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest", "Endermite Nest")
-        })
+        addAll(
+            EnderNodeDisplayEntry.TITLE to { _, list, _ -> list.addSearchString("§5§lEnder Node Tracker") },
+            EnderNodeDisplayEntry.NODES_MINED to { data, list, _ ->
+                list.addSearchString("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
+            },
+            EnderNodeDisplayEntry.COINS_MADE to { data, list, _ ->
+                list.addSearchString("§6${getLootProfit(data).values.sum().shortFormat()} Coins made")
+            },
+            EnderNodeDisplayEntry.ENDERMITE_NEST to { data, list, _ ->
+                list.addSearchString("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest", "Endermite Nest")
+            },
+            EnderNodeDisplayEntry.ENDER_ARMOR to { data, list, _ ->
+                val totalEnderArmor = data.lootCount.countKeys { it.isEnderArmor() }
+                list.addSearchString(
+                    "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)",
+                )
+            },
+            EnderNodeDisplayEntry.ENDERMAN_PET to { data, list, _ ->
+                val lootProfit = getLootProfit(data)
+                val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (data.lootCount[it] ?: 0).addSeparators() }
+                val profit = EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 }.shortFormat()
+                list.addSearchString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
+            },
 
-        add(EnderNodeDisplayEntry.SPACER_1 to { _, list, _ -> list.addSearchString(" ") })
-        add(EnderNodeDisplayEntry.SPACER_2 to { _, list, _ -> list.addSearchString(" ") })
+            EnderNodeDisplayEntry.SPACER_1 to { _, list, _ -> list.addSearchString(" ") },
+            EnderNodeDisplayEntry.SPACER_2 to { _, list, _ -> list.addSearchString(" ") },
+        )
 
         addFromNodeEntries(EnderNode.miscEntries) { data, list, nodeItem ->
             if (nodeItem == null) return@addFromNodeEntries
@@ -256,20 +271,6 @@ object EnderNodeTracker {
             val profit = (lootProfit[nodeItem] ?: 0.0).shortFormat()
             list.addSearchString("§b$count ${nodeItem.displayName} §7(§6$profit§7)")
         }
-
-        add(EnderNodeDisplayEntry.ENDER_ARMOR to { data, list, _ ->
-            val totalEnderArmor = data.lootCount.countKeys { it.isEnderArmor() }
-            list.addSearchString(
-                "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)",
-            )
-        })
-
-        add(EnderNodeDisplayEntry.ENDERMAN_PET to { data, list, _ ->
-            val lootProfit = getLootProfit(data)
-            val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (data.lootCount[it] ?: 0).addSeparators() }
-            val profit = EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 }.shortFormat()
-            list.addSearchString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
-        })
     }
 
     private fun MutableMap<EnderNodeDisplayEntry, (Data, MutableList<Searchable>, EnderNode?) -> Unit>.addFromNodeEntries(
