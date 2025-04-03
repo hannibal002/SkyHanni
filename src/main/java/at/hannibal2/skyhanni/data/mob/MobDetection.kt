@@ -32,6 +32,7 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
+import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.util.DamageSource
 import net.minecraft.world.World
@@ -361,7 +362,7 @@ object MobDetection {
         when (val packet = event.packet) {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
-            // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
+            is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
             is S01PacketJoinGame -> {
                 // one of the first packets that is sent when switching servers inside the BungeeCord Network
                 // (please some prove this, I just found it out via Testing)
