@@ -25,7 +25,7 @@ object StereoHarmonyDiscReplacer {
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (!config.replaceMenuIcons)
+        if (!config.replaceMenuIcons) return
         if (!inventoryPattern.matches(event.inventory.name)) return
         if (event.slot !in 11..15 && event.slot !in 20..24) return
 
