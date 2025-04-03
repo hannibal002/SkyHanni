@@ -9,6 +9,7 @@ class ModuleProvider : SymbolProcessorProvider {
         return ModuleProcessor(
             environment.codeGenerator,
             environment.logger,
+            environment.options["skyhanni.modver"] ?: "0.0.0",
             environment.options["skyhanni.sourceset"] ?: "1.8.9",
             environment.options["skyhanni.buildpaths"],
         )
