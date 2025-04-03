@@ -167,7 +167,7 @@ object GardenVisitorDropStatistics {
 
     private val transformMap: Map<
         DropsStatisticsTextEntry,
-            (ProfileSpecificStorage.GardenStorage.VisitorDrops, MutableList<Renderable>) -> Unit,
+        (ProfileSpecificStorage.GardenStorage.VisitorDrops, MutableList<Renderable>) -> Unit,
         > = buildMap {
         VisitorReward.entries.forEach { reward ->
             val textEntryOption = reward.toStatsTextEntryOrNull() ?: return@forEach

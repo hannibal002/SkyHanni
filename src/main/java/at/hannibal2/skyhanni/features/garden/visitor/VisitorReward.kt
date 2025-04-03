@@ -37,7 +37,7 @@ enum class VisitorReward(
     }
 
     // Todo: Remove this when enum names of this and DropsStatisticsTextEntry are in sync
-    fun toStatsTextEntryOrNull() = when(this) {
+    fun toStatsTextEntryOrNull() = when (this) {
         DEDICATION -> StatsEntry.DEDICATION_IV
         MUSIC_RUNE -> StatsEntry.MUSIC_RUNE_I
         CULTIVATING -> StatsEntry.CULTIVATING_I

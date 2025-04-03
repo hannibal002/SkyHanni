@@ -44,9 +44,9 @@ class DropsStatisticsConfig {
     /**
      * Generic non VisitorReward stuff belongs in front of the first VisitorReward.
      */
-    enum class DropsStatisticsTextEntry
-        (private val displayName: String,
-         private val legacyId: Int = -1
+    enum class DropsStatisticsTextEntry(
+        private val displayName: String,
+        private val legacyId: Int = -1
     ) : HasLegacyId {
         // generic stuff
         TITLE("§e§lVisitor Statistics", 0),
@@ -95,7 +95,8 @@ class DropsStatisticsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Display Icons", desc = "Replace the drop names with icons.\n" +
+        name = "Display Icons",
+        desc = "Replace the drop names with icons.\n" +
             "§eNote: Will not update the preview above!"
     )
     @ConfigEditorBoolean
