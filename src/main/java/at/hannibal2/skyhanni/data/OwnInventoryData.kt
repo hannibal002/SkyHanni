@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
+import at.hannibal2.skyhanni.events.playerinventory.InventoryChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -18,12 +19,15 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -34,6 +38,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object OwnInventoryData {
 
+    private var itemStacks: Array<PrimitiveItemStack?> = emptyArray() // TODO: make this normal ItemStack as to provide more info
     private var itemAmounts = mapOf<NeuInternalName, Int>()
     private var dirty = false
 
@@ -74,8 +79,11 @@ object OwnInventoryData {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
+        checkInventoryChange()
+
         if (itemAmounts.isEmpty()) {
             itemAmounts = getCurrentItems()
+            return
         }
 
         if (!dirty) return
@@ -97,9 +105,36 @@ object OwnInventoryData {
         return map
     }
 
-    @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
-        itemAmounts = emptyMap()
+    private fun Array<ItemStack?>.toSimpleArray(): Array<PrimitiveItemStack?> {
+        return this.map { it?.toPrimitiveStackOrNull() }.toTypedArray()
+    }
+
+    private fun checkInventoryChange() {
+        val newStacks: Array<PrimitiveItemStack?> = InventoryUtils.getItemsInOwnInventoryWithNull()?.toSimpleArray() ?: return
+        val oldStacks: Array<PrimitiveItemStack?> = itemStacks
+        if (didItemStacksChange(oldStacks, newStacks)) {
+            itemStacks = newStacks
+            InventoryChangeEvent(oldStacks, newStacks).post()
+        }
+    }
+
+    private fun isItemStackEqual(base: PrimitiveItemStack?, other: PrimitiveItemStack?): Boolean {
+        if (base == null && other == null) return true
+        if (base == null || other == null) return false
+        if (base.internalName != other.internalName) return false
+        if (base.amount != other.amount) return false
+        return true
+    }
+
+    private fun didItemStacksChange(oldStacks: Array<PrimitiveItemStack?>, newStacks: Array<PrimitiveItemStack?>): Boolean {
+        if (oldStacks.size != newStacks.size) return true
+        for (i in newStacks.indices) {
+//             if (!areItemsEqual(oldStacks[i], newStacks[i])) {
+            if (!isItemStackEqual(oldStacks[i], newStacks[i])) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun calculateDifference(internalName: NeuInternalName, newAmount: Int) {
@@ -109,6 +144,11 @@ object OwnInventoryData {
         if (diff > 0) {
             addItem(internalName, diff)
         }
+    }
+
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        itemAmounts = emptyMap()
     }
 
     @HandleEvent
