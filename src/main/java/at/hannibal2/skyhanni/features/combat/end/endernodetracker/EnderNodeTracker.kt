@@ -249,12 +249,6 @@ object EnderNodeTracker {
             list.addSearchString("§b$count ${nodeItem.displayName}", nodeItem.displayName)
         }
 
-        add(EnderNodeDisplayEntry.ENDER_ARMOR to { data, list, _ ->
-            val totalEnderArmor = data.lootCount.countKeys { it.isEnderArmor() }
-            list.addSearchString(
-            "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)",
-            )
-        })
         addFromNodeEntries(EnderNode.armorEntries) { data, list, nodeItem ->
             if (nodeItem == null) return@addFromNodeEntries
             val lootProfit = getLootProfit(data)
@@ -262,6 +256,13 @@ object EnderNodeTracker {
             val profit = (lootProfit[nodeItem] ?: 0.0).shortFormat()
             list.addSearchString("§b$count ${nodeItem.displayName} §7(§6$profit§7)")
         }
+
+        add(EnderNodeDisplayEntry.ENDER_ARMOR to { data, list, _ ->
+            val totalEnderArmor = data.lootCount.countKeys { it.isEnderArmor() }
+            list.addSearchString(
+                "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)",
+            )
+        })
 
         add(EnderNodeDisplayEntry.ENDERMAN_PET to { data, list, _ ->
             val lootProfit = getLootProfit(data)
