@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.ItemAddEvent
 
+@Suppress("unused")
 enum class ItemSource {
     MOB_DROP,
     LOOTSHARE,
@@ -25,7 +26,8 @@ enum class ItemSource {
     AUCTION,
     TRADING,
     COLLECTION_REWARD,
-    PET,
+    QUEST_REWARD,
+    PET, // I don't know any cases as of now
     DRAGON,
     ARMOR_EFFECT,
     REFUND,
@@ -33,13 +35,28 @@ enum class ItemSource {
     SACKS,
     STASH,
     ENDER_CHEST,
-    ITEM_COPACT,
+    ITEM_COMPACT,
     DICE_ROLL,
 
-    COMMAND, // TODO: remove this into its own event
+    COMMAND,
     UNKNOWN;
 
     companion object {
-        fun ItemAddEvent.isTrackerRelevant() = source in setOf(ItemSource.FISHING, ItemSource.SACKS) // TODO
+        fun ItemAddEvent.isRelevant(): Boolean = source !in setOf(
+            COMMAND,
+            CRAFTING,
+            CHEST,
+            ENDER_CHEST,
+            BAZAAR,
+            BANK,
+            BASIC_REFORGING,
+            STONE_REFORGING,
+            ENCHANTING,
+            TRADING,
+            AUCTION,
+            ITEM_COMPACT,
+        )
+
+        fun ItemAddEvent.isTrackerRelevant() = this.isRelevant() // TODO
     }
 }
