@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.TitleManager.CountdownTitleContext.Companion.fromTitleData
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -236,6 +237,30 @@ object TitleManager {
             location,
             countDownDisplayType = if (countdown) CountdownTitleDisplayType.PARTIAL_SECONDS else null,
         )
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("TitleManager")
+        event.addIrrelevant {
+            add("Title Location Queues" + titleLocationQueues.let { queues ->
+                queues.entries.joinToString("\n\n") { queue ->
+                    "${queue.key}:\n" + buildString {
+                        append("Title Queue: ${queue.value.size}\n")
+                        queue.value.forEach { title ->
+                            val titleItem = title.item
+                            append("Title: ${titleItem.getTitleText()}\n")
+                            append("Subtitle: ${titleItem.getSubtitleText()}\n")
+                            append("Duration: ${titleItem.duration.inWholeSeconds}s\n")
+                            append("Height: ${titleItem.height}\n")
+                            append("Font Size: ${titleItem.fontSize}\n")
+                            append("Weight: ${titleItem.weight}\n")
+                            append("End Time: ${titleItem.endTime.timeUntil().inWholeSeconds}s\n")
+                        }
+                    }
+                }
+            })
+        }
     }
 
     @HandleEvent
