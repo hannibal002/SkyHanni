@@ -21,6 +21,7 @@ enum class VisitorReward(
     DELICATE("DELICATE;5", "§9Delicate V"),
     COPPER_DYE("DYE_COPPER", "§8Copper Dye"),
     JUNGLE_KEY("JUNGLE_KEY", "§5Jungle Key"),
+    FRUIT_BOWL("FRUIT_BOWL", "§9Fruit Bowl"),
     ;
 
     private val internalName = rawInternalName.toInternalName()
