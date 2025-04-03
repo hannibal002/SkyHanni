@@ -191,11 +191,11 @@ object MiningApi {
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        if (!inColdIsland()) return
+
         dungeonRoomPattern.firstMatcher(event.new) {
             groupOrNull("roomId")?.let { mineshaftRoomId = it }
         }
-
-        if (!inColdIsland()) return
 
         val newCold = coldPattern.firstMatcher(event.added) {
             group("cold").toInt().absoluteValue

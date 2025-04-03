@@ -71,10 +71,14 @@ object TpsCounter {
                 val newTps = tpsList.average().roundTo(1).coerceIn(0.0..20.0)
                 tps = newTps
                 val legacyColor = format(newTps)
-                "$legacyColor$newTps"
+                "$legacyColor${fixTps(newTps)}"
             }
         }
         display = "§eTPS: $text"
+    }
+
+    private fun fixTps(tps: Double): Double {
+        return if (LorenzUtils.isAprilFoolsDay) tps / 2 else tps
     }
 
     private fun tpsCommand() {
