@@ -236,10 +236,12 @@ object EnderNodeTracker {
         add(EnderNodeDisplayEntry.COINS_MADE to { data, list, _ ->
             list.addSearchString("§6${getLootProfit(data).values.sum().shortFormat()} Coins made")
         })
-        add(EnderNodeDisplayEntry.SPACER_1 to { _, list, _ -> list.addSearchString(" ") })
         add(EnderNodeDisplayEntry.ENDERMITE_NEST to { data, list, _ ->
             list.addSearchString("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest", "Endermite Nest")
         })
+
+        add(EnderNodeDisplayEntry.SPACER_1 to { _, list, _ -> list.addSearchString(" ") })
+        add(EnderNodeDisplayEntry.SPACER_2 to { _, list, _ -> list.addSearchString(" ") })
 
         addFromNodeEntries(EnderNode.miscEntries) { data, list, nodeItem ->
             if (nodeItem == null) return@addFromNodeEntries
@@ -247,14 +249,12 @@ object EnderNodeTracker {
             list.addSearchString("§b$count ${nodeItem.displayName}", nodeItem.displayName)
         }
 
-        add(EnderNodeDisplayEntry.SPACER_2 to { _, list, _ -> list.addSearchString(" ") })
         add(EnderNodeDisplayEntry.ENDER_ARMOR to { data, list, _ ->
             val totalEnderArmor = data.lootCount.countKeys { it.isEnderArmor() }
             list.addSearchString(
             "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)",
             )
         })
-
         addFromNodeEntries(EnderNode.armorEntries) { data, list, nodeItem ->
             if (nodeItem == null) return@addFromNodeEntries
             val lootProfit = getLootProfit(data)
