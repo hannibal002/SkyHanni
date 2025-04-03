@@ -94,7 +94,11 @@ object SeaCreatureFeatures {
         }
         if (config.announceRareInParty && PartyApi.isInParty()) {
             val name = event.seaCreature.name
-            HypixelCommands.partyChat("I caught ${StringUtils.optionalAn(name)} $name!")
+            val message = buildString {
+                if (event.doubleHook) append("DOUBLE HOOK: ")
+                append("I caught ${StringUtils.optionalAn(name)} $name!")
+            }
+            HypixelCommands.partyChat(message)
         }
     }
 
