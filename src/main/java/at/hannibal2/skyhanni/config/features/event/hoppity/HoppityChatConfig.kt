@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class HoppityChatConfig {
@@ -30,13 +31,13 @@ class HoppityChatConfig {
 
     @Expose
     @ConfigOption(
-        name = "Compact Hitman",
-        desc = "Show a summary message instead of individual messages for Hitman \"Claim All\" menu.\n" +
+        name = "Compact Hitman Threshold",
+        desc = "Show a summary message instead of individual messages for Hitman \"Claim All\"-s including this many eggs or more.\n" +
+            "§eSet to 29 to disable.\n" +
             "§cRequires Compact Chat enabled to work."
     )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var compactHitman: Boolean = false
+    @ConfigEditorSlider(minValue = 0f, maxValue = 29f, minStep = 1f)
+    var compactHitmanThreshold: Int = 29
 
     @Expose
     @ConfigOption(

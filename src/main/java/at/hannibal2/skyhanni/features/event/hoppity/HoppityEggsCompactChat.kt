@@ -59,27 +59,21 @@ object HoppityEggsCompactChat {
     }
 
     private fun compactMultipleFinds() {
-        val inClaimAll = InventoryUtils.openInventoryName() == "Claim All"
-        if (!chatConfig.compactHitman || !inClaimAll) {
-            sendSingularFind()
-            return
-        }
+        if (InventoryUtils.openInventoryName() != "Claim All") return sendSingularFind()
 
-        hoppityDataSet.let {
-            hitmanCompactDataSets.add(it.copy())
-            it.reset()
-        }
-        val expectedHitmanFinds = InventoryUtils.getItemsInOpenChest().count { it.stack.item == Items.skull }
+        val eggsBeingClaimedCount = InventoryUtils.getItemsInOpenChest().count {
+            it.stack.item == Items.skull
+        }.takeIf {
+            it >= chatConfig.compactHitmanThreshold
+        } ?: return
+
+        hitmanCompactDataSets.add(hoppityDataSet.copy().also { hoppityDataSet.reset() })
+
         val hitmanFindsNow = hitmanCompactDataSets.size
-        if (hitmanFindsNow >= expectedHitmanFinds) {
-            sendHitmanSummary()
-            hitmanCompactDataSets.clear()
-        } else DelayedRun.runDelayed(2.seconds) {
+        if (hitmanFindsNow >= eggsBeingClaimedCount) sendHitmanSummary()
+        else DelayedRun.runDelayed(2.seconds) {
             // Runaway check to make sure data doesn't sit still if expected finds don't calculate correctly
-            if (hitmanCompactDataSets.size == hitmanFindsNow) {
-                sendHitmanSummary()
-                hitmanCompactDataSets.clear()
-            }
+            if (hitmanCompactDataSets.size == hitmanFindsNow) sendHitmanSummary()
         }
     }
 
