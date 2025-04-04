@@ -164,7 +164,7 @@ object GardenVisitorDropStatistics {
         acceptPattern.matchMatcher(message) {
             storage.acceptedVisitors += 1
             val rarity = LorenzRarity.getByName(group("rarity")) ?: return@matchMatcher
-            storage.visitorRarities.addOrPut(rarity, 1)
+            storage.acceptedRarities.addOrPut(rarity, 1)
             saveAndUpdate()
         }
     }
@@ -216,7 +216,7 @@ object GardenVisitorDropStatistics {
             },
             DropsStatisticsTextEntry.VISITORS_BY_RARITY to { storage, list ->
                 val visitorRarityLine = visitorRarityEntries.joinToString("§f-") { rarity ->
-                    val count = storage.visitorRarities[rarity] ?: 0
+                    val count = storage.acceptedRarities[rarity] ?: 0
                     "${rarity.chatColorCode}${count.addSeparators()}"
                 }
                 list.addString(visitorRarityLine)
@@ -262,7 +262,7 @@ object GardenVisitorDropStatistics {
                 storage.gardenExp = 0
                 storage.gemstonePowder = 0
                 storage.mithrilPowder = 0
-                storage.visitorRarities = mutableMapOf()
+                storage.acceptedRarities = mutableMapOf()
                 storage.rewardsCount = mutableMapOf()
                 ChatUtils.chat("Visitor Drop Statistics reset!")
                 saveAndUpdate()
@@ -303,7 +303,11 @@ object GardenVisitorDropStatistics {
         }
 
         // Was a list of longs, now a map of rarity to count
-        event.transform(79, "#profile.garden.visitorDrops.visitorRarities") { element ->
+        event.move(
+            79,
+            "#profile.garden.visitorDrops.visitorRarities",
+            "#profile.garden.visitorDrops.acceptedRarities",
+        ) { element ->
             val list = element.asJsonArray.map { it.asLong }.toMutableList()
 
             // Adding the mythic rarity between legendary and special, if missing
@@ -318,7 +322,7 @@ object GardenVisitorDropStatistics {
                 map[rarity] = list[index]
             }
 
-            ConfigManager.gson.toJsonTree(map)
+            ConfigManager.gson.toJsonTree(map, MutableMap::class.java)
         }
     }
 

@@ -448,7 +448,7 @@ class ProfileSpecificStorage {
             fun getTotalVisitors() = acceptedVisitors + deniedVisitors
 
             @Expose
-            var visitorRarities: MutableMap<LorenzRarity, Long> = enumMapOf()
+            var acceptedRarities: MutableMap<LorenzRarity, Long> = enumMapOf()
 
             @Expose
             var copper: Int = 0
