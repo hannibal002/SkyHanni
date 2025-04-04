@@ -21,6 +21,6 @@ class ShinyOrbTrackerConfig {
     var holdingItems: Boolean = false
 
     @Expose
-    @ConfigLink(owner = YearOfThePigConfig::class, field = "enabled")
+    @ConfigLink(owner = ShinyOrbTrackerConfig::class, field = "enabled")
     var position: Position = Position(100, 100)
 }
