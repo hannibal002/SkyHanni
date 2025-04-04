@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.audio.ISound
+import kotlin.math.max
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 private typealias WarningReason = PestTrapConfig.WarningConfig.WarningReason
@@ -41,11 +43,12 @@ object PestTrapFeatures {
 
     private val allActiveWarnings: MutableList<WarningReason> = mutableListOf()
     private val reminderInterval: Property<Int> get() = config.warningConfig.warningIntervalSeconds
+    private val virtualReminderInterval get() = max(10, reminderInterval.get()).seconds
     private var nextWarningMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private val soundString get(): String = config.warningConfig.warningSound.get()
     private var warningSound: ISound? = refreshSound()
 
-    private fun getNextWarningMark() = SimpleTimeMark.now() + reminderInterval.get().toInt().seconds
+    private fun getNextWarningMark() = SimpleTimeMark.now() + virtualReminderInterval
     private fun refreshSound() = soundString.takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
 
     @HandleEvent
