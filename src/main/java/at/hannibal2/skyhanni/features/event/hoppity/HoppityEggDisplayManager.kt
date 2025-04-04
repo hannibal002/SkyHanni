@@ -82,11 +82,11 @@ object HoppityEggDisplayManager {
                 it.hasRemainingSpawns() || // Only show eggs that have future spawns
                     !it.isClaimed() // Or eggs that have not been claimed
             }.let { entries ->
-                if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
+                if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil }
                 else entries
             }.forEach {
                 val (color, timeFormat) = if (it.hasRemainingSpawns()) {
-                    it.mealColor to it.timeUntil().format()
+                    it.mealColor to it.timeUntil.format()
                 } else {
                     "§c" to (HoppityApi.getEventEndMark()?.timeUntil()?.format() ?: "???")
                 }
