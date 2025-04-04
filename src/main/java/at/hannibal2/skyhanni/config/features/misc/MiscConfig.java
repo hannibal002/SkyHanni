@@ -411,7 +411,7 @@ public class MiscConfig {
     public boolean warnAboutPcTimeOffset = true;
 
     @Expose
-    @ConfigOption(name = "Render Tooltips Transparent", desc = "This makes tooltips rendered by SkyHanni Transparent. §cFUN!")
+    @ConfigOption(name = "Transparent Tooltips", desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!")
     @ConfigEditorBoolean
     public boolean transparentTooltips = false;
 }
