@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -72,7 +73,7 @@ object GardenApi {
                 storage?.experience = it
             }
         }
-    private val cropIconCache: MutableMap<CropType, TimeLimitedCache<String, ItemStack>> = mutableMapOf()
+    private val cropIconCache: TimeLimitedCache<String, ItemStack> = TimeLimitedCache(10.minutes)
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
     // TODO USE SH-REPO
@@ -120,6 +121,21 @@ object GardenApi {
         checkItemInHand()
     }
 
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("GardenApi")
+        if (!inGarden()) return event.addIrrelevant("Not in garden")
+        if (cropIconCache.isEmpty()) return event.addIrrelevant("cropIconCache is empty")
+
+        event.addData(
+            "cropIconCache:\n" +
+                cropIconCache.map { (key, value) ->
+                    "$key: ${value.getInternalName()}"
+                }.joinToString("\n") +
+                "\n\n"
+        )
+    }
+
     private fun updateGardenTool() {
         GardenToolChangeEvent(cropInHand, itemInHand).post()
     }
@@ -163,10 +179,7 @@ object GardenApi {
 
     fun readCounter(itemStack: ItemStack): Long? = itemStack.getHoeCounter() ?: itemStack.getCultivatingCounter()
 
-    fun CropType.getItemStackCopy(iconId: String): ItemStack {
-        val cropCache = cropIconCache.getOrPut(this) { TimeLimitedCache(10.minutes) }
-        return cropCache.getOrPut(iconId) { icon.copy() }
-    }
+    fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory ||
         AnitaMedalProfit.inInventory ||
