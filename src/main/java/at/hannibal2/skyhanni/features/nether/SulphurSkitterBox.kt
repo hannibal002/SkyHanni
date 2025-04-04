@@ -16,7 +16,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.init.Blocks
@@ -76,27 +77,18 @@ object SulphurSkitterBox {
         if (!isEnabled()) return
         val location = closestSponge ?: return
         if (location.distanceToPlayer() >= 50) return
-        renderBox?.let { drawBox(it, event.partialTicks) }
-    }
-
-    private fun drawBox(axis: AxisAlignedBB, partialTicks: Float) {
+        val axis = renderBox ?: return
         val color = config.boxColor.toSpecialColor()
         when (config.boxType) {
             SulphurSkitterBoxConfig.BoxType.FULL -> {
-                RenderUtils.drawFilledBoundingBoxNea(
+                event.drawFilledBoundingBox(
                     axis,
                     color,
-                    partialTicks = partialTicks,
-                    renderRelativeToCamera = false,
                 )
             }
 
             SulphurSkitterBoxConfig.BoxType.WIREFRAME -> {
-                RenderUtils.drawWireframeBoundingBoxNea(axis, color, partialTicks)
-            }
-
-            else -> {
-                RenderUtils.drawWireframeBoundingBoxNea(axis, color, partialTicks)
+                event.drawWireframeBoundingBox(axis, color)
             }
         }
     }

@@ -80,6 +80,7 @@ object TunnelsMaps {
     private var possibleLocations = mapOf<String, List<GraphNode>>()
     private val cooldowns = mutableMapOf<GraphNode, SimpleTimeMark>()
     private var active: String = ""
+    private var lastBaseCampWarp: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private lateinit var fairySouls: Map<String, GraphNode>
 
@@ -488,11 +489,9 @@ object TunnelsMaps {
 
     private fun campfireKey(event: KeyPressEvent) {
         if (event.keyCode != config.campfireKey) return
-        if (config.travelScroll) {
-            HypixelCommands.warp("basecamp")
-        } else {
-            campfireOverride()
-        }
+        if (lastBaseCampWarp.passedSince() < 2.seconds) return
+        lastBaseCampWarp = SimpleTimeMark.now()
+        if (config.travelScroll) HypixelCommands.warp("basecamp") else campfireOverride()
     }
 
     @HandleEvent
