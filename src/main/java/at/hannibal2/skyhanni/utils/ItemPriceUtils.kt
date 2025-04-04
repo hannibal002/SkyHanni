@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -142,12 +141,7 @@ object ItemPriceUtils {
         return if (name.isEmpty()) {
             InventoryUtils.getItemInHand()?.getInternalName()
         } else {
-            val internalName = name.toInternalName()
-            if (internalName.getItemStackOrNull() != null) {
-                internalName
-            } else {
-                NeuInternalName.fromItemNameOrNull(name)
-            }
+            NeuInternalName.fromItemNameOrInternalName(name)
         }
     }
 
