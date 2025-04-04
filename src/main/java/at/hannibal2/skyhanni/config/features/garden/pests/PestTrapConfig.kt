@@ -28,10 +28,10 @@ class PestTrapConfig {
 
     class WarningConfig {
 
-        enum class WarningReason(private val displayName: String, val warningString: String) {
-            TRAP_FULL("§cTrap Full§r", "§cFull Trap(s)"),
-            NO_BAIT("§eNo Bait§r", "§eTrap(s) Out of Bait"),
-            UNPLACED_TRAPS("§aUnplaced Traps§r", "§aUnplaced Trap(s)"),
+        enum class WarningReason(private val displayName: String) {
+            TRAP_FULL("§cTrap Full§r"),
+            NO_BAIT("§eNo Bait§r"),
+            UNPLACED_TRAPS("§aUnplaced Traps§r"),
             ;
 
             override fun toString() = displayName

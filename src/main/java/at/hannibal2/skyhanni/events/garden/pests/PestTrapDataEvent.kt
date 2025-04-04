@@ -4,6 +4,6 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
 class PestTrapDataEvent(
     val trapsPlaced: Int,
-    val anyFull: Boolean,
-    val anyNoBait: Boolean,
+    val fullTraps: Set<Int>,
+    val noBaitTraps: Set<Int>,
 ) : SkyHanniEvent()

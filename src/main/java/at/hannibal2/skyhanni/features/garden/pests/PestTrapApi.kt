@@ -30,38 +30,56 @@ object PestTrapApi {
     private val tabListFullTrapsPattern = TabWidget.FULL_TRAPS.pattern
     private val tabListNoBaitPattern = TabWidget.NO_BAIT.pattern
 
-    private var delayEvent = false
-    private var lastTitleHash: Int = 0
-    private var lastNoBaitHash: Int = 0
-    private var lastFullHash: Int = 0
-    private var trapsPlaced: Int = 0
-    private var anyFull: Boolean = false
-    private var anyNoBait: Boolean = false
+    private val delayEvent: MutableMap<TabWidget, Boolean> = enumMapOf()
+    private val lastHashes: TimeLimitedCache<TabWidget, Int> = TimeLimitedCache(10.seconds)
+    var trapsPlaced: Int? = null
+        private set
+    var fullTraps: Set<Int>? = null
+        private set
+    var noBaitTraps: Set<Int>? = null
+        private set
     private var timeEnteredGarden: SimpleTimeMark? = null
     var MAX_TRAPS = 3
         private set
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PEST_TRAPS)) return
-        val timeEnteredGarden = timeEnteredGarden ?: return
+        if (!event.isWidget(TabWidget.PEST_TRAPS, TabWidget.FULL_TRAPS, TabWidget.NO_BAIT)) return
+        if (event.lines.isEmpty()) return
+        val timeEnteredGarden = timeEnteredGarden ?: run {
+            timeEnteredGarden = SimpleTimeMark.now()
+            return
+        }
         if (timeEnteredGarden.passedSince() < 5.seconds) {
-            delayEvent = true
+            delayEvent[event.widget] = true
             DelayedRun.runDelayed(5.seconds) {
-                if (delayEvent) onWidgetUpdate(event)
+                if (delayEvent[event.widget] == true) onWidgetUpdate(event)
             }
             return
         }
 
-        delayEvent = false
-        trapsPlaced = event.lines.map { it.getPlacedTraps() }.firstOrNull { it != trapsPlaced } ?: trapsPlaced
-        anyFull = event.lines.map { it.anyFull() }.firstOrNull { it != anyFull } ?: anyFull
-        anyNoBait = event.lines.map { it.anyNoBait() }.firstOrNull { it != anyNoBait } ?: anyNoBait
+        delayEvent[event.widget] = false
+
+        when (event.widget) {
+            TabWidget.PEST_TRAPS -> {
+                widgetEnabledAndVisible[TabWidget.PEST_TRAPS] = true
+                trapsPlaced = event.lines.firstNotNullOfOrNull { it.getTrapsPlacedOrNull() }
+            }
+            TabWidget.FULL_TRAPS -> {
+                widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
+                fullTraps = event.lines.firstNotNullOfOrNull { it.getFullTrapsOrNull() }
+            }
+            TabWidget.NO_BAIT -> {
+                widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
+                noBaitTraps = event.lines.firstNotNullOfOrNull { it.getNoBaitTrapsOrNull() }
+            }
+            else -> return
+        }
 
         PestTrapDataEvent(
-            trapsPlaced = trapsPlaced,
-            anyFull = anyFull,
-            anyNoBait = anyNoBait,
+            trapsPlaced = trapsPlaced ?: MAX_TRAPS,
+            fullTraps = fullTraps.orEmpty(),
+            noBaitTraps = noBaitTraps.orEmpty(),
         ).post()
     }
 
@@ -69,7 +87,6 @@ object PestTrapApi {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.GARDEN) return
         timeEnteredGarden = SimpleTimeMark.now()
-
     }
 
     private fun Matcher.getTrapIndexSet(): Set<Int>? =
@@ -77,24 +94,31 @@ object PestTrapApi {
             it.toIntOrNull()
         }?.takeIfNotEmpty()?.toSet()
 
-    private fun String.getPlacedTraps(): Int = tabListPestTrapsPattern.matchMatcher(this) {
+    private fun TabWidget.getNewHashOrNull(line: String): Int? = line.hashCode().takeIf {
+        it != lastHashes[this]
+    }
+
+    private fun String.getTrapsPlacedOrNull(): Int? = tabListPestTrapsPattern.matchMatcher(this) {
         widgetEnabledAndVisible[TabWidget.PEST_TRAPS] = true
-        lastTitleHash = this.hashCode().takeIf { it != lastTitleHash } ?: return@matchMatcher trapsPlaced
         MAX_TRAPS = groupOrNull("max")?.toIntOrNull() ?: MAX_TRAPS
-        return groupOrNull("count")?.toIntOrNull() ?: trapsPlaced
-    } ?: trapsPlaced
+        lastHashes[TabWidget.PEST_TRAPS] = TabWidget.PEST_TRAPS.getNewHashOrNull(this@getTrapsPlacedOrNull)
+            ?: return@matchMatcher trapsPlaced
+        return groupOrNull("count")?.toIntOrNull()
+    }
 
-    private fun String.anyFull(): Boolean = tabListFullTrapsPattern.matchMatcher(this) {
+    private fun String.getFullTrapsOrNull(): Set<Int>? = tabListFullTrapsPattern.matchMatcher(this) {
         widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
-        lastFullHash = this.hashCode().takeIf { it != lastFullHash } ?: return@matchMatcher anyFull
-        return this.getTrapIndexSet()?.any() ?: return@matchMatcher anyFull
-    } ?: anyFull
+        lastHashes[TabWidget.FULL_TRAPS] = TabWidget.FULL_TRAPS.getNewHashOrNull(this@getFullTrapsOrNull)
+            ?: return@matchMatcher fullTraps
+        return this.getTrapIndexSet()
+    }
 
-    private fun String.anyNoBait(): Boolean = tabListNoBaitPattern.matchMatcher(this) {
+    private fun String.getNoBaitTrapsOrNull(): Set<Int>? = tabListNoBaitPattern.matchMatcher(this) {
         widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
-        lastNoBaitHash = this.hashCode().takeIf { it != lastNoBaitHash } ?: return@matchMatcher anyNoBait
-        return this.getTrapIndexSet()?.any() ?: return@matchMatcher anyNoBait
-    } ?: anyNoBait
+        lastHashes[TabWidget.NO_BAIT] = TabWidget.NO_BAIT.getNewHashOrNull(this@getNoBaitTrapsOrNull)
+            ?: return@matchMatcher noBaitTraps
+        return this.getTrapIndexSet()
+    }
 
     @Suppress("UnstableApiUsage")
     private fun baseWidgetStatus() = TimeLimitedCache<TabWidget, Boolean>(

@@ -9,16 +9,19 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.MAX_TRAPS
+import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.fullTraps
+import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.trapsPlaced
+import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.noBaitTraps
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.audio.ISound
 import kotlin.math.max
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 private typealias WarningReason = PestTrapConfig.WarningConfig.WarningReason
@@ -64,23 +67,42 @@ object PestTrapFeatures {
         }
     }
 
+    private fun WarningReason.getDescriptiveWarning(): String = when (this) {
+        WarningReason.TRAP_FULL -> {
+            val trapsFull = fullTraps?.size ?: 3
+            val trapsFormatting = StringUtils.pluralize(trapsFull, "Trap")
+            "§cFull $trapsFormatting: §f${fullTraps?.joinToString("§7, ") { "§a#$it" }}"
+        }
+        WarningReason.NO_BAIT -> {
+            val trapsNoBait = noBaitTraps?.size ?: 3
+            val trapsFormatting = StringUtils.pluralize(trapsNoBait, "Trap")
+            "§cNo Bait $trapsFormatting: §f${noBaitTraps?.joinToString("§7, ") { "§a#$it" }}"
+        }
+        WarningReason.UNPLACED_TRAPS -> {
+            val trapsLeft = MAX_TRAPS - (trapsPlaced ?: 0)
+            val unPlacedTrapFormatting = StringUtils.pluralize(trapsLeft, "Trap")
+            val placedTrapFormatting = StringUtils.pluralize((trapsPlaced ?: 0), "Trap")
+            "§aUnplaced $unPlacedTrapFormatting: §c${trapsPlaced}§4/§c$MAX_TRAPS §a$placedTrapFormatting Placed"
+        }
+    }
+
     @HandleEvent
     fun onPestTrapDataUpdate(event: PestTrapDataEvent) {
         allActiveWarnings.clear()
         if (event.trapsPlaced < MAX_TRAPS) allActiveWarnings.add(WarningReason.UNPLACED_TRAPS)
-        if (event.anyFull) allActiveWarnings.add(WarningReason.TRAP_FULL)
-        if (event.anyNoBait) allActiveWarnings.add(WarningReason.NO_BAIT)
+        if (event.fullTraps.isNotEmpty()) allActiveWarnings.add(WarningReason.TRAP_FULL)
+        if (event.noBaitTraps.isNotEmpty()) allActiveWarnings.add(WarningReason.NO_BAIT)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
         val applicableWarnings = allActiveWarnings.filter { it in userEnabledWarnings }
         if (applicableWarnings.isEmpty() || nextWarningMark.isInFuture()) return
-        val activeWarnings = applicableWarnings.map { it.warningString }
+        val activeWarnings = applicableWarnings.map { it.getDescriptiveWarning() }
 
         warningSound?.playSound()
         if (titleWarnEnabled) TitleManager.sendTitle(activeWarnings.first(), height = 2.8, fontSize = 7f)
-        if (chatWarnEnabled) activeWarnings.forEach { ChatUtils.chat(it) }
+        if (chatWarnEnabled) activeWarnings.forEach { ChatUtils.chat(it, replaceSameMessage = true) }
 
         nextWarningMark = getNextWarningMark()
     }
