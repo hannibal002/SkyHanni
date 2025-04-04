@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.MAX_TRAPS
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.fullTraps
-import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.trapsPlaced
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.noBaitTraps
+import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.trapsPlaced
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -73,16 +73,18 @@ object PestTrapFeatures {
             val trapsFormatting = StringUtils.pluralize(trapsFull, "Trap")
             "§cFull $trapsFormatting: §f${fullTraps?.joinToString("§7, ") { "§a#$it" }}"
         }
+
         WarningReason.NO_BAIT -> {
             val trapsNoBait = noBaitTraps?.size ?: 3
             val trapsFormatting = StringUtils.pluralize(trapsNoBait, "Trap")
             "§cNo Bait $trapsFormatting: §f${noBaitTraps?.joinToString("§7, ") { "§a#$it" }}"
         }
+
         WarningReason.UNPLACED_TRAPS -> {
             val trapsLeft = MAX_TRAPS - (trapsPlaced ?: 0)
             val unPlacedTrapFormatting = StringUtils.pluralize(trapsLeft, "Trap")
             val placedTrapFormatting = StringUtils.pluralize((trapsPlaced ?: 0), "Trap")
-            "§aUnplaced $unPlacedTrapFormatting: §c${trapsPlaced}§4/§c$MAX_TRAPS §a$placedTrapFormatting Placed"
+            "§aUnplaced $unPlacedTrapFormatting: §c$trapsPlaced§4/§c$MAX_TRAPS §a$placedTrapFormatting Placed"
         }
     }
 
