@@ -47,6 +47,7 @@ object TitleManager {
         var height: Double = 1.8,
         var fontSize: Float = 4f,
         val weight: Double = 1.0,
+        var discardOnWorldChange: Boolean = true,
     ) {
         open var endTime: SimpleTimeMark = SimpleTimeMark.farPast()
         open fun getTitleText(): String = titleText
@@ -114,6 +115,7 @@ object TitleManager {
                 displayType: CountdownTitleDisplayType,
                 updateInterval: Duration,
                 loomInterval: Duration,
+                discardOnWorldChange: Boolean = true,
                 onInterval: () -> Unit = {},
                 onFinish: () -> Unit = {},
             ) = CountdownTitleContext(
@@ -125,7 +127,9 @@ object TitleManager {
                 loomInterval = loomInterval,
                 onInterval = onInterval,
                 onFinish = onFinish,
-            )
+            ).apply {
+                this.discardOnWorldChange = discardOnWorldChange
+            }
         }
     }
 
@@ -157,6 +161,7 @@ object TitleManager {
         location: TitleLocation = TitleLocation.GLOBAL,
         addType: TitleAddType = TitleAddType.QUEUE,
         weight: Double = 1.0,
+        discardOnWorldChange: Boolean = true,
         /**
          * Only provide these parameters if you want to use a countdown title.
          * countDownDisplayType being not null determines code path.
@@ -171,7 +176,14 @@ object TitleManager {
         val newTitle = TitleContext(titleText, subtitleText, duration, height, fontSize, weight).let {
             when (countDownDisplayType) {
                 null -> it
-                else -> it.fromTitleData(countDownDisplayType, countDownInterval, loomInterval, onInterval, onFinish)
+                else -> it.fromTitleData(
+                    countDownDisplayType,
+                    countDownInterval,
+                    loomInterval,
+                    discardOnWorldChange,
+                    onInterval,
+                    onFinish
+                )
             }
         }
 
@@ -267,7 +279,16 @@ object TitleManager {
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        stop()
+        titleLocationQueues.forEach { queue ->
+            val (location, titleQueue) = queue
+            titleLocationQueues[location] = titleQueue.copyWithFilter { !it.discardOnWorldChange }
+        }
+        currentTitles.forEach { (location, titleContext) ->
+            if (titleContext == null || !titleContext.discardOnWorldChange) return@forEach
+            titleContext.stop()
+            currentTitles[location] = null
+            dequeueNextTitle(location)
+        }
     }
 
     @HandleEvent
