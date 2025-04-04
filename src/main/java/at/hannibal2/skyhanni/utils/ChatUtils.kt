@@ -172,6 +172,23 @@ object ChatUtils {
         }
     }
 
+    /**
+     * Sends the message in chat.
+     * Show the lines when on hover.
+     * Offer option to click on the chat message to copy the lines to clipboard.
+     * Sseful for quick debug infos
+     */
+    fun clickToClipboard(message: String, lines: List<String>) {
+        val text = lines.joinToString("\n") { "§7$it" }
+        clickableChat(
+            "$message §7(hover for info)",
+            hover = "$text\n \n§eClick to copy to clipboard!",
+            onClick = {
+                ClipboardUtils.copyToClipboard(text.removeColor())
+            },
+        )
+    }
+
     private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
 
     // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
@@ -360,7 +377,6 @@ object ChatUtils {
             "§eClick to find setting in the config!",
         )
     }
-
 
     fun clickToActionOrDisable(
         message: String,
