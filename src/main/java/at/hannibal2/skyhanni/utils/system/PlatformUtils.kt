@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.ModContainer
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.VersionConstants
 import kotlin.time.Duration.Companion.INFINITE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -22,7 +23,7 @@ import net.minecraftforge.fml.common.Loader
  */
 object PlatformUtils {
 
-    const val MC_VERSION = "@MC_VERSION@"
+    const val MC_VERSION = VersionConstants.MC_VERSION
 
     val isDevEnvironment: Boolean by lazy {
         //#if MC < 1.16
@@ -36,7 +37,7 @@ object PlatformUtils {
 
     fun shutdownMinecraft(reason: String? = null) {
         val reasonLine = reason?.let { " Reason: $it" }.orEmpty()
-        System.err.println("SkyHanni-@MOD_VERSION@ ${"forced the game to shutdown.$reasonLine"}")
+        System.err.println("SkyHanni-${VersionConstants.MOD_VERSION} ${"forced the game to shutdown.$reasonLine"}")
 
         //#if FORGE
         FMLCommonHandler.instance().handleExit(-1)

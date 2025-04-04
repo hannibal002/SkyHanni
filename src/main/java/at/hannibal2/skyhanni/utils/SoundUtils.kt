@@ -17,7 +17,7 @@ import net.minecraft.client.audio.PositionedSound
 
 object SoundUtils {
 
-    private val beepSound by lazy { createSound("random.orb", 1f) }
+    private val beepSoundCache = mutableMapOf<Float, ISound>()
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
     private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
     val plingSound by lazy { createSound("note.pling", 1f) }
@@ -69,7 +69,8 @@ object SoundUtils {
         //#endif
     }
 
-    fun playBeepSound() {
+    fun playBeepSound(pitch: Float = 1f) {
+        val beepSound = beepSoundCache.getOrPut(pitch) { createSound("random.orb", pitch) }
         beepSound.playSound()
     }
 
