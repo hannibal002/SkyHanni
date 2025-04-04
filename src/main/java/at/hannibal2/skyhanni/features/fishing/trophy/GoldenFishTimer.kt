@@ -159,7 +159,7 @@ object GoldenFishTimer {
             return
         }
         TrophyFishMessages.trophyFishPattern.matchMatcher(event.message) {
-            val internalName = TrophyFishMessages.getInternalName(group("displayName"))
+            val internalName = TrophyFishApi.getInternalName(group("displayName"))
             if (internalName != "goldenfish") return@matchMatcher
             timePossibleSpawn = ServerTimeMark.now() + minimumSpawnTime
             removeGoldenFish()

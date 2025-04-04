@@ -3,12 +3,16 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
+import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,6 +39,7 @@ object HoppityEggsManager {
     private val chatConfig get() = config.chat
     private val unclaimedEggsConfig get() = config.unclaimedEggs
     private val waypointsConfig get() = config.waypoints
+    private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
     // <editor-fold desc="Patterns">
     /**
@@ -131,11 +136,40 @@ object HoppityEggsManager {
     private var lastWarnTime = SimpleTimeMark.farPast()
 
     private var latestWaypointOnclick: () -> Unit = {}
+    private var syncedFromConfig: Boolean = false
+
+    @HandleEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        if (!HoppityApi.isHoppityEvent()) return
+        resettingEntries.forEach {
+            val lastFound = profileStorage?.mealLastFound?.get(it) ?: SimpleTimeMark.farFuture()
+            if (lastFound.isInPast()) it.markClaimed(lastFound)
+
+            val nextSpawn = profileStorage?.mealNextSpawn?.get(it) ?: SimpleTimeMark.farFuture()
+            if (nextSpawn.isInPast() && it.hasRemainingSpawns() && !it.hasNotFirstSpawnedYet()) it.markSpawned()
+        }
+    }
+
+    @HandleEvent
+    fun onEggSpawned(event: EggSpawnedEvent) {
+        event.eggType.markSpawned(setLastReset = true)
+    }
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         lastMeal = null
         lastNote = null
+        syncFromConfig()
+    }
+
+    private fun syncFromConfig() {
+        if (syncedFromConfig) return
+        profileStorage?.mealNextSpawn?.filter {
+            it.value.isInPast()
+        }?.keys?.forEach {
+            if (HoppityApi.isHoppityEvent()) it.markSpawned()
+        }
+        syncedFromConfig = true
     }
 
     @HandleEvent
@@ -169,7 +203,7 @@ object HoppityEggsManager {
         if (!HoppityApi.isHoppityEvent()) return
 
         noEggsLeftPattern.matchMatcher(event.message) {
-            HoppityEggType.allFound()
+            HoppityEggType.markAllFound()
             if (chatConfig.eggLocatorTimeInChat) event.sendNextEggAvailable()
             return
         }
@@ -181,7 +215,7 @@ object HoppityEggsManager {
         }
 
         eggSpawnedPattern.matchMatcher(event.message) {
-            getEggType(event).markSpawned()
+            EggSpawnedEvent(getEggType(event)).post()
             return
         }
     }
@@ -216,20 +250,22 @@ object HoppityEggsManager {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        checkSpawned()
         if (!isActive()) return
-        HoppityEggType.checkClaimed()
         checkWarn()
     }
 
-    private fun checkWarn() {
-        val allEggsRemaining = HoppityEggType.allEggsRemaining()
-        if (!warningActive) {
-            warningActive = !allEggsRemaining
-        }
+    private fun checkSpawned() {
+        resettingEntries
+            .filter { it.spawnedToday() && !it.alreadyResetToday() }
+            .forEach { EggSpawnedEvent(it).post() }
+    }
 
-        if (warningActive && allEggsRemaining) {
-            warn()
-        }
+    private fun checkWarn() {
+        val allEggsRemaining = HoppityEggType.allEggsUnclaimed()
+        if (!warningActive) warningActive = !allEggsRemaining
+
+        if (warningActive && allEggsRemaining) warn()
     }
 
     private val warpClickAction: Pair<() -> Unit, String> get() =
