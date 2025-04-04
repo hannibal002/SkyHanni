@@ -57,6 +57,13 @@ object TitleManager {
 
         val alive get() = !endTime.isInPast()
         val ended get() = endTime.isInPast()
+
+        fun dataEquivalent(other: TitleContext): Boolean = titleText == other.titleText &&
+            subtitleText == other.subtitleText &&
+            duration == other.duration &&
+            height == other.height &&
+            fontSize == other.fontSize &&
+            weight == other.weight
     }
 
     enum class CountdownTitleDisplayType(private val displayName: String) {
@@ -168,7 +175,14 @@ object TitleManager {
         location: TitleLocation = TitleLocation.GLOBAL,
         addType: TitleAddType = TitleAddType.QUEUE,
         weight: Double = 1.0,
+        /**
+         * Whether the title will be cleared from the queue when a WorldChangeEvent is triggered.
+         */
         discardOnWorldChange: Boolean = true,
+        /**
+         * Prevent duplicate entries of the same title in the queue.
+         */
+        noDuplicates: Boolean = true,
         /**
          * Only provide these parameters if you want to use a countdown title.
          * countDownDisplayType being not null determines code path.
@@ -179,7 +193,7 @@ object TitleManager {
         onFinish: () -> Unit = {},
         // How long the title will stay around for after the countdown is done.
         loomInterval: Duration = 250.milliseconds,
-    ): TitleContext {
+    ): TitleContext? {
         val newTitle = TitleContext(titleText, subtitleText, duration, height, fontSize, weight).let {
             when (countDownDisplayType) {
                 null -> it
@@ -195,6 +209,8 @@ object TitleManager {
         }
 
         val targetQueue = titleLocationQueues.getOrPut(location) { CollectionUtils.OrderedQueue() }
+        if (targetQueue.any { it.item.dataEquivalent(newTitle) } && noDuplicates) return null
+
         val weightOverride = if (addType == TitleAddType.FORCE_FIRST) Double.MAX_VALUE else weight
         targetQueue.add(newTitle, weightOverride)
 
