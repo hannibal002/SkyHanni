@@ -263,7 +263,7 @@ object GardenCropMilestoneDisplay {
                 addType = TitleManager.TitleAddType.FORCE_FIRST,
                 countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
                 onInterval = SoundUtils::playBeepSound
-            )
+            ) ?: countdownTitleContext
         } else if (countdownTitleContext?.endTime?.isInPast() == true) countdownTitleContext = null
     }
 

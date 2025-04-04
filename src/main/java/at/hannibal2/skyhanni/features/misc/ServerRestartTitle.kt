@@ -55,7 +55,7 @@ object ServerRestartTitle {
                 "§cServer Restart in §b%f",
                 duration = totalTime,
                 countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS
-            )
+            ) ?: timerTitleContext
         }
     }
 }
