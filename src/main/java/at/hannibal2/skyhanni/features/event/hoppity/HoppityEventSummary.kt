@@ -245,7 +245,7 @@ object HoppityEventSummary {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!liveDisplayEnabled()) return
 
-        val stats = getYearStats(statYear)
+        val stats = getYearStats(statYear) ?: return
         // Calculate a 'hash' of the stats to determine if they have changed
         val statsHash = stats.hashCode()
         if (statsHash != lastKnownStatHash) {
