@@ -39,11 +39,6 @@ class HoppityEggsConfig {
     var waypoints: HoppityWaypointsConfig = HoppityWaypointsConfig()
 
     @Expose
-    @ConfigOption(name = "Egg Locations", desc = "")
-    @Accordion
-    var locations: HoppityLocationConfig = HoppityLocationConfig()
-
-    @Expose
     @ConfigOption(name = "Unclaimed Eggs", desc = "")
     @Accordion
     var unclaimedEggs: HoppityUnclaimedEggsConfig = HoppityUnclaimedEggsConfig()

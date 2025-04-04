@@ -308,10 +308,9 @@ object HoppityEggsManager {
             "showAllWaypoints" to "waypoints.showAll",
             "hideDuplicateWaypoints" to "waypoints.hideDuplicates",
             "sharedWaypoints" to "waypoints.shared",
-
-            "highlightDuplicateEggLocations" to "locations.highlightDuplicates",
-            "showNearbyDuplicateEggLocations" to "locations.showNearbyDuplicates",
-            "loadFromNeuPv" to "locations.loadFromNeuPv",
+            "highlightDuplicateEggLocations" to "waypoints.highlightDuplicates",
+            "showNearbyDuplicates" to "waypoints.showNearbyDuplicates",
+            "loadFromNeuPv" to "waypoints.loadFromNeuPv",
 
             "showClaimedEggs" to "unclaimedEggs.enabled",
             "position" to "unclaimedEggs.position",
@@ -347,7 +346,7 @@ object HoppityEggsManager {
 
         val baseConfig = "event.hoppityEggs"
         massMigrationMap.forEach { (oldKey, newKey) ->
-            event.move(70, "$baseConfig.$oldKey", "$baseConfig.$newKey")
+            event.move(79, "$baseConfig.$oldKey", "$baseConfig.$newKey")
         }
     }
 

@@ -42,7 +42,6 @@ import kotlin.time.Duration.Companion.seconds
 object HoppityEggLocator {
     private val config get() = HoppityEggsManager.config
     private val waypointsConfig get() = config.waypoints
-    private val locationConfig get() = config.locations
     val locatorItem = "EGGLOCATOR".toInternalName()
 
     private var lastClick = SimpleTimeMark.farPast()
@@ -124,7 +123,7 @@ object HoppityEggLocator {
     }
 
     private fun SkyHanniRenderWorldEvent.drawDuplicateEggs(islandEggsLocations: Set<LorenzVec>) {
-        if (!locationConfig.highlightDuplicates || !locationConfig.showNearbyDuplicates) return
+        if (!waypointsConfig.highlightDuplicates || !waypointsConfig.showNearbyDuplicates) return
         for (eggLocation in islandEggsLocations) {
             val dist = eggLocation.distanceToPlayer()
             if (dist < 10 && HoppityEggLocations.hasCollectedEgg(eggLocation)) {
@@ -136,7 +135,7 @@ object HoppityEggLocator {
     }
 
     private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
-        val shouldMarkDuplicate = locationConfig.highlightDuplicates && HoppityEggLocations.hasCollectedEgg(location)
+        val shouldMarkDuplicate = waypointsConfig.highlightDuplicates && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
         if (!shouldMarkDuplicate) {
             drawWaypointFilled(location, waypointsConfig.color.toSpecialColor(), seeThroughBlocks = true)
