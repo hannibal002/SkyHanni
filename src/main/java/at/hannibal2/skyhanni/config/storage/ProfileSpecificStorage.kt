@@ -365,6 +365,10 @@ class ProfileSpecificStorage {
                     2 -> strays
                     else -> throw IllegalArgumentException("Invalid index: $index")
                 }
+
+                companion object {
+                    val EMPTY get() = RabbitData(0, 0, 0)
+                }
             }
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }

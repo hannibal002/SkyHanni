@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -59,6 +60,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
 import net.minecraft.client.Minecraft
@@ -263,6 +265,17 @@ object HoppityEventSummary {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(64, "event.hoppity.preventMissingFish", "event.hoppity.preventMissingRabbitTheFish")
         event.move(65, "hoppityStatLiveDisplayToggled", "hoppityStatLiveDisplayToggledOff")
+
+        event.transform(79, "#profile.hoppityEventStats") { element ->
+            val eventStats: Map<Int, HoppityEventStats> = element.asJsonObject.entrySet().associate {
+                it.key.toInt() to ConfigManager.gson.fromJson<HoppityEventStats>(it.value)
+            }
+            eventStats.forEach {
+                it.value.typeCountSnapshot = RabbitData.EMPTY
+                it.value.typeCountsSince = RabbitData.EMPTY
+            }
+            ConfigManager.gson.toJsonTree(eventStats)
+        }
     }
 
     @HandleEvent
