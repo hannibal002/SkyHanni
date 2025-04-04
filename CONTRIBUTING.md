@@ -319,6 +319,11 @@ For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002
 
 We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
 
+### Discord Bot
+
+While not directly part of the Minecraft mod, it is useful to know that we have
+a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
+
 ## 1.21 / Modern version development
 
 You might have noticed that while the SkyHanni source code is found in `src/`, the actual tasks for compiling, building and running the mod
@@ -331,11 +336,6 @@ different Minecraft versions.
 
 Note also that the only targets we consider are 1.8.9 and 1.21 (or whatever the latest version we may target). The other versions are only there
 to make mappings translate more easily (more on that later).
-
-## Discord Bot
-
-While not directly part of the Minecraft mod, it is useful to know that we have
-a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
 
 ### Goals
 
