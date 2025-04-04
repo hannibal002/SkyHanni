@@ -7,24 +7,20 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
-import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
-import org.lwjgl.input.Keyboard
 import java.time.Instant
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
@@ -46,17 +42,6 @@ object HoppityCallWarning {
     )
 
     /**
-     * REGEX-TEST: §a✆ RING... §r §r§2§l[PICK UP]
-     * REGEX-TEST: §a✆ RING... RING... §r §r§2§l[PICK UP]
-     * REGEX-TEST: §a✆ RING... RING... RING... §r §r§2§l[PICK UP]
-     * REGEX-TEST: §a✆ RING... RING... RING...
-     */
-    private val callRingPattern by ChocolateFactoryApi.patternGroup.pattern(
-        "hoppity.call.ring",
-        "§a✆ (?:RING\\.{3} ?){1,3}(?:§r §r§2§l\\[PICK UP])?",
-    )
-
-    /**
      * REGEX-TEST: §e[NPC] §aHoppity§f: §b✆ §f§rWhat's up, §boBlazin§f?
      */
     private val pickupHoppityCallPattern by ChocolateFactoryApi.patternGroup.pattern(
@@ -71,17 +56,7 @@ object HoppityCallWarning {
     private var nextWarningTime: Instant? = null
     private var finalWarningTime: Instant? = null
     private val callLength = 7.seconds
-    private var acceptUUID: String? = null
     private var commandSentTimer = SimpleTimeMark.farPast()
-
-    @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
-        if (config.acceptHotkey == Keyboard.KEY_NONE || config.acceptHotkey != event.keyCode) return
-        acceptUUID?.let {
-            HypixelCommands.callback(acceptUUID!!)
-            acceptUUID = null
-        }
-    }
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -95,7 +70,6 @@ object HoppityCallWarning {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyHanniChatEvent) {
-        if (callRingPattern.matches(event.message) && acceptUUID == null) readPickupUuid(event)
         if (!isEnabled()) return
         if (initHoppityCallPattern.matches(event.message)) startWarningUser()
         if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
@@ -153,16 +127,7 @@ object HoppityCallWarning {
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        acceptUUID = null
         stopWarningUser()
-    }
-
-    private fun readPickupUuid(event: SkyHanniChatEvent) {
-        val siblings = event.chatComponent.siblings.takeIf { it.size >= 3 } ?: return
-        val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return
-        if (clickEvent.action.name.lowercase() != "run_command" || !clickEvent.value.lowercase().startsWith("/cb")) return
-        acceptUUID = clickEvent.value.lowercase().replace("/cb ", "").takeIf { it.isValidUuid() }
-        if (acceptUUID != null) DelayedRun.runDelayed(12.seconds) { acceptUUID = null }
     }
 
     private fun startWarningUser() {
