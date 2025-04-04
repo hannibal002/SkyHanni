@@ -15,10 +15,10 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -54,6 +54,9 @@ object TitleManager {
         open fun getSubtitleText(): String? = subtitleText
         open fun start() { endTime = SimpleTimeMark.now() + duration }
         open fun stop() { endTime = SimpleTimeMark.farPast() }
+
+        val alive get() = !endTime.isInPast()
+        val ended get() = endTime.isInPast()
     }
 
     enum class CountdownTitleDisplayType(private val displayName: String) {
@@ -75,13 +78,17 @@ object TitleManager {
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
         private var virtualEndTime: SimpleTimeMark = SimpleTimeMark.farPast()
-        private var virtualTimeLeftFormat: String = getTimeLeftFormat()
+        private var virtualTimeLeft: Duration = getTimeLeft()
         private val internalUpdateInterval: Duration = 100.milliseconds.takeIf {
             it < updateInterval
         } ?: updateInterval
 
-        override fun getTitleText(): String = formattedTitleText.replace("%t", virtualTimeLeftFormat)
-        override fun getSubtitleText(): String? = formattedSubtitleText?.replace("%t", virtualTimeLeftFormat)
+        private fun String.formatCountdownString() = this
+            .replace("%t", virtualTimeLeft.toString())
+            .replace("%f", virtualTimeLeft.format())
+
+        override fun getTitleText(): String = formattedTitleText.formatCountdownString()
+        override fun getSubtitleText(): String? = formattedSubtitleText?.formatCountdownString()
         override fun start() {
             virtualEndTime = SimpleTimeMark.now() + countdownDuration
             endTime = virtualEndTime + loomInterval
@@ -93,10 +100,10 @@ object TitleManager {
             onFinish()
         }
 
-        private fun getTimeLeftFormat(): String = when (displayType) {
-            CountdownTitleDisplayType.WHOLE_SECONDS -> virtualEndTime.timeUntil().inWholeSeconds
-            CountdownTitleDisplayType.PARTIAL_SECONDS -> virtualEndTime.timeUntil().inPartialSeconds.roundTo(1)
-        }.toString()
+        private fun getTimeLeft(): Duration = when (displayType) {
+            CountdownTitleDisplayType.WHOLE_SECONDS -> virtualEndTime.timeUntil().inWholeSeconds.seconds
+            CountdownTitleDisplayType.PARTIAL_SECONDS -> virtualEndTime.timeUntil().inPartialSeconds.seconds
+        }
 
         private fun onIntervalOutward() {
             if (endTime.isInPast()) return
@@ -106,7 +113,7 @@ object TitleManager {
 
         private fun onIntervalInternal() {
             if (endTime.isInPast()) return stop()
-            if (virtualEndTime.isInFuture()) virtualTimeLeftFormat = getTimeLeftFormat()
+            if (virtualEndTime.isInFuture()) virtualTimeLeft = getTimeLeft()
             DelayedRun.runDelayed(internalUpdateInterval) { onIntervalInternal() }
         }
 
