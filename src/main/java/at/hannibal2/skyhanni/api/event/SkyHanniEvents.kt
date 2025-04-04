@@ -38,15 +38,29 @@ object SkyHanniEvents {
     fun isDisabledHandler(handler: String): Boolean = handler in disabledHandlers
     fun isDisabledInvoker(invoker: String): Boolean = invoker in disabledHandlerInvokers
 
-    @Suppress("UNCHECKED_CAST")
     private fun registerMethod(method: Method, instance: Any) {
-        if (method.parameterCount != 1) return
         val options = method.getAnnotation(HandleEvent::class.java) ?: return
-        val event = method.parameterTypes[0]
-        if (!SkyHanniEvent::class.java.isAssignableFrom(event)) return
-        listeners.getOrPut(event as Class<SkyHanniEvent>) { EventListeners(event) }
+        registerSingleEventType(options, method, instance)
+        registerMultipleEventTypes(options, method, instance)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun registerSingleEventType(options: HandleEvent, method: Method, instance: Any) {
+        val eventType = method.parameterTypes.getOrNull(0) ?: options.eventType.java
+        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
+        listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
             .addListener(method, instance, options)
     }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun registerMultipleEventTypes(options: HandleEvent, method: Method, instance: Any) {
+        options.eventTypes.map { it.java }.forEach { eventType ->
+            if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
+            listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
+                .addListener(method, instance, options)
+        }
+    }
+
 
     private fun unregisterMethod(method: Method) {
         if (method.parameterCount != 1) return

@@ -123,17 +123,21 @@ object GardenApi {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("GardenApi")
+        event.title("Garden API")
         if (!inGarden()) return event.addIrrelevant("Not in garden")
-        if (cropIconCache.isEmpty()) return event.addIrrelevant("cropIconCache is empty")
 
-        event.addData(
-            "cropIconCache:\n" +
-                cropIconCache.map { (key, value) ->
-                    "$key: ${value.getInternalName()}"
-                }.joinToString("\n") +
-                "\n\n"
-        )
+        event.addData {
+            if (cropIconCache.isNotEmpty()) {
+                add("cropIconCache:")
+                addAll(
+                    cropIconCache.map { (key, value) ->
+                        " $key: ${value.getInternalName()}"
+                    },
+                )
+            } else {
+                add("cropIconCache is empty")
+            }
+        }
     }
 
     private fun updateGardenTool() {
