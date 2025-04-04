@@ -63,6 +63,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
+import com.google.gson.JsonElement
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -267,14 +268,15 @@ object HoppityEventSummary {
         event.move(65, "hoppityStatLiveDisplayToggled", "hoppityStatLiveDisplayToggledOff")
 
         event.transform(79, "#profile.hoppityEventStats") { element ->
-            val eventStats: Map<Int, HoppityEventStats> = element.asJsonObject.entrySet().associate {
-                it.key.toInt() to ConfigManager.gson.fromJson<HoppityEventStats>(it.value)
+            element.asJsonObject.apply {
+                entrySet().forEach { (year, stats) ->
+                    val newStats = ConfigManager.gson.fromJson<HoppityEventStats>(stats).apply {
+                        typeCountSnapshot = RabbitData.EMPTY
+                        typeCountsSince = RabbitData.EMPTY
+                    }
+                    addProperty(year, ConfigManager.gson.toJson(newStats))
+                }
             }
-            eventStats.forEach {
-                it.value.typeCountSnapshot = RabbitData.EMPTY
-                it.value.typeCountsSince = RabbitData.EMPTY
-            }
-            ConfigManager.gson.toJsonTree(eventStats)
         }
     }
 
