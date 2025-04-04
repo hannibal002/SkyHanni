@@ -231,8 +231,9 @@ object StringUtils {
         return builder.toString()
     }
 
-    fun String.capAtMinecraftLength(limit: Int) =
-        capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.toString()) }
+    fun String.capAtMinecraftLength(limit: Int) = capAtLength(limit) {
+        Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.toString())
+    }
 
     private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
         var i = 0
@@ -467,6 +468,8 @@ object StringUtils {
     fun Char.isVowel(): Boolean = this in vowels
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
+
+    fun String.splitCamelCase() = this.replace("([a-z])([A-Z])".toRegex(), "$1 $2")
 
     fun String.isValidUuid(): Boolean {
         return try {
