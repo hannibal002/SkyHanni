@@ -413,5 +413,5 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Render Tooltips Transparent", desc = "This makes tooltips rendered by SkyHanni Transparent. §cFUN!")
     @ConfigEditorBoolean
-    public boolean revertTooltipFix = false;
+    public boolean transparentTooltips = false;
 }
