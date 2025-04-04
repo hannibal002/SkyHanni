@@ -138,7 +138,7 @@ object FarmingLaneFeatures {
     private fun showWarning() {
         with(config.laneSwitchNotification) {
             if (enabled) {
-                TitleManager.sendTitle(text.replace("&", "§"))
+                TitleManager.sendTitle(text.replace("&", "§"), duration = 3.seconds)
                 if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
                     lastPlaySound = SimpleTimeMark.now()
                     playUserSound()
