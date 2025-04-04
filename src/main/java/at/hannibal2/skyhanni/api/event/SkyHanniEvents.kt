@@ -63,7 +63,8 @@ object SkyHanniEvents {
         val eventType = eventPrimaryFunctionNames[method.name] ?: return
         if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
         listeners.getOrPut(eventType) { EventListeners(eventType) }
-            .addListener(method, instance, options)
+        registerSingleEventType(options, method, instance)
+        registerMultipleEventTypes(options, method, instance)
     }
 
     @Suppress("UNCHECKED_CAST")
