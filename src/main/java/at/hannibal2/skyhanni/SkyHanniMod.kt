@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
+import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -77,7 +78,7 @@ object SkyHanniMod {
     }
 
     const val MODID: String = "skyhanni"
-    const val VERSION: String = "@MOD_VERSION@"
+    const val VERSION: String = VersionConstants.MOD_VERSION
 
     val modVersion: ModVersion = ModVersion.fromString(VERSION)
 

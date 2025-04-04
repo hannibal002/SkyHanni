@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
+import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -67,6 +68,11 @@ object HoppityEggLocator {
         currentEggType = null
         currentEggNote = null
         bezierFitter.reset()
+    }
+
+    @HandleEvent
+    fun onEggSpawn(event: EggSpawnedEvent) {
+        if (event.eggType == currentEggType) resetData()
     }
 
     @HandleEvent
@@ -137,7 +143,7 @@ object HoppityEggLocator {
         drawDynamicText(location.up(), possibleDuplicateLabel, 1.5)
     }
 
-    private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
+    private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.anyEggsUnclaimed()
 
     private val bezierFitter = ParticlePathBezierFitter(3)
 
