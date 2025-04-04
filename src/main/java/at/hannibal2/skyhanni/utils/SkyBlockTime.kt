@@ -33,11 +33,11 @@ data class SkyBlockTime(
         else -> SkyblockSeason.WINTER
     }
 
-    fun getSeasonModifier(): SkyblockSeason.SkyblockSeasonModifier = when ((month - 1) % 3) {
-        0 -> SkyblockSeason.SkyblockSeasonModifier.EARLY
-        1 -> SkyblockSeason.SkyblockSeasonModifier.NONE
-        2 -> SkyblockSeason.SkyblockSeasonModifier.LATE
-        else -> SkyblockSeason.SkyblockSeasonModifier.NONE
+    fun getSeasonModifier(): SkyblockSeasonModifier = when ((month - 1) % 3) {
+        0 -> SkyblockSeasonModifier.EARLY
+        1 -> SkyblockSeasonModifier.NONE
+        2 -> SkyblockSeasonModifier.LATE
+        else -> SkyblockSeasonModifier.NONE
     }
 
     private val seasonBorders: List<List<IntRange>> = listOf(
@@ -50,20 +50,6 @@ data class SkyBlockTime(
         return seasonBorders.any { borderSet ->
             borderSet.zip(currentValues).all { (range, value) -> value in range }
         }
-    }
-
-    fun getSeason(): SkyblockSeason = when (month) {
-        in 1..3 -> SkyblockSeason.SPRING
-        in 4..6 -> SkyblockSeason.SUMMER
-        in 7..9 -> SkyblockSeason.AUTUMN
-        else -> SkyblockSeason.WINTER
-    }
-
-    fun getSeasonModifier(): SkyblockSeasonModifier = when ((month - 1) % 3) {
-        0 -> SkyblockSeasonModifier.EARLY
-        1 -> SkyblockSeasonModifier.NONE
-        2 -> SkyblockSeasonModifier.LATE
-        else -> SkyblockSeasonModifier.NONE
     }
 
     companion object {
