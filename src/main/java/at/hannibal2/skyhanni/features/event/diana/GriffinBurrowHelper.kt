@@ -45,7 +45,6 @@ import at.hannibal2.skyhanni.utils.compat.addLeaves2
 import at.hannibal2.skyhanni.utils.compat.addRedFlower
 import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.block.Block
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
 import org.lwjgl.input.Keyboard
@@ -56,7 +55,16 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val allowedBlocksAboveGround = getAllowedBlocksAboveGround()
+    private val allowedBlocksAboveGround = buildList {
+        add(Blocks.air)
+        add(Blocks.yellow_flower)
+        add(Blocks.spruce_fence)
+        addLeaves()
+        addLeaves2()
+        addTallGrass()
+        addDoublePlant()
+        addRedFlower()
+    }
 
     var targetLocation: LorenzVec? = null
 
@@ -514,20 +522,5 @@ object GriffinBurrowHelper {
             category = CommandCategory.DEVELOPER_TEST
             callback { setTestBurrow(it) }
         }
-    }
-
-    private fun getAllowedBlocksAboveGround(): List<Block> {
-        val list = mutableListOf(
-            Blocks.air,
-            Blocks.yellow_flower,
-            Blocks.spruce_fence,
-        )
-        list.addLeaves()
-        list.addLeaves2()
-        list.addTallGrass()
-        list.addDoublePlant()
-        list.addRedFlower()
-
-        return list
     }
 }
