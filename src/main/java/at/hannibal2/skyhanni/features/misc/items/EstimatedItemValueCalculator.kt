@@ -500,11 +500,20 @@ object EstimatedItemValueCalculator {
         val tierIndex = internalName.getKuudraTier()?.takeIf { it > 1 } ?: return 0.0
         val armorTier = kuudraTiers.getOrNull(tierIndex - 1) ?: return 0.0
 
-        val allTiersCost = (0 until tierIndex).mapNotNull { index ->
-            kuudraTiers.getOrNull(index)?.let { tierName ->
-                EstimatedItemValue.crimsonPrestigeCosts[tierName] ?: return 0.0
-            }
-        }.sumByKey()
+        val allTiersCost =
+            (0 until tierIndex).mapNotNull { index ->
+                kuudraTiers.getOrNull(index)?.let { tierName ->
+                    EstimatedItemValue.crimsonPrestigeCosts[tierName] ?: run {
+                        ErrorManager.logErrorStateWithData(
+                            "Could not find crimson prestige cost for $tierName",
+                            "EstimatedItemValue has no crimsonPrestigeCosts for $tierName",
+                            "internalName" to internalName,
+                            "crimsonPrestigeCosts" to EstimatedItemValue.crimsonPrestigeCosts,
+                        )
+                        return 0.0
+                    }
+                }
+            }.sumByKey()
 
         val (totalPrice, names) = getTotalAndNames(allTiersCost)
 
