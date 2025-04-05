@@ -6,9 +6,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -52,7 +51,7 @@ object ArachneSpawnTimer {
     private var searchTime = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         searchTime = SimpleTimeMark.farPast()
         lastTickTime = SimpleTimeMark.farPast()
         particleCounter = 0
@@ -110,5 +109,5 @@ object ArachneSpawnTimer {
     }
 
     fun isEnabled() =
-        IslandType.SPIDER_DEN.isInIsland() && LorenzUtils.skyBlockArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
+        IslandType.SPIDER_DEN.isInIsland() && IslandAreas.currentAreaName == "Arachne's Sanctuary" && config.showArachneSpawnTimer
 }

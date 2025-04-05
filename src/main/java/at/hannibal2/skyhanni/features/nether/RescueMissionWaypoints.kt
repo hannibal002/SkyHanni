@@ -49,7 +49,7 @@ object RescueMissionWaypoints {
     /**
      * REGEX-TEST: §e[NPC] §eRescue Recruiter§f: §rYou want to help us rescue a hostage from those filthy brutes over there?
      */
-    private val recruiterPattern by RepoPattern.pattern(
+    private val recruiterPattern by patternGroup.pattern(
         "recruiter",
         "§e\\[NPC] §eRescue Recruiter§f: §rYou want to help us rescue a hostage from those filthy brutes over there\\?",
     )
@@ -57,7 +57,7 @@ object RescueMissionWaypoints {
     /**
      * REGEX-TEST: §cThe guards captured you and threw you out.
      */
-    private val caughtPattern by RepoPattern.pattern(
+    private val caughtPattern by patternGroup.pattern(
         "caught",
         "§cThe guards captured you and threw you out.",
     )
@@ -65,7 +65,7 @@ object RescueMissionWaypoints {
     /**
      * REGEX-TEST: §cYou took too long and the agents found someone else.
      */
-    private val cancelTimeoutPattern by RepoPattern.pattern(
+    private val cancelTimeoutPattern by patternGroup.pattern(
         "cancel.timeout",
         "§cYou took too long and the agents found someone else\\.",
     )
@@ -73,7 +73,7 @@ object RescueMissionWaypoints {
     /**
      * REGEX-TEST: §e[NPC] §eUndercover Agent§f: §rIt's too dangerous for you?
      */
-    private val cancelAfraidPattern by RepoPattern.pattern(
+    private val cancelAfraidPattern by patternGroup.pattern(
         "cancel.afraid",
         "§e\\[NPC] §eUndercover Agent§f: §rIt's too dangerous for you\\?",
     )
@@ -81,7 +81,7 @@ object RescueMissionWaypoints {
     /**
      * REGEX-TEST: §cYou left the area and failed your rescue mission.
      */
-    private val cancelRunAwayPattern by RepoPattern.pattern(
+    private val cancelRunAwayPattern by patternGroup.pattern(
         "cancel.run-away",
         "§cYou left the area and failed your rescue mission\\.",
     )
@@ -90,7 +90,7 @@ object RescueMissionWaypoints {
      * REGEX-TEST: §aⒸ §eRescue Mission
      * REGEX-TEST: §5Ⓐ §cRescue Mission
      */
-    private val questTierPattern by RepoPattern.pattern(
+    private val questTierPattern by patternGroup.pattern(
         "tier",
         "§.(?<tier>.) §.Rescue Mission",
     )
@@ -98,7 +98,7 @@ object RescueMissionWaypoints {
     /**
      * REGEX-TEST: Rescue
      */
-    private val menuPattern by RepoPattern.pattern(
+    private val menuPattern by patternGroup.pattern(
         "menu",
         "Rescue",
     )
