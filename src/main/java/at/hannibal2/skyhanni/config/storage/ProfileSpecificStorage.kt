@@ -324,18 +324,24 @@ class ProfileSpecificStorage {
         @Expose var rabbitTheFishFinds: Int = 0,
 
         @Expose var millisInCf: Duration = Duration.ZERO,
-        @Expose var initialLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(),
-        @Expose var finalLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(),
+        @Expose var initialLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
+        @Expose var finalLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
         @Expose var lastLbUpdate: SimpleTimeMark = farPast(),
         @Expose var summarized: Boolean = false,
 
         @Expose var typeCountSnapshot: RabbitData = RabbitData(),
         @Expose var typeCountsSince: RabbitData = RabbitData(),
     ) {
-        @Transient var containingYears: MutableSet<Int> = mutableSetOf()
+        @Transient
+        var containingYears: MutableSet<Int> = mutableSetOf()
 
-        constructor(year: Int) : this() { containingYears.add(year) }
-        constructor(years: Set<Int>) : this() { containingYears = years.toMutableSet() }
+        constructor(year: Int) : this() {
+            containingYears.add(year)
+        }
+
+        constructor(years: Set<Int>) : this() {
+            containingYears = years.toMutableSet()
+        }
 
         operator fun plusAssign(it: HoppityEventStats) {
             it.mealsFound.forEach { (key, value) ->
@@ -368,13 +374,15 @@ class ProfileSpecificStorage {
                     2 -> strays
                     else -> throw IllegalArgumentException("Invalid index: $index")
                 }
+
+                companion object {
+                    val EMPTY get() = RabbitData(0, 0, 0)
+                }
             }
-            data class LeaderboardPosition(
-                @Expose var position: Int = -1,
-                @Expose var percentile: Double = -1.0,
-            )
+            data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
     }
+
 
     // - fame
     @Expose

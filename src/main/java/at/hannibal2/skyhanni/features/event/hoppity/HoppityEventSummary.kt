@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -245,7 +246,7 @@ object HoppityEventSummary {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!liveDisplayEnabled()) return
 
-        val stats = getYearStats(statYear)
+        val stats = getYearStats(statYear) ?: return
         // Calculate a 'hash' of the stats to determine if they have changed
         val statsHash = stats.hashCode()
         if (statsHash != lastKnownStatHash) {
@@ -263,6 +264,16 @@ object HoppityEventSummary {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(64, "event.hoppity.preventMissingFish", "event.hoppity.preventMissingRabbitTheFish")
         event.move(65, "hoppityStatLiveDisplayToggled", "hoppityStatLiveDisplayToggledOff")
+
+        event.transform(79, "#profile.hoppityEventStats") { element ->
+            element.asJsonObject.apply {
+                val empty = ConfigManager.gson.toJsonTree(RabbitData.EMPTY)
+                entrySet().forEach { (_, stats) ->
+                    stats.asJsonObject.add("typeCountSnapshot", empty)
+                    stats.asJsonObject.add("typeCountsSince", empty)
+                }
+            }
+        }
     }
 
     @HandleEvent
@@ -853,20 +864,18 @@ object HoppityEventSummary {
 
     fun HoppityEventStats.getPairTriple(
         year: Int,
-        index: Int
-    ): Triple<Int, Int, Int> =
-        if (year == Int.MAX_VALUE) Triple(0, 0, 0)
-        else getPreviousStats(year)?.let {
-            val currentValue = this.typeCountSnapshot.getByIndex(index)
-            val previousValue = it.typeCountSnapshot.getByIndex(index)
-            val sinceValue = it.typeCountsSince.getByIndex(index) - previousValue
-            val validData = previousValue != 0 && previousValue != currentValue
-            Triple(
-                if (validData) previousValue else 0,
-                if (validData) currentValue else 0,
-                if (validData) sinceValue else 0,
-            )
-        } ?: Triple(0, 0, 0)
+        index: Int,
+    ): Triple<Int, Int, Int> = getPreviousStats(year)?.let {
+        val currentValue = this.typeCountSnapshot.getByIndex(index)
+        val previousValue = it.typeCountSnapshot.getByIndex(index)
+        val sinceValue = it.typeCountsSince.getByIndex(index) - previousValue
+        val validData = previousValue > 0 && previousValue != currentValue && sinceValue > 0
+        Triple(
+            if (validData) previousValue else 0,
+            if (validData) currentValue else 0,
+            if (validData) sinceValue else 0,
+        )
+    } ?: Triple(0, 0, 0)
 
     fun getRabbitsFormat(
         rarityMap: Map<LorenzRarity, Int>,
@@ -877,7 +886,7 @@ object HoppityEventSummary {
         val rabbitsSum = rarityMap.values.sum()
         if (rabbitsSum == 0) return emptyList()
 
-        val sinceFormat = if (sinceCount != 0) " §8+$sinceCount§7" else ""
+        val sinceFormat = if (sinceCount > 0) " §8+$sinceCount§7" else ""
         val countFormat = if (config.eventSummary.showCountDiff && prevCount != 0 && currCount != 0) {
             " §7($prevCount$sinceFormat -> $currCount)"
         } else ""
