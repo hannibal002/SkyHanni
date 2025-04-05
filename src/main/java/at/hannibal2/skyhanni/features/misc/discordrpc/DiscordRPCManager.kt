@@ -19,8 +19,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -186,7 +184,7 @@ object DiscordRPCManager : IPCListener {
     private fun isEnabled() = config.enabled.get()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         // The mod has already started the connection process. This variable is my way of running a function when
         // the player joins SkyBlock but only running it again once they join and leave.
         if (started || !isEnabled()) return
@@ -197,7 +195,7 @@ object DiscordRPCManager : IPCListener {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         if (nextUpdate.isInFuture()) return
         // wait 5 seconds to check if the new world is skyblock or not before stopping the function
         nextUpdate = DelayedRun.runDelayed(5.seconds) {
