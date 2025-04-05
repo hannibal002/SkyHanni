@@ -507,6 +507,8 @@ object EstimatedItemValueCalculator {
                         "Could not find crimson prestige cost for ${stack.displayName}",
                         "EstimatedItemValue has no crimsonPrestigeCosts for $tierName tier",
                         "internalName" to internalName,
+                        "tierIndex" to tierIndex,
+                        "armorTier" to armorTier,
                         "tierName" to tierName,
                         "crimsonPrestigeCosts" to EstimatedItemValue.crimsonPrestigeCosts,
                     )
