@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityUnclaimedEggsConfig.UnclaimedEggsOrder.SOONEST_FIRST
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL11
 object HoppityEggDisplayManager {
 
     private val config get() = HoppityEggsManager.config
+    private val unclaimedEggsConfig get() = config.unclaimedEggs
     private var shouldHidePlayer: Boolean = false
 
     var display = listOf<Renderable>()
@@ -73,8 +74,8 @@ object HoppityEggDisplayManager {
 
     private fun updateDisplay(): List<Renderable> {
         if (!HoppityEggsManager.isActive()) return emptyList()
-        if (!config.showClaimedEggs) return emptyList()
-        if (ReminderUtils.isBusy() && !config.showWhileBusy) return emptyList()
+        if (!unclaimedEggsConfig.enabled) return emptyList()
+        if (ReminderUtils.isBusy() && !unclaimedEggsConfig.showWhileBusy) return emptyList()
 
         val displayList: List<String> = buildList {
             add("§bUnclaimed Eggs:")
@@ -82,7 +83,7 @@ object HoppityEggDisplayManager {
                 it.hasRemainingSpawns() || // Only show eggs that have future spawns
                     !it.isClaimed() // Or eggs that have not been claimed
             }.let { entries ->
-                if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil }
+                if (unclaimedEggsConfig.displayOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil }
                 else entries
             }.forEach {
                 val (color, timeFormat) = if (it.hasRemainingSpawns()) {
@@ -93,7 +94,7 @@ object HoppityEggDisplayManager {
                 add("§7 - ${it.formattedName}$color $timeFormat")
             }
 
-            if (!config.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
+            if (!unclaimedEggsConfig.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
 
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {
@@ -107,10 +108,10 @@ object HoppityEggDisplayManager {
 
         val container = Renderable.verticalContainer(displayList.map(Renderable::string))
         return listOf(
-            if (config.warpUnclaimedEggs) Renderable.clickable(
+            if (unclaimedEggsConfig.warpClickEnabled) Renderable.clickable(
                 container,
-                tips = listOf("§eClick to ${"/warp ${config.warpDestination}".trim()}!"),
-                onLeftClick = { HypixelCommands.warp(config.warpDestination) },
+                tips = listOf("§eClick to ${"/warp ${unclaimedEggsConfig.warpClickDestination}".trim()}!"),
+                onLeftClick = { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) },
             ) else container,
         )
     }
@@ -121,7 +122,7 @@ object HoppityEggDisplayManager {
             inOwnInventory = true,
             condition = { HoppityEggsManager.isActive() },
             onRender = {
-                config.position.renderRenderables(display, posLabel = "Hoppity Eggs")
+                unclaimedEggsConfig.position.renderRenderables(display, posLabel = "Hoppity Eggs")
             },
         )
     }
