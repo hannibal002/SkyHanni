@@ -60,7 +60,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
 import net.minecraft.client.Minecraft
@@ -268,12 +267,10 @@ object HoppityEventSummary {
 
         event.transform(79, "#profile.hoppityEventStats") { element ->
             element.asJsonObject.apply {
-                entrySet().forEach { (year, stats) ->
-                    val newStats = ConfigManager.gson.fromJson<HoppityEventStats>(stats).apply {
-                        typeCountSnapshot = RabbitData.EMPTY
-                        typeCountsSince = RabbitData.EMPTY
-                    }
-                    addProperty(year, ConfigManager.gson.toJson(newStats))
+                val empty = ConfigManager.gson.toJsonTree(RabbitData.EMPTY)
+                entrySet().forEach { (_, stats) ->
+                    stats.asJsonObject.add("typeCountSnapshot", empty)
+                    stats.asJsonObject.add("typeCountsSince", empty)
                 }
             }
         }
@@ -799,7 +796,7 @@ object HoppityEventSummary {
 
     fun HoppityEventStats.getPairTriple(
         year: Int,
-        index: Int
+        index: Int,
     ): Triple<Int, Int, Int> = getPreviousStats(year)?.let {
         val currentValue = this.typeCountSnapshot.getByIndex(index)
         val previousValue = it.typeCountSnapshot.getByIndex(index)
