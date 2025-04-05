@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -69,7 +71,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: Split into two classes, one for event summary in general, and one for live display
 @SkyHanniModule
+@Suppress("LargeClass")
 object HoppityEventSummary {
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
@@ -183,8 +187,14 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onRabbitFound(event: RabbitFoundEvent) {
-        if (!HoppityApi.isHoppityEvent()) return
+
         val stats = getYearStats() ?: return
+        if (!HoppityApi.isHoppityEvent()) {
+            DelayedRun.runDelayed(5.seconds) {
+                stats.typeCountsSince = HoppityCollectionStats.getTypeCountSnapshot()
+            }
+            return
+        }
 
         stats.mealsFound.addOrPut(event.eggType, 1)
         val rarity = HoppityApi.rarityByRabbit(event.rabbitName) ?: return
@@ -192,6 +202,11 @@ object HoppityEventSummary {
         if (event.duplicate) rarityMap.dupes++
         else rarityMap.uniques++
         if (event.chocGained > 0) stats.dupeChocolateGained += event.chocGained
+
+        // Make sure we account for event priority, since HoppityCollectionStats has a statically set lower priority
+        DelayedRun.runDelayed(5.seconds) {
+            stats.typeCountSnapshot = HoppityCollectionStats.getTypeCountSnapshot()
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -231,7 +246,7 @@ object HoppityEventSummary {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!liveDisplayEnabled()) return
 
-        val stats = getYearStats(statYear)
+        val stats = getYearStats(statYear) ?: return
         // Calculate a 'hash' of the stats to determine if they have changed
         val statsHash = stats.hashCode()
         if (statsHash != lastKnownStatHash) {
@@ -249,6 +264,16 @@ object HoppityEventSummary {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(64, "event.hoppity.preventMissingFish", "event.hoppity.preventMissingRabbitTheFish")
         event.move(65, "hoppityStatLiveDisplayToggled", "hoppityStatLiveDisplayToggledOff")
+
+        event.transform(79, "#profile.hoppityEventStats") { element ->
+            element.asJsonObject.apply {
+                val empty = ConfigManager.gson.toJsonTree(RabbitData.EMPTY)
+                entrySet().forEach { (_, stats) ->
+                    stats.asJsonObject.add("typeCountSnapshot", empty)
+                    stats.asJsonObject.add("typeCountsSince", empty)
+                }
+            }
+        }
     }
 
     @HandleEvent
@@ -263,6 +288,7 @@ object HoppityEventSummary {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
+        checkStatsTypeCountInit()
         checkLbUpdateWarning()
         reCheckInventoryState()
         checkEnded()
@@ -312,6 +338,14 @@ object HoppityEventSummary {
             it.hoppityEventStats.clear()
             ChatUtils.chat("Hoppity Event stats have been reset.")
         } ?: ErrorManager.skyHanniError("Could not reset Hoppity Event stats.")
+    }
+
+    private fun checkStatsTypeCountInit() {
+        val stats = getYearStats() ?: return
+        for (i in 0..2) {
+            if (stats.typeCountSnapshot.getByIndex(i) != 0) return
+        }
+        stats.typeCountSnapshot = HoppityCollectionStats.getTypeCountSnapshot()
     }
 
     private fun checkLbUpdateWarning() {
@@ -538,6 +572,9 @@ object HoppityEventSummary {
         add(StatString(chocFormatLine))
     }
 
+    private fun getPreviousStats(year: Int): HoppityEventStats? =
+        storage?.hoppityEventStats?.get(year - 1)
+
     private fun HoppityEventStats.getMilestoneCount(): Int =
         (mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
             (mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)
@@ -589,21 +626,33 @@ object HoppityEventSummary {
                 }
             }
 
-            put(HoppityStat.NEW_RABBITS) { statList, stats, _ ->
-                getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.uniques }, "Unique").forEach {
+            put(HoppityStat.NEW_RABBITS) { statList, stats, year ->
+                getRabbitsFormat(
+                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.uniques },
+                    name = "Unique",
+                    countTriple = stats.getPairTriple(year, 0),
+                ).forEach {
                     statList.addStr(it)
                 }
             }
 
-            put(HoppityStat.DUPLICATE_RABBITS) { statList, stats, _ ->
-                getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.dupes }, "Duplicate").forEach {
+            put(HoppityStat.DUPLICATE_RABBITS) { statList, stats, year ->
+                getRabbitsFormat(
+                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.dupes },
+                    name = "Duplicate",
+                    countTriple = stats.getPairTriple(year, 1),
+                ).forEach {
                     statList.addStr(it)
                 }
                 statList.addExtraChocFormatLine(stats.dupeChocolateGained)
             }
 
-            put(HoppityStat.STRAY_RABBITS) { statList, stats, _ ->
-                getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.strays }, "Stray").forEach {
+            put(HoppityStat.STRAY_RABBITS) { statList, stats, year ->
+                getRabbitsFormat(
+                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.strays },
+                    name = "Stray",
+                    countTriple = stats.getPairTriple(year, 2),
+                ).forEach {
                     statList.addStr(it)
                 }
                 statList.addExtraChocFormatLine(stats.strayChocolateGained)
@@ -745,12 +794,37 @@ object HoppityEventSummary {
         return previousEggs + currentEggs
     }
 
-    fun getRabbitsFormat(rarityMap: Map<LorenzRarity, Int>, name: String): List<String> {
+    fun HoppityEventStats.getPairTriple(
+        year: Int,
+        index: Int,
+    ): Triple<Int, Int, Int> = getPreviousStats(year)?.let {
+        val currentValue = this.typeCountSnapshot.getByIndex(index)
+        val previousValue = it.typeCountSnapshot.getByIndex(index)
+        val sinceValue = it.typeCountsSince.getByIndex(index) - previousValue
+        val validData = previousValue > 0 && previousValue != currentValue && sinceValue > 0
+        Triple(
+            if (validData) previousValue else 0,
+            if (validData) currentValue else 0,
+            if (validData) sinceValue else 0,
+        )
+    } ?: Triple(0, 0, 0)
+
+    fun getRabbitsFormat(
+        rarityMap: Map<LorenzRarity, Int>,
+        name: String,
+        countTriple: Triple<Int, Int, Int> = Triple(0, 0, 0),
+    ): List<String> {
+        val (prevCount, currCount, sinceCount) = countTriple
         val rabbitsSum = rarityMap.values.sum()
         if (rabbitsSum == 0) return emptyList()
 
+        val sinceFormat = if (sinceCount > 0) " §8+$sinceCount§7" else ""
+        val countFormat = if (config.eventSummary.showCountDiff && prevCount != 0 && currCount != 0) {
+            " §7($prevCount$sinceFormat -> $currCount)"
+        } else ""
+
         return mutableListOf(
-            "§7$name Rabbits: §f$rabbitsSum",
+            "§7$name Rabbits: §f$rabbitsSum$countFormat",
             HoppityApi.hoppityRarities.joinToString(" §7-") {
                 " ${it.chatColorCode}${rarityMap[it] ?: 0}"
             },
