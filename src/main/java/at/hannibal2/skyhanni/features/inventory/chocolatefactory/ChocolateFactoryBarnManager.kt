@@ -32,16 +32,15 @@ object ChocolateFactoryBarnManager {
         "§c§lBARN FULL! §f\\D+ §7got §ccrushed§7! §6\\+(?<amount>[\\d,]+) Chocolate",
     )
 
-    val barnFull: Boolean
-        get() {
-            val profileStorage = profileStorage ?: return false
+    fun isBarnFull(): Boolean {
+        val profileStorage = profileStorage ?: return false
 
-            // when the unlocked barn space has already reached or surpassed the total amount of rabbits
-            val alreadyBigEnough = profileStorage.maxRabbits >= HoppityCollectionData.knownRabbitCount
+        // when the unlocked barn space has already reached or surpassed the total amount of rabbits
+        val alreadyBigEnough = profileStorage.maxRabbits >= HoppityCollectionData.knownRabbitCount
 
-            val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
-            return remainingSpace <= config.barnCapacityThreshold && !alreadyBigEnough
-        }
+        val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
+        return remainingSpace <= config.barnCapacityThreshold && !alreadyBigEnough
+    }
 
     private var sentBarnFullWarning = false
     private var lastRabbit = ""
@@ -78,7 +77,7 @@ object ChocolateFactoryBarnManager {
                 (HoppityCollectionStats.getRabbitCount(lastRabbit)).takeIf { it > 0 }?.let {
                     changedMessage = changedMessage.replace(
                         "§7§lDUPLICATE RABBIT!",
-                        "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r"
+                        "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r",
                     )
                 }
             }
@@ -87,7 +86,7 @@ object ChocolateFactoryBarnManager {
                 // Replace §6\+(?<amount>[\d,]+) Chocolate with §6\+§d(?<amount>[\d,]+) §6Chocolate
                 changedMessage = changedMessage.replace(
                     "§6\\+(?<amount>[\\d,]+) Chocolate",
-                    "§6\\+§d${group("amount")} §6Chocolate"
+                    "§6\\+§d${group("amount")} §6Chocolate",
                 )
             }
 
@@ -117,7 +116,7 @@ object ChocolateFactoryBarnManager {
         // TODO rename maxRabbits to maxUnlockedBarnSpace
         if (profileStorage.maxRabbits >= ChocolateFactoryApi.maxRabbits) return
 
-        if (!barnFull) return
+        if (!isBarnFull()) return
 
         if (inventory && sentBarnFullWarning) return
 
