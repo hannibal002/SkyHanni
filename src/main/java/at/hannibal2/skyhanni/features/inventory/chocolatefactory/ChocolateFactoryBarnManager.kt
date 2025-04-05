@@ -35,8 +35,10 @@ object ChocolateFactoryBarnManager {
     val barnFull: Boolean
         get() {
             val profileStorage = profileStorage ?: return false
+
             // when the unlocked barn space has already reached or surpassed the total amount of rabbits
             val alreadyBigEnough = profileStorage.maxRabbits >= HoppityCollectionData.knownRabbitCount
+
             val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
             return remainingSpace <= config.barnCapacityThreshold && !alreadyBigEnough
         }
