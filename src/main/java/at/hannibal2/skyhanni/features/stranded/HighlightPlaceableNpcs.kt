@@ -27,11 +27,11 @@ object HighlightPlaceableNpcs {
         "location",
         "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]",
     )
-    private val clickToSetPattern by RepoPattern.pattern(
+    private val clickToSetPattern by patternGroup.pattern(
         "clicktoset",
         "§7§eClick to set the location of this NPC!",
     )
-    private val clickToSpawnPattern by RepoPattern.pattern(
+    private val clickToSpawnPattern by patternGroup.pattern(
         "clicktospawn",
         "§elocation!",
     )
