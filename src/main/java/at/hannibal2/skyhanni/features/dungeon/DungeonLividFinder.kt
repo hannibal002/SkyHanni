@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -26,7 +25,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
@@ -158,7 +157,7 @@ object DungeonLividFinder {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         color = null
         lividArmorStandId = null
     }
@@ -191,7 +190,7 @@ object DungeonLividFinder {
         event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
 
         val color = lorenzColor.toColor()
-        event.drawFilledBoundingBoxNea(boundingBox, color, 0.5f)
+        event.drawFilledBoundingBox(boundingBox, color, 0.5f)
 
         if (location.distanceSqToPlayer() > 50) {
             event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)

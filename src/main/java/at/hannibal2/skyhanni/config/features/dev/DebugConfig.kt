@@ -191,6 +191,11 @@ class DebugConfig {
     @ConfigEditorBoolean
     var forceGreatSpook: Property<Boolean> = Property.of(false)
 
+    @Expose
+    @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
+    @ConfigEditorBoolean
+    var dvdLogo: Boolean = false
+
     // Does not have a config element!
     @Expose
     var trackSoundPosition: Position = Position(0, 0)
