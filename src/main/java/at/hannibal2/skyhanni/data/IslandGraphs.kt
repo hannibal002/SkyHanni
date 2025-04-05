@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -170,7 +169,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         currentIslandGraph = null
         if (currentTarget != null) {
             "§e[SkyHanni] Navigation stopped because of world switch!".asComponent().send(pathFindMessageId)
@@ -187,7 +186,7 @@ object IslandGraphs {
             return
         }
 
-        val now = isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)
+        val now = isGlaciteTunnelsArea(IslandAreas.currentAreaName)
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
             loadDwarvenMines()
@@ -199,7 +198,7 @@ object IslandGraphs {
     }
 
     private fun loadDwarvenMines() {
-        if (isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)) {
+        if (isGlaciteTunnelsArea(IslandAreas.currentAreaName)) {
             reloadFromJson("GLACITE_TUNNELS")
         } else {
             reloadFromJson("DWARVEN_MINES")
