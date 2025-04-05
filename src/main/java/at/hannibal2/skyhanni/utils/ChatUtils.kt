@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.EmojiReplacer.replaceEmojis
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
