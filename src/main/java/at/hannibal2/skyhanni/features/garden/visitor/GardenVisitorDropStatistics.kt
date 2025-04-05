@@ -31,8 +31,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
@@ -174,7 +176,20 @@ object GardenVisitorDropStatistics {
             val textEntryOption = reward.toStatsTextEntryOrNull() ?: return@forEach
             val transformer: (VisitorDrops, MutableList<Renderable>) -> Unit = { storage, list ->
                 val count = storage.rewardsCount[reward] ?: 0
-                list.addString(format(count, reward.displayName, "§b"))
+                when (config.displayIcons) {
+                    true -> {
+                        val stack = reward.itemStack
+                        val countFormat = "§b${count.addSeparators()}"
+                        if (config.displayNumbersFirst) list.addLine {
+                            addString(countFormat)
+                            addItemStack(stack)
+                        } else list.addLine {
+                            addItemStack(stack)
+                            addString(countFormat)
+                        }
+                    }
+                    false -> list.addString(format(count, reward.displayName, "§b"))
+                }
             }
             add(textEntryOption to transformer)
         }
