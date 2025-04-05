@@ -22,10 +22,11 @@ object ShortenCoins {
      * REGEX-TEST: §6§lALLOWANCE! §r§eYou earned §r§650,000 coins§r§e!
      * REGEX-TEST: §6[Bazaar] §r§7§r§eSell Offer Setup! §r§a5§r§7x §r§9Enchanted Melon Block §r§7for §r§6250,303 coins§r§7.
      * REGEX-FAIL: §aYou have withdrawn §r§610.5k coins§r§a! You now have §r§6991.1M coins §r§ain your account!
+     * REGEX-FAIL: §6:typing:  §f-  §e✎§6...
      */
     private val coinsPattern by patternGroup.pattern(
         "format",
-        "§6(?<amount>[\\d,.]+)(?![\\d.,kMB])",
+        "§6(?<amount>\\d[\\d,.]+)(?![\\d.,kMB])",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -38,7 +39,7 @@ object ShortenCoins {
 
         val originalComponent = event.chatComponent.siblings.firstOrNull() ?: event.chatComponent
 
-        event.chatComponent = modifiedMessage.asComponent().apply {
+        event.chatComponent = modifiedMessage.asComponent {
             chatStyle = originalComponent.chatStyle
         }
     }

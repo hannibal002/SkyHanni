@@ -865,9 +865,7 @@ class GraphingNode(
 
         other as GraphingNode
 
-        if (id != other.id) return false
-
-        return true
+        return id == other.id
     }
 }
 

@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -55,7 +53,7 @@ object MinecraftData {
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         val hand = InventoryUtils.getItemInHand()
         val newItem = hand?.getInternalName() ?: NeuInternalName.NONE
         val oldItem = InventoryUtils.itemInHandId
@@ -72,7 +70,7 @@ object MinecraftData {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         InventoryUtils.itemInHandId = NeuInternalName.NONE
         InventoryUtils.recentItemsInHand.clear()
     }
