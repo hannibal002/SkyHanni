@@ -118,8 +118,7 @@ object SkyHanniEvents {
     /**
      * Returns a list of all super classes and the class itself up to [SkyHanniEvent].
      */
-    @JvmStatic
-    fun getEventClasses(clazz: Class<*>): List<Class<*>> {
+    private fun getEventClasses(clazz: Class<*>): List<Class<*>> {
         val classes = mutableListOf<Class<*>>()
         classes.add(clazz)
 
