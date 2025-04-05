@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -70,7 +70,7 @@ object FishingProfitTracker {
 
         override fun getDescription(timesCaught: Long): List<String> {
             val percentage = timesCaught.toDouble() / totalCatchAmount
-            val catchRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val catchRate = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
                 "§7Caught §e${timesCaught.addSeparators()} §7times.",
@@ -239,7 +239,7 @@ object FishingProfitTracker {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastCatchTime = SimpleTimeMark.farPast()
     }
 
