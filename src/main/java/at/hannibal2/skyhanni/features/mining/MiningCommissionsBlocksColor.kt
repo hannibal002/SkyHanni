@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.CommissionBlock.Companion.onColor
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.isOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -96,7 +94,7 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         val newEnabled = (inCrystalHollows || inGlacite) && config.enabled
         var reload = false
         if (newEnabled != enabled) {
@@ -147,7 +145,7 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         enabled = false
         replaceBlocksMapCache = mutableMapOf()
     }
