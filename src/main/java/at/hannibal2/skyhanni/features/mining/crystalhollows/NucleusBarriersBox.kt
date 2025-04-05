@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.inNucleus
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -59,18 +59,16 @@ object NucleusBarriersBox {
         Crystal.entries.forEach { crystal ->
             when (config.boxStyle) {
                 BoundingBoxType.FILLED -> {
-                    event.drawFilledBoundingBoxNea(
+                    event.drawFilledBoundingBox(
                         crystal.boundingBox,
                         crystal.configColorOption.get().toSpecialColor(),
-                        renderRelativeToCamera = false,
                     )
                 }
 
                 BoundingBoxType.OUTLINE -> {
-                    RenderUtils.drawWireframeBoundingBoxNea(
+                    event.drawWireframeBoundingBox(
                         crystal.boundingBox,
                         crystal.configColorOption.get().toSpecialColor(),
-                        event.partialTicks,
                     )
                 }
             }

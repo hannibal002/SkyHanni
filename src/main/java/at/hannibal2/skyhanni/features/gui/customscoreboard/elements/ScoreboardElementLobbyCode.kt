@@ -16,7 +16,7 @@ object ScoreboardElementLobbyCode : ScoreboardElement() {
             HypixelData.serverId,
             DungeonApi.roomId,
             MiningApi.mineshaftRoomId,
-        ).forEach { append(" §8$it") }
+        ).distinct().forEach { append(" §8$it") }
     }.trim()
 
     override val configLine = "§7${DateFormat.US_SLASH_MMDDYYYY} §8mega77CK"

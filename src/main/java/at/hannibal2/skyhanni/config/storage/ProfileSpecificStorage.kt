@@ -7,7 +7,8 @@ import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
+import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
+import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
@@ -132,6 +133,9 @@ class ProfileSpecificStorage {
 
     @Expose
     var enderNodeTracker: EnderNodeTracker.Data = EnderNodeTracker.Data()
+
+    @Expose
+    var dragonProfitTracker: DragonProfitTracker.BucketData = DragonProfitTracker.BucketData()
 
     // - event
     // -- carnival
@@ -286,6 +290,9 @@ class ProfileSpecificStorage {
         @Expose
         var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
+        @Expose
+        var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+
         class HitmanStatsStorage {
             @Expose
             var availableHitmanEggs: Int = 0
@@ -340,14 +347,30 @@ class ProfileSpecificStorage {
 
         @Expose
         var summarized: Boolean = false,
+
+        @Expose
+        var typeCountSnapshot: RabbitData = RabbitData(),
+
+        @Expose
+        var typeCountsSince: RabbitData = RabbitData(),
     ) {
         companion object {
             data class RabbitData(
                 @Expose var uniques: Int = 0,
                 @Expose var dupes: Int = 0,
                 @Expose var strays: Int = 0,
-            )
+            ) {
+                fun getByIndex(index: Int): Int = when (index) {
+                    0 -> uniques
+                    1 -> dupes
+                    2 -> strays
+                    else -> throw IllegalArgumentException("Invalid index: $index")
+                }
 
+                companion object {
+                    val EMPTY get() = RabbitData(0, 0, 0)
+                }
+            }
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
     }
