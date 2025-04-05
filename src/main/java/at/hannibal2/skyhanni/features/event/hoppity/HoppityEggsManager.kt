@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -156,7 +155,7 @@ object HoppityEggsManager {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastMeal = null
         lastNote = null
         syncFromConfig()
@@ -308,10 +307,9 @@ object HoppityEggsManager {
             "showAllWaypoints" to "waypoints.showAll",
             "hideDuplicateWaypoints" to "waypoints.hideDuplicates",
             "sharedWaypoints" to "waypoints.shared",
-
-            "highlightDuplicateEggLocations" to "locations.highlightDuplicates",
-            "showNearbyDuplicateEggLocations" to "locations.showNearbyDuplicates",
-            "loadFromNeuPv" to "locations.loadFromNeuPv",
+            "highlightDuplicateEggLocations" to "waypoints.highlightDuplicates",
+            "showNearbyDuplicates" to "waypoints.showNearbyDuplicates",
+            "loadFromNeuPv" to "waypoints.loadFromNeuPv",
 
             "showClaimedEggs" to "unclaimedEggs.enabled",
             "position" to "unclaimedEggs.position",
@@ -347,7 +345,7 @@ object HoppityEggsManager {
 
         val baseConfig = "event.hoppityEggs"
         massMigrationMap.forEach { (oldKey, newKey) ->
-            event.move(70, "$baseConfig.$oldKey", "$baseConfig.$newKey")
+            event.move(79, "$baseConfig.$oldKey", "$baseConfig.$newKey")
         }
     }
 
