@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -103,7 +102,7 @@ object SeaCreatureFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         rareSeaCreatures.clear()
         entityIds.clear()
     }
