@@ -120,7 +120,7 @@ object TitleManager {
 
         private fun onIntervalInternal() {
             if (endTime.isInPast()) return stop()
-            if (virtualEndTime.isInFuture()) virtualTimeLeft = getTimeLeft()
+            virtualTimeLeft = if (virtualEndTime.isInFuture()) getTimeLeft() else Duration.ZERO
             DelayedRun.runDelayed(internalUpdateInterval) { onIntervalInternal() }
         }
 
