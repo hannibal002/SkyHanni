@@ -197,7 +197,7 @@ object GardenCropMilestoneDisplay {
                 val missingTime = (missing / farmingFortuneSpeed).seconds
                 val millis = missingTime.inWholeMilliseconds
                 GardenBestCropTime.timeTillNextCrop[crop] = millis
-                tryWarn(missingTime, "§b${crop.cropName} $nextTier in %t")
+                tryWarn(missingTime, "§b${crop.cropName} $nextTier in %t", crop)
                 // TODO, change functionality to use enum rather than ordinals
                 val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
                 val duration = missingTime.format(biggestUnit)
