@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawned
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawningSoon
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isTimerKnown
@@ -176,7 +175,7 @@ object CrimsonMinibossRespawnTimer {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         MiniBoss.entries.forEach {
             it.nextSpawnTime = null
             it.possibleSpawnTime = null

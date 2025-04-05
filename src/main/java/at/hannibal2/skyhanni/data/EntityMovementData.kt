@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -87,7 +85,7 @@ object EntityMovementData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         addToTrack(MinecraftCompat.localPlayer)
 
         for (entity in entityLocation.keys) {
@@ -112,7 +110,7 @@ object EntityMovementData {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         entityLocation.clear()
     }
 }

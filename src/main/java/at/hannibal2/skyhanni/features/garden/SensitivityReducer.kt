@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -32,8 +31,9 @@ object SensitivityReducer {
     private val gameSettings get() = Minecraft.getMinecraft().gameSettings
     private val playerOnGround get() = MinecraftCompat.localPlayer.onGround
 
+    @Suppress("CyclomaticComplexMethod")
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!GardenApi.inGarden()) {
             if (isToggled && lastCheckCooldown.passedSince() > 1.seconds) {
                 lastCheckCooldown = SimpleTimeMark.now()
