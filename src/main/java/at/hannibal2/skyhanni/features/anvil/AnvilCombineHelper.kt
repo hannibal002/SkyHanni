@@ -52,7 +52,7 @@ object AnvilCombineHelper {
 
         for (slot in InventoryUtils.getSlotsInOwnInventory()) {
             if (slot.slotNumber in highlightedSlots) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }
