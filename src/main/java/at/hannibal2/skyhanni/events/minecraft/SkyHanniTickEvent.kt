@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.events.minecraft
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
-class SkyHanniTickEvent(private val tick: Int) : SkyHanniEvent("onTick") {
+@PrimaryFunction("onTick")
+class SkyHanniTickEvent(private val tick: Int) : SkyHanniEvent() {
 
     fun isMod(i: Int, offset: Int = 0) = (tick + offset) % i == 0
 

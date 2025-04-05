@@ -46,22 +46,14 @@ object SkyHanniEvents {
     }
 
     @JvmStatic
-    @Suppress("UNCHECKED_CAST")
-    val eventPrimaryFunctionNames: Map<String, Class<SkyHanniEvent>> by lazy {
-        getEventClasses(SkyHanniEvent::class.java).mapNotNull {
-            val eventClass = it as Class<SkyHanniEvent>
-            val primaryFunctionName = it.getDeclaredMethod("primaryFunctionName").invoke(null) as String?
-                ?: return@mapNotNull null
-            primaryFunctionName to eventClass
-        }.toMap()
-    }
+    val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
+        GeneratedEventPrimaryFunctionNames.map
 
     private fun registerNoEventType(options: HandleEvent, method: Method, instance: Any) {
         val eventType = eventPrimaryFunctionNames[method.name] ?: return
         if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
         listeners.getOrPut(eventType) { EventListeners(eventType) }
-        registerSingleEventType(options, method, instance)
-        registerMultipleEventTypes(options, method, instance)
+            .addListener(method, instance, options)
     }
 
     @Suppress("UNCHECKED_CAST")
