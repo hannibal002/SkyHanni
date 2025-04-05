@@ -851,7 +851,7 @@ object HoppityEventSummary {
         return previousEggs + currentEggs
     }
 
-    private fun HoppityEventStats.getPairTriple(
+    fun HoppityEventStats.getPairTriple(
         year: Int,
         index: Int
     ): Triple<Int, Int, Int> =

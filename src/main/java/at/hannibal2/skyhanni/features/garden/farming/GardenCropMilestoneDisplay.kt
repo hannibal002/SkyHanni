@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenApi.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.setSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -36,6 +35,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration.Companion.milliseconds
@@ -156,7 +156,7 @@ object GardenCropMilestoneDisplay {
         nextTier = if (useCustomGoal) customTargetLevel else nextTier
 
         lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.line {
-            addCropIcon(crop)
+            addItemStack(crop.icon)
             if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
                 addString("§7" + crop.cropName + " §eMAXED")
             } else {
@@ -302,7 +302,7 @@ object GardenCropMilestoneDisplay {
 
         lineMap[MushroomTextEntry.TITLE] = Renderable.string("§6Mooshroom Cow Perk")
         lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.line {
-            addCropIcon(mushroom)
+            addItemStack(mushroom.icon)
             addString("§7Mushroom Milestone $nextTier")
         }
 
