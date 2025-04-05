@@ -109,30 +109,29 @@ object ItemPriceUtils {
         }
 
         val defaultPrice = internalName.getPrice().addSeparators()
-        ChatUtils.chat("${internalName.repoItemName}§f: §6$defaultPrice")
+        val info = buildList {
+            add("Debug Item Price for §6$internalName ")
+            add("defaultPrice: §6$defaultPrice")
 
-        println("")
-        println(" Debug Item Price for $internalName ")
-        println("defaultPrice: $defaultPrice")
+            add("#")
+            for (source in ItemPriceSource.entries) {
+                val price = internalName.getPrice(source)
+                add("${source.displayName} price: §6${price.addSeparators()}")
+            }
+            add("#")
 
-        println(" #")
-        for (source in ItemPriceSource.entries) {
-            val price = internalName.getPrice(source)
-            println("${source.displayName} price: ${price.addSeparators()}")
+            add(" ")
+            add("getLowestBinOrNull: §6${internalName.getLowestBinOrNull()?.addSeparators()}")
+
+            internalName.getBazaarData().let {
+                add("getBazaarData sellOfferPrice: §6${it?.sellOfferPrice?.addSeparators()}")
+                add("getBazaarData instantBuyPrice: §6${it?.instantBuyPrice?.addSeparators()}")
+            }
+
+            add("getNpcPriceOrNull: §6${internalName.getNpcPriceOrNull()?.addSeparators()}")
+            add("getRawCraftCostOrNull: §6${internalName.getRawCraftCostOrNull()?.addSeparators()}")
         }
-        println(" #")
-
-        println(" ")
-        println("getLowestBinOrNull: ${internalName.getLowestBinOrNull()?.addSeparators()}")
-
-        internalName.getBazaarData().let {
-            println("getBazaarData sellOfferPrice: ${it?.sellOfferPrice?.addSeparators()}")
-            println("getBazaarData instantBuyPrice: ${it?.instantBuyPrice?.addSeparators()}")
-        }
-
-        println("getNpcPriceOrNull: ${internalName.getNpcPriceOrNull()?.addSeparators()}")
-        println("getRawCraftCostOrNull: ${internalName.getRawCraftCostOrNull()?.addSeparators()}")
-        println(" ")
+        ChatUtils.clickToClipboard("${internalName.repoItemName}§f: §6$defaultPrice", info)
     }
 
     // TODO move either into inventory utils or new command utils
