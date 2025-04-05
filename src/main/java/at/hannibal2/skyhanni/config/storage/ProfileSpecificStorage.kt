@@ -348,31 +348,25 @@ class ProfileSpecificStorage {
         var summarized: Boolean = false,
 
         @Expose
-        var typeCountSnapshot: RabbitData = RabbitData(),
+        var typeCountSnapshot: RabbitData? = RabbitData(),
 
         @Expose
-        var typeCountsSince: RabbitData = RabbitData(),
-    ) {
-        companion object {
-            data class RabbitData(
-                @Expose var uniques: Int = 0,
-                @Expose var dupes: Int = 0,
-                @Expose var strays: Int = 0,
-            ) {
-                fun getByIndex(index: Int): Int = when (index) {
-                    0 -> uniques
-                    1 -> dupes
-                    2 -> strays
-                    else -> throw IllegalArgumentException("Invalid index: $index")
-                }
+        var typeCountsSince: RabbitData? = RabbitData(),
+    )
 
-                companion object {
-                    val EMPTY get() = RabbitData(0, 0, 0)
-                }
-            }
-            data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
+    data class RabbitData(
+        @Expose var uniques: Int = 0,
+        @Expose var dupes: Int = 0,
+        @Expose var strays: Int = 0,
+    ) {
+        fun getByIndex(index: Int): Int = when (index) {
+            0 -> uniques
+            1 -> dupes
+            2 -> strays
+            else -> throw IllegalArgumentException("Invalid index: $index")
         }
     }
+    data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
 
     // - fame
     @Expose
