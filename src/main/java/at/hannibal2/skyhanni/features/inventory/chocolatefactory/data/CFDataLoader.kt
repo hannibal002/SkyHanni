@@ -241,7 +241,7 @@ object CFDataLoader {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         clearData()
     }
 

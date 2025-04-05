@@ -29,6 +29,7 @@ object HitmanApi {
      * Get the time until the given number of slots are available.
      */
     private fun HitmanStatsStorage.getTimeToNumSlots(numSlots: Int): Duration {
+        if (availableHitmanEggs >= numSlots) return Duration.ZERO
         val currentSlots = getOpenSlots().takeIf { it < numSlots } ?: return Duration.ZERO
         val slotCooldown = singleSlotCooldownMark ?: return Duration.ZERO
         // Determine how many slots are on cooldown, -1 to account for the current slot (partial time)
@@ -180,6 +181,7 @@ object HitmanApi {
 
         // Figure out which timer is the inhibitor
         val longerTime = if (timeToSlots > timeToHunt) timeToSlots else timeToHunt
+        if (longerTime == Duration.ZERO) return Pair(Duration.ZERO, false)
 
         // If the inhibitor is longer than the event end, return the time until the event ends
         if ((SimpleTimeMark.now() + longerTime) > eventEndMark) return Pair(eventEndMark.timeUntil(), true)
