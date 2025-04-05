@@ -50,7 +50,7 @@ object SkyHanniEvents {
     val eventPrimaryFunctionNames: Map<String, Class<SkyHanniEvent>> by lazy {
         getEventClasses(SkyHanniEvent::class.java).mapNotNull {
             val eventClass = it as Class<SkyHanniEvent>
-            val primaryFunctionName = it.getDeclaredMethod("primaryFunctionName").invoke(null) as String?
+            val primaryFunctionName = it.getMethod("primaryFunctionName").invoke(null) as String?
                 ?: return@mapNotNull null
             primaryFunctionName to eventClass
         }.toMap()
