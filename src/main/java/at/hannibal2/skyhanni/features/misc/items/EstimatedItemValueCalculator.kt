@@ -505,7 +505,7 @@ object EstimatedItemValueCalculator {
                 EstimatedItemValue.crimsonPrestigeCosts[tierName] ?: run {
                     ErrorManager.logErrorStateWithData(
                         "Could not find crimson prestige cost for ${stack.displayName}",
-                        "EstimatedItemValue has no crimsonPrestigeCosts for $tierName",
+                        "EstimatedItemValue has no crimsonPrestigeCosts for $tierName tier",
                         "tierName" to tierName,
                         "crimsonPrestigeCosts" to EstimatedItemValue.crimsonPrestigeCosts,
                         "internalName" to internalName,
