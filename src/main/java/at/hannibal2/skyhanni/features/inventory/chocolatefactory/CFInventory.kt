@@ -61,7 +61,7 @@ object CFInventory {
                 slot.highlight(LorenzColor.GREEN.addOpacity(200))
             }
 
-            if (slotIndex == CFApi.barnIndex && CFBarnManager.barnFull) {
+            if (slotIndex == CFApi.barnIndex && CFBarnManager.isBarnFull()) {
                 slot.highlight(LorenzColor.RED)
             }
             if (slotIndex == CFApi.milestoneIndex) {

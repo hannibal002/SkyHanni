@@ -348,10 +348,10 @@ class ProfileSpecificStorage {
         var summarized: Boolean = false,
 
         @Expose
-        var typeCountSnapshot: RabbitData = RabbitData(),
+        var typeCountSnapshot: RabbitData? = RabbitData(),
 
         @Expose
-        var typeCountsSince: RabbitData = RabbitData(),
+        var typeCountsSince: RabbitData? = RabbitData(),
     ) {
         companion object {
             data class RabbitData(
