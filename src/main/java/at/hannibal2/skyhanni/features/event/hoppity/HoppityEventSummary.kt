@@ -343,7 +343,7 @@ object HoppityEventSummary {
     private fun checkStatsTypeCountInit() {
         val stats = getYearStats() ?: return
         for (i in 0..2) {
-            if (stats.typeCountSnapshot.getByIndex(i) != 0) return
+            if (stats.typeCountSnapshot?.getByIndex(i) != 0) return
         }
         stats.typeCountSnapshot = HoppityCollectionStats.getTypeCountSnapshot()
     }
@@ -794,13 +794,13 @@ object HoppityEventSummary {
         return previousEggs + currentEggs
     }
 
-    fun HoppityEventStats.getPairTriple(
+    private fun HoppityEventStats.getPairTriple(
         year: Int,
         index: Int,
     ): Triple<Int, Int, Int> = getPreviousStats(year)?.let {
-        val currentValue = this.typeCountSnapshot.getByIndex(index)
-        val previousValue = it.typeCountSnapshot.getByIndex(index)
-        val sinceValue = it.typeCountsSince.getByIndex(index) - previousValue
+        val currentValue = this.typeCountSnapshot?.getByIndex(index) ?: 0
+        val previousValue = it.typeCountSnapshot?.getByIndex(index) ?: 0
+        val sinceValue = ((it.typeCountsSince?.getByIndex(index) ?: previousValue) - previousValue)
         val validData = previousValue > 0 && previousValue != currentValue && sinceValue > 0
         Triple(
             if (validData) previousValue else 0,
