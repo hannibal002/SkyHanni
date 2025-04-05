@@ -33,7 +33,7 @@ object NoBitsWarning {
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
         }
 
-        if (config.enableWarning) {
+        if (config.bitsGainChatMessage) {
             if (event.bits < config.threshold) return
             ChatUtils.chat("You have gained §b${event.difference.addSeparators()} §eBits.")
         }
