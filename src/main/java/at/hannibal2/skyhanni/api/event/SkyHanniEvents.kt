@@ -45,8 +45,9 @@ object SkyHanniEvents {
         registerMultipleEventTypes(options, method, instance)
     }
 
+    @JvmStatic
     @Suppress("UNCHECKED_CAST")
-    private val eventPrimaryFunctionNames: Map<String, Class<SkyHanniEvent>> by lazy {
+    val eventPrimaryFunctionNames: Map<String, Class<SkyHanniEvent>> by lazy {
         getEventClasses(SkyHanniEvent::class.java).mapNotNull {
             val eventClass = it as Class<SkyHanniEvent>
             val primaryFunctionName = it.getDeclaredMethod("primaryFunctionName").invoke(null) as String?
@@ -55,10 +56,6 @@ object SkyHanniEvents {
         }.toMap()
     }
 
-    fun getEventClassByPrimaryNameOrNull(primaryName: String) =
-        eventPrimaryFunctionNames[primaryName]
-
-    @Suppress("UNCHECKED_CAST")
     private fun registerNoEventType(options: HandleEvent, method: Method, instance: Any) {
         val eventType = eventPrimaryFunctionNames[method.name] ?: return
         if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
@@ -121,7 +118,8 @@ object SkyHanniEvents {
     /**
      * Returns a list of all super classes and the class itself up to [SkyHanniEvent].
      */
-    private fun getEventClasses(clazz: Class<*>): List<Class<*>> {
+    @JvmStatic
+    fun getEventClasses(clazz: Class<*>): List<Class<*>> {
         val classes = mutableListOf<Class<*>>()
         classes.add(clazz)
 
