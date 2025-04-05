@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityChatConfig
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.HoppityStateDataSet
@@ -30,7 +29,6 @@ object HoppityEggsCompactChat {
     private val config get() = CFApi.config
     private val chatConfig get() = HoppityEggsManager.config.chat
     private val waypointsConfig get() = HoppityEggsManager.config.waypoints
-    private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
     private val hitmanCompactDataSets: MutableList<HoppityStateDataSet> = mutableListOf()
     private var hoppityDataSet = HoppityStateDataSet()
 
