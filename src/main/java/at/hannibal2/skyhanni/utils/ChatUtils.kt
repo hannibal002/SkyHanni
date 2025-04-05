@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -172,6 +171,23 @@ object ChatUtils {
         }
     }
 
+    /**
+     * Sends the message in chat.
+     * Show the lines when on hover.
+     * Offer option to click on the chat message to copy the lines to clipboard.
+     * Sseful for quick debug infos
+     */
+    fun clickToClipboard(message: String, lines: List<String>) {
+        val text = lines.joinToString("\n") { "§7$it" }
+        clickableChat(
+            "$message §7(hover for info)",
+            hover = "$text\n \n§eClick to copy to clipboard!",
+            onClick = {
+                ClipboardUtils.copyToClipboard(text.removeColor())
+            },
+        )
+    }
+
     private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
 
     // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
@@ -321,7 +337,7 @@ object ChatUtils {
         (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
             MinecraftCompat.localPlayer.sendChatMessage(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
@@ -360,7 +376,6 @@ object ChatUtils {
             "§eClick to find setting in the config!",
         )
     }
-
 
     fun clickToActionOrDisable(
         message: String,
