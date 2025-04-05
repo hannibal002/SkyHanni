@@ -367,7 +367,7 @@ class ProfileSpecificStorage {
                 }
 
                 companion object {
-                    val EMPTY = RabbitData(0, 0, 0)
+                    val EMPTY get() = RabbitData(0, 0, 0)
                 }
             }
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
