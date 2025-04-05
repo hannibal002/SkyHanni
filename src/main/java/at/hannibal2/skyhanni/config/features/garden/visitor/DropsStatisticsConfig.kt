@@ -18,7 +18,7 @@ class DropsStatisticsConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    var enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Text Format", desc = "Drag text to change the appearance of the overlay.")
@@ -91,7 +91,7 @@ class DropsStatisticsConfig {
             "§eNote: Will not update the preview above!"
     )
     @ConfigEditorBoolean
-    var displayNumbersFirst: Boolean = true
+    var displayNumbersFirst: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -100,12 +100,12 @@ class DropsStatisticsConfig {
             "§eNote: Will not update the preview above!"
     )
     @ConfigEditorBoolean
-    var displayIcons: Boolean = false
+    var displayIcons: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Only on Barn Plot", desc = "Only show the overlay while on the Barn plot.")
     @ConfigEditorBoolean
-    var onlyOnBarn: Boolean = true
+    var onlyOnBarn: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigLink(owner = DropsStatisticsConfig::class, field = "enabled")

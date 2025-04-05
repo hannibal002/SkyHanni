@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -176,11 +176,11 @@ object GardenVisitorDropStatistics {
             val textEntryOption = reward.toStatsTextEntryOrNull() ?: return@forEach
             val transformer: (VisitorDrops, MutableList<Renderable>) -> Unit = { storage, list ->
                 val count = storage.rewardsCount[reward] ?: 0
-                when (config.displayIcons) {
+                when (config.displayIcons.get()) {
                     true -> {
                         val stack = reward.itemStack
                         val countFormat = "§b${count.addSeparators()}"
-                        if (config.displayNumbersFirst) list.addLine {
+                        if (config.displayNumbersFirst.get()) list.addLine {
                             addString(countFormat)
                             addItemStack(stack)
                         } else list.addLine {
@@ -247,7 +247,7 @@ object GardenVisitorDropStatistics {
     }
 
     fun format(amount: Number, name: String, color: String, amountColor: String = color) =
-        if (config.displayNumbersFirst)
+        if (config.displayNumbersFirst.get())
             "$color${format(amount)} $name"
         else
             "$color$name: $amountColor${format(amount)}"
@@ -289,16 +289,21 @@ object GardenVisitorDropStatistics {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         saveAndUpdate()
-        config.textFormat.afterChange {
+        ConditionalUtils.onToggle(
+            config.enabled,
+            config.textFormat,
+            config.displayNumbersFirst,
+            config.displayIcons
+        ) {
             saveAndUpdate()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (GardenApi.hideExtraGuis()) return
-        if (config.onlyOnBarn && !GardenApi.onBarnPlot) return
+        if (config.onlyOnBarn.get() && !GardenApi.onBarnPlot) return
         config.pos.renderRenderables(display, posLabel = "Visitor Stats")
     }
 
