@@ -243,9 +243,13 @@ object SkyBlockItemModifierUtils {
     //#endif
 
     //#if MC < 1.21
-    fun String.isVanillaItem() = Item.itemRegistry.getObject(ResourceLocation(this)) != null
+    fun isVanillaItem(itemId: String): Boolean {
+        return Item.itemRegistry.getObject(ResourceLocation(itemId)) != null
+    }
     //#else
-    //$$ fun String.isVanillaItem() = Registries.ITEM.get(Identifier.of(vanillaName)) != Items.AIR
+    //$$ fun isVanillaItem(itemId: String): Boolean {
+    //$$     Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
+    //$$ }
     //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {

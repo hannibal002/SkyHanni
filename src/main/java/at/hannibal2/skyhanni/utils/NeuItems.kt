@@ -137,7 +137,7 @@ object NeuItems {
             val json = allNeuRepoItems()[vanillaName]
             if (json != null && json.has("vanilla") && json["vanilla"].asBoolean) return true
         }
-        return vanillaName.isVanillaItem()
+        return isVanillaItem(vanillaName)
     }
 
     fun NeuInternalName.removePrefix(prefix: String): NeuInternalName {
