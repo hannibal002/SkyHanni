@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.GuessLogic
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
@@ -26,7 +25,7 @@ object PreciseGuessBurrow {
     private val bezierFitter = ParticlePathBezierFitter(3)
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onWorldChange(event: IslandChangeEvent) {
+    fun onIslandChange() {
         bezierFitter.reset()
     }
 

@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -57,7 +56,7 @@ object PrecisionMiningHighlight {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         lastParticle ?: return
         val deletionTime = deleteTime ?: return
         if (deletionTime.isInPast()) {
