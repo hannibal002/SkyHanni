@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestone
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
+import at.hannibal2.skyhanni.data.GardenCropMilestones.getTier
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.IslandType
@@ -52,6 +53,7 @@ object GardenCropMilestoneDisplay {
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone
 
     private var countdownTitleContext: TitleManager.TitleContext? = null
+    private var lastTitleWarnedLevel = -1
     private var needsInventory = false
 
     private var lastWarnedLevel = -1
@@ -246,7 +248,7 @@ object GardenCropMilestoneDisplay {
         return formatDisplay(lineMap)
     }
 
-    private fun tryWarn(timeLeft: Duration, title: String) {
+    private fun tryWarn(timeLeft: Duration, title: String, crop: CropType) {
         val isConfigEnabled = config.warnClose
         val isCropBreakEnabled = (GardenCropSpeed.lastBrokenTime.passedSince() < 500.milliseconds)
         val isTimeLeftValid = timeLeft <= 6.seconds
@@ -257,15 +259,16 @@ object GardenCropMilestoneDisplay {
             return
         }
 
-        if (!needsInventory && countdownTitleContext == null) {
-            countdownTitleContext = TitleManager.sendTitle(
-                title,
-                duration = timeLeft,
-                addType = TitleManager.TitleAddType.FORCE_FIRST,
-                countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
-                onInterval = SoundUtils::playBeepSound
-            ) ?: countdownTitleContext
-        } else if (countdownTitleContext?.endTime?.isInPast() == true) countdownTitleContext = null
+        lastTitleWarnedLevel = crop.getTier().takeIf { it != lastTitleWarnedLevel } ?: return
+        if (needsInventory || countdownTitleContext != null) return
+
+        countdownTitleContext = TitleManager.sendTitle(
+            title,
+            duration = timeLeft,
+            addType = TitleManager.TitleAddType.FORCE_FIRST,
+            countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
+            onInterval = SoundUtils::playBeepSound
+        )
     }
 
     private fun formatDisplay(lineMap: MutableMap<MilestoneTextEntry, Renderable>): List<Renderable> {
