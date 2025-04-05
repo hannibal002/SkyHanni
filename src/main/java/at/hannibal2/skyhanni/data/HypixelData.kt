@@ -427,6 +427,7 @@ object HypixelData {
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
                     skyBlock = false
+                    profileName = ""
                     SkyBlockLeaveEvent.post()
                 }
                 HypixelLeaveEvent.post()
@@ -441,10 +442,9 @@ object HypixelData {
         if (inSkyBlock) {
             checkSidebar()
             checkCurrentServerId()
-        } else {
-            if (!skyBlock) {
-                SkyBlockLeaveEvent.post()
-            }
+        } else if (!skyBlock) {
+            profileName = ""
+            SkyBlockLeaveEvent.post()
         }
 
         if (inSkyBlock == skyBlock) return
