@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -70,8 +69,7 @@ object ScoreboardData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
-        val packet = event.packet
-        when (packet) {
+        when (val packet = event.packet) {
             is S3CPacketUpdateScore -> {
                 if (packet.objectiveName == "update") {
                     dirty = true
@@ -113,7 +111,7 @@ object ScoreboardData {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!dirty) return
         dirty = false
         monitor()
