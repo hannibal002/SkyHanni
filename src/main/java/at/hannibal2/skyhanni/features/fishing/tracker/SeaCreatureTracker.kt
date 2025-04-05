@@ -127,7 +127,7 @@ object SeaCreatureTracker {
             if (SeaCreatureManager.allFishingMobs.containsKey(newName)) {
                 data[oldName]?.let {
                     ChatUtils.debug("Sea Creature Tracker migrated $it $oldName to $newName")
-                    data[newName] = it
+                    data[newName] = it + (data[newName] ?: 0)
                     data.remove(oldName)
                 }
             }
