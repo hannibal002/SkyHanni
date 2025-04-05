@@ -20,7 +20,7 @@ object NoBitsWarning {
 
     @HandleEvent
     fun onBitsGain(event: BitsUpdateEvent.BitsGain) {
-        if (config.bitsGainChatMessage && event.bitsAvailable == 0) {
+        if (config.enableWarning && event.bitsAvailable == 0) {
 
             ChatUtils.clickableChat(
                 "§bNo Bits Available! §eClick to buy booster cookies on the bazaar.",
