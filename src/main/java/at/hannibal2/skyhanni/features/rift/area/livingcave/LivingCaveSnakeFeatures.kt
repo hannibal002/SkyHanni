@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.livingcave.snake.LivingCaveSnake
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -110,7 +109,7 @@ object LivingCaveSnakeFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         if (LorenzUtils.debug && MinecraftCompat.localPlayer.isSneaking && snakes.isNotEmpty()) {

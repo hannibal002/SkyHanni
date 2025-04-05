@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -55,7 +55,7 @@ object MatriarchHelper {
         if (config.highlight) {
             val color = config.highlightColor.toSpecialColor()
             pearlList.forEach {
-                event.drawFilledBoundingBoxNea(it.boundingBox.expandBlock(), color, 1.0f)
+                event.drawFilledBoundingBox(it.boundingBox.expandBlock(), color, 1.0f)
             }
         }
         if (config.line) {
