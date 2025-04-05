@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -82,7 +83,6 @@ object SeaCreatureTracker {
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
-        // manually migrating from "Phlhlegblast" to "Plhlegblast" when the new name is in the repo
         tryToMigrate(data.amount)
 
         addSearchString("§7Sea Creature Tracker:")
@@ -103,7 +103,7 @@ object SeaCreatureTracker {
             }
 
             val percentageSuffix = if (config.showPercentage.get()) {
-                val percentage = LorenzUtils.formatPercentage(amount.toDouble() / total)
+                val percentage = (amount.toDouble() / total).formatPercentage()
                 " §7$percentage"
             } else ""
 
@@ -112,21 +112,24 @@ object SeaCreatureTracker {
         addSearchString(" §7- §e${total.addSeparators()} §7Total Sea Creatures")
     }
 
-    private fun tryToMigrate(
-        data: MutableMap<String, Int>,
-    ) {
+    // Hypixel renames sea creatures from time to time. This migration process fixes the invalid config entries.
+    private fun tryToMigrate(data: MutableMap<String, Int>) {
         if (!needMigration) return
         needMigration = false
 
-        val oldName = "Phlhlegblast"
-        val newName = "Plhlegblast"
+        val map = mutableMapOf(
+            "Phlhlegblast" to "Plhlegblast",
+            "Sea Emperor" to "The Sea Emperor",
+        )
 
-        // only migrate once the repo contains the new name
-        if (SeaCreatureManager.allFishingMobs.containsKey(newName)) {
-            data[oldName]?.let {
-                ChatUtils.debug("Sea Creature Tracker migrated $it $oldName to $newName")
-                data[newName] = it
-                data.remove(oldName)
+        for ((oldName, newName) in map) {
+            // only migrate once the repo contains the new name
+            if (SeaCreatureManager.allFishingMobs.containsKey(newName)) {
+                data[oldName]?.let {
+                    ChatUtils.debug("Sea Creature Tracker migrated $it $oldName to $newName")
+                    data[newName] = it + (data[newName] ?: 0)
+                    data.remove(oldName)
+                }
             }
         }
     }

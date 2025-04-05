@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -132,7 +131,7 @@ object GardenVisitorTimer {
                 if (!sixthVisitorReady) {
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) {
-                        TitleManager.sendTitle("§a6th Visitor Ready", 5.seconds)
+                        TitleManager.sendTitle("§a6th Visitor Ready", duration = 5.seconds)
                         SoundUtils.playBeepSound()
                     }
                 }
@@ -196,7 +195,7 @@ object GardenVisitorTimer {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastVisitors = -1
         GardenApi.storage?.nextSixthVisitorArrival?.let {
             if (it.isFarFuture() && it.toMillis() != -9223370336633802065) {

@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
@@ -65,7 +65,7 @@ object PesthunterProfit {
     private fun buildRenderables(items: Map<Int, ItemStack>) = buildList {
         val table = items.mapNotNull { (slot, stack) -> readItem(slot, stack) }
         add(Renderable.string("§ePesthunter Shop Profit"))
-        add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
+        add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
     }
 
     private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {
