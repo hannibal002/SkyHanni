@@ -329,8 +329,8 @@ class ProfileSpecificStorage {
         @Expose var lastLbUpdate: SimpleTimeMark = farPast(),
         @Expose var summarized: Boolean = false,
 
-        @Expose var typeCountSnapshot: RabbitData = RabbitData(),
-        @Expose var typeCountsSince: RabbitData = RabbitData(),
+        @Expose var typeCountSnapshot: RabbitData? = RabbitData(),
+        @Expose var typeCountsSince: RabbitData? = RabbitData(),
     ) {
         @Transient
         var containingYears: MutableSet<Int> = mutableSetOf()
