@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -70,7 +69,7 @@ object SkyBlockKickDuration {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         if (!isEnabled()) return
         if (kickMessage) {
             kickMessage = false
@@ -109,7 +108,7 @@ object SkyBlockKickDuration {
     }
 
     private fun warn() {
-        TitleManager.sendTitle("§eTry rejoining SkyBlock now!", 3.seconds)
+        TitleManager.sendTitle("§eTry rejoining SkyBlock now!")
         SoundUtils.playBeepSound()
     }
 

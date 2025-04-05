@@ -11,12 +11,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -81,7 +78,7 @@ object FishingTimer {
         if (config.wormLimitAlert && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             if (currentCount >= 20) {
                 playSound()
-                TitleManager.sendTitle("§cWORM CAP FULL!!!", 2.seconds)
+                TitleManager.sendTitle("§cWORM CAP FULL!!!", duration = 2.seconds)
             }
         } else if (config.fishingCapAlert && currentCount >= currentCap) {
             playSound()
@@ -167,13 +164,13 @@ object FishingTimer {
     }
 
     @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
+    fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
-        if (config.manualResetTimer.isKeyClicked()) {
-            mobDespawnTime.replaceAll { _, _ ->
-                SimpleTimeMark.now()
-            }
+        if (event.keyCode != config.manualResetTimer) return
+
+        mobDespawnTime.replaceAll { _, _ ->
+            SimpleTimeMark.now()
         }
     }
 
@@ -197,7 +194,7 @@ object FishingTimer {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         if (!rightLocation) return
         if (currentCount == 0) return
@@ -245,7 +242,7 @@ object FishingTimer {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         mobDespawnTime.clear()
         recentMobs.clear()
         babyMagmaSlugsToFind = 0

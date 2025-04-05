@@ -414,7 +414,7 @@ object ReforgeHelper {
         val inventory = inventoryContainer?.inventorySlots ?: return
         val slot = inventory.firstOrNull { it?.stack?.cleanName() == reforgeStone }
         if (slot != null) {
-            slot highlight color
+            slot.highlight(color)
         } else {
             inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
             inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)

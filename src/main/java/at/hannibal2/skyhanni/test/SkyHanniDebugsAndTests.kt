@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -52,15 +53,17 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -78,7 +81,7 @@ object SkyHanniDebugsAndTests {
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
-    var displayList = emptyList<List<Any>>()
+    var displayList = emptyList<Renderable>()
 
     var globalRender = true
 
@@ -219,37 +222,33 @@ object SkyHanniDebugsAndTests {
             return
         }
 
-        val bigList = mutableListOf<List<Any>>()
-        var list = mutableListOf<Any>()
-        var i = 0
         var errors = 0
-        for (item in GardenVisitorColorNames.visitorItems) {
-            val name = item.key
-            i++
-            if (i == 5) {
-                i = 0
-                bigList.add(list)
-                list = mutableListOf()
-            }
 
-            val coloredName = GardenVisitorColorNames.getColoredName(name)
-            list.add("$coloredName§7 (")
-            for (itemName in item.value) {
-                try {
-                    val internalName = NeuInternalName.fromItemName(itemName)
-                    list.add(internalName.getItemStack())
-                } catch (e: Error) {
-                    ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
-                    errors++
+        displayList = buildList {
+            for (item in GardenVisitorColorNames.visitorItems) {
+                val name = item.key
+
+                addLine {
+                    val coloredName = GardenVisitorColorNames.getColoredName(name)
+                    addString("$coloredName§7 (")
+
+                    for (itemName in item.value) {
+                        try {
+                            val internalName = NeuInternalName.fromItemName(itemName)
+                            addItemStack(internalName.getItemStack())
+                        } catch (e: Error) {
+                            ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
+                            errors++
+                        }
+                    }
+                    if (item.value.isEmpty()) {
+                        addString("Any")
+                    }
+                    addString("§7) ")
                 }
             }
-            if (item.value.isEmpty()) {
-                list.add("Any")
-            }
-            list.add("§7) ")
         }
-        bigList.add(list)
-        displayList = bigList
+
         if (errors == 0) {
             ChatUtils.debug("Test garden visitor renderer: no errors")
         } else {
@@ -258,6 +257,7 @@ object SkyHanniDebugsAndTests {
     }
 
     fun reloadListeners() {
+        // TODO: use repo for this and implement it correctly
         val blockedFeatures = try {
             File("config/skyhanni/blocked-features.txt").readLines().toList()
         } catch (e: Exception) {
@@ -269,29 +269,41 @@ object SkyHanniDebugsAndTests {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
             MinecraftForge.EVENT_BUS.unregister(original)
+            SkyHanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
-                modules.add(javaClass)
-                MinecraftForge.EVENT_BUS.register(javaClass)
+                modules.add(original)
+                MinecraftForge.EVENT_BUS.register(original)
+                SkyHanniEvents.register(original)
                 println("Registered listener $simpleName")
             } else {
                 println("Skipped registering listener $simpleName")
             }
         }
-        ChatUtils.chat("reloaded ${modules.size} listener classes.")
+        ChatUtils.chat("Reloaded ${modules.size} listener classes.")
     }
 
     fun stopListeners() {
-        val modules = SkyHanniMod.modules
-        for (original in modules.toMutableList()) {
-            val javaClass = original.javaClass
-            val simpleName = javaClass.simpleName
-            MinecraftForge.EVENT_BUS.unregister(original)
-            println("Unregistered listener $simpleName")
-        }
-        ChatUtils.chat("stopped ${modules.size} listener classes.")
+        ChatUtils.clickableChat(
+            "§cAre you sure you want to stop all listeners? Doing this will make most features not work.",
+            onClick = {
+                val modules = SkyHanniMod.modules
+                for (original in modules.toMutableList()) {
+                    val javaClass = original.javaClass
+                    val simpleName = javaClass.simpleName
+                    MinecraftForge.EVENT_BUS.unregister(original)
+                    SkyHanniEvents.unregister(original)
+                    println("Unregistered listener $simpleName")
+                }
+                ChatUtils.clickableChat(
+                    "Stopped ${modules.size} listener classes. " +
+                        "If you want to re-enable them, run /shreloadlisteners or click this message.",
+                    onClick = { reloadListeners() },
+                )
+            },
+        )
     }
 
     fun whereAmI() {
@@ -498,7 +510,7 @@ object SkyHanniDebugsAndTests {
         if (displayLine.isNotEmpty()) {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
-        config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
+        config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
     }
 
     @HandleEvent
