@@ -8,7 +8,8 @@ import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
+import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
+import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
@@ -132,6 +133,9 @@ class ProfileSpecificStorage {
 
     @Expose
     var enderNodeTracker: EnderNodeTracker.Data = EnderNodeTracker.Data()
+
+    @Expose
+    var dragonProfitTracker: DragonProfitTracker.BucketData = DragonProfitTracker.BucketData()
 
     // - event
     // -- carnival
@@ -285,6 +289,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+
+        @Expose
+        var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
         class HitmanStatsStorage {
             @Expose
