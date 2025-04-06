@@ -200,7 +200,7 @@ object ScoreboardPattern {
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSB.pattern(
         "teammates",
-        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
+        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§(?<color>.))*(?<health>[\\w,.]+)(?:§.)*.?)",
     )
 
     /**
