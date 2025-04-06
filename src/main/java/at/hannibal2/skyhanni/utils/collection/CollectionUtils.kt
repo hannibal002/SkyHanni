@@ -368,7 +368,17 @@ object CollectionUtils {
 
     class OrderedQueue<T> : PriorityQueue<WeightedItem<T>>() {
         fun add(item: T, weight: Double): Boolean = super.add(WeightedItem(item, weight))
+        fun copyWithFilter(predicate: (T) -> Boolean): OrderedQueue<T> {
+            val newQueue = OrderedQueue<T>()
+            for (item in this) {
+                if (!predicate(item.item)) {
+                    newQueue.add(item.item, item.weight)
+                }
+            }
+            return newQueue
+        }
         fun pollOrNull(): T? = poll()?.item
+        fun getWaitingWeightOrNull(): Double? = peek()?.weight
     }
 
     data class WeightedItem<T>(val item: T, val weight: Double) : Comparable<WeightedItem<T>> {

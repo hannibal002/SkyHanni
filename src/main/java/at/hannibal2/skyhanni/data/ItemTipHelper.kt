@@ -8,12 +8,11 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.inventory.ContainerChest
 
 @SkyHanniModule
 object ItemTipHelper {
@@ -42,8 +41,7 @@ object ItemTipHelper {
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return
-        val chest = gui.inventorySlots as ContainerChest
-        val inventoryName = chest.getInventoryName()
+        val inventoryName = InventoryUtils.openInventoryName()
 
         val guiLeft = (gui as AccessorGuiContainer).guiLeft
         val guiTop = (gui as AccessorGuiContainer).guiTop
