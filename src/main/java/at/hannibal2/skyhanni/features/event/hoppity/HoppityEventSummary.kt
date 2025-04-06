@@ -641,7 +641,8 @@ object HoppityEventSummary {
                 stats.getMealEggCount().takeIf { it > 0 }?.let {
                     val spawnedMealEggs = getSpawnedEggCount(year)
                     val eggFormat = StringUtils.pluralize(it, "Egg")
-                    statList.addStr("§7You found §b${it.addSeparators()}§7/§a${spawnedMealEggs.addSeparators()} §6Chocolate Meal $eggFormat§7.")
+                    val amount = "${it.addSeparators()}§7/§a${spawnedMealEggs.addSeparators()}"
+                    statList.addStr("§7You found §b$amount §6Chocolate Meal $eggFormat§7.")
                 }
             }
 
