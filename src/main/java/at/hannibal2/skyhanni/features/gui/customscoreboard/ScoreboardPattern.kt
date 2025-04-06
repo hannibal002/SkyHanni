@@ -197,6 +197,10 @@ object ScoreboardPattern {
         "§3§lSolo",
     )
 
+    /**
+     * REGEX-TEST: §a[H] §6Eisengolem §7[Lv48]
+     * REGEX-TEST: §e[M] §b04032006 §a7,361§c❤
+     */
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSB.pattern(
         "teammates",

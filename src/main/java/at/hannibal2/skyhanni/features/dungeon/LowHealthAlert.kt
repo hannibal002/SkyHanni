@@ -22,7 +22,7 @@ object LowHealthAlert {
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        for (line in event.added.map { it }) {
+        for (line in event.added) {
             ScoreboardPattern.teammatesPattern.matchMatcher(line) {
                 val username = group("username")
                 val color = group("color")
@@ -35,7 +35,7 @@ object LowHealthAlert {
                         lastAlert = SimpleTimeMark.now()
                         val alertSound = SoundUtils.createSound(soundConfig.alertSound, soundConfig.pitch)
                         SoundUtils.repeatSound(100, soundConfig.repeatSound, alertSound)
-                        TitleManager.sendTitle("§c$username §ais low", "§c${health}❤", 2.seconds)
+                        TitleManager.sendTitle("§c$username §ais low", "§c$health❤", 2.seconds)
                     }
                 }
             }
