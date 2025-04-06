@@ -59,7 +59,7 @@ object JacobContestFFNeededDisplay {
         cache.clear()
     }
 
-    private fun drawDisplay(contest: FarmingContest) = buildList<Renderable> {
+    private fun drawDisplay(contest: FarmingContest) = buildList {
         addString("§6Minimum Farming Fortune needed")
         addString("")
 
