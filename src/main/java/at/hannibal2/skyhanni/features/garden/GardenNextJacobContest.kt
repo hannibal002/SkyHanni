@@ -373,11 +373,8 @@ object GardenNextJacobContest {
             return@line
         }
 
-        if (isCloseToNewYear()) {
-            addString(CLOSE_TO_NEW_YEAR_TEXT)
-        } else {
-            addString("§cOpen calendar to read Jacob contest times!")
-        }
+        if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
+        else addString("§cOpen calendar to read Jacob contest times!")
 
         fetchedFromElite = false
         contests.clear()

@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GLAllocation
@@ -517,61 +516,6 @@ object RenderUtils {
         }
         context.matrices.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
-    }
-
-    /** This function is discouraged to be used. Please use renderRenderables with List<Renderable> instead with horizontal container.*/
-    private fun Position.renderRenderablesDouble(
-        context: DrawContext,
-        renderables: List<List<Renderable>>,
-        extraSpace: Int = 0,
-        posLabel: String,
-        addToGuiManager: Boolean = true,
-    ) {
-        if (renderables.isEmpty()) return
-        var longestY = 0
-        var longestX = 0
-        context.matrices.pushMatrix()
-        val (x, y) = transform(context)
-        Renderable.withMousePosition(x, y) {
-            for (line in renderables) {
-                context.matrices.pushMatrix()
-                context.matrices.translate(0f, longestY.toFloat(), 0F)
-                val lineY = line.maxOf { it.height }
-                var lineX = 0
-                for (element in line) {
-                    element.renderYAligned(context, lineX, longestY, lineY)
-                    context.matrices.translate(element.width.toFloat(), 0f, 0f)
-                    lineX += element.width
-                }
-                longestY += lineY + extraSpace + 2
-                longestX = max(longestX, lineX)
-                context.matrices.popMatrix()
-            }
-        }
-        context.matrices.popMatrix()
-        if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
-    }
-
-    /**
-     * Accepts a list of lines to print.
-     * Each line is a list of things to print. Can print String or ItemStack objects.
-     */
-    @Deprecated("use List<List<Renderable>>", ReplaceWith("this.renderRenderablesDouble(list,extraSpace,posLabel)"))
-    fun Position.renderStringsAndItems(
-        list: List<List<Any?>>,
-        extraSpace: Int = 0,
-        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-
-        val render = list.map { listEntry ->
-            listEntry.map {
-                Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it")
-            }
-        }
-
-        this.renderRenderablesDouble(DrawContext(), render, extraSpace, posLabel, true)
     }
 
     // totally not modified Autumn Client's TargetStrafe

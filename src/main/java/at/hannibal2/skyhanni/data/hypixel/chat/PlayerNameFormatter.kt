@@ -299,6 +299,6 @@ object PlayerNameFormatter {
         //#if MC < 1.21
         this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
     //#else
-    //$$ this.copy().withColor(color.toChatFormatting())
+    //$$ this.copy().formatted(color.toChatFormatting())
     //#endif
 }
