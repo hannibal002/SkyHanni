@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -28,7 +29,6 @@ import net.minecraft.block.material.Material
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -101,7 +101,7 @@ object FruitDigging {
     private fun LorenzVec.convertCords(): Pair<Int, Int> = add(112, 0, 11).let { it.x.toInt() to it.z.toInt() }
     private fun Pair<Int, Int>.convertCords(): LorenzVec = LorenzVec(first - 112, 72, second - 11)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !hasStarted) return
         print(event.old to event.new)
@@ -143,8 +143,8 @@ object FruitDigging {
     private var lastPos = LorenzVec()
     private var ticksSinceLastFound = 0
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(7.0)) {
             val position = entityItem.position.let { pos -> LorenzVec(pos.x, 72, pos.z) }
@@ -242,8 +242,8 @@ object FruitDigging {
         FruitDiggingSolver.reset()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message.removeColor()
@@ -295,8 +295,8 @@ object FruitDigging {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for (info in FruitDiggingSolver.getBoardState()) {
