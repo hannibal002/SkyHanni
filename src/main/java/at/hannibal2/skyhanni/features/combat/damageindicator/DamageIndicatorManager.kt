@@ -653,6 +653,7 @@ object DamageIndicatorManager {
         return color.getChatColor() + calcHealth.shortFormat()
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun checkEnderSlayer(
         entity: EntityEnderman,
         entityData: EntityData,
