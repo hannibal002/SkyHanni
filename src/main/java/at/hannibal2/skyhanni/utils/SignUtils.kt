@@ -70,7 +70,7 @@ object SignUtils {
         pasteLastClicked = pasteClicked
     }
 
-    private fun GuiEditSign.getSignLines(): List<String>? {
+    fun GuiEditSign.getSignLines(): List<String>? {
         if (this !is AccessorGuiEditSign) return null
         return (this as AccessorGuiEditSign).text.map { it.unformattedText.removeColor() }
     }
