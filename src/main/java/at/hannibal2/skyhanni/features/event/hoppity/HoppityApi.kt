@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.SkyblockSeasonModifier
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -133,7 +134,7 @@ object HoppityApi {
         var lastName: String = "",
         var lastProfit: String = "",
         var lastMeal: HoppityEggType? = null,
-        var lastDuplicateAmount: Long? = null
+        var lastDuplicateAmount: Long? = null,
     ) : ResettableStorageSet()
 
     val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
@@ -154,10 +155,10 @@ object HoppityApi {
     fun getEventEndMark(): SimpleTimeMark? = if (isHoppityEvent()) getEventEndMark(SkyBlockTime.now().year) else null
 
     fun getEventEndMark(year: Int) =
-        SkyBlockTime.fromSeason(year, SkyblockSeason.SUMMER, SkyblockSeason.SkyblockSeasonModifier.EARLY).asTimeMark()
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SUMMER, SkyblockSeasonModifier.EARLY).asTimeMark()
 
     fun getEventStartMark(year: Int) =
-        SkyBlockTime.fromSeason(year, SkyblockSeason.SPRING, SkyblockSeason.SkyblockSeasonModifier.EARLY).asTimeMark()
+        SkyBlockTime.fromSeason(year, SkyblockSeason.SPRING, SkyblockSeasonModifier.EARLY).asTimeMark()
 
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
         it.chatColorCode == rabbit.substring(0, 2)
@@ -198,7 +199,7 @@ object HoppityApi {
         EggFoundEvent(
             type,
             chatEvent = event,
-            note = note
+            note = note,
         ).post()
     }
 
@@ -266,7 +267,6 @@ object HoppityApi {
             if (processed) processedStraySlots[slotNumber] = itemStack.displayName
         }
     }
-
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
