@@ -422,12 +422,6 @@ object HypixelData {
         val nowOnHypixel = LorenzUtils.onHypixel
         when {
             !wasOnHypixel && nowOnHypixel -> {
-                /* this should never happen but is still here for the odd case of it happenening */
-                if (!skyBlock) {
-                    skyBlock = true
-                    SkyBlockJoinEvent.post()
-                }
-
                 HypixelJoinEvent.post()
                 RepoManager.displayRepoStatus(true)
             }
