@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.ItemPickupEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -65,7 +65,7 @@ object CrownOfAvariceCounter {
     }
 
     @HandleEvent
-    fun onInventoryUpdated(event: OwnInventoryItemUpdateEvent) {
+    fun onInventoryUpdated(event: ItemPickupEvent) {
         if (!isEnabled() || event.slot != 5) return
         val item = event.itemStack
         if (item.getInternalNameOrNull() != internalName) return

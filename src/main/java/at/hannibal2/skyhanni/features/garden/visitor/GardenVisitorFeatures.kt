@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.ItemPickupEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -349,7 +349,7 @@ object GardenVisitorFeatures {
     }
 
     @HandleEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+    fun onOwnInventoryItemUpdate(event: ItemPickupEvent) {
         if (GardenApi.onBarnPlot) {
             update()
         }

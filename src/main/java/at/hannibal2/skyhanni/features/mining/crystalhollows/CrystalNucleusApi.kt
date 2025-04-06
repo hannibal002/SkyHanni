@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.ItemPickupEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -61,7 +61,7 @@ object CrystalNucleusApi {
     ).map { it.toInternalName() }
 
     @HandleEvent
-    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+    fun onOwnInventoryItemUpdate(event: ItemPickupEvent) {
         if (unCheckedBooks == 0) return
         if (event.itemStack.displayName != "§fEnchanted Book") return
         when (event.itemStack.getHypixelEnchantments()?.keys?.firstOrNull() ?: return) {
