@@ -412,7 +412,7 @@ object GardenVisitorFeatures {
         lastFullPrice = 0.0
         val foundRewards = mutableListOf<NeuInternalName>()
 
-        // Todo: Extract duplicated code
+        // TODO: Extract duplicated code
         for (formattedLine in stack.getLore()) {
             if (formattedLine.contains("Rewards")) {
                 readingShoppingList = false

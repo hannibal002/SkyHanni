@@ -308,7 +308,7 @@ object SackApi {
 
     data class SackChange(val delta: Int, val internalName: NeuInternalName, val sacks: List<String>)
 
-    // Todo: Move to repo pattern, add regex tests..?
+    // TODO: Move to repo pattern, add regex tests..?
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
     @HandleEvent

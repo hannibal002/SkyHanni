@@ -222,7 +222,7 @@ object ComposterOverlay {
         val matterPer = ComposterApi.organicMatterRequiredPer(null)
         val matterPerPreview = ComposterApi.organicMatterRequiredPer(upgrade)
 
-        // Todo: Extract duplicate code
+        // TODO: Extract duplicate code
         val matterMaxDuration = ComposterApi.timePerCompost(null) * floor(maxOrganicMatter / matterPer)
         val matterMaxDurationPreview =
             ComposterApi.timePerCompost(upgrade) * floor(maxOrganicMatterPreview / matterPerPreview)
