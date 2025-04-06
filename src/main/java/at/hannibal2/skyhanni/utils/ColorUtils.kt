@@ -1,14 +1,20 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import java.awt.Color
 
 object ColorUtils {
 
-    /** Transfer string colors from the config to [Color] */
-    fun String.toChromaColor() = Color(toChromaColorInt(), true)
-    fun String.toChromaColorInt() = SpecialColor.specialToChromaRGB(this)
+    @Deprecated("Use toSpecialColor() instead", ReplaceWith("this.toSpecialColor()"))
+    fun String.toChromaColor() = this.toSpecialColor()
+
+    @Deprecated("Use toSpecialColorInt() instead", ReplaceWith("this.toSpecialColorInt()"))
+    fun String.toChromaColorInt() = this.toSpecialColorInt()
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
+
+    fun getAlpha(color: Int) = color shr 24 and 0xFF
 
     fun getRed(color: Int) = color shr 16 and 0xFF
 
@@ -16,7 +22,11 @@ object ColorUtils {
 
     fun getBlue(color: Int) = color and 0xFF
 
-    fun getAlpha(color: Int) = color shr 24 and 0xFF
+    // I think you need to manually import these
+    operator fun Color.component1(): Float = this.alpha / 255f
+    operator fun Color.component2(): Float = this.red / 255f
+    operator fun Color.component3(): Float = this.green / 255f
+    operator fun Color.component4(): Float = this.blue / 255f
 
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),
@@ -35,9 +45,6 @@ object ColorUtils {
     )
 
     val TRANSPARENT_COLOR = Color(0, 0, 0, 0)
-
-    @Deprecated("Don't use int colors", ReplaceWith("this.addAlpha()"))
-    fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (rgb and 0x00ffffff)
 
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 

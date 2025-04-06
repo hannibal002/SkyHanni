@@ -1,16 +1,15 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
+import at.hannibal2.skyhanni.SkyHanniMod.coroutineScope
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FossilSolverDisplay {
@@ -33,16 +31,24 @@ object FossilSolverDisplay {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
 
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
+
+    /**
+     * REGEX-TEST: Chisel Charges Remaining: 3
+     */
     private val chargesRemainingPattern by patternGroup.pattern(
         "chargesremaining",
         "Chisel Charges Remaining: (?<charges>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: Fossil Excavation Progress: 8.3%
+     */
     private val fossilProgressPattern by patternGroup.pattern(
         "fossilprogress",
         "Fossil Excavation Progress: (?<progress>[\\d.]+%)",
     )
 
-    private val inExcavatorMenu get() = FossilExcavatorAPI.inExcavatorMenu
+    private val inExcavatorMenu get() = FossilExcavatorApi.inExcavatorMenu
 
     private var foundPercentage = false
     private var percentage: String? = null
@@ -66,12 +72,12 @@ object FossilSolverDisplay {
 
     var possibleFossilTypes = setOf<FossilType>()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         clearData()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         clearData()
     }
@@ -88,8 +94,8 @@ object FossilSolverDisplay {
         possibleFossilTypes = emptySet()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick() {
         if (!isEnabled()) return
         val slots = InventoryUtils.getItemsInOpenChest()
         val itemNames = slots.map { it.stack.displayName.removeColor() }
@@ -142,7 +148,7 @@ object FossilSolverDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
@@ -156,20 +162,20 @@ object FossilSolverDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    @HandleEvent
+    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
         if (slotToClick == null) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotIndex == slotToClick) {
-                slot highlight LorenzColor.GREEN.toColor().addAlpha(90)
+                slot.highlight(LorenzColor.GREEN.toColor().addAlpha(90))
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.showPercentage) return
@@ -182,7 +188,7 @@ object FossilSolverDisplay {
         event.offsetY = 10
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
@@ -211,7 +217,7 @@ object FossilSolverDisplay {
         config.position.renderStrings(displayList, posLabel = "Fossil Excavator Solver")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(36, "mining.fossilExcavator", "mining.fossilExcavator2.solver")
         event.move(37, "mining.fossilExcavator2", "mining.fossilExcavator")
@@ -233,5 +239,5 @@ object FossilSolverDisplay {
         isCompleted = true
     }
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled && FossilExcavatorAPI.inInventory
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled && FossilExcavatorApi.inInventory
 }

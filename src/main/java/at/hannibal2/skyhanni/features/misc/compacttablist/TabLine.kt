@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.entity.player.EntityPlayer
@@ -21,7 +22,7 @@ class TabLine(val text: String, val type: TabStringType, val customName: String 
     fun getInfo(): NetworkPlayerInfo? {
         val minecraft = Minecraft.getMinecraft()
         val usernameFromLine = TabStringType.usernameFromLine(text)
-        return minecraft.netHandler.getPlayerInfo(usernameFromLine)
+        return minecraft.netHandler?.getPlayerInfo(usernameFromLine)
     }
 
     private var entity: EntityPlayer? = null
@@ -30,8 +31,7 @@ class TabLine(val text: String, val type: TabStringType, val customName: String 
         entity?.let {
             return it
         }
-        val minecraft = Minecraft.getMinecraft()
-        val entity = minecraft.theWorld.getPlayerEntityByUUID(pLayerInfo.gameProfile.id)
+        val entity = MinecraftCompat.localWorld.getPlayerEntityByUUID(pLayerInfo.gameProfile.id)
         this.entity = entity
         return entity
     }

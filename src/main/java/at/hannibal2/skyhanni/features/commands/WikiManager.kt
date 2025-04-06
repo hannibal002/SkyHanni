@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
@@ -10,10 +11,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLEncoder
 
 @SkyHanniModule
@@ -25,14 +26,13 @@ object WikiManager {
 
     private val config get() = SkyHanniMod.feature.misc.commands.betterWiki
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
         val message = event.message.lowercase()
         if (!(message.startsWith("/wiki"))) return
@@ -57,11 +57,10 @@ object WikiManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onKeybind(event: GuiKeyPressEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (NEUItems.neuHasFocus()) return
-        val stack = event.guiContainer.slotUnderMouse?.stack ?: return
+        if (NeuItems.neuHasFocus()) return
+        val stack = slotUnderCursor()?.stack ?: return
 
         if (!config.wikiKeybind.isKeyHeld()) return
         wikiTheItem(stack, config.menuOpenWiki)

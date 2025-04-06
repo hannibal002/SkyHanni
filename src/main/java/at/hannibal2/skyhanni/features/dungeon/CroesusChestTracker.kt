@@ -1,26 +1,25 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
-import at.hannibal2.skyhanni.events.DungeonCompleteEvent
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.DungeonChest
+import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonChest
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -29,8 +28,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CroesusChestTracker {
@@ -57,7 +54,7 @@ object CroesusChestTracker {
     private const val BACK_ARROW_SLOT = 45
     private const val MAX_CHESTS = 60
 
-    private val kismetInternalName = "KISMET_FEATHER".asInternalName()
+    private val kismetInternalName = "KISMET_FEATHER".toInternalName()
 
     private var inCroesusInventory = false
     private var croesusEmpty = false
@@ -72,9 +69,8 @@ object CroesusChestTracker {
 
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW, onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
 
         if (inCroesusInventory && !croesusEmpty) {
@@ -87,15 +83,14 @@ object CroesusChestTracker {
                 val state = run.openState ?: OpenedState.UNOPENED
 
                 if (state != OpenedState.KEY_USED) {
-                    slot highlight if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE
+                    slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
                 }
             }
         }
     }
 
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.showUsedKismets) &&
             croesusPattern.matches(event.inventoryName)
         ) {
@@ -138,7 +133,7 @@ object CroesusChestTracker {
             val lore = item.getLore()
 
             if (run.floor == null) run.floor =
-                (if (masterPattern.matches(item.name)) "M" else "F") + (
+                (if (masterPattern.matches(item.displayName)) "M" else "F") + (
                     lore.firstNotNullOfOrNull {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
@@ -151,7 +146,7 @@ object CroesusChestTracker {
                     "Croesus Chest couldn't be read correctly.",
                     "Open state check failed for chest.",
                     "run" to run,
-                    "lore" to lore
+                    "lore" to lore,
                 ).run { null }
             }
         }
@@ -160,7 +155,7 @@ object CroesusChestTracker {
     private fun pageSetup(event: InventoryFullyOpenedEvent) {
         inCroesusInventory = true
         pageSwitchable = true
-        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.name)
+        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.displayName)
         if (event.inventoryItems[BACK_ARROW_SLOT]?.item != Items.arrow) {
             currentPage = 0
         }
@@ -172,15 +167,14 @@ object CroesusChestTracker {
         kismetUsed = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inCroesusInventory = false
         chestInventory = null
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return
         if (chestInventory != null && event.slotId == KISMET_SLOT) {
             setKismetUsed()
@@ -204,19 +198,17 @@ object CroesusChestTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
-        if (!kismetPattern.matches(event.stack.name)) return
+        if (!kismetPattern.matches(event.stack.displayName)) return
         if (kismetUsedPattern.matches(event.stack.getLore().lastOrNull())) return
         event.stackTip = "§a$kismetAmountCache"
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTipIsKismetable(event: RenderInventoryItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return
         if (!inCroesusInventory) return
         if (event.slot.slotIndex != event.slot.slotNumber) return
@@ -227,7 +219,7 @@ object CroesusChestTracker {
         event.stackTip = "§a✔"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
         croesusChests?.add(0, DungeonRunInfo(event.floor))
@@ -273,7 +265,7 @@ object CroesusChestTracker {
     }
 
     @JvmStatic
-    fun generateMaxChestAsList(): List<DungeonRunInfo> = generateMaxChest().toList()
+    fun generateMaxChestAsList(): MutableList<DungeonRunInfo> = generateMaxChest().toMutableList()
     private fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence { DungeonRunInfo() }.take(MAX_CHESTS)
 
     private fun getLastActiveChest(includeDungeonKey: Boolean = false): Int = (

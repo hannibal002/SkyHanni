@@ -1,29 +1,28 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
 
 @SkyHanniModule
 object RenderableTooltips {
 
     private var tooltip: DeferredTooltip? = null
 
-    @SubscribeEvent
-    fun onPostRenderTick(event: RenderTickEvent) {
-        if (event.phase == TickEvent.Phase.START) {
+    @HandleEvent
+    fun onRenderingTick(event: RenderingTickEvent) {
+        if (event.startPhase) {
             tooltip = null
-        } else if (event.phase == TickEvent.Phase.END) {
+        } else {
             drawHoveringText()
         }
     }
@@ -77,69 +76,8 @@ object RenderableTooltips {
         val zLevel = 400f
         GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
-        RenderUtils.drawGradientRect(
-            left = -3,
-            top = -4,
-            right = tooltipTextWidth + 2,
-            bottom = -3,
-        )
-        RenderUtils.drawGradientRect(
-            left = -3,
-            top = tooltipHeight + 3,
-            right = tooltipTextWidth + 2,
-            bottom = tooltipHeight + 4,
-        )
-        RenderUtils.drawGradientRect(
-            left = -3,
-            top = -3,
-            right = tooltipTextWidth + 2,
-            bottom = tooltipHeight + 3,
-        )
-        RenderUtils.drawGradientRect(
-            left = -4,
-            top = -3,
-            right = -3,
-            bottom = tooltipHeight + 3,
-        )
-        RenderUtils.drawGradientRect(
-            left = tooltipTextWidth + 2,
-            top = -3,
-            right = tooltipTextWidth + 3,
-            bottom = tooltipHeight + 3,
-        )
-        val borderColorEnd = borderColorStart and 0xFEFEFE shr 1 or (borderColorStart and -0x1000000)
-        RenderUtils.drawGradientRect(
-            left = -3,
-            top = -3 + 1,
-            right = -3 + 1,
-            bottom = tooltipHeight + 3 - 1,
-            startColor = borderColorStart,
-            endColor = borderColorEnd
-        )
-        RenderUtils.drawGradientRect(
-            left = tooltipTextWidth + 1,
-            top = -3 + 1,
-            right = tooltipTextWidth + 2,
-            bottom = tooltipHeight + 3 - 1,
-            startColor = borderColorStart,
-            endColor = borderColorEnd
-        )
-        RenderUtils.drawGradientRect(
-            left = -3,
-            top = -3,
-            right = tooltipTextWidth + 2,
-            bottom = -3 + 1,
-            startColor = borderColorStart,
-            endColor = borderColorStart
-        )
-        RenderUtils.drawGradientRect(
-            left = -3,
-            top = tooltipHeight + 2,
-            right = tooltipTextWidth + 2,
-            bottom = tooltipHeight + 3,
-            startColor = borderColorEnd,
-            endColor = borderColorEnd
-        )
+        drawTooltipBackground(tooltipTextWidth, tooltipHeight, borderColorStart)
+
         GlStateManager.translate(-1f, -1f, 0f)
 
         var yTranslateSum = 0
@@ -156,6 +94,32 @@ object RenderableTooltips {
         RenderHelper.enableStandardItemLighting()
         GlStateManager.enableRescaleNormal()
         GlStateManager.disableLighting()
+    }
+
+    private fun drawTooltipBackground(tooltipTextWidth: Int, tooltipHeight: Int, borderColorStart: Int) {
+        val borderColorEnd = borderColorStart and 0xFEFEFE shr 1 or (borderColorStart and -0x1000000)
+
+        GuiRenderUtils.drawGradientRect(left = -3, top = -4, right = tooltipTextWidth + 2, bottom = -3)
+        GuiRenderUtils.drawGradientRect(left = -3, top = tooltipHeight + 3, right = tooltipTextWidth + 2, bottom = tooltipHeight + 4)
+        GuiRenderUtils.drawGradientRect(left = -3, top = -3, right = tooltipTextWidth + 2, bottom = tooltipHeight + 3)
+        GuiRenderUtils.drawGradientRect(left = -4, top = -3, right = -3, bottom = tooltipHeight + 3)
+        GuiRenderUtils.drawGradientRect(left = tooltipTextWidth + 2, top = -3, right = tooltipTextWidth + 3, bottom = tooltipHeight + 3)
+        GuiRenderUtils.drawGradientRect(
+            left = -3, top = -3 + 1, right = -3 + 1, bottom = tooltipHeight + 3 - 1,
+            startColor = borderColorStart, endColor = borderColorEnd
+        )
+        GuiRenderUtils.drawGradientRect(
+            left = tooltipTextWidth + 1, top = -3 + 1, right = tooltipTextWidth + 2, bottom = tooltipHeight + 3 - 1,
+            startColor = borderColorStart, endColor = borderColorEnd
+        )
+        GuiRenderUtils.drawGradientRect(
+            left = -3, top = -3, right = tooltipTextWidth + 2, bottom = -3 + 1,
+            startColor = borderColorStart, endColor = borderColorStart
+        )
+        GuiRenderUtils.drawGradientRect(
+            left = -3, top = tooltipHeight + 2, right = tooltipTextWidth + 2, bottom = tooltipHeight + 3,
+            startColor = borderColorEnd, endColor = borderColorEnd
+        )
     }
 }
 

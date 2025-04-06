@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
@@ -37,9 +38,6 @@ object NumberUtil {
             1 to "I",
         ),
     )
-
-    @Deprecated("outdated", ReplaceWith("value.shortFormat(preciseBillions)"))
-    fun format(value: Number, preciseBillions: Boolean = false): String = value.shortFormat(preciseBillions)
 
     // 1234 -> 1.2k
     fun Number.shortFormat(preciseBillions: Boolean = false): String {
@@ -87,12 +85,6 @@ object NumberUtil {
     }
 
     fun Float.roundTo(precision: Int): Float = toDouble().roundTo(precision).toFloat()
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
-    fun Double.roundToPrecision(precision: Int) = this.roundTo(precision)
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
-    fun Float.roundToPrecision(precision: Int) = this.roundTo(precision)
 
     fun Number.ordinal(): String {
         val long = this.toLong()
@@ -263,13 +255,15 @@ object NumberUtil {
 
     // Sometimes we just take an L, never find it and forget to write it down
     val Int.million get() = this * 1_000_000.0
-    private val Int.billion get() = this * 1_000_000_000.0
+    val Int.billion get() = this * 1_000_000_000.0
     val Double.million get() = (this * 1_000_000.0).toLong()
 
     /** @return clamped to [0.0, 1.0]**/
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max
     }?.coerceIn(0.0, 1.0) ?: 1.0
+
+    fun Int?.isPositive(): Boolean = (this ?: 0) > 0
 
     fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
         var interp = now
@@ -280,5 +274,12 @@ object NumberUtil {
         }
         return interp
     }
+
+    fun Int.intPow(n: Int): Int = toDouble().pow(n).toInt()
+
+    fun Double.formatPercentage(): String = formatPercentage(this, "0.00")
+
+    private fun formatPercentage(percentage: Double, format: String?): String =
+        DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
 }

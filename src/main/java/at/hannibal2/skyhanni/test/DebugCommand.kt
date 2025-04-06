@@ -5,13 +5,22 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.repo.RepoManager
-import at.hannibal2.skyhanni.data.repo.RepoManager.Companion.hasDefaultSettings
+import at.hannibal2.skyhanni.data.repo.RepoManager.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.features.misc.TpsCounter
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object DebugCommand {
 
@@ -23,7 +32,7 @@ object DebugCommand {
         }
         val list = mutableListOf<String>()
         list.add("```")
-        list.add("= Debug Information for SkyHanni ${SkyHanniMod.version} =")
+        list.add("= Debug Information for SkyHanni ${SkyHanniMod.VERSION} =")
         list.add("")
 
         val search = args.joinToString(" ")
@@ -42,10 +51,11 @@ object DebugCommand {
         repoData(event)
         globalRender(event)
         skyblockStatus(event)
+        networkInfo(event)
         profileName(event)
         profileType(event)
 
-        event.postAndCatch()
+        event.post()
 
         if (event.empty) {
             list.add("")
@@ -167,6 +177,8 @@ object DebugCommand {
                     add("  - $constant")
                 }
             }
+
+            add(" loaded neu items: ${NeuItems.allNeuRepoItems().size}")
         }
 
         val isRelevant = RepoManager.usingBackupRepo || RepoManager.unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
@@ -184,4 +196,51 @@ object DebugCommand {
             add("uuid: '${LorenzUtils.getPlayerUuid()}'")
         }
     }
+
+    private const val TPS_LIMIT = 15.0
+    private val pingLimit = 1.5.seconds
+
+    private fun networkInfo(event: DebugDataCollectEvent) {
+        event.title("Network Information")
+        val tps = TpsCounter.tps ?: 0.0
+        val pingEnabled = SkyHanniMod.feature.dev.hypixelPingApi
+
+        val list = buildList {
+            add("tps: $tps")
+            add("ping: ${CurrentPing.averagePing.inWholeMilliseconds.formatTime()}")
+
+            val lastWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince()
+            var showPreviousPings = CurrentPing.averagePing > pingLimit
+            if (!pingEnabled) {
+                add("Hypixel Ping Packet disabled in settings!")
+                showPreviousPings = true
+            }
+            if (lastWorldSwitch < 1.minutes) {
+                add("last world switch: ${lastWorldSwitch.format()} ago")
+                showPreviousPings = true
+            }
+            if (CurrentPing.previousPings.any { it > 5_000 }) {
+                showPreviousPings = true
+            }
+            if (showPreviousPings) {
+                add("previousPings: ${CurrentPing.previousPings.map { it.formatTime() }}")
+            }
+
+            if (LimboTimeTracker.inLimbo) {
+                add("currently in limbo!")
+            }
+        }
+
+
+
+        if (tps < TPS_LIMIT || CurrentPing.averagePing > pingLimit || !pingEnabled) {
+            event.addData(list)
+        } else {
+            event.addIrrelevant(list)
+        }
+    }
+
+    private fun Long.formatTime(): String = if (this > 999) {
+        this.milliseconds.format(showMilliSeconds = true)
+    } else this.addSeparators() + "ms"
 }

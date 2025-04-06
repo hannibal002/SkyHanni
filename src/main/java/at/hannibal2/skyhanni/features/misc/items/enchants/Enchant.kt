@@ -3,11 +3,16 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
@@ -21,10 +26,10 @@ open class Enchant : Comparable<Enchant> {
     var loreName = ""
 
     @Expose
-    private var goodLevel = 0
+    private val goodLevel = 0
 
     @Expose
-    private var maxLevel = 0
+    private val maxLevel = 0
 
     private fun isNormal() = this is Normal
     private fun isUltimate() = this is Ultimate
@@ -67,7 +72,7 @@ open class Enchant : Comparable<Enchant> {
 
         val itemCategory = itemStack?.getItemCategoryOrNull()
         val internalName = itemStack?.getInternalNameOrNull()
-        val itemName = internalName?.itemName?.removeColor()
+        val itemName = internalName?.repoItemName?.removeColor()
 
         if (this.nbtName == "efficiency") {
             // If the item is a Stonk, or a non-mining tool with Efficiency 5 (whilst not being a Promising Shovel),
@@ -102,16 +107,27 @@ open class Enchant : Comparable<Enchant> {
 
     class Stacking : Enchant() {
         @Expose
-        private var nbtNum: String? = null
+        private val nbtNum: String? = null
 
         @Expose
         @Suppress("UnusedPrivateProperty")
         private val statLabel: String? = null
 
         @Expose
-        private var stackLevel: TreeSet<Int>? = null
+        private val stackLevel: TreeSet<Int>? = null
 
         override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
+
+        fun progressString(item: ItemStack): String {
+            val nbtKey = nbtNum ?: return ""
+            val levels = stackLevel ?: return ""
+            val label = statLabel?.splitCamelCase()?.replaceFirstChar { it.uppercase() }?.replace("Xp", "XP") ?: return ""
+            val progress = item.extraAttributes.getDouble(nbtKey).roundTo(0).toInt()
+            if (progress == 0) return ""
+            val nextLevel = levels.higher(progress)
+            val tail = nextLevel?.shortFormat()?.insert(0, "/ ") ?: "(Maxed)"
+            return "§7$label: §c${progress.shortFormat()} §7$tail"
+        }
     }
 
     class Dummy(name: String) : Enchant() {

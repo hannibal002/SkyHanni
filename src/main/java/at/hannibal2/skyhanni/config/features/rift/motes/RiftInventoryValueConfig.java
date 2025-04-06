@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class RiftInventoryValueConfig {
     @Expose
@@ -20,23 +21,23 @@ public class RiftInventoryValueConfig {
     @ConfigOption(name = "Number Format Type", desc = "Short: 1.2M\n" +
         "Long: 1,200,000")
     @ConfigEditorDropdown
-    public NumberFormatEntry formatType = NumberFormatEntry.SHORT;
+    public Property<NumberFormatEntry> formatType = Property.of(NumberFormatEntry.SHORT);
 
     public enum NumberFormatEntry implements HasLegacyId {
         SHORT("Short", 0),
         LONG("Long", 1);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        NumberFormatEntry(String str, int legacyId) {
-            this.str = str;
+        NumberFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        NumberFormatEntry(String str) {
-            this(str, -1);
+        NumberFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -46,7 +47,7 @@ public class RiftInventoryValueConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 

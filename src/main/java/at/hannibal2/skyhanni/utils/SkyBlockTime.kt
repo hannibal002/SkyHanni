@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import java.time.Instant
 
 /**
@@ -25,6 +26,32 @@ data class SkyBlockTime(
     fun toMillis(): Long =
         calculateTimeInSkyBlockMillis(year, month, day, hour, minute, second) + SKYBLOCK_EPOCH_START_MILLIS
 
+    fun getSeason(): SkyblockSeason = when (month) {
+        in 1..3 -> SkyblockSeason.SPRING
+        in 4..6 -> SkyblockSeason.SUMMER
+        in 7..9 -> SkyblockSeason.AUTUMN
+        else -> SkyblockSeason.WINTER
+    }
+
+    fun getSeasonModifier(): SkyblockSeasonModifier = when ((month - 1) % 3) {
+        0 -> SkyblockSeasonModifier.EARLY
+        1 -> SkyblockSeasonModifier.NONE
+        2 -> SkyblockSeasonModifier.LATE
+        else -> SkyblockSeasonModifier.NONE
+    }
+
+    private val seasonBorders: List<List<IntRange>> = listOf(
+        listOf(1..1, 1..1, 0..0, 0..0, 0..5), // First border set
+        listOf(12..12, 31..31, 23..23, 59..59, 55..59), // End border set
+    )
+
+    fun isSeasonBorder(): Boolean {
+        val currentValues = listOf(month, day, hour, minute, second)
+        return seasonBorders.any { borderSet ->
+            borderSet.zip(currentValues).all { (range, value) -> value in range }
+        }
+    }
+
     companion object {
         private const val SKYBLOCK_EPOCH_START_MILLIS = 1559829300000L // Day 1, Year 1
         const val SKYBLOCK_YEAR_MILLIS = 124 * 60 * 60 * 1000L
@@ -38,8 +65,18 @@ data class SkyBlockTime(
         fun fromInstant(instant: Instant): SkyBlockTime =
             calculateSkyBlockTime(instant.toEpochMilli() - SKYBLOCK_EPOCH_START_MILLIS)
 
-        fun fromSbYear(year: Int): SkyBlockTime =
+        fun fromSBYear(year: Int): SkyBlockTime =
             fromInstant(Instant.ofEpochMilli(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
+
+        fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeasonModifier? = null): SkyBlockTime {
+            return fromInstant(
+                Instant.ofEpochMilli(
+                    SKYBLOCK_EPOCH_START_MILLIS +
+                        (SKYBLOCK_YEAR_MILLIS * year) +
+                        (SKYBLOCK_MONTH_MILLIS * (season.getMonth(modifier))),
+                ),
+            )
+        }
 
         fun now(): SkyBlockTime = fromInstant(Instant.now())
 
@@ -67,7 +104,7 @@ data class SkyBlockTime(
             day: Int,
             hour: Int,
             minute: Int,
-            second: Int
+            second: Int,
         ): Long {
             var time = 0L
             time += year * SKYBLOCK_YEAR_MILLIS
@@ -107,6 +144,24 @@ data class SkyBlockTime(
                 3 -> "rd"
                 else -> "th"
             }
+        }
+
+        operator fun SkyBlockTime.plus(duration: kotlin.time.Duration): SkyBlockTime {
+            val millis = toMillis() + duration.inWholeMilliseconds
+            return fromInstant(Instant.ofEpochMilli(millis))
+        }
+
+        fun isDay(): Boolean = MinecraftCompat.localWorld.worldTime % 24000 in 1..12000
+
+        fun getSBMonthByName(month: String): Int {
+            var monthNr = 0
+            for (i in 1..12) {
+                val monthName = monthName(i)
+                if (month == monthName) {
+                    monthNr = i
+                }
+            }
+            return monthNr
         }
     }
 }

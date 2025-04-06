@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.tiarelay
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -8,13 +9,11 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -25,13 +24,12 @@ object TiaRelayHelper {
 
     private var lastClickSlot = 0
     private var lastClickTime = SimpleTimeMark.farPast()
-    private var sounds = mutableMapOf<Int, Sound>()
+    private val sounds = mutableMapOf<Int, Sound>()
 
-    private var resultDisplay = mutableMapOf<Int, Int>()
+    private val resultDisplay = mutableMapOf<Int, Int>()
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         val soundName = event.soundName
 
         if (config.tiaRelayMute && soundName == "mob.wolf.whine") {
@@ -55,9 +53,8 @@ object TiaRelayHelper {
         tryResult()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.soundHelper) return
 
         if (InventoryUtils.openInventoryName().contains("Network Relay")) {
@@ -76,9 +73,13 @@ object TiaRelayHelper {
         for (sound in sounds.toMutableMap()) {
             if (sound.value.name != name) {
                 ChatUtils.userError("Tia Relay Helper error: Too much background noise! Try turning off the music and then try again.")
-                ChatUtils.clickableChat("Click here to run /togglemusic", onClick = {
-                    HypixelCommands.toggleMusic()
-                }, "§eClick to run /togglemusic!")
+                ChatUtils.clickableChat(
+                    "Click here to run /togglemusic",
+                    onClick = {
+                        HypixelCommands.toggleMusic()
+                    },
+                    "§eClick to run /togglemusic!",
+                )
                 sounds.clear()
                 return
             }
@@ -98,9 +99,8 @@ object TiaRelayHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.soundHelper) return
         if (!inInventory) return
 
@@ -127,9 +127,8 @@ object TiaRelayHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.soundHelper) return
         if (!inInventory) return
 
@@ -140,7 +139,7 @@ object TiaRelayHelper {
         lastClickTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.tiaRelayMute", "inventory.helper.tiaRelay.tiaRelayMute")
         event.move(2, "misc.tiaRelayHelper", "inventory.helper.tiaRelay.soundHelper")

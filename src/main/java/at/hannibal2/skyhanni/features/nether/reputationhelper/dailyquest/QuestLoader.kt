@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.KuudraQuest
@@ -14,68 +15,57 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.Q
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.RescueMissionQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
+import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
+import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import net.minecraft.item.ItemStack
 
-class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
+object QuestLoader {
 
-    companion object {
-
-        val quests = mutableMapOf<String, Pair<String, ReputationQuest>>()
-        fun loadQuests(data: Map<String, ReputationQuest>, questType: String) {
-            for ((questName, questInfo) in data) {
-                quests[questName] = Pair(questType, questInfo)
-            }
+    val quests = mutableMapOf<String, Pair<String, ReputationQuest>>()
+    fun loadQuests(data: Map<String, ReputationQuest>, questType: String) {
+        for ((questName, questInfo) in data) {
+            quests[questName] = Pair(questType, questInfo)
         }
     }
 
     fun loadFromTabList() {
-        dailyQuestHelper.greatSpook = false
+        DailyQuestHelper.greatSpook = false
         var found = 0
 
 
         for (line in TabWidget.FACTION_QUESTS.lines) {
             readQuest(line)
             found++
-            if (dailyQuestHelper.greatSpook) return
+            if (DailyQuestHelper.greatSpook) return
         }
 
-        dailyQuestHelper.reputationHelper.tabListQuestsMissing = found == 0
-        dailyQuestHelper.update()
+        CrimsonIsleReputationHelper.tabListQuestsMissing = found == 0
+        DailyQuestHelper.update()
     }
 
     private fun readQuest(line: String) {
-        if (!dailyQuestHelper.reputationHelper.tabListQuestPattern.matches(line)) return
+        CrimsonIsleReputationHelper.tabListQuestPattern.matchMatcher(line) {
+            if (line.contains("The Great Spook")) {
+                DailyQuestHelper.greatSpook = true
+                DailyQuestHelper.update()
+                return
+            }
 
-        if (line.contains("The Great Spook")) {
-            dailyQuestHelper.greatSpook = true
-            dailyQuestHelper.update()
-            return
+            val name = group("name")
+            val amount = groupOrNull("amount")?.toInt() ?: 1
+            val green = group("status") == "✔"
+
+            checkQuest(name, green, amount)
         }
-        var text = line.substring(3)
-        val green = text.startsWith("§a")
-        text = text.substring(2)
-
-        val amount: Int
-        val name: String
-        // TODO use regex
-        if (text.contains(" §r§8x")) {
-            val split = text.split(" §r§8x")
-            name = split[0]
-            amount = split[1].toInt()
-        } else {
-            name = text
-            amount = 1
-        }
-
-        checkQuest(name, green, amount)
     }
 
     private fun checkQuest(name: String, green: Boolean, needAmount: Int) {
@@ -83,24 +73,24 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         if (oldQuest != null) {
             if (green && oldQuest.state != QuestState.READY_TO_COLLECT && oldQuest.state != QuestState.COLLECTED) {
                 oldQuest.state = QuestState.READY_TO_COLLECT
-                dailyQuestHelper.update()
+                DailyQuestHelper.update()
                 ChatUtils.debug("Reputation Helper: Tab-List updated ${oldQuest.internalName} (This should not happen)")
             }
             return
         }
 
-        val state = if (green) QuestState.READY_TO_COLLECT else QuestState.NOT_ACCEPTED
-        dailyQuestHelper.update()
+        val state = if (green) QuestState.READY_TO_COLLECT else QuestState.ACCEPTED
+        DailyQuestHelper.update()
         addQuest(addQuest(name, state, needAmount))
     }
 
     private fun addQuest(name: String, state: QuestState, needAmount: Int): Quest {
-        for (miniBoss in dailyQuestHelper.reputationHelper.miniBossHelper.miniBosses) {
+        for (miniBoss in DailyMiniBossHelper.miniBosses) {
             if (name == miniBoss.displayName) {
                 return MiniBossQuest(miniBoss, state, needAmount)
             }
         }
-        for (kuudraTier in dailyQuestHelper.reputationHelper.kuudraBossHelper.kuudraTiers) {
+        for (kuudraTier in DailyKuudraBossHelper.kuudraTiers) {
             val kuudraName = kuudraTier.name
             if (name == "Kill Kuudra $kuudraName Tier") {
                 return KuudraQuest(kuudraTier, state)
@@ -118,7 +108,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         if (questName in quests) {
             val questInfo = quests[questName] ?: return UnknownQuest(name)
             val locationInfo = questInfo.second.location
-            val location = dailyQuestHelper.reputationHelper.readLocationData(locationInfo)
+            val location = CrimsonIsleReputationHelper.readLocationData(locationInfo)
             val displayItem = questInfo.second.item
 
             when (questInfo.first) {
@@ -142,7 +132,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun getQuestByName(name: String): Quest? {
-        return dailyQuestHelper.quests.firstOrNull { it.internalName == name }
+        return DailyQuestHelper.quests.firstOrNull { it.internalName == name }
     }
 
     fun checkInventory(event: InventoryFullyOpenedEvent) {
@@ -151,22 +141,17 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         if (!inMageRegion && !inBarbarianRegion) return
 
         val name = event.inventoryName
-        for (quest in dailyQuestHelper.quests) {
+        for (quest in DailyQuestHelper.quests) {
             val categoryName = quest.category.name
             if (!categoryName.equals(name, ignoreCase = true)) continue
             val stack = event.inventoryItems[22] ?: continue
 
-            val completed = stack.getLore().any { it.contains("Completed!") }
+            val completed = stack.getLore().any { DailyQuestHelper.completedPattern.matches(it) }
             if (completed && quest.state != QuestState.COLLECTED) {
                 quest.state = QuestState.COLLECTED
-                dailyQuestHelper.update()
+                DailyQuestHelper.update()
             }
 
-            val accepted = !stack.getLore().any { it.contains("Click to start!") }
-            if (accepted && quest.state == QuestState.NOT_ACCEPTED) {
-                quest.state = QuestState.ACCEPTED
-                dailyQuestHelper.update()
-            }
             if (name == "Miniboss") {
                 fixMinibossAmount(quest, stack)
             }
@@ -179,7 +164,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         val storedAmount = quest.needAmount
         if (storedAmount != 1) return
         for (line in stack.getLore()) {
-            val realAmount = dailyQuestHelper.minibossAmountPattern.matchMatcher(line) {
+            val realAmount = DailyQuestHelper.minibossAmountPattern.matchMatcher(line) {
                 group("amount").toInt()
             } ?: continue
             if (storedAmount == realAmount) continue
@@ -188,26 +173,36 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
             val newQuest = MiniBossQuest(quest.miniBoss, quest.state, realAmount)
             newQuest.haveAmount = quest.haveAmount
             DelayedRun.runNextTick {
-                dailyQuestHelper.quests.remove(quest)
-                dailyQuestHelper.quests.add(newQuest)
-                ChatUtils.chat("Fixed wrong miniboss amount from tab list.")
-                dailyQuestHelper.update()
+                DailyQuestHelper.quests.remove(quest)
+                DailyQuestHelper.quests.add(newQuest)
+                ChatUtils.chat("Fixed wrong miniboss amount from Town Board.")
+                DailyQuestHelper.update()
             }
         }
     }
 
     fun loadConfig(storage: ProfileSpecificStorage.CrimsonIsleStorage) {
-        if (dailyQuestHelper.greatSpook) return
+        if (DailyQuestHelper.greatSpook) return
         if (storage.quests.toList().any { hasGreatSpookLine(it) }) {
-            dailyQuestHelper.greatSpook = true
+            DailyQuestHelper.greatSpook = true
             return
         }
         for (text in storage.quests.toList()) {
             val split = text.split(":")
             val name = split[0]
-            val state = QuestState.valueOf(split[1])
+            val state = if (split[1] == "NOT_ACCEPTED") {
+                QuestState.ACCEPTED
+            } else {
+                QuestState.valueOf(split[1])
+            }
             val needAmount = split[2].toInt()
             val quest = addQuest(name, state, needAmount)
+            if (quest is UnknownQuest) {
+                DailyQuestHelper.quests.clear()
+                storage.quests.clear()
+                println("Reset crimson isle quest data from the config because the config was invalid!")
+                return
+            }
             if (quest is ProgressQuest && split.size == 4) {
                 try {
                     val haveAmount = split[3].toInt()
@@ -234,9 +229,9 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     private fun addQuest(element: Quest) {
-        dailyQuestHelper.quests.add(element)
-        if (dailyQuestHelper.quests.size > 5) {
-            dailyQuestHelper.reputationHelper.reset()
+        DailyQuestHelper.quests.add(element)
+        if (DailyQuestHelper.quests.size > 5) {
+            CrimsonIsleReputationHelper.reset()
         }
     }
 }

@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,7 +71,7 @@ public class InventoryConfig {
     public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
 
     @Expose
-    @Category(name = "Craftable Item List", desc = "")
+    @Category(name = "Craftable Item List", desc = "Helps to find items to §e/craft.")
     @Accordion
     public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
 
@@ -135,6 +136,11 @@ public class InventoryConfig {
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
 
     @Expose
+    @ConfigOption(name = "New Year Cake Tracker", desc = "")
+    @Accordion
+    public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
+  
+    @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
     public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
@@ -147,6 +153,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
+    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,
@@ -169,26 +176,24 @@ public class InventoryConfig {
         LARVA_HOOK("§bLarva Hook", 12),
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
-        BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
-        DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
+        TIME_POCKET_ITEMS("§bEvolving Items", 15), // TODO: Rename to EVOLVING_ITEMS
         EDITION_NUMBER("§bEdition Number", 16),
-        ENCHANTING_EXP("§bEnchanting EXP (Superpairs)"),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
         BESTIARY_LEVEL("§bBestiary Level"),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        ItemNumberEntry(String str, int legacyId) {
-            this.str = str;
+        ItemNumberEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        ItemNumberEntry(String str) {
-            this(str, -1);
+        ItemNumberEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -198,7 +203,7 @@ public class InventoryConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -216,8 +221,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Quick Craft Confirmation",
         desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-            "(e.g. armor, weapons, accessories). " +
-            "Sack items can be crafted normally."
+            "(e.g. armor, weapons, accessories). Sack items can be crafted normally."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -277,6 +281,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Shift Click NPC sell", desc = "Change normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to shiftClickNpcSell
     public boolean shiftClickNPCSell = false;
 
     @Expose
@@ -286,9 +291,10 @@ public class InventoryConfig {
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Bottle of Jyrre and Dark Cacao Truffle in the lore.")
+    @ConfigOption(name = "Time Held for Evolving Items", desc = "Show time held in the lore of Evolving Items.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
     public boolean timeHeldInLore = false;
 
     @Expose

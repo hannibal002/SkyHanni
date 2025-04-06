@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
@@ -24,13 +24,15 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
+    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).expand(0.0001, 0.0001, 0.0001).calculateEdges() }
+
     constructor() : this(0.0, 0.0, 0.0)
 
     constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
     constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
-    fun toBlockPos(): BlockPos = BlockPos(x, y, z)
+    fun toBlockPos(): BlockPos = BlockPos(x.toInt(), y.toInt(), z.toInt())
 
     fun toVec3(): Vec3 = Vec3(x, y, z)
 
@@ -73,17 +75,6 @@ data class LorenzVec(
 
     fun add(x: Int = 0, y: Int = 0, z: Int = 0): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
 
-    override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
-
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
-    fun multiply(d: Double): LorenzVec = LorenzVec(x * d, y * d, z * d)
-
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
-    fun multiply(d: Int): LorenzVec = LorenzVec(x * d, y * d, z * d)
-
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * v"))
-    fun multiply(v: LorenzVec) = LorenzVec(x * v.x, y * v.y, z * v.z)
-
     fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
 
     fun angleAsCos(other: LorenzVec) = normalize().dotProduct(other.normalize())
@@ -92,11 +83,13 @@ data class LorenzVec(
 
     fun angleInDeg(other: LorenzVec) = Math.toDegrees(angleInRad(other))
 
-    @Deprecated("Use operator fun plus instead", ReplaceWith("this + other"))
-    fun add(other: LorenzVec) = LorenzVec(x + other.x, y + other.y, z + other.z)
+    fun crossProduct(other: LorenzVec): LorenzVec = LorenzVec(
+        this.y * other.z - this.z * other.y,
+        this.z * other.x - this.x * other.z,
+        this.x * other.y - this.y * other.x,
+    )
 
-    @Deprecated("Use operator fun minus instead", ReplaceWith("this - other"))
-    fun subtract(other: LorenzVec) = LorenzVec(x - other.x, y - other.y, z - other.z)
+    fun scaledTo(other: LorenzVec) = this.normalize().times(other.length())
 
     fun normalize() = length().let { LorenzVec(x / it, y / it, z / it) }
 
@@ -124,6 +117,8 @@ data class LorenzVec(
 
     fun toCleanString(separator: String = ", "): String = listOf(x, y, z).joinToString(separator)
 
+    fun asStoredString(): String = "$x:$y:$z"
+
     fun lengthSquared(): Double = x * x + y * y + z * z
     fun length(): Double = sqrt(lengthSquared())
 
@@ -137,24 +132,6 @@ data class LorenzVec(
     fun toFloatArray(): Array<Float> = arrayOf(x.toFloat(), y.toFloat(), z.toFloat())
 
     fun equalsIgnoreY(other: LorenzVec) = x == other.x && z == other.z
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-
-        return (other as? LorenzVec)?.let {
-            x == it.x && y == it.y && z == it.z
-        } ?: super.equals(other)
-    }
-
-    override fun hashCode(): Int {
-        var result = x.hashCode()
-        result = 31 * result + y.hashCode()
-        result = 31 * result + z.hashCode()
-        return result
-    }
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
-    fun round(precision: Int) = roundTo(precision)
 
     fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
@@ -181,10 +158,6 @@ data class LorenzVec(
         AxisAlignedBB(x, y, z, x + offX, y + offY, z + offZ)
 
     fun scale(scalar: Double): LorenzVec = LorenzVec(scalar * x, scalar * y, scalar * z)
-
-    fun applyTranslationToGL() {
-        GlStateManager.translate(x, y, z)
-    }
 
     fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
 
@@ -226,11 +199,36 @@ data class LorenzVec(
         return (nearestPointOnLine(startPos, endPos) - this).lengthSquared()
     }
 
-    fun middle(other: LorenzVec): LorenzVec = this.plus(other.minus(this) / 2)
+    fun middle(other: LorenzVec): LorenzVec = this + ((other - this) / 2)
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
+    private val normX = if (x == 0.0) 0.0 else x
+    private val normY = if (y == 0.0) 0.0 else y
+    private val normZ = if (z == 0.0) 0.0 else z
+
+    override fun equals(other: Any?): Boolean {
+        if (other is LorenzVec) {
+            val v2: LorenzVec = other
+            if (this.x == v2.x && this.y == v2.y && this.z == v2.z) {
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun hashCode() = 31 * (31 * normX.hashCode() + normY.hashCode()) + normZ.hashCode()
+
     companion object {
+
+        val directions = setOf(
+            LorenzVec(1, 0, 0),
+            LorenzVec(-1, 0, 0),
+            LorenzVec(0, 1, 0),
+            LorenzVec(0, -1, 0),
+            LorenzVec(0, 0, 1),
+            LorenzVec(0, 0, -1),
+        )
 
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180
@@ -248,6 +246,12 @@ data class LorenzVec(
             return LorenzVec(x, y, z)
         }
 
+        fun List<Double>.toLorenzVec(): LorenzVec {
+            if (size != 3) error("Can not transform a list of size $size to LorenzVec")
+
+            return LorenzVec(this[0], this[1], this[2])
+        }
+
         fun getBlockBelowPlayer() = LocationUtils.playerLocation().roundLocationToBlock().down()
 
         val expandVector = LorenzVec(0.0020000000949949026, 0.0020000000949949026, 0.0020000000949949026)
@@ -258,6 +262,7 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
+
 fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
@@ -269,8 +274,6 @@ fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoor
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
-
-fun RenderUtils.translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
 
 fun AxisAlignedBB.expand(vec: LorenzVec): AxisAlignedBB = expand(vec.x, vec.y, vec.z)
 

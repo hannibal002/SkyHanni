@@ -15,7 +15,12 @@ import net.minecraft.entity.player.EntityPlayer
 
 @SkyHanniModule
 object MobUtils {
-    val defaultArmorStandName by RepoPattern.pattern("armorstand.default", "Armou?r Stand")
+
+    /**
+     * REGEX-TEST: Armor Stand
+     * REGEX-TEST: Armour Stand
+     */
+    private val defaultArmorStandName by RepoPattern.pattern("armorstand.default", "Armou?r Stand")
 
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
     fun getArmorStand(entity: Entity, offset: Int = 1) = getNextEntity(entity, offset) as? EntityArmorStand
@@ -69,7 +74,11 @@ object MobUtils {
 
     fun rayTraceForMobs(entity: Entity, partialTicks: Float, offset: LorenzVec = LorenzVec()): List<Mob>? {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
+        //#if MC < 1.21
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
+        //#else
+        //$$ val look = entity.rotationVector.toLorenzVec().normalize()
+        //#endif
         val possibleEntities = MobData.entityToMob.filterKeys {
             it !is EntityArmorStand &&
                 it.entityBoundingBox.rayIntersects(
@@ -80,6 +89,8 @@ object MobUtils {
         return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }
     }
 
-    val EntityLivingBase.mob get() = MobData.entityToMob[this]
+    val EntityLivingBase.mob: Mob? get() = MobData.entityToMob[this]
+
+    val Entity.mob: Mob? get() = (this as? EntityLivingBase)?.mob
 
 }
