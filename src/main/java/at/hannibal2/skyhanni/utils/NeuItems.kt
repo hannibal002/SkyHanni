@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isVanillaItem
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -25,7 +26,6 @@ import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.util.ResourceLocation
 
 @SkyHanniModule
 object NeuItems {
@@ -137,7 +137,7 @@ object NeuItems {
             val json = allNeuRepoItems()[vanillaName]
             if (json != null && json.has("vanilla") && json["vanilla"].asBoolean) return true
         }
-        return Item.itemRegistry.getObject(ResourceLocation(vanillaName)) != null
+        return isVanillaItem(vanillaName)
     }
 
     fun NeuInternalName.removePrefix(prefix: String): NeuInternalName {

@@ -250,13 +250,20 @@ object CollectionUtils {
         return destination
     }
 
-    inline fun <T, C : Number, D : Number> Iterable<T>.sumOfPair(selector: (T) -> Pair<C, D>): Pair<Double, Double> {
-        var sum = Pair(0.0, 0.0)
+    inline fun <T, C : Number, D : Number, R : Number> Iterable<T>.sumOfPair(
+        crossinline selector: (T) -> Pair<C, D>,
+        crossinline resultConverter: (Double) -> R
+    ): Pair<R, R> {
+        var sumFirst = 0.0
+        var sumSecond = 0.0
+
         for (element in this) {
-            val add = selector(element)
-            sum = sum.first + add.first.toDouble() to sum.second + add.second.toDouble()
+            val (c, d) = selector(element)
+            sumFirst += c.toDouble()
+            sumSecond += d.toDouble()
         }
-        return sum
+
+        return resultConverter(sumFirst) to resultConverter(sumSecond)
     }
 
     inline fun <T, R> Iterable<T>.zipWithNext3(transform: (a: T, b: T, c: T) -> R): List<R> {
@@ -359,19 +366,43 @@ object CollectionUtils {
         return null
     }
 
-    fun <T> List<T>.insertAfterEach(extra: T): List<T> = buildList(size * 2) {
-        for (item in this@insertAfterEach) {
-            add(item)
-            add(extra)
-        }
-    }
-
     class OrderedQueue<T> : PriorityQueue<WeightedItem<T>>() {
         fun add(item: T, weight: Double): Boolean = super.add(WeightedItem(item, weight))
+        fun copyWithFilter(predicate: (T) -> Boolean): OrderedQueue<T> {
+            val newQueue = OrderedQueue<T>()
+            for (item in this) {
+                if (!predicate(item.item)) {
+                    newQueue.add(item.item, item.weight)
+                }
+            }
+            return newQueue
+        }
         fun pollOrNull(): T? = poll()?.item
+        fun getWaitingWeightOrNull(): Double? = peek()?.weight
     }
 
     data class WeightedItem<T>(val item: T, val weight: Double) : Comparable<WeightedItem<T>> {
         override fun compareTo(other: WeightedItem<T>): Int = this.weight.compareTo(other.weight)
+    }
+
+    class ObservableMutableMap<K, V>(
+        private val map: MutableMap<K, V> = mutableMapOf(),
+        private val preUpdate: (K, V?) -> Unit = { _, _ -> },
+        private val postUpdate: (K, V?) -> Unit = { _, _ -> },
+    ) : MutableMap<K, V> by map {
+
+        override fun put(key: K, value: V): V? {
+            preUpdate(key, value)
+            val oldValue = map.put(key, value)
+            postUpdate(key, value)
+            return oldValue
+        }
+
+        override fun remove(key: K): V? {
+            preUpdate(key, null)
+            val removedValue = map.remove(key)
+            postUpdate(key, null)
+            return removedValue
+        }
     }
 }
