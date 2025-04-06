@@ -6,11 +6,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.getOrNull
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -57,7 +56,7 @@ object ChocolateFactoryTooltipCompact {
         if (!lore.any { it == "§7§eClick to uncover the meaning of life!" }) return
         if (lastClick.passedSince() >= 1.seconds && !config.compactOnClickAlways) return
         val list = mutableListOf<String>()
-        list.add(itemStack.name)
+        list.add(itemStack.displayName)
         lore.getOrNull(5)?.let {
             list.add(it)
         }

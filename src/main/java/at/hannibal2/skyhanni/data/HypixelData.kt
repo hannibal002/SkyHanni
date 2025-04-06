@@ -36,6 +36,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -202,7 +204,7 @@ object HypixelData {
 
         TabWidget.SERVER.matchMatcherFirstLine {
             serverId = group("serverid")
-            HypixelLocationApi.checkServerId(serverId)
+            HypixelLocationApi.checkEquals()
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
             lastSuccessfulServerIdFetchType = "tab list"
             failedServerIdFetchCounter = 0
@@ -212,7 +214,7 @@ object HypixelData {
         serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             val serverType = if (group("servertype") == "M") "mega" else "mini"
             serverId = "$serverType${group("serverid")}"
-            HypixelLocationApi.checkServerId(serverId)
+            HypixelLocationApi.checkEquals()
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
             lastSuccessfulServerIdFetchType = "scoreboard"
             failedServerIdFetchCounter = 0
@@ -448,7 +450,7 @@ object HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
-        HypixelLocationApi.checkSkyblock(skyBlock)
+        HypixelLocationApi.checkEquals()
     }
 
     private fun sendLocraw() {
@@ -490,11 +492,16 @@ object HypixelData {
     private fun checkHypixel() {
         if (!hasScoreboardUpdated) return
         val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
 
         var hypixel = false
 
-        player.clientBrand?.let {
+        //#if MC < 1.21
+        val clientBrand = player.clientBrand
+        //#else
+        //$$ val clientBrand = mc.networkHandler?.brand
+        //#endif
+        clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
                 hypixel = true
             }
@@ -517,7 +524,7 @@ object HypixelData {
         }
 
         hypixelLive = hypixel && !hypixelAlpha
-        HypixelLocationApi.checkHypixel(hypixelLive)
+        HypixelLocationApi.checkEquals()
     }
 
     private fun checkSidebar() {
@@ -565,7 +572,7 @@ object HypixelData {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland
             IslandChangeEvent(newIsland, oldIsland).post()
-            HypixelLocationApi.checkIsland(skyBlockIsland)
+            HypixelLocationApi.checkEquals()
 
             if (newIsland == IslandType.UNKNOWN) {
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
@@ -589,10 +596,9 @@ object HypixelData {
     }
 
     private fun checkScoreboard(): Boolean {
-        val minecraft = Minecraft.getMinecraft()
-        val world = minecraft.theWorld ?: return false
+        val world = MinecraftCompat.localWorldOrNull ?: return false
 
-        val objective = world.scoreboard.getObjectiveInDisplaySlot(1) ?: return false
+        val objective = world.scoreboard.getSidebarObjective() ?: return false
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)

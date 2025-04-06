@@ -16,10 +16,9 @@ _Frequently Asked Questions_
 > **5: How can I move GUIs like Coins/Copper in SkyMart?**
 > Use the command `/sh open hotkey` to set a hotkey, and press it inside the GUI you want to move.
 
-> **6: Will SkyHanni support Minecraft versions 1.20? (Foraging Update)**
-> The Foraging update isn't expected to release for several months.
-> Thus, we'll wait for other mods in the community to update for Minecraft version 1.20.
-> Switching from 1.8.9 to 1.20 will take some time, and we plan to discontinue support for 1.8.9 afterward since we won't support multiple versions at once.
+> **6: Will SkyHanni support newer Minecraft versions (1.21+)?**
+> Yes, it is planned. The Foraging Update isn't expected to release for several more months (state march 2025), but we're already working on updating the mod to support newer versions behind the scenes.
+> Initially, we plan to support both 1.8.9 and 1.21.4, but we will consider removing support for 1.8.9 once the newer version becomes more integral for SkyBlock gameplay.
 
 > **7: My Jacob Contest Display crops are wrong, how do I fix this?**
 > Run the command `/shclearcontestdata` to clear the Jacob contest data.
@@ -64,7 +63,7 @@ _Frequently Asked Questions_
 > If you are using [VanillaHUD](https://modrinth.com/mod/vanillahud), please update to 2.2.9 or newer to resolve this issue.
 > If you are using [Apec](https://github.com/BananaFructa/Apec/) and want to remove their Scoreboard, you need to remove Apec since they don't have an option to disable their Scoreboard.
 > If you are using [Odin](https://github.com/odtheking/Odin), disable their "Sidebar".
-> If you are using [Patcher](https://sk1er.club/mods/patcher) or [PolyPatcher](https://modrinth.com/mod/patcher) and the vanilla scoreboard is flickering, disable the "HUD Caching" option.
+> If you are using [Patcher](https://sk1er.club/mods/patcher) or [PolyPatcher](https://modrinth.com/mod/patcher) and the vanilla scoreboard is flickering, disable the "HUD Caching" option (this may reduce FPS).
 > If you don't use any of these mods, make sure the option to "Hide Vanilla Scoreboard" is actually enabled.
 
 > **13: Why doesn't the burrow warp key and line prioritize my guess waypoint when there are known burrows nearby?**
@@ -76,5 +75,5 @@ _Frequently Asked Questions_
 > If you are using [VolcAddons](https://github.com/zhenga8533/VolcAddons), disable Hide Far/Hide Close Entities.
 
 
-*This FAQ was last updated on Febraury 6th, 2025.
+*This FAQ was last updated on March 24rd, 2025.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*

@@ -18,9 +18,10 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -60,7 +61,7 @@ private fun getCropMilestoneDisplay(): String {
     val allowOverflow = GardenApi.config.cropMilestones.overflow.discordRPC
     val tier = cropCounter?.let { getTierForCropCount(it, crop, allowOverflow) }
     val progress = tier?.let {
-        LorenzUtils.formatPercentage(crop.progressToNextLevel(allowOverflow))
+        crop.progressToNextLevel(allowOverflow).formatPercentage()
     } ?: 100 // percentage to next milestone
 
     if (tier == null) return AutoStatus.CROP_MILESTONES.placeholderText
@@ -78,7 +79,7 @@ fun getPetDisplay(): String = PetApi.currentPet?.let {
     val petName = it.substring(2).removeColor()
     val petLevel = if (PlatformUtils.isNeuLoaded()) getCurrentPet()?.petLevel?.currentLevel ?: "?" else "?"
 
-    "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
+    "[Lvl $petLevel] ${LorenzRarity.colorCodeToRarity(colorCode)} $petName"
 } ?: "No pet equipped"
 
 enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
@@ -285,7 +286,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                     percent = if (amount.toDouble() == 0.0) {
                         ""
                     } else {
-                        LorenzUtils.formatPercentage((amount.toDouble() - levels[level - 1]) / (levels[level] - levels[level - 1]))
+                        ((amount.toDouble() - levels[level - 1]) / (levels[level] - levels[level - 1])).formatPercentage()
                     }
                     break
                 }

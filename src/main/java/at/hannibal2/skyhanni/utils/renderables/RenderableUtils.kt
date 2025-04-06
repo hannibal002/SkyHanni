@@ -1,21 +1,25 @@
 package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.putAt
+import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.leftAndRightClickable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
 import kotlin.reflect.KMutableProperty0
 
-private typealias Direction = Renderable.Companion.Direction
-
+@Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
     /** Calculates the relative x position of the columns in a table*/
@@ -40,13 +44,14 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute x position of the columns in a table*/
-    fun calculateTableXOffsets(content: Collection<List<Renderable?>>, xPadding: Int) = run {
+    fun calculateTableXOffsets(content: Collection<Collection<Renderable?>>, xPadding: Int) = run {
+        val rows: List<List<Renderable?>> = content.map { it.toList() }
         var buffer = 0
         var index = 0
         buildList {
             add(0)
             while (true) {
-                buffer += content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                buffer += rows.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
                     it?.width ?: 0
                 }?.let { it + xPadding } ?: break
                 add(buffer)
@@ -59,7 +64,7 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute y position of the rows in a table*/
-    fun calculateTableYOffsets(content: Collection<List<Renderable?>>, yPadding: Int) = run {
+    fun calculateTableYOffsets(content: Collection<Collection<Renderable?>>, yPadding: Int) = run {
         var buffer = 0
         listOf(0) + (
             content.takeIf { it.isNotEmpty() }?.map { row ->
@@ -274,18 +279,6 @@ internal object RenderableUtils {
         enableUniverseScroll: Boolean = true,
         scrollValue: ScrollValue = ScrollValue(),
     ): Searchable {
-        val onClick: (Direction) -> Unit = { direction ->
-            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                val next = when (direction) {
-                    Direction.LEFT -> universe.circle(current)
-                    Direction.RIGHT -> universe.circleBackwards(current)
-                }
-                onChange(next)
-                SoundUtils.playClickSound()
-                ChatUtils.lastButtonClicked = System.currentTimeMillis()
-            }
-        }
-
         val currentName = getName(current)
         val tips = buildList {
             add("§a$label")
@@ -306,12 +299,29 @@ internal object RenderableUtils {
             }
         }
 
+        val onClick: (Int) -> Unit = onClick@{ keyCode ->
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) < 150) return@onClick
+            val next = when (keyCode) {
+                LEFT_MOUSE -> universe.circle(current)
+                RIGHT_MOUSE -> universe.circleBackwards(current)
+                else -> return@onClick
+            }
+            onChange(next)
+            SoundUtils.playClickSound()
+            ChatUtils.lastButtonClicked = System.currentTimeMillis()
+        }
+
+        val clickMap = mapOf(
+            LEFT_MOUSE to { onClick(LEFT_MOUSE) },
+            RIGHT_MOUSE to { onClick(RIGHT_MOUSE) },
+        )
+
         return Renderable.line {
             addString("§7$label §a[")
             val displayFormat = hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {})
             when (enableUniverseScroll) {
-                true -> clickableAndScrollable(displayFormat, onClick = onClick, bypassChecks = false, scrollValue = scrollValue)
-                false -> leftAndRightClickable(displayFormat, onClick = onClick, bypassChecks = false)
+                true -> clickableAndScrollable(displayFormat, onAnyClick = clickMap, bypassChecks = false, scrollValue = scrollValue)
+                false -> clickable(displayFormat, onAnyClick = clickMap, bypassChecks = false)
             }.let { add(it) }
             addString("§a]")
         }.toSearchable()
@@ -319,6 +329,29 @@ internal object RenderableUtils {
 
     fun MutableList<Renderable>.addCenteredString(string: String) =
         this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
+
+    fun fillTable(
+        data: List<DisplayTableEntry>,
+        padding: Int = 1,
+        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
+    ): Renderable {
+        val sorted = data.sortedByDescending { it.sort }
+
+        val outerList = mutableListOf<List<Renderable>>()
+        for (entry in sorted) {
+            val item = entry.item.getItemStackOrNull()?.let {
+                Renderable.itemStack(it, scale = itemScale)
+            } ?: continue
+            val left = hoverTips(
+                entry.left,
+                tips = entry.hover,
+                highlightsOnHoverSlots = entry.highlightsOnHoverSlots,
+            )
+            val right = Renderable.string(entry.right)
+            outerList.add(listOf(item, left, right))
+        }
+        return Renderable.table(outerList, xPadding = 5, yPadding = padding)
+    }
 }
 
 fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {

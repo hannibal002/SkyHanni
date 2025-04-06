@@ -12,15 +12,15 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.livingcave.snake.LivingCaveSnake
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.block.Block
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -113,7 +113,7 @@ object LivingCaveSnakeFeatures {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
-        if (LorenzUtils.debug && Minecraft.getMinecraft().thePlayer.isSneaking && snakes.isNotEmpty()) {
+        if (LorenzUtils.debug && MinecraftCompat.localPlayer.isSneaking && snakes.isNotEmpty()) {
             snakes.clear()
             ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
             return

@@ -11,18 +11,19 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -34,7 +35,7 @@ import com.google.gson.annotations.Expose
 object CorpseTracker {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 
-    private val tracker = SkyHanniBucketedItemTracker<CorpseType, BucketData>(
+    private val tracker = SkyHanniBucketedItemTracker(
         "Corpse Tracker",
         { BucketData() },
         { it.mining.mineshaft.corpseProfitTracker },
@@ -53,7 +54,7 @@ object CorpseTracker {
                 } ?: corpsesLooted.sumAllValues().toInt(),
             )
             val percentage = timesGained.toDouble() / divisor
-            val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$dropRate.",
@@ -85,9 +86,7 @@ object CorpseTracker {
         for ((itemName, amount) in event.loot) {
             if (itemName.removeColor().trim() == "Glacite Powder") continue
             NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
-                tracker.modify {
-                    it.addItem(event.corpseType, item, amount)
-                }
+                tracker.addItem(event.corpseType, item, amount, message = false)
             }
         }
     }
@@ -108,7 +107,7 @@ object CorpseTracker {
         val keyCostStrings = buildList {
             applicableKeys.forEach { keyData ->
                 keyData.key?.let { key ->
-                    val keyName = key.itemName
+                    val keyName = key.repoItemName
                     val price = key.getPrice()
                     val count = bucketData.corpsesLooted[keyData] ?: 0
                     val totalPrice = price * count
@@ -123,7 +122,7 @@ object CorpseTracker {
         }
 
         if (totalKeyCount > 0) {
-            val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.itemName else "§eCorpse Keys"
+            val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.repoItemName else "§eCorpse Keys"
             val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
             add(
                 if (applicableKeys.count() == 1) Renderable.string(keyFormat).toSearchable()

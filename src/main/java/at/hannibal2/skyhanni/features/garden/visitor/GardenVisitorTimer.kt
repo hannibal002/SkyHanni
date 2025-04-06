@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -132,7 +132,7 @@ object GardenVisitorTimer {
                 if (!sixthVisitorReady) {
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) {
-                        LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
+                        TitleManager.sendTitle("§a6th Visitor Ready", duration = 5.seconds)
                         SoundUtils.playBeepSound()
                     }
                 }
@@ -179,10 +179,10 @@ object GardenVisitorTimer {
         display = createDisplayText("§b$visitorsAmount $visitorLabel §7($next§7)")
     }
 
-    private fun createDisplayText(text: String) = Renderable.clickAndHover(
+    private fun createDisplayText(text: String) = Renderable.clickable(
         text,
-        listOf("§eClick to teleport to the barn!"),
-        onClick = { HypixelCommands.teleportToPlot("barn") },
+        tips = listOf("§eClick to teleport to the barn!"),
+        onLeftClick = { HypixelCommands.teleportToPlot("barn") },
     )
 
     init {

@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -57,7 +56,7 @@ object ChocolateFactoryStrayWarning {
         } ?: false
 
     private fun isSpecial(stack: ItemStack) =
-        clickMeGoldenRabbitPattern.matches(stack.name) || stack.getSkullTexture() in specialRabbitTextures
+        clickMeGoldenRabbitPattern.matches(stack.displayName) || stack.getSkullTexture() in specialRabbitTextures
 
     private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
         StrayTypeEntry.SPECIAL -> isSpecial(item)
@@ -67,7 +66,7 @@ object ChocolateFactoryStrayWarning {
         StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
         StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
 
-        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.name) || isSpecial(item)
+        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.displayName) || isSpecial(item)
 
         StrayTypeEntry.NONE -> false
         else -> false
@@ -76,8 +75,8 @@ object ChocolateFactoryStrayWarning {
     private fun handleRabbitWarnings(item: ItemStack) {
         if (caughtRabbitPattern.matches(item.getSingleLineLore())) return
 
-        val clickMeMatches = clickMeRabbitPattern.matches(item.name)
-        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.name)
+        val clickMeMatches = clickMeRabbitPattern.matches(item.displayName)
+        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.displayName)
         if (!clickMeMatches && !goldenClickMeMatches || !shouldWarnAboutStray(item)) return
 
         val isSpecial = goldenClickMeMatches || item.getSkullTexture() in specialRabbitTextures
@@ -98,11 +97,11 @@ object ChocolateFactoryStrayWarning {
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
         val eventChest = getEventChest() ?: return
-        eventChest.getUpperItems().keys.forEach { it highlight CHROMA_COLOR_ALT.toSpecialColor() }
+        eventChest.getUpperItems().keys.forEach { it.highlight(CHROMA_COLOR_ALT.toSpecialColor()) }
         eventChest.inventorySlots.filter {
             it.slotNumber != it.slotIndex
         }.forEach {
-            it highlight CHROMA_COLOR_ALT2.toSpecialColor()
+            it.highlight(CHROMA_COLOR_ALT2.toSpecialColor())
         }
     }
 
@@ -111,7 +110,7 @@ object ChocolateFactoryStrayWarning {
         eventChest.getUpperItems().keys.filter {
             it.slotNumber in activeStraySlots
         }.forEach {
-            it highlight warningConfig.inventoryHighlightColor.toSpecialColor()
+            it.highlight(warningConfig.inventoryHighlightColor.toSpecialColor())
         }
     }
 
@@ -136,7 +135,7 @@ object ChocolateFactoryStrayWarning {
                 StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(stack, LorenzRarity.UNCOMMON)
 
                 StrayTypeEntry.ALL -> {
-                    clickMeRabbitPattern.matches(it.value.name) || isSpecial(stack)
+                    clickMeRabbitPattern.matches(it.value.displayName) || isSpecial(stack)
                 }
 
                 StrayTypeEntry.NONE -> false

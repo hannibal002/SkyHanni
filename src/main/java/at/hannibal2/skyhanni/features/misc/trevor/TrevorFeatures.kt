@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -144,7 +146,7 @@ object TrevorFeatures {
         mobDiedPattern.matchMatcher(event.message) {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
-                LorenzUtils.sendTitle("§2Mob Died ", 5.seconds)
+                TitleManager.sendTitle("§2Mob Died ", duration = 5.seconds)
                 SoundUtils.playBeepSound()
             }
             trapperReady = true
@@ -190,11 +192,11 @@ object TrevorFeatures {
 
         clickOptionPattern.findMatcher(event.message) {
             for (sibling in event.chatComponent.siblings) {
-                val clickEvent = sibling.chatStyle.chatClickEvent ?: continue
+                val clickEvent = sibling.command ?: continue
 
-                if (clickEvent.value.contains("YES")) {
+                if (clickEvent.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
-                    lastChatPrompt = clickEvent.value.substringAfter(" ")
+                    lastChatPrompt = clickEvent.substringAfter(" ")
                 }
             }
         }
@@ -224,7 +226,7 @@ object TrevorFeatures {
 
         if (timeUntilNextReady <= 0 && trapperReady) {
             if (timeUntilNextReady == 0) {
-                LorenzUtils.sendTitle("§2Trapper Ready", 3.seconds)
+                TitleManager.sendTitle("§2Trapper Ready")
                 SoundUtils.playBeepSound()
             }
             currentStatus = TrapperStatus.READY
