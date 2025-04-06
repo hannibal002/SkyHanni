@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.compat.appendString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
-import net.minecraft.client.gui.FontRenderer
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 
