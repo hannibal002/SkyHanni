@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ItemPickupEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -110,7 +110,7 @@ object GardenCropMilestoneDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onOwnInventoryItemUpdate(event: ItemPickupEvent) {
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
 
         try {
             val item = event.itemStack
