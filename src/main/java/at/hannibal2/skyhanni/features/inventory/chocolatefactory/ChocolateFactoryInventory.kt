@@ -61,7 +61,7 @@ object ChocolateFactoryInventory {
                 slot.highlight(LorenzColor.GREEN.addOpacity(200))
             }
 
-            if (slotIndex == ChocolateFactoryApi.barnIndex && ChocolateFactoryBarnManager.barnFull) {
+            if (slotIndex == ChocolateFactoryApi.barnIndex && ChocolateFactoryBarnManager.isBarnFull()) {
                 slot.highlight(LorenzColor.RED)
             }
             if (slotIndex == ChocolateFactoryApi.milestoneIndex) {

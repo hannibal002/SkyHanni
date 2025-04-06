@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isBait
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -35,7 +35,7 @@ object ShowFishingItemName {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNextToPlayer<EntityItem>(15.0)) {
             val itemStack = entityItem.entityItem
@@ -71,17 +71,14 @@ object ShowFishingItemName {
         }
     }
 
-    fun inCorrectArea(): Boolean {
+    private fun inCorrectArea(): Boolean {
         if (IslandType.HUB.isInIsland()) {
-            LorenzUtils.skyBlockArea?.let {
-                if (it.endsWith(" Atrium")) return false
-                if (it.endsWith(" Museum")) return false
-                if (it == "Fashion Shop") return false
-                if (it == "Shen's Auction") return false
+            IslandAreas.currentAreaName.let {
+                if (it.endsWith(" Atrium") || it.endsWith(" Museum")) return false
+                if (it == "Fashion Shop" || it == "Shen's Auction") return false
             }
         }
-        if (IslandType.THE_END.isInIsland()) return false
-        return true
+        return !(IslandType.THE_END.isInIsland())
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingApi.holdingRod && inCorrectArea()
