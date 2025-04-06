@@ -119,7 +119,7 @@ class Mob(
      * @property isRunic does not change.
      */
     val isRunic = !RiftApi.inRift() &&
-        armorStand?.getNameAsString()?.startsWith("§5") == true &&
+        armorStand?.name?.startsWith("§5") == true &&
         mobType == Type.BASIC
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
