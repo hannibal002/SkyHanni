@@ -352,7 +352,7 @@ class ProfileSpecificStorage {
                     RabbitData(
                         uniques = existing.uniques + new.uniques,
                         dupes = existing.dupes + new.dupes,
-                        strays = existing.strays + new.strays
+                        strays = existing.strays + new.strays,
                     )
                 }
             }
@@ -379,10 +379,10 @@ class ProfileSpecificStorage {
                     val EMPTY get() = RabbitData(0, 0, 0)
                 }
             }
+
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
     }
-
 
     // - fame
     @Expose
@@ -792,6 +792,7 @@ class ProfileSpecificStorage {
     // data
     @Expose
     var currentPet: String = ""
+
     @Expose
     var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()
 

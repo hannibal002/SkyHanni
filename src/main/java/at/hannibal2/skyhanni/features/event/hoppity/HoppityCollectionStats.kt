@@ -640,7 +640,7 @@ object HoppityCollectionStats {
                 val duplicates = foundOfRarity.values.sum() - uniquesFound
                 uniquesFound to duplicates
             },
-            resultConverter = Double::toInt
+            resultConverter = Double::toInt,
         )
 
         return RabbitData(

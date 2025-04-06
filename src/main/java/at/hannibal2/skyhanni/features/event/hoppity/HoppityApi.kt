@@ -134,7 +134,7 @@ object HoppityApi {
         var lastName: String = "",
         var lastProfit: String = "",
         var lastMeal: HoppityEggType? = null,
-        var lastDuplicateAmount: Long? = null
+        var lastDuplicateAmount: Long? = null,
     ) : ResettableStorageSet()
 
     val hoppityRarities = LorenzRarity.entries.filter { it <= DIVINE }
@@ -199,7 +199,7 @@ object HoppityApi {
         EggFoundEvent(
             type,
             chatEvent = event,
-            note = note
+            note = note,
         ).post()
     }
 
@@ -267,7 +267,6 @@ object HoppityApi {
             if (processed) processedStraySlots[slotNumber] = itemStack.displayName
         }
     }
-
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
