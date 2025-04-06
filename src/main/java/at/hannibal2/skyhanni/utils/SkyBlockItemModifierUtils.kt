@@ -244,12 +244,6 @@ object SkyBlockItemModifierUtils {
     //#endif
 
     //#if MC < 1.21
-    fun String.isVanillaItem() = Item.itemRegistry.getObject(ResourceLocation(this)) != null
-    //#else
-    //$$ fun String.isVanillaItem() = Registries.ITEM.get(Identifier.of(this)) != Items.AIR
-    //#endif
-
-    //#if MC < 1.21
     fun isVanillaItem(itemId: String): Boolean {
         return Item.itemRegistry.getObject(ResourceLocation(itemId)) != null
     }
