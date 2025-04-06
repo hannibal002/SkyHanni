@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.block.Block
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.item.ItemStack
@@ -45,8 +44,8 @@ object FishingApi {
         "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
-    val lavaBlocks = mutableListOf<Block>().addLavas()
-    private val waterBlocks = mutableListOf<Block>().addWaters()
+    val lavaBlocks = buildList { addLavas() }
+    private val waterBlocks = buildList { addWaters() }
 
     var lastCastTime = SimpleTimeMark.farPast()
     var holdingRod = false

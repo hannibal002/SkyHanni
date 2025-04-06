@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 
@@ -26,7 +25,6 @@ object ThunderSparksHighlight {
     private val config get() = SkyHanniMod.feature.fishing.thunderSpark
     private val THUNDER_SPARK_TEXTURE by lazy { SkullTextureHolder.getTexture("THUNDER_SPARK") }
     private val sparks = mutableListOf<EntityArmorStand>()
-    private val lavaBlocks = buildList { addLavas() }
 
     @HandleEvent
     fun onTick() {
@@ -47,8 +45,7 @@ object ThunderSparksHighlight {
             if (spark.isDead) continue
             val sparkLocation = spark.getLorenzVec()
             val block = sparkLocation.getBlockAt()
-            val seeThroughBlocks =
-                sparkLocation.distanceToPlayer() < 6 && (block in lavaBlocks)
+            val seeThroughBlocks = sparkLocation.distanceToPlayer() < 6 && (block in FishingApi.lavaBlocks)
             event.drawWaypointFilled(
                 sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks,
             )
