@@ -14,4 +14,9 @@ class EnderSlayerConfig {
     @ConfigOption(name = "Health During Laser", desc = "Show the health of Voidgloom Seraph 4 during the laser phase.")
     @ConfigEditorBoolean
     var showHealthDuringLaser: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "TP Timer", desc = "Show a timer for when the Boss will teleport.")
+    @ConfigEditorBoolean
+    var emanTpTimer: Boolean = false
 }

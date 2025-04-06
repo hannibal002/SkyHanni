@@ -751,6 +751,14 @@ object DamageIndicatorManager {
             return it
         }
 
+        if (config.enderSlayer.emanTpTimer && !entity.isDead) {
+            val teleportTime = 7.1.seconds
+
+            val ticksAlive = entity.ticksExisted.ticks
+            val remainingTime = teleportTime - ticksAlive
+            val formatDelay = formatDelay(remainingTime)
+            entityData.nameSuffix = " §f$formatDelay"
+        }
         return result
     }
 
