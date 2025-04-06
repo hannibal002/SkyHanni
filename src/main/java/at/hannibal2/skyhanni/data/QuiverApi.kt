@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.ItemCollectEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -231,7 +231,7 @@ object QuiverApi {
     }
 
     @HandleEvent
-    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
+    fun onInventoryUpdate(event: ItemCollectEvent) {
         if (!isEnabled() && event.slot != 44) return
         val stack = event.itemStack
         if (stack.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
