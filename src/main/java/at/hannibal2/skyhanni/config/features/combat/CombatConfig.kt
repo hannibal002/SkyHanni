@@ -61,17 +61,6 @@ class CombatConfig {
     var flare: FlareConfig = FlareConfig()
 
     @Expose
-    @ConfigOption(name = "Dragon Features", desc = "")
-    @Accordion
-    var dragon: DragonConfig = DragonConfig()
-
-    @Expose
-    @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after it died.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var endstoneProtectorChat: Boolean = true
-
-    @Expose
     @ConfigOption(name = "Broodmother", desc = "")
     @Accordion
     var broodmother: BroodmotherConfig = BroodmotherConfig()
