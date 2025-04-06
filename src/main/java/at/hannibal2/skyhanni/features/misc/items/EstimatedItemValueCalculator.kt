@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -173,7 +172,6 @@ object EstimatedItemValueCalculator {
         val internalName = stack.getInternalName()
         var internalNameString = internalName.removeKuudraTier().removePrefix("VANQUISHED_").asString()
         if (internalNameString == "INFERNO_ROD" || internalNameString == "HELLFIRE_ROD") internalNameString = "MAGMA_ROD"
-        ChatUtils.debug(internalNameString)
         var genericName = internalNameString
         if (internalName.isKuudraArmor()) {
             genericName = KuudraApi.kuudraSets.fold(internalNameString) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
@@ -189,8 +187,7 @@ object EstimatedItemValueCalculator {
 
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
-            val gray = useless
-            list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(gray)}")
+            list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(useless)}")
             if (!useless) {
                 subTotal += comboPrice
             }
