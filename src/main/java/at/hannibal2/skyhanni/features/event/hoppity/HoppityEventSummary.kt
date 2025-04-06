@@ -641,7 +641,7 @@ object HoppityEventSummary {
                 stats.getMealEggCount().takeIf { it > 0 }?.let {
                     val spawnedMealEggs = getSpawnedEggCount(year)
                     val eggFormat = StringUtils.pluralize(it, "Egg")
-                    statList.addStr("§7You found §b$it§7/§a$spawnedMealEggs §6Chocolate Meal $eggFormat§7.")
+                    statList.addStr("§7You found §b${it.addSeparators()}§7/§a${spawnedMealEggs.addSeparators()} §6Chocolate Meal $eggFormat§7.")
                 }
             }
 
@@ -661,7 +661,7 @@ object HoppityEventSummary {
 
                 stats.mealsFound[HoppityEggType.HITMAN]?.let {
                     val eggFormat = StringUtils.pluralize(it, "Egg")
-                    val divisorFormat = "§b$it§7/§a$missedMealEggs"
+                    val divisorFormat = "§b${it.addSeparators()}§7/§a${missedMealEggs.addSeparators()}"
                     statList.addStr("§7You recovered $divisorFormat §7missed §6Meal $eggFormat §7from §cRabbit Hitman§7.")
                 }
             }
@@ -669,14 +669,14 @@ object HoppityEventSummary {
             put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { statList, stats, _ ->
                 stats.getBoughtCount().takeIf { it > 0 }?.let {
                     val rabbitFormat = StringUtils.pluralize(it, "Rabbit")
-                    statList.addStr("§7You bought §b$it §f$rabbitFormat §7from §aHoppity§7.")
+                    statList.addStr("§7You bought §b${it.addSeparators()} §f$rabbitFormat §7from §aHoppity§7.")
                 }
             }
 
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->
                 stats.mealsFound[HoppityEggType.SIDE_DISH]?.let {
                     val eggFormat = StringUtils.pluralize(it, "Egg")
-                    statList.addStr("§7You found §b$it §6§lSide Dish $eggFormat §r§7in the §6Chocolate Factory§7.")
+                    statList.addStr("§7You found §b${it.addSeparators()} §6§lSide Dish $eggFormat §r§7in the §6Chocolate Factory§7.")
                 }
             }
 
@@ -893,9 +893,9 @@ object HoppityEventSummary {
         } else ""
 
         return mutableListOf(
-            "§7$name Rabbits: §f$rabbitsSum$countFormat",
+            "§7$name Rabbits: §f${rabbitsSum.addSeparators()}$countFormat",
             HoppityApi.hoppityRarities.joinToString(" §7-") {
-                " ${it.chatColorCode}${rarityMap[it] ?: 0}"
+                " ${it.chatColorCode}${(rarityMap[it] ?: 0).addSeparators()}"
             },
         )
     }
