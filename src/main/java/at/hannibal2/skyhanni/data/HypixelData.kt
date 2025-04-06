@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.SkyBlockJoinEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -421,6 +422,12 @@ object HypixelData {
         val nowOnHypixel = LorenzUtils.onHypixel
         when {
             !wasOnHypixel && nowOnHypixel -> {
+                /* this should never happen but is still here for the odd case of it happenening */
+                if (!skyBlock) {
+                    skyBlock = true
+                    SkyBlockJoinEvent.post()
+                }
+
                 HypixelJoinEvent.post()
                 RepoManager.displayRepoStatus(true)
             }
@@ -441,6 +448,10 @@ object HypixelData {
         if (inSkyBlock) {
             checkSidebar()
             checkCurrentServerId()
+            if (!skyBlock) {
+                skyBlock = true
+                SkyBlockJoinEvent.post()
+            }
         } else {
             if (!skyBlock) {
                 SkyBlockLeaveEvent.post()
@@ -466,6 +477,11 @@ object HypixelData {
             skyBlockIsland = IslandType.NONE
             IslandChangeEvent(IslandType.NONE, oldIsland)
         }
+    }
+
+    @HandleEvent
+    fun onSkyBlockJoin(event: SkyBlockJoinEvent) {
+        println("SkyBlockJoinEvent")
     }
 
     @HandleEvent
