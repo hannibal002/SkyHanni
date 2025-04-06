@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage.HotspotRabbitStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -45,6 +46,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.collectWhile
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.consumeWhile
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumOfPair
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
@@ -55,6 +58,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
+
+private typealias RabbitData = ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData
 
 @SkyHanniModule
 object HoppityCollectionStats {
@@ -186,12 +191,13 @@ object HoppityCollectionStats {
     )
     // </editor-fold>
 
+    private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
     private var shCountData: HoppityEggLocationsJson? = null
     private var neuCountData: HoppityInfo? = null
     private var hotspotRabbitCount = 0
     private var display = emptyList<Renderable>()
     private val loggedRabbits
-        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
+        get() = profileStorage?.rabbitCounts ?: mutableMapOf()
 
     enum class HighlightRabbitTypes(
         private val displayName: String,
@@ -230,17 +236,17 @@ object HoppityCollectionStats {
     }
 
     private val locationRabbitRequirements: MutableMap<String, LocationRabbit>
-        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.locationRabbitRequirements ?: mutableMapOf()
+        get() = profileStorage?.locationRabbitRequirements ?: mutableMapOf()
 
     private val residentRabbitData: MutableMap<IslandType, MutableMap<String, Boolean?>>
-        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.residentRabbits ?: mutableMapOf()
+        get() = profileStorage?.residentRabbits ?: mutableMapOf()
 
     private val hotspotRabbitData: HotspotRabbitStorage?
-        get() = ProfileStorageData.profileSpecific?.chocolateFactory?.hotspotRabbitStorage?.let { storage ->
+        get() = profileStorage?.hotspotRabbitStorage?.let { storage ->
             val yearNow = SkyBlockTime.now().year
             if (storage.skyblockYear != yearNow) {
                 HotspotRabbitStorage(yearNow).also {
-                    ProfileStorageData.profileSpecific?.chocolateFactory?.hotspotRabbitStorage = it
+                    profileStorage?.hotspotRabbitStorage = it
                 }
             } else storage
         }
@@ -603,7 +609,7 @@ object HoppityCollectionStats {
 
         val newList = mutableListOf<Renderable>()
         newList.add(Renderable.string("§eHoppity Rabbit Collection§f:"))
-        newList.add(RenderableUtils.fillTable(getRabbitStats(), padding = 5))
+        newList.add(RenderableUtils.fillTable(getRabbitStatsFormat(), padding = 5))
 
         addLocationRequirementRabbitsToHud(newList)
         addResidentRabbitsInformationToHud(newList)
@@ -624,7 +630,27 @@ object HoppityCollectionStats {
         return newList
     }
 
-    private fun getRabbitStats(): MutableList<DisplayTableEntry> {
+    fun getTypeCountSnapshot(): RabbitData {
+        val (uniqueCount, duplicateCount) = RabbitCollectionRarity.entries.sumOfPair(
+            selector = { rarity ->
+                val foundOfRarity = loggedRabbits.filterKeys {
+                    HoppityCollectionData.getRarity(it) == rarity
+                }
+                val uniquesFound = foundOfRarity.size
+                val duplicates = foundOfRarity.values.sum() - uniquesFound
+                uniquesFound to duplicates
+            },
+            resultConverter = Double::toInt,
+        )
+
+        return RabbitData(
+            uniques = uniqueCount,
+            dupes = duplicateCount,
+            strays = profileStorage?.strayTracker?.straysCaught?.sumAllValues()?.toInt() ?: 0,
+        )
+    }
+
+    private fun getRabbitStatsFormat(): MutableList<DisplayTableEntry> {
         var totalUniquesFound = 0
         var totalDuplicates = 0
         var totalChocolatePerSecond = 0

@@ -8,7 +8,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class DamageIndicatorConfig {
     @Expose
@@ -105,6 +104,25 @@ class DamageIndicatorConfig {
     @ConfigOption(name = "Hide Nametag", desc = "Hide the vanilla nametag of bosses with damage indicator enabled.")
     @ConfigEditorBoolean
     var hideVanillaNametag: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Shuriken Indicator", desc = "Indicate if an Extremely Real Shuriken has been used.")
+    @ConfigEditorBoolean
+    var shurikenIndicator: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Twilight Indicator", desc = "Indicate if Twilight Arrow Poison has been used.")
+    @ConfigEditorBoolean
+    var twilightIndicator: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Compact Status Effects",
+        desc = "Use the icons of Extremely Real Shuriken and Twilight Arrow Poison " +
+            "instead of their names for the indicator."
+    )
+    @ConfigEditorBoolean
+    var compactStatusEffects: Boolean = false
 
     @Expose
     @ConfigOption(
