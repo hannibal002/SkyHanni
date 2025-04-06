@@ -186,7 +186,8 @@ object IslandGraphs {
             return
         }
 
-        val now = isGlaciteTunnelsArea(IslandAreas.currentAreaName)
+        @Suppress("DEPRECATION") // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
+        val now = isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
             loadDwarvenMines()
@@ -198,7 +199,8 @@ object IslandGraphs {
     }
 
     private fun loadDwarvenMines() {
-        if (isGlaciteTunnelsArea(IslandAreas.currentAreaName)) {
+        @Suppress("DEPRECATION") // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
+        if (isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)) {
             reloadFromJson("GLACITE_TUNNELS")
         } else {
             reloadFromJson("DWARVEN_MINES")
