@@ -500,7 +500,7 @@ object EstimatedItemValueCalculator {
         val tierIndex = internalName.getKuudraTier()?.takeIf { it > 1 } ?: return 0.0
         val armorTier = kuudraTiers.getOrNull(tierIndex - 1) ?: return 0.0
 
-        val allTiersCost = (0 until tierIndex).mapNotNull { index ->
+        val allTiersCost = (1 until tierIndex).mapNotNull { index ->
             kuudraTiers.getOrNull(index)?.let { tierName ->
                 EstimatedItemValue.crimsonPrestigeCosts[tierName] ?: run {
                     ErrorManager.logErrorStateWithData(
