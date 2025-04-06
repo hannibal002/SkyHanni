@@ -54,7 +54,7 @@ object CruxTalismanDisplay {
         display = drawDisplay()
     }
 
-    private fun drawDisplay() = buildList {
+    private fun drawDisplay() = buildList<Renderable> {
         var showAsMaxed = maxed
         if (!config.compactWhenMaxed && maxed) showAsMaxed = false
 
