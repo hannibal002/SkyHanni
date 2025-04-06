@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
-import at.hannibal2.skyhanni.events.skyblock.SkyBlockJoinEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -442,10 +441,6 @@ object HypixelData {
         if (inSkyBlock) {
             checkSidebar()
             checkCurrentServerId()
-            if (!skyBlock) {
-                skyBlock = true
-                SkyBlockJoinEvent.post()
-            }
         } else {
             if (!skyBlock) {
                 SkyBlockLeaveEvent.post()
