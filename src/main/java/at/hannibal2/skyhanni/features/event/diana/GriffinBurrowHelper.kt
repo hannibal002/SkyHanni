@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -39,6 +38,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.addDoublePlant
+import at.hannibal2.skyhanni.utils.compat.addLeaves
+import at.hannibal2.skyhanni.utils.compat.addLeaves2
+import at.hannibal2.skyhanni.utils.compat.addRedFlower
+import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
@@ -50,16 +54,16 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val allowedBlocksAboveGround = listOf(
-        Blocks.air,
-        Blocks.leaves,
-        Blocks.leaves2,
-        Blocks.tallgrass,
-        Blocks.double_plant,
-        Blocks.red_flower,
-        Blocks.yellow_flower,
-        Blocks.spruce_fence,
-    )
+    private val allowedBlocksAboveGround = buildList {
+        add(Blocks.air)
+        add(Blocks.yellow_flower)
+        add(Blocks.spruce_fence)
+        addLeaves()
+        addLeaves2()
+        addTallGrass()
+        addDoublePlant()
+        addRedFlower()
+    }
 
     var targetLocation: LorenzVec? = null
 
@@ -282,7 +286,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         resetAllData()
     }
 
