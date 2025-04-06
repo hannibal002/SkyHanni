@@ -22,7 +22,7 @@ object ModifyVisualWords {
     // Replacements the user added manually via /shwords
     var userModifiedWords = mutableListOf<VisualWord>()
 
-    // Replacements the mod added automatically for some features, april jokes, etc
+    // Replacements the mod added automatically for some features, april jokes, etc.
     private val modModifiedWords = mutableListOf<VisualWord>()
     private var finalWordsList = listOf<VisualWord>()
     private var debug = false
