@@ -34,12 +34,12 @@ object HitmanApi {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        val storage = storage ?: return
         if (event.inventoryName != "Rabbit Hitman") return
         val summaryItem = event.inventoryItems[4].takeIf { it?.displayName == "§cRabbit Hitman" } ?: return
         val availableEggs = hitmanAvailableEggsPattern.firstMatcher(summaryItem.getLore()) {
             group("amount").toInt()
         } ?: return
-        val storage = storage ?: return
         storage.chocolateFactory.hitmanStats.availableHitmanEggs = availableEggs
     }
 
