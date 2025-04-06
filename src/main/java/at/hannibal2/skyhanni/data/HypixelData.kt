@@ -474,11 +474,6 @@ object HypixelData {
     }
 
     @HandleEvent
-    fun onSkyBlockJoin(event: SkyBlockJoinEvent) {
-        println("SkyBlockJoinEvent")
-    }
-
-    @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
