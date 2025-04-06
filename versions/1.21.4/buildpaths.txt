@@ -21,6 +21,7 @@ at/hannibal2/skyhanni/TestingModFeatures.kt
 
 at/hannibal2/skyhanni/mixins/init/SkyhanniMixinPlugin.java
 at/hannibal2/skyhanni/mixins/init/BeforeForLoopInjectionPoint.java
+at/hannibal2/skyhanni/utils/VersionConstants.kt
 
 at/hannibal2/skyhanni/SkyHanniModLoader.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/AnitaUpgradeCostsJson.kt

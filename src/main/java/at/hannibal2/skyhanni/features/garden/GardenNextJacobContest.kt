@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
@@ -372,11 +373,8 @@ object GardenNextJacobContest {
             return@line
         }
 
-        if (isCloseToNewYear()) {
-            addString(CLOSE_TO_NEW_YEAR_TEXT)
-        } else {
-            addString("§cOpen calendar to read Jacob contest times!")
-        }
+        if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
+        else addString("§cOpen calendar to read Jacob contest times!")
 
         fetchedFromElite = false
         contests.clear()
@@ -400,7 +398,8 @@ object GardenNextJacobContest {
         }
         for (crop in nextContest.crops) {
             val isBoosted = crop == boostedCrop
-            val stack = Renderable.itemStack(crop.icon, 1.0, highlight = isBoosted)
+            val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest")
+            val stack = Renderable.itemStack(cropStack, 1.0, highlight = isBoosted)
             if (config.additionalBoostedHighlight && isBoosted) {
                 add(stack.renderBounds(config.additionalBoostedHighlightColor.toSpecialColor()))
             } else add(stack)

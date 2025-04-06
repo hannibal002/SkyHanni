@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -56,7 +55,16 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val allowedBlocksAboveGround = getAllowedBlocksAboveGround()
+    private val allowedBlocksAboveGround = buildList {
+        add(Blocks.air)
+        add(Blocks.yellow_flower)
+        add(Blocks.spruce_fence)
+        addLeaves()
+        addLeaves2()
+        addTallGrass()
+        addDoublePlant()
+        addRedFlower()
+    }
 
     var targetLocation: LorenzVec? = null
 
@@ -279,7 +287,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         resetAllData()
     }
 
@@ -514,20 +522,5 @@ object GriffinBurrowHelper {
             category = CommandCategory.DEVELOPER_TEST
             callback { setTestBurrow(it) }
         }
-    }
-
-    private fun getAllowedBlocksAboveGround(): List<Block> {
-        val list = mutableListOf(
-            Blocks.air,
-            Blocks.yellow_flower,
-            Blocks.spruce_fence,
-        )
-        list.addLeaves()
-        list.addLeaves2()
-        list.addTallGrass()
-        list.addDoublePlant()
-        list.addRedFlower()
-
-        return list
     }
 }

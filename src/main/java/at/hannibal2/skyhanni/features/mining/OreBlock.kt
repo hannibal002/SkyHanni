@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.data.MiningApi.inGlacite
 import at.hannibal2.skyhanni.data.MiningApi.inMineshaft
 import at.hannibal2.skyhanni.data.MiningApi.inSpidersDen
 import at.hannibal2.skyhanni.data.MiningApi.inTunnels
+import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
-import at.hannibal2.skyhanni.utils.compat.addRedstoneOres
 import net.minecraft.block.Block
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.block.BlockStainedGlassPane
@@ -47,7 +47,7 @@ enum class OreBlock(
     GOLD_ORE(Blocks.gold_ore, { inDwarvenMines || inCrystalHollows }),
     LAPIS_ORE(Blocks.lapis_ore, { inDwarvenMines || inCrystalHollows }),
     REDSTONE_ORE(
-        { it.block.equalsOneOf(mutableListOf<Block>().addRedstoneOres()) },
+        { it.block.equalsOneOf(BlockUtils.redstoneOreBlocks) },
         { inDwarvenMines || inCrystalHollows },
     ),
     EMERALD_ORE(Blocks.emerald_ore, { inDwarvenMines || inCrystalHollows }),
