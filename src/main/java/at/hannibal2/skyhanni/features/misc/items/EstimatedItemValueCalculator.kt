@@ -195,15 +195,15 @@ object EstimatedItemValueCalculator {
             list.add("§7Attributes:")
         }
         for (attr in attributes) {
-            val armorWithAttributeName = "$genericName+ATTRIBUTE_${attr.first}"
-            val armorBasedPrice = getPriceOrCompositePriceForAttribute(armorWithAttributeName, attr.second)
+            val itemWithAttributeName = "$genericName+ATTRIBUTE_${attr.first}"
+            val itemBasedPrice = getPriceOrCompositePriceForAttribute(itemWithAttributeName, attr.second)
 
             val shardBasedPrice = attr.getAttributePrice()
 
-            val price = listOfNotNull(armorBasedPrice, shardBasedPrice).minOrNull()
+            val price = listOfNotNull(itemBasedPrice, shardBasedPrice).minOrNull()
 
             var gray = true
-            val useless = isUselessAttribute(armorWithAttributeName)
+            val useless = isUselessAttribute(itemWithAttributeName)
             val nameColor = if (!useless) "§9" else "§7"
             price?.let {
                 if (it > 0 && !useless) {
