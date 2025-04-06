@@ -1096,6 +1096,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Allows to view remaining time for full and 28 claimable slots.
 + Added party mode for Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3054)
     + Using it is not recommended.
++ Added chat compact for Hitman Claim All. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3077)
+    + Requires `Chat Compact` for Hoppity enabled to work.
 
 ### The Carnival
 
