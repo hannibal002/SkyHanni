@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.addRedstoneOres
 import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
@@ -16,11 +17,24 @@ object BlockUtils {
 
     fun LorenzVec.getBlockStateAt(): IBlockState = world.getBlockState(toBlockPos())
 
+    //#if MC < 1.21
     fun LorenzVec.isInLoadedChunk(): Boolean = world.isBlockLoaded(toBlockPos(), false)
+    //#else
+    //$$ fun LorenzVec.isInLoadedChunk(): Boolean =
+    //$$ world.chunkManager.isChunkLoaded(x.toInt() shr 4, z.toInt() shr 4)
+    //#endif
 
-    fun getTextureFromSkull(position: LorenzVec?): String? {
-        val entity = world.getTileEntity(position?.toBlockPos()) as? TileEntitySkull ?: return null
-        return entity.serializeNBT().getCompoundTag("Owner").getSkullTexture()
+    fun getTextureFromSkull(position: LorenzVec): String? {
+        val entity = world.getTileEntity(position.toBlockPos()) as? TileEntitySkull ?: return null
+        return entity.getSkullTexture()
+    }
+
+    fun TileEntitySkull.getSkullTexture(): String? {
+        //#if MC < 1.21
+        return this.serializeNBT().getCompoundTag("Owner").getSkullTexture()
+        //#else
+        //$$ return this.owner?.id?.get()?.toString()
+        //#endif
     }
 
     fun IBlockState.isBabyCrop(): Boolean {
@@ -66,4 +80,6 @@ object BlockUtils {
         radius: Int = distance,
         filter: Block,
     ): Map<LorenzVec, IBlockState> = nearbyBlocks(center, distance, radius, condition = { it.block == filter })
+
+    val redstoneOreBlocks = buildList { addRedstoneOres() }
 }

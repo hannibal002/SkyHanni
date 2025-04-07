@@ -17,9 +17,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import java.util.Locale
-//#if FORGE
-import net.minecraftforge.common.util.Constants
-//#elseif MC > 1.21
+//#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
 //#endif
@@ -165,7 +163,7 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.hasKey("attributes", Constants.NBT.TAG_COMPOUND) }
+        ?.takeIf { it.hasKey("attributes", 10) }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
@@ -206,7 +204,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getSecondsHeld() = when (getItemId()) {
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
-        "DARK_CACAO_TRUFFLE" -> getAttributeInt("seconds_held")
+        "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
         else -> null
     }
@@ -242,6 +240,16 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as ResourceLocation
     //#else
     //$$ fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
+    //#endif
+
+    //#if MC < 1.21
+    fun isVanillaItem(itemId: String): Boolean {
+        return Item.itemRegistry.getObject(ResourceLocation(itemId)) != null
+    }
+    //#else
+    //$$ fun isVanillaItem(itemId: String): Boolean {
+    //$$     Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
+    //$$ }
     //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {

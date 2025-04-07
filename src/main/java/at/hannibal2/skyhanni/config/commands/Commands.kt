@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
@@ -338,11 +337,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_DEBUG
             callback { InquisitorWaypointShare.test() }
         }
-        event.register("shshowcropmoneycalculation") {
-            description = "Show the calculation of the crop money"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CropMoneyDisplay.toggleShowCalculation() }
-        }
         event.register("shcropspeedmeter") {
             description = "Debugs how many crops you collect over time"
             category = CommandCategory.DEVELOPER_DEBUG
@@ -446,12 +440,12 @@ object Commands {
             callback { SkyHanniDebugsAndTests.waypoint(it) }
         }
         event.register("shstoplisteners") {
-            description = "Unregistering all loaded forge event listeners"
+            description = "Unregistering all loaded event listeners"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.stopListeners() }
         }
         event.register("shreloadlisteners") {
-            description = "Trying to load all forge event listeners again. Might not work at all"
+            description = "Reloads all event listeners again"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.reloadListeners() }
         }

@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -196,7 +195,7 @@ object ChocolateFactoryDataLoader {
     /**
      * REGEX-TEST: §7Available eggs: §a0
      */
-    private val hitmanAvailableEggsPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val hitmanAvailableEggsPattern by ChocolateFactoryApi.patternGroup.pattern(
         "hitman.availableeggs",
         "§7Available eggs: §a(?<amount>\\d+)",
     )
@@ -236,7 +235,7 @@ object ChocolateFactoryDataLoader {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         clearData()
     }
 

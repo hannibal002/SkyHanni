@@ -14,16 +14,16 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi.addCropIcon
+import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -31,11 +31,14 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonPrimitive
@@ -348,7 +351,7 @@ object GardenNextJacobContest {
         if (inCalendar) {
             val size = contests.size
             val percentage = size.toDouble() / MAX_CONTESTS_PER_YEAR
-            val formatted = LorenzUtils.formatPercentage(percentage)
+            val formatted = percentage.formatPercentage()
             addString("§eDetected $formatted of farming contests this year")
             return@line
         }
@@ -370,11 +373,8 @@ object GardenNextJacobContest {
             return@line
         }
 
-        if (isCloseToNewYear()) {
-            addString(CLOSE_TO_NEW_YEAR_TEXT)
-        } else {
-            addString("§cOpen calendar to read Jacob contest times!")
-        }
+        if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
+        else addString("§cOpen calendar to read Jacob contest times!")
 
         fetchedFromElite = false
         contests.clear()
@@ -397,7 +397,12 @@ object GardenNextJacobContest {
             duration -= contestDuration
         }
         for (crop in nextContest.crops) {
-            addCropIcon(crop, 1.0, highlight = (crop == boostedCrop))
+            val isBoosted = crop == boostedCrop
+            val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest")
+            val stack = Renderable.itemStack(cropStack, 1.0, highlight = isBoosted)
+            if (config.additionalBoostedHighlight && isBoosted) {
+                add(stack.renderBounds(config.additionalBoostedHighlightColor.toSpecialColor()))
+            } else add(stack)
             nextContestCrops.add(crop)
         }
         if (!activeContest) {
@@ -431,7 +436,7 @@ object GardenNextJacobContest {
         lastWarningTime = SimpleTimeMark.now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         ChatUtils.chat("Next farming contest: $cropText")
-        TitleManager.sendTitle("§eFarming Contest!", 5.seconds)
+        TitleManager.sendTitle("§eFarming Contest!", duration = 5.seconds)
         SoundUtils.playBeepSound()
 
         val cropTextNoColor = crops.joinToString(", ") {

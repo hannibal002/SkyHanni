@@ -23,11 +23,12 @@ object ItemClickData {
         val packet = event.packet
         val cancelled = when {
             packet is C08PacketPlayerBlockPlacement -> {
+                val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
                 if (packet.placedBlockDirection != 255) {
                     val position = packet.position.toLorenzVec()
-                    BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.getUsedItem()).post()
+                    BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.getUsedItem()).post() || clickCancelled
                 } else {
-                    ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
+                    clickCancelled
                 }
             }
 

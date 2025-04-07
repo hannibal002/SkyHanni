@@ -10,17 +10,14 @@ import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -63,7 +60,7 @@ object MiningNotifications {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.inMiningIsland()) return
+        if (!MiningApi.inMiningIsland()) return
         if (!config.enabled) return
         val message = event.message
         when {
@@ -93,7 +90,7 @@ object MiningNotifications {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         hasSentCold = false
         hasSentAscensionRope = false
     }
@@ -107,7 +104,7 @@ object MiningNotifications {
 
     private fun sendNotification(type: MiningNotificationList) {
         if (type !in config.notifications) return
-        TitleManager.sendTitle(type.notification, 1500.milliseconds)
+        TitleManager.sendTitle(type.notification, duration = 1.5.seconds)
         if (config.playSound) SoundUtils.playPlingSound()
     }
 }

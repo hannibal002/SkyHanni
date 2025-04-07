@@ -9,7 +9,8 @@ enum class GraphNodeTag(
     val cleanName: String,
     val description: String,
     val onlyIsland: IslandType? = null,
-    val onlySkyblock: Boolean? = true
+    val onlyIslands: Set<IslandType> = emptySet(),
+    val onlySkyblock: Boolean? = true,
 ) {
     DEV("dev", LorenzColor.WHITE, "Dev", "Intentionally marked as dev.", onlySkyblock = null), // E.g. Spawn points, todos, etc
 
@@ -94,6 +95,22 @@ enum class GraphNodeTag(
         "A Basket during the Halloween Event.",
         onlySkyblock = false,
     ),
+
+    FISHING_HOTSPOT(
+        "fishing_hotspot",
+        LorenzColor.AQUA,
+        "Fishing Hotspot",
+        "A possible hotspot where you can fish",
+        onlyIslands = setOf(IslandType.BACKWATER_BAYOU, IslandType.HUB, IslandType.CRIMSON_ISLE),
+    ),
+
+    FAIRY_SOUL(
+        "fairy_soul",
+        LorenzColor.DARK_PURPLE,
+        "Fairy Soul",
+        "A Fairy Soul.",
+    ),
+
     ;
 
     val displayName: String = color.getChatColor() + cleanName

@@ -8,8 +8,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -73,10 +71,14 @@ object TpsCounter {
                 val newTps = tpsList.average().roundTo(1).coerceIn(0.0..20.0)
                 tps = newTps
                 val legacyColor = format(newTps)
-                "$legacyColor$newTps"
+                "$legacyColor${fixTps(newTps)}"
             }
         }
         display = "§eTPS: $text"
+    }
+
+    private fun fixTps(tps: Double): Double {
+        return if (LorenzUtils.isAprilFoolsDay) tps / 2 else tps
     }
 
     private fun tpsCommand() {
@@ -85,7 +87,7 @@ object TpsCounter {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (hasReceivedPacket) {
             packetsFromLastSecond++
             hasReceivedPacket = false
@@ -93,7 +95,7 @@ object TpsCounter {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         tpsList.clear()
         tps = null
         packetsFromLastSecond = 0
@@ -124,8 +126,7 @@ object TpsCounter {
 
     private fun shouldIgnore() = timeSinceWorldSwitch < ignorePacketDelay
 
-    private fun isEnabled() = LorenzUtils.onHypixel &&
-        config.tpsDisplay &&
+    private fun isEnabled() = LorenzUtils.onHypixel && config.tpsDisplay &&
         (LorenzUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
 
     @HandleEvent

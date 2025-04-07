@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -291,7 +290,7 @@ object EntityOutlineRenderer {
         if (entity === mc.renderViewEntity &&
             !(
                 mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
-                    mc.gameSettings.thirdPersonView != 0
+                    !PlayerUtils.isFirstPersonView()
                 )
         ) {
             false
@@ -357,11 +356,9 @@ object EntityOutlineRenderer {
      *
      * This works since entities are only updated once per tick, so the inclusion or exclusion of an entity
      * to be outlined can be cached each tick with no loss of data
-     *
-     * @param event the client tick event
      */
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         val renderGlobal = try {
