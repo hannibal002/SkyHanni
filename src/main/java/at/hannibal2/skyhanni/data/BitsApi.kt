@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
+import at.hannibal2.skyhanni.events.BitsAvailableUpdateEvent
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -32,22 +31,21 @@ import kotlin.time.Duration.Companion.days
 @SkyHanniModule
 object BitsApi {
     private val profileStorage get() = ProfileStorageData.profileSpecific?.bits
-    private val playerStorage get() = SkyHanniMod.feature.storage
+    private val playerStorage get() = ProfileStorageData.playerSpecific
 
     // TODO: remove once issue is tracked down
-    private var lastBitUpdates = mapOf<String, Int>()
+    private val lastBitUpdates = mutableMapOf<String, Int>()
 
     var bits: Int
         get() = profileStorage?.bits ?: 0
         private set(value) {
             profileStorage?.bits = value
         }
-
-    private var currentFameRank: FameRank?
-        get() = getFameRankByNameOrNull(playerStorage.currentFameRank)
+    var fameRank: FameRank?
+        get() = playerStorage?.fameRank?.let(FameRanks::getByInternalName)
         set(value) {
             if (value != null) {
-                playerStorage.currentFameRank = value.name
+                playerStorage?.fameRank = value.internalName
             }
         }
 
@@ -63,7 +61,7 @@ object BitsApi {
             profileStorage?.boosterCookieExpiryTime = value
         }
 
-    private const val defaultCookieBits = 4800
+    private const val DEFAULT_COOKIE_BITS = 4800
 
     private val bitsDataGroup = RepoPattern.group("data.bits")
 
@@ -222,20 +220,19 @@ object BitsApi {
         }
     }
 
-    /**
-     * @param bits The new amount of bits
-     */
-    private fun updateBits(bits: Int, modifyAvailable: Boolean = true, cause: String) {
-        ChatUtils.debug("Updating bits to $bits, cause: $cause")
-        lastBitUpdates = lastBitUpdates + (cause to bits)
-        if (bits > this.bits) {
-            val difference = bits - this.bits
-            if (modifyAvailable) bitsAvailable -= difference
-            this.bits = bits
-            sendBitsGainEvent(difference)
+    private fun updateBits(amount: Int, modifyAvailable: Boolean = true, cause: String) {
+        ChatUtils.debug("Updating bits to $amount, cause: $cause")
+        lastBitUpdates[cause] = bits
+        val diff = amount - bits
+        if (diff == 0) return
+
+        if (diff > 0) {
+            if (modifyAvailable) bitsAvailable -= diff
+            bits = amount
+            sendBitsGainEvent(diff)
         } else {
-            this.bits = bits
-            sendBitsSpentEvent()
+            bits = amount
+            sendBitsSpentEvent(diff)
         }
     }
 
@@ -255,13 +252,13 @@ object BitsApi {
         fameRankUpPattern.matchMatcher(message) {
             val rank = group("rank")
 
-            currentFameRank = getFameRankByNameOrNull(rank) ?: run {
+            fameRank = FameRanks.getByName(rank) ?: run {
                 ErrorManager.logErrorWithData(
                     FameRankNotFoundException(rank),
                     "FameRank $rank not found",
                     "Rank" to rank,
                     "Message" to message,
-                    "FameRanks" to FameRanks.fameRanks,
+                    "FameRanks" to FameRanks.fameRanksMap,
                 )
                 return
             }
@@ -279,7 +276,7 @@ object BitsApi {
 
     fun bitsPerCookie(): Int {
         val museumBonus = profileStorage?.museumMilestone?.let { 1 + it * 0.01 } ?: 1.0 // Adds 1% per level
-        return (defaultCookieBits * museumBonus * (currentFameRank?.bitsMultiplier ?: 1.0)).toInt()
+        return (DEFAULT_COOKIE_BITS * museumBonus * (fameRank?.bitsMultiplier ?: 1.0)).toInt()
     }
 
     @HandleEvent
@@ -336,13 +333,13 @@ object BitsApi {
     private fun processFameRankStacks(stacks: Collection<ItemStack>) {
         val stack = stacks.firstOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
         fun fameRankOrNull(rank: String) {
-            currentFameRank = getFameRankByNameOrNull(rank) ?: run {
+            fameRank = FameRanks.getByName(rank) ?: run {
                 ErrorManager.logErrorWithData(
                     FameRankNotFoundException(rank),
                     "FameRank $rank not found",
                     "Rank" to rank,
                     "Lore" to stack.getLore(),
-                    "FameRanks" to FameRanks.fameRanks,
+                    "FameRanks" to FameRanks.fameRanksMap,
                 )
                 return
             }
@@ -415,8 +412,9 @@ object BitsApi {
 
     private fun sendBitsGainEvent(difference: Int) = BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).post()
 
-    private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).post()
-    private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).post()
+    private fun sendBitsSpentEvent(difference: Int) =
+        BitsUpdateEvent.BitsSpent(bits, bitsAvailable, difference).post()
+    private fun sendBitsAvailableGainedEvent() = BitsAvailableUpdateEvent(bitsAvailable).post()
 
     fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.isOnAlphaServer && profileStorage != null
 
@@ -427,7 +425,7 @@ object BitsApi {
             add("Bits: $bits")
             add("Bits Available: $bitsAvailable")
             add("Cookie Buff Time: $cookieBuffTime")
-            add("Current Fame Rank: $currentFameRank")
+            add("Current Fame Rank: $fameRank")
             add("Last Bit Updates: $lastBitUpdates")
             add("Bits per Cookie: ${bitsPerCookie()}")
         }
