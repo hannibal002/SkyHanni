@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -129,7 +128,7 @@ object DailyQuestHelper {
 
         if (event.gui !is GuiChest) return
         val chest = event.container as ContainerChest
-        val chestName = chest.getInventoryName()
+        val chestName = InventoryUtils.openInventoryName()
 
         if (chestName == "Challenges") {
             if (LorenzUtils.skyBlockArea != "Dojo") return
