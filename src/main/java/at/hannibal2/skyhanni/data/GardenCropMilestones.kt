@@ -132,6 +132,12 @@ object GardenCropMilestones {
         return getCounter() >= maxValue
     }
 
+    fun CropType.getTier(allowOverflow: Boolean = false): Int =
+        getTierForCrop(this, allowOverflow)
+
+    private fun getTierForCrop(crop: CropType, allowOverflow: Boolean = false): Int =
+        getTierForCropCount(crop.getCounter(), crop, allowOverflow)
+
     fun getTierForCropCount(count: Long, crop: CropType, allowOverflow: Boolean = false): Int {
         var tier = 0
         var totalCrops = 0L
