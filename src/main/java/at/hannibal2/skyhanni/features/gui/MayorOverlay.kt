@@ -17,6 +17,12 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 private val config get() = SkyHanniMod.feature.gui.mayorOverlay
 
 enum class MayorOverlay(private val configLine: String, private val createLines: () -> Renderable) {
+    TITLE(
+        "Title",
+        {
+            Renderable.string("§6§lMAYOR OVERLAY")
+        },
+    ),
     MAYOR(
         "Mayor",
         {
