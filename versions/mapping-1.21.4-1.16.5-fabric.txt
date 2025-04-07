@@ -13,3 +13,5 @@ net.minecraft.item.ItemStack getName() toHoverableText()
 net.minecraft.item.ItemStack getComponents() getTag()
 
 net.minecraft.client.gui.screen.ingame.SignEditScreen blockEntity sign
+
+net.minecraft.text.Text net.minecraft.text.LiteralText

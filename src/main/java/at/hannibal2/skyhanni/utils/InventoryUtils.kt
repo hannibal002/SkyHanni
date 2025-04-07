@@ -68,8 +68,6 @@ object InventoryUtils {
 
     fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
 
-    fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
-
     fun getItemsInOwnInventory(): List<ItemStack> =
         getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
 
