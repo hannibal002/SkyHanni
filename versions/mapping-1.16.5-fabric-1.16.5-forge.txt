@@ -40,3 +40,6 @@ net.minecraft.text.Style withStrikethrough() setStrikethrough()
 net.minecraft.text.Style withUnderline() setUnderlined()
 net.minecraft.text.Style withObfuscated() setObfuscated()
 net.minecraft.text.Style withParent() applyTo()
+
+net.minecraft.text.MutableText net.minecraft.network.chat.MutableComponent
+net.minecraft.text.MutableText setStyle() setStyle()

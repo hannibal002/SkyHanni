@@ -41,6 +41,8 @@ class ModuleProcessor(
         skyHanniEvent =
             resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
 
+        generatePrimaryFunctionNames(resolver)
+
         if (mcVersion == "1.8.9") {
             minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
                 ?.asStarProjectedType()
@@ -184,5 +186,39 @@ class ModuleProcessor(
             it.write("}\n")
         }
         logger.warn("Generated VersionConstants file with mod version $modVersion and mc version $mcVersion")
+    }
+
+    private fun generatePrimaryFunctionNames(resolver: Resolver) {
+        val skyHanniEvent = skyHanniEvent ?: return
+        // Get all class declarations annotated with @PrimaryFunction.
+        val primaryFunctionSymbols = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
+            .filterIsInstance<KSClassDeclaration>()
+            .filter { skyHanniEvent.isAssignableFrom(it.asStarProjectedType()) }
+            .toList()
+
+        val entries = primaryFunctionSymbols.mapNotNull { symbol ->
+            val primaryFunctionAnnotation = symbol.annotations.firstOrNull {
+                it.shortName.asString() == "PrimaryFunction"
+            }
+            val value = primaryFunctionAnnotation?.arguments?.firstOrNull()?.value as? String ?: return@mapNotNull null
+            val fqName = symbol.qualifiedName?.asString() ?: return@mapNotNull null
+            "\"$value\" to $fqName::class.java"
+        }.joinToString(",\n        ")
+
+        val dependencies = Dependencies(true, *primaryFunctionSymbols.mapNotNull { it.containingFile }.toTypedArray())
+        val file = codeGenerator.createNewFile(
+            dependencies,
+            "at.hannibal2.skyhanni.api.event",
+            "GeneratedEventPrimaryFunctionNames"
+        )
+        OutputStreamWriter(file).use { writer ->
+            writer.write("package at.hannibal2.skyhanni.api.event\n\n")
+            writer.write("object GeneratedEventPrimaryFunctionNames {\n")
+            writer.write("    val map: Map<String, Class<out SkyHanniEvent>> = mapOf(\n")
+            writer.write("        $entries\n")
+            writer.write("    )\n")
+            writer.write("}\n")
+        }
+        logger.warn("Generated GeneratedEventPrimaryFunctionNames with ${primaryFunctionSymbols.size} entries")
     }
 }
