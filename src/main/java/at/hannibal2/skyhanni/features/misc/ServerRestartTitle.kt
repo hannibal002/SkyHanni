@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -17,6 +16,7 @@ object ServerRestartTitle {
 
     private val config get() = SkyHanniMod.feature.misc
     private val patternGroup = RepoPattern.group("features.misc.serverrestart")
+    private var timerTitleContext: TitleManager.TitleContext? = null
 
     /**
      * REGEX-TEST: §cServer closing: 03:11 §8m77A
@@ -36,15 +36,26 @@ object ServerRestartTitle {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!config.serverRestartTitle) return
+        if (!config.serverRestartTitle) {
+            timerTitleContext?.stop()
+            timerTitleContext = null
+            return
+        }
 
         restartingPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
+            if (timerTitleContext?.alive == true) return
+            else if (timerTitleContext?.ended == true) {
+                timerTitleContext = null
+            }
             val minutes = group("minutes").toInt().minutes
             val seconds = group("seconds").toInt().seconds
             val totalTime = minutes + seconds
             if (totalTime > 2.minutes && totalTime.inWholeSeconds % 30 != 0L) return
-            val time = totalTime.format()
-            TitleManager.sendTitle("§cServer Restart in §b$time", duration = 2.seconds)
+            timerTitleContext = TitleManager.sendTitle(
+                "§cServer Restart in §b%f",
+                duration = totalTime,
+                countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS
+            ) ?: timerTitleContext
         }
     }
 }
