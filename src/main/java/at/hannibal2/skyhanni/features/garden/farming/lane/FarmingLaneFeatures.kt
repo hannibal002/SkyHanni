@@ -32,10 +32,11 @@ import kotlin.time.Duration.Companion.seconds
 object FarmingLaneFeatures {
     val config get() = FarmingLaneApi.config
 
-    private var currentPositon: Double? = null
+    private var currentPosition: Double? = null
     private var currentDistance = 0.0
 
     private var display = listOf<String>()
+    private var titleContext: TitleManager.TitleContext? = null
     private var timeRemaining: Duration? = null
     private var lastSpeed = 0.0
     private var lastTimeFarming = SimpleTimeMark.farPast()
@@ -118,11 +119,11 @@ object FarmingLaneFeatures {
     }
 
     private fun calculateDirection(newPosition: Double): Int? {
-        val position = currentPositon ?: run {
-            currentPositon = newPosition
+        val position = currentPosition ?: run {
+            currentPosition = newPosition
             return null
         }
-        currentPositon = newPosition
+        currentPosition = newPosition
 
         val diff = position - newPosition
         return if (diff > 0) {
@@ -136,12 +137,17 @@ object FarmingLaneFeatures {
 
     private fun showWarning() {
         with(config.laneSwitchNotification) {
-            if (enabled) {
-                TitleManager.sendTitle(text.replace("&", "§"))
-                if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
-                    lastPlaySound = SimpleTimeMark.now()
-                    playUserSound()
-                }
+            if (!enabled) return
+            titleContext = when (titleContext) {
+                null -> TitleManager.sendTitle(
+                    text.replace("&", "§"),
+                    duration = secondsBefore.seconds,
+                )
+                else -> titleContext.takeIf { it?.ended == false }
+            }
+            if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
+                lastPlaySound = SimpleTimeMark.now()
+                playUserSound()
             }
         }
     }

@@ -41,7 +41,7 @@ object BurrowWarpHelper {
                 HypixelCommands.warp(it.name)
                 lastWarp = currentWarp
                 GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
-                TitleManager.optionalResetTitle { currentTitle ->
+                TitleManager.conditionallyStopTitle { currentTitle ->
                     currentTitle.startsWith("§bWarp to ")
                 }
             }
