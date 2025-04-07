@@ -9,15 +9,15 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.isMaxed
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenApi.addCropIcon
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -27,6 +27,7 @@ object GardenBestCropTime {
     var display: Renderable? = null
 
     private val config get() = GardenApi.config.cropMilestones
+    // Todo: Use Duration instead of Long
     val timeTillNextCrop = mutableMapOf<CropType, Long>()
 
     fun reset() {
@@ -115,26 +116,28 @@ object GardenBestCropTime {
         val isCurrent = crop == currentCrop
         if (index > config.next.showOnlyBest && (!config.next.showCurrent || !isCurrent)) return null
 
-        return Renderable.line {
-            if (!config.next.bestCompact) {
-                addString("§7$index# ")
-            }
-            addCropIcon(crop)
+        return Renderable.horizontalContainer(
+            buildList {
+                if (!config.next.bestCompact) {
+                    addString("§7$index# ")
+                }
+                addItemStack(crop.icon)
 
-            val color = if (isCurrent) "§e" else "§7"
-            val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
-            val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
-            val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
+                val color = if (isCurrent) "§e" else "§7"
+                val contestFormat = if (GardenNextJacobContest.isNextCrop(crop)) "§n" else ""
+                val currentTier = GardenCropMilestones.getTierForCropCount(crop.getCounter(), crop, allowOverflow = true)
+                val nextTier = if (config.bestShowMaxedNeeded.get()) 46 else currentTier + 1
 
-            val cropName = if (!config.next.bestCompact) crop.cropName + " " else ""
-            val tier = if (!config.next.bestCompact) "$currentTier➜$nextTier§r " else ""
-            addString("$color$contestFormat$cropName$tier§b$duration")
+                val cropName = if (!config.next.bestCompact) crop.cropName + " " else ""
+                val tier = if (!config.next.bestCompact) "$currentTier➜$nextTier§r " else ""
+                addString("$color$contestFormat$cropName$tier§b$duration")
 
-            if (gardenExp && !config.next.bestCompact) {
-                val gardenExpForTier = getGardenExpForTier(nextTier)
-                addString(" §7(§2$gardenExpForTier §7Exp)")
-            }
-        }
+                if (gardenExp && !config.next.bestCompact) {
+                    val gardenExpForTier = getGardenExpForTier(nextTier)
+                    addString(" §7(§2$gardenExpForTier §7Exp)")
+                }
+            },
+        )
     }
 
     private fun getGardenExpForTier(gardenLevel: Int) = if (gardenLevel > 30) 300 else gardenLevel * 10

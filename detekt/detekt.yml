@@ -5,6 +5,10 @@ GrammarRules:
     AvoidBritishSpelling:
         active: true
 
+CompatRules:
+    MinecraftCompat:
+        active: true
+
 FormattingRules:
     CustomCommentSpacing:
         active: true
@@ -29,6 +33,8 @@ SkyHanniStyle:
     InSkyBlockEarlyReturn:
         active: true
     IsInIslandEarlyReturn:
+        active: true
+    OnlyOnIslandSpecificity:
         active: true
 
 style:
@@ -149,3 +155,8 @@ potential-bugs:
         active: false
     StorageNeedsExpose:
         active: true
+    NonStorageDoesntNeedExpose:
+        active: true
+    ImmutableTypesWithExpectedInteriorMutabilityInConfig:
+        active: true
+

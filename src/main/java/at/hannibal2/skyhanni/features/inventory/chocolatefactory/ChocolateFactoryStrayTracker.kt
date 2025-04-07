@@ -14,13 +14,10 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -31,6 +28,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -284,7 +283,7 @@ object ChocolateFactoryStrayTracker {
         InventoryUtils.getItemsInOpenChest().filter {
             claimedStraysSlots.contains(it.slotIndex)
         }.forEach {
-            if (!strayCaughtPattern.matches(it.stack.name)) {
+            if (!strayCaughtPattern.matches(it.stack.displayName)) {
                 claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.slotIndex))
             }
         }
@@ -304,7 +303,10 @@ object ChocolateFactoryStrayTracker {
     }
 
     init {
-        tracker.initRenderer(config.strayRabbitTrackerPosition) { isEnabled() }
+        tracker.initRenderer(
+            { config.strayRabbitTrackerPosition },
+            ChocolateFactoryApi.mainInventory,
+        ) { isEnabled() }
     }
 
     @HandleEvent

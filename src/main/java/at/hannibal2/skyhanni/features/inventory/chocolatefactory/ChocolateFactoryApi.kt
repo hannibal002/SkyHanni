@@ -13,10 +13,9 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -26,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import java.util.TreeSet
@@ -84,7 +84,7 @@ object ChocolateFactoryApi {
      */
     val caughtRabbitPattern by patternGroup.pattern(
         "rabbit.caught",
-        ".*§7You caught.*"
+        ".*§7You caught.*",
     )
     // </editor-fold>
 
@@ -108,8 +108,9 @@ object ChocolateFactoryApi {
     private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var maxPrestige = 6
+    var cfShortcutIndex = 16
 
-    var inChocolateFactory = false
+    val inChocolateFactory get() = mainInventory.isInside()
     var chocolateFactoryPaused = false
 
     var currentPrestige = 1
@@ -124,10 +125,10 @@ object ChocolateFactoryApi {
 
     var specialRabbitTextures = listOf<String>()
     var warningSound = SoundUtils.createSound("note.pling", 1f)
+    val mainInventory = InventoryDetector { name -> name == "Chocolate Factory" }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
             if (config.enabled) {
                 chocolateFactoryPaused = true
@@ -135,8 +136,7 @@ object ChocolateFactoryApi {
             }
             return
         }
-        if (event.inventoryName != "Chocolate Factory") return
-        inChocolateFactory = true
+        if (!mainInventory.isInside()) return
 
         if (config.enabled) {
             factoryUpgrades = emptyList()
@@ -166,6 +166,7 @@ object ChocolateFactoryApi {
         rabbitHitmanIndex = data.rabbitHitmanIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
+        cfShortcutIndex = data.cfShortcutIndex
         chocolateMilestones = data.chocolateMilestones
         hitmanCosts = data.hitmanCosts
         chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()
@@ -207,7 +208,7 @@ object ChocolateFactoryApi {
     }
 
     fun getNextLevelName(stack: ItemStack): String? = upgradeLorePattern.firstMatcher(stack.getLore()) {
-        val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
+        val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.displayName) {
             groupOrNull("employee")
         } else groupOrNull("upgradename")
         val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")

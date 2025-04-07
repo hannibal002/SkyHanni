@@ -3,11 +3,10 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
-import at.hannibal2.skyhanni.utils.compat.getWholeInventory
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
@@ -26,7 +25,7 @@ object FixGhostEntities {
     private var recentlySpawnedEntities = ArrayDeque<Int>()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         recentlyRemovedEntities = ArrayDeque()
         recentlySpawnedEntities = ArrayDeque()
     }
@@ -64,7 +63,7 @@ object FixGhostEntities {
     fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!config.hideTemporaryArmorstands) return
         with(event.entity) {
-            if (ticksExisted < 10 && isDefaultValue() && getWholeInventory().all { it == null }) event.cancel()
+            if (ticksExisted < 10 && isDefaultValue() && getAllEquipment().all { it == null }) event.cancel()
         }
     }
 

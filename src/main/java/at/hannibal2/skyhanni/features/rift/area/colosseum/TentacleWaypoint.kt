@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.monster.EntitySlime
@@ -67,11 +67,11 @@ object TentacleWaypoint {
         }
     }
 
-    private fun getText(hits: Int) = if (BactePhase.currentPhase == BactePhase.BactePhase.PHASE_5) {
+    private fun getText(hits: Int) = if (BacteApi.currentPhase == BacteApi.Phase.PHASE_5) {
         "§a${pluralize(hits, "Hit", withNumber = true)}"
     } else {
-        val maxHp = when (BactePhase.currentPhase) {
-            BactePhase.BactePhase.PHASE_4 -> 3
+        val maxHp = when (BacteApi.currentPhase) {
+            BacteApi.Phase.PHASE_4 -> 3
             else -> 4
         }
         val hpColor = if (hits > 0) "§c" else "§a"

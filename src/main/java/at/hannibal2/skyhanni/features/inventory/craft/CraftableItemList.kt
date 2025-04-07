@@ -7,14 +7,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -26,6 +23,9 @@ import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -107,13 +107,13 @@ object CraftableItemList {
         val amountFormat = canCraftAmount.addSeparators()
         val totalPrice = pricePer(neededItems)
         pricePer[internalName] = totalPrice
-        val itemName = internalName.itemName
+        val itemName = internalName.repoItemName
         val tooltip = buildList {
             add(itemName)
             add("")
             add("§7Craft cost: §6${totalPrice.shortFormat()}")
             for ((item, amount) in neededItems) {
-                val name = item.itemName
+                val name = item.repoItemName
                 val price = item.getPrice() * amount
                 add(" §8x${amount.addSeparators()} $name §7(§6${price.shortFormat()}§7)")
             }
@@ -124,10 +124,10 @@ object CraftableItemList {
             add("")
             add("§eClick to craft!")
         }
-        return Renderable.clickAndHover(
+        return Renderable.clickable(
             "§8x$amountFormat $itemName",
             tips = tooltip,
-            onClick = {
+            onLeftClick = {
                 HypixelCommands.viewRecipe(internalName.asString())
             },
         ).toSearchable(itemName)

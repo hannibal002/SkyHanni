@@ -15,15 +15,14 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -37,18 +36,22 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import com.google.gson.JsonArray
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.EntityLiving
@@ -76,6 +79,8 @@ object DamageIndicatorManager {
 
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
+
+    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
 
     fun isDamageSplash(entity: EntityArmorStand): Boolean {
         if (entity.ticksExisted > 300) return false
@@ -112,7 +117,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         mobFinder = MobFinder()
         data = emptyMap()
     }
@@ -150,11 +155,7 @@ object DamageIndicatorManager {
         val sizeBossName: Double
         val sizeFinalResults: Double
         val smallestDistanceVew: Double
-        val thirdPersonView = Minecraft.getMinecraft().gameSettings.thirdPersonView
-        // 0 == normal
-        // 1 == f3 behind
-        // 2 == selfie
-        if (thirdPersonView == 1) {
+        if (PlayerUtils.isThirdPersonView()) {
             sizeHealth = 2.8
             sizeNameAbove = 2.2
             sizeBossName = 2.4
@@ -215,7 +216,6 @@ object DamageIndicatorManager {
                 NameVisibility.HIDDEN -> ""
                 NameVisibility.FULL_NAME -> data.bossType.fullName
                 NameVisibility.SHORT_NAME -> data.bossType.shortName
-                else -> data.bossType.fullName
             }
 
             if (data.namePrefix.isNotEmpty()) {
@@ -226,8 +226,37 @@ object DamageIndicatorManager {
             }
             event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
 
+            val icons = iconCache.getOrPut(data) {
+                buildList {
+                    if (config.shurikenIndicator && entity.getNameTagWith(3, "§b✯") != null) {
+                        add(
+                            if (config.compactStatusEffects) "§b✯"
+                            else "§bShuriken",
+                        )
+                    }
+                    if (config.twilightIndicator && entity.getNameTagWith(3, "§5ᛤ") != null) {
+                        add(
+                            if (config.compactStatusEffects) "§5ᛤ"
+                            else "§5Twilight",
+                        )
+                    }
+                }
+            }
+
+            val iconString = icons.joinToString(if (config.compactStatusEffects) "" else " ")
+            var diff = 9f
+            if (iconString.isNotEmpty()) {
+                event.drawDynamicText(
+                    location,
+                    iconString,
+                    sizeBossName,
+                    diff,
+                    smallestDistanceVew = smallestDistanceVew,
+                )
+                diff += 22f
+            } else diff += 4f
+
             if (config.showDamageOverTime) {
-                var diff = 13f
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
                 if (currentDamage != 0L || currentHealing != 0L) {
@@ -324,7 +353,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         data = data.editCopy {
             EntityUtils.getEntities<EntityLivingBase>()
@@ -470,8 +499,34 @@ object DamageIndicatorManager {
                 entityData.ignoreBlocks = location.y == 117.0 && location.distanceToPlayer() < 15
             }
 
+            BossType.BACTE,
+            -> {
+                return checkBacte(entityData)
+            }
+
+            BossType.END_ENDER_DRAGON,
+            -> {
+                return checkEnderDragon(entityData)
+            }
+
             else -> return ""
         }
+        return ""
+    }
+
+    private fun checkEnderDragon(entityData: EntityData): String {
+        DragonFightAPI.currentType?.let {
+            entityData.namePrefix = "§c§l$it "
+        }
+        return DragonFightAPI.currentHp?.let {
+            "§c" + it.shortFormat()
+        }.orEmpty()
+    }
+
+    private fun checkBacte(entityData: EntityData): String {
+        if (!config.showBactePhase) return ""
+        if (currentPhase == BacteApi.Phase.NOT_ACTIVE) return ""
+        entityData.namePrefix = "§c${currentPhase.ordinal}/${BacteApi.Phase.PHASE_5.ordinal} "
         return ""
     }
 
@@ -708,7 +763,7 @@ object DamageIndicatorManager {
         val config = config.vampireSlayer
 
         if (config.percentage) {
-            val percentage = LorenzUtils.formatPercentage(health.toDouble() / maxHealth)
+            val percentage = (health.toDouble() / maxHealth).formatPercentage()
             entityData.nameSuffix = " §e$percentage"
         }
 

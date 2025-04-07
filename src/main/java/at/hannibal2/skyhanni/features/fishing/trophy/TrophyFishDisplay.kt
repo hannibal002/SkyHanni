@@ -16,13 +16,10 @@ import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSingleString
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -34,6 +31,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -86,6 +86,7 @@ object TrophyFishDisplay {
                 showCross,
                 showCheckmark,
                 onlyShowMissing,
+                showCaughtHigher,
             ) {
                 update()
             }
@@ -97,7 +98,6 @@ object TrophyFishDisplay {
         val list = mutableListOf<Renderable>()
         list.addString("§e§lTrophy Fish Display")
         list.add(Renderable.table(createTable(), yPadding = config.extraSpace.get()))
-
         display = list
     }
 
@@ -132,8 +132,8 @@ object TrophyFishDisplay {
         table: MutableList<List<Renderable>>,
     ) {
         get(config.onlyShowMissing.get())?.let { atLeast ->
-            val list = TrophyRarity.entries.filter { it == atLeast }
-            if (list.all { (data[it] ?: 0) > 0 }) {
+            val list = TrophyRarity.entries.filter { it == atLeast || (!config.showCaughtHigher.get() && it > atLeast) }
+            if (list.any { (data[it] ?: 0) > 0 }) {
                 return
             }
         }
@@ -222,7 +222,7 @@ object TrophyFishDisplay {
     ) = trophyFishes.entries.sortedBy { it.value[rarity] ?: 0 }
 
     private fun getItemName(rawName: String): String {
-        val name = getInternalName(rawName).itemName
+        val name = getInternalName(rawName).repoItemName
         return name.split(" ").dropLast(1).joinToString(" ")
     }
 

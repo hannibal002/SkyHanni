@@ -20,8 +20,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -49,6 +48,7 @@ object EstimatedItemValue {
     private var lastToolTipTime = 0L
     var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
+    var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
     private var currentlyShowing = false
 
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
@@ -67,6 +67,7 @@ object EstimatedItemValue {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
+        crimsonPrestigeCosts = data.crimsonPrestigeCosts
     }
 
     private fun isInNeuOverlay(): Boolean {
@@ -226,7 +227,7 @@ object EstimatedItemValue {
                 e, "Error in Estimated Item Value renderer",
                 "openInventoryName" to openInventoryName,
                 "item" to item,
-                "item name" to item.itemName,
+                "item name" to item.repoItemName,
                 "internal name" to item.getInternalNameOrNull(),
                 "lore" to item.getLore(),
             )
@@ -240,7 +241,7 @@ object EstimatedItemValue {
 
     private fun ItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
-            val name = this.name
+            val name = this.displayName
             return (
                 this.item == Items.enchanted_book ||
                     name.contains("Salesperson") ||
