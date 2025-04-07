@@ -3,7 +3,11 @@ package at.hannibal2.skyhanni.config.features.gui
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.gui.MayorOverlay
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.*
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MayorOverlayConfig {
     @Expose
