@@ -1098,6 +1098,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Using it is not recommended.
 + Added chat compact for Hitman Claim All. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3077)
     + Requires `Chat Compact` for Hoppity enabled to work.
++ Added an All-Time Stats view for the Hoppity Live Display card. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3242)
+    + Navigate to the very right using the Event History keys.
 
 ### The Carnival
 
