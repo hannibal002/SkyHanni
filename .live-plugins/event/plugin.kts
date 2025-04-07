@@ -39,26 +39,15 @@ fun buildPrimaryNameMap(project: Project): Map<String, String> {
     )
 
     for (psiInheritor in inheritors) {
-        val ktDeclaration = psiInheritor.navigationElement.takeIf {
-            it is KtClassOrObject
-        } as? KtClassOrObject ?: continue
-        val superTypeCallEntry = ktDeclaration.superTypeListEntries
-            .firstOrNull { it.text.startsWith("SkyHanniEvent(") }
+        val ktDeclaration = psiInheritor.navigationElement.takeIf { it is KtClassOrObject } as? KtClassOrObject ?: continue
 
-        if (superTypeCallEntry != null) {
-            val callText = superTypeCallEntry.text
-            val nameInQuotes = callText.substringAfter("(").substringBefore(")")
-            val primaryName = nameInQuotes.removeSurrounding("\"")
+        val primaryAnnotation = ktDeclaration.annotationEntries.firstOrNull { it.shortName?.asString() == "PrimaryFunction" }
+        if (primaryAnnotation != null) {
+            val valueArg = primaryAnnotation.valueArguments.firstOrNull()?.getArgumentExpression()?.text ?: continue
+            val primaryName = valueArg.removeSurrounding("\"")
             if (primaryName.isNotBlank()) {
                 result[primaryName] = ktDeclaration.name ?: ""
-            }
-        } else ktDeclaration.getBody()?.properties?.forEach { prop ->
-            if (prop.name == "primaryFunctionName" && prop.initializer != null) {
-                val textValue = prop.initializer!!.text
-                val primaryName = textValue.removeSurrounding("\"")
-                if (primaryName.isNotBlank()) {
-                    result[primaryName] = ktDeclaration.name ?: ""
-                }
+                continue
             }
         }
     }
@@ -78,7 +67,9 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
             override fun visitNamedFunction(function: KtNamedFunction) {
                 val hasEventAnnotation = function.annotationEntries.any { it.shortName!!.asString() == handleEvent }
                 val functionName = function.name ?: return
-                val isPrimaryName = buildPrimaryNameMap(holder.project)[functionName] != null
+
+                val primaryNameMap = buildPrimaryNameMap(function.project)
+                val isPrimaryName = primaryNameMap.containsKey(functionName)
 
                 // Check if the function's parameter is a SkyHanniEvent or its subtype
                 val isEvent = function.valueParameters.firstOrNull()?.type()?.supertypes()
@@ -108,7 +99,7 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
                 } else if (!isEvent && !hasEventType && !isPrimaryName && hasEventAnnotation) {
                     holder.registerProblem(
                         function,
-                        "Function should not be annotated with @HandleEvent if it does not take a SkyHanniEvent",
+                        "Function should not be annotated with @HandleEvent if it does not take a SkyHanniEvent\n",
                         ProblemHighlightType.GENERIC_ERROR
                     )
                 }
