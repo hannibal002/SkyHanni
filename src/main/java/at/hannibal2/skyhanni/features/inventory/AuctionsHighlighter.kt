@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -47,7 +47,7 @@ object AuctionsHighlighter {
         if (event.gui !is GuiChest) return
 
         val chest = event.container as ContainerChest
-        if (chest.getInventoryName() != "Manage Auctions") return
+        if (InventoryUtils.openInventoryName() != "Manage Auctions") return
 
         for ((slot, stack) in chest.getUpperItems()) {
             val lore = stack.getLore()
