@@ -39,6 +39,8 @@
 
 + Added chat compact for Hitman Claim All. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3077)
     + Requires `Chat Compact` for Hoppity enabled to work.
++ Added an All-Time Stats view for the Hoppity Live Display card. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3242)
+    + Navigate to the very right using the Event History keys.
 
 #### Misc
 
@@ -86,10 +88,14 @@
 #### Chat
 
 + Added legacy item warning to the "Others" chat filter. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3331)
++ Added Hypixel's Anniversary Video Ad to Spam Filter. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3739)
 
 #### Combat
 
 + Added Twilight Arrow Poison and Extremely Real Shuriken name and icon indicators to Damage Indicator. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3639)
++ Added option to enable Voidgloom Tracker in Dragon's Nest. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3705)
+    + Disabled by default to avoid interference with Dragon Tracker.
++ Improved Dragon Profit Tracker to now always render everything. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3705)
 
 #### Misc
 
@@ -146,6 +152,8 @@
 #### Mining
 
 + Fixed Corpse Tracker not displaying profit titles. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3451)
++ Fixed Bits Gained chat message appearing despite disabled setting. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3729)
++ Fixed Mineshaft Pity Display not appearing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3733)
 
 #### Events
 
@@ -158,6 +166,7 @@
 + Fixed SkyBlock Level not displaying in `/show` messages with Custom Chat Formatting enabled. - SuperClash (https://github.com/hannibal002/SkyHanni/pull/3519)
 + Fixed non-clickable chat messages caused by Shortened Coin Amounts. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3662)
 + Fixed Shorten Coin Amount in chat triggering on emotes. - nopo (https://github.com/hannibal002/SkyHanni/pull/3673)
++ Fixed chat spam from `HoppityEventSummary`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3727)
 
 #### Inventory
 
@@ -165,6 +174,7 @@
 + Fixed XP in Inventory not displaying for Renew Experiments menu. - aphased (https://github.com/hannibal002/SkyHanni/pull/3648)
 + Fixed NEU Item List + Hypixel Item Description showing wrong percentages for Chimera. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3700)
 + Fixed titles in inventories overstaying their welcome. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3692)
++ Fixed an issue where the Estimated Item Value was not displayed for Kuudra Armors when using an outdated repository. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3689)
 
 #### Dungeon
 
@@ -173,6 +183,11 @@
 #### Combat
 
 + Fixed Dragon Profit tracker overwriting edit commands for other Trackers. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3704)
+
+#### Hoppity
+
++ Fixed Rabbit Barn sometimes being incorrectly highlighted as full in the Chocolate Factory. - Luna (https://github.com/hannibal002/SkyHanni/pull/3726)
+    + This mainly happened when using multiple profiles.
 
 #### Misc
 
@@ -321,6 +336,18 @@
 + SkyHanniEvents can now be `@Handle`-d without an `event:` parameter or a HandleEvent parameter if a default function name is provided for the event. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3064)
 + SkyHanniEvents can now be `@Handle`-d without an `event:` parameter, and without a HandleEvent parameter, if a default function name is provided for the event. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3656)
     + See `SkyhanniTickEvent` and `WorldChangeEvent` for examples.
++ Added block compat, changed inventory name getting. - nopo (https://github.com/hannibal002/SkyHanni/pull/3629)
++ Added cache for `getSlayerTypeForCurrentArea()`. - hannibal2. (https://github.com/hannibal002/SkyHanni/pull/3730)
++ Added context option on default function names for navigating to event declaration. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3724)
++ Added debug command `/shdebugrecentitemadds`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3720)
++ Bumped `ModAPI` to 1.0.1.2. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3702)
++ Removed `MixinHypixelForgeModApi` in favor of the `ModAPI` version change. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3702)
++ Removed the `addAsSingletonList` function in favor of `Renderable`s. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3607)
+
+### Removed Features
+
++ Removed `/shshowcropmoneycalculation`. - appable (https://github.com/hannibal002/SkyHanni/pull/3607)
+    + Use `/shdebug Crop Money` instead.
 
 ## Version 2.0.0
 
