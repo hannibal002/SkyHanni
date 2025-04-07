@@ -125,6 +125,10 @@ object DebugCommand {
             event.addData("Unknown SkyBlock island!")
             return
         }
+        if (LorenzUtils.skyBlockIsland == IslandType.NONE) {
+            event.addData("No SkyBlock island found!")
+            return
+        }
 
         if (LorenzUtils.skyBlockIsland != HypixelData.skyBlockIsland) {
             event.addData {
