@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -115,7 +114,7 @@ object HideNotClickableItems {
         if (bypassActive()) return
         if (event.gui !is GuiChest) return
         val chest = event.container as ContainerChest
-        val chestName = chest.getInventoryName()
+        val chestName = InventoryUtils.openInventoryName()
 
         for ((slot, stack) in chest.getLowerItems()) {
             if (hide(chestName, stack)) {
@@ -133,7 +132,7 @@ object HideNotClickableItems {
 
         val guiChest = Minecraft.getMinecraft().currentScreen
         if (guiChest !is GuiChest) return
-        val chestName = (guiChest.inventorySlots as ContainerChest).getInventoryName()
+        val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.itemStack
         if (InventoryUtils.getItemsInOpenChest().map { it.stack }.contains(stack)) return

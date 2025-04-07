@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.collection
 
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
@@ -374,7 +375,17 @@ object CollectionUtils {
 
     class OrderedQueue<T> : PriorityQueue<WeightedItem<T>>() {
         fun add(item: T, weight: Double): Boolean = super.add(WeightedItem(item, weight))
+        fun copyWithFilter(predicate: (T) -> Boolean): OrderedQueue<T> {
+            val newQueue = OrderedQueue<T>()
+            for (item in this) {
+                if (!predicate(item.item)) {
+                    newQueue.add(item.item, item.weight)
+                }
+            }
+            return newQueue
+        }
         fun pollOrNull(): T? = poll()?.item
+        fun getWaitingWeightOrNull(): Double? = peek()?.weight
     }
 
     data class WeightedItem<T>(val item: T, val weight: Double) : Comparable<WeightedItem<T>> {
@@ -401,4 +412,12 @@ object CollectionUtils {
             return removedValue
         }
     }
+
+    fun <K> MutableMap<K, SimpleTimeMark>.evictOldestEntry(cap: Int) {
+        if (size > cap) {
+            val oldestKey = minByOrNull { it.value }?.key
+            oldestKey?.let { remove(it) }
+        }
+    }
+
 }
