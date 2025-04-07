@@ -50,6 +50,7 @@ public class SensitivityReducerConfig {
         name = "Show GUI",
         desc = "Show the GUI element while the feature is enabled.")
     @ConfigEditorBoolean
+    // TODO rename showGui
     public boolean showGUI = true;
 
     @Expose

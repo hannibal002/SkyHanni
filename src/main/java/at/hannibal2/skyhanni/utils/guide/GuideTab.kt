@@ -12,7 +12,7 @@ class GuideTab(
     val item: ItemStack,
     val tip: Renderable,
     val isVertical: Boolean = false,
-    var lastTab: GuideGUI.tabWrapper,
+    var lastTab: GuideGui.tabWrapper,
     val onClick: (GuideTab) -> Unit
 ) {
 

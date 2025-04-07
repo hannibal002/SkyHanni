@@ -14,7 +14,7 @@ const val TAB_SPACING = 5
 const val TAB_SHORT_SIDE = 25
 const val TAB_LONG_SIDE = 28
 
-abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen() {
+abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen() {
 
     abstract val sizeX: Int
     abstract val sizeY: Int
