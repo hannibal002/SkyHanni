@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.addRedstoneOres
 import net.minecraft.block.Block
 import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
@@ -79,4 +80,6 @@ object BlockUtils {
         radius: Int = distance,
         filter: Block,
     ): Map<LorenzVec, IBlockState> = nearbyBlocks(center, distance, radius, condition = { it.block == filter })
+
+    val redstoneOreBlocks = buildList { addRedstoneOres() }
 }
