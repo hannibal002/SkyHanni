@@ -6,9 +6,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.ReflectionUtils
-import java.lang.invoke.LambdaMetafactory
-import java.lang.invoke.MethodHandles
-import java.lang.invoke.MethodType
 import java.lang.reflect.Method
 import java.util.function.Consumer
 
@@ -64,10 +61,14 @@ class EventListeners private constructor(val name: String, private val isGeneric
                     "Each event in eventTypes in @HandleEvent must extend SkyHanniEvent. Provided: $kClass"
                 }
             }
-        } else {
-            require(options.eventType != SkyHanniEvent::class) {
-                "Method ${method.name} has no parameters but no eventType was provided in the annotation."
+        } else if (options.eventType == SkyHanniEvent::class) {
+            require(SkyHanniEvents.eventPrimaryFunctionNames.containsKey(method.name)) {
+                "Method ${method.name} has no parameters and no eventType was provided, " +
+                    "and no matching primary function name was found in eventPrimaryFunctionNames.\n" +
+                    "eventPrimaryFunctionNames: ${SkyHanniEvents.eventPrimaryFunctionNames}" +
+                    "\nMethod: ${method.name} in ${method.declaringClass.name}"
             }
+        } else {
             require(SkyHanniEvent::class.java.isAssignableFrom(options.eventType.java)) {
                 "eventType in @HandleEvent must extend SkyHanniEvent. Provided: ${options.eventType.java}"
             }
@@ -93,27 +94,6 @@ class EventListeners private constructor(val name: String, private val isGeneric
                     "event class hierarchy for type $genericType"
             )
         } ?: error("Method ${method.name} does not have a generic parameter type.")
-
-    /**
-     * Creates a consumer using LambdaMetafactory, this is the most efficient way to reflectively call
-     * a method from within code.
-     */
-    @Suppress("UNCHECKED_CAST")
-    private fun createEventConsumer(name: String, instance: Any, method: Method): Consumer<Any> {
-        try {
-            val handle = MethodHandles.lookup().unreflect(method)
-            return LambdaMetafactory.metafactory(
-                MethodHandles.lookup(),
-                "accept",
-                MethodType.methodType(Consumer::class.java, instance::class.java),
-                MethodType.methodType(Nothing::class.javaPrimitiveType, Object::class.java),
-                handle,
-                MethodType.methodType(Nothing::class.javaPrimitiveType, method.parameterTypes[0]),
-            ).target.bindTo(instance).invokeExact() as Consumer<Any>
-        } catch (e: Throwable) {
-            throw IllegalArgumentException("Method $name is not a valid consumer", e)
-        }
-    }
 
     fun getListeners(): List<Listener> = listeners
 

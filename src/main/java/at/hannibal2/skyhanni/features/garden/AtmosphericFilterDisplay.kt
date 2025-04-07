@@ -37,7 +37,7 @@ object AtmosphericFilterDisplay {
 
     private fun drawDisplay(season: SkyblockSeason): String = buildString {
         if (!config.onlyBuff) {
-            append(season.getSeason(config.abbreviateSeason))
+            append(season.getSeasonName(config.abbreviateSeason))
             append("§7: ")
         }
         append(season.getPerk(config.abbreviatePerk))
