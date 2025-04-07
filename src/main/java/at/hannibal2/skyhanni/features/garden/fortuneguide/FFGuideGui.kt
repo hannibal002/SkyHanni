@@ -57,7 +57,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
         pageList = mapOf(
             FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
-            FortuneGuidePage.CROP to CropPage({ currentCrop!! }, sizeX, sizeY),
+            FortuneGuidePage.CROP to CropPage({ currentCrop ?: error("current crop is null") }, sizeX, sizeY),
             FortuneGuidePage.UPGRADES to UpgradePage({ currentCrop }, sizeX, sizeY - 2),
         )
         verticalTabs = listOf(
