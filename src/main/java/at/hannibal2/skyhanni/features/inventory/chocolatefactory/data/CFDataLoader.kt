@@ -200,7 +200,7 @@ object CFDataLoader {
     /**
      * REGEX-TEST: §7Available eggs: §a0
      */
-    private val hitmanAvailableEggsPattern by CFApi.patternGroup.pattern(
+    val hitmanAvailableEggsPattern by CFApi.patternGroup.pattern(
         "hitman.availableeggs",
         "§7Available eggs: §a(?<amount>\\d+)",
     )
