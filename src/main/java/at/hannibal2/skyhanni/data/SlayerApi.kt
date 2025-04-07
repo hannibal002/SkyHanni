@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,6 +38,10 @@ object SlayerApi {
     var latestSlayerCategory = ""
     var latestWrongAreaWarning = SimpleTimeMark.farPast()
     var latestSlayerProgress = ""
+
+    val currentAreaType by RecalculatingValue(500.milliseconds) {
+        checkSlayerTypeForCurrentArea()
+    }
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
 
@@ -121,19 +126,19 @@ object SlayerApi {
         }
 
         if (event.isMod(5)) {
-            isInCorrectArea = if (LorenzUtils.isStrandedProfile) {
+            if (LorenzUtils.isStrandedProfile) {
                 isInAnyArea = true
-                true
+                isInCorrectArea = true
             } else {
-                val slayerTypeForCurrentArea = getSlayerTypeForCurrentArea()
-                isInAnyArea = slayerTypeForCurrentArea != null
-                slayerTypeForCurrentArea == activeSlayer && slayerTypeForCurrentArea != null
+                val area = currentAreaType
+                isInAnyArea = area != null
+                isInCorrectArea = area == activeSlayer && area != null
             }
         }
     }
 
     // TODO USE SH-REPO
-    fun getSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
+    private fun checkSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
         "Graveyard",
         "Coal Mine",
         -> SlayerType.REVENANT
@@ -151,10 +156,10 @@ object SlayerApi {
         in listOf(
             "The End",
             "Void Sepulture",
-            "Zealot Bruiser Hideout"
+            "Zealot Bruiser Hideout",
         ).let {
             if (trackerConfig.voidgloomInNest) it + "Dragon's Nest" else it
-        }
+        },
         -> SlayerType.VOID
 
         "Stronghold",
@@ -168,5 +173,4 @@ object SlayerApi {
 
         else -> null
     }
-
 }
