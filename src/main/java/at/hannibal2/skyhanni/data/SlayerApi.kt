@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -20,7 +18,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -44,13 +41,6 @@ object SlayerApi {
 
     val currentAreaType by RecalculatingValue(500.milliseconds) {
         checkSlayerTypeForCurrentArea()
-    }
-
-    @HandleEvent
-    fun onRender(event: GuiRenderEvent) {
-        Position(100, 100).renderString(currentAreaType?.displayName ?: "none", posLabel = "a")
-        Position(100, 110).renderString(isInCorrectArea.toString(), posLabel = "b")
-        Position(100, 120).renderString(IslandAreas.currentAreaName, posLabel = "c")
     }
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
