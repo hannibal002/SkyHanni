@@ -28,7 +28,7 @@ class PestTrapConfig {
     @Expose
     @ConfigOption(name = "Warnings", desc = "")
     @Accordion
-    var warningConfig = WarningConfig()
+    var warning = WarningConfig()
 
     class WarningConfig {
 

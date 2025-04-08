@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.pestTrapPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -79,7 +80,7 @@ object PestTrapApi {
     private val PEST_SLOTS = 13..15
     private const val RELEASE_ALL_SLOT = 17
     private const val MAX_RELEASED_PESTS = 8
-    private const val MAX_PEST_TRAPS = 3
+    const val MAX_PEST_TRAPS = 3
 
     private val patternGroup = RepoPattern.group("garden.pests.trap")
     private val storage get() = GardenApi.storage
@@ -185,12 +186,24 @@ object PestTrapApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!PestApi.isNearPestTrap()) return
-        if (lastClickedIndex == -1) return
+        if (!PestApi.isNearPestTrap()) run {
+            ChatUtils.chat("Not near a pest trap!")
+            return
+        }
+        if (lastClickedIndex == -1) run {
+            ChatUtils.chat("Last clicked index is -1!")
+            return
+        }
         inIndex = lastClickedIndex
         pestTrapInventoryNamePattern.matchMatcher(event.inventoryName) {
-            val inventoryTrapType = this.extractTrapType() ?: return
-            val storage = storage ?: return
+            val inventoryTrapType = this.extractTrapType() ?: run {
+                ChatUtils.chat("Trap type not found!")
+                return@matchMatcher
+            }
+            val storage = storage ?: run {
+                ChatUtils.chat("Storage not found!")
+                return@matchMatcher
+            }
             val baitStack = event.inventoryItems[BAIT_SLOT]?.takeIf {
                 trapBaitItemPattern.matches(it.displayName)
             }
@@ -372,17 +385,23 @@ object PestTrapApi {
         groupOrNull("three"),
     ).takeIf { it.any { group -> group != null } }
 
+    private fun List<String?>.extractTrapList(): List<Int> = mapNotNull {
+        it?.toIntOrNull() ?: return@mapNotNull null
+    }
+
     private fun String.updateDataFromFull(
         storage: ProfileSpecificStorage.GardenStorage
     ) = tabListFullTrapsPattern.matchMatcher(this@updateDataFromFull) {
         widgetEnabledAndVisible[TabWidget.FULL_TRAPS] = true
         lastFullHash = this@updateDataFromFull.hashCode().takeIf { it != lastFullHash } ?: return@matchMatcher
 
-        val fullTraps = extractTrapList() ?: return@matchMatcher
-        storage.pestTrapStatus.filter {
-            fullTraps[it.index] != null
-        }.onEach {
-            it.count = MAX_PEST_COUNT_PER_TRAP
+        val fullTrapGroups = extractTrapList()
+        val fullTraps = fullTrapGroups?.extractTrapList().orEmpty()
+        storage.pestTrapStatus.onEach {
+            it.count = when (it.number in fullTraps) {
+                true -> MAX_PEST_COUNT_PER_TRAP
+                else -> it.count
+            }
         }
     }
 
@@ -392,12 +411,13 @@ object PestTrapApi {
         widgetEnabledAndVisible[TabWidget.NO_BAIT] = true
         lastNoBaitHash = this@updateDataFromNoBait.hashCode().takeIf { it != lastNoBaitHash } ?: return@matchMatcher
 
-        val noBaitTraps = extractTrapList() ?: return@matchMatcher
-        storage.pestTrapStatus.filter {
-            noBaitTraps[it.index] != null
-        }.onEach {
-            it.baitType = null
-            it.baitCount = 0
+        val noBaitTrapGroups = extractTrapList()
+        val noBaitTraps = noBaitTrapGroups?.extractTrapList().orEmpty()
+        storage.pestTrapStatus.onEach {
+            it.baitCount = when (it.number in noBaitTraps) {
+                true -> 0
+                else -> it.baitCount
+            }
         }
     }
 

@@ -7,6 +7,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.PestTrapData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,9 +28,12 @@ private typealias WarningDisplayType = PestTrapConfig.WarningConfig.WarningDispl
 object PestTrapFeatures {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestTrap
-    private val sound get() = config.warningConfig.warningSound
-    private val enabledTypes get() = config.warningConfig.warningDisplayType
+    private val sound get() = config.warning.warningSound
+    private val enabledTypes get() = config.warning.warningDisplayType
 
+    private var actionPlot: GardenPlotApi.Plot? = null
+    private var activeTitle: TitleManager.TitleContext? = null
+    private var finalWarning: String? = null
     private var fullSet: Set<Int> = emptySet()
     private var noBaitSet: Set<Int> = emptySet()
     private var warningSound: ISound? = null
@@ -40,6 +46,9 @@ object PestTrapFeatures {
             warningSound = refreshSound()
         }
         warningSound = refreshSound()
+        ConditionalUtils.onToggle(config.warning.warningIntervalSeconds) {
+            nextWarning = SimpleTimeMark.now().plus(config.warning.warningIntervalSeconds.get().seconds)
+        }
     }
 
     private fun refreshSound() = sound.get().takeIf { it.isNotEmpty() }?.let {
@@ -52,7 +61,10 @@ object PestTrapFeatures {
         fullSet = data.checkFullWarnings()
         noBaitSet = data.checkNoBaitWarnings()
 
-        val warningsEnabled = config.warningConfig.enabledWarnings.get()
+        ChatUtils.chat("Full set: ${fullSet.joinToString(", ")}")
+        ChatUtils.chat("No bait set: ${noBaitSet.joinToString(", ")}")
+
+        val warningsEnabled = config.warning.enabledWarnings.get()
         val fullEnabled = fullSet.any() && warningsEnabled.contains(WarningReason.TRAP_FULL)
         val noBaitEnabled = noBaitSet.any() && warningsEnabled.contains(WarningReason.NO_BAIT)
 
@@ -64,13 +76,22 @@ object PestTrapFeatures {
 
         val fullWarning = data.buildFullWarning(warningCount)
         val noBaitWarning = data.buildNoBaitWarning(warningCount)
-        val finalWarning = listOf(fullWarning, noBaitWarning).joinToString(" §8| ")
+        updateActionPlot()
+        finalWarning = listOf(fullWarning, noBaitWarning).joinToString(" §8| ")
+    }
+
+    private fun updateActionPlot() {
+        val storage = GardenApi.storage ?: return
+        val firstDataItem = storage.pestTrapStatus.firstOrNull { it.isFull || it.noBait }
+        actionPlot = firstDataItem?.plot
+    }
+
+    @HandleEvent
+    fun onTick() {
+        val finalWarning = finalWarning ?: return
 
         val chatWarnEnabled = enabledTypes in listOf(WarningDisplayType.CHAT, WarningDisplayType.BOTH)
         val titleWarnEnabled = enabledTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
-
-        val firstDataItem = data.firstOrNull { it.isFull || it.noBait }
-        val actionPlot = firstDataItem?.plot
 
         lastWarningCount = (fullSet.size + noBaitSet.size).takeIf {
             it != 0
@@ -82,17 +103,19 @@ object PestTrapFeatures {
                 null -> ChatUtils.chat(finalWarning)
                 else -> ChatUtils.clickToActionOrDisable(
                     message = finalWarning,
-                    config.warningConfig::enabledWarnings,
-                    actionName = "warp to $actionPlot",
+                    config.warning::enabledWarnings,
+                    actionName = "warp to ${actionPlot?.name ?: "plot"}",
                     action = {
-                        actionPlot.sendTeleportTo()
+                        actionPlot?.sendTeleportTo()
                     },
                     oneTimeClick = true,
                 )
             }
         }
-        if (titleWarnEnabled) TitleManager.sendTitle(finalWarning, height = 3.0, fontSize = 6f)
-        nextWarning = SimpleTimeMark.now().plus(config.warningConfig.warningIntervalSeconds.get().seconds)
+        if (titleWarnEnabled && activeTitle == null || activeTitle?.ended == true) {
+            activeTitle = TitleManager.sendTitle(finalWarning, height = 2.8, fontSize = 7f)
+        }
+        nextWarning = SimpleTimeMark.now().plus(config.warning.warningIntervalSeconds.get().seconds)
     }
 
     private fun List<PestTrapData>.getFullWarningJoinedString() =
