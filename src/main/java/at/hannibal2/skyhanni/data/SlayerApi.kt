@@ -126,12 +126,12 @@ object SlayerApi {
         }
 
         if (event.isMod(5)) {
-            isInCorrectArea = if (LorenzUtils.isStrandedProfile) {
+            if (LorenzUtils.isStrandedProfile) {
                 isInAnyArea = true
-                true
+                isInCorrectArea = true
             } else {
                 isInAnyArea = currentAreaType != null
-                currentAreaType == activeSlayer && currentAreaType != null
+                isInCorrectArea = currentAreaType == activeSlayer && currentAreaType != null
             }
         }
     }
