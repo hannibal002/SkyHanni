@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.PestTrapData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -91,7 +91,7 @@ object PestTrapFeatures {
                 )
             }
         }
-        if (titleWarnEnabled) LorenzUtils.sendTitle(finalWarning, 3.seconds, 2.8, 7f)
+        if (titleWarnEnabled) TitleManager.sendTitle(finalWarning, height = 3.0, fontSize = 6f)
         nextWarning = SimpleTimeMark.now().plus(config.warningConfig.warningIntervalSeconds.get().seconds)
     }
 

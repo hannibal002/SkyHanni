@@ -18,8 +18,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.pestTrapPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -29,11 +27,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.cache.RemovalCause.EXPIRED
 import com.google.gson.annotations.Expose
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C02PacketUseEntity
@@ -168,7 +168,7 @@ object PestTrapApi {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onClickEntity(event: PacketSentEvent) {
         if (!PestApi.isNearPestTrap()) return
-        val world = Minecraft.getMinecraft().theWorld ?: return
+        val world = MinecraftCompat.localWorldOrNull ?: return
         val packet = event.packet as? C02PacketUseEntity ?: return
         val entity = packet.getEntityFromWorld(world) ?: return
         val armorStandEntity = entity as? EntityArmorStand ?: return

@@ -147,7 +147,7 @@ class ModuleProcessor(
 
         OutputStreamWriter(file).use {
             it.write("package at.hannibal2.skyhanni.skyhannimodule\n\n")
-            it.write("@Suppress(\"LargeClass\")\n")
+            it.write("@Suppress(\"LargeClass\", \"Deprecated\")\n")
             it.write("object LoadedModules {\n")
             it.write("    val isDev: Boolean = at.hannibal2.skyhanni.utils.system.PlatformUtils.isDevEnvironment\n")
             it.write("    val hasNeu: Boolean get() = at.hannibal2.skyhanni.utils.system.PlatformUtils.isNeuLoaded()\n")
