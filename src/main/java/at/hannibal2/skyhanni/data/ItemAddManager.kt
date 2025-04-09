@@ -29,12 +29,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ItemAddManager {
-    enum class Source(val displayName: String) {
-        ITEM_ADD("Picked up in inventory"),
-        SACKS("Went into Sacks"),
-        COMMAND("Invented via command"),
-    }
-
     private val ARCHFIEND_DICE = "ARCHFIEND_DICE".toInternalName()
     private val HIGH_CLASS_ARCHFIEND_DICE = "HIGH_CLASS_ARCHFIEND_DICE".toInternalName()
 

@@ -39,7 +39,7 @@ enum class ItemSource(val description: String?) {
     DICE_ROLL(null),
 
     COMMAND("Item added via command"),
-    UNKNOWN("Item source is unknown"),;
+    UNKNOWN("Item source is unknown");
 
     override fun toString(): String {
         return this.name.lowercase()
