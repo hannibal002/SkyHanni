@@ -65,6 +65,8 @@ object PestSpawnTimer {
 
     private var maxPests = false
 
+    private var ready = false
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
@@ -72,8 +74,8 @@ object PestSpawnTimer {
         pestCooldownPattern.firstMatcher(event.widget.lines) {
             val minutes = groupOrNull("minutes")?.formatInt()
             val seconds = groupOrNull("seconds")?.formatInt()
-            val ready = hasGroup("ready")
-            val maxedPests = hasGroup("maxPests")
+            ready = hasGroup("ready")
+            maxPests = hasGroup("maxPests")
 
             if (ready) {
                 if (pestSpawned) return // prevent warning twice if tablist updates the same time as pest spawn
@@ -81,8 +83,7 @@ object PestSpawnTimer {
                 return
             }
 
-            if (maxedPests) {
-                maxPests = true
+            if (maxPests) {
                 return
             }
 
@@ -204,11 +205,10 @@ object PestSpawnTimer {
 
         val pestCooldown = if (!TabWidget.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
-        } else if (maxPests) {
-            "§cMax Pests!"
         } else {
             var cooldownValue = if (!pestCooldownEndTime.isFarPast()) pestCooldownEndTime.timeUntil().format() else "§cUnknown"
-            if (cooldownValue == "Soon") cooldownValue = "§aReady!"
+            if (ready) cooldownValue = "§aReady!"
+            if (maxPests) cooldownValue = "§cMax Pests!"
 
             "§ePest Cooldown: §b$cooldownValue"
         }
