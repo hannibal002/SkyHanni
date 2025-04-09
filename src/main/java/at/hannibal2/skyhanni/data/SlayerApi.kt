@@ -130,9 +130,8 @@ object SlayerApi {
                 isInAnyArea = true
                 isInCorrectArea = true
             } else {
-                val area = currentAreaType
-                isInAnyArea = area != null
-                isInCorrectArea = area == activeSlayer && area != null
+                isInAnyArea = currentAreaType != null
+                isInCorrectArea = currentAreaType == activeSlayer && currentAreaType != null
             }
         }
     }
@@ -141,6 +140,7 @@ object SlayerApi {
     private fun checkSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
         "Graveyard",
         "Coal Mine",
+        "Revenant Cave",
         -> SlayerType.REVENANT
 
         "Spider Mound",

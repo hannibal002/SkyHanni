@@ -58,10 +58,11 @@ object AttributeOverlay {
         if (!config.ignoreList && type !in config.attributesList) return false
         val isLevel = level >= config.minimumLevel
         if (!isLevel && !config.goodRollsOverrideLevel) return false
+        if (!config.hideNonGoodRolls) return true
         return when {
             rollType == RollType.PARTIAL_ROLL && config.highlightGoodAttributes && attribute.type.isPartialRoll(internalName) -> true
             rollType == RollType.GOOD_ROLL -> config.highlightGoodRolls
-            else -> !config.hideNonGoodRolls
+            else -> false
         }
     }
 
