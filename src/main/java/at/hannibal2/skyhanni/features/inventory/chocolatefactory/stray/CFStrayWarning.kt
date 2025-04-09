@@ -12,7 +12,10 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.caughtRabbitPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.specialRabbitTextures
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeGoldenRabbitPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
@@ -57,7 +60,7 @@ object CFStrayWarning {
         } ?: false
 
     private fun isSpecial(stack: ItemStack) =
-        CFDataLoader.clickMeGoldenRabbitPattern.matches(stack.displayName) || stack.getSkullTexture() in CFApi.specialRabbitTextures
+        clickMeGoldenRabbitPattern.matches(stack.displayName) || stack.getSkullTexture() in specialRabbitTextures
 
     private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
         StrayTypeEntry.SPECIAL -> isSpecial(item)
@@ -67,19 +70,19 @@ object CFStrayWarning {
         StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
         StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
 
-        StrayTypeEntry.ALL -> CFDataLoader.clickMeRabbitPattern.matches(item.displayName) || isSpecial(item)
+        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.displayName) || isSpecial(item)
 
         StrayTypeEntry.NONE -> false
     }
 
     private fun handleRabbitWarnings(item: ItemStack) {
-        if (CFApi.caughtRabbitPattern.matches(item.getSingleLineLore())) return
+        if (caughtRabbitPattern.matches(item.getSingleLineLore())) return
 
-        val clickMeMatches = CFDataLoader.clickMeRabbitPattern.matches(item.displayName)
-        val goldenClickMeMatches = CFDataLoader.clickMeGoldenRabbitPattern.matches(item.displayName)
+        val clickMeMatches = clickMeRabbitPattern.matches(item.displayName)
+        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.displayName)
         if (!clickMeMatches && !goldenClickMeMatches || !shouldWarnAboutStray(item)) return
 
-        val isSpecial = goldenClickMeMatches || item.getSkullTexture() in CFApi.specialRabbitTextures
+        val isSpecial = goldenClickMeMatches || item.getSkullTexture() in specialRabbitTextures
 
         if (isSpecial) SoundUtils.repeatSound(100, warningConfig.repeatSound, CFApi.warningSound)
         else SoundUtils.playBeepSound()
@@ -122,7 +125,7 @@ object CFStrayWarning {
         }
         val strayStacks = HoppityApi.filterMayBeStray(event.inventoryItems)
         strayStacks.forEach { handleRabbitWarnings(it.value) }
-        val activeStrays = strayStacks.filterValues { !CFApi.caughtRabbitPattern.matches(it.getSingleLineLore()) }
+        val activeStrays = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }
         activeStraySlots = activeStrays.keys
         flashScreen = activeStrays.any {
             val stack = it.value
@@ -135,7 +138,7 @@ object CFStrayWarning {
                 StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(stack, LorenzRarity.UNCOMMON)
 
                 StrayTypeEntry.ALL -> {
-                    CFDataLoader.clickMeRabbitPattern.matches(it.value.displayName) || isSpecial(stack)
+                    clickMeRabbitPattern.matches(it.value.displayName) || isSpecial(stack)
                 }
 
                 StrayTypeEntry.NONE -> false
