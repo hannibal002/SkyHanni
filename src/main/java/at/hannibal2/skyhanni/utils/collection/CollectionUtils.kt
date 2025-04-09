@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.collection
 
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
@@ -405,4 +406,12 @@ object CollectionUtils {
             return removedValue
         }
     }
+
+    fun <K> MutableMap<K, SimpleTimeMark>.evictOldestEntry(cap: Int) {
+        if (size > cap) {
+            val oldestKey = minByOrNull { it.value }?.key
+            oldestKey?.let { remove(it) }
+        }
+    }
+
 }

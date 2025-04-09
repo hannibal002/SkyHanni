@@ -33,11 +33,23 @@ data class SkyBlockTime(
         else -> SkyblockSeason.WINTER
     }
 
-    fun getSeasonModifier(): SkyblockSeason.SkyblockSeasonModifier = when ((month - 1) % 3) {
-        0 -> SkyblockSeason.SkyblockSeasonModifier.EARLY
-        1 -> SkyblockSeason.SkyblockSeasonModifier.NONE
-        2 -> SkyblockSeason.SkyblockSeasonModifier.LATE
-        else -> SkyblockSeason.SkyblockSeasonModifier.NONE
+    fun getSeasonModifier(): SkyblockSeasonModifier = when ((month - 1) % 3) {
+        0 -> SkyblockSeasonModifier.EARLY
+        1 -> SkyblockSeasonModifier.NONE
+        2 -> SkyblockSeasonModifier.LATE
+        else -> SkyblockSeasonModifier.NONE
+    }
+
+    private val seasonBorders: List<List<IntRange>> = listOf(
+        listOf(1..1, 1..1, 0..0, 0..0, 0..5), // First border set
+        listOf(12..12, 31..31, 23..23, 59..59, 55..59), // End border set
+    )
+
+    fun isSeasonBorder(): Boolean {
+        val currentValues = listOf(month, day, hour, minute, second)
+        return seasonBorders.any { borderSet ->
+            borderSet.zip(currentValues).all { (range, value) -> value in range }
+        }
     }
 
     companion object {
@@ -56,7 +68,7 @@ data class SkyBlockTime(
         fun fromSBYear(year: Int): SkyBlockTime =
             fromInstant(Instant.ofEpochMilli(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
 
-        fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeason.SkyblockSeasonModifier? = null): SkyBlockTime {
+        fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeasonModifier? = null): SkyBlockTime {
             return fromInstant(
                 Instant.ofEpochMilli(
                     SKYBLOCK_EPOCH_START_MILLIS +
