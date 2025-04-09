@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
+import at.hannibal2.skyhanni.data.ElectionApi.ignoreDerpy
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
-import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -81,9 +81,9 @@ class MobFinder {
     private var floor6SadanSpawnTime = 0L
 
     internal fun tryAdd(entity: EntityLivingBase) = when {
-        DungeonAPI.inDungeon() -> tryAddDungeon(entity)
-        RiftAPI.inRift() -> tryAddRift(entity)
-        GardenAPI.inGarden() -> tryAddGarden(entity)
+        DungeonApi.inDungeon() -> tryAddDungeon(entity)
+        RiftApi.inRift() -> tryAddRift(entity)
+        GardenApi.inGarden() -> tryAddGarden(entity)
         else -> {
             if (entity is EntityLiving && entity.hasNameTagWith(2, "Dummy §a10M§c❤")) {
                 EntityResult(bossType = BossType.DUMMY)
@@ -124,19 +124,19 @@ class MobFinder {
     }
 
     private fun tryAddGardenPest(entity: EntityLivingBase): EntityResult? {
-        if (!GardenAPI.inGarden()) return null
+        if (!GardenApi.inGarden()) return null
 
-        return PestType.entries.firstOrNull { entity.hasNameTagWith(3, it.displayName) }
+        return PestType.filterableEntries.firstOrNull { entity.hasNameTagWith(3, it.displayName) }
             ?.let { EntityResult(bossType = it.damageIndicatorBoss) }
     }
 
     private fun tryAddDungeon(entity: EntityLivingBase) = when {
-        DungeonAPI.isOneOf("F1", "M1") -> tryAddDungeonF1(entity)
-        DungeonAPI.isOneOf("F2", "M2") -> tryAddDungeonF2(entity)
-        DungeonAPI.isOneOf("F3", "M3") -> tryAddDungeonF3(entity)
-        DungeonAPI.isOneOf("F4", "M4") -> tryAddDungeonF4(entity)
-        DungeonAPI.isOneOf("F5", "M5") -> tryAddDungeonF5(entity)
-        DungeonAPI.isOneOf("F6", "M6") -> tryAddDungeonF6(entity)
+        DungeonApi.isOneOf("F1", "M1") -> tryAddDungeonF1(entity)
+        DungeonApi.isOneOf("F2", "M2") -> tryAddDungeonF2(entity)
+        DungeonApi.isOneOf("F3", "M3") -> tryAddDungeonF3(entity)
+        DungeonApi.isOneOf("F4", "M4") -> tryAddDungeonF4(entity)
+        DungeonApi.isOneOf("F5", "M5") -> tryAddDungeonF5(entity)
+        DungeonApi.isOneOf("F6", "M6") -> tryAddDungeonF6(entity)
         else -> null
     }
 
@@ -238,14 +238,14 @@ class MobFinder {
         if (floor6Giants && entity.posY > 68) {
             val (extraDelay, bossType) = checkExtraF6GiantsDelay(entity)
             return EntityResult(
-                floor6GiantsSpawnTime + extraDelay,
-                floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis(),
+                floor6GiantsSpawnTime + extraDelay + 5_000,
+                floor6GiantsSpawnTime + extraDelay > System.currentTimeMillis(),
                 bossType = bossType,
             )
         }
 
         if (floor6Sadan) {
-            return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true, bossType = BossType.DUNGEON_F6_SADAN)
+            return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true, bossType = BossType.DUNGEON_F6_SADAN, ignoreBlocks = true)
         }
         return null
     }
@@ -270,6 +270,10 @@ class MobFinder {
         }
         if (entity is EntitySlime && entity.baseMaxHealth == 1_000) {
             return EntityResult(bossType = BossType.BACTE)
+        }
+        if (entity is EntityOtherPlayerMP && entity.baseMaxHealth == 250 && entity.name == "Sun Gecko") {
+            return EntityResult(bossType = BossType.SUN_GECKO)
+
         }
         return null
     }
@@ -324,6 +328,7 @@ class MobFinder {
         entity.name == "Minos Inquisitor" -> EntityResult(bossType = BossType.MINOS_INQUISITOR)
         entity.name == "Minos Champion" -> EntityResult(bossType = BossType.MINOS_CHAMPION)
         entity.name == "Minotaur " -> EntityResult(bossType = BossType.MINOTAUR)
+        entity.name == "Ragnarok" -> EntityResult(bossType = BossType.RAGNAROK)
 
         else -> null
     }
@@ -469,15 +474,15 @@ class MobFinder {
     private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Pair<Long, BossType> {
         val uuid = entity.uniqueID
 
-        if (floor6GiantsSeparateDelay.contains(uuid)) {
-            return floor6GiantsSeparateDelay[uuid]!!
+        floor6GiantsSeparateDelay[uuid]?.let {
+            return it
         }
 
         val middle = LorenzVec(-8, 0, 56)
 
         val loc = entity.getLorenzVec()
 
-        var pos = 0
+        val pos: Int
 
         val type: BossType
         if (loc.x > middle.x && loc.z > middle.z) {
@@ -502,14 +507,14 @@ class MobFinder {
         }
 
         val extraDelay = 900L * pos
-        val pair = Pair(extraDelay, type)
+        val pair = extraDelay to type
         floor6GiantsSeparateDelay[uuid] = pair
 
         return pair
     }
 
     fun handleChat(message: String) {
-        if (!DungeonAPI.inDungeon()) return
+        if (!DungeonApi.inDungeon()) return
         when (message) {
             // F1
             "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {
@@ -586,13 +591,13 @@ class MobFinder {
             // F6
             "§c[BOSS] Sadan§r§f: ENOUGH!" -> {
                 floor6Giants = true
-                floor6GiantsSpawnTime = System.currentTimeMillis() + 7_400
+                floor6GiantsSpawnTime = System.currentTimeMillis() + 7_400 - 4_600
             }
 
             "§c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect." -> {
                 floor6Giants = false
                 floor6Sadan = true
-                floor6SadanSpawnTime = System.currentTimeMillis() + 32_500
+                floor6SadanSpawnTime = System.currentTimeMillis() + 11_500
             }
 
             "§c[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!" -> {
@@ -606,7 +611,7 @@ class MobFinder {
     }
 
     fun handleNewEntity(entity: Entity) {
-        if (DungeonAPI.inDungeon() && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
+        if (DungeonApi.inDungeon() && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
             floor3ProfessorGuardianEntity = entity
             floor3ProfessorGuardianPrepare = false
         }

@@ -3,15 +3,16 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import com.google.devtools.ksp.gradle.KspTaskJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
-import moe.nea.shot.ShotParser
 import moe.nea.shot.Shots
 import net.fabricmc.loom.api.processor.MinecraftJarProcessor
 import net.fabricmc.loom.api.processor.ProcessorContext
 import net.fabricmc.loom.api.processor.SpecContext
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
@@ -27,14 +28,13 @@ plugins {
     java
     id("com.gradleup.shadow") version "8.3.4"
     id("gg.essential.loom")
-    id("dev.deftu.gradle.preprocess")
+    id("com.github.SkyHanniStudios.SkyHanni-Preprocessor")
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
     id("io.gitlab.arturbosch.detekt")
-    id("net.kyori.blossom")
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
@@ -50,6 +50,7 @@ java {
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
+
 // Minecraft configuration:
 loom {
     if (this.isForgeLike) {
@@ -70,8 +71,12 @@ loom {
             if (target == ProjectTarget.MAIN) {
                 isIdeConfigGenerated = true
                 appendProjectPathToConfigName.set(false)
+                this.runDir(runDirectory.relativeTo(projectDir).toString())
+            } else if (target == ProjectTarget.MODERN) {
+                isIdeConfigGenerated = true
+                appendProjectPathToConfigName.set(true)
+                this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
             }
-            this.runDir(runDirectory.relativeTo(projectDir).toString())
             property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
@@ -128,15 +133,16 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.prBody = project.findProperty("prBody") as String
 }
 
-file("shots.txt")
-    .takeIf(File::exists)
-    ?.readText()
-    ?.lines()
-    ?.let(ShotParser()::parse)
-    ?.let(::Shots)
-    ?.let {
-        loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
-    }
+// Disabled because it breaks mixins with the minecraft dev plugin
+// file("shots.txt")
+//     .takeIf(File::exists)
+//     ?.readText()
+//     ?.lines()
+//     ?.let(ShotParser()::parse)
+//     ?.let(::Shots)
+//     ?.let {
+//         loom.addMinecraftJarProcessor(ShotApplicationJarProcessor::class.java, it)
+//     }
 
 dependencies {
     minecraft("com.mojang:minecraft:${target.minecraftVersion.versionName}")
@@ -160,7 +166,7 @@ dependencies {
 
     headlessLwjgl(libs.headlessLwjgl)
 
-    compileOnly(ksp(project(":annotation-processors"))!!)
+    ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
     val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
 
@@ -172,11 +178,13 @@ dependencies {
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
     } else if (target == ProjectTarget.BRIDGE116FABRIC) {
-        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
-        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
+        modImplementation("net.fabricmc:fabric-loader:0.16.7")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
-        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
-        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
+        modImplementation("net.fabricmc:fabric-loader:0.16.10")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
+
+        modLocalRuntime(libs.modmenu)
     }
 
     implementation(kotlin("stdlib-jdk8"))
@@ -191,14 +199,19 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // October 3, 2024, 11:43 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.4.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all") {
+    // December 29, 2024, 07:30 PM EST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.5.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.5.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
 
-    shadowModImpl(libs.moulconfig)
+    if (target == ProjectTarget.MAIN) {
+        shadowModImpl(libs.moulconfig)
+    } else if (target == ProjectTarget.MODERN) {
+        shadowModImpl(libs.moulconfigModern)
+    }
+
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
@@ -212,7 +225,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.12.5")
 
-    implementation("net.hypixel:mod-api:0.3.1")
+    if (target.minecraftVersion == MinecraftVersion.MC189) {
+        compileOnly(libs.hypixelmodapi)
+        shadowImpl(libs.hypixelmodapitweaker)
+    }
 
     // getting clock offset
     shadowImpl("commons-net:commons-net:3.11.1")
@@ -225,6 +241,11 @@ dependencies {
 afterEvaluate {
     loom.runs.named("client") {
         programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+    }
+    tasks.named("kspKotlin", KspTaskJvm::class) {
+        this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
     }
 }
 
@@ -281,7 +302,7 @@ fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
     if (buildPathsFile.exists()) {
         sourceSet.get().apply {
             val buildPaths = buildPathsFile.readText().lineSequence()
-                .map { it.substringBefore("#").trim() }
+                .map { it.substringBefore("#").trim().replace(Regex("\\.(?!kt|java|\\()"), "/") }
                 .filter { it.isNotBlank() }
                 .toSet()
             kotlin.include(buildPaths)
@@ -312,7 +333,7 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
-    archiveAppendix.set("mc${target.minecraftVersion.versionName}")
+    archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
         this["Main-Class"] = "SkyHanniInstallerFrame"
@@ -347,6 +368,7 @@ tasks.shadowJar {
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
     relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
+    relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
@@ -380,12 +402,6 @@ preprocess {
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
-    patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
-}
-
-blossom {
-    replaceToken("@MOD_VERSION@", version)
-    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {

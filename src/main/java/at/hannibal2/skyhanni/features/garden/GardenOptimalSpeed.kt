@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
+import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -14,30 +17,27 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SignUtils
+import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenOptimalSpeed {
 
-    private val config get() = GardenAPI.config.optimalSpeeds
+    private val config get() = GardenApi.config.optimalSpeeds
 
     private val configCustomSpeed get() = config.customSpeed
     private var sneakingSince = SimpleTimeMark.farFuture()
     private var sneakingTime = 0.seconds
-    private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
+    private val sneaking get() = MinecraftCompat.localPlayer.isSneaking
     private val sneakingPersistent get() = sneakingSince.passedSince() > 5.seconds
     private val rancherBoots = "RANCHERS_BOOTS".toInternalName()
 
@@ -62,10 +62,9 @@ object GardenOptimalSpeed {
     private var display = listOf<Renderable>()
     private var lastToolSwitch = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!GardenAPI.inGarden()) return
-        currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTick() {
+        currentSpeed = (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
 
         if (sneaking && !sneakingSince.isInPast()) {
             sneakingSince = SimpleTimeMark.now()
@@ -76,8 +75,8 @@ object GardenOptimalSpeed {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGuiScreenOpen(event: GuiScreenOpenEvent) {
         if (!isRancherOverlayEnabled()) return
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign()) return
@@ -94,7 +93,7 @@ object GardenOptimalSpeed {
                     ),
                     spacing = 2,
                 )
-                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
+                Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })
             }
         } else {
             crops.map { (crop, speed) ->
@@ -106,13 +105,13 @@ object GardenOptimalSpeed {
                     ),
                     spacing = 2,
                 )
-                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
+                Renderable.link(renderable, underlineColor = color.toColor(), onLeftClick = { SignUtils.setTextIntoSign("$speed") })
             }
         }
     }
 
-    @SubscribeEvent
-    fun onGuiRender(event: DrawScreenEvent.Post) {
+    @HandleEvent
+    fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!isRancherOverlayEnabled()) return
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign()) return
@@ -158,13 +157,12 @@ object GardenOptimalSpeed {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenAPI.inGarden()) return
 
         val speed = optimalSpeed ?: return
 
-        if (GardenAPI.hideExtraGuis()) return
+        if (GardenApi.hideExtraGuis()) return
 
         var text = "Optimal Speed: §f$speed"
         if (speed != currentSpeed) {
@@ -183,16 +181,16 @@ object GardenOptimalSpeed {
     }
 
     private fun warn(optimalSpeed: Int) {
-        if (!Minecraft.getMinecraft().thePlayer.onGround) return
-        if (GardenAPI.onBarnPlot) return
+        if (!MinecraftCompat.localPlayer.onGround) return
+        if (GardenApi.onBarnPlot) return
         if (!config.warning) return
-        if (!GardenAPI.isCurrentlyFarming()) return
+        if (!GardenApi.isCurrentlyFarming()) return
         if (lastWarnTime.passedSince() < 20.seconds) return
         val ranchersEquipped = InventoryUtils.getBoots()?.getInternalNameOrNull() == rancherBoots
         if (!ranchersEquipped && config.onlyWarnRanchers) return
 
         lastWarnTime = SimpleTimeMark.now()
-        LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
+        TitleManager.sendTitle("§cWrong speed!")
         val cropInHand = cropInHand ?: return
 
         val text = "§cWrong speed while farming ${cropInHand.cropName} detected!" +
@@ -215,7 +213,7 @@ object GardenOptimalSpeed {
         }
     }
 
-    private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
+    private fun isRancherOverlayEnabled() = GardenApi.inGarden() && config.signEnabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

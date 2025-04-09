@@ -8,26 +8,32 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ContributorManager {
     private val config get() = SkyHanniMod.feature.dev
 
+    // Key is the lowercase contributor name
     private var contributors: Map<String, ContributorJsonEntry> = emptyMap()
 
-    @SubscribeEvent
+    // Just the names of the contributors including their proper case
+    var contributorNames = emptyList<String>()
+        private set
+
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        contributors = event.getConstant<ContributorsJson>("Contributors").contributors.mapKeys { it.key.lowercase() }
+        val map = event.getConstant<ContributorsJson>("Contributors").contributors
+        contributors = map.mapKeys { it.key.lowercase() }
+        contributorNames = map.map { it.key }
     }
 
     @HandleEvent
     fun onRenderNametag(event: EntityDisplayNameEvent<EntityPlayer>) {
         if (!config.contributorNametags) return
         if (event.entity.isRealPlayer()) getSuffix(event.entity.name)?.let {
-            event.chatComponent.appendSibling(ChatComponentText(" $it"))
+            event.chatComponent.appendSibling(it.asComponent())
         }
     }
 

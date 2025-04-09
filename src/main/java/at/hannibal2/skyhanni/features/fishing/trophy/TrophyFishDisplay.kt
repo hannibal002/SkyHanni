@@ -12,32 +12,31 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSingleString
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,8 +44,8 @@ import kotlin.time.Duration.Companion.seconds
 object TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
 
-    private val recentlyDroppedTrophies = TimeLimitedCache<NEUInternalName, TrophyRarity>(5.seconds)
-    private val itemNameCache = mutableMapOf<String, NEUInternalName>()
+    private val recentlyDroppedTrophies = TimeLimitedCache<NeuInternalName, TrophyRarity>(5.seconds)
+    private val itemNameCache = mutableMapOf<String, NeuInternalName>()
 
     private var display = emptyList<Renderable>()
 
@@ -87,35 +86,41 @@ object TrophyFishDisplay {
                 showCross,
                 showCheckmark,
                 onlyShowMissing,
+                showCaughtHigher,
             ) {
                 update()
             }
         }
     }
 
-
     fun update() {
         if (!isEnabled()) return
         val list = mutableListOf<Renderable>()
         list.addString("§e§lTrophy Fish Display")
         list.add(Renderable.table(createTable(), yPadding = config.extraSpace.get()))
-
         display = list
     }
 
     private fun createTable(): List<List<Renderable>> {
         val trophyFishes = TrophyFishManager.fish ?: return emptyList()
         val table = mutableListOf<List<Renderable>>()
+
+        if (trophyFishes.isEmpty()) {
+            table.addSingleString("§cNo Trophy data found!")
+            table.addSingleString("§eTalk to Odger to load the data!")
+            return table
+        }
+
         for ((rawName, data) in getOrder(trophyFishes)) {
             addRow(rawName, data, table)
         }
-        if (table.isEmpty()) {
-            get(config.onlyShowMissing.get())?.let { rarity ->
-                val name = rarity.formattedString
-                table.addSingleString("§eYou caught all $name Trophy Fishes")
-                if (rarity != TrophyRarity.DIAMOND) {
-                    table.addSingleString("§cChange §eOnly Show Missing §cin the config to show more.")
-                }
+        if (table.isNotEmpty()) return table
+
+        get(config.onlyShowMissing.get())?.let { rarity ->
+            val name = rarity.formattedString
+            table.addSingleString("§eYou caught all $name Trophy Fishes")
+            if (rarity != TrophyRarity.DIAMOND) {
+                table.addSingleString("§cChange §eOnly Show Missing §cin the config to show more.")
             }
         }
         return table
@@ -127,12 +132,12 @@ object TrophyFishDisplay {
         table: MutableList<List<Renderable>>,
     ) {
         get(config.onlyShowMissing.get())?.let { atLeast ->
-            val list = TrophyRarity.entries.filter { it == atLeast }
-            if (list.all { (data[it] ?: 0) > 0 }) {
+            val list = TrophyRarity.entries.filter { it == atLeast || (!config.showCaughtHigher.get() && it > atLeast) }
+            if (list.any { (data[it] ?: 0) > 0 }) {
                 return
             }
         }
-        val hover = TrophyFishAPI.hoverInfo(rawName)
+        val hover = TrophyFishApi.hoverInfo(rawName)
         fun string(string: String): Renderable = hover?.let {
             Renderable.hoverTips(Renderable.string(string), tips = it.split("\n"))
         } ?: Renderable.string(string)
@@ -217,11 +222,11 @@ object TrophyFishDisplay {
     ) = trophyFishes.entries.sortedBy { it.value[rarity] ?: 0 }
 
     private fun getItemName(rawName: String): String {
-        val name = getInternalName(rawName).itemName
+        val name = getInternalName(rawName).repoItemName
         return name.split(" ").dropLast(1).joinToString(" ")
     }
 
-    private fun getInternalName(name: String): NEUInternalName {
+    private fun getInternalName(name: String): NeuInternalName {
         itemNameCache[name]?.let {
             return it
         }
@@ -233,12 +238,12 @@ object TrophyFishDisplay {
 
         ErrorManager.skyHanniError(
             "No Trophy Fishing name found",
-            "name" to name
+            "name" to name,
         )
     }
 
-    private fun readInternalName(rawName: String): NEUInternalName? {
-        for ((name, internalName) in NEUItems.allItemsCache) {
+    private fun readInternalName(rawName: String): NeuInternalName? {
+        for ((name, internalName) in NeuItems.allItemsCache) {
             val test = name.removeColor().replace(" ", "").replace("-", "")
             if (test.startsWith(rawName)) {
                 return internalName
@@ -251,25 +256,25 @@ object TrophyFishDisplay {
         return null
     }
 
-    @SubscribeEvent
-    fun onGuiRender(event: GuiRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
 
-        if (config.requireHunterArmor.get() && !FishingAPI.wearingTrophyArmor) return
+        if (config.requireHunterArmor.get() && !FishingApi.wearingTrophyArmor) return
 
         config.position.renderRenderables(
             display,
             extraSpace = config.extraSpace.get(),
-            posLabel = "Trophy Fishing Display"
+            posLabel = "Trophy Fishing Display",
         )
     }
 
     fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
         WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getMinecraft().currentScreen is GuiInventory
-        WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingAPI.holdingLavaRod
+        WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingApi.holdingLavaRod
         WhenToShow.ONLY_WITH_KEYBIND -> config.keybind.isKeyHeld()
     }
 

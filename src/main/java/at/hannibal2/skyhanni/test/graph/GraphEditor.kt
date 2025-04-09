@@ -1,14 +1,20 @@
 package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.dev.GraphConfig
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -19,32 +25,35 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLineNea
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import kotlinx.coroutines.runBlocking
+import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
 import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 
+@Suppress("LargeClass")
 @SkyHanniModule
 object GraphEditor {
 
-    val config get() = SkyHanniMod.feature.dev.devTool.graph
+    val config: GraphConfig get() = SkyHanniMod.feature.dev.devTool.graph
 
-    fun isEnabled() = config != null && config.enabled
+    fun isEnabled(): Boolean = config.enabled
 
     private var id = 0
 
@@ -97,15 +106,21 @@ object GraphEditor {
     private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onRender(event: LorenzRenderWorldEvent) {
+    private val nodesAlreadyFound = mutableListOf<LorenzVec>()
+    private val nodesToFind: List<LorenzVec>
+        get() = IslandGraphs.currentIslandGraph?.nodes?.map { it.position }?.filter { it !in nodesAlreadyFound }.orEmpty()
+    private var currentNodeToFind: LorenzVec? = null
+    private var active = false
+
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
         edges.forEach { event.drawEdge(it) }
         drawGhostPosition(event)
     }
 
-    private fun drawGhostPosition(event: LorenzRenderWorldEvent) {
+    private fun drawGhostPosition(event: SkyHanniRenderWorldEvent) {
         val ghostPosition = ghostPosition ?: return
         if (ghostPosition.distanceToPlayer() >= config.maxNodeDistance) return
 
@@ -118,8 +133,8 @@ object GraphEditor {
         )
     }
 
-    @SubscribeEvent
-    fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.infoDisplay.renderStrings(buildDisplay(), posLabel = "Graph Info")
     }
@@ -189,16 +204,76 @@ object GraphEditor {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         input()
+        if (event.isMod(5)) {
+            updateRender()
+        }
         if (nodes.isEmpty()) return
-        closestNode = nodes.minBy { it.position.distanceSqToPlayer() }
+        closestNode = nodes.minBy { distanceToPlayer(it.position) }
+        handleAllNodeFind()
     }
 
-    private fun LorenzRenderWorldEvent.drawNode(node: GraphingNode) {
-        if (node.position.distanceToPlayer() > config.maxNodeDistance) return
+    private fun updateRender() {
+        val maxNodeDistance = config.maxNodeDistance * config.maxNodeDistance
+        val player = LocationUtils.playerLocation()
+        for (node in nodes) {
+            node.rendering = node.position.distanceSq(player) < maxNodeDistance
+        }
+    }
+
+    private fun handleAllNodeFind() {
+        if (!active) return
+
+        if (nodesToFind.isEmpty()) return
+        val closest = nodesToFind.minBy { distanceToPlayer(it) }
+        if (closest.distanceToPlayer() >= 3) return
+        nodesAlreadyFound.add(closest)
+
+        if (nodesToFind.isEmpty()) {
+            currentNodeToFind = null
+            ChatUtils.chat("Found all nodes on this island")
+            TitleManager.sendTitle("§eAll Found!")
+            active = false
+            return
+        }
+
+        calculateNewAllNodeFind()
+    }
+
+    private fun calculateNewAllNodeFind(): LorenzVec {
+        val next = GraphUtils.findAllShortestDistancesOnCurrentIsland(
+            LocationUtils.playerLocation(),
+        ).distances.keys.first { it.position in nodesToFind }.position
+
+        val max = IslandGraphs.currentIslandGraph?.nodes?.size ?: -1
+        val todo = nodesToFind.size
+        val done = max - todo
+        val percentage = (done.toDouble() / max.toDouble()) * 100
+        val node = GraphUtils.nearestNodeOnCurrentIsland(next)
+        node.pathFind(
+            "Progress: ${done.addSeparators()}/${max.addSeparators()} (${percentage.roundTo(2)}%)",
+            condition = { active },
+        )
+        currentNodeToFind = next
+        return next
+    }
+
+    private fun toggleFindAll() {
+        active = !active
+        if (active) {
+            nodesAlreadyFound.clear()
+            calculateNewAllNodeFind()
+            ChatUtils.chat("Graph navigation over all nodes started.")
+        } else {
+            ChatUtils.chat("Graph navigation over all nodes stopped.")
+        }
+    }
+
+    private fun SkyHanniRenderWorldEvent.drawNode(node: GraphingNode) {
+        if (!node.rendering) return
         this.drawWaypointFilled(
             node.position,
             node.getNodeColor(),
@@ -212,7 +287,7 @@ object GraphEditor {
             node.position,
             nodeName,
             0.8,
-            ignoreBlocks = seeThroughBlocks || node.position.distanceSqToPlayer() < 100,
+            ignoreBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = -15f,
@@ -226,7 +301,7 @@ object GraphEditor {
             node.position,
             tagText,
             0.8,
-            ignoreBlocks = seeThroughBlocks || node.position.distanceSqToPlayer() < 100,
+            ignoreBlocks = seeThroughBlocks || distanceToPlayer(node.position) < 100,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = 0f,
@@ -234,15 +309,15 @@ object GraphEditor {
         )
     }
 
-    private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) {
-        if (edge.node1.position.distanceToPlayer() > config.maxNodeDistance) return
+    private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
+        if (!edge.node1.rendering && !edge.node2.rendering) return
         val color = when {
             selectedEdge == edge -> edgeSelectedColor
             edge in highlightedEdges -> edgeDijkstraColor
             else -> edgeColor
         }
 
-        this.draw3DLineNea(
+        draw3DLine(
             edge.node1.position.add(0.5, 0.5, 0.5),
             edge.node2.position.add(0.5, 0.5, 0.5),
             color,
@@ -254,14 +329,14 @@ object GraphEditor {
         }
     }
 
-    private fun LorenzRenderWorldEvent.drawDirection(edge: GraphingEdge, color: Color) {
+    private fun SkyHanniRenderWorldEvent.drawDirection(edge: GraphingEdge, color: Color) {
         val lineVec = edge.node2.position - edge.node1.position
         val center = edge.node1.position + lineVec / 2.0
         val quad1 = edge.node1.position + lineVec / 4.0
         val quad2 = edge.node1.position + lineVec * (3.0 / 4.0)
 
-        val pyramidSize = lineVec.normalize()
-            .times(min(lineVec.length() / 10.0, 1.0)) * (if (edge.direction == EdgeDirection.ONE_TO_TWO) 1.0 else -1.0)
+        val pyramidSize =
+            lineVec.normalize().times(min(lineVec.length() / 10.0, 1.0)) * (if (edge.direction == EdgeDirection.ONE_TO_TWO) 1.0 else -1.0)
 
         val lineOffsetVec = LorenzVec(0.5, 0.5, 0.5)
 
@@ -288,7 +363,51 @@ object GraphEditor {
         else -> nodeColor
     }
 
-    fun commandIn() {
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shgraph") {
+            description = "Enables the graph editor"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { toggleFeature() }
+        }
+        event.register("shgraphfindall") {
+            description = "Navigate over the whole graph network"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { toggleFindAll() }
+        }
+        event.register("shgraphloadthisisland") {
+            description = "Loads the current island data into the graph editor."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { loadThisIsland() }
+        }
+    }
+
+    private var bypassTempRemoveTimer = SimpleTimeMark.farPast()
+
+    private fun loadThisIsland() {
+        val graph = IslandGraphs.currentIslandGraph
+        if (graph == null) {
+            ChatUtils.userError("This island does not have graph data!")
+            return
+        }
+
+        IslandGraphs.disabledNodesReason?.let {
+            if (bypassTempRemoveTimer.isInPast()) {
+                IslandGraphs.enableAllNodes()
+                ChatUtils.chat("Reset temp remove!")
+            } else {
+                ChatUtils.chat("§cParts of the island graph are currently temp removed: $it")
+                ChatUtils.chat("Run this command again in the next 5 seconds to remove the temp remove logic and copy the current island!")
+                bypassTempRemoveTimer = 5.seconds.fromNow()
+                return
+            }
+        }
+        enable()
+        import(graph)
+        ChatUtils.chat("Graph Editor loaded this island!")
+    }
+
+    private fun toggleFeature() {
         config.enabled = !config.enabled
         if (config.enabled) {
             ChatUtils.chat("Graph Editor is now active.")
@@ -299,15 +418,21 @@ object GraphEditor {
 
     private fun chatAtDisable() = ChatUtils.clickableChat(
         "Graph Editor is now inactive. §lClick to activate.",
-        GraphEditor::commandIn,
+        GraphEditor::toggleFeature,
     )
 
     private fun input() {
-        if (LorenzUtils.isAnyGuiActive()) return
+        if (isAnyGuiActive()) return
         if (config.exitKey.isKeyClicked()) {
             if (inTextMode) {
                 inTextMode = false
                 feedBackInTutorial("Exited Text Mode.")
+                activeNode?.let {
+                    handleNameShortcut(it.name)?.let { (tag, name) ->
+                        it.tags.add(tag)
+                        it.name = name
+                    }
+                }
                 return
             }
             if (inEditMode) {
@@ -321,11 +446,7 @@ object GraphEditor {
         if (inTextMode) {
             textBox.handle()
             val text = textBox.finalText()
-            if (text.isEmpty()) {
-                activeNode?.name = null
-            } else {
-                activeNode?.name = text
-            }
+            activeNode?.name = text.ifEmpty { null }
             return
         }
         if (activeNode != null && config.textKey.isKeyClicked()) {
@@ -402,7 +523,7 @@ object GraphEditor {
                     minimumDistance = distance
                     continue
                 }
-                if (minimumNode == null || minimumNode.position.distanceSqToPlayer() > node.position.distanceSqToPlayer()) {
+                if (minimumNode == null || distanceToPlayer(minimumNode.position) > distanceToPlayer(node.position)) {
                     minimumNode = node
                     minimumDistance = distance
                 }
@@ -480,6 +601,12 @@ object GraphEditor {
         }
     }
 
+    private fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {
+        "fsoul" -> GraphNodeTag.FAIRY_SOUL to "Fairy Soul"
+        "na" -> GraphNodeTag.AREA to "no_area"
+        else -> null
+    }
+
     private fun save() {
         if (nodes.isEmpty()) {
             ChatUtils.chat("Copied nothing since the graph is empty.")
@@ -489,6 +616,9 @@ object GraphEditor {
         if (config.useAsIslandArea) {
             IslandGraphs.setNewGraph(compileGraph)
             GraphEditorBugFinder.runTests()
+            if (active) {
+                calculateNewAllNodeFind()
+            }
         }
         val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
@@ -501,6 +631,16 @@ object GraphEditor {
                 }\n" + "§eNodes: ${nodes.size.addSeparators()}\n" + "§eEdges: ${edges.size.addSeparators()}\n" + "§eLength: $length",
             )
         }
+    }
+
+    private var lastGuiTime = SimpleTimeMark.farPast()
+
+    private fun isAnyGuiActive(): Boolean {
+        val gui = Minecraft.getMinecraft().currentScreen != null
+        if (gui) {
+            lastGuiTime = 3.ticks.fromNow()
+        }
+        return !lastGuiTime.isInPast()
     }
 
     private fun editModeClicks() {
@@ -535,7 +675,7 @@ object GraphEditor {
 
     private fun addNode() {
         val closestNode = closestNode
-        if (closestNode != null && closestNode.position.distanceSqToPlayer() < 9.0) {
+        if (closestNode != null && distanceToPlayer(closestNode.position) < 9.0) {
             if (closestNode == activeNode) {
                 feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
                 nodes.remove(closestNode)
@@ -585,7 +725,7 @@ object GraphEditor {
             edges.add(edge)
         } else false
 
-    private fun compileGraph(): Graph {
+    fun compileGraph(): Graph {
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
         val nodes = nodes.mapIndexed { index, node ->
             GraphNode(
@@ -599,9 +739,8 @@ object GraphEditor {
         }
         val neighbours = GraphEditor.nodes.map { node ->
             edges.filter { it.isInEdge(node) && it.isValidDirectionFrom(node) }.map { edge ->
-                val otherNode =
-                    if (node == edge.node1) edge.node2
-                    else edge.node1
+                val otherNode = if (node == edge.node1) edge.node2
+                else edge.node1
                 // TODO: Fix this to not use a bang bang
                 @Suppress("MapGetWithNotNullAssertionOperator")
                 nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
@@ -628,20 +767,24 @@ object GraphEditor {
         val neighbors = graph.map { node ->
             // TODO: Fix this to not use bang bangs
             @Suppress("MapGetWithNotNullAssertionOperator")
-            node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!, EdgeDirection.ONE_TO_TWO) }
+            node.neighbours.map {
+                GraphingEdge(
+                    translation[node]!!,
+                    translation[it.key]!!,
+                    EdgeDirection.ONE_TO_TWO,
+                )
+            }
         }.flatten()
 
-        val reduced = neighbors.groupingBy { it }.reduce(
-            { _, accumulator, element ->
-                if (
-                    (element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
-                    (element.node1 == accumulator.node2 && accumulator.direction == element.direction)
-                ) {
-                    accumulator.direction = EdgeDirection.BOTH
-                }
-                accumulator
-            },
-        )
+        val reduced = neighbors.groupingBy { it }.reduce { _, accumulator, element ->
+            if (
+                (element.node1 == accumulator.node1 && accumulator.direction != element.direction) ||
+                (element.node1 == accumulator.node2 && accumulator.direction == element.direction)
+            ) {
+                accumulator.direction = EdgeDirection.BOTH
+            }
+            accumulator
+        }
 
         edges.addAll(reduced.values)
         id = nodes.lastOrNull()?.id?.plus(1) ?: 0
@@ -675,8 +818,7 @@ object GraphEditor {
         highlightedNodes.addAll(inGraph)
 
         highlightedEdges.addAll(
-            highlightedNodes.zipWithNext { a, b -> edges.firstOrNull { it.isValidConnectionFromTo(a, b) } }
-                .filterNotNull(),
+            highlightedNodes.zipWithNext { a, b -> edges.firstOrNull { it.isValidConnectionFromTo(a, b) } }.filterNotNull(),
         )
     }
 
@@ -690,7 +832,17 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    fun LorenzVec.distanceSqToPlayer(): Double = ghostPosition?.let { distanceSq(it) } ?: distanceSq(playerLocation())
+    fun distanceToPlayer(location: LorenzVec): Double {
+        val playerPosition = ghostPosition ?: LocationUtils.playerLocation()
+        return location.distanceSq(playerPosition)
+    }
+
+    fun enable() {
+        if (!config.enabled) {
+            config.enabled = true
+            ChatUtils.chat("Graph Editor is now active.")
+        }
+    }
 }
 
 // The node object the graph editor is working with
@@ -700,6 +852,8 @@ class GraphingNode(
     var name: String? = null,
     var tags: MutableList<GraphNodeTag> = mutableListOf(),
 ) {
+
+    var rendering = true
 
     override fun hashCode(): Int {
         return id
@@ -711,9 +865,7 @@ class GraphingNode(
 
         other as GraphingNode
 
-        if (id != other.id) return false
-
-        return true
+        return id == other.id
     }
 }
 

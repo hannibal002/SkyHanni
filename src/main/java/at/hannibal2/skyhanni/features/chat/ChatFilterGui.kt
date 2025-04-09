@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
@@ -15,7 +16,6 @@ import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
-import org.lwjgl.input.Mouse
 
 class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult>) : GuiScreen() {
 
@@ -27,11 +27,10 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         history.maxOf { reasonLength(it) }
 
     private fun reasonLength(result: ChatManager.MessageFilteringResult): Int =
-        result.actionReason?.let { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it) } ?: 0
+        result.actionReason?.let { fontRenderer().getStringWidth(it) } ?: 0
 
-    private val historySize by lazy {
-        history.sumOf { splitLine(it.message).size * 10 + if (it.modified != null) splitLine(it.modified).size * 10 else 0 }
-    }
+    private val historySize =
+        history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
 
     override fun drawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         super.drawScreen(originalMouseX, originalMouseY, partialTicks)
@@ -44,26 +43,26 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         RenderUtils.drawFloatingRectDark(0, 0, w, h)
         GlStateManager.translate(5.0, 5.0 - scroll, 0.0)
         val mouseX = originalMouseX - l
-        val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && Mouse.isButtonDown(0)
+        val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)
         var mouseY = originalMouseY - (t - scroll).toInt()
         val sr = ScaledResolution(mc)
         GlScissorStack.push(l + 5, t + 5, w + l - 5, h + t - 5, sr)
 
         for (msg in history) {
-            drawString(mc.fontRendererObj, msg.actionKind.renderedString, 0, 0, -1)
-            drawString(mc.fontRendererObj, msg.actionReason, ChatManager.ActionKind.maxLength + 5, 0, -1)
+            drawString(fontRenderer(), msg.actionKind.renderedString, 0, 0, -1)
+            drawString(fontRenderer(), msg.actionReason, ChatManager.ActionKind.maxLength + 5, 0, -1)
             var size = drawMultiLineText(
                 msg.message,
                 ChatManager.ActionKind.maxLength + reasonMaxLength + 10,
             )
-            if (msg.modified != null) {
+            msg.modified?.let {
                 drawString(
-                    mc.fontRendererObj,
+                    fontRenderer(),
                     "§e§lNEW TEXT",
                     0, 0, -1,
                 )
                 size += drawMultiLineText(
-                    msg.modified,
+                    it,
                     ChatManager.ActionKind.maxLength + reasonMaxLength + 10,
                 )
             }
@@ -97,7 +96,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         return GuiUtilRenderComponents.splitText(
             comp,
             w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10),
-            mc.fontRendererObj,
+            fontRenderer(),
             false,
             true,
         )
@@ -118,7 +117,7 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         val modifiedSplitText = splitLine(comp)
         for (line in modifiedSplitText) {
             drawString(
-                mc.fontRendererObj,
+                fontRenderer(),
                 line.formattedText,
                 xPos,
                 0,
@@ -129,8 +128,10 @@ class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult
         return modifiedSplitText.size
     }
 
+    private fun fontRenderer() = Minecraft.getMinecraft().fontRendererObj
+
     override fun handleMouseInput() {
         super.handleMouseInput()
-        setScroll(scroll - Mouse.getEventDWheel())
+        setScroll(scroll - MouseCompat.getScrollDelta())
     }
 }

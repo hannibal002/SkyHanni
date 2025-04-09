@@ -1,21 +1,30 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import java.util.Locale
+//#if MC > 1.21
+//$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.registry.Registries
+//#endif
 
 object SkyBlockItemModifierUtils {
+
+    fun ItemStack.getCoinsOfAvarice() = getAttributeLong("collected_coins")
 
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
@@ -31,9 +40,11 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getHoeCounter() = getAttributeLong("mined_crops")
 
-    fun ItemStack.getSilexCount() = getEnchantments()?.get("efficiency")?.let {
+    fun ItemStack.getSilexCount() = getHypixelEnchantments()?.get("efficiency")?.let {
         it - 5 - getBaseSilexCount()
     }?.takeIf { it > 0 }
+
+    fun ItemStack.getMithrilInfusion(): Boolean = getAttributeByte("mithril_infusion") == 1.toByte()
 
     private fun ItemStack.getBaseSilexCount() = when (getInternalName().asString()) {
         "STONK_PICKAXE" -> 1
@@ -73,21 +84,21 @@ object SkyBlockItemModifierUtils {
         return data.heldItem
     }
 
-    fun ItemStack.isRiftTransferable(): Boolean? {
+    fun ItemStack.isRiftTransferable(): Boolean {
         val data = cachedData
-        if (data.riftTransferable == null) {
-            data.riftTransferable = getLore().any { it == "§5§kX§5 Rift-Transferable §kX" }
-        }
         return data.riftTransferable
+            ?: UtilsPatterns.riftTransferablePattern.anyMatches(getLore())
+                .also { data.riftTransferable = it }
     }
 
-    fun ItemStack.isRiftExportable(): Boolean? {
+    fun ItemStack.isRiftExportable(): Boolean {
         val data = cachedData
-        if (data.riftExportable == null) {
-            data.riftExportable = getLore().any { it == "§5§kX§5 Rift-Exportable §kX" }
-        }
         return data.riftExportable
+            ?: UtilsPatterns.riftExportablePattern.anyMatches(getLore())
+                .also { data.riftExportable = it }
     }
+
+    fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
 
     private fun ItemStack.getPetInfo() =
         ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)
@@ -95,12 +106,12 @@ object SkyBlockItemModifierUtils {
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData get() = (this as ItemStackCachedData).skyhanni_cachedData
 
-    fun ItemStack.getPetLevel(): Int = PetAPI.getPetLevel(displayName) ?: 0
+    fun ItemStack.getPetLevel(): Int = PetApi.getPetLevel(displayName) ?: 0
 
     fun ItemStack.getMaxPetLevel() = if (this.getInternalName() == "GOLDEN_DRAGON;4".toInternalName()) 200 else 100
 
     fun ItemStack.getDrillUpgrades() = getExtraAttributes()?.let {
-        val list = mutableListOf<NEUInternalName>()
+        val list = mutableListOf<NeuInternalName>()
         for (attributes in it.keySet) {
             if (attributes in drillPartTypes) {
                 val upgradeItem = it.getString(attributes)
@@ -122,7 +133,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getRanchersSpeed() = getAttributeInt("ranchers_speed")
 
-    fun ItemStack.getRune(): NEUInternalName? {
+    fun ItemStack.getRune(): NeuInternalName? {
         val runesMap = getExtraAttributes()?.getCompoundTag("runes") ?: return null
         val runesList = runesMap.keySet.associateWith { runesMap.getInteger(it) }.toList()
         if (runesList.isEmpty()) return null
@@ -130,19 +141,25 @@ object SkyBlockItemModifierUtils {
         return "${name.uppercase()}_RUNE;$tier".toInternalName()
     }
 
-    fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let {
-        val list = mutableListOf<NEUInternalName>()
-        for (attributes in it.keySet) {
-            if (attributes == "ability_scroll") {
-                val tagList = it.getTagList(attributes, 8)
-                for (i in 0..3) {
-                    val text = tagList.get(i).toString()
-                    if (text == "END") break
-                    list.add(text.replace("\"", "").toInternalName())
-                }
+    fun ItemStack.getAbilityScrolls() = getExtraAttributes()?.let { compound ->
+        val ultimateWitherScroll = "ULTIMATE_WITHER_SCROLL".toInternalName()
+        val implosion = "IMPLOSION_SCROLL".toInternalName()
+        val witherShield = "WITHER_SHIELD_SCROLL".toInternalName()
+        val shadowWarp = "SHADOW_WARP_SCROLL".toInternalName()
+
+        val scrolls = mutableSetOf<NeuInternalName>()
+
+        for (scroll in compound.getStringList("ability_scroll").map { it.toInternalName() }) {
+            if (scroll == ultimateWitherScroll) {
+                scrolls.add(implosion)
+                scrolls.add(witherShield)
+                scrolls.add(shadowWarp)
+                continue
             }
+            scrolls.add(scroll)
         }
-        list.toList()
+
+        scrolls.toList()
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
@@ -159,26 +176,25 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
         when {
             it == "pitchin" -> "pitchin_koi"
-            it == "warped" && name.removeColor().startsWith("Hyper ") -> "endstone_geode"
+            it == "warped" && displayName.removeColor().startsWith("Hyper ") -> "endstone_geode"
 
             else -> it
         }
     }
 
-    fun ItemStack.isRecombobulated() = getAttributeBoolean("rarity_upgrades")
+    fun ItemStack.isRecombobulated() = getAttributeInt("rarity_upgrades").isPositive()
 
-    fun ItemStack.hasJalapenoBook() = getAttributeBoolean("jalapeno_count")
+    fun ItemStack.hasJalapenoBook() = getAttributeInt("jalapeno_count").isPositive()
 
     fun ItemStack.hasEtherwarp() = getAttributeBoolean("ethermerge")
 
-    fun ItemStack.hasWoodSingularity() = getAttributeBoolean("wood_singularity_count")
+    fun ItemStack.hasWoodSingularity() = getAttributeInt("wood_singularity_count").isPositive()
 
     fun ItemStack.hasDivanPowderCoating() = getAttributeBoolean("divan_powder_coating")
 
-    fun ItemStack.hasArtOfWar() = getAttributeBoolean("art_of_war_count")
+    fun ItemStack.hasArtOfWar() = getAttributeInt("art_of_war_count").isPositive()
 
-    // TODO untested
-    fun ItemStack.hasBookOfStats() = getAttributeBoolean("stats_book")
+    fun ItemStack.hasBookOfStats() = getAttributeInt("stats_book") != null
 
     fun ItemStack.hasArtOfPeace() = getAttributeBoolean("artOfPeaceApplied")
 
@@ -186,9 +202,12 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
-    fun ItemStack.getSecondsHeld() = getAttributeInt("seconds_held")
-
-    fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
+    fun ItemStack.getSecondsHeld() = when (getItemId()) {
+        "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
+        "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
+        "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
+        else -> null
+    }
 
     fun ItemStack.getEdition() = getAttributeInt("edition")
 
@@ -196,7 +215,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getPersonalCompactorActive() = getAttributeByte("PERSONAL_DELETOR_ACTIVE") == 1.toByte()
 
-    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()
+    fun ItemStack.getHypixelEnchantments(): Map<String, Int>? = getExtraAttributes()
         ?.takeIf { it.hasKey("enchantments") }
         ?.run {
             val enchantments = this.getCompoundTag("enchantments")
@@ -217,7 +236,21 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getItemId() = getAttributeString("id")
 
+    //#if MC < 1.21
     fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as ResourceLocation
+    //#else
+    //$$ fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
+    //#endif
+
+    //#if MC < 1.21
+    fun isVanillaItem(itemId: String): Boolean {
+        return Item.itemRegistry.getObject(ResourceLocation(itemId)) != null
+    }
+    //#else
+    //$$ fun isVanillaItem(itemId: String): Boolean {
+    //$$     Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
+    //$$ }
+    //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {
         val list = mutableListOf<GemstoneSlot>()
@@ -235,20 +268,20 @@ object SkyBlockItemModifierUtils {
                 }
 
                 val rawType = key.split("_")[0]
-                val type = GemstoneType.getByName(rawType)
+                val type = GemstoneType.getByNameOrNull(rawType)
 
-                val quality = GemstoneQuality.getByName(value)
+                val quality = GemstoneQuality.getByNameOrNull(value)
                 if (quality == null) {
-                    ChatUtils.debug("Gemstone quality is null for item $name§7: ('$key' = '$value')")
+                    ChatUtils.debug("Gemstone quality is null for item $displayName§7: ('$key' = '$value')")
                     continue
                 }
                 if (type != null) {
                     list.add(GemstoneSlot(type, quality))
                 } else {
                     val newKey = gemstones.getString(key + "_gem")
-                    val newType = GemstoneType.getByName(newKey)
+                    val newType = GemstoneType.getByNameOrNull(newKey)
                     if (newType == null) {
-                        ChatUtils.debug("Gemstone type is null for item $name§7: ('$newKey' with '$key' = '$value')")
+                        ChatUtils.debug("Gemstone type is null for item $displayName§7: ('$newKey' with '$key' = '$value')")
                         continue
                     }
                     list.add(GemstoneSlot(newType, quality))
@@ -273,45 +306,54 @@ object SkyBlockItemModifierUtils {
     private fun ItemStack.getAttributeByte(label: String) =
         getExtraAttributes()?.getByte(label) ?: 0
 
-    fun ItemStack.getExtraAttributes() = tagCompound?.extraAttributes
+    //#if MC < 1.21
+    fun ItemStack.getExtraAttributes(): NBTTagCompound? = tagCompound?.extraAttributes
+    //#else
+    //$$ fun ItemStack.getExtraAttributes(): NbtCompound? = get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
+    //#endif
 
-    class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
-
-        fun getInternalName() = "${quality}_${type}_GEM".toInternalName()
+    class GemstoneSlot(private val type: GemstoneType, private val quality: GemstoneQuality) {
+        fun getInternalName() = "${quality.name}_${type.name}_GEM".toInternalName()
     }
 
-    enum class GemstoneQuality(val displayName: String) {
-        ROUGH("Rough"),
-        FLAWED("Flawed"),
-        FINE("Fine"),
-        FLAWLESS("Flawless"),
-        PERFECT("Perfect"),
+    enum class GemstoneQuality(private val displayName: String, private val color: LorenzColor) {
+        ROUGH("Rough", LorenzColor.WHITE),
+        FLAWED("Flawed", LorenzColor.GREEN),
+        FINE("Fine", LorenzColor.BLUE),
+        FLAWLESS("Flawless", LorenzColor.DARK_PURPLE),
+        PERFECT("Perfect", LorenzColor.GOLD),
         ;
+
+        override fun toString() = displayName
+        fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
 
-            fun getByName(name: String) = entries.firstOrNull { it.name == name }
+            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name.lowercase() == name.lowercase() }
         }
     }
 
-    enum class GemstoneType(val displayName: String) {
-        JADE("Jade"),
-        AMBER("Amber"),
-        TOPAZ("Topaz"),
-        SAPPHIRE("Sapphire"),
-        AMETHYST("Amethyst"),
-        JASPER("Jasper"),
-        RUBY("Ruby"),
-        OPAL("Opal"),
-        ONYX("Onyx"),
-        AQUAMARINE("Aquamarine"),
-        CITRINE("Citrine"),
-        PERIDOT("Peridot"),
+    enum class GemstoneType(val displayName: String, private val color: LorenzColor) {
+        JADE("Jade", LorenzColor.GREEN),
+        AMBER("Amber", LorenzColor.GOLD),
+        TOPAZ("Topaz", LorenzColor.YELLOW),
+        SAPPHIRE("Sapphire", LorenzColor.BLUE),
+        AMETHYST("Amethyst", LorenzColor.DARK_PURPLE),
+        JASPER("Jasper", LorenzColor.LIGHT_PURPLE),
+        RUBY("Ruby", LorenzColor.RED),
+        OPAL("Opal", LorenzColor.WHITE),
+        ONYX("Onyx", LorenzColor.DARK_GRAY),
+        AQUAMARINE("Aquamarine", LorenzColor.AQUA),
+        CITRINE("Citrine", LorenzColor.DARK_RED),
+        PERIDOT("Peridot", LorenzColor.DARK_GREEN),
         ;
+
+        override fun toString() = displayName
+        fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
 
-            fun getByName(name: String) = entries.firstOrNull { it.name == name }
+            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name == name || it.displayName == name }
         }
     }
 

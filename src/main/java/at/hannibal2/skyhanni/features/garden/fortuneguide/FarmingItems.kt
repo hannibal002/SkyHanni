@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.init.Blocks
@@ -36,6 +37,7 @@ enum class FarmingItems(
     RABBIT(ItemCategory.PET, FFStats::getPetFFData),
     BEE(ItemCategory.PET, FFStats::getPetFFData),
     SLUG(ItemCategory.PET, FFStats::getPetFFData),
+    HEDGEHOG(ItemCategory.PET, FFStats::getPetFFData),
     ;
 
     var selectedState = false
@@ -44,7 +46,7 @@ enum class FarmingItems(
 
     private val fallbackItem: ItemStack by lazy {
         val name = "§cNo saved ${name.lowercase().replace("_", " ")}"
-        ItemStack(Blocks.barrier).setStackDisplayName(name)
+        ItemStack(Blocks.barrier).setCustomItemName(name)
     }
 
     fun getItemOrNull() = ProfileStorageData.profileSpecific?.garden?.fortune?.farmingItems?.get(this)
@@ -98,7 +100,7 @@ enum class FarmingItems(
             Renderable.itemStackWithTip(
                 getItem(), 1.0, 0, 0, false,
             ),
-            onClick = onClick(),
+            onLeftClick = onClick(),
             condition = { clickEnabled },
         )
 
@@ -138,7 +140,7 @@ enum class FarmingItems(
 
         val armor = listOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
         val equip = listOf(NECKLACE, CLOAK, BELT, BRACELET)
-        val pets = listOf(ELEPHANT, MOOSHROOM_COW, RABBIT, BEE, SLUG)
+        val pets = listOf(ELEPHANT, MOOSHROOM_COW, RABBIT, BEE, SLUG, HEDGEHOG)
 
         fun getArmorDisplay(clickEnabled: Boolean = false): List<Renderable> = armor.map { it.getDisplay(clickEnabled) }
 

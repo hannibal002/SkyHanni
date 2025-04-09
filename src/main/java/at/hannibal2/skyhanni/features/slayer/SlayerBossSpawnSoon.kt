@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
+import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -29,7 +29,7 @@ object SlayerBossSpawnSoon {
     @HandleEvent
     fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
         if (!isEnabled()) return
-        if (!SlayerAPI.isInCorrectArea) return
+        if (!SlayerApi.isInCorrectArea) return
 
         val completion = progressPattern.matchMatcher(event.newProgress.removeColor()) {
             group("progress").formatDouble() / group("total").formatDouble()
@@ -38,7 +38,7 @@ object SlayerBossSpawnSoon {
         if (completion > config.percent / 100.0) {
             if (!warned || (config.repeat && completion != lastCompletion)) {
                 SoundUtils.playBeepSound()
-                LorenzUtils.sendTitle("§eSlayer boss soon!", 2.seconds)
+                TitleManager.sendTitle("§eSlayer boss soon!", duration = 2.seconds)
                 warned = true
             }
         } else {
@@ -47,5 +47,5 @@ object SlayerBossSpawnSoon {
         lastCompletion = completion
     }
 
-    fun isEnabled() = config.enabled && SlayerAPI.hasActiveSlayerQuest()
+    fun isEnabled() = config.enabled && SlayerApi.hasActiveSlayerQuest()
 }

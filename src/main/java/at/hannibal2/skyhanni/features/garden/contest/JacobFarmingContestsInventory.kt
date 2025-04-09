@@ -8,14 +8,14 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -49,15 +48,14 @@ object JacobFarmingContestsInventory {
         "§7§7You placed in the (?<medal>.*) §7bracket!"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         realTime.clear()
         hideEverything = true
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (event.inventoryName != "Your Contests") return
 
         realTime.clear()
@@ -66,9 +64,9 @@ object JacobFarmingContestsInventory {
         for ((slot, item) in event.inventoryItems) {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
-            foundEvents.add(item.name)
-            val time = FarmingContestAPI.getSbTimeFor(item.name) ?: continue
-            FarmingContestAPI.addContest(time, item)
+            foundEvents.add(item.displayName)
+            val time = FarmingContestApi.getSBTimeFor(item.displayName) ?: continue
+            FarmingContestApi.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
             }
@@ -83,18 +81,17 @@ object JacobFarmingContestsInventory {
         realTime[slot] = "$dayFormat $startTimeFormat-$endTimeFormat"
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         // TODO add tooltip line "click + press <keybind> to open on elite website
         if (!config.openOnElite.isKeyHeld()) return
-        if (!LorenzUtils.inSkyBlock) return
 
         val slot = event.slot ?: return
-        val itemName = slot.stack.name
+        val itemName = slot.stack.displayName
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
-                val (year, month, day) = FarmingContestAPI.getSbDateFromItemName(itemName) ?: return
+                val (year, month, day) = FarmingContestApi.getSBDateFromItemName(itemName) ?: return
                 openContest(year, month, day)
                 event.cancel()
             }
@@ -111,7 +108,7 @@ object JacobFarmingContestsInventory {
     }
 
     private fun openContest(year: String, month: String, day: String) {
-        val date = "$year/${LorenzUtils.getSBMonthByName(month)}/$day"
+        val date = "$year/${SkyBlockTime.getSBMonthByName(month)}/$day"
         OSUtils.openBrowser("https://elitebot.dev/contests/$date")
         ChatUtils.chat("Opening contest in elitebot.dev")
     }
@@ -149,7 +146,7 @@ object JacobFarmingContestsInventory {
             val day = GardenNextJacobContest.dayPattern.matchMatcher(itemName) { group("day") } ?: return
             val year = group("year")
             val month = group("month")
-            val time = SkyBlockTime(year.toInt(), LorenzUtils.getSBMonthByName(month), day.toInt()).toMillis()
+            val time = SkyBlockTime(year.toInt(), SkyBlockTime.getSBMonthByName(month), day.toInt()).toMillis()
             if (time < SkyBlockTime.now().toMillis()) {
                 openContest(year, month, day)
             } else {
@@ -161,9 +158,8 @@ object JacobFarmingContestsInventory {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
         if (!config.highlightRewards) return
 
@@ -171,19 +167,17 @@ object JacobFarmingContestsInventory {
         if (hideEverything) return
 
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (stack.getLore().any { it == "§eClick to claim reward!" }) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onToolTip(event: ToolTipEvent) {
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
         val slot = event.slot.slotNumber
@@ -197,9 +191,8 @@ object JacobFarmingContestsInventory {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.medalIcon) return
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
 
@@ -210,7 +203,7 @@ object JacobFarmingContestsInventory {
             if (line.contains("Contest boosted by Finnegan!")) finneganContest = true
 
             val name = medalPattern.matchMatcher(line) { group("medal").removeColor() } ?: continue
-            val medal = LorenzUtils.enumValueOfOrNull<ContestBracket>(name) ?: return
+            val medal = EnumUtils.enumValueOfOrNull<ContestBracket>(name) ?: return
 
             var stackTip = "§${medal.color}✦"
             var x = event.x + 9
@@ -233,7 +226,7 @@ object JacobFarmingContestsInventory {
         event.move(
             3,
             "inventory.jacobFarmingContestHighlightRewards",
-            "inventory.jacobFarmingContests.highlightRewards"
+            "inventory.jacobFarmingContests.highlightRewards",
         )
         event.move(3, "inventory.jacobFarmingContestHideDuplicates", "inventory.jacobFarmingContests.hideDuplicates")
         event.move(3, "inventory.jacobFarmingContestRealTime", "inventory.jacobFarmingContests.realTime")
