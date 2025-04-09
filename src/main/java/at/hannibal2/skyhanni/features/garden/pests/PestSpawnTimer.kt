@@ -63,6 +63,10 @@ object PestSpawnTimer {
 
     private var hasWarned = false
 
+    private var maxPests = false
+
+    private var ready = false
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
@@ -71,15 +75,18 @@ object PestSpawnTimer {
             val minutes = groupOrNull("minutes")?.formatInt()
             val seconds = groupOrNull("seconds")?.formatInt()
             val ready = hasGroup("ready")
-            val maxPests = hasGroup("maxPests")
+            val maxedPests = hasGroup("maxPests")
 
             if (ready) {
                 if (pestSpawned) return // prevent warning twice if tablist updates the same time as pest spawn
-                pestCooldownEndTime = SimpleTimeMark.now() - 1.seconds
+                pestCooldownEndTime = SimpleTimeMark.farPast()
                 return
             }
 
-            if (maxPests) return
+            if (maxedPests) {
+                maxPests = true
+                return
+            }
 
             if (minutes == null && seconds == null) return
 
@@ -94,14 +101,13 @@ object PestSpawnTimer {
                 } else {
                     tablistCooldownEnd
                 }
+
+                if (pestSpawned) {
+                    hasWarned = false
+                    pestSpawned = false
+                }
             }
         }
-
-        if (pestSpawned) {
-            hasWarned = false
-            pestSpawned = false
-        }
-
     }
 
     @HandleEvent
@@ -157,7 +163,7 @@ object PestSpawnTimer {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (hasWarned || !config.cooldownOverWarning) return
 
-        if (pestCooldownEndTime.isFarPast()) {
+        if (pestCooldownEndTime.isInPast()) {
             cooldownExpired()
             return
         }
