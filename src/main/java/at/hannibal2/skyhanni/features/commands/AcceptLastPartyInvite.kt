@@ -38,6 +38,7 @@ object AcceptLastPartyInvite {
         "§eThe party invite from §r§.(?:\\[.*].)?(?<player>\\S+) §r§ehas expired\\.",
     )
 
+    // TODO move into PartyApi
     private var lastInviter = ""
 
     @HandleEvent
@@ -59,11 +60,9 @@ object AcceptLastPartyInvite {
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.acceptLastInvite) return
         if (event.senderIsSkyhanni()) return
-        if (!event.message.startsWith("/party accept", ignoreCase = true) &&
-            !event.message.startsWith("/p accept", ignoreCase = true)
-        ) {
-            return
-        }
+        val message = event.message.lowercase()
+        if (!message.startsWith("/party accept") && !message.startsWith("/p accept")) return
+
         event.cancel()
         if (lastInviter == "") {
             ChatUtils.chat("There is no party invite to accept!")
