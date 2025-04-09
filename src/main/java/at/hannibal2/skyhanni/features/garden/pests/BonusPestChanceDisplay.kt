@@ -3,21 +3,20 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BonusPestChanceDisplay {
 
-    private val config get() = PestAPI.config
+    private val config get() = PestApi.config
 
     private val patternGroup = RepoPattern.group("garden.bonuspestchance")
 
@@ -31,15 +30,15 @@ object BonusPestChanceDisplay {
     )
     private var display: String? = null
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = null
     }
 
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.STATS)) return
-        if (!GardenAPI.inGarden()) return
+        if (!GardenApi.inGarden()) return
         event.widget.lines.forEach { line ->
             bonusPestChancePattern.matchMatcher(line) {
                 val disabled = groupOrNull("disabled") != null
@@ -56,11 +55,11 @@ object BonusPestChanceDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.pestChanceDisplayPosition.renderString(display, posLabel = "Bonus Pest Chance")
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.pestChanceDisplay && !GardenAPI.hideExtraGuis()
+    private fun isEnabled() = GardenApi.inGarden() && config.pestChanceDisplay && !GardenApi.hideExtraGuis()
 }
