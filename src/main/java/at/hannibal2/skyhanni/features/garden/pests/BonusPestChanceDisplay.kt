@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -35,10 +36,9 @@ object BonusPestChanceDisplay {
         display = null
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.STATS)) return
-        if (!GardenApi.inGarden()) return
         event.widget.lines.forEach { line ->
             bonusPestChancePattern.matchMatcher(line) {
                 val disabled = groupOrNull("disabled") != null
