@@ -95,7 +95,7 @@ object CFStrayTimer {
 
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = isInventoryClosure(keycode) || !isEnabled() || !CFApi.inChocolateFactory
+        val shouldContinue = !isInventoryClosure(keycode) || !isEnabled() || !CFApi.inChocolateFactory
         if (!shouldContinue) {
             TitleManager.sendTitle(
                 "§cStray Timer Prevented Close",
