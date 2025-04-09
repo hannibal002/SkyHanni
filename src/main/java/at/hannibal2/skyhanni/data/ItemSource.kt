@@ -3,43 +3,47 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.ItemAddEvent
 
 @Suppress("unused")
-enum class ItemSource {
-    MOB_DROP,
-    LOOTSHARE,
-    DUNGEON_SECRET,
-    DUNGEON_REWARD,
-    SLAYER_BOSS,
-    SLAYER_MINIBOSS,
-    RNG_METER,
-    FISHING,
-    BLOCK_BREAK,
-    CHEST,
-    MINION,
-    CRAFTING,
-    NPC,
-    BAZAAR,
-    ANVIL,
-    BASIC_REFORGING,
-    STONE_REFORGING,
-    ENCHANTING,
-    EXPERIMENTATION_TABLE,
-    AUCTION,
-    TRADING,
-    COLLECTION_REWARD,
-    QUEST_REWARD,
-    PET, // I don't know any cases as of now
-    DRAGON,
-    ARMOR_EFFECT,
-    REFUND,
-    BANK,
-    SACKS,
-    STASH,
-    ENDER_CHEST,
-    ITEM_COMPACT,
-    DICE_ROLL,
+enum class ItemSource(val description: String?) {
+    MOB_DROP(null),
+    LOOTSHARE(null),
+    DUNGEON_SECRET(null),
+    DUNGEON_REWARD(null),
+    SLAYER_BOSS(null),
+    SLAYER_MINIBOSS(null),
+    RNG_METER(null),
+    FISHING(null),
+    BLOCK_BREAK(null),
+    CHEST(null),
+    MINION(null),
+    CRAFTING(null),
+    NPC(null),
+    BAZAAR(null),
+    ANVIL(null),
+    BASIC_REFORGING(null),
+    STONE_REFORGING(null),
+    ENCHANTING(null),
+    EXPERIMENTATION_TABLE(null),
+    AUCTION(null),
+    TRADING(null),
+    COLLECTION_REWARD(null),
+    QUEST_REWARD(null),
+    PET(null), // I don't know any cases as of now
+    DRAGON(null),
+    ARMOR_EFFECT(null),
+    REFUND(null),
+    BANK(null),
+    SACKS(null),
+    STASH(null),
+    ENDER_CHEST(null),
+    ITEM_COMPACT(null),
+    DICE_ROLL(null),
 
-    COMMAND,
-    UNKNOWN;
+    COMMAND("Item added via command"),
+    UNKNOWN("Item source is unknown"),;
+
+    override fun toString(): String {
+        return this.name.lowercase()
+    }
 
     companion object {
         fun ItemAddEvent.isRelevant(): Boolean = source !in setOf(

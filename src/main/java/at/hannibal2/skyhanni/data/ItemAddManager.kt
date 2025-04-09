@@ -128,7 +128,7 @@ object ItemAddManager {
     private fun formattedList() = recentItems.map { (itemAddEvent, time) ->
         val itemName = itemAddEvent.internalName.repoItemName
         val amount = itemAddEvent.amount
-        val source = itemAddEvent.source.displayName
+        val source = itemAddEvent.source.description ?: itemAddEvent.source.name.lowercase()
         val passedSince = time.passedSince().format()
         "§r$itemName §7(§8x$amount§7) §e$source §b$passedSince ago §7(§b$time§7)"
     }
