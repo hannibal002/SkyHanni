@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
@@ -183,9 +183,9 @@ class ProfileSpecificStorage {
 
     // -- hoppity
     @Expose
-    var chocolateFactory: ChocolateFactoryStorage = ChocolateFactoryStorage()
+    var chocolateFactory: CFStorage = CFStorage()
 
-    class ChocolateFactoryStorage {
+    class CFStorage {
         @Expose
         var currentRabbits: Int = 0
 
@@ -284,7 +284,7 @@ class ProfileSpecificStorage {
         var hoppityShopYearOpened: Int? = null
 
         @Expose
-        var strayTracker: ChocolateFactoryStrayTracker.Data = ChocolateFactoryStrayTracker.Data()
+        var strayTracker: CFStrayTracker.Data = CFStrayTracker.Data()
 
         @Expose
         var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
@@ -317,42 +317,51 @@ class ProfileSpecificStorage {
     var hoppityStatLiveDisplayToggledOff: Boolean = false
 
     data class HoppityEventStats(
-        @Expose
-        var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
+        @Expose var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
+        @Expose var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
+        @Expose var dupeChocolateGained: Long = 0,
+        @Expose var strayChocolateGained: Long = 0,
+        @Expose var rabbitTheFishFinds: Int = 0,
 
-        @Expose
-        var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
+        @Expose var millisInCf: Duration = Duration.ZERO,
+        @Expose var initialLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
+        @Expose var finalLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
+        @Expose var lastLbUpdate: SimpleTimeMark = farPast(),
+        @Expose var summarized: Boolean = false,
 
-        @Expose
-        var dupeChocolateGained: Long = 0,
-
-        @Expose
-        var strayChocolateGained: Long = 0,
-
-        @Expose
-        var millisInCf: Duration = Duration.ZERO,
-
-        @Expose
-        var rabbitTheFishFinds: Int = 0,
-
-        @Expose
-        var initialLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
-
-        @Expose
-        var finalLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
-
-        @Expose
-        var lastLbUpdate: SimpleTimeMark = farPast(),
-
-        @Expose
-        var summarized: Boolean = false,
-
-        @Expose
-        var typeCountSnapshot: RabbitData = RabbitData(),
-
-        @Expose
-        var typeCountsSince: RabbitData = RabbitData(),
+        @Expose var typeCountSnapshot: RabbitData? = RabbitData(),
+        @Expose var typeCountsSince: RabbitData? = RabbitData(),
     ) {
+        @Transient
+        var containingYears: MutableSet<Int> = mutableSetOf()
+
+        constructor(year: Int) : this() {
+            containingYears.add(year)
+        }
+
+        constructor(years: Set<Int>) : this() {
+            containingYears = years.toMutableSet()
+        }
+
+        operator fun plusAssign(it: HoppityEventStats) {
+            it.mealsFound.forEach { (key, value) ->
+                mealsFound.merge(key, value, Int::plus)
+            }
+            it.rabbitsFound.forEach { (key, rabbitData) ->
+                rabbitsFound.merge(key, rabbitData) { existing, new ->
+                    RabbitData(
+                        uniques = existing.uniques + new.uniques,
+                        dupes = existing.dupes + new.dupes,
+                        strays = existing.strays + new.strays,
+                    )
+                }
+            }
+            dupeChocolateGained += it.dupeChocolateGained
+            strayChocolateGained += it.strayChocolateGained
+            rabbitTheFishFinds += it.rabbitTheFishFinds
+            millisInCf += it.millisInCf
+        }
+
         companion object {
             data class RabbitData(
                 @Expose var uniques: Int = 0,
@@ -370,6 +379,7 @@ class ProfileSpecificStorage {
                     val EMPTY get() = RabbitData(0, 0, 0)
                 }
             }
+
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
     }
