@@ -23,9 +23,9 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFBarnManager
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStrayTracker
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStrayTracker.duplicateDoradoStrayPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStrayTracker.duplicatePseudoStrayPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicateDoradoStrayPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils

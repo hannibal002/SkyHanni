@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isInventoryClosure
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import java.util.Locale
+import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -34,9 +34,11 @@ object CFStrayTimer {
     fun onEggFound(event: EggFoundEvent) {
         timer = when (event.type) {
             // If a stray is found, the timer is no longer relevant
-            HoppityEggType.STRAY -> { Duration.ZERO }
+            HoppityEggType.STRAY -> {
+                Duration.ZERO
+            }
             // Only reset the timer for meal entries and hitman eggs
-            in resettingEntries, HoppityEggType.HITMAN -> { 30.seconds }
+            in HoppityEggType.resettingEntries, HoppityEggType.HITMAN -> { 30.seconds }
             else -> return
         }
         lastTimerSubtraction = null

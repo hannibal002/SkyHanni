@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStrayTimer;
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStrayWarning;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTimer;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayWarning;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import net.minecraft.client.gui.GuiScreen;

@@ -1,10 +1,15 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFBarnManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFTimeTowerManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFUpgradeWarning
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -516,7 +521,7 @@ object CFDataLoader {
         } ?: return
 
         if (slotIndex == CFApi.timeTowerIndex) {
-            this.profileStorage?.timeTowerLevel = level
+            profileStorage?.timeTowerLevel = level
         }
 
         if (isMaxed) {
