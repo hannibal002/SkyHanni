@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -49,7 +49,7 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Déjeuner Egg §r§don the arms of the Amethyst statue§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Supper Egg §r§dunderneath the stairwell§r§d!
      */
-    val eggFoundPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val eggFoundPattern by CFApi.patternGroup.pattern(
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>[\\wé]+) Egg §r§d(?<note>.*)§r§d!",
     )
@@ -57,7 +57,7 @@ object HoppityEggsManager {
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§cHitman Egg§r§d!
      */
-    val hitmanEggFoundPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val hitmanEggFoundPattern by CFApi.patternGroup.pattern(
         "egg.found.hitman",
         "§d§lHOPPITY'S HUNT §r§dYou found a (?:§.)+Hitman Egg(?:§.)+!",
     )
@@ -66,7 +66,7 @@ object HoppityEggsManager {
      * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
      * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
      */
-    val eggBoughtPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val eggBoughtPattern by CFApi.patternGroup.pattern(
         "egg.bought",
         "§aYou bought §r(?<rabbitname>.*?) §r§afor §r§6(?<cost>[\\d,]*) Coins§r§a!",
     )
@@ -76,7 +76,7 @@ object HoppityEggsManager {
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §aPenelope §7(§A§LUNCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §6Solomon §7(§6§LLEGENDARY§7)!
      */
-    val rabbitFoundPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val rabbitFoundPattern by CFApi.patternGroup.pattern(
         "rabbit.found",
         "§D§LHOPPITY'S HUNT §7You found (?<name>.*) §7\\(§.§L(?<rarity>.*)§7\\)!",
     )
@@ -86,7 +86,7 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lNEW RABBIT! §6+0.02x Chocolate §7per second!
      * REGEX-TEST: §d§lNEW RABBIT! §7Your §dTime Tower §7charge time is now §a7h§7!
      */
-    val newRabbitFound by ChocolateFactoryApi.patternGroup.pattern(
+    val newRabbitFound by CFApi.patternGroup.pattern(
         "rabbit.found.new",
         "§d§lNEW RABBIT! (?:(?:§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!|(?<other>.*))",
     )
@@ -94,12 +94,12 @@ object HoppityEggsManager {
     /**
      * REGEX-TEST: §7§lDUPLICATE RABBIT! §6+6,759,912 Chocolate
      */
-    val duplicateRabbitFound by ChocolateFactoryApi.patternGroup.pattern(
+    val duplicateRabbitFound by CFApi.patternGroup.pattern(
         "rabbit.duplicate",
         "§7§lDUPLICATE RABBIT! §6\\+(?<amount>[\\d,]+) Chocolate",
     )
 
-    private val noEggsLeftPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val noEggsLeftPattern by CFApi.patternGroup.pattern(
         "egg.noneleft",
         "§cThere are no hidden Chocolate Rabbit Eggs nearby! Try again later!",
     )
@@ -108,7 +108,7 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§9Chocolate Lunch Egg §r§dhas appeared!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dA §r§aChocolate Déjeune Egg §r§dhas appeared!
      */
-    private val eggSpawnedPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val eggSpawnedPattern by CFApi.patternGroup.pattern(
         "egg.spawned",
         "§d§lHOPPITY'S HUNT §r§dA §r§.Chocolate (?<meal>[\\wé]+) Egg §r§dhas appeared!",
     )
@@ -117,11 +117,11 @@ object HoppityEggsManager {
      * REGEX-TEST: §cYou have already collected this Chocolate Breakfast Egg§r§c! Try again when it respawns!
      * REGEX-TEST: §cYou have already collected this Chocolate Déjeune Egg§r§c! Try again when it respawns!
      */
-    private val eggAlreadyCollectedPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val eggAlreadyCollectedPattern by CFApi.patternGroup.pattern(
         "egg.alreadycollected",
         "§cYou have already collected this Chocolate (?<meal>[\\wé]+) Egg§r§c! Try again when it respawns!",
     )
-    private val hoppityEventNotOn by ChocolateFactoryApi.patternGroup.pattern(
+    private val hoppityEventNotOn by CFApi.patternGroup.pattern(
         "egg.notevent",
         "§cThis only works during Hoppity's Hunt!",
     )
