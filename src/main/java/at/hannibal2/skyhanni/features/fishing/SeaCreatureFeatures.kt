@@ -4,15 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.Entity
@@ -69,7 +71,7 @@ object SeaCreatureFeatures {
         if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
             else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
-            TitleManager.sendTitle(text, 1.5.seconds, 3.6, 7f)
+            TitleManager.sendTitle(text, duration = 1.5.seconds, height = 3.6, fontSize = 7f)
             if (config.playSound) SoundUtils.playBeepSound()
         }
     }
@@ -81,19 +83,26 @@ object SeaCreatureFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!config.alertOwnCatches) return
-
-        if (event.seaCreature.rare) {
+        if (!event.seaCreature.rare) return
+        if (config.alertOwnCatches) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
-            TitleManager.sendTitle(text, 3.seconds, 2.8, 7f)
+            TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
             if (config.playSound) SoundUtils.playBeepSound()
             lastRareCatch = SimpleTimeMark.now()
+        }
+        if (config.announceRareInParty && PartyApi.isInParty()) {
+            val name = event.seaCreature.name
+            val message = buildString {
+                if (event.doubleHook) append("DOUBLE HOOK: ")
+                append("I caught ${StringUtils.optionalAn(name)} $name!")
+            }
+            HypixelCommands.partyChat(message)
         }
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         rareSeaCreatures.clear()
         entityIds.clear()
     }

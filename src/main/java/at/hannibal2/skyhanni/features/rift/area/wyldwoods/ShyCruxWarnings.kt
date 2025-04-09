@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -18,14 +17,14 @@ object ShyCruxWarnings {
     private val shyNames = arrayOf("I'm ugly! :(", "Eek!", "Don't look at me!", "Look away!")
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!config.shyWarning) return
         checkForShy()
     }
 
     private fun checkForShy() {
         if (EntityUtils.getAllEntities().any { it.name in shyNames && it.distanceToPlayer() < 8 }) {
-            TitleManager.sendTitle("§eLook away!", 150.milliseconds)
+            TitleManager.sendTitle("§eLook away!", duration = 150.milliseconds)
         }
     }
 

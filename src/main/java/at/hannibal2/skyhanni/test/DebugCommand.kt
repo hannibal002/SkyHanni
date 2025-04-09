@@ -125,6 +125,10 @@ object DebugCommand {
             event.addData("Unknown SkyBlock island!")
             return
         }
+        if (LorenzUtils.skyBlockIsland == IslandType.NONE) {
+            event.addData("No SkyBlock island found!")
+            return
+        }
 
         if (LorenzUtils.skyBlockIsland != HypixelData.skyBlockIsland) {
             event.addData {
@@ -203,6 +207,7 @@ object DebugCommand {
     private fun networkInfo(event: DebugDataCollectEvent) {
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
+        val pingEnabled = SkyHanniMod.feature.dev.hypixelPingApi
 
         val list = buildList {
             add("tps: $tps")
@@ -210,6 +215,10 @@ object DebugCommand {
 
             val lastWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince()
             var showPreviousPings = CurrentPing.averagePing > pingLimit
+            if (!pingEnabled) {
+                add("Hypixel Ping Packet disabled in settings!")
+                showPreviousPings = true
+            }
             if (lastWorldSwitch < 1.minutes) {
                 add("last world switch: ${lastWorldSwitch.format()} ago")
                 showPreviousPings = true
@@ -226,7 +235,9 @@ object DebugCommand {
             }
         }
 
-        if (tps < TPS_LIMIT || CurrentPing.averagePing > pingLimit) {
+
+
+        if (tps < TPS_LIMIT || CurrentPing.averagePing > pingLimit || !pingEnabled) {
             event.addData(list)
         } else {
             event.addIrrelevant(list)

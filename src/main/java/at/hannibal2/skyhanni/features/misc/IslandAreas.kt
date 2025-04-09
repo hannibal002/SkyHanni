@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -39,7 +38,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object IslandAreas {
@@ -53,7 +51,7 @@ object IslandAreas {
     private val textInput = SearchTextInput()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         nodes = emptyMap()
         display = null
         targetNode = null
@@ -251,7 +249,7 @@ object IslandAreas {
         // when this is a small area and small areas are disabled via config
         if (event.onlyInternal) return
         if (inAnArea && config.enterTitle) {
-            TitleManager.sendTitle("§aEntered $name!", 3.seconds)
+            TitleManager.sendTitle("§aEntered $name!")
         }
     }
 

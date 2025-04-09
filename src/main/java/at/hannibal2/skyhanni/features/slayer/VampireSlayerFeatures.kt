@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -143,8 +142,8 @@ object VampireSlayerFeatures {
                     if (nextClawSend < System.currentTimeMillis()) {
                         TitleManager.sendTitle(
                             "§6§lTWINCLAWS",
-                            (1750 - config.twinclawsDelay).milliseconds,
-                            2.6,
+                            duration = (1750 - config.twinclawsDelay).milliseconds,
+                            height = 2.6,
                         )
                         nextClawSend = System.currentTimeMillis() + 5_000
                     }
@@ -180,7 +179,7 @@ object VampireSlayerFeatures {
                 else canUseSteak && configCoopBoss.steakAlert && containCoop
 
             if (shouldSendSteakTitle) {
-                TitleManager.sendTitle("§c§lSTEAK!", 300.milliseconds, 2.6)
+                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds, height = 2.6)
             }
 
             if (shouldRender) {
@@ -323,7 +322,7 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         entityList.clear()
         taggedEntityList.clear()
         standList = mutableMapOf()

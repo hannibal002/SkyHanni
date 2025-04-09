@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 object ChocolateFactoryBarnManager {
 
     private val config get() = ChocolateFactoryApi.config
-    private val hoppityConfig get() = HoppityEggsManager.config
+    private val hoppityChatConfig get() = HoppityEggsManager.config.chat
     private val profileStorage get() = ChocolateFactoryApi.profileStorage
 
     /**
@@ -32,7 +32,16 @@ object ChocolateFactoryBarnManager {
         "§c§lBARN FULL! §f\\D+ §7got §ccrushed§7! §6\\+(?<amount>[\\d,]+) Chocolate",
     )
 
-    var barnFull = false
+    fun isBarnFull(): Boolean {
+        val profileStorage = profileStorage ?: return false
+
+        // when the unlocked barn space has already reached or surpassed the total amount of rabbits
+        val alreadyBigEnough = profileStorage.maxRabbits >= HoppityCollectionData.knownRabbitCount
+
+        val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
+        return remainingSpace <= config.barnCapacityThreshold && !alreadyBigEnough
+    }
+
     private var sentBarnFullWarning = false
     private var lastRabbit = ""
 
@@ -52,7 +61,7 @@ object ChocolateFactoryBarnManager {
         HoppityEggsManager.duplicateRabbitFound.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
             val amount = group("amount").formatLong()
-            if (config.showDuplicateTime && !hoppityConfig.compactChat) {
+            if (config.showDuplicateTime && !hoppityChatConfig.compact) {
                 val format = ChocolateFactoryApi.timeUntilNeed(amount).format(maxUnits = 2)
                 DelayedRun.runNextTick {
                     ChatUtils.chat("§7(§a+§b$format §aof production§7)")
@@ -63,21 +72,21 @@ object ChocolateFactoryBarnManager {
 
             var changedMessage = event.message
 
-            if (hoppityConfig.showDuplicateNumber && !hoppityConfig.compactChat) {
+            if (hoppityChatConfig.showDuplicateNumber && !hoppityChatConfig.compact) {
                 // Add duplicate number to the duplicate rabbit message
                 (HoppityCollectionStats.getRabbitCount(lastRabbit)).takeIf { it > 0 }?.let {
                     changedMessage = changedMessage.replace(
                         "§7§lDUPLICATE RABBIT!",
-                        "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r"
+                        "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r",
                     )
                 }
             }
 
-            if (hoppityConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) {
+            if (hoppityChatConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) {
                 // Replace §6\+(?<amount>[\d,]+) Chocolate with §6\+§d(?<amount>[\d,]+) §6Chocolate
                 changedMessage = changedMessage.replace(
                     "§6\\+(?<amount>[\\d,]+) Chocolate",
-                    "§6\\+§d${group("amount")} §6Chocolate"
+                    "§6\\+§d${group("amount")} §6Chocolate",
                 )
             }
 
@@ -107,12 +116,7 @@ object ChocolateFactoryBarnManager {
         // TODO rename maxRabbits to maxUnlockedBarnSpace
         if (profileStorage.maxRabbits >= ChocolateFactoryApi.maxRabbits) return
 
-        // when the unlocked barn space has already surpassed the total amount of rabbits
-        val alreadyBigEnough = profileStorage.maxRabbits >= HoppityCollectionData.knownRabbitCount
-
-        val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
-        barnFull = remainingSpace <= config.barnCapacityThreshold && !alreadyBigEnough
-        if (!barnFull) return
+        if (!isBarnFull()) return
 
         if (inventory && sentBarnFullWarning) return
 

@@ -124,10 +124,16 @@ class DevConfig {
     @ConfigEditorBoolean
     var numberFormatOverride: Boolean = false
 
+    // TODO reenable the setting once the hypixel mod api works fine
+//     @Expose
+//     @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
+//     @ConfigEditorBoolean
+//     var hypixelModApi: Boolean = true
+
     @Expose
-    @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
+    @ConfigOption(name = "Hypixel Ping API", desc = "Use the Hypixel Mod API for calculating the ping.")
     @ConfigEditorBoolean
-    var hypixelModApi: Boolean = true
+    var hypixelPingApi: Boolean = true
 
     @Expose
     @ConfigOption(
