@@ -74,6 +74,11 @@ class GUIConfig {
     var xpBar: XPBarConfig = XPBarConfig()
 
     @Expose
+    @ConfigOption(name = "Mayor Overlay", desc = "Settings for the mayor overlay.")
+    @Accordion
+    var mayorOverlay = MayorOverlayConfig()
+
+    @Expose
     @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
     @Accordion
     var markedPlayers: MarkedPlayerConfig = MarkedPlayerConfig()

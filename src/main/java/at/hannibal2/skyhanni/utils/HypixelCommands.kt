@@ -115,6 +115,10 @@ object HypixelCommands {
         send("ec $position")
     }
 
+    fun partyAccept(player: String) {
+        send("party accept $player")
+    }
+
     fun partyWarp() {
         send("party warp")
     }

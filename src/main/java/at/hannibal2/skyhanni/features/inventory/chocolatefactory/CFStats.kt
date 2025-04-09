@@ -101,7 +101,7 @@ object CFStats {
         val percentile = CFApi.leaderboardPercentile
         val percentileText = percentile?.let { "§7Top §a$it%" }.orEmpty()
         val leaderboard = "#$positionText $percentileText"
-        ChocolatePositionChange.update(position, leaderboard)
+        CFApi.updatePosition(position, leaderboard)
         HoppityEventSummary.updateCfPosition(position, percentile)
         put(CFStat.LEADERBOARD_POS, "§ePosition: §b$leaderboard")
     }

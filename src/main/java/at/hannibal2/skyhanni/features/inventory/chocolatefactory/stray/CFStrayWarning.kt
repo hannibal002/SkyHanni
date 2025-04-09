@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFStrayRabbitWarningConfig
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFStrayRabbitWarningConfig.StrayTypeEntry
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -60,16 +60,16 @@ object CFStrayWarning {
         CFDataLoader.clickMeGoldenRabbitPattern.matches(stack.displayName) || stack.getSkullTexture() in CFApi.specialRabbitTextures
 
     private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
-        CFStrayRabbitWarningConfig.StrayTypeEntry.SPECIAL -> isSpecial(item)
+        StrayTypeEntry.SPECIAL -> isSpecial(item)
 
-        CFStrayRabbitWarningConfig.StrayTypeEntry.LEGENDARY_P -> isRarityOrHigher(item, LorenzRarity.LEGENDARY)
-        CFStrayRabbitWarningConfig.StrayTypeEntry.EPIC_P -> isRarityOrHigher(item, LorenzRarity.EPIC)
-        CFStrayRabbitWarningConfig.StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
-        CFStrayRabbitWarningConfig.StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
+        StrayTypeEntry.LEGENDARY_P -> isRarityOrHigher(item, LorenzRarity.LEGENDARY)
+        StrayTypeEntry.EPIC_P -> isRarityOrHigher(item, LorenzRarity.EPIC)
+        StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
+        StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
 
-        CFStrayRabbitWarningConfig.StrayTypeEntry.ALL -> CFDataLoader.clickMeRabbitPattern.matches(item.displayName) || isSpecial(item)
+        StrayTypeEntry.ALL -> CFDataLoader.clickMeRabbitPattern.matches(item.displayName) || isSpecial(item)
 
-        CFStrayRabbitWarningConfig.StrayTypeEntry.NONE -> false
+        StrayTypeEntry.NONE -> false
     }
 
     private fun handleRabbitWarnings(item: ItemStack) {
@@ -127,18 +127,18 @@ object CFStrayWarning {
         flashScreen = activeStrays.any {
             val stack = it.value
             when (config.rabbitWarning.flashScreenLevel) {
-                CFStrayRabbitWarningConfig.StrayTypeEntry.SPECIAL -> isSpecial(stack)
+                StrayTypeEntry.SPECIAL -> isSpecial(stack)
 
-                CFStrayRabbitWarningConfig.StrayTypeEntry.LEGENDARY_P -> isRarityOrHigher(stack, LorenzRarity.LEGENDARY)
-                CFStrayRabbitWarningConfig.StrayTypeEntry.EPIC_P -> isRarityOrHigher(stack, LorenzRarity.EPIC)
-                CFStrayRabbitWarningConfig.StrayTypeEntry.RARE_P -> isRarityOrHigher(stack, LorenzRarity.RARE)
-                CFStrayRabbitWarningConfig.StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(stack, LorenzRarity.UNCOMMON)
+                StrayTypeEntry.LEGENDARY_P -> isRarityOrHigher(stack, LorenzRarity.LEGENDARY)
+                StrayTypeEntry.EPIC_P -> isRarityOrHigher(stack, LorenzRarity.EPIC)
+                StrayTypeEntry.RARE_P -> isRarityOrHigher(stack, LorenzRarity.RARE)
+                StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(stack, LorenzRarity.UNCOMMON)
 
-                CFStrayRabbitWarningConfig.StrayTypeEntry.ALL -> {
+                StrayTypeEntry.ALL -> {
                     CFDataLoader.clickMeRabbitPattern.matches(it.value.displayName) || isSpecial(stack)
                 }
 
-                CFStrayRabbitWarningConfig.StrayTypeEntry.NONE -> false
+                StrayTypeEntry.NONE -> false
             }
         }
     }

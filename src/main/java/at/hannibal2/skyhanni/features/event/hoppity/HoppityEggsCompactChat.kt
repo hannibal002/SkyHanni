@@ -28,11 +28,11 @@ typealias RarityType = HoppityChatConfig.CompactRarityTypes
 object HoppityEggsCompactChat {
 
     private var lockedHitmanClaimCount: Int? = null
-    private var hoppityDataSet = HoppityStateDataSet()
     private val config get() = CFApi.config
     private val chatConfig get() = HoppityEggsManager.config.chat
     private val waypointsConfig get() = HoppityEggsManager.config.waypoints
     private val hitmanCompactDataSets: MutableList<HoppityStateDataSet> = mutableListOf()
+    private var hoppityDataSet = HoppityStateDataSet()
 
     private fun reset() {
         lockedHitmanClaimCount = null
