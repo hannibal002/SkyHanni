@@ -43,7 +43,7 @@ class PestTrapConfig {
         @Expose
         @ConfigOption(name = "Enabled Warnings", desc = "Which warning types to enable.")
         @ConfigEditorDraggableList
-        var enabledWarnings: Property<MutableList<WarningReason>> = Property.of(mutableListOf())
+        var warnReason: MutableList<WarningReason> = mutableListOf()
 
         enum class WarningDisplayType(val displayName: String) {
             CHAT("Chat"),
@@ -57,17 +57,17 @@ class PestTrapConfig {
         @Expose
         @ConfigOption(name = "Warning Message", desc = "How the warning message should display")
         @ConfigEditorDropdown
-        var warningDisplayType: WarningDisplayType = WarningDisplayType.TITLE
+        var warnType: Property<WarningDisplayType> = Property.of(WarningDisplayType.TITLE)
 
         @Expose
         @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a warning.\nClear to disable sound.")
         @ConfigEditorText
-        var warningSound: Property<String> = Property.of("note.pling")
+        var sound: Property<String> = Property.of("note.pling")
 
 
         @Expose
         @ConfigOption(name = "Warning Interval", desc = "Reminder interval for messages in seconds.")
-        @ConfigEditorSlider(minValue = 1f, minStep = 1f, maxValue = 300f)
+        @ConfigEditorSlider(minValue = 10f, minStep = 1f, maxValue = 300f)
         var warningIntervalSeconds: Property<Int> = Property.of(0)
     }
 }

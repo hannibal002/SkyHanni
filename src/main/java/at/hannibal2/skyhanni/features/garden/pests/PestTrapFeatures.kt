@@ -6,11 +6,8 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestTrapConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestTrapDataUpdatedEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
 import at.hannibal2.skyhanni.features.garden.pests.PestTrapApi.PestTrapData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -18,7 +15,11 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import net.minecraft.client.audio.ISound
+import kotlin.math.max
 import kotlin.time.Duration.Companion.seconds
 
 private typealias WarningReason = PestTrapConfig.WarningConfig.WarningReason
@@ -28,113 +29,69 @@ private typealias WarningDisplayType = PestTrapConfig.WarningConfig.WarningDispl
 object PestTrapFeatures {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestTrap
-    private val sound get() = config.warning.warningSound
-    private val enabledTypes get() = config.warning.warningDisplayType
+    private val warnTypes get() = config.warning.warnType.get()
+    private val chatWarnEnabled: Boolean get() = warnTypes in listOf(WarningDisplayType.CHAT, WarningDisplayType.BOTH)
+    private val titleWarnEnabled: Boolean get() = warnTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
+    private val activeWarnings: MutableMap<WarningReason, Set<Int>> = enumMapOf()
 
-    private var actionPlot: GardenPlotApi.Plot? = null
-    private var activeTitle: TitleManager.TitleContext? = null
-    private var finalWarning: String? = null
-    private var fullSet: Set<Int> = emptySet()
-    private var noBaitSet: Set<Int> = emptySet()
+    private var nextWarningMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var warningSound: ISound? = null
-    private var nextWarning: SimpleTimeMark = SimpleTimeMark.farPast()
-    private var lastWarningCount: Int = 0
+
+    private fun getNextWarningMark() = SimpleTimeMark.now() + max(10, config.warning.warningIntervalSeconds.get()).seconds
+    private fun refreshSound() = config.warning.sound.get().takeIf(String::isNotEmpty)?.let { SoundUtils.createSound(it, 1f) }
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(sound) {
+        ConditionalUtils.onToggle(config.warning.sound) {
             warningSound = refreshSound()
-        }
-        warningSound = refreshSound()
-        ConditionalUtils.onToggle(config.warning.warningIntervalSeconds) {
-            nextWarning = SimpleTimeMark.now().plus(config.warning.warningIntervalSeconds.get().seconds)
-        }
-    }
+        }.also { warningSound = refreshSound() }
 
-    private fun refreshSound() = sound.get().takeIf { it.isNotEmpty() }?.let {
-        SoundUtils.createSound(it, 1f)
+        ConditionalUtils.onToggle(
+            config.warning.warningIntervalSeconds,
+            config.warning.warnType,
+        ) {
+            nextWarningMark = getNextWarningMark()
+        }.also { nextWarningMark = getNextWarningMark() }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestTrapDataUpdate(event: PestTrapDataUpdatedEvent) {
         val data = event.data
-        fullSet = data.checkFullWarnings()
-        noBaitSet = data.checkNoBaitWarnings()
 
-        ChatUtils.chat("Full set: ${fullSet.joinToString(", ")}")
-        ChatUtils.chat("No bait set: ${noBaitSet.joinToString(", ")}")
+        data.checkFullWarnings().takeIfNotEmpty()?.let {
+            activeWarnings[WarningReason.TRAP_FULL] = it
+        } ?: activeWarnings.remove(WarningReason.TRAP_FULL)
 
-        val warningsEnabled = config.warning.enabledWarnings.get()
-        val fullEnabled = fullSet.any() && warningsEnabled.contains(WarningReason.TRAP_FULL)
-        val noBaitEnabled = noBaitSet.any() && warningsEnabled.contains(WarningReason.NO_BAIT)
-
-        val warningCount = when {
-            fullEnabled && noBaitEnabled -> 2
-            fullEnabled || noBaitEnabled -> 1
-            else -> 0
-        }.takeIf { it != 0 } ?: return
-
-        val fullWarning = data.buildFullWarning(warningCount)
-        val noBaitWarning = data.buildNoBaitWarning(warningCount)
-        updateActionPlot()
-        finalWarning = listOf(fullWarning, noBaitWarning).joinToString(" §8| ")
+        data.checkNoBaitWarnings().takeIfNotEmpty()?.let {
+            activeWarnings[WarningReason.NO_BAIT] = it
+        } ?: activeWarnings.remove(WarningReason.NO_BAIT)
     }
 
-    private fun updateActionPlot() {
-        val storage = GardenApi.storage ?: return
-        val firstDataItem = storage.pestTrapStatus.firstOrNull { it.isFull || it.noBait }
-        actionPlot = firstDataItem?.plot
-    }
-
-    @HandleEvent
-    fun onTick() {
-        val finalWarning = finalWarning ?: return
-
-        val chatWarnEnabled = enabledTypes in listOf(WarningDisplayType.CHAT, WarningDisplayType.BOTH)
-        val titleWarnEnabled = enabledTypes in listOf(WarningDisplayType.TITLE, WarningDisplayType.BOTH)
-
-        lastWarningCount = (fullSet.size + noBaitSet.size).takeIf {
-            it != 0
-        }?.takeIf { it > lastWarningCount || !nextWarning.isInFuture() } ?: return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onSecondPassed(event: SecondPassedEvent) {
+        val applicableWarnings = activeWarnings.filter { it.key in config.warning.warnReason }
+        if (applicableWarnings.isEmpty() || nextWarningMark.isInFuture()) return
 
         warningSound?.playSound()
-        if (chatWarnEnabled) {
-            when (actionPlot) {
-                null -> ChatUtils.chat(finalWarning)
-                else -> ChatUtils.clickToActionOrDisable(
-                    message = finalWarning,
-                    config.warning::enabledWarnings,
-                    actionName = "warp to ${actionPlot?.name ?: "plot"}",
-                    action = {
-                        actionPlot?.sendTeleportTo()
-                    },
-                    oneTimeClick = true,
-                )
-            }
+        applicableWarnings.forEach { (reason, traps) ->
+            val displayFormat = reason.getDisplayFormat(traps)
+            if (titleWarnEnabled) TitleManager.sendTitle(displayFormat, height = 2.8, fontSize = 7f)
+            if (chatWarnEnabled) ChatUtils.chat(displayFormat, replaceSameMessage = true)
         }
-        if (titleWarnEnabled && activeTitle == null || activeTitle?.ended == true) {
-            activeTitle = TitleManager.sendTitle(finalWarning, height = 2.8, fontSize = 7f)
+
+        nextWarningMark = getNextWarningMark()
+    }
+
+    private fun WarningReason.getDisplayFormat(traps: Set<Int>): String {
+        val trapCount = traps.size
+        val pluralizedTraps = StringUtils.pluralize(trapCount, "Trap")
+        return when (this) {
+            WarningReason.TRAP_FULL -> "Full $pluralizedTraps: ${traps.getWarningFormat()}"
+            WarningReason.NO_BAIT -> "No Bait $pluralizedTraps: ${traps.getWarningFormat()}"
         }
-        nextWarning = SimpleTimeMark.now().plus(config.warning.warningIntervalSeconds.get().seconds)
     }
 
-    private fun List<PestTrapData>.getFullWarningJoinedString() =
-        this.filter { it.isFull }.joinToString("§8, ") { "§a#${it.number}" }
-
-    private fun List<PestTrapData>.buildFullWarning(warningCount: Int) = when (warningCount) {
-        2 -> "§cFull: ${this.getFullWarningJoinedString()}"
-        1 -> "§cPest Traps Full! ${this.getFullWarningJoinedString()}"
-        else -> "§cF: ${this.getFullWarningJoinedString()}"
-    }
-
-    private fun List<PestTrapData>.getNoBaitWarningJoinedString() =
-        this.filter { it.noBait }.joinToString("§8, ") { "§a#${it.number}" }
-
-    private fun List<PestTrapData>.buildNoBaitWarning(warningCount: Int) = when (warningCount) {
-        2 -> "§cNo Bait: ${this.getNoBaitWarningJoinedString()}"
-        1 -> "§cNo Bait in Pest Traps! ${this.getNoBaitWarningJoinedString()}"
-        else -> "§cNB: ${this.getNoBaitWarningJoinedString()}"
-    }
+    private fun Set<Int>.getWarningFormat() = joinToString("§8, ") { "§a#$it" }
 
     private fun List<PestTrapData>.checkFullWarnings() = this.filter {
         it.count >= PestTrapApi.MAX_PEST_COUNT_PER_TRAP
