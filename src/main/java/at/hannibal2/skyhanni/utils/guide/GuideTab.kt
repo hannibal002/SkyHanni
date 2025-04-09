@@ -28,19 +28,19 @@ class GuideTab(
     }
 
     fun select() {
-        selectColor = SELECTED_COLOR
+        selectColor = GuideGUI.SELECTED_COLOR
     }
 
     fun unSelect() {
-        selectColor = NOT_SELECTED_COLOR
+        selectColor = GuideGUI.NOT_SELECTED_COLOR
     }
 
-    fun isSelected() = selectColor == SELECTED_COLOR
+    fun isSelected() = selectColor == GuideGUI.SELECTED_COLOR
 
-    val width = if (isVertical) TAB_LONG_SIDE else TAB_SHORT_SIDE
-    val height = if (isVertical) TAB_SHORT_SIDE else TAB_LONG_SIDE
+    val width = if (isVertical) GuideGUI.TAB_LONG_SIDE else GuideGUI.TAB_SHORT_SIDE
+    val height = if (isVertical) GuideGUI.TAB_SHORT_SIDE else GuideGUI.TAB_LONG_SIDE
 
-    private var selectColor = NOT_SELECTED_COLOR
+    private var selectColor = GuideGUI.NOT_SELECTED_COLOR
 
     private val renderable = Renderable.clickable(
         object : Renderable {
