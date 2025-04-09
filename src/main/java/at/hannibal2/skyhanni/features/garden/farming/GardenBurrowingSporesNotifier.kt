@@ -26,11 +26,11 @@ object GardenBurrowingSporesNotifier {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
+        if (!sporeDropMessage.matches(event.message)) return
         val selected = config.burrowingSporesNotificationType
         val titleEnabled = selected in listOf(Type.TITLE, Type.BOTH)
         val blinkEnabled = selected in listOf(Type.BLINK, Type.BOTH)
         if (!titleEnabled && !blinkEnabled) return
-        if (!sporeDropMessage.matches(event.message)) return
 
         if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!")
         if (blinkEnabled) ItemBlink.setBlink(NeuItems.getItemStackOrNull("BURROWING_SPORES"), 3_000)
