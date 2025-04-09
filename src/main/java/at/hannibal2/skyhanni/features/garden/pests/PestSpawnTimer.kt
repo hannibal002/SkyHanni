@@ -77,15 +77,7 @@ object PestSpawnTimer {
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
 
-            if (ready) {
-                if (pestSpawned) return // prevent warning twice if tablist updates the same time as pest spawn
-                pestCooldownEndTime = SimpleTimeMark.farPast()
-                return
-            }
-
-            if (maxPests) {
-                return
-            }
+            if (ready || maxPests) return
 
             if (minutes == null && seconds == null) return
 
@@ -206,9 +198,12 @@ object PestSpawnTimer {
         val pestCooldown = if (!TabWidget.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
         } else {
-            var cooldownValue = if (!pestCooldownEndTime.isFarPast()) pestCooldownEndTime.timeUntil().format() else "§cUnknown"
-            if (ready) cooldownValue = "§aReady!"
-            if (maxPests) cooldownValue = "§cMax Pests!"
+            val cooldownValue = when {
+                maxPests -> "§cMax Pests!"
+                ready || pestCooldownEndTime.isInPast() -> "§aReady!"
+                pestCooldownEndTime.isFarPast() -> "§cUnknown"
+                else -> pestCooldownEndTime.timeUntil().format()
+            }
 
             "§ePest Cooldown: §b$cooldownValue"
         }
