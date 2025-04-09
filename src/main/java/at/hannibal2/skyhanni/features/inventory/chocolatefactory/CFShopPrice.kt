@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
-object ChocolateShopPrice {
+object CFShopPrice {
     private val config get() = CFApi.config.chocolateShopPrice
 
     private var display = emptyList<Renderable>()

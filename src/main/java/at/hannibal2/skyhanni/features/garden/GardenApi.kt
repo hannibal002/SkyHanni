@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -191,7 +191,7 @@ object GardenApi {
         FarmingContestApi.inInventory ||
         VisitorApi.inInventory ||
         FFGuideGUI.isInGui() ||
-        ChocolateShopPrice.inInventory ||
+        CFShopPrice.inInventory ||
         CFApi.inCf ||
         CFApi.chocolateFactoryPaused ||
         HoppityCollectionStats.inInventory ||

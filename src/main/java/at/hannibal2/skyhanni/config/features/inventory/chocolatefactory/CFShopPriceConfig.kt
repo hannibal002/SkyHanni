@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class CFPriceConfig {
+class CFShopPriceConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show chocolate to coin prices inside the Chocolate Shop inventory.")
     @ConfigEditorBoolean

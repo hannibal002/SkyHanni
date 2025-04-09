@@ -150,7 +150,7 @@ object CFCustomReminder {
         event.transform(72, "inventory.chocolateFactory.customReminder.position", Position::migrate)
     }
 
-    private fun inChocolateMenu() = ChocolateShopPrice.inInventory || CFApi.inCf ||
+    private fun inChocolateMenu() = CFShopPrice.inInventory || CFApi.inCf ||
         CFApi.chocolateFactoryPaused
 
     private fun setReminder(target: Long, name: String) {

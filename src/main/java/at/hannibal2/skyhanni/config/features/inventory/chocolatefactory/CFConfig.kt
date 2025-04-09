@@ -54,7 +54,7 @@ class CFConfig {
     @Expose
     @ConfigOption(name = "Stray Rabbit Warning", desc = "")
     @Accordion
-    var rabbitWarning: CFStrayWarningConfig = CFStrayWarningConfig()
+    var rabbitWarning: CFStrayRabbitWarningConfig = CFStrayRabbitWarningConfig()
 
     @Expose
     @ConfigOption(name = "Upgrade Warnings", desc = "")
@@ -64,7 +64,7 @@ class CFConfig {
     @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
     @Accordion
-    var chocolateShopPrice: CFPriceConfig = CFPriceConfig()
+    var chocolateShopPrice: CFShopPriceConfig = CFShopPriceConfig()
 
     @Expose
     @ConfigOption(name = "Chocolate Factory Keybinds", desc = "")
