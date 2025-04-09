@@ -92,7 +92,7 @@ object PestSpawn {
     private fun pestSpawn(amount: Int, plotNames: List<String>, unknownAmount: Boolean) {
         PestSpawnEvent(amount, plotNames, unknownAmount).post()
 
-        if (unknownAmount) return // todo make this work with offline pest spawn messages
+        if (unknownAmount) return // TODO: make this work with offline pest spawn messages
         val plotName = plotNames.firstOrNull() ?: error("first plot name is null")
         val pestName = StringUtils.pluralize(amount, "Pest")
         val message = "§e$amount §a$pestName Spawned in §b$plotName§a!"

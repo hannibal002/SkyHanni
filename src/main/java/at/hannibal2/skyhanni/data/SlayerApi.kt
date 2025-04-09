@@ -136,7 +136,7 @@ object SlayerApi {
         }
     }
 
-    // TODO USE SH-REPO
+    // TODO: USE SH-REPO
     private fun checkSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
         "Graveyard",
         "Coal Mine",

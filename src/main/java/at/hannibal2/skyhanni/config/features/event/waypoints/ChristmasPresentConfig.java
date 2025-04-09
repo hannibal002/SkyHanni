@@ -13,7 +13,7 @@ public class ChristmasPresentConfig {
     @FeatureToggle
     public boolean allWaypoints = false;
 
-    // TODO confirm if this toggle actually does anything, ar there helper waypoints at all?
+    // TODO: confirm if this toggle actually does anything, are there helper waypoints at all?
     @Expose
     @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints.")
     @ConfigEditorBoolean

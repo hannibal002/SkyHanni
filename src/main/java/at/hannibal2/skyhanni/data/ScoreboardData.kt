@@ -24,8 +24,8 @@ object ScoreboardData {
 
     var sidebarLinesFormatted: List<String> = emptyList()
 
-    private var sidebarLines: List<String> = emptyList() // TODO rename to raw
-    var sidebarLinesRaw: List<String> = emptyList() // TODO delete
+    private var sidebarLines: List<String> = emptyList() // TODO: rename to raw
+    var sidebarLinesRaw: List<String> = emptyList() // TODO: delete
     val objectiveTitle: String get() =
         MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
 
@@ -163,7 +163,7 @@ object ScoreboardData {
         //#endif
     }
 
-    // TODO USE SH-REPO
+    // TODO: USE SH-REPO
     private val splitIcons = listOf(
         "\uD83C\uDF6B",
         "\uD83D\uDCA3",

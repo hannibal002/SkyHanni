@@ -26,10 +26,10 @@ object HighlightMiningCommissionMobs {
 
     private val config get() = SkyHanniMod.feature.mining
 
-    // TODO Commission API
+    // TODO: Commission API
     private var active = listOf<MobType>()
 
-    // TODO Commission API
+    // TODO: Commission API
     enum class MobType(val commissionName: String, val isMob: (EntityLivingBase) -> Boolean) {
 
         // Dwarven Mines
@@ -75,7 +75,7 @@ object HighlightMiningCommissionMobs {
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
 
-        // TODO Commissin API
+        // TODO: Commissin API
         MobType.entries.filter { type ->
             event.tabList.findLast { line -> line.removeColor().trim().startsWith(type.commissionName) }
                 ?.let { !it.endsWith("§aDONE") }

@@ -34,7 +34,7 @@ import kotlin.time.times
 @SkyHanniModule
 object ChatUtils {
 
-    // TODO log based on chat category (error, warning, debug, user error, normal)
+    // TODO: log based on chat category (error, warning, debug, user error, normal)
     private val log = LorenzLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
@@ -190,7 +190,7 @@ object ChatUtils {
 
     private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
 
-    // TODO kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
+    // TODO: kill Detekt's Missing newline after "{" check and then format this function in a kotlin typical way again
     private fun getUniqueMessageIdForString(string: String): Int {
         return uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
     }

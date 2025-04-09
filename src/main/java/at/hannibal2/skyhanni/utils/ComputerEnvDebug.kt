@@ -55,7 +55,7 @@ object ComputerEnvDebug {
         }
     }
 
-    // TODO put into repo
+    // TODO: USE SH-REPO
     private fun findLauncher(firstStack: String): Pair<String?, Boolean> {
         if (firstStack.contains("net.fabricmc.devlaunchinjector.Main.main")) {
             return Pair("Dev Env", false)

@@ -42,7 +42,7 @@ object GardenCropSpeed {
     var latestPumpkinDicer = 0.0
 
     init {
-        // TODO use SecondPassedEvent + passedSince
+        // TODO: use SecondPassedEvent + passedSince
         fixedRateTimer(name = "skyhanni-crop-milestone-speed", period = 1000L) {
             if (isEnabled()) {
                 if (GardenApi.mushroomCowPet) {

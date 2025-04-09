@@ -73,7 +73,7 @@ object BlazeSlayerDaggerHelper {
         checkActiveDagger()
         lastNearest = findNearest()
 
-        val first = Dagger.entries[config.firstDagger.ordinal] // todo avoid ordinal
+        val first = Dagger.entries[config.firstDagger.ordinal] // TODO: avoid ordinal
         val second = first.other()
 
         textTop = format(holding, true, first) + " " + format(holding, true, second)

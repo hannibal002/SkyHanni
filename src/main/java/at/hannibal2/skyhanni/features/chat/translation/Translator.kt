@@ -27,7 +27,7 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO split into two classes: TranslatorCommand and GoogleTranslator. only communicates via getTranslationFromEnglish and getTranslationToEnglish
+// TODO: split into two classes: TranslatorCommand and GoogleTranslator. only communicates via getTranslationFromEnglish and getTranslationToEnglish
 @SkyHanniModule
 object Translator {
 
@@ -40,7 +40,7 @@ object Translator {
         if (!isEnabled()) return
 
         val message = event.message
-        // TODO use PlayerAllChatEvent and other player chat events
+        // TODO: use PlayerAllChatEvent and other player chat events
         if (message.getPlayerNameFromChatMessage() == null) return
 
         val editedComponent = event.chatComponent.transformIf({ siblings.isNotEmpty() }) { siblings.last() }
@@ -119,7 +119,7 @@ object Translator {
         targetLanguage: String,
         sourceLanguage: String = "auto",
     ): Array<String>? {
-        // TODO add &dj=1 to use named json
+        // TODO: add &dj=1 to use named json
         val encode = URLEncoder.encode(message, "UTF-8")
         val url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=$sourceLanguage&tl=$targetLanguage&q=$encode"
 

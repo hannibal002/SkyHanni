@@ -170,7 +170,7 @@ object MineshaftPityDisplay {
         return chance
     }
 
-    // TODO extract into multiple smaller functions
+    // TODO: extract into multiple smaller functions
     private fun update() {
         val pityCounter = calculateCounter()
         val chance = calculateChance(pityCounter)

@@ -34,7 +34,7 @@ object LivingCaveSnakeFeatures {
 
     private val FROZEN_WATER_PUNGI = "FROZEN_WATER_PUNGI".toInternalName()
 
-    // TODO maybe move this in repo
+    // TODO: maybe move this in repo
     private val pickaxes = setOf(
         "SELF_RECURSIVE_PICKAXE",
         "ANTI_SENTIENT_PICKAXE",

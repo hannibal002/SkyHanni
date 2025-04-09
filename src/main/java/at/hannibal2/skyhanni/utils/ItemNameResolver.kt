@@ -67,7 +67,7 @@ object ItemNameResolver {
                 ItemResolutionQuery.findInternalNameByDisplayName(itemName, true)?.let {
 
                     // This fixes a NEU bug with §9Hay Bale (cosmetic item)
-                    // TODO remove workaround when this is fixed in neu
+                    // TODO: remove workaround when this is fixed in neu
                     val rawInternalName = if (it == "HAY_BALE") "HAY_BLOCK" else it
                     rawInternalName.toInternalName()
                 } ?: return null
@@ -107,7 +107,7 @@ object ItemNameResolver {
             val tier = group("tier")
             return "ULTIMATE_REITERATE;$tier".toInternalName()
         }
-        // TODO USE SH-REPO
+        // TODO: USE SH-REPO
         return originalName.toInternalName()
     }
 

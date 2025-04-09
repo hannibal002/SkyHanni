@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ObjectHighlighterConfig {
-    // TODO move some stuff from DungeonConfig into this
+    // TODO: move some stuff from DungeonConfig into this
     @Expose
     @ConfigOption(name = "Starred Mobs", desc = "")
     @Accordion
@@ -24,7 +24,7 @@ class ObjectHighlighterConfig {
         var highlight: Property<Boolean> = Property.of(false)
 
         /*
-        TODO for someone who has time
+        TODO: for someone who has time
         @Expose
         @ConfigOption(name = "Show Outline", desc = "Shows only a outline instead of a full highlight.")
         @ConfigEditorBoolean

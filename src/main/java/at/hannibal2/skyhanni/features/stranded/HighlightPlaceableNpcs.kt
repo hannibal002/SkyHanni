@@ -22,7 +22,7 @@ object HighlightPlaceableNpcs {
 
     private val patternGroup = RepoPattern.group("stranded.highlightplacement")
 
-    // TODO Please add regex tests
+    // TODO: Please add regex tests
     private val locationPattern by patternGroup.pattern(
         "location",
         "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]",

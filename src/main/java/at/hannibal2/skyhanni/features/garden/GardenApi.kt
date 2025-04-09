@@ -76,7 +76,7 @@ object GardenApi {
     private val cropIconCache: TimeLimitedCache<String, ItemStack> = TimeLimitedCache(10.minutes)
     private val barnArea = AxisAlignedBB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
 
-    // TODO USE SH-REPO
+    // TODO: USE SH-REPO
     private val otherToolsList = listOf(
         "BASIC_GARDENING_HOE",
         "ADVANCED_GARDENING_AXE",

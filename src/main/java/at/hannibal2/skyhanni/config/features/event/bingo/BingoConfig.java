@@ -20,7 +20,7 @@ public class BingoConfig {
     @Accordion
     public CompactChatConfig compactChat = new CompactChatConfig();
 
-    // TODO move into own category
+    // TODO: move into own category
     @Expose
     @ConfigOption(name = "Minion Craft Helper", desc = "Show how many more items you need to upgrade the minion in your inventory. Especially useful for Bingo.")
     @ConfigEditorBoolean

@@ -150,7 +150,7 @@ class DebugConfig {
     @ConfigEditorBoolean
     var currentAreaDebug: Boolean = true
 
-    // TODO rename to rayTracedOreBlock
+    // TODO: rename to rayTracedOreBlock
     @Expose
     @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at.")
     @ConfigEditorBoolean

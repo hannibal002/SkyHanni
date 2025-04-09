@@ -96,7 +96,7 @@ object GhostTracker {
         @Expose
         var maxKillCombo = 0L
 
-        // TODO rename to combatXPGained
+        // TODO: rename to combatXPGained
         @Expose
         var combatXpGained = 0L
 

@@ -52,13 +52,13 @@ public class MiscConfig {
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
-    // TODO maybe we can migrate this already
+    // TODO: maybe we can migrate this already
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
     @ConfigOption(name = "Non-God Pot Effects", desc = "")
     @Accordion
-    // TODO rename nonGodPotEffect
+    // TODO: rename nonGodPotEffect
     public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
 
     @Expose
@@ -162,7 +162,7 @@ public class MiscConfig {
     @ConfigOption(name = "Armor Stands", desc = "Hide armor stands that are sometimes visible for a fraction of a second.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to hideTemporaryArmorStands
+    // TODO: rename to hideTemporaryArmorStands
     public boolean hideTemporaryArmorstands = true;
 
     @Expose
@@ -188,7 +188,7 @@ public class MiscConfig {
     @SearchTag("skyblockxp skyblocklevel level lvl")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to skyblockXPBar
+    // TODO: rename to skyblockXPBar
     public boolean skyblockXpBar = false;
 
     @Expose
@@ -198,7 +198,7 @@ public class MiscConfig {
     @FeatureToggle
     public boolean xpInInventory = true;
 
-    // TODO move into scoreboard accordion
+    // TODO: move into scoreboard accordion
     @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
     @ConfigEditorBoolean
@@ -400,7 +400,7 @@ public class MiscConfig {
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to userLuck
+    // TODO: rename to userLuck
     public boolean userluckEnabled = true;
 
     @Expose

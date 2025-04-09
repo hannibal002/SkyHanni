@@ -63,7 +63,7 @@ object AreaMiniBossFeatures {
         miniBossType = null
     }
 
-    // TODO move to repo
+    // TODO: USE SH-REPO
     private enum class AreaMiniBossType(
         val displayName: String,
         val color: LorenzColor,

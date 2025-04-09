@@ -115,7 +115,7 @@ object FishingApi {
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        // TODO correct rod type per island water/lava
+        // TODO: correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
         holdingLavaRod = event.newItem.isLavaRod()
         holdingWaterRod = event.newItem.isWaterRod()

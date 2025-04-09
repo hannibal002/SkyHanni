@@ -83,7 +83,7 @@ object TunnelsMaps {
 
     private lateinit var fairySouls: Map<String, GraphNode>
 
-    // TODO what is this? why is there a difference? can this be replaced with GraphNodeTag.GRIND_ORES?
+    // TODO: what is this? why is there a difference? can this be replaced with GraphNodeTag.GRIND_ORES?
     private lateinit var newGemstones: Map<String, List<GraphNode>>
     private lateinit var oldGemstones: Map<String, List<GraphNode>>
     private lateinit var normalLocations: Map<String, List<GraphNode>>

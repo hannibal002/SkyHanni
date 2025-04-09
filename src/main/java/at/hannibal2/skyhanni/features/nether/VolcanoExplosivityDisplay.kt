@@ -36,7 +36,7 @@ object VolcanoExplosivityDisplay {
             display = ""
             return
         }
-        // TODO merge widget pattern with statusPattern
+        // TODO: merge widget pattern with statusPattern
         statusPattern.matchMatcher(event.lines.first()) {
             display = "§bVolcano Explosivity§7: ${group("status")}"
         }

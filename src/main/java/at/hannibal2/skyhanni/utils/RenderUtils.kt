@@ -117,7 +117,7 @@ object RenderUtils {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         GlStateManager.pushMatrix()
-        // TODO don't use z
+        // TODO: don't use z
         GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
         Gui.drawRect(x, y, x + 16, y + 16, color.rgb)
         GlStateManager.popMatrix()
@@ -880,7 +880,7 @@ object RenderUtils {
         val dZ = (z - renderOffsetZ) * (z - renderOffsetZ)
         val distToPlayerSq = dX + dY + dZ
         var distToPlayer = sqrt(distToPlayerSq)
-        // TODO this is optional maybe?
+        // TODO: this is optional maybe?
         distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
 
         if (distToPlayer < hideTooCloseAt) return
@@ -964,7 +964,7 @@ object RenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
-        // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
+        // TODO: add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
         LineDrawer.draw3D(partialTicks) {
             drawEdges(axisAlignedBB, color, lineWidth, depth)
         }
@@ -1150,7 +1150,7 @@ object RenderUtils {
         }
 
         fun drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
-            // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
+            // TODO: add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
             for ((p1, p2) in axisAlignedBB.calculateEdges()) {
                 draw3DLine(p1, p2, color, lineWidth, depth)
             }

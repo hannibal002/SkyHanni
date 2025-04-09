@@ -64,7 +64,7 @@ object MiningCommissionsBlocksColor {
     private var dirty = false
     private var replaceBlocksMapCache = mutableMapOf<IBlockState, IBlockState>()
 
-    // TODO Commission API
+    // TODO: Commission API
     @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         for (block in CommissionBlock.entries) {
@@ -80,7 +80,7 @@ object MiningCommissionsBlocksColor {
 
     private val ignoredTabListCommissions = TimeLimitedSet<CommissionBlock>(5.seconds)
 
-    // TODO Commission API
+    // TODO: Commission API
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!enabled) return

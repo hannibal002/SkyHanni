@@ -303,7 +303,7 @@ open class VisualWordGui : GuiScreen() {
 
                 GlStateManager.scale(0.75f, 0.75f, 1f)
 
-                // TODO remove more code duplication
+                // TODO: remove more code duplication
                 drawUnmodifiedString(
                     "§bThe top line of each section",
                     (guiLeft + 10) * inverseScale,

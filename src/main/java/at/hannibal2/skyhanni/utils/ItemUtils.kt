@@ -103,7 +103,7 @@ object ItemUtils {
             allItems[internalName] = stats
         }
 
-        // TODO maybe create a new enum for item stats?
+        // TODO: maybe create a new enum for item stats?
         unknownStats.remove("WEAPON_ABILITY_DAMAGE") // stat exists only on items, not as player stat
         unknownStats.removeIfKey { it.startsWith("RIFT_") } // rift stats are not in SkyblockStat enum
 
@@ -112,7 +112,7 @@ object ItemUtils {
             ErrorManager.logErrorStateWithData(
                 "Found unknown skyblock stats on items, please report this in discord",
                 "found $name via Hypixel Item API that are not in enum SkyblockStat",
-                // TODO logErrorStateWithData should accept a map of extra data directly
+                // TODO: logErrorStateWithData should accept a map of extra data directly
                 extraData = unknownStats.map { it.key to it.value }.toTypedArray(),
                 betaOnly = true,
             )
@@ -231,12 +231,12 @@ object ItemUtils {
         return this
     }
 
-    // TODO change else janni is sad
+    // TODO: change else janni is sad
     fun ItemStack.isCoopSoulBound(): Boolean = getLore().any {
         it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
     }
 
-    // TODO change else janni is sad
+    // TODO: change else janni is sad
     fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
@@ -381,7 +381,7 @@ object ItemUtils {
         stack.tagCompound = tag
         return stack
         //#else
-        //$$ // todo we are ignoring damage for now, idk what to do for this
+        //$$ // TODO: we are ignoring damage for now, idk what to do for this
         //$$ val stack = ItemStack(item, amount)
         //$$ stack.setCustomItemName(displayName)
         //$$ stack.setLore(lore)
@@ -745,7 +745,7 @@ object ItemUtils {
                 matches.add(internalName)
             }
         }
-        // TODO add all enchantments to NeuItems.allItemsCache
+        // TODO: add all enchantments to NeuItems.allItemsCache
         // somehow, enchantments arent part of NeuItems.allItemsCache atm
         // itemNameCache contains bazaar enchantments
         // the non bz enchantments are only in the cache after found in game
@@ -847,7 +847,7 @@ object ItemUtils {
     }
 
     // Taken from NEU
-    // TODO add cache
+    // TODO: add cache
     fun getCoinItemStack(coinAmount: Number): ItemStack {
         val amount = coinAmount.toDouble()
         var uuid = "2070f6cb-f5db-367a-acd0-64d39a7e5d1b"

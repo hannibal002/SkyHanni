@@ -243,7 +243,7 @@ object RepoManager {
 
     private fun reloadRepository(answerMessage: String = "") {
         if (!shouldManuallyReload) return
-        // TODO move away
+        // TODO: move away
         ErrorManager.resetCache()
         error = false
         successfulConstants.clear()

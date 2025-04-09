@@ -26,14 +26,14 @@ enum class SkyblockStat(
     private val hypxelId: String? = null,
 ) {
     DAMAGE("§c❁", "", ""), // Weapon only
-    HEALTH("§c❤", " Health: §r§c❤(?<value>\\d+)(?: .*)?", " §c❤ Health §f(?<value>\\d+)(?: .*)?"), // TODO get from action bar
-    DEFENSE("§a❈", " Defense: §r§a❈(?<value>\\d+)(?: .*)?", " §a❈ Defense §f(?<value>\\d+)(?: .*)?"), // TODO get from action bar
+    HEALTH("§c❤", " Health: §r§c❤(?<value>\\d+)(?: .*)?", " §c❤ Health §f(?<value>\\d+)(?: .*)?"), // TODO: get from action bar
+    DEFENSE("§a❈", " Defense: §r§a❈(?<value>\\d+)(?: .*)?", " §a❈ Defense §f(?<value>\\d+)(?: .*)?"), // TODO: get from action bar
     STRENGTH("§c❁", " Strength: §r§c❁(?<value>\\d+)(?: .*)?", " §c❁ Strength §f(?<value>\\d+)(?: .*)?"),
     INTELLIGENCE(
         "§b✎",
         " Intelligence: §r§b✎(?<value>\\d+)(?: .*)?",
         " §b✎ Intelligence §f(?<value>\\d+)(?: .*)?",
-    ), // TODO get from action bar
+    ), // TODO: get from action bar
     CRIT_DAMAGE(
         "§9☠", " Crit Damage: §r§9☠(?<value>\\d+)(?: .*)?", " §9☠ Crit Damage §f(?<value>\\d+)(?: .*)?",
         hypxelId = "CRITICAL_DAMAGE",
@@ -59,7 +59,7 @@ enum class SkyblockStat(
     TRUE_DEFENSE("§7❂", " True Defense: §r§f❂(?<value>\\d+)(?: .*)?", " §f❂ True Defense §f(?<value>\\d+)(?: .*)?"),
     SWING_RANGE("§eⓈ", " Swing Range: §r§eⓈ(?<value>\\d+)(?: .*)?", " §eⓈ Swing Range §f(?<value>\\d+)(?: .*)?"),
 
-    // TODO add the way sba did get it (be careful with 500+ Speed)
+    // TODO: add the way sba did get it (be careful with 500+ Speed)
     SPEED(
         "§f✦", " Speed: §r§f✦(?<value>\\d+)(?: .*)?", " §f✦ Speed §f(?<value>\\d+)(?: .*)?",
         hypxelId = "WALK_SPEED",

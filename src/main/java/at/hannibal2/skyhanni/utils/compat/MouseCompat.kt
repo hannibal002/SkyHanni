@@ -102,7 +102,7 @@ object MouseCompat {
     //$$ fun getEventX(): Int = lastEventX
     //$$ fun getEventY(): Int = lastEventY
     //$$
-    //$$ //TODO check if the .toInt() is correct
+    //$$ //TODO: check if the .toInt() is correct
     //$$ fun getEventDY(): Int {
     //$$     val delta = eventDY
     //$$     eventDY = 0.0

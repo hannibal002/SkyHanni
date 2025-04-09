@@ -166,7 +166,7 @@ class MobFinder {
         }
 
         if (floor2secondPhase && entity is EntityOtherPlayerMP) {
-            // TODO only show scarf after (all/at least x) summons are dead?
+            // TODO: only show scarf after (all/at least x) summons are dead?
             if (entity.name == "Scarf ") {
                 return EntityResult(
                     floor2secondPhaseSpawnTime,
@@ -353,7 +353,7 @@ class MobFinder {
         }
     }
 
-    // TODO testing and use sidebar data
+    // TODO: testing and use sidebar data
     @Suppress("UnusedParameter")
     private fun tryAddEntityDragon(entity: EntityLivingBase) = when {
         IslandType.THE_END.isInIsland() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)

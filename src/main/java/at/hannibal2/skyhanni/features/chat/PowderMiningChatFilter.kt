@@ -33,7 +33,7 @@ object PowderMiningChatFilter {
 
     val patternGroup = RepoPattern.group("filter.powdermining")
 
-    // TODO rename to "openedRewards" ?
+    // TODO: rename to "openedRewards" ?
     private var unclosedRewards = false
 
     /**

@@ -70,19 +70,19 @@ object MinionUpgradeHelper {
         resetItems()
     }
 
-    // TODO make this event not necessary here.
+    // TODO: make this event not necessary here.
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         resetItems()
     }
 
-    // TODO make this event not necessary here.
+    // TODO: make this event not necessary here.
     @HandleEvent
     fun onWorldChange() {
         resetItems()
     }
 
-    // TODO make this event not necessary here.
+    // TODO: make this event not necessary here.
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (lastMinionOpen.passedSince() > 2.seconds) {

@@ -119,7 +119,7 @@ object HoppityCallWarning {
             "§cBlocked picking up Hoppity without enough coins!",
             config::ensureCoins,
             actionName = "open bank menu",
-            // TODO if no booster cookie active, suggest to warp to hub/path find to bank. ideally into an utils
+            // TODO: if no booster cookie active, suggest to warp to hub/path find to bank. ideally into an utils
             action = { HypixelCommands.bank() },
         )
     }

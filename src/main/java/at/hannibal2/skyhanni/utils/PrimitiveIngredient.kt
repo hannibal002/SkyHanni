@@ -27,6 +27,6 @@ class PrimitiveIngredient(val internalName: NeuInternalName, val count: Double =
 
     fun toPair() = Pair(internalName, count)
 
-    // TODO should maybe throw an error when trying to use with internalName == SKYBLOCK_COIN
+    // TODO: should maybe throw an error when trying to use with internalName == SKYBLOCK_COIN
     fun toPrimitiveItemStack() = PrimitiveItemStack(internalName, count.toInt())
 }

@@ -70,7 +70,7 @@ object NeuItems {
             // because builder blocks can have the same display name as normal items.
             if (rawInternalName.startsWith("BUILDER_")) continue
 
-            // TODO remove all except one of them once neu is consistent
+            // TODO: remove all except one of them once neu is consistent
             name = name.removePrefix("§f§f§7[lvl 1➡100] ")
             name = name.removePrefix("§f§f§7[lvl {lvl}] ")
             name = name.removePrefix("§7[lvl 1➡100] ")
@@ -104,7 +104,7 @@ object NeuItems {
     fun transHypixelNameToInternalName(hypixelId: String): NeuInternalName =
         ItemResolutionQuery.transformHypixelBazaarToNeuItemId(hypixelId).toInternalName()
 
-    //  TODO add cache
+    // TODO: add cache
     fun NeuInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery()
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
@@ -228,7 +228,7 @@ object NeuItems {
         if (!PlatformUtils.isNeuLoaded()) return false
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
-        // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
+        // TODO: add RecipeSearchOverlay via RecalculatingValue and reflection
         // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
         if (NEUOverlay.searchBarHasFocus) return true

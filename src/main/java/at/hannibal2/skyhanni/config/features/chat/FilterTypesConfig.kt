@@ -159,7 +159,7 @@ class FilterTypesConfig {
     @FeatureToggle
     var teleportPads: Boolean = false
 
-    // TODO remove
+    // TODO: remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
     @ConfigEditorBoolean

@@ -56,7 +56,7 @@ object HighlightVisitorsOutsideOfGarden {
     }
 
     private fun isVisitor(entity: Entity): Boolean {
-        // todo migrate to Skyhanni IslandType
+        // TODO: migrate to Skyhanni IslandType
         val mode = HypixelData.mode
         val possibleJsons = visitorJson[mode] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)

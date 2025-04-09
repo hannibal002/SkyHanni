@@ -66,7 +66,7 @@ val GuiChest.container: Container
 
 object InventoryCompat {
 
-    // TODO add cache that persists until the next gui/window open/close packet is sent/received
+    // TODO: add cache that persists until the next gui/window open/close packet is sent/received
     fun getOpenChestName(): String {
         val currentScreen = Minecraft.getMinecraft().currentScreen
         //#if MC < 1.16

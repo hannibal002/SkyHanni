@@ -40,7 +40,7 @@ object DanceRoomHelper {
             if (instructions.isEmpty()) {
                 add("§cError fetching Dance Room Instructions!")
                 add("§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo")
-                // TODO make clickable
+                // TODO: make clickable
             }
             for ((lineIndex, line) in instructions.withIndex()) {
                 addLine(lineIndex, line)?.let { add(it) }

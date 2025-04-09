@@ -56,14 +56,14 @@ object PurseApi {
         }
     }
 
-    // TODO add more causes in the future (e.g. ah/bz/bank)
+    // TODO: add more causes in the future (e.g. ah/bz/bank)
     private fun getCause(diff: Double): PurseChangeCause {
         if (diff > 0) {
             if (diff == 1.0) {
                 return PurseChangeCause.GAIN_TALISMAN_OF_COINS
             }
 
-            // TODO relic of coins support
+            // TODO: relic of coins support
             if (diff == 15.million || diff == 100.million) {
                 return PurseChangeCause.GAIN_DICE_ROLL
             }

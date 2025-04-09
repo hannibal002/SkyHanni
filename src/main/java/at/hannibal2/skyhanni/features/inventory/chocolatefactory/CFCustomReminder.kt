@@ -107,7 +107,7 @@ object CFCustomReminder {
         setReminder(cost, name)
     }
 
-    // TODO add support for prestige
+    // TODO: add support for prestige
     private fun getCostAndName(item: ItemStack): Pair<Long, String>? {
         val list = item.getLore()
         val cost = CFApi.getChocolateBuyCost(list)

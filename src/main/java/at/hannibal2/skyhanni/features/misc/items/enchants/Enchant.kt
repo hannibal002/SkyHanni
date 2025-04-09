@@ -40,7 +40,7 @@ open class Enchant : Comparable<Enchant> {
     open fun getFormat(level: Int, itemStack: ItemStack? = null): String {
         val config = SkyHanniMod.feature.inventory.enchantParsing
 
-        // TODO change color to string (support for bold)
+        // TODO: change color to string (support for bold)
         var color = when {
             level >= maxLevel -> config.perfectEnchantColor
             level > goodLevel -> config.greatEnchantColor
@@ -51,7 +51,7 @@ open class Enchant : Comparable<Enchant> {
         // Exceptions
         color = checkExceptions(color, level, itemStack)
 
-        // TODO when chroma is disabled maybe use the neu chroma style instead of gold
+        // TODO: when chroma is disabled maybe use the neu chroma style instead of gold
         if (color.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
         return color.get().getChatColor()
     }

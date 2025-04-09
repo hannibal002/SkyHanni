@@ -47,7 +47,7 @@ object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
 
-    // TODO add regex tests
+    // TODO: add regex tests
     private val serverNameConnectionPattern by patternGroup.pattern(
         "servername.connection",
         "(?<prefix>.+\\.)?hypixel\\.net",
@@ -299,7 +299,7 @@ object HypixelData {
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
     private val jsonBracketPattern = "^\\{.+}".toPattern()
 
-    // todo convert to proper json object
+    // TODO: convert to proper json object
     fun checkForLocraw(message: String) {
         jsonBracketPattern.matchMatcher(message.removeColor()) {
             try {
@@ -391,7 +391,7 @@ object HypixelData {
         }
     }
 
-    // TODO rewrite everything in here
+    // TODO: rewrite everything in here
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
@@ -566,7 +566,7 @@ object HypixelData {
             newIsland = getIslandType(foundIsland, guesting)
         }
 
-        // TODO don't send events when one of the arguments is none, at least when not on sb anymore
+        // TODO: don't send events when one of the arguments is none, at least when not on sb anymore
         if (skyBlockIsland != newIsland) {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland

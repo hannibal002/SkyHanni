@@ -68,7 +68,7 @@ object MobDetection {
         MobData.retries.clear()
     }
 
-    // TODO this is a unused debug function. maybe connect with a debug commmand or remove
+    // TODO: this is a unused debug function. maybe connect with a debug commmand or remove
     private fun watchdog() {
         val world = MinecraftCompat.localWorldOrNull ?: return
         if (MobData.retries.any { it.value.entity.worldObj != world }) {

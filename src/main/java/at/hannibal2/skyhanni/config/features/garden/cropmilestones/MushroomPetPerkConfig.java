@@ -18,7 +18,7 @@ import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.Mushro
 import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry.TIME;
 import static at.hannibal2.skyhanni.config.features.garden.cropmilestones.MushroomPetPerkConfig.MushroomTextEntry.TITLE;
 
-// TODO moulconfig runnable support
+// TODO: moulconfig runnable support
 public class MushroomPetPerkConfig {
     @Expose
     @ConfigOption(
@@ -44,7 +44,7 @@ public class MushroomPetPerkConfig {
 
     public enum MushroomTextEntry implements HasLegacyId {
         TITLE("§6Mooshroom Cow Perk", 0),
-        // TODO change to mushroom milestone
+        // TODO: change to mushroom milestone
         MUSHROOM_TIER("§7Mushroom Milestone 8", 1),
         NUMBER_OUT_OF_TOTAL("§e6,700§8/§e15,000", 2),
         TIME("§7In §b12m 34s", 3),

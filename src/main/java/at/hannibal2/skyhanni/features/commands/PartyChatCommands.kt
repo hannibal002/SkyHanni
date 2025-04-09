@@ -128,7 +128,7 @@ object PartyChatCommands {
     }
 
     /**
-     * TODO use a utils function for add/remove/list/clear
+     * TODO: use a utils function for add/remove/list/clear
      * function(args: Array<String>, list: List<String>, listName: String,
      * precondition(string): () -> Boolean, onAdd(string), onRemove(string), onList(list))
      */

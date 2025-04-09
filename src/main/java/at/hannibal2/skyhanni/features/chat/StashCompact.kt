@@ -103,7 +103,7 @@ object StashCompact {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
-        // TODO make a system for detecting message "groups" (multiple consecutive messages)
+        // TODO: make a system for detecting message "groups" (multiple consecutive messages)
         materialCountPattern.matchMatcher(event.message) {
             currentType = fromGroup() ?: return@matchMatcher
             val currentType = currentType ?: return@matchMatcher

@@ -121,7 +121,7 @@ object CFShopPrice {
         if (callUpdate) updateProducts()
 
         val multiplier = 1.million
-        // TODO merge core with SkyMartCopperPrice into a utils
+        // TODO: merge core with SkyMartCopperPrice into a utils
         val table = mutableListOf<DisplayTableEntry>()
 
         for (product in products) {
@@ -165,10 +165,10 @@ object CFShopPrice {
 
         display = buildList {
             add(Renderable.string("§e§lCoins per million chocolate§f:"))
-            // TODO update this value every second
-            // TODO add time until can afford
+            // TODO: update this value every second
+            // TODO: add time until can afford
             add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
-            // TODO add chocolate spend needed for next milestone
+            // TODO: add chocolate spend needed for next milestone
             add(Renderable.string("§eChocolate spent: §6${chocolateSpent.addSeparators()}"))
             add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale.toDouble()))
         }

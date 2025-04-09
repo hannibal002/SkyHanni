@@ -114,7 +114,7 @@ object CFBarnManager {
 
         val profileStorage = profileStorage ?: return
 
-        // TODO rename maxRabbits to maxUnlockedBarnSpace
+        // TODO: rename maxRabbits to maxUnlockedBarnSpace
         if (profileStorage.maxRabbits >= CFApi.maxRabbits) return
 
         if (!isBarnFull()) return

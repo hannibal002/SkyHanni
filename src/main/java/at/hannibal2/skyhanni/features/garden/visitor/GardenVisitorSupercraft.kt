@@ -74,7 +74,7 @@ object GardenVisitorSupercraft {
         if (amountInSacks >= amount) return
 
         val ingredients = NeuItems.getRecipes(internalName)
-            // TODO describe what this line does
+            // TODO: describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
             ?.ingredients ?: return
         val requiredIngredients = mutableMapOf<NeuInternalName, Int>()

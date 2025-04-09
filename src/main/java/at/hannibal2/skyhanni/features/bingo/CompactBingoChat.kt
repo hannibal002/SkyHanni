@@ -57,7 +57,7 @@ object CompactBingoChat {
         if (onNewAreaDiscovered(message)) event.blockedReason = "compact_new_area_discovered"
     }
 
-    // TODO USE SH-REPO
+    // TODO: USE SH-REPO
     private fun onSkillLevelUp(message: String): Boolean {
         if (message.startsWith("  §r§b§lSKILL LEVEL UP ")) {
             inSkillLevelUp = true

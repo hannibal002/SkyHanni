@@ -264,7 +264,7 @@ object GardenVisitorDropStatistics {
         return "$amount"
     }
 
-    // todo this should just save when changed not once a second
+    // TODO: this should just save when changed not once a second
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         saveAndUpdate()

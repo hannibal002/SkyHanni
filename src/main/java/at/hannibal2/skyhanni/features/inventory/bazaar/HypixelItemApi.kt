@@ -54,7 +54,7 @@ class HypixelItemApi {
             npcPrices = loadNpcPrices()
         }
 
-        // TODO use SecondPassedEvent
+        // TODO: use SecondPassedEvent
     }
 
 }

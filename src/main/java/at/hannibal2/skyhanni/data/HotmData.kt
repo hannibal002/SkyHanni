@@ -406,7 +406,7 @@ enum class HotmData(
 
     val totalCostMaxLevel = calculateTotalCost(maxLevel)
 
-    // TODO move all object functions into hotm api?
+    // TODO: move all object functions into hotm api?
     @SkyHanniModule
     companion object {
 

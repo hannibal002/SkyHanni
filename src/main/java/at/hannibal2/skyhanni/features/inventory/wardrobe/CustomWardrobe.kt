@@ -200,7 +200,7 @@ object CustomWardrobe {
         return wardrobeWarning to wardrobeSlots
     }
 
-    // TODO don't initialize all 18 slots at once, load them lazily when first time hovering over the item.
+    // TODO: don't initialize all 18 slots at once, load them lazily when first time hovering over the item.
     private fun createArmorTooltipRenderable(
         slot: WardrobeSlot,
         containerHeight: Int,
@@ -245,7 +245,7 @@ object CustomWardrobe {
     ): List<String>? {
         try {
             // Get tooltip from minecraft and other mods
-            // TODO add support for advanced tooltip (F3+H)
+            // TODO: add support for advanced tooltip (F3+H)
             val toolTips = stack.getTooltipCompat(false)
 
             // Modify tooltip via SkyHanni Events

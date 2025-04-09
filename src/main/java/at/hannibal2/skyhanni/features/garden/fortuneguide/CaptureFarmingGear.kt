@@ -128,7 +128,7 @@ object CaptureFarmingGear {
         }
     }
 
-    // TODO upadte armor on equpment/wardeobe update as well
+    // TODO: upadte armor on equpment/wardeobe update as well
     fun captureFarmingGear() {
         for (armor in InventoryUtils.getArmor()) {
             if (armor == null) continue
@@ -144,7 +144,7 @@ object CaptureFarmingGear {
         val currentCrop = itemStack.getCropType()
 
         if (currentCrop == null) {
-            // todo better fall back items
+            // TODO: better fall back items
         } else {
             currentCrop.farmingItem.setItem(itemStack)
         }

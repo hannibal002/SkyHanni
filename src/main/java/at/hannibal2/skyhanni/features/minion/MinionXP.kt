@@ -91,7 +91,7 @@ object MinionXP {
         }
     }
 
-    // TODO find the correct name of the list
+    // TODO: find the correct name of the list
     private val listWithMissingName = listOf(21..26, 30..35, 39..44)
 
     private fun handleItems(inventoryItems: Map<Int, ItemStack>, isMinion: Boolean): EnumMap<SkillType, Double> {
@@ -105,7 +105,7 @@ object MinionXP {
             val name = item.internalName
             val xp = xpInfoMap[name] ?: continue
 
-            // TODO add wisdom and temporary skill exp (Events) to calculation
+            // TODO: add wisdom and temporary skill exp (Events) to calculation
             val baseXP = xp.amount * item.amount
             val xpAmount = if (Perk.MOAR_SKILLZ.isActive) {
                 baseXP * 1.5

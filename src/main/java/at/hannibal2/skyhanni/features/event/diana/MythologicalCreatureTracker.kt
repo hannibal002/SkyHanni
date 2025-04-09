@@ -101,7 +101,7 @@ object MythologicalCreatureTracker {
             tracker.modify {
                 it.count.addOrPut(creatureType, 1)
 
-                // TODO migrate to abstract feature in the future
+                // TODO: migrate to abstract feature in the future
                 if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
                     event.chatComponent = (event.message + " §e(${it.creaturesSinceLastInquisitor})").asComponent()
                     it.creaturesSinceLastInquisitor = 0

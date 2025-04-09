@@ -59,7 +59,7 @@ object PestApi {
     private var lastPestKillTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
-    // TODO move into repo
+    // TODO: USE SH-REPO
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".toInternalName(),
         "SKYMART_TURBO_VACUUM".toInternalName(),

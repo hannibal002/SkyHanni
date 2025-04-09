@@ -27,7 +27,7 @@ public class MoneyPerHourConfig {
     @FeatureToggle
     public boolean display = false;
 
-    // TODO moulconfig runnable support
+    // TODO: moulconfig runnable support
     @Expose
     @ConfigOption(name = "Only Show Top", desc = "Only show the best # items.")
     @ConfigEditorSlider(
@@ -42,7 +42,7 @@ public class MoneyPerHourConfig {
     @ConfigEditorBoolean
     public boolean showCurrent = true;
 
-    // TODO moulconfig runnable support
+    // TODO: moulconfig runnable support
     @Expose
     @ConfigOption(
         name = "Always On",

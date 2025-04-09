@@ -85,7 +85,7 @@ object CarryTracker {
         update()
     }
 
-    // TODO create trade event with player name, coins and items
+    // TODO: create trade event with player name, coins and items
     private var lastTradedPlayer: String? = null
 
     @HandleEvent(onlyOnSkyblock = true)

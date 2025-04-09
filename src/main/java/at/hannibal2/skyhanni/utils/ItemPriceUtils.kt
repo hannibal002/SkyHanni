@@ -134,7 +134,7 @@ object ItemPriceUtils {
         ChatUtils.clickToClipboard("${internalName.repoItemName}§f: §6$defaultPrice", info)
     }
 
-    // TODO move either into inventory utils or new command utils
+    // TODO: move either into inventory utils or new command utils
     fun getItemOrFromHand(args: Array<String>): NeuInternalName? {
         val name = args.joinToString(" ")
         return if (name.isEmpty()) {

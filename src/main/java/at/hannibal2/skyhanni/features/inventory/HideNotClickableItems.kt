@@ -238,7 +238,7 @@ object HideNotClickableItems {
 
         val internalName = stack.getInternalNameOrNull() ?: return false
 
-        // TODO add more special named fossils (hypixel why)
+        // TODO: add more special named fossils (hypixel why)
         val list = listOf(
             "HELIX".toInternalName(),
         )
@@ -312,7 +312,7 @@ object HideNotClickableItems {
             "BRACELET",
         )
         for (type in list) {
-            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) { // todo use item api
+            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) { // TODO: use item api
                 showGreenLine = true
                 return false
             }
@@ -529,7 +529,7 @@ object HideNotClickableItems {
             hideReason = "This item should not be salvaged! (Recombobulated)"
             return true
         }
-        // TODO replace with rarity check
+        // TODO: replace with rarity check
         for (line in stack.getLore()) {
             if (line.contains("LEGENDARY DUNGEON")) {
                 hideReason = "This item should not be salvaged! (Legendary)"

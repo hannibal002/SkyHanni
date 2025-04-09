@@ -163,7 +163,7 @@ object EnoughUpdatesManager {
         json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.displayName)
         //#if MC < 1.21
-        //$$ // todo nbt tag doesnt exist on modern
+        //$$ // TODO: nbt tag doesnt exist on modern
         //$$ json.addProperty("nbttag", tag.toString())
         //$$ json.addProperty("damage", stack.itemDamage)
         //#endif
@@ -188,7 +188,7 @@ object EnoughUpdatesManager {
             if (cachedStack != null) return cachedStack.copy()
         }
 
-        // todo modern doesnt have the "meta" number
+        // TODO: modern doesnt have the "meta" number
         val stack = ItemStack(json["itemid"].asString.getVanillaItem() ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255))
         stack.item ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255)
 
@@ -226,7 +226,7 @@ object EnoughUpdatesManager {
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
         //#else
-        //$$ // todo clearly this isnt correct but this is lot that has to change and this works for now
+        //$$ // TODO: clearly this isnt correct but this is lot that has to change and this works for now
         //$$ return ItemStack(Items.PAINTING)
         //#endif
     }

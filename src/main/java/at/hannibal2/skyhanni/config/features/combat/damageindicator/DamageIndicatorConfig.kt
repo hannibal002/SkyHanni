@@ -36,7 +36,7 @@ class DamageIndicatorConfig {
         override fun toString() = displayName
     }
 
-    // TODO only show currently working and tested features
+    // TODO: only show currently working and tested features
     @Expose
     @ConfigOption(name = "Select Boss", desc = "Change what bosses the damage indicator should be enabled for.")
     @ConfigEditorDraggableList

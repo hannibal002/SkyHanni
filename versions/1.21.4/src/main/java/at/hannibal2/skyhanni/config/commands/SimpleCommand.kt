@@ -6,7 +6,7 @@ class SimpleCommand(
     private val name: String,
     private val aliases: List<String>,
     private val callback: (Array<String>) -> Unit,
-    // TODO modern version reimplement this
+    // TODO: modern version reimplement this
     private val tabCallback: ((Array<String>) -> List<String>) = { emptyList() },
 ) {
 

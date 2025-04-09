@@ -12,11 +12,11 @@ public class ShoppingListConfig {
     @ConfigOption(name = "Enable", desc = "Show all items required for the visitors.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename "enabled"
+    // TODO: rename "enabled"
     public boolean display = true;
 
     @Expose
-    // TODO rename "position"
+    // TODO: rename "position"
     @ConfigLink(owner = ShoppingListConfig.class, field = "display")
     public Position pos = new Position(180, 170, false, true);
 

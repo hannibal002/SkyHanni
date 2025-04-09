@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-// TODO moulconfig runnable support
+// TODO: moulconfig runnable support
 public class NextConfig {
     @Expose
     @ConfigOption(
@@ -20,7 +20,7 @@ public class NextConfig {
     @FeatureToggle
     public boolean bestDisplay = false;
 
-    // TODO moulconfig runnable support
+    // TODO: moulconfig runnable support
     @Expose
     @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock EXP.")
     @ConfigEditorDropdown
@@ -54,7 +54,7 @@ public class NextConfig {
         }
     }
 
-    // TODO moulconfig runnable support
+    // TODO: moulconfig runnable support
     @Expose
     @ConfigOption(name = "Only Show Top", desc = "Only show the top # crops.")
     @ConfigEditorSlider(
@@ -69,7 +69,7 @@ public class NextConfig {
     @ConfigEditorBoolean
     public boolean showCurrent = true;
 
-    // TODO moulconfig runnable support
+    // TODO: moulconfig runnable support
     @Expose
     @ConfigOption(
         name = "Always On",

@@ -158,7 +158,7 @@ object JacobContestTimeNeeded {
                 }
             }
             val line = if (timeInMinutes < 20.minutes) {
-                // TODO use table: first row crop name, second row "in <time>" or error msg
+                // TODO: use table: first row crop name, second row "in <time>" or error msg
                 "§9${crop.cropName} §7in §b$formatDuration" + marking
             } else {
                 val cropFF = crop.getLatestTrueFarmingFortune() ?: 0.0

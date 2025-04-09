@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
-// todo: create abstract class for this and BasketWaypoints
+// TODO: create abstract class for this and BasketWaypoints
 @SkyHanniModule
 object PresentWaypoints {
 

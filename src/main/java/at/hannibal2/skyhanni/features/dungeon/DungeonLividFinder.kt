@@ -212,7 +212,7 @@ object DungeonLividFinder {
             return
         }
 
-        // TODO either hide if setting is disabled, or include the info if setting is enabled
+        // TODO: either hide if setting is disabled, or include the info if setting is enabled
         event.addData {
             add("inBoss: ${inLividBossRoom()}")
             add("isBlind: $isBlind")

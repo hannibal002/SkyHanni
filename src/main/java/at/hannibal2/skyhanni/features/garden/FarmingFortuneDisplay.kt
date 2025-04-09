@@ -71,7 +71,7 @@ object FarmingFortuneDisplay {
         "§7Piece Bonus: §6+(?<bonus>.*)☘",
     )
 
-    // todo make pattern work on Melon and Cropie armor
+    // TODO: make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
         "§7.*§7Grants §6(?<bonus>.*)☘.*",
@@ -374,7 +374,7 @@ object FarmingFortuneDisplay {
         greenThumbFortune = 0.0
         pesterminatorFortune = getPesterminatorFortune(tool)
 
-        // TODO code cleanup (after ff rework)
+        // TODO: code cleanup (after ff rework)
 
         val lore = tool?.getLore() ?: return
         for (line in lore) {

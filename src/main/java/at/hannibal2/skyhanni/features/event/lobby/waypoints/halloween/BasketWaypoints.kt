@@ -37,7 +37,7 @@ object BasketWaypoints {
 
     private val patternGroup = RepoPattern.group("event.lobbywaypoints")
 
-    // TODO add regex tests
+    // TODO: add regex tests
     private val scoreboardTitlePattern by patternGroup.pattern(
         "main.scoreboard.title",
         "^HYPIXEL$"

@@ -364,7 +364,7 @@ object IslandGraphs {
     }
 
     private fun setFastestPath(path: Pair<Graph, Double>, setPath: Boolean = true) {
-        // TODO cleanup
+        // TODO: cleanup
         val (fastestPath, distance) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.nodes.toMutableList()
         if (MinecraftCompat.localPlayer.onGround) {
@@ -384,7 +384,7 @@ object IslandGraphs {
     }
 
     private fun onNewNode() {
-        // TODO create an event
+        // TODO: create an event
         IslandAreas.nodeMoved()
         if (shouldAllowRerouting) {
             tryRerouting()
@@ -545,7 +545,7 @@ object IslandGraphs {
         event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
     }
 
-    // TODO move into new utils class
+    // TODO: move into new utils class
     private fun cutByMaxDistance(nodes: List<GraphNode>, maxDistance: Double): List<GraphNode> {
         var index = nodes.size * 10
         val locations = mutableListOf<LorenzVec>()

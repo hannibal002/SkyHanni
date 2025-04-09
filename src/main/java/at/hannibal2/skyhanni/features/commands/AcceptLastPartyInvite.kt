@@ -38,7 +38,7 @@ object AcceptLastPartyInvite {
         "§eThe party invite from §r§.(?:\\[.*].)?(?<player>\\S+) §r§ehas expired\\.",
     )
 
-    // TODO move into PartyApi
+    // TODO: move into PartyApi
     private var lastInviter = ""
 
     @HandleEvent

@@ -53,7 +53,7 @@ object VisitorListener {
         VisitorApi.reset()
     }
 
-    // TODO make event
+    // TODO: make event
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendEvent(event: PacketSentEvent) {
         val packet = event.packet

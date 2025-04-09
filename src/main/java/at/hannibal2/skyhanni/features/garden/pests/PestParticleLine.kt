@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
-// TODO remove this workaround once PestParticleWaypoint does work again
+// TODO: remove this workaround once PestParticleWaypoint does work again
 @SkyHanniModule
 object PestParticleLine {
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
@@ -45,7 +45,7 @@ object PestParticleLine {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        // TODO time in config
+        // TODO: time in config
         if (lastPestTrackerUse.passedSince() > 5.seconds) return
 
         if (event.type == EnumParticleTypes.ENCHANTMENT_TABLE || event.type == EnumParticleTypes.VILLAGER_ANGRY) {
@@ -80,7 +80,7 @@ object PestParticleLine {
     @HandleEvent(priority = HandleEvent.LOW)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        // TODO time in config
+        // TODO: time in config
         if (lastPestTrackerUse.passedSince() > 10.seconds) {
             locations.clear()
             return
@@ -106,7 +106,7 @@ object PestParticleLine {
     private fun draw(event: SkyHanniRenderWorldEvent, list: List<ParticleLocation>) {
         val color = LorenzColor.YELLOW.toColor()
         for ((prev, next) in list.asSequence().zipWithNext()) {
-            // TODO time in config
+            // TODO: time in config
             if (next.spawnTime.passedSince() > 5.seconds) continue
             val location = next.location
             event.draw3DLine(

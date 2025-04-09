@@ -32,7 +32,7 @@ object SummoningSoulsName {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
-        // TODO use packets instead of this
+        // TODO: use packets instead of this
         check()
     }
 
@@ -67,7 +67,7 @@ object SummoningSoulsName {
 
         val entityList = EntityUtils.getEntities<EntityArmorStand>()
         souls.keys.removeIf { it !in entityList }
-        // TODO fix overhead!
+        // TODO: fix overhead!
 //        mobs.keys.removeIf { it !in world.loadedEntityList }
     }
 

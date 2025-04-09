@@ -51,7 +51,7 @@ object CollectionApi {
 
     val collectionValue = mutableMapOf<NeuInternalName, Long>()
 
-    // TODO repo
+    // TODO: repo
     private val incorrectCollectionNames = mapOf(
         "Mushroom" to "RED_MUSHROOM".toInternalName(),
     )
@@ -106,7 +106,7 @@ object CollectionApi {
         val amount = NeuItems.getPrimitiveMultiplier(internalName).amount
         if (amount > 1) return
 
-        // TODO add support for replenish (higher collection than actual items in inv)
+        // TODO: add support for replenish (higher collection than actual items in inv)
         if (internalName.getItemStackOrNull() == null) {
             ChatUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
             return

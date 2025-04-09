@@ -67,7 +67,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
     @Accordion
-    // TODO remove the suffix "config"
+    // TODO: remove the suffix "config"
     public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
 
     @Expose
@@ -253,14 +253,14 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
-    // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
+    // TODO: move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
     @ConfigOption(name = "Power Stone Guide", desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
-    // TODO move( , "inventory.powerStoneGuide", "inventory.skyblockGuideConfig.powerStoneGuide")
+    // TODO: move( , "inventory.powerStoneGuide", "inventory.skyblockGuideConfig.powerStoneGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powerStoneGuide = true;
@@ -281,7 +281,7 @@ public class InventoryConfig {
     @ConfigOption(name = "Shift Click NPC sell", desc = "Change normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to shiftClickNpcSell
+    // TODO: rename to shiftClickNpcSell
     public boolean shiftClickNPCSell = false;
 
     @Expose

@@ -61,7 +61,7 @@ object HighlightBonzoMasks {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message.removeColor()
-        // TODO move pattern into enum
+        // TODO: move pattern into enum
         if (bonzoMaskPattern.matches(message)) {
             maskTimers[MaskType.BONZO_MASK] = SimpleTimeMark.now() + MaskType.BONZO_MASK.cooldown
         } else if (spiritMaskPattern.matches(message)) {

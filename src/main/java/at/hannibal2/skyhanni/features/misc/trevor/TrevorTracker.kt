@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Matcher
 
-// TODO change to use skyhanni tracker
+// TODO: change to use skyhanni tracker
 @SkyHanniModule
 object TrevorTracker {
 
@@ -24,7 +24,7 @@ object TrevorTracker {
 
     private val patternGroup = RepoPattern.group("misc.trevor")
 
-    // TODO regex tests
+    // TODO: regex tests
     /**
      * REGEX-TEST: §aYour mob died randomly, you are rewarded §r§53 pelts§r§a.
      */
@@ -81,7 +81,7 @@ object TrevorTracker {
         stoppedChecks = 0
     }
 
-    // TODO change functionality to use enum rather than ordinals
+    // TODO: change functionality to use enum rather than ordinals
     private fun formatDisplay(map: List<Renderable>) = config.textFormat.map { map[it.ordinal] }
 
     @HandleEvent

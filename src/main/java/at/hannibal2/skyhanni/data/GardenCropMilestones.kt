@@ -71,7 +71,7 @@ object GardenCropMilestones {
         val customGoalLevel = ProfileStorageData.profileSpecific?.garden?.customGoalMilestone?.get(crop) ?: 0
         val goalReached = newLevel == customGoalLevel
 
-        // TODO utils function that is shared with Garden Level Display
+        // TODO: utils function that is shared with Garden Level Display
         val rewards = buildList {
             add("    §r§8+§aRespect from Elite Farmers and SkyHanni members :)")
             add("    §r§8+§b1 Flexing Point")
@@ -117,7 +117,7 @@ object GardenCropMilestones {
 
     val cropCounter: MutableMap<CropType, Long>? get() = GardenApi.storage?.cropCounter
 
-    // TODO make nullable
+    // TODO: make nullable
     fun CropType.getCounter() = cropCounter?.get(this) ?: 0
 
     fun CropType.setCounter(counter: Long) {
@@ -127,7 +127,7 @@ object GardenCropMilestones {
     fun CropType.isMaxed(useOverflow: Boolean): Boolean {
         if (useOverflow) return false
 
-        // TODO change 1b
+        // TODO: change 1b
         val maxValue = cropMilestoneData[this]?.sum() ?: 1_000_000_000 // 1 bil for now
         return getCounter() >= maxValue
     }

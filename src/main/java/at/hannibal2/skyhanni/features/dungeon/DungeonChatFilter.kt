@@ -17,7 +17,7 @@ object DungeonChatFilter {
     private val config get() = SkyHanniMod.feature.chat
 
     // <editor-fold desc="Patterns, Messages, and Maps">
-    // TODO USE SH-REPO
+    // TODO: USE SH-REPO
     private val endPatterns = listOf(
         "(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!".toPattern(),
         " {4}§r§d(.*) Essence §r§8x(.*)".toPattern()

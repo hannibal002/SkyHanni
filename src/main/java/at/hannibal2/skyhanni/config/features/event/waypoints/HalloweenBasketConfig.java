@@ -13,7 +13,7 @@ public class HalloweenBasketConfig {
         "§eCoordinates may not always be up to date!")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to "enabled"
+    // TODO: rename to "enabled"
     public boolean allWaypoints = false;
 
     @Expose

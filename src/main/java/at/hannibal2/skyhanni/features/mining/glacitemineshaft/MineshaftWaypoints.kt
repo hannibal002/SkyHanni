@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO rename to something else to reduce confusion
+// TODO: rename to something else to reduce confusion
 @SkyHanniModule
 object MineshaftWaypoints {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft

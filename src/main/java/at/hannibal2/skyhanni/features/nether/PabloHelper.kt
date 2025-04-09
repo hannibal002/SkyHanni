@@ -21,7 +21,7 @@ object PabloHelper {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
-    // TODO RepoPattern.list does not work, find out why
+    // TODO: RepoPattern.list does not work, find out why
 
 //     /**
 //      * REGEX-TEST: §e[NPC] §5Pablo§f: §b✆ §f§rBring me that §aEnchanted Dandelion §fas soon as you can!

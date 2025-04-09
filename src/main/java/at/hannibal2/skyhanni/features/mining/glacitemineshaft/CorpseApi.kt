@@ -66,7 +66,7 @@ object CorpseApi {
         }
         var pair = itemPattern.matchMatcher(message) {
             /**
-             * TODO fix the bug that readItemAmount produces two different outputs:
+             * TODO: fix the bug that readItemAmount produces two different outputs:
              * §r§fEnchanted Book -> §fEnchanted
              * §fEnchanted Book §r§8x -> §fEnchanted Book
              *

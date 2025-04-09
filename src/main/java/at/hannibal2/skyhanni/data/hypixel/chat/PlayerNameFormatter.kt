@@ -294,7 +294,7 @@ object PlayerNameFormatter {
         }
     }
 
-    // TODO move to TextCompat once LorenzColor works on 1.21
+    // TODO: move to TextCompat once LorenzColor works on 1.21
     private fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
         //#if MC < 1.21
         this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))

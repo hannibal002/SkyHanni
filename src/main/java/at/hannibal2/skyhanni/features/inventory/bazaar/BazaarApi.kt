@@ -177,7 +177,7 @@ object BazaarApi {
         }
     }
 
-    // TODO cache
+    // TODO: cache
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!inBazaarInventory) return

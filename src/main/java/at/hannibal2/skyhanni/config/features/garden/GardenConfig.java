@@ -36,7 +36,7 @@ public class GardenConfig {
     @Category(name = "Crop Milestones", desc = "Crop Milestones Settings")
     public CropMilestonesConfig cropMilestones = new CropMilestonesConfig();
 
-    // TODO moulconfig runnable support
+    // TODO: moulconfig runnable support
     @Expose
     @ConfigOption(name = "Custom Keybinds", desc = "")
     @Accordion
@@ -64,7 +64,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
     @Accordion
-    // TODO rename to dicerRngDropTracker
+    // TODO: rename to dicerRngDropTracker
     public DicerRngDropTrackerConfig dicerCounters = new DicerRngDropTrackerConfig();
 
     @Expose
@@ -80,7 +80,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Armor Drop Tracker", desc = "")
     @Accordion
-    // TODO rename to armorDropTracker
+    // TODO: rename to armorDropTracker
     public ArmorDropTrackerConfig farmingArmorDrop = new ArmorDropTrackerConfig();
 
     @Expose
@@ -194,7 +194,7 @@ public class GardenConfig {
     @ConfigEditorBoolean
     public boolean jacobContestCustomBps = true;
 
-    // TODO moulconfig runnable support
+    // TODO: moulconfig runnable support
     @Expose
     @ConfigOption(name = "Custom BPS Value", desc = "Set a custom Blocks per Second value.")
     @ConfigEditorSlider(

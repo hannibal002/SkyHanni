@@ -186,7 +186,7 @@ object BingoNextStepHelper {
                 currentStep.amountHavingHidden -= 10
             }
         }
-        // TODO add thys message
+        // TODO: add thys message
 //        if (event.message == "thys message") {
 //            thys.done()
 //        }
@@ -360,7 +360,7 @@ object BingoNextStepHelper {
 
         IslandType.CRYSTAL_HOLLOWS.getStep() requires IslandType.DWARVEN_MINES.getStep()
 
-        // TODO add SkyBlock level requirement
+        // TODO: add SkyBlock level requirement
 //        IslandType.GARDEN.getStep() requires SkyBlockLevelStep(6)
         IslandType.GARDEN.getStep() requires IslandType.HUB.getStep()
 

@@ -156,7 +156,7 @@ object StringUtils {
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
             if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
-                // TODO custom color
+                // TODO: custom color
                 "§b" + internalCleanPlayerName()
             } else this
         } else {

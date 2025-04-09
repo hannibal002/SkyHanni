@@ -88,7 +88,7 @@ object FishingProfitTracker {
         }
 
         override fun getCustomPricePer(internalName: NeuInternalName): Double {
-            // TODO find better way to tell if the item is a trophy
+            // TODO: find better way to tell if the item is a trophy
             val neuInternalNames = itemCategories["Trophy Fish"].orEmpty()
 
             return if (internalName in neuInternalNames) {
@@ -178,7 +178,7 @@ object FishingProfitTracker {
     private fun checkMissingItems(data: Data) {
         val missingItems = mutableListOf<NeuInternalName>()
         for (internalName in data.items.keys) {
-            // TODO remove workaround to not warn about ATTRIBUTE_SHARD
+            // TODO: remove workaround to not warn about ATTRIBUTE_SHARD
             if (internalName == "ATTRIBUTE_SHARD".toInternalName()) continue
             if (itemCategories.none { internalName in it.value }) {
                 missingItems.add(internalName)

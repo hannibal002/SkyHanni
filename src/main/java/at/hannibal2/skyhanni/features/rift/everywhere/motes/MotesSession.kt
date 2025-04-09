@@ -45,7 +45,7 @@ object MotesSession {
                 initialMotes = amount
                 enterRiftTime = SimpleTimeMark.now()
             }
-            // TODO move into RiftAPI, rename to lifetimeMotes, reuse in custom scoreboard maybe?
+            // TODO: move into RiftAPI, rename to lifetimeMotes, reuse in custom scoreboard maybe?
             currentMotes = amount
         }
     }

@@ -188,7 +188,7 @@ object ItemPickupLog {
         }
     }
 
-    // TODO merge with ItemAddInInventoryEvent
+    // TODO: merge with ItemAddInInventoryEvent
     private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
         if (isBannedItem(item)) return
 

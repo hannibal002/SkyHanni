@@ -55,7 +55,7 @@ object RenderData {
 
     private fun canRender(): Boolean = Minecraft.getMinecraft()?.renderManager?.fontRenderer != null
 
-    // TODO find better spot for this
+    // TODO: find better spot for this
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(17, "chroma.chromaDirection") { element ->

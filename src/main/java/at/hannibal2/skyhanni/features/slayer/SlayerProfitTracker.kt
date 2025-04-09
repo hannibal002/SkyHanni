@@ -209,7 +209,7 @@ object SlayerProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    // TODO reintroduce this? whats going on?
+    // TODO: reintroduce this? whats going on?
     val coinFormat: (ItemTrackerData.TrackedItem) -> Pair<String, List<String>> = { item ->
         val mobKillCoinsFormat = item.totalAmount.shortFormat()
         val text = " §6Mob kill coins§7: §6$mobKillCoinsFormat"

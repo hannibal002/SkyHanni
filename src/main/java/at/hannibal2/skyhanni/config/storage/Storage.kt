@@ -43,7 +43,7 @@ class Storage {
     @Expose
     var players: MutableMap<UUID, PlayerSpecificStorage> = mutableMapOf()
 
-    // TODO this should get moved into player specific
+    // TODO: this should get moved into player specific
     @Expose
     var currentFameRank: String = "New player"
 

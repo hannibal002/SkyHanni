@@ -142,7 +142,7 @@ object GardenVisitorFeatures {
 
         val lore = offerItem.getLore()
 
-        // TODO make this workaround unnecessary (only read non lore info)
+        // TODO: make this workaround unnecessary (only read non lore info)
         readToolTip(visitor, offerItem, lore.toMutableList())
         visitor.lastLore = emptyList()
 
@@ -269,7 +269,7 @@ object GardenVisitorFeatures {
         }
 
         val ingredients = NeuItems.getRecipes(internalName)
-            // TODO describe what this line does
+            // TODO: describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
             ?.ingredients.orEmpty()
         if (ingredients.isEmpty()) return
@@ -558,7 +558,7 @@ object GardenVisitorFeatures {
             event.blockedReason = "new_visitor_arrived"
         }
 
-        // TODO use NpcChatEvent
+        // TODO: use NpcChatEvent
         if (GardenApi.inGarden() && config.hideChat && hideVisitorMessage(event.message)) {
             event.blockedReason = "garden_visitor_message"
         }

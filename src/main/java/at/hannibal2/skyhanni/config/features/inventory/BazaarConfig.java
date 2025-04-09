@@ -62,7 +62,7 @@ public class BazaarConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename and move
+    // TODO: rename and move
     public boolean craftMaterialsFromBazaar = false;
 
     @Expose

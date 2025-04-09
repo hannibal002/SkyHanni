@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
+// TODO: important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
 @SkyHanniModule
 object SuperpairDataDisplay {
 
@@ -80,7 +80,7 @@ object SuperpairDataDisplay {
 
         val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
 
-        // TODO add variable name to indicate what is going on here
+        // TODO: add variable name to indicate what is going on here
         val items = uncoveredItems.toMutableMap()
         if (items.none { it.value.index == event.slotId && it.key == items.keys.max() }) {
             if (clicksItem != null) {
@@ -111,7 +111,7 @@ object SuperpairDataDisplay {
         val since = clicksSinceSeparator(items)
 
         val lastReward = items.entries.lastOrNull()?.value?.reward
-        // TODO use repo patterns for "Instant Find"
+        // TODO: use repo patterns for "Instant Find"
         if ((since >= 2 || (since == -1 && items.size >= 2)) && lastReward != "Instant Find") items[uncovered + 2] =
             emptySuperpairItem
 
@@ -119,7 +119,7 @@ object SuperpairDataDisplay {
     }
 
     private fun handlePowerUp(items: MutableMap<Int, SuperpairItem>, item: SuperpairItem, uncovered: Int) {
-        // TODO use repo patterns for "Instant Find"
+        // TODO: use repo patterns for "Instant Find"
         if (item.reward != "Instant Find") items.remove(uncovered)
 
         val itemData = FoundData(item = item)
@@ -132,7 +132,7 @@ object SuperpairDataDisplay {
         if (isWaiting(last.reward)) return
 
         when {
-            // TODO use repo patterns for "Instant Find"
+            // TODO: use repo patterns for "Instant Find"
             last.reward == "Instant Find" -> handleInstantFind(items, item, uncovered)
             hasFoundPair(item, last) -> handleFoundPair(item, last)
             hasFoundMatch(items, item) -> handleFoundMatch(items, item)
@@ -165,13 +165,13 @@ object SuperpairDataDisplay {
     }
 
     private fun handleFoundMatch(items: MutableMap<Int, SuperpairItem>, item: SuperpairItem) {
-        // TODO better name
+        // TODO: better name
         val match = items.values.find { it.index != item.index && it.sameAs(item) } ?: return
 
         found.entries.forEach {
             when {
                 it.key.isAnyOf(FoundType.MATCH, FoundType.PAIR) -> {
-                    // TODO extract logic in some way
+                    // TODO: extract logic in some way
                     if (it.value.any { data ->
                             (data.first?.index ?: -1).equalsOneOf(item.index, match.index) ||
                                 (data.second?.index ?: -1).equalsOneOf(item.index, match.index)
@@ -268,7 +268,7 @@ object SuperpairDataDisplay {
         second: SuperpairItem,
     ) = first.index != second.index && first.sameAs(second)
 
-    // TODO extract logic greatly
+    // TODO: extract logic greatly
     private fun hasFoundMatch(items: Map<Int, SuperpairItem>, firstItem: SuperpairItem) =
         items.any { it.value.index != firstItem.index && it.value.sameAs(firstItem) } &&
             found.entries.none {
@@ -283,7 +283,7 @@ object SuperpairDataDisplay {
     private fun isReward(reward: String) =
         ExperimentationTableApi.rewardPattern.matches(reward) || ExperimentationTableApi.powerUpPattern.matches(reward)
 
-    // TODO use repo patterns instead
+    // TODO: use repo patterns instead
     private fun isWaiting(itemName: String) =
         listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!").contains(itemName)
 

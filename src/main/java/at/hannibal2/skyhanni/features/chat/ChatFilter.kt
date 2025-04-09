@@ -165,7 +165,7 @@ object ChatFilter {
     @Suppress("MaxLineLength")
     private val slayerDropPatterns = listOf(
         // Zombie
-        // TODO merge patterns together. Just because old ones are designed poorly doesnt mean new ones need to be poor as well
+        // TODO: merge patterns together. Just because old ones are designed poorly doesnt mean new ones need to be poor as well
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
@@ -263,11 +263,11 @@ object ChatFilter {
 
     // Useless Warning
     private val uselessWarningMessages = listOf(
-        "§cYou are sending commands too fast! Please slow down.", // TODO prevent in the future
+        "§cYou are sending commands too fast! Please slow down.", // TODO: prevent in the future
         "§cYou can't use this while in combat!",
         "§cYou can not modify your equipped armor set!",
         "§cPlease wait a few seconds between refreshing!",
-        "§cThis item is not salvageable!", // TODO prevent in the future
+        "§cThis item is not salvageable!", // TODO: prevent in the future
         "§cPlace a Dungeon weapon or armor piece above the anvil to salvage it!",
         "§cWhoa! Slow down there!",
         "§cWait a moment before confirming!",
@@ -541,7 +541,7 @@ object ChatFilter {
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
 
-        // TODO need proper solution to hide empty messages in event text
+        // TODO: need proper solution to hide empty messages in event text
         config.eventLevelUp && (message.isPresent("event")) -> "event"
 
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"

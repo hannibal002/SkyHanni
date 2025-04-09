@@ -308,7 +308,7 @@ object MinionFeatures {
         } ?: return "§cCan't calculate coins/day: No time data available!"
 
         // §7Held Coins: §b151,389
-        // TODO use regex
+        // TODO: use regex
         val coins = line.split(": §b")[1].formatDouble()
 
         val coinsPerDay = (coins / (duration.inWholeMilliseconds)) * 1000 * 60 * 60 * 24

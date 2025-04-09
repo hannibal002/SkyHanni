@@ -140,7 +140,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             val loreText = getLoreList.invoke(internalName, itemProfit)
             val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
 
-            // TODO add row abstraction to api, with common click+hover behaviour
+            // TODO: add row abstraction to api, with common click+hover behaviour
             fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickable(
                 string,
                 tips = lore,

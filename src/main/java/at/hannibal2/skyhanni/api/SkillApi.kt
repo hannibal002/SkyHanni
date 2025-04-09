@@ -60,7 +60,7 @@ object SkillApi {
         "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<current>[\\d.,]+)\\/(?<needed>[\\d,.]+[kmb]?)\\)",
     )
 
-    // TODO find out whats going on here
+    // TODO: find out whats going on here
     /**
      * REGEX-TEST: Farming 35: §r§a12.4%
      */
@@ -69,13 +69,13 @@ object SkillApi {
         " (?<type>\\w+)(?: (?<level>\\d+))?: §r§a(?<progress>[0-9.]+)%",
     )
 
-    // TODO add regex tests
+    // TODO: add regex tests
     private val maxSkillTabPattern by patternGroup.pattern(
         "skill.tab.max",
         " (?<type>\\w+) (?<level>\\d+): §r§c§lMAX",
     )
 
-    // TODO add regex tests
+    // TODO: add regex tests
     private val skillTabNoPercentPattern by patternGroup.pattern(
         "skill.tab.nopercent",
         " §r§a(?<type>\\w+)(?: (?<level>\\d+))?: §r§e(?<current>[0-9,.]+)§r§6/§r§e(?<needed>[0-9kmb]+)",
@@ -500,7 +500,7 @@ object SkillApi {
     }
 
     data class SkillInfo(
-        // TODO rename all Xp -> XP
+        // TODO: rename all Xp -> XP
         @Expose var level: Int = 0,
         @Expose var totalXp: Long = 0,
         @Expose var currentXp: Long = 0,

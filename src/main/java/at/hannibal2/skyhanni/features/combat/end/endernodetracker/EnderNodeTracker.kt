@@ -60,7 +60,7 @@ object EnderNodeTracker {
         "§5§lENDER NODE! §r§fYou found §r§8(?<amount>\\d+)x §r(?<name>.*)§r§f!",
     )
 
-    // TODO add abstract logic with ohter pet drop chat messages
+    // TODO: add abstract logic with ohter pet drop chat messages
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
     private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {

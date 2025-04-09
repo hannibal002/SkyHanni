@@ -138,5 +138,5 @@ object GuiEditManager {
     }
 }
 
-// TODO remove
+// TODO: remove
 class Vector2i(val x: Int, val y: Int)

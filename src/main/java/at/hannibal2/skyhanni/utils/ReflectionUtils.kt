@@ -19,7 +19,7 @@ import kotlin.reflect.jvm.isAccessible
 
 object ReflectionUtils {
 
-    // TODO nea?
+    // TODO: nea?
 //    fun <T> dynamic(block: () -> KMutableProperty0<T>?): ReadWriteProperty<Any?, T?> {
 //        return object : ReadWriteProperty<Any?, T?> {
 //            override fun getValue(thisRef: Any?, property: KProperty<*>): T? {
@@ -92,7 +92,7 @@ object ReflectionUtils {
     ) {
         when (type) {
             is ParameterizedType -> {
-                val rawType = type.rawType as Class<*> // TODO check
+                val rawType = type.rawType as Class<*> // TODO: check
                 rawType.typeParameters.zip(type.actualTypeArguments).associateTo(universe) { it }
                 findSuperClassTypeParameters(rawType.genericSuperclass, universe)
             }

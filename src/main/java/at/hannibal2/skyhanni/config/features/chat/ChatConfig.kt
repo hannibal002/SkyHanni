@@ -16,13 +16,13 @@ class ChatConfig {
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_Z)
     var peekChat: Int = Keyboard.KEY_NONE
 
-    // TODO move into own sub category
+    // TODO: move into own sub category
     @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
     @Accordion
     var filterType: FilterTypesConfig = FilterTypesConfig()
 
-    // TODO move into own sub category
+    // TODO: move into own sub category
     @Expose
     @ConfigOption(name = "Player Messages", desc = "")
     @Accordion
@@ -75,7 +75,7 @@ class ChatConfig {
     @FeatureToggle
     var hideFarDeathMessages: Boolean = false
 
-    // TODO jawbus + thunder
+    // TODO: jawbus + thunder
     @Expose
     @ConfigOption(name = "Compact Potion Messages", desc = "")
     @Accordion

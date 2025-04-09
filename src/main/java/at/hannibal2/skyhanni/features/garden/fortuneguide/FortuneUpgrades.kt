@@ -56,7 +56,7 @@ object FortuneUpgrades {
         genericUpgrades.populateAndSort(0)
     }
 
-    // todo fix NEU price data not being loaded if run too early
+    // TODO: fix NEU price data not being loaded if run too early
     private fun MutableList<FortuneUpgrade>.populateAndSort(style: Int) {
         this.map { upgrade ->
             val cost = (upgrade.requiredItem.getPrice() * upgrade.itemQuantity).toInt()
@@ -91,7 +91,7 @@ object FortuneUpgrades {
         val visitors = GardenApi.storage?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in FarmingItems.equip) {
             val item = piece.getItem()
-            // todo tell them to buy the missing item
+            // TODO: tell them to buy the missing item
             if (!item.getInternalName().contains("LOTUS")) return
             val enchantments = item.getHypixelEnchantments().orEmpty()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
@@ -116,11 +116,11 @@ object FortuneUpgrades {
             }
         }
     }
-    // todo adding armor tier upgrades later
+    // TODO: adding armor tier upgrades later
 
     private fun getArmorUpgrades() {
         for (piece in FarmingItems.armor) {
-            val item = piece.getItemOrNull() ?: return // todo tell them to buy it later
+            val item = piece.getItemOrNull() ?: return // TODO: tell them to buy it later
 
             recombobulateItem(item, genericUpgrades)
             when (item.getReforgeName()) {
@@ -136,13 +136,13 @@ object FortuneUpgrades {
         }
     }
 
-    // todo needs to be called when switching pets
+    // TODO: needs to be called when switching pets
     private fun getPetUpgrades() {
         if (FarmingItems.currentPet.getItemOrNull()?.getInternalName()?.contains(";") == true) {
             when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> {}
                 "YELLOW_BANDANA" -> {
-                    // todo once auction stuff is done
+                    // TODO: once auction stuff is done
                 }
 
                 else -> {
@@ -155,7 +155,7 @@ object FortuneUpgrades {
     fun getCropSpecific(tool: ItemStack?) {
         cropSpecificUpgrades.clear()
         cropSpecificUpgrades.addAll(genericUpgrades)
-        // todo tell them to get the tool if it is missing
+        // TODO: tell them to get the tool if it is missing
         val crop = tool?.getCropType() ?: return
         val enchantments = tool.getHypixelEnchantments().orEmpty()
         val turboCropLvl = enchantments[crop.getTurboCrop()] ?: 0

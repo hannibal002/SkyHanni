@@ -36,7 +36,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementUnknown
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementVisiting
 
-// TODO once the config can support dynamic lists, remove this enum
+// TODO: once the config can support dynamic lists, remove this enum
 enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     TITLE(ScoreboardElementTitle),
     PROFILE(ScoreboardElementProfile),

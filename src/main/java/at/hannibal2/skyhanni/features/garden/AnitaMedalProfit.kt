@@ -110,7 +110,7 @@ object AnitaMedalProfit {
             add("")
             add("§7Sell price: §6${itemPrice.shortFormat()}")
 
-            // TODO add more exact material cost breakdown
+            // TODO: add more exact material cost breakdown
             add("§7Additional cost: §6${additionalCost.shortFormat()}")
             addAdditionalMaterials(additionalMaterials)
 

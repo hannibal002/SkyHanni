@@ -71,7 +71,7 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
         )
         add(
             Renderable.wrappedString(
-                requiredItem.repoItemName.let { if (itemQuantity == 1) it else "$it §fx$itemQuantity" }, // TODO wtf
+                requiredItem.repoItemName.let { if (itemQuantity == 1) it else "$it §fx$itemQuantity" }, // TODO: wtf
                 70,
                 0.75,
                 verticalAlign = VerticalAlignment.CENTER
@@ -83,7 +83,7 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
                 horizontalAlign = HorizontalAlignment.CENTER,
                 verticalAlign = VerticalAlignment.CENTER
             )
-        ) // TODO cleaner formating
+        ) // TODO: cleaner formating
         add(
             Renderable.string(
                 "§6" + costPerFF?.let { it.shortFormat() },

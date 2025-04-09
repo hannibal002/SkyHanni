@@ -42,7 +42,7 @@ object AuctionHouseOpenPriceWebsite {
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        // TODO get search from search sign (slot 48) since it can be cut off in title
+        // TODO: get search from search sign (slot 48) since it can be cut off in title
         ahSearchPattern.matchMatcher(event.inventoryName) {
             searchTerm = URLEncoder.encode(group("searchTerm").removeSuffix("\""), "UTF-8").replace("+", "%20")
             displayItem = createDisplayItem()

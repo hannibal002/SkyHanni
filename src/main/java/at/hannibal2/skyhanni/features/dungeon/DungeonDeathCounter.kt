@@ -18,7 +18,7 @@ object DungeonDeathCounter {
     private var deaths = 0
 
     private val deathPatternsList = listOf(
-        // TODO USE SH-REPO
+        // TODO: USE SH-REPO
         "§c ☠ §r§7You were killed by (.*)§r§7 and became a ghost§r§7.".toPattern(),
         "§c ☠ §r§7(.*) was killed by (.*) and became a ghost§r§7.".toPattern(),
 

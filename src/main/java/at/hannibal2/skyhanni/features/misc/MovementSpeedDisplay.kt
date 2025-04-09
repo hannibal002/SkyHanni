@@ -31,7 +31,7 @@ object MovementSpeedDisplay {
     var usingSoulsandSpeed = false
 
     init {
-        // TODO use LorenzTickEvent
+        // TODO: use LorenzTickEvent
         fixedRateTimer(name = "skyhanni-movement-speed-display", period = 250, initialDelay = 1_000) {
             checkSpeed()
         }

@@ -18,7 +18,7 @@ class BetterWikiCommandConfig {
     @FeatureToggle
     var enabled: Boolean = false
 
-    // TODO Make this method not suck
+    // TODO: Make this method not suck
     @Expose
     @ConfigOption(name = "SkyBlock Guide", desc = "Use SkyHanni's method in the SkyBlock Guide.")
     @ConfigEditorBoolean

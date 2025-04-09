@@ -74,7 +74,7 @@ object InventoryUtils {
     fun getItemsInOwnInventoryWithNull(): Array<ItemStack?>? =
         MinecraftCompat.localPlayerOrNull?.inventory?.mainInventory?.normalizeAsArray()
 
-    // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
+    // TODO: use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
     fun getItemsInHotbar(): List<ItemStack> =
         getItemsInOwnInventoryWithNull()?.slice(0..8)?.filterNotNull().orEmpty()
 

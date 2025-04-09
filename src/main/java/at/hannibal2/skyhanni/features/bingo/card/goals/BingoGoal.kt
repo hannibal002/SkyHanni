@@ -25,7 +25,7 @@ class BingoGoal {
     @Expose
     lateinit var hiddenGoalData: HiddenGoalData
 
-    // TODO rename communityGoalPercentage
+    // TODO: rename communityGoalPercentage
     @Expose
     var communtyGoalPercentage: Double? = null
 

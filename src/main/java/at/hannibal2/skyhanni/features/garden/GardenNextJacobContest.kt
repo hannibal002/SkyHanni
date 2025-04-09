@@ -123,7 +123,7 @@ object GardenNextJacobContest {
             add("Current time: ${SimpleTimeMark.now()}")
             add("")
 
-            // TODO Renderable.toString()
+            // TODO: Renderable.toString()
             add("Display: '$display'")
             add("")
 

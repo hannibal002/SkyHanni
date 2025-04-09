@@ -67,7 +67,7 @@ object ReplaceHoppityWithContributor {
         event.toolTip.add(" ")
         event.toolTip.add("§8§oSome might say this rabbit is also known as $realName")
 
-        // TODO find a way to handle non containing entries in a kotlin nullable way instead of checking for -1
+        // TODO: find a way to handle non containing entries in a kotlin nullable way instead of checking for -1
         val index = event.toolTip.indexOfFirst { it.contains(" a duplicate") }
         if (index == -1) return
         val oldLine = event.toolTip[index]

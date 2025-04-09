@@ -483,7 +483,7 @@ object ComposterOverlay {
 
         val havingInSacks = internalName.getAmountInSacksOrNull() ?: run {
             HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded - havingInInventory)
-            // TODO Add sack type repo data
+            // TODO: Add sack type repo data
 
             val isDwarvenMineable = internalName.let { it == VOLTA || it == OIL_BARREL || it == BIOFUEL }
             val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
@@ -513,7 +513,7 @@ object ComposterOverlay {
                 ChatUtils.chat("You're out of $itemName §ein your sacks!")
             } else {
                 ChatUtils.clickableChat(
-                    // TODO Add this as a separate feature, and then don't send any msg if the feature is disabled
+                    // TODO: Add this as a separate feature, and then don't send any msg if the feature is disabled
                     "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
                     onClick = { HypixelCommands.bazaar(itemName.removeColor()) },
                     "§eClick find on the bazaar!",

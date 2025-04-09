@@ -96,7 +96,7 @@ object CollectionTracker {
         setNewCollection(foundInternalName, stack.displayName.removeColor())
     }
 
-    // TODO repo
+    // TODO: USE SH-REPO
     private fun fixTypo(rawName: String) = when (rawName) {
         "carrots" -> "carrot"
         "melons" -> "melon"

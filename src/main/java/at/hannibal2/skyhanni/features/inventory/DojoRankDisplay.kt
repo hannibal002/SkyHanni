@@ -43,7 +43,7 @@ object DojoRankDisplay {
 
     private fun drawDisplay(items: Collection<ItemStack>) = buildList {
         if (belts.isEmpty()) {
-            // TODO make clickable
+            // TODO: make clickable
             add("§cUnable to get Belts data, please run /shupdaterepo")
             return@buildList
         }

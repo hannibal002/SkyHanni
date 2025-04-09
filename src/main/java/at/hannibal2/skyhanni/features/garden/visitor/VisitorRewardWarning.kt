@@ -123,7 +123,7 @@ object VisitorRewardWarning {
 
         blockedToolTip.add("")
         val pricePerCopper = visitor.pricePerCopper?.let { it.shortFormat() }
-        // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
+        // TODO: remove !! - best by creating new class LoadedVisitor without any nullable objects
         val loss = visitor.totalPrice!! - visitor.totalReward!!
         val formattedLoss = loss.absoluteValue.shortFormat()
         blockedToolTip.add(blockDescription(blockReason, pricePerCopper, loss, formattedLoss))

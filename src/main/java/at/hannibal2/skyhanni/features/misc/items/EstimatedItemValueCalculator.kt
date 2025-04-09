@@ -80,7 +80,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
-// TODO split into smaller sub classes
+// TODO: split into smaller sub classes
 @Suppress("LargeClass")
 object EstimatedItemValueCalculator {
 
@@ -347,7 +347,7 @@ object EstimatedItemValueCalculator {
         return list.formatHaving("Book of Stats", BOOK_OF_STATS)
     }
 
-    // TODO untested
+    // TODO: untested
     private fun addArtOfPeace(stack: ItemStack, list: MutableList<String>): Double {
         if (!stack.hasArtOfPeace()) return 0.0
 
@@ -784,7 +784,7 @@ object EstimatedItemValueCalculator {
 
         list += names
 
-        // TODO add toggle that is default enabled "show unlocked gemstone slot name
+        // TODO: add toggle that is default enabled "show unlocked gemstone slot name
         list.add(" §7Unlocked slots: " + slotNames.joinToString("§7, "))
 
         return totalPrice
@@ -905,7 +905,7 @@ object EstimatedItemValueCalculator {
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
         val unlockedSlots = getExtraAttributes()?.getCompoundTag("gems")?.getTag("unlocked_slots")?.toString() ?: return null
 
-        // TODO detection for old items which doesn't have gems.unlocked_slots NBT array
+        // TODO: detection for old items which doesn't have gems.unlocked_slots NBT array
 //        if (unlockedSlots == "null") return 0.0
 
         if (EstimatedItemValue.gemstoneUnlockCosts.isEmpty()) return null
@@ -931,7 +931,7 @@ object EstimatedItemValueCalculator {
     private fun NeuInternalName.getPrice(): Double = getPriceOrNull() ?: 0.0
     private fun NeuInternalName.getPriceOrNull(): Double? = getPriceOrNull(config.priceSource.get())
 
-    // TODO create attribute class and use this instead of pair, sync with getAttributeFromShard()
+    // TODO: create attribute class and use this instead of pair, sync with getAttributeFromShard()
     fun Pair<String, Int>.getAttributeName(): String {
         val name = first.fixMending().allLettersFirstUppercase()
         return "§b$name $second Shard"

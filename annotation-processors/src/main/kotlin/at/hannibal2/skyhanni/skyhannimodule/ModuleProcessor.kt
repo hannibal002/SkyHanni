@@ -94,7 +94,7 @@ class ModuleProcessor(
             return null
         }
 
-        // TODO remove once all events are migrated to SkyHanniEvent
+        // TODO: remove once all events are migrated to SkyHanniEvent
         val className = symbol.qualifiedName?.asString() ?: "unknown"
 
         for (function in symbol.getDeclaredFunctions()) {
@@ -121,7 +121,7 @@ class ModuleProcessor(
         return symbol
     }
 
-    //TODO remove when KMixins added as it contains KSP annotation helpers.
+    //TODO: remove when KMixins added as it contains KSP annotation helpers.
     private fun isDevAnnotation(klass: KSClassDeclaration): Boolean {
         val annotation = klass.annotations.find { it.shortName.asString() == "SkyHanniModule" } ?: return false
         return annotation.arguments.find { it.name?.asString() == "devOnly" }?.value as? Boolean ?: false
@@ -132,7 +132,7 @@ class ModuleProcessor(
         return annotation.arguments.find { it.name?.asString() == "neuRequired" }?.value as? Boolean ?: false
     }
 
-    // TODO use Kotlin Poet once KMixins is merged
+    // TODO: use Kotlin Poet once KMixins is merged
     private fun generateFile(symbols: List<KSClassDeclaration>) {
 
         if (warnings.isNotEmpty()) {

@@ -25,7 +25,7 @@ object GardenPlotIcon {
     private var inInventory = false
     private var copyStack: ItemStack? = null
 
-    // TODO replace with enum
+    // TODO: replace with enum
     private var editMode = 0 // 0 = off, 1 = on, 2 = reset
     private var lastClickedSlotId = -1
     private val originalStack = mutableMapOf<Int, ItemStack>()
@@ -109,7 +109,7 @@ object GardenPlotIcon {
                 copyStack = event.slot?.stack?.copy()?.also {
                     it.stackSize = 1
                 } ?: return
-                // TODO different format, not bold or show not in chat at all.
+                // TODO: different format, not bold or show not in chat at all.
                 ChatUtils.chat("§6§lClick an item in the desk menu to replace it with that item!")
                 return
             }

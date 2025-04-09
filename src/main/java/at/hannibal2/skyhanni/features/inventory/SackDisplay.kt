@@ -105,7 +105,7 @@ object SackDisplay {
                 val row = buildList {
                     addString(" §7- ")
                     addItemStack(internalName)
-                    // TODO move replace into itemName
+                    // TODO: move replace into itemName
                     val nameText = Renderable.optionalLink(
                         itemName.replace("§k", ""),
                         onLeftClick = {
@@ -144,7 +144,7 @@ object SackDisplay {
                         }
                     }
 
-                    // TODO change color of amount if full
+                    // TODO: change color of amount if full
                     // if (colorCode == "§a") addString("§c§l(Full!)")
 
                     if (SackApi.isTrophySack && magmaFish > 0) {

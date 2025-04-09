@@ -416,7 +416,7 @@ enum class TabWidget(
             update(event.tabList)
         }
 
-        // TODO remove this workaround once the WidgetUpdateEvent gets send when the tab list gets first loaded, as intended.
+        // TODO: remove this workaround once the WidgetUpdateEvent gets send when the tab list gets first loaded, as intended.
         @HandleEvent(priority = HandleEvent.HIGHEST)
         fun onIslandChange(event: IslandChangeEvent) {
             for (widget in entries) {

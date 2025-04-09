@@ -56,7 +56,7 @@ public class CustomSpeedConfig {
     @ConfigEditorSlider(minValue = 1, maxValue = 400, minStep = 1)
     public Property<Float> cocoaBeans = Property.of(155f);
 
-    // TODO does other speed settings exist?
+    // TODO: does other speed settings exist?
     @Expose
     @ConfigOption(name = "Sugar Cane", desc = "Suggested farm speed:\n" +
         "§eYaw 45§7: §f✦ 328 speed")
@@ -69,7 +69,7 @@ public class CustomSpeedConfig {
     @ConfigEditorSlider(minValue = 1, maxValue = 500, minStep = 1)
     public Property<Float> cactus = Property.of(464f);
 
-    // TODO does other speed settings exist?
+    // TODO: does other speed settings exist?
     @Expose
     @ConfigOption(name = "Mushroom", desc = "Suggested farm speed:\n" +
         "§eYaw 60§7: §f✦ 233 speed")

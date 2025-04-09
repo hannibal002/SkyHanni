@@ -46,7 +46,7 @@ object NonGodPotEffectDisplay {
     private val effectDuration = mutableMapOf<NonGodPotEffect, Timer>()
     private var display = emptyList<String>()
 
-    // TODO move the whole list into the repo
+    // TODO: move the whole list into the repo
     enum class NonGodPotEffect(
         val tabListName: String,
         val isMixin: Boolean = false,
@@ -108,7 +108,7 @@ object NonGodPotEffectDisplay {
         display = emptyList()
     }
 
-    // todo : cleanup and add support for poison candy I, and add support for splash / other formats
+    // TODO: cleanup and add support for poison candy I, and add support for splash / other formats
     @HandleEvent
     @Suppress("MaxLineLength")
     fun onChat(event: SkyHanniChatEvent) {
@@ -274,7 +274,7 @@ object NonGodPotEffectDisplay {
         }
     }
 
-    // TODO use TablistFooterUpdateEvent instead
+    // TODO: use TablistFooterUpdateEvent instead
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW, receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
         val packet = event.packet

@@ -54,7 +54,7 @@ object KeyboardManager {
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
 
     /**
-     * TODO make use of this function unnecessary: Try to avoid using `isModifierKeyDown` as the only option,
+     * TODO: make use of this function unnecessary: Try to avoid using `isModifierKeyDown` as the only option,
      * allow the user to set a different option instead and just set the default key to isModifierKeyDown
      */
     fun getModifierKeyName(): String = if (SystemUtils.IS_OS_MAC) "Command" else "Control"
@@ -108,7 +108,7 @@ object KeyboardManager {
             }
         } else clickedKeys.remove(key)
         //#else
-        //$$ // todo use fabric event or whatnot
+        //$$ // TODO: use fabric event or whatnot
         //#endif
     }
 

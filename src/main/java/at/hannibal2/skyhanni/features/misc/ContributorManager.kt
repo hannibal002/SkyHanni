@@ -51,7 +51,7 @@ object ContributorManager {
             // normal SkyHanni contributor
             null -> true
 
-            // TODO add other mod's devs, e.g skytils
+            // TODO: add other mod's devs, e.g skytils
 
             "SBA" -> config.fancySbaContributors
 

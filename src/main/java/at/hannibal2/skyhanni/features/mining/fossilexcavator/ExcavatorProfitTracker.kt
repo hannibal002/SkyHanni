@@ -107,7 +107,7 @@ object ExcavatorProfitTracker {
         profit: Double,
     ): Double {
         if (fossilDustGained <= 0) return profit
-        // TODO use same price source as profit tracker
+        // TODO: use same price source as profit tracker
         val pricePer = scrapItem.getPrice() / 500
         val fossilDustPrice = pricePer * fossilDustGained
         add(
@@ -144,7 +144,7 @@ object ExcavatorProfitTracker {
         profit: Double,
     ): Double {
         if (timesExcavated <= 0) return profit
-        // TODO use same price source as profit tracker
+        // TODO: use same price source as profit tracker
         val scrapPrice = timesExcavated * scrapItem.getPrice()
         val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
         add(
@@ -208,7 +208,7 @@ object ExcavatorProfitTracker {
             ChatUtils.debug("no price for excavator profit: '$name'")
             return
         }
-        // TODO use primitive item stacks in trackers
+        // TODO: use primitive item stacks in trackers
         tryAddItem(internalName, amount, command = false)
     }
 

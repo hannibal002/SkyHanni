@@ -26,7 +26,7 @@ import java.awt.Color
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
-// TODO delete workaround class PestParticleLine when this class works again
+// TODO: delete workaround class PestParticleLine when this class works again
 @SkyHanniModule
 object PestParticleWaypoint {
 

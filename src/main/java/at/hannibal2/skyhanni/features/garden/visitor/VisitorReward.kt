@@ -25,7 +25,7 @@ enum class VisitorReward(
 
     private val internalName = rawInternalName.toInternalName()
     val itemStack by lazy { internalName.getItemStack() }
-    // TODO use this instead of hard coded item names once moulconfig no longer calls toString before the neu repo gets loaded
+    // TODO: use this instead of hard coded item names once moulconfig no longer calls toString before the neu repo gets loaded
 //     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }
 
     companion object {

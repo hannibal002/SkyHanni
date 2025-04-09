@@ -87,7 +87,7 @@ enum class BossType(
     DUNGEON_F6_GIANT_4("§eLaser Shooter", Type.DUNGEON_FLOOR_6, "§eGiant 4"),
     DUNGEON_F6_SADAN("§cSadan", Type.DUNGEON_FLOOR_6),
 
-    // TODO implement
+    // TODO: implement
     DUNGEON_7("", Type.DUNGEON_FLOOR_7),
 
     MINOS_INQUISITOR("§5Minos Inquisitor", Type.DIANA_MOBS),
@@ -109,7 +109,7 @@ enum class BossType(
     BACTE("§aBacte", Type.THE_RIFT_BOSSES),
     SUN_GECKO("§cSun Gecko", Type.THE_RIFT_BOSSES),
 
-    WINTER_REINDRAKE("Reindrake", Type.REINDRAKE), // TODO fix totally
+    WINTER_REINDRAKE("Reindrake", Type.REINDRAKE), // TODO: fix totally
 
     GARDEN_PEST_BEETLE("§cBeetle", Type.GARDEN_PESTS),
     GARDEN_PEST_CRICKET("§cCricket", Type.GARDEN_PESTS),
@@ -123,8 +123,8 @@ enum class BossType(
     GARDEN_PEST_EARTHWORM("§cEarthworm", Type.GARDEN_PESTS),
     GARDEN_PEST_FIELD_MOUSE("§c§lField Mouse", Type.GARDEN_PESTS),
 
-    // TODO Corleone
-    // TODO bal
+    // TODO: Corleone
+    // TODO: bal
 
     /**
      * TODO dungeon mini bosses
@@ -137,5 +137,5 @@ enum class BossType(
      *
      */
 
-    // TODO diana mythological creatures
+    // TODO: diana mythological creatures
 }

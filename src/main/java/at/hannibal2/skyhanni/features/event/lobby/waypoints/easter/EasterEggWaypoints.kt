@@ -89,7 +89,7 @@ object EasterEggWaypoints {
         return if (config.onlyClosest) closest == this else true
     }
 
-    // TODO use regex with the help of knowing the original lore. Will most likely need to wait until next egg event
+    // TODO: use regex with the help of knowing the original lore. Will most likely need to wait until next egg event
 
     /*
         Title:

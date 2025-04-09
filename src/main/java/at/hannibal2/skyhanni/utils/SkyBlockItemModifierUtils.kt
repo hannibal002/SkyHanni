@@ -75,7 +75,7 @@ object SkyBlockItemModifierUtils {
         return data.petCandies
     }
 
-    // TODO use NeuInternalName here
+    // TODO: use NeuInternalName here
     fun ItemStack.getPetItem(): String? {
         val data = cachedData
         if (data.heldItem == "") {

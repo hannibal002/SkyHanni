@@ -154,7 +154,7 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
     //#if MC < 1.16
     Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
     //#else
-    //$$ // todo convert the id int to the middle variable of MessageSignatureData
+    //$$ // TODO: convert the id int to the middle variable of MessageSignatureData
     //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, null, MessageIndicator.system())
     //#endif
 }

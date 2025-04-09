@@ -46,7 +46,7 @@ class DebugMobConfig {
         @ConfigEditorBoolean
         var realPlayerHighlight: Boolean = false
 
-        // TODO rename to displayNpc
+        // TODO: rename to displayNpc
         @Expose
         @ConfigOption(
             name = "DisplayNPC",

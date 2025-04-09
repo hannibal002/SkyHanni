@@ -96,7 +96,7 @@ object IslandExceptions {
     ) = when {
         armorStand?.isDefaultValue() != false ->
             if (baseEntity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) < 15.0) {
-                // TODO fix to always include Valid Mobs on Private Island
+                // TODO: fix to always include Valid Mobs on Private Island
                 MobData.MobResult.found(MobFactories.minionMob(baseEntity))
             } else MobData.MobResult.notYetFound
 

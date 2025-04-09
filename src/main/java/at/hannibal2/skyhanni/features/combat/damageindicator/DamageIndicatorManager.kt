@@ -66,7 +66,7 @@ import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-// TODO cut class into smaller pieces
+// TODO: cut class into smaller pieces
 @SkyHanniModule
 @Suppress("LargeClass")
 object DamageIndicatorManager {
@@ -137,7 +137,7 @@ object DamageIndicatorManager {
         GlStateManager.disableDepth()
         GlStateManager.disableCull()
 
-        // TODO config to define between 100ms and 5 sec
+        // TODO: config to define between 100ms and 5 sec
         val filter = data.filter {
             val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
             (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
@@ -173,7 +173,7 @@ object DamageIndicatorManager {
 
         for (data in data.values) {
 
-            // TODO test end stone protector in hole? - maybe change eye pos
+            // TODO: test end stone protector in hole? - maybe change eye pos
 //            data.ignoreBlocks =
 //                data.bossType == BossType.END_ENDSTONE_PROTECTOR && Minecraft.getMinecraft().thePlayer.isSneaking
 
@@ -316,7 +316,7 @@ object DamageIndicatorManager {
         BossType.SLAYER_BLAZE_QUAZII_3,
         BossType.SLAYER_BLAZE_QUAZII_4,
 
-            // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
+            // TODO: f3/m3 4 guardians, f2/m2 4 boss room fighters
         -> true
 
         else -> false
@@ -476,7 +476,7 @@ object DamageIndicatorManager {
 
             BossType.SLAYER_ZOMBIE_5 -> {
                 if ((entity as EntityZombie).hasNameTagWith(3, "§fBoom!")) {
-                    // TODO fix
+                    // TODO: fix
 //                    val ticksAlive = entity.ticksExisted % (20 * 5)
 //                    val remainingTicks = (5 * 20).toLong() - ticksAlive
 //                    val format = formatDelay(remainingTicks * 50)
@@ -612,7 +612,7 @@ object DamageIndicatorManager {
 
         // hide while in the middle
 //        val position = entity.getLorenzVec()
-        // TODO other logic or something
+        // TODO: other logic or something
 //        entityData.healthLineHidden = position.x == -368.0 && position.z == -804.0
 
         var calcHealth = -1

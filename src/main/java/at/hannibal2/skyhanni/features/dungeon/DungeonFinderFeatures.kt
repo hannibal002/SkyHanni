@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
-// TODO Remove all removeColor calls in this class. Deal with the color code in regex.
-// TODO also fix up this all being coded very poorly and having the same patterns in multiple places
+// TODO: Remove all removeColor calls in this class. Deal with the color code in regex.
+// TODO: also fix up this all being coded very poorly and having the same patterns in multiple places
 @SkyHanniModule
 object DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
@@ -315,7 +315,7 @@ object DungeonFinderFeatures {
         if (!partyFinderTitlePattern.matches(inventoryName)) return map
         inInventory = true
         for ((slot, stack) in event.inventoryItems) {
-            // TODO use enum
+            // TODO: use enum
             val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
             val toolTip = stack.getLore().toMutableList()
             for ((index, line) in stack.getLore().withIndex()) {
@@ -353,7 +353,7 @@ object DungeonFinderFeatures {
 
         val toolTip = toolTipMap[event.slot.slotNumber]
         if (toolTip.isNullOrEmpty()) return
-        // TODO @Thunderblade73 fix that to "event.toolTip = toolTip"
+        // TODO: @Thunderblade73 fix that to "event.toolTip = toolTip"
         val oldToolTip = event.toolTip
         for ((index, line) in toolTip.withIndex()) {
             if (index >= event.toolTip.size - 1) {

@@ -123,7 +123,7 @@ object SackApi {
     private var sackRarity: TrophyRarity? = null
 
     /**
-     * TODO merge all 3 lists into one:
+     * TODO: merge all 3 lists into one:
      *
      * move item name (currently key) into AbstractSackItem
      * work with instance check

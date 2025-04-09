@@ -26,7 +26,7 @@ object BeaconPower {
 
     private val group = RepoPattern.group("gui.beaconpower")
 
-    // TODO add regex tests
+    // TODO: add regex tests
     private val deactivatedPattern by group.pattern(
         "deactivated",
         "§7Beacon Deactivated §8- §cNo Power Remaining",

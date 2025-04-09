@@ -137,7 +137,7 @@ class DungeonConfig {
     @Accordion
     var chest: DungeonChestConfig = DungeonChestConfig()
 
-    // TODO move( , "dungeon.croesusUnopenedChestTracker" ,"dungeon.chest.showUnopened" )
+    // TODO: move( , "dungeon.croesusUnopenedChestTracker" ,"dungeon.chest.showUnopened" )
     @Expose
     @ConfigOption(
         name = "Croesus Chest",

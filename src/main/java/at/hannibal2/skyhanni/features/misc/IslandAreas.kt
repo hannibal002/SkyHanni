@@ -164,7 +164,7 @@ object IslandAreas {
                 passedAreas.remove("null")
                 passedAreas.remove(currentAreaName)
                 // so show areas needed to pass thorough
-                // TODO show this pass through in the /shnavigate command
+                // TODO: show this pass through in the /shnavigate command
                 if (passedAreas.isNotEmpty()) {
 //                     suffix = " §7${passedAreas.joinToString(", ")}"
                 }

@@ -127,7 +127,7 @@ object MiningEventTracker {
 
         // we now ignore mineshaft events.
         if (IslandType.MINESHAFT.isInIsland()) return
-        // TODO fix this via regex
+        // TODO: fix this via regex
         if (eventName == "SLAYER QUEST") return
 
         val eventType = MiningEventType.fromEventName(eventName) ?: run {

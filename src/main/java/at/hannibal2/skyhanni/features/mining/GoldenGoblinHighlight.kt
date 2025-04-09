@@ -52,7 +52,7 @@ object GoldenGoblinHighlight {
     }
 
     private fun handle() {
-        // TODO merge the two time objects into one
+        // TODO: merge the two time objects into one
         if (lastChatMessage.passedSince() > timeOut || lastGoblinSpawn.passedSince() > timeOut) return
         lastChatMessage = SimpleTimeMark.farPast()
         lastGoblinSpawn = SimpleTimeMark.farPast()

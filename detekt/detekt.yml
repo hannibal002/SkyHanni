@@ -70,7 +70,7 @@ style:
         allowedNames: "^(unused|_)$"
     UseCheckOrError:
         active: false
-    ForbiddenComment: # every TODO gets flagged
+    ForbiddenComment: # every TODO: gets flagged
         active: false
     DestructuringDeclarationWithTooManyEntries: # too aggressive
         active: true

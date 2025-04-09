@@ -49,7 +49,7 @@ object HypixelLocationApi {
     var isGuest: Boolean = false
         private set
 
-    // TODO reenable the setting once the hypixel mod api works fine
+    // TODO: reenable the setting once the hypixel mod api works fine
 //     val config get() = SkyHanniMod.feature.dev.hypixelModApi
     val config get() = false
 

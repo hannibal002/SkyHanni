@@ -160,7 +160,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
+    // TODO: add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
     private fun calculateNewTarget(): LorenzVec? {
         val locations = mutableListOf<LorenzVec>()
 
@@ -351,7 +351,7 @@ object GriffinBurrowHelper {
                 event.drawColor(location, LorenzColor.LIGHT_PURPLE)
                 val distance = location.distance(playerLocation)
                 if (distance > 10) {
-                    // TODO use round(1)
+                    // TODO: use round(1)
                     val formattedDistance = distance.toInt().addSeparators()
                     event.drawDynamicText(location.up(), "§d§lInquisitor §e${formattedDistance}m", 1.7)
                 } else {

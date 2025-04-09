@@ -37,7 +37,7 @@ object TrackSoundsCommand {
     private var display: List<Renderable> = emptyList()
     private var worldSounds: Map<LorenzVec, List<PlaySoundEvent>> = emptyMap()
 
-    // TODO write abstract code for this and TrackParticlesCommand
+    // TODO: write abstract code for this and TrackParticlesCommand
     private fun command(args: Array<String>) {
         if (!LorenzUtils.inSkyBlock) {
             ChatUtils.userError("This command only works in SkyBlock!")
