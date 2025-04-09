@@ -8,13 +8,13 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 
-const val SELECTED_COLOR = 0x50000000
-const val NOT_SELECTED_COLOR = 0x50303030
-const val TAB_SPACING = 5
-const val TAB_SHORT_SIDE = 25
-const val TAB_LONG_SIDE = 28
-
 abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen() {
+
+    private val SELECTED_COLOR = 0x50000000
+    private val NOT_SELECTED_COLOR = 0x50303030
+    private val TAB_SPACING = 5
+    private val TAB_SHORT_SIDE = 25
+    private val TAB_LONG_SIDE = 28
 
     abstract val sizeX: Int
     abstract val sizeY: Int

@@ -142,6 +142,7 @@ object FarmingLaneFeatures {
                 null -> TitleManager.sendTitle(
                     text.replace("&", "§"),
                     duration = secondsBefore.seconds,
+                    weight = 1.1,
                 )
                 else -> titleContext.takeIf { it?.ended == false }
             }
