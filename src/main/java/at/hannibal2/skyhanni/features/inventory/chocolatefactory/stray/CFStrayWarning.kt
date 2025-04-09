@@ -171,7 +171,7 @@ object CFStrayWarning {
 
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = !keycode.isInventoryClosure() || !warningConfig.blockClosing || activeStraySlots.isEmpty()
+        val shouldContinue = !isInventoryClosure(keycode) || !warningConfig.blockClosing || activeStraySlots.isEmpty()
         if (!shouldContinue) {
             TitleManager.sendTitle(
                 "§cStray Rabbit Prevented Close",

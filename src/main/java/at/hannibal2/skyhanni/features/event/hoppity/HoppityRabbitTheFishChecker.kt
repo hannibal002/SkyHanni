@@ -91,7 +91,7 @@ object HoppityRabbitTheFishChecker {
 
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
+        val shouldContinue = isInventoryClosure(keycode) || !isEnabled() || rabbitTheFishIndex == null
         if (!shouldContinue) {
             TitleManager.sendTitle(
                 "§cRabbit the Fish Prevented Close",
