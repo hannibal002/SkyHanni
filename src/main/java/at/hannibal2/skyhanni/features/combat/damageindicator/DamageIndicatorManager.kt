@@ -64,7 +64,9 @@ import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toDuration
 
 // TODO cut class into smaller pieces
 @SkyHanniModule
@@ -734,6 +736,17 @@ object DamageIndicatorManager {
             hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
+        if (config.enderSlayer.emanTpTimer && !entity.isDead) {
+            val teleportTime = 7.1.seconds
+
+            val teleportCycleTicks = (7.1 * 20).toInt()
+            val ticksAlive = (entity.ticksExisted % teleportCycleTicks).ticks
+
+            val remainingTime = teleportTime - ticksAlive
+            val formatDelay = formatDelay(remainingTime)
+            entityData.nameSuffix += " §f$formatDelay"
+        }
+
         val ridingEntity = entity.ridingEntity
         // Laser phase
         if (config.enderSlayer.laserPhaseTimer && ridingEntity != null) {
@@ -743,7 +756,7 @@ object DamageIndicatorManager {
             val remainingTime = totalTimeAlive - ticksAlive
             val formatDelay = formatDelay(remainingTime)
             if (config.enderSlayer.showHealthDuringLaser || hitPhaseText != null) {
-                entityData.nameSuffix = " §f$formatDelay"
+                entityData.nameSuffix += " §f$formatDelay"
             } else {
                 return formatDelay
             }
@@ -752,14 +765,6 @@ object DamageIndicatorManager {
             return it
         }
 
-        if (config.enderSlayer.emanTpTimer && !entity.isDead) {
-            val teleportTime = 7.1.seconds
-
-            val ticksAlive = entity.ticksExisted.ticks
-            val remainingTime = teleportTime - ticksAlive
-            val formatDelay = formatDelay(remainingTime)
-            entityData.nameSuffix = " §f$formatDelay"
-        }
         return result
     }
 
