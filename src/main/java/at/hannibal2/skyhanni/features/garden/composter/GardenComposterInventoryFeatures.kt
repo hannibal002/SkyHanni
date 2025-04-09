@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -24,9 +25,8 @@ object GardenComposterInventoryFeatures {
 
     private val config get() = GardenApi.config.composters
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
-        if (!GardenApi.inGarden()) return
         if (!config.upgradePrice) return
 
         if (InventoryUtils.openInventoryName() != "Composter Upgrades") return
@@ -78,12 +78,11 @@ object GardenComposterInventoryFeatures {
 
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
             if (event.gui !is GuiChest) return
-            val guiChest = event.gui
-            val chest = guiChest.inventorySlots as ContainerChest
+            val chest = event.container as ContainerChest
 
             for ((slot, stack) in chest.getUpperItems()) {
                 if (stack.getLore().any { it == "§eClick to upgrade!" }) {
-                    slot highlight LorenzColor.GOLD
+                    slot.highlight(LorenzColor.GOLD)
                 }
             }
         }

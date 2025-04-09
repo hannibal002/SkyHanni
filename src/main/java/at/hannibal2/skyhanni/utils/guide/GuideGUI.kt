@@ -8,13 +8,14 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 
-const val SELECTED_COLOR = 0x50000000
-const val NOT_SELECTED_COLOR = 0x50303030
-const val TAB_SPACING = 5
-const val TAB_SHORT_SIDE = 25
-const val TAB_LONG_SIDE = 28
-
 abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen() {
+    companion object {
+        const val SELECTED_COLOR = 0x50000000
+        const val NOT_SELECTED_COLOR = 0x50303030
+        const val TAB_SPACING = 5
+        const val TAB_SHORT_SIDE = 25
+        const val TAB_LONG_SIDE = 28
+    }
 
     abstract val sizeX: Int
     abstract val sizeY: Int
@@ -98,7 +99,7 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
             Renderable.string(
                 "§7SkyHanni ",
                 horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
-                verticalAlign = RenderUtils.VerticalAlignment.BOTTOM
+                verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
             ).renderXYAligned(0, 0, sizeX, sizeY)
 
             val page = pageList[currentPage]
@@ -106,16 +107,15 @@ abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen
 
             GlStateManager.translate(-guiLeft.toFloat(), -guiTop.toFloat(), 0f)
         }
-
         GlStateManager.popMatrix()
-
     } catch (e: Exception) {
         GlStateManager.popMatrix()
         ErrorManager.logErrorWithData(
             e, "Something broke in GuideGUI",
             "Guide" to this.javaClass.typeName,
-            "Page" to currentPage.name
+            "Page" to currentPage.name,
         )
+        Unit
     }
 }
 

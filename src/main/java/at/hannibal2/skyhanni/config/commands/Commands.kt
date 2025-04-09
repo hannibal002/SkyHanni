@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
+import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
@@ -52,7 +52,6 @@ import at.hannibal2.skyhanni.test.command.CopyItemCommand
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
 import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
-import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -66,8 +65,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 object Commands {
     // Do not add new commands in this class
     // TODO move all command loading away from this class
-
-    val commandList = mutableListOf<CommandBuilder>()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -116,6 +113,7 @@ object Commands {
         event.register("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             category = CommandCategory.USERS_ACTIVE
+            aliases = listOf("shlockmouse")
             callback { LockMouseLook.toggleLock() }
         }
         event.register("shsensreduce") {
@@ -249,12 +247,7 @@ object Commands {
         event.register("shupdaterepo") {
             description = "Download the SkyHanni repo again"
             category = CommandCategory.USERS_BUG_FIX
-            callback { SkyHanniMod.repo.updateRepo() }
-        }
-        event.register("shtogglehypixelapierrors") {
-            description = "Show/hide hypixel api error messages in chat"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { ApiUtils.toggleApiErrorMessages() }
+            callback { RepoManager.updateRepo() }
         }
         event.register("shfixminions") {
             description = "Removed bugged minion locations from your private island"
@@ -279,7 +272,7 @@ object Commands {
         event.register("shrepostatus") {
             description = "Shows the status of all the mods constants"
             category = CommandCategory.USERS_BUG_FIX
-            callback { SkyHanniMod.repo.displayRepoStatus(false) }
+            callback { RepoManager.displayRepoStatus(false) }
         }
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."
@@ -343,11 +336,6 @@ object Commands {
             description = "Test the inquisitor waypoint share"
             category = CommandCategory.DEVELOPER_DEBUG
             callback { InquisitorWaypointShare.test() }
-        }
-        event.register("shshowcropmoneycalculation") {
-            description = "Show the calculation of the crop money"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CropMoneyDisplay.toggleShowCalculation() }
         }
         event.register("shcropspeedmeter") {
             description = "Debugs how many crops you collect over time"
@@ -434,17 +422,12 @@ object Commands {
         event.register("shreloadlocalrepo") {
             description = "Reloading the local repo data"
             category = CommandCategory.DEVELOPER_TEST
-            callback { SkyHanniMod.repo.reloadLocalRepo() }
+            callback { RepoManager.reloadLocalRepo() }
         }
         event.register("shrepopatterns") {
             description = "See where regexes are loaded from"
             category = CommandCategory.DEVELOPER_TEST
             callback { RepoPatternGui.open() }
-        }
-        event.register("shtestitem") {
-            description = "test item internal name resolving"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { SkyHanniDebugsAndTests.testItemCommand(it) }
         }
         event.register("shfindnullconfig") {
             description = "Find config elements that are null and prints them into the console"
@@ -457,12 +440,12 @@ object Commands {
             callback { SkyHanniDebugsAndTests.waypoint(it) }
         }
         event.register("shstoplisteners") {
-            description = "Unregistering all loaded forge event listeners"
+            description = "Unregistering all loaded event listeners"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.stopListeners() }
         }
         event.register("shreloadlisteners") {
-            description = "Trying to load all forge event listeners again. Might not work at all"
+            description = "Reloads all event listeners again"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.reloadListeners() }
         }

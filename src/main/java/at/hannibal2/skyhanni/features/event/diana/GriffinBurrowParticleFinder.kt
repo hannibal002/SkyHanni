@@ -5,21 +5,21 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
-import net.minecraft.network.play.server.S2APacketParticles
+import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -58,87 +58,69 @@ object GriffinBurrowParticleFinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
-    fun onPacketReceive(event: PacketReceivedEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (!config.burrowsSoopyGuess) return
-        val packet = event.packet
+        if (!config.guess) return
 
-        if (packet is S2APacketParticles) {
+        val type = ParticleType.entries.firstOrNull { it.check(event) } ?: return
 
-            val particleType = ParticleType.getParticleType(packet)
-            if (particleType != null) {
+        val location = event.location
+        val burrow = burrows.getOrPut(location) { Burrow(location) }
+        val oldBurrowType = burrow.type
 
-                val location = packet.toLorenzVec().toBlockPos().down().toLorenzVec()
-                if (location in recentlyDugParticleBurrows) return
-                val burrow = burrows.getOrPut(location) { Burrow(location) }
+        when (type) {
+            ParticleType.FOOTSTEP -> burrow.hasFootstep = true
+            ParticleType.ENCHANT -> burrow.hasEnchant = true
+            ParticleType.EMPTY -> burrow.type = 0
+            ParticleType.MOB -> burrow.type = 1
+            ParticleType.TREASURE -> burrow.type = 2
+        }
 
-                when (particleType) {
-                    ParticleType.FOOTSTEP -> burrow.hasFootstep = true
-                    ParticleType.ENCHANT -> burrow.hasEnchant = true
-                    ParticleType.EMPTY -> burrow.type = 0
-                    ParticleType.MOB -> burrow.type = 1
-                    ParticleType.TREASURE -> burrow.type = 2
-                }
-
-                if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
-                    if (!burrow.found) {
-                        BurrowDetectEvent(burrow.location, burrow.getType()).post()
-                        burrow.found = true
-                    }
-                }
+        burrow.burrowTimeToLive += 1
+        if (burrow.burrowTimeToLive > 40) burrow.burrowTimeToLive = 40
+        if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
+            if (!burrow.found || burrow.type != oldBurrowType) {
+                BurrowDetectEvent(burrow.location, burrow.getType()).post()
+                burrow.found = true
             }
         }
     }
 
-    private enum class ParticleType(val check: S2APacketParticles.() -> Boolean) {
-        EMPTY(
-            {
-                particleType == net.minecraft.util.EnumParticleTypes.CRIT_MAGIC &&
-                    particleCount == 4 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
-            },
-        ),
-        MOB(
-            {
-                particleType == net.minecraft.util.EnumParticleTypes.CRIT &&
-                    particleCount == 3 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f
-
-            },
-        ),
-        TREASURE(
-            {
-                particleType == net.minecraft.util.EnumParticleTypes.DRIP_LAVA &&
-                    particleCount == 2 && particleSpeed == 0.01f && xOffset == 0.35f && yOffset == 0.1f && zOffset == 0.35f
-            },
-        ),
-        FOOTSTEP(
-            {
-                particleType == net.minecraft.util.EnumParticleTypes.FOOTSTEP &&
-                    particleCount == 1 && particleSpeed == 0.0f && xOffset == 0.05f && yOffset == 0.0f && zOffset == 0.05f
-            },
-        ),
-        ENCHANT(
-            {
-                particleType == net.minecraft.util.EnumParticleTypes.ENCHANTMENT_TABLE &&
-                    particleCount == 5 && particleSpeed == 0.05f && xOffset == 0.5f && yOffset == 0.4f && zOffset == 0.5f
-            },
-        );
-
-        companion object {
-
-            fun getParticleType(packet: S2APacketParticles): ParticleType? {
-                if (!packet.isLongDistance) return null
-                for (type in entries) {
-                    if (type.check(packet)) {
-                        return type
-                    }
-                }
-                return null
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onTick() {
+        val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
+        if (isSpade) {
+            burrows.filter { (location, burrow) ->
+                burrow.burrowTimeToLive -= 1
+                location.distanceSqToPlayer() < 256 && burrow.burrowTimeToLive < 0
+            }.forEach { (location, burrow) ->
+                BurrowDugEvent(location).post()
+                burrows.remove(location)
+                lastDugParticleBurrow = null
             }
         }
+    }
+
+    private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
+        EMPTY(
+            { type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset == LorenzVec(0.5, 0.1, 0.5) },
+        ),
+        MOB(
+            { type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && offset == LorenzVec(0.5, 0.1, 0.5) },
+        ),
+        TREASURE(
+            { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset == LorenzVec(0.35, 0.1, 0.35) },
+        ),
+        FOOTSTEP(
+            { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && offset == LorenzVec(0.05, 0.0, 0.05) },
+        ),
+        ENCHANT(
+            { type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset == LorenzVec(0.5, 0.4, 0.5) },
+        )
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         reset()
     }
 
@@ -150,7 +132,7 @@ object GriffinBurrowParticleFinder {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (!config.burrowsSoopyGuess) return
+        if (!config.guess) return
         val message = event.message
         if (message.startsWith("§eYou dug out a Griffin Burrow!") ||
             message == "§eYou finished the Griffin burrow chain! §r§7(4/4)"
@@ -182,7 +164,7 @@ object GriffinBurrowParticleFinder {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
-        if (!config.burrowsSoopyGuess) return
+        if (!config.guess) return
 
         val location = event.position
         if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
@@ -211,6 +193,7 @@ object GriffinBurrowParticleFinder {
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
+        var burrowTimeToLive: Int = 0,
     ) {
 
         fun getType(): BurrowType {

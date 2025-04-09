@@ -19,15 +19,16 @@ import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -71,7 +72,7 @@ object SlayerProfitTracker {
 
         override fun getDescription(timesDropped: Long): List<String> {
             val percentage = timesDropped.toDouble() / slayerCompletedCount
-            val perBoss = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val perBoss = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
                 "§7Dropped §e${timesDropped.addSeparators()} §7times.",
@@ -183,16 +184,14 @@ object SlayerProfitTracker {
 
         var profit = tracker.drawItems(data, { true }, this)
         val slayerSpawnCost = data.slayerSpawnCost
-        if (slayerSpawnCost != 0L) {
-            val slayerSpawnCostFormat = slayerSpawnCost.shortFormat()
-            add(
-                Renderable.hoverTips(
-                    " §7Slayer Spawn Costs: §c$slayerSpawnCostFormat",
-                    listOf("§7You paid §c$slayerSpawnCostFormat §7in total", "§7for starting the slayer quests."),
-                ).toSearchable(),
-            )
-            profit += slayerSpawnCost
-        }
+        val slayerSpawnCostFormat = slayerSpawnCost.shortFormat()
+        add(
+            Renderable.hoverTips(
+                " §7Slayer Spawn Costs: §c$slayerSpawnCostFormat",
+                listOf("§7You paid §c$slayerSpawnCostFormat §7in total", "§7for starting the slayer quests."),
+            ).toSearchable(),
+        )
+        profit += slayerSpawnCost
 
         val slayerCompletedCount = data.slayerCompletedCount.addSeparators()
         add(

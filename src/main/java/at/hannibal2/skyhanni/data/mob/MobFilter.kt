@@ -1,25 +1,25 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -54,23 +54,26 @@ object MobFilter {
 
     private val patternGroup = RepoPattern.group("mob.detection")
 
-    /** REGEX-TEST: Wither Husk 500M❤ */
+    /**
+     * REGEX-TEST: Wither Husk 500M❤
+     */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
         "(?:\\[\\w+(?<level>\\d+)\\] )?(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
     )
     val slayerNameFilter by patternGroup.pattern("filter.slayer", "^. (?<name>.*) (?<tier>[IV]+) \\d+.*")
 
-    /** REGEX-TEST: ﴾ Storm ﴿
-     *  REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv500] Magma Boss █████████████████████████ ﴿
-     *  REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
-     *  REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
-     *  */
+    /**
+     * REGEX-TEST: ﴾ Storm ﴿
+     * REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv500] Magma Boss █████████████████████████ ﴿
+     * REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000❤ ﴿
+     * REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
+     * REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
+     */
     val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
         "^. (?:\\[Lv(?<level>\\d+)\\] )?(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
@@ -87,9 +90,15 @@ object MobFilter {
         "filter.dojo",
         "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$",
     )
+
+    /**
+     * REGEX-TEST: [Lv3] TheNewArrow's Purple Jerry 5 Hits
+     * REGEX-TEST: [Lv3] aheNewarrow's Purple Jerry 5 Hits
+     * REGEX-TEST: [Lv1] aThunderblade73's Green Jerrya 7 Hits
+     */
     val jerryPattern by patternGroup.pattern(
         "jerry",
-        "(?:\\[\\w+(?<level>\\d+)\\] )?(?<owner>\\w+)'s (?<name>\\w+ Jerry) \\d+ Hits",
+        "(?:\\[\\w+(?<level>\\d+)\\] )?(?:(?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?)) \\d+ Hits",
     )
     val petCareNamePattern by patternGroup.pattern(
         "pattern.petcare",

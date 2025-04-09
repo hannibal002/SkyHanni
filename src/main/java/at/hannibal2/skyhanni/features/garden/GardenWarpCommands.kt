@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,10 +31,9 @@ object GardenWarpCommands {
 
     private var lastWarpTime = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.warpCommands) return
-        if (!GardenApi.inGarden()) return
 
         val message = event.message.lowercase()
 
@@ -57,16 +57,16 @@ object GardenWarpCommands {
         }
     }
 
-    @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
-        if (!GardenApi.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onKeyDown(event: KeyDownEvent) {
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NeuItems.neuHasFocus()) return
 
-        if (lastWarpTime.passedSince() < 2.seconds) return
-
         when (event.keyCode) {
             config.homeHotkey -> {
+                if (lastWarpTime.passedSince() < 2.seconds) return
+                lastWarpTime = SimpleTimeMark.now()
+
                 HypixelCommands.warp("garden")
             }
 
@@ -75,12 +75,14 @@ object GardenWarpCommands {
             }
 
             config.barnHotkey -> {
+                if (lastWarpTime.passedSince() < 2.seconds) return
+                lastWarpTime = SimpleTimeMark.now()
+
                 LockMouseLook.autoDisable()
                 HypixelCommands.teleportToPlot("barn")
             }
 
             else -> return
         }
-        lastWarpTime = SimpleTimeMark.now()
     }
 }
