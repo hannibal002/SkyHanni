@@ -59,8 +59,6 @@ object PestTrapApi {
         @Expose var baitType: SprayType? = null,
     ) {
         val index get() = number - 1
-        val isFull get() = count >= MAX_PEST_COUNT_PER_TRAP
-        val noBait get() = baitCount == 0
         val plot get() = plotName?.let {
             GardenPlotApi.getPlotByName(it)
         } ?: location?.let {
@@ -80,7 +78,7 @@ object PestTrapApi {
     private val PEST_SLOTS = 13..15
     private const val RELEASE_ALL_SLOT = 17
     private const val MAX_RELEASED_PESTS = 8
-    const val MAX_PEST_TRAPS = 3
+    private const val MAX_PEST_TRAPS = 3
 
     private val patternGroup = RepoPattern.group("garden.pests.trap")
     private val storage get() = GardenApi.storage
@@ -160,6 +158,7 @@ object PestTrapApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onIslandChange(event: IslandChangeEvent) {
+        lastTabHash = 0
         timeEnteredGarden = when (event.newIsland) {
             IslandType.GARDEN -> SimpleTimeMark.now()
             else -> null

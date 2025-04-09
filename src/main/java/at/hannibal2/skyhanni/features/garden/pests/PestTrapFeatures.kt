@@ -58,6 +58,9 @@ object PestTrapFeatures {
     fun onPestTrapDataUpdate(event: PestTrapDataUpdatedEvent) {
         val data = event.data
 
+        ChatUtils.chat("Full traps: ${data.checkFullWarnings()}")
+        ChatUtils.chat("No bait traps: ${data.checkNoBaitWarnings()}")
+
         data.checkFullWarnings().takeIfNotEmpty()?.let {
             activeWarnings[WarningReason.TRAP_FULL] = it
         } ?: activeWarnings.remove(WarningReason.TRAP_FULL)
