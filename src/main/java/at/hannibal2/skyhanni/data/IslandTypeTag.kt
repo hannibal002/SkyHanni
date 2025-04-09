@@ -69,6 +69,12 @@ object IslandTypeTags {
         IslandType.GARDEN_GUEST,
     )
 
+    val PERSONAL_ISLAND = IslandTypeTag(
+        "personal_island",
+        PRIVATE_ISLAND,
+        GARDEN_ISLAND,
+    )
+
     // Mining
     val IS_COLD = IslandTypeTag(
         "is_cold",
@@ -108,9 +114,8 @@ object IslandTypeTags {
     )
     val HAS_SHOWCASES = IslandTypeTag(
         "has_showcases",
+        PRIVATE_ISLAND,
         IslandType.HUB,
-        IslandType.PRIVATE_ISLAND,
-        IslandType.PRIVATE_ISLAND_GUEST,
         IslandType.CRIMSON_ISLE,
     )
     val CONTESTS_SHOWN = IslandTypeTag(
