@@ -1,12 +1,18 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage.HitmanStatsStorage
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.hitmanAvailableEggsPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.inPartialMinutes
@@ -24,6 +30,18 @@ object HitmanApi {
     private val orderOrdinalMap = resettingEntries.mapIndexed { index, hoppityEggType ->
         hoppityEggType to resettingEntries[(index + 1) % resettingEntries.size]
     }.toMap()
+    private val storage get() = ProfileStorageData.profileSpecific
+
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        val storage = storage ?: return
+        if (event.inventoryName != "Rabbit Hitman") return
+        val summaryItem = event.inventoryItems[4].takeIf { it?.displayName == "§cRabbit Hitman" } ?: return
+        val availableEggs = hitmanAvailableEggsPattern.firstMatcher(summaryItem.getLore()) {
+            group("amount").toInt()
+        } ?: return
+        storage.chocolateFactory.hitmanStats.availableHitmanEggs = availableEggs
+    }
 
     /**
      * Get the time until the given number of slots are available.

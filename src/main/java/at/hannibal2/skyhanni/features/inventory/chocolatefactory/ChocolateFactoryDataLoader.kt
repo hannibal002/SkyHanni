@@ -195,7 +195,7 @@ object ChocolateFactoryDataLoader {
     /**
      * REGEX-TEST: §7Available eggs: §a0
      */
-    private val hitmanAvailableEggsPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val hitmanAvailableEggsPattern by ChocolateFactoryApi.patternGroup.pattern(
         "hitman.availableeggs",
         "§7Available eggs: §a(?<amount>\\d+)",
     )
