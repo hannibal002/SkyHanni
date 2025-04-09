@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig
 import at.hannibal2.skyhanni.config.features.event.EventConfig
 import at.hannibal2.skyhanni.config.features.fishing.FishingConfig
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig
-import at.hannibal2.skyhanni.config.features.gui.GUIConfig
+import at.hannibal2.skyhanni.config.features.gui.GuiConfig
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
 import at.hannibal2.skyhanni.config.features.mining.MiningConfig
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig
@@ -72,7 +72,7 @@ class Features : Config() {
     @JvmField
     @Expose
     @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
-    var gui: GUIConfig = GUIConfig()
+    var gui: GuiConfig = GuiConfig()
 
     // Islands
     @Expose

@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -75,7 +73,7 @@ object FossilSolverDisplay {
     var possibleFossilTypes = setOf<FossilType>()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         clearData()
     }
 
@@ -97,7 +95,7 @@ object FossilSolverDisplay {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         val slots = InventoryUtils.getItemsInOpenChest()
         val itemNames = slots.map { it.stack.displayName.removeColor() }

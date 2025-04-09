@@ -394,6 +394,8 @@ net.minecraft.world.level.block.Blocks DANDELION YELLOW_FLOWER
 net.minecraft.world.level.block.Blocks NETHER_QUARTZ_ORE QUARTZ_ORE
 net.minecraft.world.level.block.Blocks SUGAR_CANE REEDS
 net.minecraft.world.level.block.Blocks MELON MELON_BLOCK
+net.minecraft.world.level.block.Blocks TERRACOTTA HARDENED_CLAY
+net.minecraft.world.level.block.Blocks COBBLESTONE_STAIRS STONE_STAIRS
 
 net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 

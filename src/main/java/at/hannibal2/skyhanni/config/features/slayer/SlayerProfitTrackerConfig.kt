@@ -21,4 +21,12 @@ class SlayerProfitTrackerConfig {
     @Expose
     @ConfigLink(owner = SlayerProfitTrackerConfig::class, field = "enabled")
     var pos: Position = Position(20, 20, false, true)
+
+    @Expose
+    @ConfigOption(
+        name = "Voidgloom in Dragon's Nest",
+        desc = "Show the Voidgloom Tracker in the Dragon's Nest.",
+    )
+    @ConfigEditorBoolean
+    var voidgloomInNest: Boolean = false
 }

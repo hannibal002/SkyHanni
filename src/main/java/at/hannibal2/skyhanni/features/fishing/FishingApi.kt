@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
@@ -23,11 +22,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
+import at.hannibal2.skyhanni.utils.compat.addLavas
+import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
-import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -44,8 +44,8 @@ object FishingApi {
         "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
-    val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
-    private val waterBlocks = listOf(Blocks.water, Blocks.flowing_water)
+    val lavaBlocks = buildList { addLavas() }
+    private val waterBlocks = buildList { addWaters() }
 
     var lastCastTime = SimpleTimeMark.farPast()
     var holdingRod = false
@@ -63,7 +63,7 @@ object FishingApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityFishHook>) {
         if (!holdingRod) return
-        if (!event.entity.angler.isLocalPlayer) return
+        if (event.entity.angler?.isLocalPlayer == false) return
 
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
@@ -77,7 +77,7 @@ object FishingApi {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         resetBobber()
     }
 
