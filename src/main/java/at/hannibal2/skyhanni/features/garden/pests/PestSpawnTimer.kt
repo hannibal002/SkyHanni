@@ -65,8 +65,6 @@ object PestSpawnTimer {
 
     private var maxPests = false
 
-    private var ready = false
-
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
