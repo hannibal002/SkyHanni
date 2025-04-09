@@ -97,10 +97,10 @@ object PestTrapFeatures {
     private fun Set<Int>.getWarningFormat() = joinToString("§8, ") { "§a#$it" }
 
     private fun List<PestTrapData>.checkFullWarnings() = this.filter {
-        it.count >= PestTrapApi.MAX_PEST_COUNT_PER_TRAP
-    }.map { it.number }.toSet()
+        it.pestCount >= PestTrapApi.MAX_PEST_COUNT_PER_TRAP
+    }.map { it.trapNumber }.toSet()
 
     private fun List<PestTrapData>.checkNoBaitWarnings() = this.filter {
         it.baitCount == 0
-    }.map { it.number }.toSet()
+    }.map { it.trapNumber }.toSet()
 }
