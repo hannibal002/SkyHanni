@@ -10,11 +10,11 @@ import net.minecraft.item.ItemStack
 
 abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen() {
     companion object {
-        val SELECTED_COLOR = 0x50000000
-        val NOT_SELECTED_COLOR = 0x50303030
-        val TAB_SPACING = 5
-        val TAB_SHORT_SIDE = 25
-        val TAB_LONG_SIDE = 28
+        const val SELECTED_COLOR = 0x50000000
+        const val NOT_SELECTED_COLOR = 0x50303030
+        const val TAB_SPACING = 5
+        const val TAB_SHORT_SIDE = 25
+        const val TAB_LONG_SIDE = 28
     }
 
     abstract val sizeX: Int

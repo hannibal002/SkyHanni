@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -21,7 +22,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ChocolateFactoryStrayTimer {
+object CFStrayTimer {
 
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs.strayTimer
     private var timer: Duration = Duration.ZERO
@@ -66,7 +67,7 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || !ChocolateFactoryApi.inChocolateFactory) return
+        if (!isEnabled() || !CFApi.inChocolateFactory) return
         lastTimerSubtraction = lastTimerSubtraction?.takeIfInitialized()?.let {
             timer -= it.passedSince()
             if (timer < Duration.ZERO) timer = Duration.ZERO
@@ -80,7 +81,7 @@ object ChocolateFactoryStrayTimer {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled() || !ChocolateFactoryApi.inChocolateFactory) return
+        if (!isEnabled() || !CFApi.inChocolateFactory) return
         eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }
 

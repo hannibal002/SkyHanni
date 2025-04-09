@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.HoppityStateDataSet
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary.getRabbitsFormat
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFTimeTowerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -28,11 +28,11 @@ typealias RarityType = HoppityChatConfig.CompactRarityTypes
 object HoppityEggsCompactChat {
 
     private var lockedHitmanClaimCount: Int? = null
-    private var hoppityDataSet = HoppityStateDataSet()
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = CFApi.config
     private val chatConfig get() = HoppityEggsManager.config.chat
     private val waypointsConfig get() = HoppityEggsManager.config.waypoints
     private val hitmanCompactDataSets: MutableList<HoppityStateDataSet> = mutableListOf()
+    private var hoppityDataSet = HoppityStateDataSet()
 
     private fun reset() {
         lockedHitmanClaimCount = null
@@ -135,7 +135,7 @@ object HoppityEggsCompactChat {
 
     private fun Long?.getChocExtraTimeString(): String {
         if (this == null) return "?"
-        val extraTime = ChocolateFactoryApi.timeUntilNeed(this)
+        val extraTime = CFApi.timeUntilNeed(this)
         return if (config.showDuplicateTime) ", §a+§b${extraTime.format(maxUnits = 2)}§7" else ""
     }
 
@@ -169,7 +169,7 @@ object HoppityEggsCompactChat {
             } else ""
 
             val timeStr = lastDuplicateAmount.getChocExtraTimeString()
-            val dupeChocColor = if (chatConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) "§d" else "§6"
+            val dupeChocColor = if (chatConfig.recolorTTChocolate && CFTimeTowerManager.timeTowerActive()) "§d" else "§6"
 
             val dupeChocFormat = " §7(§6+$dupeChocColor$dupeChocAmount §6Chocolate§7$timeStr)"
 

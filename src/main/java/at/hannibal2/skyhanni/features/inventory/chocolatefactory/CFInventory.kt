@@ -13,22 +13,22 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 
 @SkyHanniModule
-object ChocolateFactoryInventory {
+object CFInventory {
 
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = CFApi.config
 
     /**
      * REGEX-TEST: §7§aYou have 1 unclaimed reward!
      * REGEX-TEST: §7§aYou have 2 unclaimed rewards!
      */
-    private val unclaimedRewardsPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val unclaimedRewardsPattern by CFApi.patternGroup.pattern(
         "unclaimedrewards",
         "§7§aYou have \\d+ unclaimed rewards?!",
     )
 
     @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!CFApi.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
 
@@ -36,7 +36,7 @@ object ChocolateFactoryInventory {
             if (slot.stack == null) continue
             val slotIndex = slot.slotNumber
 
-            if (slotIndex == ChocolateFactoryApi.bestPossibleSlot) {
+            if (slotIndex == CFApi.bestPossibleSlot) {
                 event.drawSlotText(slot.xDisplayPosition + 18, slot.yDisplayPosition, "§6✦", 1f)
             }
         }
@@ -44,36 +44,36 @@ object ChocolateFactoryInventory {
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!CFApi.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.stack == null) continue
             val slotIndex = slot.slotNumber
 
-            val currentUpdates = ChocolateFactoryApi.factoryUpgrades
+            val currentUpdates = CFApi.factoryUpgrades
             currentUpdates.find { it.slotIndex == slotIndex }?.let { upgrade ->
                 if (upgrade.canAfford()) {
                     slot.highlight(LorenzColor.GREEN.addOpacity(75))
                 }
             }
-            if (slotIndex == ChocolateFactoryApi.bestAffordableSlot) {
+            if (slotIndex == CFApi.bestAffordableSlot) {
                 slot.highlight(LorenzColor.GREEN.addOpacity(200))
             }
 
-            if (slotIndex == ChocolateFactoryApi.barnIndex && ChocolateFactoryBarnManager.isBarnFull()) {
+            if (slotIndex == CFApi.barnIndex && CFBarnManager.isBarnFull()) {
                 slot.highlight(LorenzColor.RED)
             }
-            if (slotIndex == ChocolateFactoryApi.milestoneIndex) {
+            if (slotIndex == CFApi.milestoneIndex) {
                 unclaimedRewardsPattern.firstMatcher(slot.stack?.getLore().orEmpty()) {
                     slot.highlight(LorenzColor.RED)
                 }
             }
-            if (slotIndex == ChocolateFactoryApi.timeTowerIndex) {
-                if (ChocolateFactoryTimeTowerManager.timeTowerActive()) {
+            if (slotIndex == CFApi.timeTowerIndex) {
+                if (CFTimeTowerManager.timeTowerActive()) {
                     slot.highlight(LorenzColor.LIGHT_PURPLE.addOpacity(200))
                 }
-                if (ChocolateFactoryTimeTowerManager.timeTowerFull()) {
+                if (CFTimeTowerManager.timeTowerFull()) {
                     slot.highlight(LorenzColor.RED)
                 }
             }
@@ -82,28 +82,28 @@ object ChocolateFactoryInventory {
 
     @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!CFApi.inChocolateFactory) return
         if (!config.showStackSizes) return
 
-        val upgradeInfo = ChocolateFactoryApi.factoryUpgrades.find { it.slotIndex == event.slot.slotNumber } ?: return
+        val upgradeInfo = CFApi.factoryUpgrades.find { it.slotIndex == event.slot.slotNumber } ?: return
         event.stackTip = upgradeInfo.stackTip()
     }
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!CFApi.inChocolateFactory) return
         val slot = event.slot ?: return
         val slotNumber = slot.slotNumber
         if (!config.useMiddleClick) return
-        if (slotNumber in ChocolateFactoryApi.noPickblockSlots &&
-            (slotNumber != ChocolateFactoryApi.timeTowerIndex || event.clickedButton == 1)
+        if (slotNumber in CFApi.noPickblockSlots &&
+            (slotNumber != CFApi.timeTowerIndex || event.clickedButton == 1)
         ) return
 
-        // this would break ChocolateFactoryKeybinds otherwise
+        // this would break CFKeybinds otherwise
         if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) return
 
         // if the user is holding shift, we don't want to pickblock, handled by hypixel as +10 levels for rabbits
-        if (KeyboardManager.isShiftKeyDown() && slotNumber in ChocolateFactoryApi.rabbitSlots.keys) return
+        if (KeyboardManager.isShiftKeyDown() && slotNumber in CFApi.rabbitSlots.keys) return
 
         event.makePickblock()
     }
