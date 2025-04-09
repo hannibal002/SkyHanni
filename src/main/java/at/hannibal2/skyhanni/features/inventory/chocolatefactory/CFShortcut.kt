@@ -16,13 +16,13 @@ import net.minecraft.client.player.inventory.ContainerLocalMenu
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ChocolateFactoryShortcut {
+object CFShortcut {
 
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = CFApi.config
     private var showItem = false
     private var lastClick = SimpleTimeMark.farPast()
 
-    private val slotId get() = ChocolateFactoryApi.cfShortcutIndex
+    private val slotId get() = CFApi.cfShortcutIndex
 
     private val item by lazy {
         ItemUtils.createSkull(

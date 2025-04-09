@@ -1,7 +1,7 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryStrayRabbitWarningConfig.StrayTypeEntry
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFStrayRabbitWarningConfig.StrayTypeEntry
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -10,10 +10,11 @@ import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityTextureHandler
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.caughtRabbitPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.specialRabbitTextures
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeGoldenRabbitPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.caughtRabbitPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.specialRabbitTextures
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeGoldenRabbitPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
@@ -32,9 +33,9 @@ import net.minecraft.item.ItemStack
 import kotlin.math.sin
 
 @SkyHanniModule
-object ChocolateFactoryStrayWarning {
+object CFStrayWarning {
 
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = CFApi.config
     private val warningConfig get() = config.rabbitWarning
     private const val CHROMA_COLOR = "249:255:255:85:85"
     private const val CHROMA_COLOR_ALT = "246:255:255:85:85"
@@ -81,13 +82,13 @@ object ChocolateFactoryStrayWarning {
 
         val isSpecial = goldenClickMeMatches || item.getSkullTexture() in specialRabbitTextures
 
-        if (isSpecial) SoundUtils.repeatSound(100, warningConfig.repeatSound, ChocolateFactoryApi.warningSound)
+        if (isSpecial) SoundUtils.repeatSound(100, warningConfig.repeatSound, CFApi.warningSound)
         else SoundUtils.playBeepSound()
     }
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!CFApi.inChocolateFactory) return
         if (config.partyMode.get()) event.partyModeHighlight()
         else event.strayHighlight()
     }
@@ -116,7 +117,7 @@ object ChocolateFactoryStrayWarning {
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) {
+        if (!CFApi.inChocolateFactory) {
             flashScreen = false
             return
         }
@@ -157,7 +158,7 @@ object ChocolateFactoryStrayWarning {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!CFApi.inChocolateFactory) return
         if (!flashScreen && !config.partyMode.get()) return
         val minecraft = Minecraft.getMinecraft()
         val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
