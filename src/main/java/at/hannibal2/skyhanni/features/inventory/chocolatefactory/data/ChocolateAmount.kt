@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.inventory.chocolatefactory
+package at.hannibal2.skyhanni.features.inventory.chocolatefactory.data
 
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.profileStorage
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.profileStorage
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -26,17 +27,17 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
     fun timeUntilGoal(goal: Long): Duration {
         val profileStorage = profileStorage ?: return Duration.ZERO
         val updatedAgo = profileStorage.lastDataSave.passedSince()
-        return ChocolateFactoryApi.timeUntilNeed(goal - chocolate()) - updatedAgo
+        return CFApi.timeUntilNeed(goal - chocolate()) - updatedAgo
     }
 
     companion object {
         fun chocolateSinceUpdate(): Long {
-            if (ChocolateFactoryApi.isMax()) return 0L
+            if (CFApi.isMax()) return 0L
             val lastUpdate = profileStorage?.lastDataSave ?: return 0
             val currentTime = SimpleTimeMark.now()
             val secondsSinceUpdate = (currentTime - lastUpdate).inWholeSeconds
 
-            val perSecond = ChocolateFactoryApi.chocolatePerSecond
+            val perSecond = CFApi.chocolatePerSecond
             return (perSecond * secondsSinceUpdate).toLong()
         }
 

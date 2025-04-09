@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.getOrNull
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ChocolateFactoryTooltipCompact {
-    private val config get() = ChocolateFactoryApi.config
+object CFTooltipCompact {
+    private val config get() = CFApi.config
 
     private var lastClick = SimpleTimeMark.farPast()
     private var lastHover = SimpleTimeMark.farPast()
@@ -22,7 +22,7 @@ object ChocolateFactoryTooltipCompact {
 
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!CFApi.inChocolateFactory) return
 
         if (config.tooltipMove) {
             if (event.slot.slotNumber <= 44) {
@@ -40,7 +40,7 @@ object ChocolateFactoryTooltipCompact {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryApi.inChocolateFactory) return
+        if (!CFApi.inChocolateFactory) return
         if (config.tooltipMove) {
             if (lastHover.passedSince() < 1.seconds) {
                 config.tooltipMovePosition.renderStrings(tooltipToHover, posLabel = "Tooltip Move")
@@ -67,7 +67,7 @@ object ChocolateFactoryTooltipCompact {
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
 
-        if (ChocolateFactoryApi.inChocolateFactory) {
+        if (CFApi.inChocolateFactory) {
             if (event.slotId == 13) {
                 lastClick = SimpleTimeMark.now()
             }
