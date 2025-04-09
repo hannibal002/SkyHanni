@@ -1,10 +1,11 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -16,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object BonusPestChanceDisplay {
 
-    private val config get() = GardenAPI.config
+    private val config get() = PestAPI.config
 
     private val patternGroup = RepoPattern.group("garden.bonuspestchance")
 
@@ -26,7 +27,7 @@ object BonusPestChanceDisplay {
      */
     private val bonusPestChancePattern by patternGroup.pattern(
         "widget",
-        "\\s+(?:§.)*?(?<disabled>§m)?Bonus Pest Chance: (?:§.)*ൠ(?<amount>[\\d,.]+)"
+        "\\s+(?:§.)*?(?<disabled>§m)?Bonus Pest Chance: (?:§.)*ൠ(?<amount>[\\d,.]+)",
     )
     private var display: String? = null
 
