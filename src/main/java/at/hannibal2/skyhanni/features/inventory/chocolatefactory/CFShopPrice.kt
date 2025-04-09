@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -33,13 +34,13 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
-object ChocolateShopPrice {
-    private val config get() = ChocolateFactoryApi.config.chocolateShopPrice
+object CFShopPrice {
+    private val config get() = CFApi.config.chocolateShopPrice
 
     private var display = emptyList<Renderable>()
     private var products = emptyList<Product>()
 
-    val menuNamePattern by ChocolateFactoryApi.patternGroup.pattern(
+    val menuNamePattern by CFApi.patternGroup.pattern(
         "shop.title",
         "Chocolate Shop",
     )
@@ -48,7 +49,7 @@ object ChocolateShopPrice {
      * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§a!
      * REGEX-TEST: §aYou bought §r§aSupreme Chocolate Bar§r§8 x5§r§a!
      */
-    private val itemBoughtPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val itemBoughtPattern by CFApi.patternGroup.pattern(
         "shop.bought",
         "§aYou bought §r§.(?<item>[\\w ]+)§r(?:§8 x(?<amount>\\d+)§r)?§a!",
     )
@@ -56,7 +57,7 @@ object ChocolateShopPrice {
     /**
      * REGEX-TEST: §7Chocolate Spent: §60
      */
-    private val chocolateSpentPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val chocolateSpentPattern by CFApi.patternGroup.pattern(
         "shop.spent",
         "§7Chocolate Spent: §6(?<amount>[\\d,]+)",
     )
@@ -105,7 +106,7 @@ object ChocolateShopPrice {
                 }
             }
 
-            val chocolate = ChocolateFactoryApi.getChocolateBuyCost(lore) ?: continue
+            val chocolate = CFApi.getChocolateBuyCost(lore) ?: continue
             val internalName = item.getInternalName()
             val itemPrice = internalName.getPriceOrNull() ?: continue
             val otherItemsPrice = item.loreCosts().sumOf { it.getPrice() }.takeIf { it != 0.0 }
@@ -169,7 +170,7 @@ object ChocolateShopPrice {
             add(Renderable.string("§eChocolate available: §6${ChocolateAmount.CURRENT.formatted}"))
             // TODO add chocolate spend needed for next milestone
             add(Renderable.string("§eChocolate spent: §6${chocolateSpent.addSeparators()}"))
-            add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale))
+            add(RenderableUtils.fillTable(table, padding = 5, itemScale = config.itemScale.toDouble()))
         }
     }
 

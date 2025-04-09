@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CFStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
@@ -12,18 +12,25 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFUpgrade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -34,11 +41,11 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ChocolateFactoryApi {
+object CFApi {
 
     private val chromaEnabled get() = ChromaManager.config.enabled.get()
-    val config: ChocolateFactoryConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
-    val profileStorage: ChocolateFactoryStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
+    val config: CFConfig get() = SkyHanniMod.feature.inventory.chocolateFactory
+    val profileStorage: CFStorage? get() = ProfileStorageData.profileSpecific?.chocolateFactory
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
 
     // <editor-fold desc="Patterns">
@@ -119,7 +126,7 @@ object ChocolateFactoryApi {
     var leaderboardPercentile: Double? = null
     var chocolateForPrestige = 150_000_000L
 
-    var factoryUpgrades = listOf<ChocolateFactoryUpgrade>()
+    var factoryUpgrades = listOf<CFUpgrade>()
     var bestAffordableSlot = -1
     var bestPossibleSlot = -1
 
@@ -132,7 +139,7 @@ object ChocolateFactoryApi {
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
             if (config.enabled) {
                 chocolateFactoryPaused = true
-                ChocolateFactoryStats.updateDisplay()
+                CFStats.updateDisplay()
             }
             return
         }
@@ -141,7 +148,7 @@ object ChocolateFactoryApi {
         if (config.enabled) {
             factoryUpgrades = emptyList()
             DelayedRun.runNextTick {
-                ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
+                CFDataLoader.updateInventoryItems(event.inventoryItems)
             }
         }
     }
@@ -173,7 +180,7 @@ object ChocolateFactoryApi {
         chocolateShopMilestones = data.chocolateShopMilestones.toMutableList()
         specialRabbitTextures = data.specialRabbits
 
-        ChocolateFactoryUpgrade.updateIgnoredSlots()
+        CFUpgrade.updateIgnoredSlots()
     }
 
     @HandleEvent
@@ -241,7 +248,7 @@ object ChocolateFactoryApi {
 
         if (rawChocolatePerSecond == 0) return Duration.INFINITE
 
-        val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
+        val secondsUntilTowerExpires = CFTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
 
         val timeTowerChocPerSecond = rawChocolatePerSecond * (baseMultiplier + timeTowerMultiplier())
 
@@ -270,4 +277,33 @@ object ChocolateFactoryApi {
     fun String.partyModeReplace(): String =
         if (config.partyMode.get() && inChocolateFactory && chromaEnabled) replace(Regex("§[a-fA-F0-9]"), "§z")
         else this
+
+    fun updatePosition(position: Int?, leaderboard: String) {
+        position ?: return
+        val storage = profileStorage?.positionChange ?: return
+        val lastTime = storage.lastTime
+        val lastPosition = storage.lastPosition
+        val lastLeaderboard = storage.lastLeaderboard
+
+        if (lastLeaderboard == leaderboard) return
+
+        lastLeaderboard?.let { lastLb ->
+            if (lastPosition == -1 || lastPosition == position || !config.leaderboardChange) return@let
+
+            var message = "§b$lastLb §c-> §b$leaderboard"
+            val change = lastPosition - position
+            val color = if (change > 0) "§a+" else "§c"
+            message += "\n §7Changed by $color${change.addSeparators()} ${StringUtils.pluralize(change, "spot")}"
+
+            lastTime?.let {
+                message += " §7in §b${it.passedSince().format(maxUnits = 2)}"
+            }
+
+            ChatUtils.chat(" \n§7(SkyHanni) §6CF Leaderboard Change§7:\n $message\n ", prefix = false)
+        }
+
+        storage.lastTime = SimpleTimeMark.now()
+        storage.lastLeaderboard = leaderboard
+        storage.lastPosition = position
+    }
 }
