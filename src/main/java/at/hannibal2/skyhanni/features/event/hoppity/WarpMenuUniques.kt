@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -24,7 +24,7 @@ object WarpMenuUniques {
     )
 
     private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>?
-        get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations
+        get() = CFApi.profileStorage?.collectedEggLocations
 
     private val config get() = SkyHanniMod.feature.event.hoppityEggs.warpMenu
 
