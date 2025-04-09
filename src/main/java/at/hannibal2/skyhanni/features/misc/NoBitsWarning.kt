@@ -20,7 +20,7 @@ object NoBitsWarning {
 
     @HandleEvent
     fun onBitsGain(event: BitsUpdateEvent.BitsGain) {
-        if (config.bitsGainChatMessage && event.bitsAvailable == 0) {
+        if (config.enableWarning && event.bitsAvailable == 0) {
 
             ChatUtils.clickableChat(
                 "§bNo Bits Available! §eClick to buy booster cookies on the bazaar.",
@@ -33,7 +33,7 @@ object NoBitsWarning {
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
         }
 
-        if (config.enableWarning) {
+        if (config.bitsGainChatMessage) {
             if (event.bits < config.threshold) return
             ChatUtils.chat("You have gained §b${event.difference.addSeparators()} §eBits.")
         }
