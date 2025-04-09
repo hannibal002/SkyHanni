@@ -204,6 +204,8 @@ object PestSpawnTimer {
 
         val pestCooldown = if (!TabWidget.PESTS.isActive) {
             "§cPests Widget not detected! Enable via /widget!"
+        } else if (maxPests) {
+            "§cMax Pests!"
         } else {
             var cooldownValue = if (!pestCooldownEndTime.isFarPast()) pestCooldownEndTime.timeUntil().format() else "§cUnknown"
             if (cooldownValue == "Soon") cooldownValue = "§aReady!"
