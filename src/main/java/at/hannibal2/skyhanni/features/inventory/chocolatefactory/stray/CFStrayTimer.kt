@@ -70,7 +70,7 @@ object CFStrayTimer {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || !CFApi.inCf) return
+        if (!isEnabled() || !CFApi.inChocolateFactory) return
         lastTimerSubtraction = lastTimerSubtraction?.takeIfInitialized()?.let {
             timer -= it.passedSince()
             if (timer < Duration.ZERO) timer = Duration.ZERO
@@ -84,7 +84,7 @@ object CFStrayTimer {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled() || !CFApi.inCf) return
+        if (!isEnabled() || !CFApi.inChocolateFactory) return
         eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }
 
@@ -97,7 +97,7 @@ object CFStrayTimer {
 
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || !CFApi.inCf
+        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || !CFApi.inChocolateFactory
         if (!shouldContinue) {
             TitleManager.sendTitle(
                 "§cStray Timer Prevented Close",

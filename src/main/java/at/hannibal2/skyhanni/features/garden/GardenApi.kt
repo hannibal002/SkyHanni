@@ -192,7 +192,7 @@ object GardenApi {
         VisitorApi.inInventory ||
         FFGuideGUI.isInGui() ||
         CFShopPrice.inInventory ||
-        CFApi.inCf ||
+        CFApi.inChocolateFactory ||
         CFApi.chocolateFactoryPaused ||
         HoppityCollectionStats.inInventory ||
         PesthunterProfit.isInInventory()

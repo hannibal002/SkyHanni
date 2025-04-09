@@ -112,7 +112,7 @@ object CFApi {
     private var maxPrestige = 6
     var cfShortcutIndex = 16
 
-    val inCf get() = mainInventory.isInside()
+    val inChocolateFactory get() = mainInventory.isInside()
     var chocolateFactoryPaused = false
 
     var currentPrestige = 1
@@ -270,6 +270,6 @@ object CFApi {
     } ?: false
 
     fun String.partyModeReplace(): String =
-        if (config.partyMode.get() && inCf && chromaEnabled) replace(Regex("§[a-fA-F0-9]"), "§z")
+        if (config.partyMode.get() && inChocolateFactory && chromaEnabled) replace(Regex("§[a-fA-F0-9]"), "§z")
         else this
 }

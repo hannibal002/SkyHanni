@@ -123,7 +123,7 @@ object HoppityEventSummary {
         // Get the inventory name and check if it matches any of the specific inventories
         val inventoryName = InventoryUtils.openInventoryName()
 
-        val inCf = CFApi.inCf ||
+        val inCf = CFApi.inChocolateFactory ||
             menuNamePattern.matches(inventoryName) ||
             miscCfInventoryPatterns.matches(inventoryName)
 
@@ -224,7 +224,7 @@ object HoppityEventSummary {
         if (!liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
-        if (Minecraft.getMinecraft().currentScreen != null && !CFApi.inCf) return
+        if (Minecraft.getMinecraft().currentScreen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggledOff = !storage.hoppityStatLiveDisplayToggledOff
@@ -551,7 +551,7 @@ object HoppityEventSummary {
     }
 
     private fun checkAddCfTime() {
-        if (!CFApi.inCf) {
+        if (!CFApi.inChocolateFactory) {
             lastAddedCfMillis = SimpleTimeMark.farPast()
             return
         }

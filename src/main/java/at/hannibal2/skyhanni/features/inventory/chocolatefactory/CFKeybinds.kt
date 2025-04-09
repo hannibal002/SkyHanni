@@ -18,7 +18,7 @@ object CFKeybinds {
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: GuiKeyPressEvent) {
         if (!config.enabled) return
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
 
         val chest = event.guiContainer as? GuiChest ?: return
 
@@ -38,7 +38,7 @@ object CFKeybinds {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.enabled) return
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
 
         // needed to not send duplicate clicks via keybind feature
         if (event.clickType == GuiContainerEvent.ClickType.HOTBAR) {

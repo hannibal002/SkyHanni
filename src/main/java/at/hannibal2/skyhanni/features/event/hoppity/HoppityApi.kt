@@ -234,7 +234,7 @@ object HoppityApi {
         }
 
         // Only process if we're in the Chocolate Factory.
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
 
         event.inventoryItems.filterStrayProcessable().forEach { (slotNumber, itemStack) ->
             var processed = false

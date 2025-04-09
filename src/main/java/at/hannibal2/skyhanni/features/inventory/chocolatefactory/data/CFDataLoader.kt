@@ -234,7 +234,7 @@ object CFDataLoader {
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
 
         updateInventoryItems(event.inventoryItems)
     }

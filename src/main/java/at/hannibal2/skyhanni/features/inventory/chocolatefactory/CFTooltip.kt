@@ -14,7 +14,7 @@ object CFTooltip {
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onTooltip(event: ToolTipEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         if (!config.extraTooltipStats) return
 
         val slotIndex = event.slot.slotNumber

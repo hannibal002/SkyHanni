@@ -87,7 +87,7 @@ object CFStrayWarning {
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         if (config.partyMode.get()) event.partyModeHighlight()
         else event.strayHighlight()
     }
@@ -116,7 +116,7 @@ object CFStrayWarning {
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!CFApi.inCf) {
+        if (!CFApi.inChocolateFactory) {
             flashScreen = false
             return
         }
@@ -156,7 +156,7 @@ object CFStrayWarning {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         if (!flashScreen && !config.partyMode.get()) return
         val minecraft = Minecraft.getMinecraft()
         val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)

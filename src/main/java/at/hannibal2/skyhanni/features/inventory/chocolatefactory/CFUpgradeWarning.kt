@@ -41,7 +41,7 @@ object CFUpgradeWarning {
         if (config.upgradeWarningSound) {
             SoundUtils.playBeepSound()
         }
-        if (CFApi.inCf) return
+        if (CFApi.inChocolateFactory) return
         ChatUtils.clickToActionOrDisable(
             "You have a Chocolate factory upgrade available to purchase!",
             config::upgradeWarning,

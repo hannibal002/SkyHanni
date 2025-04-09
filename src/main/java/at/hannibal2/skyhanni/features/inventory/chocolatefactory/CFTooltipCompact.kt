@@ -22,7 +22,7 @@ object CFTooltipCompact {
 
     @HandleEvent
     fun onToolTip(event: ToolTipEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
 
         if (config.tooltipMove) {
             if (event.slot.slotNumber <= 44) {
@@ -40,7 +40,7 @@ object CFTooltipCompact {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         if (config.tooltipMove) {
             if (lastHover.passedSince() < 1.seconds) {
                 config.tooltipMovePosition.renderStrings(tooltipToHover, posLabel = "Tooltip Move")
@@ -67,7 +67,7 @@ object CFTooltipCompact {
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
 
-        if (CFApi.inCf) {
+        if (CFApi.inChocolateFactory) {
             if (event.slotId == 13) {
                 lastClick = SimpleTimeMark.now()
             }

@@ -313,7 +313,7 @@ object CFStrayTracker {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         // Force a refresh for party mode
-        if (CFApi.inCf && config.partyMode.get()) tracker.update()
+        if (CFApi.inChocolateFactory && config.partyMode.get()) tracker.update()
         tracker.firstUpdate()
     }
 
@@ -363,5 +363,5 @@ object CFStrayTracker {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.strayRabbitTracker && CFApi.inCf
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.strayRabbitTracker && CFApi.inChocolateFactory
 }

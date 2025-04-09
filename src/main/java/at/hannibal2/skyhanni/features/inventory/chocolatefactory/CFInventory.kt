@@ -28,7 +28,7 @@ object CFInventory {
 
     @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
 
@@ -44,7 +44,7 @@ object CFInventory {
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
@@ -82,7 +82,7 @@ object CFInventory {
 
     @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         if (!config.showStackSizes) return
 
         val upgradeInfo = CFApi.factoryUpgrades.find { it.slotIndex == event.slot.slotNumber } ?: return
@@ -91,7 +91,7 @@ object CFInventory {
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         val slot = event.slot ?: return
         val slotNumber = slot.slotNumber
         if (!config.useMiddleClick) return

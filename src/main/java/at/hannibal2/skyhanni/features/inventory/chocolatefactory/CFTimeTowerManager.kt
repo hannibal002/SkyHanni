@@ -41,7 +41,7 @@ object CFTimeTowerManager {
 
         checkTimeTowerExpired()
 
-        if (CFApi.inCf) return
+        if (CFApi.inChocolateFactory) return
 
         if (timeTowerFullTimeMark().isInPast()) {
             profileStorage.currentTimeTowerUses = maxCharges()

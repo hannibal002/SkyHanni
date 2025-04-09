@@ -77,7 +77,7 @@ object CFCustomReminder {
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {
         if (!isEnabled()) return
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         if (configReminder.hideChat) {
             if (chatMessagePattern.matches(event.message)) {
                 event.blockedReason = "custom_reminder"
@@ -150,7 +150,7 @@ object CFCustomReminder {
         event.transform(72, "inventory.chocolateFactory.customReminder.position", Position::migrate)
     }
 
-    private fun inChocolateMenu() = CFShopPrice.inInventory || CFApi.inCf ||
+    private fun inChocolateMenu() = CFShopPrice.inInventory || CFApi.inChocolateFactory ||
         CFApi.chocolateFactoryPaused
 
     private fun setReminder(target: Long, name: String) {

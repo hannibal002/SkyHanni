@@ -25,7 +25,7 @@ object CFTooltipStray {
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onTooltip(event: ToolTipEvent) {
-        if (!CFApi.inCf) return
+        if (!CFApi.inChocolateFactory) return
         if (!config.showStrayTime) return
         if (event.slot.slotNumber > 26 || event.slot.slotNumber == CFApi.infoIndex) return
 

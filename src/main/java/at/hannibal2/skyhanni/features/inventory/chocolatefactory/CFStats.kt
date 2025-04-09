@@ -41,7 +41,7 @@ object CFStats {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!CFApi.inCf && !CFApi.chocolateFactoryPaused) return
+        if (!CFApi.inChocolateFactory && !CFApi.chocolateFactoryPaused) return
         if (!config.statsDisplay) return
 
         display?.let {
