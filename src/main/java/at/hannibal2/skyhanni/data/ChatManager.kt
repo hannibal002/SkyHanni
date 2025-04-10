@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-import at.hannibal2.skyhanni.features.chat.ChatFilterGui
+import at.hannibal2.skyhanni.features.chat.ChatHistoryGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
@@ -173,9 +173,9 @@ object ChatManager {
         return Pair(component.takeIf { modified }, cancelled)
     }
 
-    private fun openChatFilterGui(args: Array<String>) {
+    private fun openChatHistoryGui(args: Array<String>) {
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
-            ChatFilterGui(getRecentMessageHistory())
+            ChatHistoryGui(getRecentMessageHistory())
         } else {
             val searchTerm = args.joinToString(" ")
             val history = getRecentMessageHistoryWithSearch(searchTerm)
@@ -183,7 +183,7 @@ object ChatManager {
                 ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
                 return
             }
-            ChatFilterGui(history)
+            ChatHistoryGui(history)
         }
     }
 
@@ -265,7 +265,7 @@ object ChatManager {
         event.register("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            callback { openChatFilterGui(it) }
+            callback { openChatHistoryGui(it) }
         }
     }
 }

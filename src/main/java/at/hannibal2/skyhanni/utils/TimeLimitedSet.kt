@@ -68,4 +68,6 @@ class TimeLimitedSet<T : Any>(
         }
         return value
     }
+
+    override fun toString(): String = cache.keys.toString()
 }

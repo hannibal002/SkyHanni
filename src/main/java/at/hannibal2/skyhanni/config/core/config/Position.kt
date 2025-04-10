@@ -218,6 +218,7 @@ class Position @JvmOverloads constructor(
                 "owner" to configLink.owner,
                 "field" to configLink.field,
             )
+            ErrorManager.crashInDevEnv("Couldn't set config links") { e }
         }
     }
 

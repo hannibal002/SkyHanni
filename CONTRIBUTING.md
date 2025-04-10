@@ -83,7 +83,7 @@ out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/mast
 
 ## Pull Requests
 
-General infos about Pull Request can be found on [Github Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
+General infos about Pull Request can be found on the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
 
 ### Creating a Pull Request
 
@@ -146,7 +146,7 @@ Internal changes that do not impact the end user. Examples include:
 - Typos in object names (which the end user will not see)
 - API updates
 - Minor performance improvements
-- Preparations for 1.21
+- Preparations for modern Minecraft versions
 - Documentation changes to markdown files, e.g., in `/docs` or this file.
 
 #### Removed Features
@@ -222,6 +222,20 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
+
+### Compatibility with modern versions
+As SkyHanni gets closer to supporting multiple Minecraft versions, there are a few additional coding conventions to follow. Below are some
+of the main conventions to follow to ensure that code you write should work on both 1.8.9 and modern versions. Remember that the best
+way to ensure you are writing the correct code is to look at existing code for similar features and then try to follow that code. Also
+looking in the `at.hannibal2.skyhanni.utils.compat` package is a good idea, as this is where most of the compatibility code will be located.
+- When accessing either the player or the world use `MinecraftCompat.localPlayer()` and `MinecraftCompat.localWorld()`. These methods
+both have a nullable version as well: `MinecraftCompat.localPlayerOrNull()` and `MinecraftCompat.localWorldOrNull()`. This is because on
+1.8.9 while the player and world can be nullable at times, Minecraft's source code does not reflect this.
+- Rendering on modern versions is done completely differently than on 1.8.9. As such, on 1.8.9 we have adjusted our rendering code to more
+closely resemble modern rendering code. You will notice that we pass around both a `DrawContext` and a `WorldRenderContext` object. Both of
+these objects both hold a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack,
+translating and scaling. Where possible you should use these objects instead of the `GlStateManager` directly. If you are unsure, make sure
+to look at existing code to see how it is done and if you are still unsure, ask for help.
 
 ## Additional Useful Development Tools
 
