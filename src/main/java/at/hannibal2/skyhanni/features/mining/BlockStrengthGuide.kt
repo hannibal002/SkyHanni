@@ -170,8 +170,6 @@ object BlockStrengthGuide {
                 this.insert(this.length - 1, '5')
             }
 
-            val blockName = name.allLettersFirstUppercase()
-
             val (progressBar, percentLine) = when (ticks) {
                 1 -> Renderable.progressBar(1.0, InstantMineColor, InstantMineColor, width = 100) to "§6Instant Mine"
                 4 -> Renderable.progressBar(
@@ -198,16 +196,17 @@ object BlockStrengthGuide {
                     ),
                 ),
                 tips = buildList<Renderable> {
+                    val blockName = name.allLettersFirstUppercase()
                     addString(blockName)
                     add(Renderable.placeholder(0, 5))
 
                     addString("§3Ticks: §f$ticks §7(§b$time§7)")
                     addExtraInfo("It takes you §b$time§7 to break $blockName.")
-                    addExtraInfo("Only correct if the server has 20 tps.")
+                    addExtraInfo("Only correct if the server has 20 TPS.")
 
                     addString("§3Your: §6${speed.toInt().addSeparators()} ${SkyblockStat.MINING_SPEED.icon}")
                     addExtraInfo("You have §6${speed.toInt().addSeparators()} mining speed")
-                    addExtraInfo("§7when breaking $blockName :)")
+                    addExtraInfo("when breaking $blockName :)")
 
                     addString(percentLine)
                     add(Renderable.placeholder(0, 5))
@@ -219,15 +218,15 @@ object BlockStrengthGuide {
 
                     addString("§3Softcap: §6${ore.speedSoftCap.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}")
                     addExtraInfo("Having more than §6${ore.speedSoftCap.addSeparators()} mining speed")
-                    addExtraInfo("§7will §c§lNOT §r§7break $blockName any faster.")
+                    addExtraInfo("will §c§lNOT §r§7break $blockName any faster.")
 
                     addString("§3Instant: §6${ore.speedForInstantMine.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}")
-                    addExtraInfo("Once you reach §6${ore.speedForInstantMine.addSeparators()} mining speed ")
-                    addExtraInfo("§7you break $blockName in §e§lone click§7.")
+                    addExtraInfo("Once you reach §6${ore.speedForInstantMine.addSeparators()} mining speed")
+                    addExtraInfo("you break $blockName in §e§lone click§7.")
 
                     add(Renderable.placeholder(0, 5))
                     addString("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}")
-                    addString("§3Blocks in that group: ")
+                    addString("§3Blocks in that group:")
                     add(Renderable.wrappedString(hoverText, width = 200))
 
                     if (!showExtraInfos) {
