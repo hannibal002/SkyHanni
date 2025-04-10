@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -151,6 +152,18 @@ object CaptureFarmingGear {
 
         strengthPattern.firstMatcher(TabListData.getTabList()) {
             GardenApi.storage?.fortune?.farmingStrength = group("strength").toInt()
+        }
+    }
+
+    fun removeInvalidItems() {
+        val storage = GardenApi.storage?.fortune ?: return
+
+        for ((itemType, stack) in storage.farmingItems.toMap()) {
+            if (stack.getInternalNameOrNull() == null) {
+                storage.farmingItems.remove(itemType)
+                storage.outdatedItems[itemType] = true
+                ChatUtils.debug("removed invalid farming item: $itemType (${stack.displayName})")
+            }
         }
     }
 
