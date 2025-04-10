@@ -244,10 +244,10 @@ object BlockStrengthGuide {
         val block: Double,
     ) {
         fun toRenderables() = listOf(
-            base.toInt().toString(),
-            gemstone.toInt().toString(),
-            dwarven.toInt().toString(),
-        ).map { Renderable.string("§6$it") }
+            base.toInt().addSeparators(),
+            gemstone.toInt().addSeparators(),
+            dwarven.toInt().addSeparators(),
+        ).map { Renderable.string("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
     }
 
     private val headerHeaderLine = listOf("Base", "Gemstone", "Dwarven").map {
