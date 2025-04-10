@@ -22,6 +22,11 @@
 + Added Dragon Profit Tracker. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3507)
     + Tracks all loot collected during a dragon fight, records the eyes spent, and calculates overall profit.
 
+#### Dungeon
+
++ Added Dungeon Low Health Alert. - jani (https://github.com/hannibal002/SkyHanni/pull/3734)
+    + Shows a title and plays a sound when a teammate's health is low.
+
 #### Crimson
 
 + Added Rescue Mission Waypoints. - NetheriteMiner + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1928)
@@ -42,10 +47,21 @@
 + Added an All-Time Stats view for the Hoppity Live Display card. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3242)
     + Navigate to the very right using the Event History keys.
 
+#### Garden
+
++ Added Bonus Pest Chance Display. - Zickles & Empa (https://github.com/hannibal002/SkyHanni/pull/2509)
+    + Displays your Bonus Pest Chance and its enabled status.
+
 #### Misc
 
 + Added Estimated Item Value in Tooltip. - nopo (https://github.com/hannibal002/SkyHanni/pull/3631)
     + Displayed total Estimated Item Value as a single line in the item tooltip.
++ Added Accept Last Party Invite. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2541)
+    + Automatically accepts your latest party invite when no player is specified with the /p accept command.
++ Added MayorOverlay. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2593)
+    + View all Mayor-related information on your screen: Current Mayor, Minister, Candidates.
+    + Hover over their perks to see the perk description.
+    + Added to the Outside SkyBlock list to display information even when not in SkyBlock.
 
 ### Improvements
 
@@ -133,6 +149,7 @@
     + Addressed a long-standing issue where keybinds sometimes failed.
     + Bug fixed here was a more exaggerated case of keybind failure.
 + Fixed crop icons being incorrectly enchanted in some GUIs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3708)
++ Fixed lane switch titles sometimes being hidden by other messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3743)
 
 #### The Rift
 
@@ -160,6 +177,7 @@
 + Fixed incorrect Hitman times when eggs were claimable. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3573)
 + Prevented Egglocator from guessing incorrectly around Fishing Bobbers in Hotspots. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3623)
 + Fixed EggLocator particles being discarded when too close. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3652)
++ Fixed Hitman claim chat compact threshold not working as expected. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3740)
 
 #### Chat
 
@@ -183,6 +201,7 @@
 #### Combat
 
 + Fixed Dragon Profit tracker overwriting edit commands for other Trackers. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3704)
++ Fixed Slayer Profit Tracker & Custom Scoreboard line not showing for Revenant Slayer in Revenant Cave. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3744)
 
 #### Hoppity
 
@@ -217,6 +236,9 @@
     + After the recent patch notes, the TPS is capped at 10 for performance reason reasons.
 + Fixed extra characters when copying or pasting from or into signs on macOS. - appable (https://github.com/hannibal002/SkyHanni/pull/3711)
 + Fixed titles not disappearing when they should. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3703)
++ Fixed Attribute Overlay not displaying selected attributes for good rolls when Highlight Good Rolls is disabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/3745)
++ Fixed Easter Egg Waypoints in Hypixel Lobby. - L3Cache (https://github.com/hannibal002/SkyHanni/pull/3746)
++ Fixed long server restart titles blocking other messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3741)
 
 ### Technical Details
 
@@ -343,6 +365,10 @@
 + Bumped `ModAPI` to 1.0.1.2. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3702)
 + Removed `MixinHypixelForgeModApi` in favor of the `ModAPI` version change. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3702)
 + Removed the `addAsSingletonList` function in favor of `Renderable`s. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3607)
++ Ported `gui` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3659)
++ Ported Chocolate Factory configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3667)
++ Renamed all `ChocolateFactory` classes to `CF`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3667)
++ Renamed most cases of GUI to Gui. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3742)
 
 ### Removed Features
 
