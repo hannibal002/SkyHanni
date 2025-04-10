@@ -300,7 +300,23 @@ object TitleManager {
                             }
                         }
                     }
-                }
+                },
+            )
+            add(
+                "Current titles" + currentTitles.let { titles ->
+                    titles.entries.joinToString("\n\n") { title ->
+                        "${title.key}:\n" + buildString {
+                            val titleItem = title.value
+                            append("Title: ${titleItem?.getTitleText()}\n")
+                            append("Subtitle: ${titleItem?.getSubtitleText()}\n")
+                            append("Duration: ${titleItem?.duration?.inWholeSeconds}s\n")
+                            append("Height: ${titleItem?.height}\n")
+                            append("Font Size: ${titleItem?.fontSize}\n")
+                            append("Weight: ${titleItem?.weight}\n")
+                            append("End Time: ${titleItem?.endTime?.timeUntil()?.inWholeSeconds}s\n")
+                        }
+                    }
+                },
             )
         }
     }
