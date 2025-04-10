@@ -14,6 +14,9 @@ import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.WorldRenderContext
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
@@ -31,30 +34,35 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
-        SkyHanniRenderWorldEvent(event.partialTicks).post()
+        SkyHanniRenderWorldEvent(WorldRenderContext(), event.partialTicks).post()
     }
 
     @SubscribeEvent
     fun onGuiRender(event: DrawScreenEvent.Post) {
-        ScreenDrawnEvent(event.gui).post()
+        if (!canRender()) return
+        ScreenDrawnEvent(DrawContext(), event.gui).post()
     }
 
     @SubscribeEvent
     fun onPostRenderTick(event: RenderTickEvent) {
-        RenderingTickEvent(event.phase == TickEvent.Phase.START).post()
+        if (!canRender()) return
+        RenderingTickEvent(DrawContext(), event.phase == TickEvent.Phase.START).post()
     }
 
     @SubscribeEvent
     fun onRenderOverlayPre(event: RenderGameOverlayEvent.Pre) {
-        if (GameOverlayRenderPreEvent(event.type).post()) {
+        if (!canRender()) return
+        if (GameOverlayRenderPreEvent(DrawContext(), event.type).post()) {
             event.isCanceled = true
         }
     }
 
     @SubscribeEvent
     fun onRenderOverlayPost(event: RenderGameOverlayEvent.Post) {
-        GameOverlayRenderPostEvent(event.type).post()
+        if (!canRender()) return
+        GameOverlayRenderPostEvent(DrawContext(), event.type).post()
     }
 
     @SubscribeEvent
@@ -86,7 +94,8 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
-        DrawBackgroundEvent.post()
+        if (!canRender()) return
+        DrawBackgroundEvent(DrawContext()).post()
     }
 
     @SubscribeEvent
@@ -98,4 +107,6 @@ object RenderEvents {
     fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
         InitializeGuiEvent(event.gui, event.buttonList).post()
     }
+
+    private fun canRender(): Boolean = MinecraftCompat.localWorldExists && MinecraftCompat.localPlayerExists
 }

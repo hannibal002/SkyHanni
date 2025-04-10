@@ -50,7 +50,7 @@ public class SensitivityReducerConfig {
         name = "Show GUI",
         desc = "Show the GUI element while the feature is enabled.")
     @ConfigEditorBoolean
-    public boolean showGUI = true;
+    public boolean showGui = true;
 
     @Expose
     @ConfigOption(
@@ -67,6 +67,6 @@ public class SensitivityReducerConfig {
     public Property<Boolean> onlyPlot = Property.of(true);
 
     @Expose
-    @ConfigLink(owner = SensitivityReducerConfig.class, field = "showGUI")
+    @ConfigLink(owner = SensitivityReducerConfig.class, field = "showGui")
     public Position position = new Position(400, 400, 0.8f);
 }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTimer;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayWarning;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
+import at.hannibal2.skyhanni.utils.compat.DrawContext;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -46,22 +47,22 @@ public abstract class MixinGuiContainer extends GuiScreen {
 
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;color(FFFF)V", ordinal = 1))
     private void backgroundDrawn(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.backgroundDrawn(mouseX, mouseY, partialTicks);
+        skyHanni$hook.backgroundDrawn(new DrawContext(), mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     private void preDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.preDraw(mouseX, mouseY, partialTicks, ci);
+        skyHanni$hook.preDraw(new DrawContext(), mouseX, mouseY, partialTicks, ci);
     }
 
     @Inject(method = "drawScreen", at = @At("TAIL"))
     private void postDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.postDraw(mouseX, mouseY, partialTicks);
+        skyHanni$hook.postDraw(new DrawContext(), mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/inventory/GuiContainer;drawGuiContainerForegroundLayer(II)V", shift = At.Shift.AFTER))
     private void onForegroundDraw(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.foregroundDrawn(mouseX, mouseY, partialTicks);
+        skyHanni$hook.foregroundDrawn(new DrawContext(), mouseX, mouseY, partialTicks);
     }
 
     @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)
@@ -88,7 +89,7 @@ public abstract class MixinGuiContainer extends GuiScreen {
         )
     )
     public void drawScreen_after(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        skyHanni$hook.onDrawScreenAfter(mouseX, mouseY, ci);
+        skyHanni$hook.onDrawScreenAfter(new DrawContext(), mouseX, mouseY, ci);
         ToolTipData.INSTANCE.setLastSlot(this.theSlot);
     }
 }
