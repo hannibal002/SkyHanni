@@ -49,7 +49,7 @@ object DefaultConfigFeatures {
                 "Looks like you updated SkyHanni. " +
                     "Click here to configure the newly introduced options, or run $command.",
                 onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
-                "§eClick to run /shdefaultoptions!"
+                "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!"
             )
         }
     }

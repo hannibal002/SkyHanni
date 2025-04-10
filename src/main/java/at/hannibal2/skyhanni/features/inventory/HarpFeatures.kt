@@ -101,7 +101,7 @@ object HarpFeatures {
             openTime = SimpleTimeMark.now()
         }
         if (config.guiScale && (isMenuGui(event.inventoryName) || isHarpGui(event.inventoryName))) {
-            setGUIScale()
+            setGuiScale()
         }
     }
 
@@ -122,37 +122,37 @@ object HarpFeatures {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!config.guiScale) return
-        unSetGUIScale()
+        unSetGuiScale()
     }
 
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         if (!config.guiScale) return
-        unSetGUIScale()
+        unSetGuiScale()
 
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (!config.guiScale) return
-        unSetGUIScale()
+        unSetGuiScale()
     }
 
     private var guiSetting: Int = 0
-    private var isGUIScaled = false
+    private var isGuiScaled = false
 
-    private fun setGUIScale() {
+    private fun setGuiScale() {
         val gameSettings = Minecraft.getMinecraft().gameSettings
         guiSetting = gameSettings.guiScale
         gameSettings.guiScale = 0
-        isGUIScaled = true
+        isGuiScaled = true
         updateScale()
     }
 
-    private fun unSetGUIScale() {
-        if (!isGUIScaled) return
+    private fun unSetGuiScale() {
+        if (!isGuiScaled) return
         Minecraft.getMinecraft().gameSettings.guiScale = guiSetting
-        isGUIScaled = false
+        isGuiScaled = false
     }
 
     @HandleEvent(onlyOnSkyblock = true)

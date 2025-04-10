@@ -123,7 +123,7 @@ object SlayerQuestWarning {
     }
 
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
-        val slayerType = SlayerApi.getSlayerTypeForCurrentArea() ?: return false
+        val slayerType = SlayerApi.currentAreaType ?: return false
 
         // workaround for rift mob that is unrelated to slayer
         if (entity.name == "Oubliette Guard") return false
