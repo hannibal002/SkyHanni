@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage.HotspotRabbitStorage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.CFStorage.HotspotRabbitStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -59,10 +59,12 @@ import net.minecraft.item.ItemStack
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
+private typealias RabbitData = ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData
+
 @SkyHanniModule
 object HoppityCollectionStats {
-    private val collectionConfig get() = ChocolateFactoryApi.config.hoppityCollectionStats
-    private val patternGroup = ChocolateFactoryApi.patternGroup.group("collection")
+    private val collectionConfig get() = CFApi.config.hoppityCollectionStats
+    private val patternGroup = CFApi.patternGroup.group("collection")
 
     // <editor-fold desc="Patterns">
     /**
@@ -372,7 +374,7 @@ object HoppityCollectionStats {
         }
 
         replaceIndex?.let {
-            ChocolateFactoryApi.milestoneByRabbit(itemStack.displayName)?.let {
+            CFApi.milestoneByRabbit(itemStack.displayName)?.let {
                 val displayAmount = it.amount.shortFormat()
                 val operationFormat = when (milestoneType) {
                     HoppityEggType.CHOCOLATE_SHOP_MILESTONE -> "spending"
@@ -628,7 +630,7 @@ object HoppityCollectionStats {
         return newList
     }
 
-    fun getTypeCountSnapshot(): ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData {
+    fun getTypeCountSnapshot(): RabbitData {
         val (uniqueCount, duplicateCount) = RabbitCollectionRarity.entries.sumOfPair(
             selector = { rarity ->
                 val foundOfRarity = loggedRabbits.filterKeys {
@@ -638,10 +640,10 @@ object HoppityCollectionStats {
                 val duplicates = foundOfRarity.values.sum() - uniquesFound
                 uniquesFound to duplicates
             },
-            resultConverter = Double::toInt
+            resultConverter = Double::toInt,
         )
 
-        return ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData(
+        return RabbitData(
             uniques = uniqueCount,
             dupes = duplicateCount,
             strays = profileStorage?.strayTracker?.straysCaught?.sumAllValues()?.toInt() ?: 0,

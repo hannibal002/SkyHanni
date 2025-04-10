@@ -35,6 +35,7 @@ public class PunchcardConfig {
     @Expose
     @ConfigOption(name = "Countdown Overlay", desc = "Shows the amount of remaining players in the overlay.")
     @ConfigEditorBoolean
+    // TODO rename to reverseGui
     public Property<Boolean> reverseGUI = Property.of(false);
 
     @Expose
