@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
@@ -183,7 +182,6 @@ object BlockStrengthGuide {
                 ) to "§a${speed.fractionOf(ore.speedSoftCap).times(100).roundTo(1)}% §fto Soft Cap"
             }
 
-            1.isKeyHeld()
             return Renderable.hoverTips(
                 Renderable.horizontalContainer(
                     listOf(
