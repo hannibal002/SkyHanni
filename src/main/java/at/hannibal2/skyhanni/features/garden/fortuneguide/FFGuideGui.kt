@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.OverviewPage
 import at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.guide.GuideGUI
+import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.guide.GuideTab
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -15,7 +15,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
-class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
+class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVIEW) {
 
     override val sizeX = 360
     override val sizeY = 225
@@ -31,16 +31,16 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
             }
         }
 
-        fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGUI
+        fun isInGui() = Minecraft.getMinecraft().currentScreen is FFGuideGui
 
         fun open() {
             CaptureFarmingGear.captureFarmingGear()
-            SkyHanniMod.screenToOpen = FFGuideGUI()
+            SkyHanniMod.screenToOpen = FFGuideGui()
         }
 
         fun updateDisplay() {
             with(Minecraft.getMinecraft().currentScreen) {
-                if (this !is FFGuideGUI) return
+                if (this !is FFGuideGui) return
                 this.refreshPage()
             }
         }
@@ -57,7 +57,7 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
         pageList = mapOf(
             FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
-            FortuneGuidePage.CROP to CropPage({ currentCrop!! }, sizeX, sizeY),
+            FortuneGuidePage.CROP to CropPage({ currentCrop ?: error("current crop is null") }, sizeX, sizeY),
             FortuneGuidePage.UPGRADES to UpgradePage({ currentCrop }, sizeX, sizeY - 2),
         )
         verticalTabs = listOf(

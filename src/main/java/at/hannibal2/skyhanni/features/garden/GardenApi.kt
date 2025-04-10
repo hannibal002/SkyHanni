@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
@@ -190,7 +190,7 @@ object GardenApi {
         SkyMartCopperPrice.inInventory ||
         FarmingContestApi.inInventory ||
         VisitorApi.inInventory ||
-        FFGuideGUI.isInGui() ||
+        FFGuideGui.isInGui() ||
         CFShopPrice.inInventory ||
         CFApi.inChocolateFactory ||
         CFApi.chocolateFactoryPaused ||

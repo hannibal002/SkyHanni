@@ -8,7 +8,7 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 
-abstract class GuideGUI<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen() {
+abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : GuiScreen() {
     companion object {
         const val SELECTED_COLOR = 0x50000000
         const val NOT_SELECTED_COLOR = 0x50303030
