@@ -444,24 +444,23 @@ object RenderUtils {
         val display = "§f$string"
         GlStateManager.pushMatrix()
         transform()
-        val minecraft = Minecraft.getMinecraft()
-        val renderer = minecraft.renderManager.fontRenderer
+        val fr = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
-            val strLen: Int = renderer.getStringWidth(string)
+            val strLen: Int = fr.getStringWidth(string)
             val x2 = offsetX - strLen / 2f
             GL11.glTranslatef(x2, 0f, 0f)
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
+            fr.drawStringWithShadow(display, 0f, 0f, 0)
             GL11.glTranslatef(-x2, 0f, 0f)
         } else {
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
+            fr.drawStringWithShadow(display, 0f, 0f, 0)
         }
 
         GlStateManager.popMatrix()
 
-        return renderer.getStringWidth(display)
+        return fr.getStringWidth(display)
     }
 
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {

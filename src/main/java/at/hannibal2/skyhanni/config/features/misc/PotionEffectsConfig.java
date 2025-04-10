@@ -7,12 +7,14 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
 public class PotionEffectsConfig {
     @Expose
     @ConfigOption(name = "Non God Pot Effects", desc = "Display the active potion effects that are not part of the God Pot.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("Pest Repellent")
     public boolean nonGodPotEffectDisplay = false;
 
     @Expose
