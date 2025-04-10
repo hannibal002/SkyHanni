@@ -9,10 +9,13 @@ import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
@@ -21,7 +24,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
@@ -177,6 +183,7 @@ object BlockStrengthGuide {
                 ) to "§a${speed.fractionOf(ore.speedSoftCap).times(100).roundTo(1)}% §fto Soft Cap"
             }
 
+            1.isKeyHeld()
             return Renderable.hoverTips(
                 Renderable.horizontalContainer(
                     listOf(
@@ -185,29 +192,56 @@ object BlockStrengthGuide {
                         Renderable.string("$ticks"),
                     ),
                 ),
-                listOf(
-                    Renderable.string(name.allLettersFirstUppercase()),
-                    Renderable.placeholder(0, 5),
-                    Renderable.string("§3Ticks: §f$ticks"),
-                    Renderable.string("§3Your: §6${speed.toInt().addSeparators()} ${SkyblockStat.MINING_SPEED.icon}"),
-                    Renderable.string(percentLine),
-                    Renderable.placeholder(0, 5),
-                    Renderable.string("§3Block Strength: §f${ore.strength.addSeparators()}"),
-                    Renderable.string("§3Softcap: §6${ore.speedSoftCap.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}"),
-                    Renderable.string("§3Instant: §6${ore.speedForInstantMine.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}"),
-                    Renderable.placeholder(0, 5),
-                    Renderable.string("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}"),
-                    Renderable.string("§3Blocks in that group: "),
-                    Renderable.wrappedString(hoverText, width = 200),
-                ),
+                tips = buildList<Renderable> {
+                    val blockName = name.allLettersFirstUppercase()
+                    addString(blockName)
+                    add(Renderable.placeholder(0, 5))
+
+                    val time = ticks.ticks.format(showMilliSeconds = true)
+                    addString("§3Ticks: §f$ticks §7(§b${time}§7)")
+                    addExtraInfo("It takes you §b${time}§7 to break $blockName.")
+
+                    addString("§3Your: §6${speed.toInt().addSeparators()} ${SkyblockStat.MINING_SPEED.icon}")
+                    addExtraInfo("You have §6${speed.toInt().addSeparators()} mining speed §7when breaking $blockName :)")
+
+                    addString(percentLine)
+                    add(Renderable.placeholder(0, 5))
+
+                    addString("§3Block Strength: §f${ore.strength.addSeparators()}")
+                    addExtraInfo("This defines the \"thoughness\" of a block.")
+                    addExtraInfo("A higher number means it takes longer to break $blockName.")
+
+                    addString("§3Softcap: §6${ore.speedSoftCap.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}")
+                    addExtraInfo("Having more than §6${ore.speedSoftCap.addSeparators()} mining speed §7will §c§lNOT §7break $blockName any faster.")
+
+                    addString("§3Instant: §6${ore.speedForInstantMine.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}")
+                    addExtraInfo("Once you reach §6${ore.speedForInstantMine.addSeparators()} mining speed §7you break $blockName in §e§lone click§7.")
+
+                    add(Renderable.placeholder(0, 5))
+                    addString("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}")
+                    addString("§3Blocks in that group: ")
+                    add(Renderable.wrappedString(hoverText, width = 200))
+
+                    if (!showExtraInfos) {
+                        addString("")
+                        addString("§ePress control-key to show extra infos!")
+                    }
+                },
             )
         }
+    }
 
+    private fun MutableList<Renderable>.addExtraInfo(info: String) {
+        if (showExtraInfos) {
+            addString("  §7$info")
+        }
     }
 
     private val InstantMineColor = Color(0x1E, 0x90, 0xFF)
     private val SoftCapColor = Color(0x00, 0xFA, 0x9A)
     private val BaseColor = Color(0xFF, 0x63, 0x37)
+
+    private var showExtraInfos = false
 
     private lateinit var speed: SpeedClass
 
@@ -308,7 +342,7 @@ object BlockStrengthGuide {
                         scale = 0.5,
                         verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                     ),
-                    {
+                    onLeftClick = {
                         inMineshaft = !inMineshaft
                         display = createDisplay()
                     },
@@ -361,6 +395,15 @@ object BlockStrengthGuide {
 
         Renderable.withMousePosition(event.mouseX, event.mouseY) {
             display.renderAndScale(0, 0, event.gui.width, event.gui.height, 20)
+        }
+    }
+
+    @HandleEvent(SkyHanniTickEvent::class)
+    fun onTick() {
+        val now = KeyboardManager.isModifierKeyDown()
+        if (showExtraInfos != now) {
+            showExtraInfos = now
+            display = createDisplay()
         }
     }
 
