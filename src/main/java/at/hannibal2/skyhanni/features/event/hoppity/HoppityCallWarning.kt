@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -35,7 +35,7 @@ object HoppityCallWarning {
      * REGEX-TEST: §e✆ §r§bHoppity§r§e ✆
      * REGEX-TEST: §e✆ §r§aHoppity§r§e ✆
      */
-    private val initHoppityCallPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val initHoppityCallPattern by CFApi.patternGroup.pattern(
         "hoppity.call.init",
         "§e✆ §r(?:§a|§b)Hoppity§r§e ✆.*",
     )
@@ -43,7 +43,7 @@ object HoppityCallWarning {
     /**
      * REGEX-TEST: §e[NPC] §aHoppity§f: §b✆ §f§rWhat's up, §boBlazin§f?
      */
-    private val pickupHoppityCallPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val pickupHoppityCallPattern by CFApi.patternGroup.pattern(
         "hoppity.call.pickup",
         "§e\\[NPC] §aHoppity§f: §b✆ §f§rWhat's up, .*§f\\?",
     )
