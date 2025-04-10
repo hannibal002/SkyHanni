@@ -173,7 +173,7 @@ object ChatManager {
         return Pair(component.takeIf { modified }, cancelled)
     }
 
-    private fun openChatHistoryGUI(args: Array<String>) {
+    private fun openChatHistoryGui(args: Array<String>) {
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
             ChatHistoryGui(getRecentMessageHistory())
         } else {
@@ -265,7 +265,7 @@ object ChatManager {
         event.register("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            callback { openChatHistoryGUI(it) }
+            callback { openChatHistoryGui(it) }
         }
     }
 }
