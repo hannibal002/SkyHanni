@@ -56,6 +56,7 @@ object CarnivalShopHelper {
         ".*§7Your Tokens: §a(?<tokens>[\\d,]*)",
     )
 
+    // TODO replace with InventoryDetector
     /**
      * REGEX-TEST: §8Souvenir Shop
      * REGEX-TEST: §8Carnival Perks

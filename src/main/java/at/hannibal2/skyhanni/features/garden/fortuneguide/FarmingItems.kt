@@ -60,7 +60,7 @@ enum class FarmingItems(
                 armor.forEach {
                     it.selectedState = it == currentArmor
                 }
-                FFGuideGUI.updateDisplay()
+                FFGuideGui.updateDisplay()
             }
         }
 
@@ -71,7 +71,7 @@ enum class FarmingItems(
                 equip.forEach {
                     it.selectedState = it == currentEquip
                 }
-                FFGuideGUI.updateDisplay()
+                FFGuideGui.updateDisplay()
             }
         }
 
