@@ -209,20 +209,19 @@ object PestSpawnTimer {
         display = drawDisplay()
     }
 
-    private fun shouldRender(): Boolean {
-        if (!isEnabled()) return false
-        when {
+    private fun shouldRender() {
+        shouldRender = when {
             config.onlyWithFarmingTool && config.onlyWithVacuum -> {
-                if (!hasFarmingToolInHand() && !hasVacuumInHand()) return false
+                (hasFarmingToolInHand() && hasVacuumInHand())
             }
             config.onlyWithFarmingTool -> {
-                if (!hasFarmingToolInHand()) return false
+                (hasFarmingToolInHand())
             }
             config.onlyWithVacuum -> {
-                if (!hasVacuumInHand()) return false
+                (hasVacuumInHand())
             }
+            else -> true
         }
-        return true
     }
 
     private fun cooldownExpired() {
