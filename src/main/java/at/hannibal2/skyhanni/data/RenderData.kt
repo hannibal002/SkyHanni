@@ -21,7 +21,6 @@ object RenderData {
     @HandleEvent
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
-        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
@@ -32,7 +31,6 @@ object RenderData {
 
     @HandleEvent
     fun onBackgroundDraw(event: DrawBackgroundEvent) {
-        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
@@ -51,8 +49,6 @@ object RenderData {
 
         event.context.matrices.popMatrix()
     }
-
-    private fun canRender(): Boolean = MinecraftCompat.localWorldExists && MinecraftCompat.localPlayerExists
 
     var outsideInventory = false
 
