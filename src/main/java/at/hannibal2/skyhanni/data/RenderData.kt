@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.compat.DrawContext
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -21,7 +20,6 @@ object RenderData {
     @HandleEvent
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
-        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
@@ -32,7 +30,6 @@ object RenderData {
 
     @HandleEvent
     fun onBackgroundDraw(event: DrawBackgroundEvent) {
-        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
@@ -51,8 +48,6 @@ object RenderData {
 
         event.context.matrices.popMatrix()
     }
-
-    private fun canRender(): Boolean = MinecraftCompat.localWorldExists && MinecraftCompat.localPlayerExists
 
     var outsideInventory = false
 
