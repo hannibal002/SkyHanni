@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
-enum class FarmingItems(
+enum class FarmingItemType(
     val itemCategory: ItemCategory,
     private val ffCalculation: (ItemStack?) -> Map<FFTypes, Double> = { emptyMap() },
 ) {
@@ -134,9 +134,9 @@ enum class FarmingItems(
         // TODO
         var lastEquippedPet = ELEPHANT
 
-        var currentPet: FarmingItems = lastEquippedPet
-        var currentArmor: FarmingItems? = null
-        var currentEquip: FarmingItems? = null
+        var currentPet: FarmingItemType = lastEquippedPet
+        var currentArmor: FarmingItemType? = null
+        var currentEquip: FarmingItemType? = null
 
         val armor = listOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
         val equip = listOf(NECKLACE, CLOAK, BELT, BRACELET)
@@ -156,7 +156,7 @@ enum class FarmingItems(
             entries.forEach { it.ffData = null }
         }
 
-        fun setDefaultPet(): FarmingItems {
+        fun setDefaultPet(): FarmingItemType {
             currentPet = lastEquippedPet
             pets.forEach {
                 it.selectedState = it == currentPet

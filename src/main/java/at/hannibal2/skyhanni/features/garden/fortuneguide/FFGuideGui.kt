@@ -54,7 +54,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
         FFStats.loadFFData()
         FortuneUpgrades.generateGenericUpgrades()
 
-        FarmingItems.setDefaultPet()
+        FarmingItemType.setDefaultPet()
 
         pageList = mapOf(
             FortuneGuidePage.OVERVIEW to OverviewPage(sizeX, sizeY),
