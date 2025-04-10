@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -188,12 +189,12 @@ object BlockStrengthGuide {
                     Renderable.string(name.allLettersFirstUppercase()),
                     Renderable.placeholder(0, 5),
                     Renderable.string("§3Ticks: §f$ticks"),
-                    Renderable.string("§3Your: §6${speed.toInt()} ${SkyblockStat.MINING_SPEED.icon}"),
+                    Renderable.string("§3Your: §6${speed.toInt().addSeparators()} ${SkyblockStat.MINING_SPEED.icon}"),
                     Renderable.string(percentLine),
                     Renderable.placeholder(0, 5),
-                    Renderable.string("§3Block Strength: §f${ore.strength}"),
-                    Renderable.string("§3Softcap: §6${ore.speedSoftCap} ${SkyblockStat.MINING_SPEED.icon}"),
-                    Renderable.string("§3Instant: §6${ore.speedForInstantMine} ${SkyblockStat.MINING_SPEED.icon}"),
+                    Renderable.string("§3Block Strength: §f${ore.strength.addSeparators()}"),
+                    Renderable.string("§3Softcap: §6${ore.speedSoftCap.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}"),
+                    Renderable.string("§3Instant: §6${ore.speedForInstantMine.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}"),
                     Renderable.placeholder(0, 5),
                     Renderable.string("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}"),
                     Renderable.string("§3Blocks in that group: "),
