@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.hasFarmingToolInHand
 import at.hannibal2.skyhanni.features.garden.GardenApi.lastCropBrokenTime
 import at.hannibal2.skyhanni.features.garden.GardenApi.pestCooldownEndTime
-import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
