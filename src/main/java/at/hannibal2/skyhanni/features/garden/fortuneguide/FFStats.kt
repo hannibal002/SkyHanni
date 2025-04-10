@@ -159,7 +159,7 @@ object FFStats {
             baseFF, armorTotalFF, equipmentTotalFF, FarmingItems.currentPet.getFFData(),
         )
 
-        FFGuideGUI.updateDisplay()
+        FFGuideGui.updateDisplay()
     }
 
     fun List<FarmingItems>.getFFData(): Map<FFTypes, Double> = combineFFData(this.map { it.getFFData() })
