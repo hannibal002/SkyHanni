@@ -5,6 +5,10 @@ GrammarRules:
     AvoidBritishSpelling:
         active: true
 
+CompatRules:
+    MinecraftCompat:
+        active: true
+
 FormattingRules:
     CustomCommentSpacing:
         active: true
@@ -150,6 +154,8 @@ potential-bugs:
     HasPlatformType: # false positives on config get() methods
         active: false
     StorageNeedsExpose:
+        active: true
+    NonStorageDoesntNeedExpose:
         active: true
     ImmutableTypesWithExpectedInteriorMutabilityInConfig:
         active: true

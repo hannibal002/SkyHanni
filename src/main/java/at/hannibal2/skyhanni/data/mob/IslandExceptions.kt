@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.makeMobResult
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import net.minecraft.entity.item.EntityArmorStand
 
@@ -35,7 +34,7 @@ object AshfangHider {
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!AshfangManager.active || !config.particles) return
-        if (event.entity.getAllEquipment().any { it?.name == "Glowstone" }) event.cancel()
+        if (event.entity.getAllEquipment().any { it?.displayName == "Glowstone" }) event.cancel()
     }
 
     @HandleEvent

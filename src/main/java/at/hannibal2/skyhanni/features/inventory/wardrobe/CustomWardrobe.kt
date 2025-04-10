@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
+import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -59,6 +60,7 @@ object CustomWardrobe {
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
+    // TODO use inventory InventoryDetector
     private const val GUI_NAME = "Custom Wardrobe"
 
     @HandleEvent
@@ -415,7 +417,7 @@ object CustomWardrobe {
         val backButton = createLabeledButton(
             "§aBack",
             onClick = {
-                InventoryUtils.clickSlot(48)
+                clickInventorySlot(48)
                 reset()
                 WardrobeApi.currentPage = null
             },
@@ -423,7 +425,7 @@ object CustomWardrobe {
         val exitButton = createLabeledButton(
             "§cClose",
             onClick = {
-                InventoryUtils.clickSlot(49)
+                clickInventorySlot(49)
                 reset()
                 WardrobeApi.currentPage = null
             },
@@ -612,16 +614,16 @@ object CustomWardrobe {
         if (isInCurrentPage()) {
             if (isEmpty() || locked || waitingForInventoryUpdate) return
             WardrobeApi.currentSlot = if (isCurrentSlot()) null else id
-            InventoryUtils.clickSlot(inventorySlot)
+            clickInventorySlot(inventorySlot)
         } else {
             if (page < wardrobePage) {
                 WardrobeApi.currentPage = wardrobePage - 1
                 waitingForInventoryUpdate = true
-                InventoryUtils.clickSlot(previousPageSlot)
+                clickInventorySlot(previousPageSlot)
             } else if (page > wardrobePage) {
                 WardrobeApi.currentPage = wardrobePage + 1
                 waitingForInventoryUpdate = true
-                InventoryUtils.clickSlot(nextPageSlot)
+                clickInventorySlot(nextPageSlot)
             }
         }
         update()

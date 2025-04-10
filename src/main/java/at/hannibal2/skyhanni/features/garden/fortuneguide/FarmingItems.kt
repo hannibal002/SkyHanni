@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.init.Blocks
@@ -45,7 +46,7 @@ enum class FarmingItems(
 
     private val fallbackItem: ItemStack by lazy {
         val name = "§cNo saved ${name.lowercase().replace("_", " ")}"
-        ItemStack(Blocks.barrier).setStackDisplayName(name)
+        ItemStack(Blocks.barrier).setCustomItemName(name)
     }
 
     fun getItemOrNull() = ProfileStorageData.profileSpecific?.garden?.fortune?.farmingItems?.get(this)
@@ -59,7 +60,7 @@ enum class FarmingItems(
                 armor.forEach {
                     it.selectedState = it == currentArmor
                 }
-                FFGuideGUI.updateDisplay()
+                FFGuideGui.updateDisplay()
             }
         }
 
@@ -70,7 +71,7 @@ enum class FarmingItems(
                 equip.forEach {
                     it.selectedState = it == currentEquip
                 }
-                FFGuideGUI.updateDisplay()
+                FFGuideGui.updateDisplay()
             }
         }
 

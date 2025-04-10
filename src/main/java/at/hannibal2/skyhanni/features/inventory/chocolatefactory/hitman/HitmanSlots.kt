@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.hitmanInventoryPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
@@ -22,12 +22,12 @@ object HitmanSlots {
     /**
      * REGEX-TEST: §7Hitman can store more eggs you miss! §7Cost §620,000,000 Coins §eClick to purchase!
      */
-    private val slotCostPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val slotCostPattern by CFApi.patternGroup.pattern(
         "hitman.slotcost",
         ".*§7Cost §6(?<cost>[\\d,]+) Coins.*",
     )
 
-    private val config get() = ChocolateFactoryApi.config
+    private val config get() = CFApi.config
     private var slotPricesPaid: List<Long> = emptyList()
     private var slotPricesLeft: List<Long> = emptyList()
     private var inInventory = false
@@ -60,10 +60,10 @@ object HitmanSlots {
             item.hasDisplayName() && item.getLore().isNotEmpty() &&
                 slotCostPattern.matches(item.getSingleLineLore())
         }
-        val ownedSlots = ChocolateFactoryApi.hitmanCosts.size - leftToPurchase
+        val ownedSlots = CFApi.hitmanCosts.size - leftToPurchase
 
-        slotPricesPaid = ChocolateFactoryApi.hitmanCosts.take(ownedSlots)
-        slotPricesLeft = ChocolateFactoryApi.hitmanCosts.drop(ownedSlots)
+        slotPricesPaid = CFApi.hitmanCosts.take(ownedSlots)
+        slotPricesLeft = CFApi.hitmanCosts.drop(ownedSlots)
     }
 
     private fun Map<Int, ItemStack>.filterNotBorderSlots() = filterKeys {

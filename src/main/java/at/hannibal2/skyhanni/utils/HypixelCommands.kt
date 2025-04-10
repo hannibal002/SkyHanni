@@ -34,6 +34,11 @@ object HypixelCommands {
         send("recipe $itemName")
     }
 
+    // opens the crafting table
+    fun craft() {
+        send("craft")
+    }
+
     fun npcOption(npc: String, answer: String) {
         send("selectnpcoption $npc $answer")
     }
@@ -108,6 +113,10 @@ object HypixelCommands {
 
     fun enderChest(position: Int) {
         send("ec $position")
+    }
+
+    fun partyAccept(player: String) {
+        send("party accept $player")
     }
 
     fun partyWarp() {

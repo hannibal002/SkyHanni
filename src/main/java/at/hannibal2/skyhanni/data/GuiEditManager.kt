@@ -7,12 +7,11 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -52,7 +51,7 @@ object GuiEditManager {
         if (isInNeuPv) return
         guiScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
-            if (it is GuiEditSign && !it.isRancherSign()) return
+            if (it is GuiEditSign && !it.isGardenSign()) return
         }
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
@@ -70,7 +69,7 @@ object GuiEditManager {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         lastMovedGui?.let {
             GuiPositionMovedEvent(it).post()
             lastMovedGui = null

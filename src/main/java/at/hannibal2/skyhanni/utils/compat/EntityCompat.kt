@@ -7,18 +7,13 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
+
 //#if MC > 1.12
 //$$ import net.minecraft.entity.monster.EntityWitherSkeleton
 //$$ import net.minecraft.inventory.EntityEquipmentSlot
 //#endif
 //#if MC > 1.16
 //$$ import net.minecraft.world.entity.EntityType
-//#endif
-
-fun Entity.getNameAsString(): String =
-    this.name
-//#if MC >= 1.14
-//$$ .string
 //#endif
 
 fun EntityArmorStand.getStandHelmet(): ItemStack? =
@@ -70,4 +65,9 @@ fun createWitherSkeleton(world: World?): EntityLivingBase =
 //$$ EntityWitherSkeleton(world)
 //#else
 //$$ WitherSkeleton(EntityType.WITHER_SKELETON, world)
+//#endif
+
+//#if MC > 1.21
+//$$ val Entity.deceased: Boolean
+//$$     get() = this.isRemoved
 //#endif

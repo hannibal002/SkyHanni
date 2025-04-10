@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.SkillApi.activeSkill
 import at.hannibal2.skyhanni.api.SkillApi.exactLevelingMap
 import at.hannibal2.skyhanni.api.SkillApi.levelingMap
-import at.hannibal2.skyhanni.utils.Quad
 import com.google.common.base.Splitter
 
 object SkillUtil {
@@ -54,7 +53,7 @@ object SkillUtil {
         return SkillApi.levelArray.asSequence().take(level + 1).sumOf { it.toDouble() }
     }
 
-    fun calculateSkillLevel(currentXP: Long, maxSkillCap: Int): Quad<Int, Long, Long, Long> {
+    fun calculateSkillLevel(currentXP: Long, maxSkillCap: Int): SkillLevel {
         var xpCurrent = currentXP
         var level = 0
         val maxLevel = maxSkillCap.coerceAtMost(60)
@@ -100,7 +99,7 @@ object SkillUtil {
             }
         }
 
-        return Quad(level, xpCurrent, xpForNext, overflowXP)
+        return SkillLevel(level, xpCurrent, xpForNext, overflowXP)
     }
 
 }
