@@ -84,11 +84,11 @@ object TitleManager {
         var onInterval: () -> Unit = {},
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
+
         private var virtualEndTime: SimpleTimeMark = SimpleTimeMark.farPast()
         private var virtualTimeLeft: Duration = getTimeLeft()
-        private val internalUpdateInterval: Duration = 100.milliseconds.takeIf {
-            it < updateInterval
-        } ?: updateInterval
+        private val internalUpdateInterval: Duration = 100.milliseconds.takeIf { it < updateInterval } ?: updateInterval
+        private var isActive: Boolean = false
 
         private fun String.formatCountdownString() = this
             .replace("%t", virtualTimeLeft.toString())
@@ -96,13 +96,17 @@ object TitleManager {
 
         override fun getTitleText(): String = formattedTitleText.formatCountdownString()
         override fun getSubtitleText(): String? = formattedSubtitleText?.formatCountdownString()
+
         override fun start() {
+            isActive = true
             virtualEndTime = SimpleTimeMark.now() + countdownDuration
             endTime = virtualEndTime + loomInterval
             onIntervalOutward()
             onIntervalInternal()
         }
+
         override fun stop() {
+            isActive = false
             super.stop()
             onFinish()
         }
@@ -113,12 +117,13 @@ object TitleManager {
         }
 
         private fun onIntervalOutward() {
-            if (endTime.isInPast()) return
+            if (!isActive || endTime.isInPast()) return
             onInterval()
             DelayedRun.runDelayed(updateInterval) { onIntervalOutward() }
         }
 
         private fun onIntervalInternal() {
+            if (!isActive) return
             if (endTime.isInPast()) return stop()
             virtualTimeLeft = if (virtualEndTime.isInFuture()) getTimeLeft() else Duration.ZERO
             DelayedRun.runDelayed(internalUpdateInterval) { onIntervalInternal() }
