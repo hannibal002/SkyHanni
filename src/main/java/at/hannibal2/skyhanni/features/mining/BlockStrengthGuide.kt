@@ -357,7 +357,6 @@ object BlockStrengthGuide {
 
         val display = display ?: createDisplay().also {
             display = it
-            println(SkyblockStat.MINING_SPEED.lastSource)
         }
 
         Renderable.withMousePosition(event.mouseX, event.mouseY) {
