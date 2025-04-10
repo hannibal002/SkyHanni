@@ -18,7 +18,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
 
-class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
+class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : SkyhanniBaseScreen() {
 
     private var scroll = -1.0
     private val w = 500
