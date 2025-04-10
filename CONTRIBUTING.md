@@ -222,6 +222,8 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
+- Mark TODOs with `// TODO: [task]`, the exception to this is when the TODO is a list of things to do, in which case it should be
+  marked with `* TODO [title]` and each task be listed on a new line.
 
 ### Compatibility with modern versions
 As SkyHanni gets closer to supporting multiple Minecraft versions, there are a few additional coding conventions to follow. Below are some
