@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
@@ -164,6 +166,11 @@ object BlockStrengthGuide {
             }
 
             val ticks = ore.miningTicks(speed)
+            val time = ticks.ticks.format(showMilliSeconds = true).transformIf({ ticks % 2 == 1 }) {
+                this.insert(this.length - 1, '5')
+            }
+
+            val blockName = name.allLettersFirstUppercase()
 
             val (progressBar, percentLine) = when (ticks) {
                 1 -> Renderable.progressBar(1.0, InstantMineColor, InstantMineColor, width = 100) to "§6Instant Mine"
@@ -191,29 +198,32 @@ object BlockStrengthGuide {
                     ),
                 ),
                 tips = buildList<Renderable> {
-                    val blockName = name.allLettersFirstUppercase()
                     addString(blockName)
                     add(Renderable.placeholder(0, 5))
 
-                    val time = ticks.ticks.format(showMilliSeconds = true)
-                    addString("§3Ticks: §f$ticks §7(§b${time}§7)")
-                    addExtraInfo("It takes you §b${time}§7 to break $blockName.")
+                    addString("§3Ticks: §f$ticks §7(§b$time§7)")
+                    addExtraInfo("It takes you §b$time§7 to break $blockName.")
+                    addExtraInfo("Only correct if the server has 20 tps.")
 
                     addString("§3Your: §6${speed.toInt().addSeparators()} ${SkyblockStat.MINING_SPEED.icon}")
-                    addExtraInfo("You have §6${speed.toInt().addSeparators()} mining speed §7when breaking $blockName :)")
+                    addExtraInfo("You have §6${speed.toInt().addSeparators()} mining speed")
+                    addExtraInfo("§7when breaking $blockName :)")
 
                     addString(percentLine)
                     add(Renderable.placeholder(0, 5))
 
                     addString("§3Block Strength: §f${ore.strength.addSeparators()}")
                     addExtraInfo("This defines the \"thoughness\" of a block.")
-                    addExtraInfo("A higher number means it takes longer to break $blockName.")
+                    addExtraInfo("A higher number means it takes longer")
+                    addExtraInfo("to break $blockName.")
 
                     addString("§3Softcap: §6${ore.speedSoftCap.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}")
-                    addExtraInfo("Having more than §6${ore.speedSoftCap.addSeparators()} mining speed §7will §c§lNOT §7break $blockName any faster.")
+                    addExtraInfo("Having more than §6${ore.speedSoftCap.addSeparators()} mining speed")
+                    addExtraInfo("§7will §c§lNOT §r§7break $blockName any faster.")
 
                     addString("§3Instant: §6${ore.speedForInstantMine.addSeparators()} ${SkyblockStat.MINING_SPEED.icon}")
-                    addExtraInfo("Once you reach §6${ore.speedForInstantMine.addSeparators()} mining speed §7you break $blockName in §e§lone click§7.")
+                    addExtraInfo("Once you reach §6${ore.speedForInstantMine.addSeparators()} mining speed ")
+                    addExtraInfo("§7you break $blockName in §e§lone click§7.")
 
                     add(Renderable.placeholder(0, 5))
                     addString("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}")
@@ -221,8 +231,8 @@ object BlockStrengthGuide {
                     add(Renderable.wrappedString(hoverText, width = 200))
 
                     if (!showExtraInfos) {
-                        addString("")
-                        addString("§ePress control-key to show extra infos!")
+                        add(Renderable.placeholder(0, 5))
+                        addString("§eHold control-key to show extra infos!")
                     }
                 },
             )
