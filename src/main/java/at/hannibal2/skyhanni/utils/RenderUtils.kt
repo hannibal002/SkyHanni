@@ -445,22 +445,21 @@ object RenderUtils {
         val display = "§f$string"
         context.matrices.pushMatrix()
         transform(context)
-        val minecraft = Minecraft.getMinecraft()
-        val renderer = minecraft.renderManager.fontRenderer
+        val fr = Minecraft.getMinecraft().fontRendererObj
 
         context.matrices.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
-            val strLen: Int = renderer.getStringWidth(string)
+            val strLen: Int = fr.getStringWidth(string)
             val x2 = offsetX - strLen / 2f
-            renderer.drawStringWithShadow(display, x2, 0f, 0)
+            fr.drawStringWithShadow(display, x2, 0f, 0)
         } else {
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
+            fr.drawStringWithShadow(display, 0f, 0f, 0)
         }
 
         context.matrices.popMatrix()
 
-        return renderer.getStringWidth(display)
+        return fr.getStringWidth(display)
     }
 
     fun Position.renderStrings(context: DrawContext, list: List<String>, extraSpace: Int = 0, posLabel: String) {
