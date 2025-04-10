@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.WorldRenderContext
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -33,22 +34,26 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         SkyHanniRenderWorldEvent(WorldRenderContext(), event.partialTicks).post()
     }
 
     @SubscribeEvent
     fun onGuiRender(event: DrawScreenEvent.Post) {
+        if (!canRender()) return
         ScreenDrawnEvent(DrawContext(), event.gui).post()
     }
 
     @SubscribeEvent
     fun onPostRenderTick(event: RenderTickEvent) {
+        if (!canRender()) return
         RenderingTickEvent(DrawContext(), event.phase == TickEvent.Phase.START).post()
     }
 
     @SubscribeEvent
     fun onRenderOverlayPre(event: RenderGameOverlayEvent.Pre) {
+        if (!canRender()) return
         if (GameOverlayRenderPreEvent(DrawContext(), event.type).post()) {
             event.isCanceled = true
         }
@@ -56,6 +61,7 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderOverlayPost(event: RenderGameOverlayEvent.Post) {
+        if (!canRender()) return
         GameOverlayRenderPostEvent(DrawContext(), event.type).post()
     }
 
@@ -88,6 +94,7 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (!canRender()) return
         DrawBackgroundEvent(DrawContext()).post()
     }
 
@@ -100,4 +107,6 @@ object RenderEvents {
     fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
         InitializeGuiEvent(event.gui, event.buttonList).post()
     }
+
+    private fun canRender(): Boolean = MinecraftCompat.localWorldExists && MinecraftCompat.localPlayerExists
 }

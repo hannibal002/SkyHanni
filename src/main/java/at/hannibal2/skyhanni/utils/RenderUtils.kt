@@ -445,8 +445,7 @@ object RenderUtils {
         val display = "§f$string"
         context.matrices.pushMatrix()
         transform(context)
-        val minecraft = Minecraft.getMinecraft()
-        val fr = minecraft.fontRendererObj
+        val fr = Minecraft.getMinecraft().fontRendererObj
 
         context.matrices.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
