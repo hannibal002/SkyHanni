@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.hasFarmingToolInHand
 import at.hannibal2.skyhanni.features.garden.GardenApi.lastCropBrokenTime
 import at.hannibal2.skyhanni.features.garden.GardenApi.pestCooldownEndTime
-import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -39,8 +39,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestSpawnTimer {
 
-    private val config get() = PestApi.config.pestTimer
 
+    private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
 
     /**
@@ -65,6 +65,7 @@ object PestSpawnTimer {
     private var ready = false
     private var shouldRender = false
     private var display: List<Renderable> = emptyList()
+
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -112,6 +113,7 @@ object PestSpawnTimer {
 
         pestSpawned = true
         longestCropBrokenTime = 0.seconds
+        lastPestSpawnTime = SimpleTimeMark.now()
     }
 
     @HandleEvent
@@ -212,7 +214,7 @@ object PestSpawnTimer {
     private fun shouldRender() {
         shouldRender = when {
             config.onlyWithFarmingTool && config.onlyWithVacuum -> {
-                (hasFarmingToolInHand() && hasVacuumInHand())
+                (hasFarmingToolInHand() || hasVacuumInHand())
             }
             config.onlyWithFarmingTool -> {
                 (hasFarmingToolInHand())
