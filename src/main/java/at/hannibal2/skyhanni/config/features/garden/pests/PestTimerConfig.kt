@@ -29,7 +29,10 @@ class PestTimerConfig {
     @Expose
     @ConfigOption(name = "Pest Timer Text", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
-    var pestDisplay: MutableList<PestTimerTextEntry> = mutableListOf()
+    var pestDisplay: MutableList<PestTimerTextEntry> = mutableListOf(
+        PestTimerTextEntry.PEST_TIMER,
+        PestTimerTextEntry.PEST_COOLDOWN
+    )
 
     enum class PestTimerTextEntry(private val displayName: String) {
         PEST_TIMER("§eLast pest spawned: §b8s ago"),
@@ -42,7 +45,7 @@ class PestTimerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Pest Cooldown Warning", desc = "Warn when pest cooldown is over.")
+    @ConfigOption(name = "Pest Cooldown Warning", desc = "Warn when pests are eligible to spawn.")
     @ConfigEditorBoolean
     @FeatureToggle
     var cooldownOverWarning: Boolean = false

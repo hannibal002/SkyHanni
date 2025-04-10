@@ -57,6 +57,7 @@ object PestApi {
         }
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
+    var lastPestSpawnTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     // TODO move into repo
@@ -198,6 +199,8 @@ object PestApi {
         }
         if (!event.unknownAmount) scoreboardPests += event.amountPests
         updatePests()
+
+        lastPestSpawnTime = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
