@@ -20,7 +20,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
-class GUIConfig {
+class GuiConfig {
     @Expose
     @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
     @Accordion
@@ -115,7 +115,7 @@ class GUIConfig {
     var beaconPowerStat: Boolean = true
 
     @Expose
-    @ConfigLink(owner = GUIConfig::class, field = "beaconPower")
+    @ConfigLink(owner = GuiConfig::class, field = "beaconPower")
     var beaconPowerPosition: Position = Position(10, 10)
 
     @Expose
@@ -141,7 +141,7 @@ class GUIConfig {
     var realTimeShowSeconds: Boolean = true
 
     @Expose
-    @ConfigLink(owner = GUIConfig::class, field = "realTime")
+    @ConfigLink(owner = GuiConfig::class, field = "realTime")
     var realTimePosition: Position = Position(10, 10, false, true)
 
     @Expose
@@ -155,7 +155,7 @@ class GUIConfig {
     var tpsDisplay: Boolean = false
 
     @Expose
-    @ConfigLink(owner = GUIConfig::class, field = "tpsDisplay")
+    @ConfigLink(owner = GuiConfig::class, field = "tpsDisplay")
     var tpsDisplayPosition: Position = Position(10, 10, false, true)
 
     @Expose
