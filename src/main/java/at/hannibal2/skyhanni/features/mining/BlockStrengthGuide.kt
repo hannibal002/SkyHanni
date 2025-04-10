@@ -145,7 +145,7 @@ object BlockStrengthGuide {
 
         val icon by lazy(this.iconDel)
 
-        val hoverText get() = "Block ids: " + oreBlocks.joinToString(", ") { it.name.allLettersFirstUppercase() }
+        val hoverText get() = oreBlocks.joinToString(", ") { it.name.allLettersFirstUppercase() }
 
         fun renderable(rawSpeed: SpeedClass): Renderable {
             val ore = oreBlocks.first()
@@ -187,15 +187,17 @@ object BlockStrengthGuide {
                 listOf(
                     Renderable.string(name.allLettersFirstUppercase()),
                     Renderable.placeholder(0, 5),
-                    Renderable.string("${SkyblockStat.MINING_SPEED.icon} Your: ${speed.toInt()}"),
+                    Renderable.string("§3Ticks: §f$ticks"),
+                    Renderable.string("§3Your: §6${speed.toInt()} ${SkyblockStat.MINING_SPEED.icon}"),
                     Renderable.string(percentLine),
                     Renderable.placeholder(0, 5),
-                    Renderable.string("Block Strength: ${ore.strength}"),
-                    Renderable.string("${SkyblockStat.MINING_SPEED.icon} Softcap: ${ore.speedSoftCap}"),
-                    Renderable.string("${SkyblockStat.MINING_SPEED.icon} Instant: ${ore.speedForInstantMine}"),
+                    Renderable.string("§3Block Strength: §f${ore.strength}"),
+                    Renderable.string("§3Softcap: §6${ore.speedSoftCap} ${SkyblockStat.MINING_SPEED.icon}"),
+                    Renderable.string("§3Instant: §6${ore.speedForInstantMine} ${SkyblockStat.MINING_SPEED.icon}"),
                     Renderable.placeholder(0, 5),
-                    Renderable.string("Category: ${ore.category.toString().allLettersFirstUppercase()}"),
-                    Renderable.string(hoverText),
+                    Renderable.string("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}"),
+                    Renderable.string("§3Blocks in that group: "),
+                    Renderable.wrappedString(hoverText, width = 200),
                 ),
             )
         }
