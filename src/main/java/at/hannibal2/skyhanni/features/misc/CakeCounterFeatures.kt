@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -203,11 +204,11 @@ object CakeCounterFeatures {
         }
 
         val cakesMessage = cakesDifference?.let {
-            "ate §d$it§e ${StringUtils.pluralize(it, "Century Cake")}"
+            "ate §d${it.addSeparators()}§e ${StringUtils.pluralize(it, "Century Cake")}"
         }
 
         val soulsMessage = soulsDifference?.let {
-            "found §b$it§e ${StringUtils.pluralize(it, "Cake Soul")}"
+            "found §b${it.addSeparators()}§e ${StringUtils.pluralize(it, "Cake Soul")}"
         }
 
         when (config.offlineStatsMode) {
