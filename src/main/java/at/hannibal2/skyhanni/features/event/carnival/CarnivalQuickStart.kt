@@ -55,7 +55,7 @@ object CarnivalQuickStart {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         // IDK what is wrong here, but it does not work with event.message
-        if (!chatPattern.matches((event.chatComponent as? ChatComponentText)?.chatComponentText_TextValue)) return
+        if (!chatPattern.matches((event.chatComponent as? ChatComponentText)?.unformattedTextForChat)) return
         lastChat = SimpleTimeMark.now()
     }
 
