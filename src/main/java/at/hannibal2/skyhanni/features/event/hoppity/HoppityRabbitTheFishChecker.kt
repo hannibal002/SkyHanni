@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -29,7 +29,7 @@ object HoppityRabbitTheFishChecker {
      * REGEX-TEST: Chocolate Déjeuner Egg
      * REGEX-TEST: Chocolate Supper Egg
      */
-    val mealEggInventoryPattern by ChocolateFactoryApi.patternGroup.pattern(
+    val mealEggInventoryPattern by CFApi.patternGroup.pattern(
         "inventory.mealegg.name",
         "(?:§.)*Chocolate (?:Breakfast|Lunch|Dinner|Brunch|Déjeuner|Supper) Egg.*",
     )
@@ -37,7 +37,7 @@ object HoppityRabbitTheFishChecker {
     /**
      * REGEX-TEST: §cRabbit the Fish
      */
-    private val rabbitTheFishItemPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val rabbitTheFishItemPattern by CFApi.patternGroup.pattern(
         "item.rabbitthefish",
         "(?:§.)*Rabbit the Fish",
     )
@@ -45,7 +45,7 @@ object HoppityRabbitTheFishChecker {
     /**
      * REGEX-TEST: Click to open Chocolate Factory!
      */
-    private val openCfSlotLorePattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val openCfSlotLorePattern by CFApi.patternGroup.pattern(
         "inventory.mealegg.continue",
         "(?:§.)*Click to open Chocolate Factory!",
     )
@@ -59,7 +59,7 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled()) return
 
         val index = rabbitTheFishIndex ?: return
-        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
+        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(event.context, LorenzColor.RED)
     }
 
     @HandleEvent
@@ -68,7 +68,7 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.hasDisplayName() && it.key != 22
+            it.value.displayName.isNotEmpty() && it.key != 22
         }.entries.firstOrNull {
             rabbitTheFishItemPattern.matches(it.value.displayName)
         }?.key

@@ -40,6 +40,12 @@ class TrophyFishingConfig {
     var filletTooltip: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Total Caught Tooltip", desc = "Show total Trophy Fish caught in tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var totalFishCaught: Boolean = true
+
+    @Expose
     @ConfigOption(
         name = "Odger Waypoint",
         desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand.\n" +
