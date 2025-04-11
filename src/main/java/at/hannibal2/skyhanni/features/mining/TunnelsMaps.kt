@@ -271,8 +271,8 @@ object TunnelsMaps {
     @HandleEvent
     @Suppress("AvoidBritishSpelling")
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(79, "mining.tunnelMaps.pathColour", "mining.tunnelMaps.pathColor")
-        event.move(79, "mining.tunnelMaps.dynamicPathColour", "mining.tunnelMaps.dynamicPathColor")
+        event.move(84, "mining.tunnelMaps.pathColour", "mining.tunnelMaps.pathColor")
+        event.move(84, "mining.tunnelMaps.dynamicPathColour", "mining.tunnelMaps.dynamicPathColor")
     }
 
     init {
