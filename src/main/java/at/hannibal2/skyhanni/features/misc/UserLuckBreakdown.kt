@@ -11,13 +11,14 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Blocks
@@ -120,7 +121,7 @@ object UserLuckBreakdown {
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (event.inventoryName != "Your Stats Breakdown") {
+        if (InventoryUtils.openInventoryName() != "Your Stats Breakdown") {
             inMiscStats = false
             return
         }
@@ -165,7 +166,7 @@ object UserLuckBreakdown {
             calcSkillLuck()
         }
         val limboLuck = storage?.limbo?.userLuck?.roundTo(1) ?: 0.0f
-        when (event.slot.inventory.name) {
+        when (InventoryUtils.openInventoryName()) {
             "Your Equipment and Stats" -> equipmentMenuTooltip(event, limboLuck)
             "Your Stats Breakdown" -> statsBreakdownLoreTooltip(event, limboLuck)
             "SkyBlock Menu" -> skyblockMenuTooltip(event, limboLuck)

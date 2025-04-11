@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -28,10 +27,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import java.util.Objects
 import kotlin.math.absoluteValue
@@ -117,7 +116,7 @@ object ItemPickupLog {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         if (!isEnabled()) return
         itemList.clear()
         itemsAddedToInventory.clear()
@@ -154,7 +153,7 @@ object ItemPickupLog {
             itemList.clear()
 
             val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
-            val cursorItem = Minecraft.getMinecraft().thePlayer?.getItemOnCursor()
+            val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
 
             if (cursorItem != null) {
                 val hash = cursorItem.hash()

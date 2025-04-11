@@ -4,50 +4,86 @@ import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
 import at.hannibal2.skyhanni.utils.ColorUtils.component4
+import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
+import kotlin.math.min
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Some functions taken from NotEnoughUpdates
  */
+@Suppress("UnusedParameter")
 object GuiRenderUtils {
 
-    private fun drawStringCentered(str: String?, fr: FontRenderer, x: Float, y: Float, shadow: Boolean, color: Int) {
+    private val fr: FontRenderer get() = Minecraft.getMinecraft().fontRendererObj
+
+    // TODO change to extend function of DrawContext
+    private fun drawStringCentered(context: DrawContext, str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
+        str ?: return
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
-        GL11.glTranslatef(x2, y2, 0f)
-        fr.drawString(str, 0f, 0f, color, shadow)
-        GL11.glTranslatef(-x2, -y2, 0f)
+        //#if MC < 1.21
+        fr.drawString(str, x2, y2, color, shadow)
+        //#else
+        //$$ context.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+        //#endif
     }
 
-    fun drawString(str: String, x: Float, y: Float) {
-        Minecraft.getMinecraft().fontRendererObj.drawString(str, x, y, 0xffffff, true)
-    }
-
-    fun drawString(str: String, x: Int, y: Int) {
-        Minecraft.getMinecraft().fontRendererObj.drawString(str, x.toFloat(), y.toFloat(), 0xffffff, true)
-    }
-
-    fun drawStringCentered(str: String?, x: Int, y: Int) {
+    // TODO change to extend function of DrawContext
+    fun drawStringCentered(context: DrawContext, str: String?, x: Int, y: Int) {
         drawStringCentered(
-            str, Minecraft.getMinecraft().fontRendererObj, x.toFloat(), y.toFloat(), true, 0xffffff,
+            context, str, x.toFloat(), y.toFloat(), true, 0xffffff,
         )
+    }
+
+    // TODO change to extend function of DrawContext
+    fun drawStringCenteredScaledMaxWidth(context: DrawContext, text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
+        context.matrices.pushMatrix()
+        val strLength = fr.getStringWidth(text)
+        val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
+        context.matrices.translate(x, y, 0f)
+        context.matrices.scale(factor, factor, 1f)
+        drawString(context, text, -strLength / 2, -fr.FONT_HEIGHT / 2, color, shadow)
+        context.matrices.popMatrix()
+    }
+
+    // TODO change to extend function of DrawContext
+    fun drawString(context: DrawContext, str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
+        //#if MC < 1.21
+        fr.drawString(str, x, y, color, shadow)
+        //#else
+        //$$ context.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
+        //#endif
+    }
+
+    // TODO change to extend function of DrawContext
+    fun drawString(context: DrawContext, str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        //#if MC < 1.21
+        fr.drawString(str, x.toFloat(), y.toFloat(), color, shadow)
+        //#else
+        //$$ context.drawText(fr, str, x, y, color, shadow)
+        //#endif
     }
 
     private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
@@ -102,13 +138,10 @@ object GuiRenderUtils {
         )
     }
 
-    fun Int.darkenColor(): Int {
-        val color = Color(this)
-        return Color(color.red / 5, color.green / 5, color.blue / 5).rgb
-    }
-
-    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
-        GuiScreen.drawRect(
+    // TODO change to extend function of DrawContext
+    fun drawScaledRec(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
+        drawRect(
+            context,
             (left * inverseScale).toInt(),
             (top * inverseScale).toInt(),
             (right * inverseScale).toInt(),
@@ -117,9 +150,19 @@ object GuiRenderUtils {
         )
     }
 
-    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
+    // TODO change to extend function of DrawContext
+    fun drawRect(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int, color: Int) {
+        //#if MC < 1.21
+        GuiScreen.drawRect(left, top, right, bottom, color)
+        //#else
+        //$$ context.fill(left, top, right, bottom, color)
+        //#endif
+    }
+
+    // TODO change to extend function of DrawContext
+    fun renderItemAndBackground(context: DrawContext, item: ItemStack, x: Int, y: Int, color: Int) {
         renderItemStack(item, x, y)
-        GuiScreen.drawRect(x, y, x + 16, y + 16, color)
+        drawRect(context, x, y, x + 16, y + 16, color)
     }
 
     /** @Mojang */
@@ -210,5 +253,77 @@ object GuiRenderUtils {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST)
 
         GlStateManager.disableBlend()
+    }
+
+    fun ItemStack.renderOnScreen(
+        x: Float,
+        y: Float,
+        scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
+        rescaleSkulls: Boolean = true,
+    ) {
+        val item = checkBlinkItem()
+        val isSkull = rescaleSkulls && item.item === Items.skull
+
+        val baseScale = (if (isSkull) 4f / 3f else 1f)
+        val finalScale = baseScale * scaleMultiplier
+
+        val translateX: Float
+        val translateY: Float
+        if (isSkull) {
+            val skullDiff = ((scaleMultiplier) * 2.5).toFloat()
+            translateX = x - skullDiff
+            translateY = y - skullDiff
+        } else {
+            translateX = x
+            translateY = y
+        }
+
+        GlStateManager.pushMatrix()
+
+        GlStateManager.translate(translateX, translateY, -19f)
+        GlStateManager.scale(finalScale, finalScale, 0.2)
+        GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
+
+        RenderHelper.enableGUIStandardItemLighting()
+
+        AdjustStandardItemLighting.adjust() // Compensate for z scaling
+
+        try {
+            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        } catch (e: Exception) {
+            if (lastWarn.passedSince() > 1.seconds) {
+                lastWarn = SimpleTimeMark.now()
+                println(" ")
+                println("item: $item")
+                println("name: ${item.displayName}")
+                println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
+                println(" ")
+                ChatUtils.debug("rendering an item has failed.")
+            }
+        }
+        RenderHelper.disableStandardItemLighting()
+
+        GlStateManager.popMatrix()
+    }
+
+    private var lastWarn = SimpleTimeMark.farPast()
+
+    private object AdjustStandardItemLighting {
+
+        private const val lightScaling = 2.47f // Adjust as needed
+        private const val g = 0.6f // Original Value taken from RenderHelper
+        private const val lightIntensity = lightScaling * g
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16)
+
+        init {
+            itemLightBuffer.clear()
+            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1.0f)
+            itemLightBuffer.flip()
+        }
+
+        fun adjust() {
+            GL11.glLight(16384, 4609, itemLightBuffer)
+            GL11.glLight(16385, 4609, itemLightBuffer)
+        }
     }
 }

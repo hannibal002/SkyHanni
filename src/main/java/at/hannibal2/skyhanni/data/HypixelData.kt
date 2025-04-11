@@ -6,16 +6,15 @@ import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
@@ -36,6 +35,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
@@ -330,7 +330,7 @@ object HypixelData {
     private val loggerIslandChange = LorenzLogger("debug/island_change")
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         locrawData = null
         skyBlock = false
         inLimbo = false
@@ -491,14 +491,14 @@ object HypixelData {
     private fun checkHypixel() {
         if (!hasScoreboardUpdated) return
         val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
 
         var hypixel = false
 
         //#if MC < 1.21
         val clientBrand = player.clientBrand
         //#else
-        //$$ val clientBrand = MinecraftClient.getInstance().networkHandler?.brand
+        //$$ val clientBrand = mc.networkHandler?.brand
         //#endif
         clientBrand?.let {
             if (it.contains("hypixel", ignoreCase = true)) {
@@ -595,8 +595,7 @@ object HypixelData {
     }
 
     private fun checkScoreboard(): Boolean {
-        val minecraft = Minecraft.getMinecraft()
-        val world = minecraft.theWorld ?: return false
+        val world = MinecraftCompat.localWorldOrNull ?: return false
 
         val objective = world.scoreboard.getSidebarObjective() ?: return false
         val displayName = objective.displayName

@@ -10,12 +10,15 @@ import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendComponent
+import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
-import net.minecraft.util.IChatComponent
 import java.util.Stack
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+//#if MC < 1.21
+import net.minecraft.util.IChatComponent
+//#endif
 
 object ComponentMatcherUtils {
 
@@ -250,7 +253,7 @@ class ComponentSpan internal constructor(
      */
     fun intoComponent(): IChatComponent {
         val parent = "".asComponent()
-        parent.chatStyle = ChatStyle()
+        parent.chatStyle = defaultStyleConstructor
         for ((component, start, end) in sampleSlicedComponents()) {
             val copy = component.unformattedTextForChat.substring(start, end).asComponent()
             copy.chatStyle = component.chatStyle.createDeepCopy()

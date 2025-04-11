@@ -8,17 +8,16 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -45,7 +44,7 @@ object RiftTimer {
     private val changes = mutableMapOf<Long, String>()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         display = emptyList()
         maxTime = 0.seconds
         latestTime = 0.seconds
@@ -71,7 +70,7 @@ object RiftTimer {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !RiftApi.inRiftRace) return
         if (!event.isMod(5)) return
-        val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")
+        val newTime = TimeUtils.getDuration(MinecraftCompat.localPlayer.experienceLevel.toString() + " s")
         currentTime = newTime
         update()
     }
@@ -87,7 +86,7 @@ object RiftTimer {
 
         val currentFormat = currentTime.format()
         val percentage =
-            LorenzUtils.formatPercentage(currentTime.inWholeMilliseconds.toDouble() / maxTime.inWholeMilliseconds)
+            (currentTime.inWholeMilliseconds.toDouble() / maxTime.inWholeMilliseconds).formatPercentage()
         val percentageFormat = if (config.percentage.get()) " §7($percentage)" else ""
         val maxTimeFormat = if (config.maxTime.get()) "§7/§b" + maxTime.format() else ""
         val color = if (currentTime <= 1.minutes) "§c" else if (currentTime <= 5.minutes) "§e" else "§b"

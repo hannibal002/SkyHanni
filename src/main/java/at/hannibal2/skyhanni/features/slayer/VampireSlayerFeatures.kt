@@ -13,11 +13,9 @@ import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -38,8 +36,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.renderer.GlStateManager
@@ -143,8 +142,8 @@ object VampireSlayerFeatures {
                     if (nextClawSend < System.currentTimeMillis()) {
                         TitleManager.sendTitle(
                             "§6§lTWINCLAWS",
-                            (1750 - config.twinclawsDelay).milliseconds,
-                            2.6,
+                            duration = (1750 - config.twinclawsDelay).milliseconds,
+                            height = 2.6,
                         )
                         nextClawSend = System.currentTimeMillis() + 5_000
                     }
@@ -180,7 +179,7 @@ object VampireSlayerFeatures {
                 else canUseSteak && configCoopBoss.steakAlert && containCoop
 
             if (shouldSendSteakTitle) {
-                TitleManager.sendTitle("§c§lSTEAK!", 300.milliseconds, 2.6)
+                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds, height = 2.6)
             }
 
             if (shouldRender) {
@@ -259,7 +258,7 @@ object VampireSlayerFeatures {
         if (!isEnabled()) return
 
         if (config.drawLine) {
-            for (it in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>()) {
+            for (it in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
                 if (!it.isHighlighted()) continue
                 val vec = event.exactLocation(it)
                 if (vec.distanceToPlayer() < 15) {
@@ -273,7 +272,7 @@ object VampireSlayerFeatures {
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
-        for (stand in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()) {
+        for (stand in MinecraftCompat.localWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()) {
             val vec = stand.position.toLorenzVec()
             val distance = vec.distanceToPlayer()
             val isIchor = stand.hasSkullTexture(BLOOD_ICHOR_TEXTURE)
@@ -323,7 +322,7 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         entityList.clear()
         taggedEntityList.clear()
         standList = mutableMapOf()

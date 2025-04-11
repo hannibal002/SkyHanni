@@ -13,10 +13,11 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.compat.getLocation
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C03PacketPlayer
@@ -174,7 +175,7 @@ object PacketTest {
             val distance = getDistance(getLocation(this@print, entity))
 
             if (entity != null) {
-                if (entity == Minecraft.getMinecraft().thePlayer) {
+                if (entity.isLocalPlayer) {
                     append(" own")
                     return@buildString
                 } else {
@@ -222,7 +223,7 @@ object PacketTest {
     }
 
     private fun getEntity(packet: Packet<*>, id: Int?): Entity? {
-        val world = Minecraft.getMinecraft().theWorld
+        val world = MinecraftCompat.localWorld
         if (packet is S14PacketEntity) {
             return packet.getEntity(world)
         }

@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.CommissionBlock.Companion.onColor
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.isOreType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,6 +16,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockCarpet
 import net.minecraft.block.state.IBlockState
@@ -95,7 +94,7 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         val newEnabled = (inCrystalHollows || inGlacite) && config.enabled
         var reload = false
         if (newEnabled != enabled) {
@@ -108,7 +107,7 @@ object MiningCommissionsBlocksColor {
 
         if (enabled) {
             if (config.sneakQuickToggle.get()) {
-                val sneaking = Minecraft.getMinecraft().thePlayer.isSneaking
+                val sneaking = MinecraftCompat.localPlayer.isSneaking
                 if (sneaking != oldSneakState) {
                     oldSneakState = sneaking
                     if (oldSneakState) {
@@ -146,7 +145,7 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         enabled = false
         replaceBlocksMapCache = mutableMapOf()
     }
