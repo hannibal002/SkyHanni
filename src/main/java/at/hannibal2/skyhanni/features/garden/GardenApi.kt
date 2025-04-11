@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -57,6 +58,8 @@ object GardenApi {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
+    var pestCooldownEndTime = SimpleTimeMark.farPast()
+    var lastCropBrokenTime = SimpleTimeMark.farPast()
     val mushroomCowPet
         get() = PetApi.isCurrentPet("Mooshroom Cow") &&
             storage?.fortune?.farmingItems?.get(FarmingItems.MOOSHROOM_COW)

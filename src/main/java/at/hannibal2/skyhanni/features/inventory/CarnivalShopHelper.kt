@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EssenceUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -98,17 +99,17 @@ object CarnivalShopHelper {
         tryReplaceOverviewStack(event)
     }
 
-    private fun ReplaceItemEvent.isUnknownShop() = repoEventShops.none {
-        it.shopName.equals(this.inventory.name, ignoreCase = true)
+    private fun isUnknownShop() = repoEventShops.none {
+        it.shopName.equals(InventoryUtils.openInventoryName(), ignoreCase = true)
     }
 
     private fun tryReplaceShopSpecificStack(event: ReplaceItemEvent) {
-        if (currentProgress == null || event.isUnknownShop()) return
+        if (currentProgress == null || isUnknownShop()) return
         shopSpecificInfoItemStack?.let { event.replace(it) }
     }
 
     private fun tryReplaceOverviewStack(event: ReplaceItemEvent) {
-        if (!overviewInventoryNamesPattern.matches(event.inventory.name)) return
+        if (!overviewInventoryNamesPattern.matches(InventoryUtils.openInventoryName())) return
         overviewInfoItemStack?.let { event.replace(it) }
     }
 
