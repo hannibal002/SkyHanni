@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -120,12 +119,12 @@ object FlareDisplay {
                 }
 
                 FlareConfig.AlertType.TITLE -> {
-                    TitleManager.sendTitle(message, 1.seconds)
+                    TitleManager.sendTitle(message, duration = 1.seconds)
                 }
 
                 FlareConfig.AlertType.CHAT_TITLE -> {
                     ChatUtils.chat(message)
-                    TitleManager.sendTitle(message, 1.seconds)
+                    TitleManager.sendTitle(message, duration = 1.seconds)
                 }
 
                 else -> {}
@@ -153,7 +152,7 @@ object FlareDisplay {
         flares.any { it.entity.entityId == entity.entityId }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         flares.clear()
         display = emptyList()
     }

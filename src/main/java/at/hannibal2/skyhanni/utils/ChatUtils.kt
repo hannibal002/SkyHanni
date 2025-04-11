@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -55,7 +55,7 @@ object ChatUtils {
         replaceSameMessage: Boolean = false,
     ) {
         if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
-            LorenzUtils.consoleLog("[Debug] $message")
+            consoleLog("[Debug] $message")
         }
     }
 
@@ -127,7 +127,7 @@ object ChatUtils {
         log.log(formattedMessage)
 
         if (!MinecraftCompat.localPlayerExists) {
-            LorenzUtils.consoleLog(formattedMessage.removeColor())
+            consoleLog(formattedMessage.removeColor())
             return false
         }
 
@@ -169,6 +169,23 @@ object ChatUtils {
         } else {
             chat(text)
         }
+    }
+
+    /**
+     * Sends the message in chat.
+     * Show the lines when on hover.
+     * Offer option to click on the chat message to copy the lines to clipboard.
+     * Sseful for quick debug infos
+     */
+    fun clickToClipboard(message: String, lines: List<String>) {
+        val text = lines.joinToString("\n") { "§7$it" }
+        clickableChat(
+            "$message §7(hover for info)",
+            hover = "$text\n \n§eClick to copy to clipboard!",
+            onClick = {
+                ClipboardUtils.copyToClipboard(text.removeColor())
+            },
+        )
     }
 
     private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
@@ -320,7 +337,7 @@ object ChatUtils {
         (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
             MinecraftCompat.localPlayer.sendChatMessage(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
@@ -360,7 +377,6 @@ object ChatUtils {
         )
     }
 
-
     fun clickToActionOrDisable(
         message: String,
         option: KMutableProperty0<*>,
@@ -393,5 +409,9 @@ object ChatUtils {
     //$$ val ChatHudLine.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
     //$$ fun ChatHudLine.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
     //#endif
+
+    fun consoleLog(text: String) {
+        SkyHanniMod.consoleLog(text)
+    }
 
 }

@@ -74,13 +74,26 @@ object TimeUtils {
         else -> default
     }
 
+    fun Iterable<Duration>.average(): Duration {
+        var sum: Duration = Duration.ZERO
+        var count = 0
+        for (element in this) {
+            sum += element
+            count++
+        }
+        return if (count == 0) Duration.ZERO else sum / count
+    }
+
     val Duration.inWholeTicks: Int get() = (inWholeMilliseconds / 50).toInt()
 
     private fun String.preFixDurationString() =
         replace(Regex("(\\d+)([yMWwdhms])(?!\\s)"), "$1$2 ") // Add a space only after common time units
             .trim()
 
-    fun getDuration(string: String) = getMillis(string.preFixDurationString())
+    fun getDuration(string: String): Duration =
+        getDurationOrNull(string) ?: throw RuntimeException("Invalid format: '$string'")
+
+    fun getDurationOrNull(string: String): Duration? = getMillis(string.preFixDurationString())
 
     private fun getMillis(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
@@ -99,7 +112,7 @@ object TimeUtils {
         millis.toDuration(DurationUnit.MILLISECONDS)
     } ?: tryAlternativeFormat(string)
 
-    private fun tryAlternativeFormat(string: String): Duration {
+    private fun tryAlternativeFormat(string: String): Duration? {
         val split = string.split(":")
         return when (split.size) {
             3 -> {
@@ -117,7 +130,7 @@ object TimeUtils {
 
             1 -> split[0].toInt() * 1000
 
-            else -> throw RuntimeException("Invalid format: '$string'")
+            else -> return null
         }.milliseconds
     }
 

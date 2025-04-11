@@ -20,6 +20,7 @@ import java.util.Locale
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.item.Items
 //#endif
 
 object SkyBlockItemModifierUtils {
@@ -204,7 +205,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getSecondsHeld() = when (getItemId()) {
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
-        "DARK_CACAO_TRUFFLE" -> getAttributeInt("seconds_held")
+        "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
         else -> null
     }
@@ -240,6 +241,16 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as ResourceLocation
     //#else
     //$$ fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
+    //#endif
+
+    //#if MC < 1.21
+    fun isVanillaItem(itemId: String): Boolean {
+        return Item.itemRegistry.getObject(ResourceLocation(itemId)) != null
+    }
+    //#else
+    //$$ fun isVanillaItem(itemId: String): Boolean {
+    //$$     Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
+    //$$ }
     //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {

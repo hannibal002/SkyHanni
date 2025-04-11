@@ -60,7 +60,10 @@ enum class FortuneStats(
 
     companion object {
 
-        fun getTotal(): Pair<Double, Double> = entries.filter { it.isActive() }.sumOfPair { it.current to it.max }
+        fun getTotal(): Pair<Double, Double> = entries.filter { it.isActive() }.sumOfPair(
+            selector = { it.current to it.max },
+            resultConverter = { it }
+        )
 
         fun reset() = entries.forEach { it.reset() }
     }
@@ -77,6 +80,6 @@ private fun carrolynToolTip(crop: CropType): String =
 private fun carrolynOnClick(crop: CropType) =
     CarrolynTable.getByCrop(crop)?.let {
         it.setVisibleActive(!it.get())
-        FFGuideGUI.updateDisplay()
+        FFGuideGui.updateDisplay()
     }
 
