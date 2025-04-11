@@ -53,7 +53,7 @@ object HighlightBonzoMasks {
 
             if (readyAt.isInFuture()) {
                 val hue = interpolate(redHue, greenHue, maskType.percentageComplete(readyAt.timeUntil()))
-                slot.highlight(Color(Color.HSBtoRGB(hue.toFloat(), 1F, 1F)))
+                slot.highlight(event.context, Color(Color.HSBtoRGB(hue.toFloat(), 1F, 1F)))
             }
         }
     }

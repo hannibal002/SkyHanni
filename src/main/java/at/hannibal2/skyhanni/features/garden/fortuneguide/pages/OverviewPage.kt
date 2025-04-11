@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFInfos
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFStats
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFTypes
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -102,14 +102,14 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         )
 
         val moreInfo = "§2Select a piece for more info"
-        val wordArmor = if (FarmingItems.currentArmor == null) "Armor" else "Piece"
-        val armorName = FarmingItems.currentArmor?.getItem()?.displayName.orEmpty()
+        val wordArmor = if (FarmingItemType.currentArmor == null) "Armor" else "Piece"
+        val armorName = FarmingItemType.currentArmor?.getItem()?.displayName.orEmpty()
 
         content.addTable(
             1,
             FFInfos.TOTAL_ARMOR.bar(
                 "§2Total $wordArmor Fortune",
-                if (FarmingItems.currentArmor == null) "§7§2Total fortune from your armor\n$moreInfo"
+                if (FarmingItemType.currentArmor == null) "§7§2Total fortune from your armor\n$moreInfo"
                 else "§7§2Total fortune from your\n$armorName",
             ),
         )
@@ -118,7 +118,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             2,
             FFInfos.BASE_ARMOR.bar(
                 "§2Base $wordArmor Fortune",
-                if (FarmingItems.currentArmor == null) "§7§2The base fortune from your armor\n$moreInfo"
+                if (FarmingItemType.currentArmor == null) "§7§2The base fortune from your armor\n$moreInfo"
                 else "§7§2Base fortune from your\n$armorName",
             ),
         )
@@ -127,7 +127,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             3,
             FFInfos.ABILITY_ARMOR.bar(
                 "§2$wordArmor Ability",
-                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's ability\n$moreInfo"
+                if (FarmingItemType.currentArmor == null) "§7§2The fortune from your armor's ability\n$moreInfo"
                 else "§7§2Ability fortune from your\n$armorName",
             ),
         )
@@ -136,7 +136,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             4,
             FFInfos.REFORGE_ARMOR.bar(
                 "§2$wordArmor Reforge",
-                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's reforge\n$moreInfo"
+                if (FarmingItemType.currentArmor == null) "§7§2The fortune from your armor's reforge\n$moreInfo"
                 else "§7§2Reforge fortune from your\n$armorName",
             ),
         )
@@ -145,7 +145,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             5,
             FFInfos.ENCHANT_ARMOR.bar(
                 "§2$wordArmor Enchantment",
-                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's enchantments\n$moreInfo"
+                if (FarmingItemType.currentArmor == null) "§7§2The fortune from your armor's enchantments\n$moreInfo"
                 else "§7§2Enchantment fortune from your\n$armorName",
             ),
         )
@@ -154,20 +154,20 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             6,
             FFInfos.GEMSTONE_ARMOR.bar(
                 "§2$wordArmor Gemstones",
-                if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's gemstones\n$moreInfo"
+                if (FarmingItemType.currentArmor == null) "§7§2The fortune from your armor's gemstones\n$moreInfo"
                 else "§7§2Gemstone fortune from your\n$armorName",
             ),
         )
 
-        val wordEquip = if (FarmingItems.currentEquip == null) "Equipment" else "Piece"
+        val wordEquip = if (FarmingItemType.currentEquip == null) "Equipment" else "Piece"
 
-        val equipmentName = FarmingItems.currentEquip?.getItem()?.displayName.orEmpty()
+        val equipmentName = FarmingItemType.currentEquip?.getItem()?.displayName.orEmpty()
 
         content.addTable(
             1,
             FFInfos.TOTAL_EQUIP.bar(
                 "§2Total $wordEquip Fortune",
-                if (FarmingItems.currentEquip == null) "§7§2Total fortune from your equipment\n$moreInfo"
+                if (FarmingItemType.currentEquip == null) "§7§2Total fortune from your equipment\n$moreInfo"
                 else "§7§2Total fortune from your\n$equipmentName",
             ),
         )
@@ -176,7 +176,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             2,
             FFInfos.BASE_EQUIP.bar(
                 "§2$wordEquip Base Fortune",
-                if (FarmingItems.currentEquip == null) "§7§2The base fortune from your equipment\n$moreInfo"
+                if (FarmingItemType.currentEquip == null) "§7§2The base fortune from your equipment\n$moreInfo"
                 else "§7§2Base fortune from your\n$equipmentName",
             ),
         )
@@ -185,7 +185,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             3,
             FFInfos.ABILITY_EQUIP.bar(
                 "§2$wordEquip Ability",
-                if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's abilities\n$moreInfo"
+                if (FarmingItemType.currentEquip == null) "§7§2The fortune from your equipment's abilities\n$moreInfo"
                 else "§7§2Ability fortune from your\n$equipmentName",
             ),
         )
@@ -194,7 +194,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             4,
             FFInfos.REFORGE_EQUIP.bar(
                 "§2$wordEquip Reforge",
-                if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's reforges\n$moreInfo"
+                if (FarmingItemType.currentEquip == null) "§7§2The fortune from your equipment's reforges\n$moreInfo"
                 else "§7§2Reforge fortune from your\n$equipmentName",
             ),
         )
@@ -203,13 +203,13 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             5,
             FFInfos.ENCHANT_EQUIP.bar(
                 "§2$wordEquip Enchantment",
-                if (FarmingItems.currentEquip == null) "§7§2The fortune from your equipment's enchantments\n$moreInfo"
+                if (FarmingItemType.currentEquip == null) "§7§2The fortune from your equipment's enchantments\n$moreInfo"
                 else "§7§2Enchantment fortune from your\n$equipmentName",
             ),
         )
 
         val petFooter = Renderable.horizontalContainer(
-            FarmingItems.getPetsDisplay(true),
+            FarmingItemType.getPetsDisplay(true),
             4,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -246,7 +246,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         content.addTable(
             0,
             Renderable.horizontalContainer(
-                FarmingItems.getArmorDisplay(true),
+                FarmingItemType.getArmorDisplay(true),
                 4,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -255,7 +255,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         content.addTable(
             0,
             Renderable.horizontalContainer(
-                FarmingItems.getEquipmentDisplay(true),
+                FarmingItemType.getEquipmentDisplay(true),
                 4,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,

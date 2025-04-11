@@ -67,6 +67,7 @@ object DungeonApi {
         private set
     var roomId: String? = null
         private set
+    val active get() = started && !completed
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
