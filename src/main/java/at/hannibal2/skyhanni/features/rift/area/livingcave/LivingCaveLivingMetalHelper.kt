@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object LivingCaveLivingMetalHelper {
 
-    private val config get() = RiftApi.config.area.livingCave.livingCaveLivingMetalConfig
+    private val config get() = RiftApi.config.area.livingCave.livingMetal
     private var lastClicked: LorenzVec? = null
     private var pair: Pair<LorenzVec, LorenzVec>? = null
     private var animationStartTime = SimpleTimeMark.farPast()

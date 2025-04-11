@@ -43,7 +43,11 @@ object PlayerChatModifier {
         }
         val hoverEvent = chatComponent.chatStyle.chatHoverEvent ?: return
         hoverEvent.action ?: return
+        //#if MC < 1.21
         if (hoverEvents.any { it.value == hoverEvent.value }) return
+        //#else
+        //$$ if (hoverEvents.any { it.getValue(HoverEvent.Action.SHOW_TEXT) == hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT) }) return
+        //#endif
         hoverEvents.add(hoverEvent)
     }
 
