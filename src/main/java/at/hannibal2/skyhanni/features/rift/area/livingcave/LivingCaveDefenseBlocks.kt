@@ -178,7 +178,7 @@ object LivingCaveDefenseBlocks {
         event.move(9, "rift.area.livingCaveConfig", "rift.area.livingCave")
 
         val basePath = "rift.area.livingCave"
-        event.move(79, "$basePath.defenseBlockConfig", "$basePath.defenseBlock")
-        event.move(79, "$basePath.livingCaveLivingMetalConfig", "$basePath.livingMetal")
+        event.move(82, "$basePath.defenseBlockConfig", "$basePath.defenseBlock")
+        event.move(82, "$basePath.livingCaveLivingMetalConfig", "$basePath.livingMetal")
     }
 }

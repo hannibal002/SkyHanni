@@ -218,6 +218,6 @@ object RiftBloodEffigies {
         event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
 
         val basePath = "rift.area.stillgoreChateau.bloodEffigies"
-        event.move(79, "$basePath.respwningSoonTime", "$basePath.respawningSoonTime")
+        event.move(82, "$basePath.respwningSoonTime", "$basePath.respawningSoonTime")
     }
 }

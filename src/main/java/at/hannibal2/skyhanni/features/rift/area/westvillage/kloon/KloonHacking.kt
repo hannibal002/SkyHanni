@@ -175,6 +175,6 @@ object KloonHacking {
         event.move(9, "rift.area.westVillageConfig", "rift.area.westVillage")
 
         val basePath = "rift.area.westVillage"
-        event.move(79, "$basePath.hacking.colour", "$basePath.hacking.color")
+        event.move(82, "$basePath.hacking.colour", "$basePath.hacking.color")
     }
 }

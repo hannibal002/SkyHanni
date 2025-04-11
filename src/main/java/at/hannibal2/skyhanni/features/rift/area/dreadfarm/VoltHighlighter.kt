@@ -117,6 +117,6 @@ object VoltHighlighter {
     @HandleEvent
     @Suppress("AvoidBritishSpelling")
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(79, "rift.area.dreadfarm.voltCrux.voltColour", "rift.area.dreadfarm.voltCrux.voltColor")
+        event.move(82, "rift.area.dreadfarm.voltCrux.voltColour", "rift.area.dreadfarm.voltCrux.voltColor")
     }
 }
