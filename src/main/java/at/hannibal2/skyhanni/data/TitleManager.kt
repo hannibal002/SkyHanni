@@ -52,11 +52,20 @@ object TitleManager {
         var discardOnWorldChange: Boolean = true,
     ) {
         open val alive get() = endTime != null && (endTime?.isInPast() == false)
+
         var endTime: SimpleTimeMark? = null
+
         open fun getTitleText(): String = titleText
+
         open fun getSubtitleText(): String? = subtitleText
-        open fun start() { endTime = if (endTime == null) (now() + duration) else endTime }
-        open fun stop() { endTime = farPast() }
+
+        open fun start() {
+            endTime = if (endTime == null) (now() + duration) else endTime
+        }
+
+        open fun stop() {
+            endTime = farPast()
+        }
 
         override fun equals(other: Any?): Boolean = this === other || other is TitleContext && this.dataEquivalent(other)
         override fun hashCode(): Int =
@@ -86,7 +95,7 @@ object TitleManager {
         var countdownDuration: Duration = 5.seconds,
         var displayType: CountdownTitleDisplayType = CountdownTitleDisplayType.WHOLE_SECONDS,
         var updateInterval: Duration = 1.seconds,
-        var loomInterval: Duration = 250.milliseconds,
+        var loomInterval: Duration = 250.milliseconds, // TODO add explanation what this is
         var onInterval: () -> Unit = {},
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
@@ -142,6 +151,7 @@ object TitleManager {
             CountdownTitleDisplayType.PARTIAL_SECONDS -> (virtualEndTime?.timeUntil()?.inPartialSeconds ?: 0.0).seconds
         }
 
+        // TODO instead of run delayed, use tick event or similar. inaccuracies below one tick (50 ms) are not relevant imo
         private fun onIntervalOutward() {
             if (!alive) return
             onInterval()
@@ -233,7 +243,7 @@ object TitleManager {
                     loomInterval,
                     discardOnWorldChange,
                     onInterval,
-                    onFinish
+                    onFinish,
                 )
             }
         }
