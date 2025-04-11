@@ -60,7 +60,6 @@ object DungeonSpiritLeapOverlay {
         overlayPosition = Position(
             (gui.width - spiritLeapOverlay.width) / 2,
             (gui.height - spiritLeapOverlay.height) / 2,
-            false, true,
         ).apply {
             renderRenderable(spiritLeapOverlay, posLabel = "Spirit Leap Overlay", addToGuiManager = false)
         }

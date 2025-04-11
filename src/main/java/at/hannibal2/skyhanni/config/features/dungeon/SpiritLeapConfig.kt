@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SpiritLeapConfig {
     val defaultColor: String = "0:200:0:0:0"
-    val deadColor: String = "0:200:120:0:0"
+    private val deadColor: String = "0:200:120:0:0"
 
     @Expose
     @ConfigOption(name = "Enable Spirit Leap Overlay", desc = "Enable Spirit Leap Overlay inside Dungeons.")
@@ -20,7 +20,7 @@ class SpiritLeapConfig {
     @Expose
     @ConfigOption(
         name = "Show Player Class Level",
-        desc = "Display the player's Class level in the Spirit Leap overlay."
+        desc = "Display the player's Class level in the Spirit Leap overlay.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -29,7 +29,7 @@ class SpiritLeapConfig {
     @Expose
     @ConfigOption(
         name = "Dead Teammate Color",
-        desc = "Set the highlight color for dead teammates in the Spirit Leap overlay."
+        desc = "Set the highlight color for dead teammates in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
     var deadTeammateColor: String = "0:200:120:0:0"
@@ -37,7 +37,7 @@ class SpiritLeapConfig {
     @Expose
     @ConfigOption(
         name = "Archer Class Color",
-        desc = "Set the highlight color for the Archer class in the Spirit Leap overlay."
+        desc = "Set the highlight color for the Archer class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
     var archerClassColor: String = defaultColor
@@ -45,7 +45,7 @@ class SpiritLeapConfig {
     @Expose
     @ConfigOption(
         name = "Mage Class Color",
-        desc = "Set the highlight color for the Mage class in the Spirit Leap overlay."
+        desc = "Set the highlight color for the Mage class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
     var mageClassColor: String = defaultColor
@@ -53,7 +53,7 @@ class SpiritLeapConfig {
     @Expose
     @ConfigOption(
         name = "Berserk Class Color",
-        desc = "Set the highlight color for the Berserk class in the Spirit Leap overlay."
+        desc = "Set the highlight color for the Berserk class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
     var berserkClassColor: String = defaultColor
@@ -61,7 +61,7 @@ class SpiritLeapConfig {
     @Expose
     @ConfigOption(
         name = "Tank Class Color",
-        desc = "Set the highlight color for the Tank class in the Spirit Leap overlay."
+        desc = "Set the highlight color for the Tank class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
     var tankClassColor: String = defaultColor
@@ -69,7 +69,7 @@ class SpiritLeapConfig {
     @Expose
     @ConfigOption(
         name = "Healer Class Color",
-        desc = "Set the highlight color for the Healer class in the Spirit Leap overlay."
+        desc = "Set the highlight color for the Healer class in the Spirit Leap overlay.",
     )
     @ConfigEditorColour
     var healerClassColor: String = defaultColor
