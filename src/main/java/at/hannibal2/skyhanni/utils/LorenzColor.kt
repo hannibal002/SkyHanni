@@ -52,6 +52,7 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     override fun toString(): String = coloredLabel
 
+    @Suppress("AvoidBritishSpelling")
     @Deprecated("Use ChromaColour instead", ReplaceWith("toChromaColor()"))
     fun toConfigColor(): String = "0:255:${color.red}:${color.green}:${color.blue}"
 

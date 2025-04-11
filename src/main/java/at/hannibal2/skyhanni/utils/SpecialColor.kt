@@ -6,6 +6,7 @@ import java.awt.Color
  * Taken from NotEnoughUpdates,
  * translated to Kotlin and modified.
  */
+@Suppress("AvoidBritishSpelling")
 object SpecialColor {
     private const val MIN_CHROMA_SECS = 1
     private const val MAX_CHROMA_SECS = 60
