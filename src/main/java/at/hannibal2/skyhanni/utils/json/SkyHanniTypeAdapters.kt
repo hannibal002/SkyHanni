@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.json
 
-import at.hannibal2.skyhanni.config.core.config.CustomColor
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
@@ -85,8 +84,6 @@ object SkyHanniTypeAdapters {
     )
 
     val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
-
-    val CUSTOM_COLOR: TypeAdapter<CustomColor> = SimpleStringTypeAdapter(CustomColor::asString, ::CustomColor)
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
     val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>(IslandType.UNKNOWN)

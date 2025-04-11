@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.json
 
-import at.hannibal2.skyhanni.config.core.config.CustomColor
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
@@ -8,10 +7,11 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
+import io.github.notenoughupdates.moulconfig.ChromaColour
+import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
@@ -32,7 +32,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(LorenzRarity::class.java, SkyHanniTypeAdapters.RARITY.nullSafe())
         .registerTypeAdapter(IslandType::class.java, SkyHanniTypeAdapters.ISLAND_TYPE.nullSafe())
         .registerTypeAdapter(ModVersion::class.java, SkyHanniTypeAdapters.MOD_VERSION.nullSafe())
-        .registerTypeAdapter(CustomColor::class.java, SkyHanniTypeAdapters.CUSTOM_COLOR.nullSafe())
+        .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
         .registerTypeAdapter(
             SkyHanniTracker.DefaultDisplayMode::class.java,
             SkyHanniTypeAdapters.TRACKER_DISPLAY_MODE.nullSafe(),

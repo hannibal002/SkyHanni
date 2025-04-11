@@ -1,17 +1,22 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 
 object ColorUtils {
 
-    @Deprecated("Use toSpecialColor() instead", ReplaceWith("this.toSpecialColor()"))
-    fun String.toChromaColor() = this.toSpecialColor()
+    @JvmStatic
+    @JvmOverloads
+    fun Color.toChromaColor(alpha: Int = this.alpha, chroma: Int = 0): ChromaColour =
+        ChromaColour.fromRGB(red, green, blue, alpha, chroma)
 
-    @Deprecated("Use toSpecialColorInt() instead", ReplaceWith("this.toSpecialColorInt()"))
-    fun String.toChromaColorInt() = this.toSpecialColorInt()
+    @JvmStatic
+    fun String.toChromaColor() = ChromaColour.forLegacyString(this)
+
+    fun ChromaColour.toColor(): Color = effectiveColour
+
+    fun ChromaColour.toInt() = effectiveColour.rgb
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
 

@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
-import at.hannibal2.skyhanni.config.core.config.CustomColor;
+import at.hannibal2.skyhanni.utils.ColorUtils;
 import at.hannibal2.skyhanni.utils.OSUtils;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.ChromaColour;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
@@ -27,7 +28,7 @@ public class BackgroundConfig {
         desc = "The color of the background."
     )
     @ConfigEditorColour
-    public CustomColor color = new CustomColor(Color.BLACK, 80);
+    public ChromaColour color = ColorUtils.toChromaColor(Color.BLACK, 80);
 
     @Expose
     @ConfigOption(
