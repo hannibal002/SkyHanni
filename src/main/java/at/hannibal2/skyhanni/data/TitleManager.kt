@@ -380,8 +380,8 @@ object TitleManager {
     private fun dequeueNextTitle(location: TitleLocation) {
         val titleQueue = titleLocationQueues[location]
         val title = titleQueue?.pollOrNull()
-        title?.start()
         currentTitles[location] = title
+        currentTitles[location]?.start()
     }
 
     @HandleEvent
