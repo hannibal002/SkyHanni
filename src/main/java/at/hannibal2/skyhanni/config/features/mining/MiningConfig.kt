@@ -58,7 +58,7 @@ class MiningConfig {
     @Expose
     @ConfigOption(name = "Ordered Waypoints", desc = "Settings for ordered waypoints (credit to Ninjune and Soopy).")
     @Accordion
-    var orderedWaypoints: OrderedWaypointsConfig = OrderedWaypointsConfig();
+    var orderedWaypoints: OrderedWaypointsConfig = OrderedWaypointsConfig()
 
     @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
