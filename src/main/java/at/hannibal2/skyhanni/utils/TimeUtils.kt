@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig
 import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -213,12 +212,6 @@ enum class TimeUnit(val factor: Long, private val shortName: String, private val
     } else shortName
 
     fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
-
-    companion object {
-        fun fromTimeFormatEntryOrNull(entry: CropMilestonesConfig.TimeFormatEntry): TimeUnit? {
-            return entries.firstOrNull { it.name == entry.name }
-        }
-    }
 }
 
 val Duration.inPartialSeconds: Double get() = toDouble(DurationUnit.SECONDS)
