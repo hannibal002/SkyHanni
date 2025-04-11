@@ -52,7 +52,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
                 GuiRenderUtils.drawString(
                     context,
                     "§e§lNEW TEXT",
-                    0, 0, -1,
+                    0, size * 10, -1,
                 )
                 size += drawMultiLineText(context, it, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             }
@@ -98,8 +98,8 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
     private fun drawMultiLineText(context: DrawContext, comp: IChatComponent, xPos: Int): Int {
         val lines = splitLine(comp)
         for (line in lines) {
-            GuiRenderUtils.drawString(context, line, xPos, 0)
-            context.matrices.translate(0F, 10F, 0F)
+            GuiRenderUtils.drawString(context, line, xPos, 0, -1)
+            context.matrices.translate(0f, 10f, 0f)
         }
         return lines.size
     }

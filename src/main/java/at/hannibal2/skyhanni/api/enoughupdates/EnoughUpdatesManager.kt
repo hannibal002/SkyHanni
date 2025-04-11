@@ -163,9 +163,9 @@ object EnoughUpdatesManager {
         json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.displayName)
         //#if MC < 1.21
-        //$$ // todo nbt tag doesnt exist on modern
-        //$$ json.addProperty("nbttag", tag.toString())
-        //$$ json.addProperty("damage", stack.itemDamage)
+        // todo nbt tag doesnt exist on modern
+        json.addProperty("nbttag", tag.toString())
+        json.addProperty("damage", stack.itemDamage)
         //#endif
 
         val jsonLore = JsonArray()

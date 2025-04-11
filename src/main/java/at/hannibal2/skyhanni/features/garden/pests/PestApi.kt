@@ -57,6 +57,7 @@ object PestApi {
         }
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
+    var lastPestSpawnTime = SimpleTimeMark.farPast()
     var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
     // TODO move into repo
@@ -73,7 +74,7 @@ object PestApi {
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
-    private val patternGroup = RepoPattern.group("garden.pestsapi")
+    val patternGroup = RepoPattern.group("garden.pestsapi")
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
         " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)",
@@ -182,7 +183,6 @@ object PestApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestSpawn(event: PestSpawnEvent) {
-        PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plotNames = event.plotNames
         for (plotName in plotNames) {
             val plot = GardenPlotApi.getPlotByName(plotName)
