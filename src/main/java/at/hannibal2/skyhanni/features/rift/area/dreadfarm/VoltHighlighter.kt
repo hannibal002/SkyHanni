@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -71,7 +72,7 @@ object VoltHighlighter {
                 ) { config.voltMoodMeter }
             if (state == VoltState.DOING_LIGHTNING && config.voltRange) {
                 event.drawCylinderInWorld(
-                    config.voltColour.toSpecialColor(),
+                    config.voltColor.toSpecialColor(),
                     entity.posX,
                     entity.posY - 4f,
                     entity.posZ,
@@ -111,5 +112,11 @@ object VoltHighlighter {
         if (entity !is EntityArmorStand) return VoltState.NO_VOLT
         val helmet = entity.getStandHelmet() ?: return VoltState.NO_VOLT
         return getVoltState(helmet)
+    }
+
+    @HandleEvent
+    @Suppress("AvoidBritishSpelling")
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(82, "rift.area.dreadfarm.voltCrux.voltColour", "rift.area.dreadfarm.voltCrux.voltColor")
     }
 }

@@ -57,7 +57,7 @@ object HitmanSlots {
     private fun handleSlotStorageUpdate(event: InventoryOpenEvent) {
         if (!config.hitmanCosts) return
         val leftToPurchase = event.inventoryItems.filterNotBorderSlots().count { (_, item) ->
-            item.hasDisplayName() && item.getLore().isNotEmpty() &&
+            item.displayName.isNotEmpty() && item.getLore().isNotEmpty() &&
                 slotCostPattern.matches(item.getSingleLineLore())
         }
         val ownedSlots = CFApi.hitmanCosts.size - leftToPurchase

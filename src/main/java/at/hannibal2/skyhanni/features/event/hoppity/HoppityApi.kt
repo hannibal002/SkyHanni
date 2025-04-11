@@ -182,7 +182,7 @@ object HoppityApi {
             // Stack must not be null, and must be a skull.
             stack.item != null && stack.item == Items.skull &&
             // All strays have a display name, all the time.
-            stack.hasDisplayName() && stack.displayName.isNotEmpty()
+            stack.displayName.isNotEmpty() && stack.displayName.isNotEmpty()
     }
 
     private fun Map<Int, ItemStack>.filterStrayProcessable() = filterMayBeStray(this).filter {
@@ -193,7 +193,7 @@ object HoppityApi {
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.
         stack != null && stack.item != null && stack.item in miscProcessableItemTypes &&
-            stack.hasDisplayName() && stack.getLore().isNotEmpty()
+            stack.displayName.isNotEmpty() && stack.getLore().isNotEmpty()
 
     private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent, note: String? = null) {
         EggFoundEvent(
