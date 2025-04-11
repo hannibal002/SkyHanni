@@ -59,6 +59,7 @@ object LimboPlaytime {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!enabled) return
         if (event.inventory !is ContainerLocalMenu) return
+        // TODO replace with InventoryDetector
         if (InventoryUtils.openInventoryName() != "Detailed /playtime") return
         if (event.slot != 43) return
         val playtime = storage?.playtime ?: 0
@@ -89,6 +90,7 @@ object LimboPlaytime {
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
         if (!enabled) return
+        // TODO replace with InventoryDetector
         if (!InventoryUtils.openInventoryName().startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
         val playtime = storage?.playtime ?: 0

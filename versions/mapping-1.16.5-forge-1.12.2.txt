@@ -1,7 +1,10 @@
 
 com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
 
-com.mojang.blaze3d.systems.RenderSystem color4f() color()
+
+com.mojang.blaze3d.systems.RenderSystem enableDepthTest() enableDepth()
+com.mojang.blaze3d.systems.RenderSystem disableDepthTest() disableDepth()
+com.mojang.blaze3d.systems.RenderSystem blendFuncSeparate() tryBlendFuncSeparate()
 
 com.mojang.math.Matrix3f org.lwjgl.util.vector.Matrix3f
 com.mojang.math.Matrix4f org.lwjgl.util.vector.Matrix4f

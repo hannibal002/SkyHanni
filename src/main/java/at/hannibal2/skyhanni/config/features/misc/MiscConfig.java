@@ -413,6 +413,11 @@ public class MiscConfig {
     public boolean warnAboutPcTimeOffset = true;
 
     @Expose
+    @ConfigOption(name = "Transparent Tooltips", desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!")
+    @ConfigEditorBoolean
+    public boolean transparentTooltips = false;
+
+    @Expose
     @ConfigOption(
         name = "Abiphone Hotkey",
         desc = "Answer incoming abiphone calls with a hotkey."

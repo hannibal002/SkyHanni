@@ -60,6 +60,7 @@ object CustomWardrobe {
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
+    // TODO use inventory InventoryDetector
     private const val GUI_NAME = "Custom Wardrobe"
 
     @HandleEvent
