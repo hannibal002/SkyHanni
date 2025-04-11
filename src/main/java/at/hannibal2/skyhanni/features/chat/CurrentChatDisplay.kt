@@ -4,17 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.toFormattedName
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -26,8 +27,7 @@ object CurrentChatDisplay {
     private val config get() = SkyHanniMod.feature.chat
     private val storage get() = ProfileStorageData.playerSpecific
 
-    @Suppress("unused")
-    enum class ChatTypes(
+    enum class ChatType(
         color: LorenzColor? = null,
         chatName: String? = null,
         displayName: String? = null
@@ -89,7 +89,7 @@ object CurrentChatDisplay {
     private var privateMessageEnd = SimpleTimeMark.farPast()
     private var privateMessagePlayer: String? = null
 
-    private var currentChat: ChatTypes?
+    private var currentChat: ChatType?
         get() = storage?.currentChat
         set(value) {
             storage?.currentChat = value
@@ -105,19 +105,19 @@ object CurrentChatDisplay {
         changedChatPattern.matchMatcher(message) {
             val chat = group("chat")
             privateMessagePlayer = null
-            currentChat = ChatTypes.fromName(chat)
+            currentChat = ChatType.fromName(chat)
             update()
             return
         }
         if (allChatPattern.matches(message)) {
-            currentChat = ChatTypes.ALL
+            currentChat = ChatType.ALL
             privateMessagePlayer = null
             update()
             return
         }
         openPrivateMessagePattern.matchMatcher(message) {
             privateMessageEnd = maxPrivateMessageTime.fromNow()
-            currentChat = ChatTypes.PRIVATE
+            currentChat = ChatType.PRIVATE
             privateMessagePlayer = group("player")
             update()
             return
@@ -134,13 +134,13 @@ object CurrentChatDisplay {
     private fun drawDisplay() = buildString {
         val chat = currentChat ?: return@buildString
         append("§aChat: ")
-        if (chat == ChatTypes.PRIVATE) {
+        if (chat == ChatType.PRIVATE) {
             append(privateMessagePlayer?.let { "§6$it " } ?: "§cUnknown ")
             append(if (privateMessageEnd.isInPast()) "§c(EXPIRED)" else "§b${privateMessageEnd.timeUntil().format()}")
             return@buildString
         }
         append(chat.displayName)
-        if (chat != ChatTypes.PARTY) return@buildString
+        if (chat != ChatType.PARTY) return@buildString
         val size = PartyApi.partyMembers.size
         append(
             if (size == 0) " §c(NOT IN PARTY)"

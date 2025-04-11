@@ -25,7 +25,7 @@ class PlayerSpecificStorage {
     var fameRank: String = "New Player"
 
     @Expose
-    var currentChat: CurrentChatDisplay.ChatTypes? = null
+    var currentChat: CurrentChatDisplay.ChatType? = null
 
     @Expose
     var nextCityProjectParticipationTime: SimpleTimeMark = farPast()
