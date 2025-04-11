@@ -44,7 +44,7 @@ object ServerRestartTitle {
 
         restartingPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             if (timerTitleContext?.alive == true) return
-            else if (timerTitleContext?.ended == true) {
+            else if (timerTitleContext?.alive == false) {
                 timerTitleContext = null
             }
             val minutes = group("minutes").toInt().minutes
@@ -54,6 +54,7 @@ object ServerRestartTitle {
             timerTitleContext = TitleManager.sendTitle(
                 "§cServer Restart in §b%f",
                 duration = totalTime,
+                weight = -1.0,
                 countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS
             ) ?: timerTitleContext
         }
