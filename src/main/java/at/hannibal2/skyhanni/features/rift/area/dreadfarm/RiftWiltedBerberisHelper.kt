@@ -20,9 +20,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumParticleTypes
@@ -278,7 +278,7 @@ object RiftWiltedBerberisHelper {
     private fun axisAlignedBB(loc: LorenzVec) = loc.add(0.1, -0.1, 0.1).boundingToOffset(0.8, 1.0, 0.8).expandBlock()
 
     private fun SkyHanniRenderWorldEvent.drawBox(location: LorenzVec, color: Color, alphaMultiplier: Float) {
-        drawFilledBoundingBoxNea(axisAlignedBB(location), color, alphaMultiplier)
+        drawFilledBoundingBox(axisAlignedBB(location), color, alphaMultiplier)
     }
 
     private fun isEnabled() = RiftApi.inRift() && RiftApi.inDreadfarm() && config.enabled
