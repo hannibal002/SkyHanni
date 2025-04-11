@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemBow
 import java.util.regex.Matcher
 
-
 @SkyHanniModule
 object QuiverApi {
     private val storage get() = ProfileStorageData.profileSpecific
@@ -134,24 +133,28 @@ object QuiverApi {
 
         selectPattern.matchMatcher(message) {
             val type = group("arrow")
-            currentArrow = getArrowByNameOrNull(type)
-                ?: return ErrorManager.logErrorWithData(
+            currentArrow = getArrowByNameOrNull(type) ?: run {
+                ErrorManager.logErrorWithData(
                     UnknownArrowType("Unknown arrow type: $type"),
                     "Unknown arrow type: $type",
                     "message" to message,
                 )
+                return
+            }
             postUpdateEvent()
             return
         }
 
         arrowRanOutPattern.matchMatcher(message) {
             val type = group("type")
-            val ranOutType = getArrowByNameOrNull(type)
-                ?: return ErrorManager.logErrorWithData(
+            val ranOutType = getArrowByNameOrNull(type) ?: run {
+                ErrorManager.logErrorWithData(
                     UnknownArrowType("Unknown arrow type: $type"),
                     "Unknown arrow type: $type",
                     "message" to message,
                 )
+                return
+            }
             ranOutType.amount = 0
             postUpdateEvent(ranOutType)
         }
@@ -194,13 +197,14 @@ object QuiverApi {
     private fun Matcher.handleQuiverAddedMatch(message: String) {
         val type = group("type")
         val amount = group("amount").formatInt()
-        val filledUpType = getArrowByNameOrNull(type)
-            ?: return ErrorManager.logErrorWithData(
+        val filledUpType = getArrowByNameOrNull(type) ?: run {
+            ErrorManager.logErrorWithData(
                 UnknownArrowType("Unknown arrow type: $type"),
                 "Unknown arrow type: $type",
                 "message" to message,
             )
-
+            return
+        }
         filledUpType.amount += amount
         if (filledUpType == currentArrow) {
             postUpdateEvent()
@@ -235,12 +239,14 @@ object QuiverApi {
                 quiverInventoryPattern.matchMatcher(line) {
                     val type = group("type")
                     val amount = group("amount").formatInt()
-                    val currentArrowType = getArrowByNameOrNull(type)
-                        ?: return ErrorManager.logErrorWithData(
+                    val currentArrowType = getArrowByNameOrNull(type) ?: run {
+                        ErrorManager.logErrorWithData(
                             UnknownArrowType("Unknown arrow type: $type"),
                             "Unknown arrow type: $type",
                             "line" to line,
                         )
+                        return
+                    }
                     if (currentArrowType != currentArrow || amount != currentAmount) {
                         currentArrow = currentArrowType
                         currentAmount = amount

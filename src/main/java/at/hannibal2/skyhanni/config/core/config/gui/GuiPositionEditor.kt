@@ -29,11 +29,11 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import java.io.IOException
 
 class GuiPositionEditor(
@@ -52,7 +52,7 @@ class GuiPositionEditor(
         for (position in positions) {
             position.clicked = false
         }
-        OtherInventoryData.close()
+        OtherInventoryData.close("ShPositionEditor")
     }
 
     override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -234,7 +234,7 @@ class GuiPositionEditor(
 
     override fun handleMouseInput() {
         super.handleMouseInput()
-        val mw = Mouse.getEventDWheel()
+        val mw = MouseCompat.getScrollDelta()
         if (mw == 0) return
 
         val (mouseX, mouseY) = GuiScreenUtils.mousePos

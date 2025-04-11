@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
@@ -111,11 +112,11 @@ object ErrorManager {
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ) {
+    ): Boolean {
         if (extraData.isNotEmpty()) {
             cachedExtraData = null
         }
-        logError(
+        return logError(
             IllegalStateException(internalMessage),
             userMessage,
             ignoreErrorCache,
@@ -134,9 +135,7 @@ object ErrorManager {
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
-    ) {
-        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
-    }
+    ): Boolean = logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
@@ -148,19 +147,19 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ) {
-        if (betaOnly && !SkyHanniMod.isBetaVersion) return
+    ): Boolean {
+        if (betaOnly && !SkyHanniMod.isBetaVersion) return false
         if (!ignoreErrorCache) {
             val cachedError = throwable.stackTrace.getOrNull(0)?.let {
                 CachedError(it.fileName ?: "<unknown>", it.lineNumber, message)
             } ?: CachedError("<empty stack trace>", 0, message)
-            if (cachedError in cache) return
+            if (cachedError in cache) return false
             cache.add(cachedError)
         }
-        if (!condition()) return
+        if (!condition()) return false
 
         Error(message, throwable).printStackTrace()
-        Minecraft.getMinecraft().thePlayer ?: return
+        MinecraftCompat.localPlayerOrNull ?: return false
 
         val fullStackTrace: String
         val stackTrace: String
@@ -180,13 +179,14 @@ object ErrorManager {
         fullErrorMessages[randomId] =
             "```\nSkyHanni ${SkyHanniMod.VERSION}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
-        val finalMessage = buildFinalMessage(message) ?: return
+        val finalMessage = buildFinalMessage(message) ?: return false
         ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.VERSION}]: $finalMessage Click here to copy the error into the clipboard.",
             onClick = { copyError(randomId) },
             "§eClick to copy!",
             prefix = false,
         )
+        return true
     }
 
     private fun getExtraDataOrCached(extraData: Array<out Pair<String, Any?>>): String {

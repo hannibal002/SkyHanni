@@ -19,9 +19,18 @@ class RareDropMessagesConfig {
     @Expose
     @ConfigOption(
         name = "Enchanted Book Name",
-        desc = "Shows what enchantment the dropped enchanted book is, and sends a message if you get one without a chat message."
+        desc = "Shows what enchantment the dropped enchanted book is."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var enchantedBook: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Missing Enchanted Book Message",
+        desc = "Sends a custom Rare Drop message if you get an enchanted book without a message in chat."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var enchantedBookMissingMessage: Boolean = false
 }
