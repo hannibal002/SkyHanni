@@ -58,15 +58,15 @@ object ChatCopy {
         val x = MathHelper.floor_float((mouseX / scaleFactor - 3) / chatScale)
         val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - getOffset()) / chatScale)
 
-        if (x >= 0 && y >= 0) {
-            val fontHeight = mc.fontRendererObj.FONT_HEIGHT
-            val chatLines = access.drawnChatLines_skyhanni
-            val maxLines = chatGui.lineCount.coerceAtMost(chatLines.size)
-            if (x <= MathHelper.floor_float(chatGui.chatWidth.toFloat() / chatGui.chatScale) && y < fontHeight * maxLines + maxLines) {
-                val lineIndex = y / fontHeight + access.scrollPos_skyhanni
-                if (lineIndex in 0 until chatLines.size) {
-                    return chatLines[lineIndex]
-                }
+        if (x < 0 || y < 0) return null
+
+        val fontHeight = mc.fontRendererObj.FONT_HEIGHT
+        val chatLines = access.drawnChatLines_skyhanni
+        val maxLines = chatGui.lineCount.coerceAtMost(chatLines.size)
+        if (x <= MathHelper.floor_float(chatGui.chatWidth.toFloat() / chatGui.chatScale) && y < fontHeight * maxLines + maxLines) {
+            val lineIndex = y / fontHeight + access.scrollPos_skyhanni
+            if (lineIndex in 0 until chatLines.size) {
+                return chatLines[lineIndex]
             }
         }
         return null
@@ -81,7 +81,4 @@ object ChatCopy {
             if (patcherConfigClass.getDeclaredFieldOrNull("chatPosition")?.getBoolean(null) == true) 12 else 0
         }.getOrDefault(0)
     }
-
-
-
 }
