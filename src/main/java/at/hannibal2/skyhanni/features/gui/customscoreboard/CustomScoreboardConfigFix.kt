@@ -103,8 +103,7 @@ object CustomScoreboardConfigFix {
             event.move(63, "$TITLE_AND_FOOTER_KEY.alignTitleAndFooter", "$TITLE_AND_FOOTER_KEY.$key")
         }
         event.move(69, "$DISPLAY_PREFIX.hideCoinsDifference", "$DISPLAY_PREFIX.showNumberDifference")
-        // TODO: BUMP NUMBER HELLO HANNI DONT MERGE IT NOT BUMPED
-        event.move(64, "$DISPLAY_PREFIX.displayNumbersFirst", "$DISPLAY_PREFIX.numberDisplayFormat ") {
+        event.move(83, "$DISPLAY_PREFIX.displayNumbersFirst", "$DISPLAY_PREFIX.numberDisplayFormat ") {
             JsonPrimitive(
                 if (it.asBoolean) CustomScoreboardUtils.NumberDisplayFormat.COLOR_TEXT_NUMBER.name
                 else CustomScoreboardUtils.NumberDisplayFormat.TEXT_COLOR_NUMBER.name,
