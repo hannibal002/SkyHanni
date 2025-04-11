@@ -74,7 +74,7 @@ object PestApi {
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
-    private val patternGroup = RepoPattern.group("garden.pestsapi")
+    val patternGroup = RepoPattern.group("garden.pestsapi")
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
         " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)",

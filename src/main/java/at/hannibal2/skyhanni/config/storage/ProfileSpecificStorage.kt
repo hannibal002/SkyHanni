@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
-import at.hannibal2.skyhanni.features.garden.pests.VinylType
+import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
@@ -851,4 +851,12 @@ class ProfileSpecificStorage {
         @Expose
         var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
     }
+
+    @Expose
+    var cakeCounterData: CakeCounterData = CakeCounterData()
+
+    class CakeCounterData(
+        @Expose var cakesEaten: Int? = -1,
+        @Expose var soulsFound: Int = 0,
+    )
 }

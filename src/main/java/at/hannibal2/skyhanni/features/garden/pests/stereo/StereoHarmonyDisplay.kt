@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.pests
+package at.hannibal2.skyhanni.features.garden.pests.stereo
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -24,7 +26,7 @@ object StereoHarmonyDisplay {
 
     private val config get() = PestApi.config.stereoHarmony
 
-    private var activeVinyl: VinylType?
+    var activeVinyl: VinylType?
         get() = ProfileStorageData.profileSpecific?.garden?.activeVinyl
         private set(type) {
             ProfileStorageData.profileSpecific?.garden?.activeVinyl = type
