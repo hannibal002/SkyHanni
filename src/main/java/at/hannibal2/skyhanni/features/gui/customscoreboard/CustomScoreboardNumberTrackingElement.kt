@@ -6,11 +6,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-interface CustomScoreboardNumberTrackingElement {
-    var previousAmount: Long
-    var temporaryChangeDisplay: String?
-    val numberColor: String
-    var currentJob: Job?
+abstract class CustomScoreboardNumberTrackingElement {
+    abstract var previousAmount: Long
+    abstract val numberColor: String
+    var temporaryChangeDisplay: String? = null
+    var currentJob: Job? = null
 
     fun checkDifference(currentAmount: Long) {
         if (currentAmount != previousAmount) {
