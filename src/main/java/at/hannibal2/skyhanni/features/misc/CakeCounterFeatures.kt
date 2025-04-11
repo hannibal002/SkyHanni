@@ -171,47 +171,47 @@ object CakeCounterFeatures {
         if (!statsToBeSent) return
         if (cakesEatenEntityId == null || (soulsStandExists && soulsFoundEntityId == null)) return
 
-        val currentCakesDifference = cakesDifference
-        val currentSoulsDifference = soulsDifference
+        val noCakeDiff = cakesDifference == null
+        val noSOulDiff = soulsDifference == null
 
         val shouldReturn = when (config.offlineStatsMode) {
-            OfflineStatsMode.CAKES_ONLY -> currentCakesDifference == null
-            OfflineStatsMode.SOULS_ONLY -> currentSoulsDifference == null
-            OfflineStatsMode.BOTH -> currentCakesDifference == null && currentSoulsDifference == null
+            OfflineStatsMode.CAKES_ONLY -> noCakeDiff
+            OfflineStatsMode.SOULS_ONLY -> noSOulDiff
+            OfflineStatsMode.BOTH -> noCakeDiff && noSOulDiff
             OfflineStatsMode.DISABLED -> true
         }
 
         if (shouldReturn) return
 
-        val message = buildString {
-            append("Since you ")
-            when (config.offlineTrackingMode) {
-                OfflineTrackingMode.SINCE_LAST_LEFT -> append("were last on your Private Island, ")
-                OfflineTrackingMode.SINCE_LAST_JOINED -> append("last joined your Private Island, ")
-            }
+        ChatUtils.chat("${buildMessage()}.")
+        statsToBeSent = false
+    }
 
-            val cakesMessage = currentCakesDifference?.let {
-                "ate §d$it§e ${StringUtils.pluralize(it, "Century Cake")}"
-            }
-
-            val soulsMessage = currentSoulsDifference?.let {
-                "found §b$it§e ${StringUtils.pluralize(it, "Cake Soul")}"
-            }
-
-            when (config.offlineStatsMode) {
-                OfflineStatsMode.CAKES_ONLY -> append("players ${cakesMessage ?: return@buildString}")
-                OfflineStatsMode.SOULS_ONLY -> append("players ${soulsMessage ?: return@buildString}")
-                OfflineStatsMode.BOTH -> {
-                    val combinedMessage = listOfNotNull(cakesMessage, soulsMessage).joinToString(" and ")
-                    append("players $combinedMessage")
-                }
-
-                OfflineStatsMode.DISABLED -> return@buildString
-            }
+    private fun buildMessage(): String = buildString {
+        append("Since you ")
+        when (config.offlineTrackingMode) {
+            OfflineTrackingMode.SINCE_LAST_LEFT -> append("were last on your Private Island, ")
+            OfflineTrackingMode.SINCE_LAST_JOINED -> append("last joined your Private Island, ")
         }
 
-        ChatUtils.chat("$message.")
-        statsToBeSent = false
+        val cakesMessage = cakesDifference?.let {
+            "ate §d$it§e ${StringUtils.pluralize(it, "Century Cake")}"
+        }
+
+        val soulsMessage = soulsDifference?.let {
+            "found §b$it§e ${StringUtils.pluralize(it, "Cake Soul")}"
+        }
+
+        when (config.offlineStatsMode) {
+            OfflineStatsMode.CAKES_ONLY -> append("players ${cakesMessage ?: return@buildString}")
+            OfflineStatsMode.SOULS_ONLY -> append("players ${soulsMessage ?: return@buildString}")
+            OfflineStatsMode.BOTH -> {
+                val combinedMessage = listOfNotNull(cakesMessage, soulsMessage).joinToString(" and ")
+                append("players $combinedMessage")
+            }
+
+            OfflineStatsMode.DISABLED -> return@buildString
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
