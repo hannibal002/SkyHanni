@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -125,6 +126,10 @@ enum class PestType(
     @SkyHanniModule
     companion object {
         val filterableEntries by lazy { entries.filter { it.displayName.isNotEmpty() } }
+
+        fun getByVinylOrNull(vinyl: VinylType): PestType? {
+            return filterableEntries.firstOrNull { it.vinyl == vinyl }
+        }
 
         fun getByNameOrNull(name: String): PestType? {
             return filterableEntries.firstOrNull { it.displayName.lowercase() == name.lowercase() }

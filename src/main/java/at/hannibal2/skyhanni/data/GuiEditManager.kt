@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -105,20 +106,20 @@ object GuiEditManager {
     }
 
     @JvmStatic
-    fun renderLast() {
+    fun renderLast(context: DrawContext) {
         if (!isInGui()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
 
-        GlStateManager.translate(0f, 0f, 200f)
+        context.matrices.translate(0f, 0f, 200f)
 
-        RenderData.renderOverlay()
+        RenderData.renderOverlay(context)
 
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
         GlStateManager.enableDepth()
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().post()
-        GlStateManager.popMatrix()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent(context).post()
+        context.matrices.popMatrix()
 
-        GlStateManager.translate(0f, 0f, -200f)
+        context.matrices.translate(0f, 0f, -200f)
     }
 
     fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor

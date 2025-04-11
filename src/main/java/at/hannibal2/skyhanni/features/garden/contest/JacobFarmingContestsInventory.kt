@@ -45,7 +45,7 @@ object JacobFarmingContestsInventory {
     private var hideEverything = true
     private val medalPattern by RepoPattern.pattern(
         "garden.jacob.contests.inventory.medal",
-        "§7§7You placed in the (?<medal>.*) §7bracket!"
+        "§7§7You placed in the (?<medal>.*) §7bracket!",
     )
 
     @HandleEvent
@@ -101,9 +101,7 @@ object JacobFarmingContestsInventory {
                 event.cancel()
             }
 
-            else -> {
-                openFromCalendar(chestName, itemName, event, slot)
-            }
+            else -> openFromCalendar(chestName, itemName, event, slot)
         }
     }
 
@@ -171,7 +169,7 @@ object JacobFarmingContestsInventory {
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (stack.getLore().any { it == "§eClick to claim reward!" }) {
-                slot.highlight(LorenzColor.GREEN)
+                slot.highlight(event.context, LorenzColor.GREEN)
             }
         }
     }

@@ -74,3 +74,5 @@ at/hannibal2/skyhanni/utils/compat/ScoreboardCompat.kt
 at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 at/hannibal2/skyhanni/utils/compat/TextCompat.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
+
+# \.(?!kt|java|\()

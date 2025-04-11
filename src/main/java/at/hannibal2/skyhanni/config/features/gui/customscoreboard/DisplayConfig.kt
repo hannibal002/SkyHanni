@@ -57,16 +57,16 @@ class DisplayConfig {
     @ConfigOption(
         name = "Hide Vanilla Scoreboard",
         desc = "Hide the vanilla scoreboard.\n" +
-            "§cMods that add their own scoreboard will not be affected by this setting!"
+            "§cMods that add their own scoreboard will not be affected by this setting!",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var hideVanillaScoreboard: Property<Boolean> = Property.of(true)
 
     @Expose
-    @ConfigOption(name = "Hide coins earned/lost", desc = "Hide the amount of coins earned or lost.")
+    @ConfigOption(name = "Show earned/lost", desc = "Show the amount you earned/lost on any Number display.")
     @ConfigEditorBoolean
-    var hideCoinsDifference: Boolean = false
+    var showNumberDifference: Boolean = false
 
     @Expose
     @ConfigOption(name = "Use Custom Lines", desc = "Use custom lines instead of the default ones.")
@@ -81,7 +81,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "Show Max Island Players",
-        desc = "Show the maximum amount of players that can join your current island."
+        desc = "Show the maximum amount of players that can join your current island.",
     )
     @ConfigEditorBoolean
     var showMaxIslandPlayers: Boolean = true
@@ -117,7 +117,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "Number Display Format",
-        desc = "Select how numbers with their prefix and color should be formatted."
+        desc = "Select how numbers with their prefix and color should be formatted.",
     )
     @ConfigEditorDropdown
     var numberDisplayFormat: NumberDisplayFormat = NumberDisplayFormat.TEXT_COLOR_NUMBER
@@ -125,7 +125,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "SkyBlock Time 24h Format",
-        desc = "Display the current SkyBlock time in 24hr format rather than 12h Format."
+        desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.",
     )
     @ConfigEditorBoolean
     var skyblockTime24hFormat: Boolean = false
@@ -133,7 +133,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "SkyBlock Time Exact Minutes",
-        desc = "Display the exact minutes in the SkyBlock time, rather than only 10 minute increments."
+        desc = "Display the exact minutes in the SkyBlock time, rather than only 10 minute increments.",
     )
     @ConfigEditorBoolean
     var skyblockTimeExactMinutes: Boolean = false
@@ -141,7 +141,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "Date in Lobby Code",
-        desc = "Show the current date infront of the server name, like Hypixel does."
+        desc = "Show the current date infront of the server name, like Hypixel does.",
     )
     @ConfigEditorBoolean
     var dateInLobbyCode: Boolean = true
@@ -159,7 +159,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(
         name = "Text Alignment",
-        desc = "Will align the text to the left, center or right, while not overriding certain lines, like title or footer."
+        desc = "Will align the text to the left, center or right, while not overriding certain lines, like title or footer.",
     )
     @ConfigEditorDropdown
     var textAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
@@ -173,7 +173,7 @@ class DisplayConfig {
     @ConfigOption(
         name = "Cache Scoreboard on Island Switch",
         desc = "Will stop the Scoreboard from updating while switching islands.\n" +
-            "Removes the shaking when loading data."
+            "Removes the shaking when loading data.",
     )
     @ConfigEditorBoolean
     var cacheScoreboardOnIslandSwitch: Boolean = false

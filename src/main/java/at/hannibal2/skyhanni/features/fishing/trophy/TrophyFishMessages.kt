@@ -72,7 +72,7 @@ object TrophyFishMessages {
 
         if (config.enabled) {
             edited = (
-                "§6§lTROPHY FISH! " + when (config.design) {
+                "§6♔ §6§lTROPHY FISH! " + when (config.design) {
                     DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
                     else "§7$amount${amount.ordinal()} §r$displayRarity $displayName"
 
