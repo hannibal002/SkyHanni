@@ -1,7 +1,6 @@
 /**
  * TODO LIST
  *  - countdown events like fishing festival + fiesta when its not on tablist
- *  - improve hide coin difference to also work with bits, motes, etc
  *  - choose the amount of decimal places in shorten nums
  *  - heavily optimize elements and events by only updating them when absolutely needed
  */
@@ -17,11 +16,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementTitle
@@ -107,7 +104,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         if (dirty || nextScoreboardUpdate.isInPast()) {
@@ -202,7 +199,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         runDelayed(2.seconds) {
             if (!LorenzUtils.inSkyBlock || !(LorenzUtils.onHypixel && OutsideSBFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
         }
