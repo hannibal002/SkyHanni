@@ -102,7 +102,7 @@ internal object RenderableUtils {
         else -> 0
     }
 
-    fun Renderable.renderAndScale(posX: Int, posY: Int, xSpace: Int, ySpace: Int, padding: Int = 5) {
+    fun Renderable.renderAndScale(context: DrawContext, posX: Int, posY: Int, xSpace: Int, ySpace: Int, padding: Int = 5) {
         val xWithoutPadding = xSpace - padding * 2
         val yWithoutPadding = ySpace - padding * 2
 
@@ -125,14 +125,15 @@ internal object RenderableUtils {
             Renderable.currentRenderPassMousePosition =
                 ((preScaleMouse.first - padding) * inverseScale).toInt() to ((preScaleMouse.second - padding) * inverseScale).toInt()
 
-            GlStateManager.translate(xOffsetRender, yOffsetRender, 0f)
-            GlStateManager.scale(scale, scale, 1.0)
+            context.matrices.translate(xOffsetRender, yOffsetRender, 0f)
+            context.matrices.scale(scale.toFloat(), scale.toFloat(), 1.0f)
             render(
+                context,
                 posX + (xOffset * inverseScale).toInt(),
                 posY + (yOffset * inverseScale).toInt(),
             )
-            GlStateManager.scale(inverseScale, inverseScale, 1.0)
-            GlStateManager.translate(-xOffsetRender, -yOffsetRender, 0f)
+            context.matrices.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1.0f)
+            context.matrices.translate(-xOffsetRender, -yOffsetRender, 0f)
         } finally {
             Renderable.currentRenderPassMousePosition = preScaleMouse
         }

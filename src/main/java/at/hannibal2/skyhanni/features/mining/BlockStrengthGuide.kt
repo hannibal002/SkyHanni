@@ -392,7 +392,7 @@ object BlockStrengthGuide {
                 scale = 2.0,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
+            ).renderXYAligned(event.context, 0, 0, event.gui.width, event.gui.height)
             return
         }
 
@@ -401,7 +401,7 @@ object BlockStrengthGuide {
         }
 
         Renderable.withMousePosition(event.mouseX, event.mouseY) {
-            display.renderAndScale(0, 0, event.gui.width, event.gui.height, 20)
+            display.renderAndScale(event.context, 0, 0, event.gui.width, event.gui.height, 20)
         }
     }
 
