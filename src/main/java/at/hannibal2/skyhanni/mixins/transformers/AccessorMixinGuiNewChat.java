@@ -21,7 +21,4 @@ public interface AccessorMixinGuiNewChat {
 
     @Accessor("drawnChatLines")
     void setDrawnChatLines_skyhanni(List<ChatLine> drawnChatLines);
-
-    @Accessor("scrollPos")
-    int getScrollPos_skyhanni();
 }

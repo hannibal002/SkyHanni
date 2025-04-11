@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
-import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
@@ -13,13 +12,10 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiChat
-import net.minecraft.util.MathHelper
 
 @SkyHanniModule
 object CopyChat {
@@ -47,26 +43,26 @@ object CopyChat {
     }
 
     private fun getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
-        val mc = Minecraft.getMinecraft() ?: return null
-        val chatGui = mc.ingameGUI.chatGUI ?: return null
-        val access = chatGui as AccessorMixinGuiNewChat
-        val chatScale = chatGui.chatScale
-        val scaleFactor = GuiScreenUtils.scaleFactor
-
-        val x = MathHelper.floor_float((mouseX / scaleFactor - 3) / chatScale)
-        val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - getOffset()) / chatScale)
-
-        if (x < 0 || y < 0) return null
-
-        val fontHeight = mc.fontRendererObj.FONT_HEIGHT
-        val chatLines = access.drawnChatLines_skyhanni
-        val maxLines = chatGui.lineCount.coerceAtMost(chatLines.size)
-        if (x <= MathHelper.floor_float(chatGui.chatWidth.toFloat() / chatGui.chatScale) && y < fontHeight * maxLines + maxLines) {
-            val lineIndex = y / fontHeight + access.scrollPos_skyhanni
-            if (lineIndex in 0 until chatLines.size) {
-                return chatLines[lineIndex]
-            }
-        }
+//         val mc = Minecraft.getMinecraft() ?: return null
+//         val chatGui = mc.ingameGUI.chatGUI ?: return null
+//         val access = chatGui as AccessorMixinGuiNewChat
+//         val chatScale = chatGui.chatScale
+//         val scaleFactor = GuiScreenUtils.scaleFactor
+//
+//         val x = MathHelper.floor_float((mouseX / scaleFactor - 3) / chatScale)
+//         val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - getOffset()) / chatScale)
+//
+//         if (x < 0 || y < 0) return null
+//
+//         val fontHeight = mc.fontRendererObj.FONT_HEIGHT
+//         val chatLines = access.drawnChatLines_skyhanni
+//         val maxLines = chatGui.lineCount.coerceAtMost(chatLines.size)
+//         if (x <= MathHelper.floor_float(chatGui.chatWidth.toFloat() / chatGui.chatScale) && y < fontHeight * maxLines + maxLines) {
+//             val lineIndex = y / fontHeight + access.scrollPos_skyhanni
+//             if (lineIndex in 0 until chatLines.size) {
+//                 return chatLines[lineIndex]
+//             }
+//         }
         return null
     }
 
