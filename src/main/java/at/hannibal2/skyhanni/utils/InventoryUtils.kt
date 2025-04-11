@@ -197,7 +197,11 @@ object InventoryUtils {
 
     // TODO replace mode with GuiContainerEvent.ClickType
     fun clickSlot(slotNumber: Int, windowId: Int? = null, mouseButton: Int = 0, mode: Int = 0) {
-        InventoryCompat.clickInventorySlot(slotNumber, windowId, mouseButton, mode)
+        if (windowId != null) {
+            InventoryCompat.clickInventorySlot(slotNumber, windowId, mouseButton = mouseButton, mode = mode)
+        } else {
+            InventoryCompat.clickInventorySlot(slotNumber, mouseButton = mouseButton, mode = mode)
+        }
     }
 
     fun GuiContainer.slots(): List<Slot> {
