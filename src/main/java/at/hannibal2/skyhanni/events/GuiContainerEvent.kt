@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Container
@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack
 abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : SkyHanniEvent() {
 
     data class BackgroundDrawnEvent(
+        val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
@@ -19,17 +20,16 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     ) : GuiContainerEvent(gui, container)
 
     data class PreDraw(
+        val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
         val mouseY: Int,
         val partialTicks: Float,
-    ) : GuiContainerEvent(gui, container), Cancellable {
-        fun drawDefaultBackground() =
-            GuiRenderUtils.drawGradientRect(0, 0, gui.width, gui.height, -1072689136, -804253680, 0.0)
-    }
+    ) : GuiContainerEvent(gui, container), Cancellable
 
     data class PostDraw(
+        val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
@@ -59,6 +59,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     }
 
     data class ForegroundDrawnEvent(
+        val context: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
