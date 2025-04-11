@@ -65,7 +65,7 @@ object DungeonMobManager {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onPlayerMove(event: EntityMoveEvent<EntityLivingBase>) {
+    fun onEntityMove(event: EntityMoveEvent<EntityLivingBase>) {
         val mob = event.entity.mob ?: return
         if (felOnTheGround.remove(mob)) {
             felMoving.add(mob)
