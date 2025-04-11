@@ -857,4 +857,12 @@ class ProfileSpecificStorage {
         @Expose
         var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
     }
+
+    @Expose
+    var cakeCounterData: CakeCounterData = CakeCounterData()
+
+    class CakeCounterData(
+        @Expose var cakesEaten: Int? = -1,
+        @Expose var soulsFound: Int = 0,
+    )
 }

@@ -7,10 +7,12 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -38,7 +40,7 @@ object TabListRenderer {
 
         if (config.toggleTab) return
 
-        drawTabList()
+        drawTabList(event.context)
     }
 
     private var isPressed = false
@@ -60,11 +62,11 @@ object TabListRenderer {
         }
 
         if (isTabToggled) {
-            drawTabList()
+            drawTabList(event.context)
         }
     }
 
-    private fun drawTabList() {
+    private fun drawTabList(context: DrawContext) {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
@@ -102,7 +104,8 @@ object TabListRenderer {
         val x = screenWidth - totalWidth / 2
         val y = 10
 
-        Gui.drawRect(
+        GuiRenderUtils.drawRect(
+            context,
             x - COLUMN_SPACING,
             y - TAB_PADDING,
             screenWidth + totalWidth / 2 + COLUMN_SPACING,
@@ -113,7 +116,8 @@ object TabListRenderer {
         var headerY = y
         if (header.isNotEmpty()) {
             for (line in header) {
-                minecraft.fontRendererObj.drawStringWithShadow(
+                GuiRenderUtils.drawString(
+                    context,
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     headerY.toFloat(),
@@ -123,12 +127,13 @@ object TabListRenderer {
             }
         }
 
-        drawColumms(x, headerY, columns, minecraft)
+        drawColumns(context, x, headerY, columns, minecraft)
 
         if (footer.isNotEmpty()) {
             var footerY = y + totalHeight - footer.size * LINE_HEIGHT + TAB_PADDING / 2 + 1
             for (line in footer) {
-                minecraft.fontRendererObj.drawStringWithShadow(
+                GuiRenderUtils.drawString(
+                    context,
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     footerY.toFloat(),
@@ -140,7 +145,7 @@ object TabListRenderer {
         GlStateManager.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
-    private fun drawColumms(x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {
+    private fun drawColumns(context: DrawContext, x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {
         var middleX = x
         var lastTitle: TabLine? = null
         var lastSubTitle: TabLine? = null
@@ -158,7 +163,8 @@ object TabListRenderer {
                 !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post()
             }.let(::RenderColumn)
 
-            Gui.drawRect(
+            GuiRenderUtils.drawRect(
+                context,
                 middleX - TAB_PADDING + 1,
                 middleY - TAB_PADDING + 1,
                 middleX + column.getMaxWidth() + TAB_PADDING - 2,
@@ -188,14 +194,16 @@ object TabListRenderer {
                 var text = if (AdvancedPlayerList.ignoreCustomTabList()) tabLine.text else tabLine.customName
                 if (text.contains("§l")) text = "§r$text"
                 if (tabLine.type == TabStringType.TITLE) {
-                    minecraft.fontRendererObj.drawStringWithShadow(
+                    GuiRenderUtils.drawString(
+                        context,
                         text,
                         middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
                         0xFFFFFF,
                     )
                 } else {
-                    minecraft.fontRendererObj.drawStringWithShadow(
+                    GuiRenderUtils.drawString(
+                        context,
                         text,
                         middleX.toFloat(),
                         middleY.toFloat(),

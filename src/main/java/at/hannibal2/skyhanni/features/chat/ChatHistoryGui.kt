@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
@@ -13,7 +15,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
 import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
@@ -49,12 +50,12 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         GlScissorStack.push(l + 5, t + 5, w + l - 5, h + t - 5, sr)
 
         for (msg in history) {
-            drawString(fontRenderer(), msg.actionKind.renderedString, 0, 0, -1)
-            drawString(fontRenderer(), msg.actionReason, ChatManager.ActionKind.maxLength + 5, 0, -1)
+            GuiRenderUtils.drawString(context, msg.actionKind.renderedString, 0, 0, -1)
+            msg.actionReason?.let { GuiRenderUtils.drawString(context, it, ChatManager.ActionKind.maxLength + 5, 0, -1) }
             var size = drawMultiLineText(context, msg.message, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             msg.modified?.let {
-                drawString(
-                    fontRenderer(),
+                GuiRenderUtils.drawString(
+                    context,
                     "§e§lNEW TEXT",
                     0, size * 10, -1,
                 )
@@ -86,14 +87,8 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         GlStateManager.color(1f, 1f, 1f, 1f)
     }
 
-    private fun splitLine(comp: IChatComponent): List<IChatComponent> {
-        return GuiUtilRenderComponents.splitText(
-            comp,
-            w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10),
-            fontRenderer(),
-            false,
-            true,
-        )
+    private fun splitLine(comp: IChatComponent): List<String> {
+        return comp.formattedText.splitLines(w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10)).split("\n")
     }
 
     override fun onInitGui() {
@@ -107,18 +102,12 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
     }
 
     private fun drawMultiLineText(context: DrawContext, comp: IChatComponent, xPos: Int): Int {
-        val modifiedSplitText = splitLine(comp)
-        for (line in modifiedSplitText) {
-            drawString(
-                fontRenderer(),
-                line.formattedText,
-                xPos,
-                0,
-                -1,
-            )
-            context.matrices.translate(0F, 10F, 0F)
+        val lines = splitLine(comp)
+        for (line in lines) {
+            GuiRenderUtils.drawString(context, line, xPos, 0, -1)
+            context.matrices.translate(0f, 10f, 0f)
         }
-        return modifiedSplitText.size
+        return lines.size
     }
 
     private fun fontRenderer() = Minecraft.getMinecraft().fontRendererObj

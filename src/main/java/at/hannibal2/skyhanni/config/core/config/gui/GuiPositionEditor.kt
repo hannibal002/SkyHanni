@@ -65,11 +65,11 @@ class GuiPositionEditor(
         GlStateManager.disableLighting()
         val hoveredPos = renderRectangles(context)
 
-        renderLabels(hoveredPos)
+        renderLabels(context, hoveredPos)
     }
 
-    private fun renderLabels(hoveredPos: Int) {
-        GuiRenderUtils.drawStringCentered("§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
+    private fun renderLabels(context: DrawContext, hoveredPos: Int) {
+        GuiRenderUtils.drawStringCentered(context, "§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
 
         var displayPos = -1
         if (clickedPos != -1 && positions[clickedPos].clicked) {
@@ -81,29 +81,17 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         if (displayPos == -1) {
-            GuiRenderUtils.drawStringCentered(
-                "§eTo edit hidden GUI elements set a key in /sh edit",
-                getScaledWidth() / 2,
-                20,
-            )
-            GuiRenderUtils.drawStringCentered(
-                "§ethen click that key while the GUI element is visible",
-                getScaledWidth() / 2,
-                32,
-            )
+            GuiRenderUtils.drawStringCentered(context, "§eTo edit hidden GUI elements set a key in /sh edit", getScaledWidth() / 2, 20)
+            GuiRenderUtils.drawStringCentered(context, "§ethen click that key while the GUI element is visible", getScaledWidth() / 2, 32)
             return
         }
 
         val pos = positions[displayPos]
         val location = "§7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}"
-        GuiRenderUtils.drawStringCentered("§b ${pos.internalName}", getScaledWidth() / 2, 18)
-        GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
+        GuiRenderUtils.drawStringCentered(context, "§b ${pos.internalName}", getScaledWidth() / 2, 18)
+        GuiRenderUtils.drawStringCentered(context, location, getScaledWidth() / 2, 28)
         if (pos.canJumpToConfigOptions())
-            GuiRenderUtils.drawStringCentered(
-                "§aRight-Click to open associated config options",
-                getScaledWidth() / 2,
-                38,
-            )
+            GuiRenderUtils.drawStringCentered(context, "§aRight-Click to open associated config options", getScaledWidth() / 2, 38)
     }
 
     private fun renderRectangles(context: DrawContext): Int {
@@ -126,7 +114,14 @@ class GuiPositionEditor(
 
             elementWidth = position.getDummySize().x
             elementHeight = position.getDummySize().y
-            drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
+            GuiRenderUtils.drawRect(
+                context,
+                x - border,
+                y - border,
+                x + elementWidth + border * 2,
+                y + elementHeight + border * 2,
+                -0x7fbfbfc0,
+            )
 
             if (GuiRenderUtils.isPointInRect(
                     mouseX,

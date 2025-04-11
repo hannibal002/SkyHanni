@@ -137,6 +137,11 @@ public class MiscConfig {
     public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
 
     @Expose
+    @ConfigOption(name = "Cake Counter Features", desc = "")
+    @Accordion
+    public CakeCounterConfig cakeCounter = new CakeCounterConfig();
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     public boolean resetSearchGuiOnClose = true;

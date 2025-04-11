@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.guide
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
@@ -84,7 +85,7 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
 
         context.matrices.pushMatrix()
         context.matrices.translate(guiLeft.toFloat(), guiTop.toFloat(), 0f)
-        drawRect(0, 0, sizeX, sizeY, 0x50000000)
+        GuiRenderUtils.drawRect(context, 0, 0, sizeX, sizeY, 0x50000000)
 
         Renderable.withMousePosition(relativeMouseX, relativeMouseY) {
             renderHorizontalTabs(context)
