@@ -52,7 +52,12 @@ object TitleManager {
         open var endTime: SimpleTimeMark = SimpleTimeMark.farPast()
         open fun getTitleText(): String = titleText
         open fun getSubtitleText(): String? = subtitleText
-        open fun start() { endTime = SimpleTimeMark.now() + duration }
+        open fun start() {
+            endTime = when (endTime) {
+                SimpleTimeMark.farPast() -> SimpleTimeMark.now() + duration
+                else -> endTime
+            }
+        }
         open fun stop() { endTime = SimpleTimeMark.farPast() }
 
         val alive get() = !endTime.isInPast()
@@ -375,13 +380,15 @@ object TitleManager {
                 }
             }
         }
+        TitleLocation.entries.forEach {
+            currentTitles[it]?.start()
+        }
     }
 
     private fun dequeueNextTitle(location: TitleLocation) {
         val titleQueue = titleLocationQueues[location]
         val title = titleQueue?.pollOrNull()
         currentTitles[location] = title
-        currentTitles[location]?.start()
     }
 
     @HandleEvent
