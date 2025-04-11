@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
-import net.minecraft.command.CommandBase
 
 @SkyHanniModule
 object DefaultConfigFeatures {
@@ -114,7 +114,7 @@ object DefaultConfigFeatures {
 
     private fun onComplete(strings: Array<String>): List<String> {
         if (strings.size <= 2)
-            return CommandBase.getListOfStringsMatchingLastWord(
+            return StringUtils.getListOfStringsMatchingLastWord(
                 strings,
                 SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null"),
             )

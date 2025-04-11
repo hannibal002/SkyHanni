@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.FontRenderer
 import net.minecraft.entity.Entity
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.scoreboard.Team
@@ -32,7 +32,7 @@ object DungeonTeammateOutlines {
         val team = entity.team as ScorePlayerTeam
         if (team.nameTagVisibility == Team.EnumVisible.NEVER) return null
 
-        val colorFormat = FontRenderer.getFormatFromString(team.colorPrefix)
+        val colorFormat = StringUtils.getFormatFromString(team.colorPrefix)
         return if (colorFormat.length >= 2)
             Minecraft.getMinecraft().fontRendererObj.getColorCode(colorFormat[1])
         else null
