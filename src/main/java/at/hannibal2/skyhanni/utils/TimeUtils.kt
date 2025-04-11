@@ -74,6 +74,16 @@ object TimeUtils {
         else -> default
     }
 
+    fun Iterable<Duration>.average(): Duration {
+        var sum: Duration = Duration.ZERO
+        var count = 0
+        for (element in this) {
+            sum += element
+            count++
+        }
+        return if (count == 0) Duration.ZERO else sum / count
+    }
+
     val Duration.inWholeTicks: Int get() = (inWholeMilliseconds / 50).toInt()
 
     private fun String.preFixDurationString() =
