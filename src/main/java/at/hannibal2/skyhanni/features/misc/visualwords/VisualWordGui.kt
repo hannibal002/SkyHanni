@@ -593,6 +593,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
     }
 
+    // TODO change to extend function of DrawContext
     private fun drawUnmodifiedString(context: DrawContext, str: String, x: Float, y: Float) {
         GuiRenderUtils.drawString(context, "§§$str", x, y)
     }
@@ -601,6 +602,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         drawUnmodifiedString(context, str, x.toFloat(), y.toFloat())
     }
 
+    // TODO change to extend function of DrawContext
     private fun drawUnmodifiedStringCentered(context: DrawContext, str: String?, x: Int, y: Int) {
         GuiRenderUtils.drawStringCentered(context, "§§$str", x, y)
     }
