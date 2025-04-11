@@ -804,6 +804,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a title when you use the Pest Tracker without any pests to clear.
 + Added Carrolyn Fetch Helper to fetch items for permanent farming buffs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3096)
 + Added Pesthunter Shop profit display. - not_a_cow + Daveed. (https://github.com/hannibal002/SkyHanni/pull/3279)
++ Added Pest Cooldown Warning. - Chissl + not_a_cow (https://github.com/hannibal002/SkyHanni/pull/3343)
+    + Warns when pests are about to spawn.
++ Added Pest Spawn Time Message. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3343)
+    + Sends a chat message showing how long it took for a pest to spawn.
 
 </details>
 <details open><summary>
@@ -977,6 +981,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Flowstate Helper. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2561)
     +  Displays stats for the Flowstate enchantment on mining tools.
 + Added a chat filter, profit per run, and profit tracker for Crystal Nucleus runs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2285)
++ Added /shblockstrength. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2778)
+    + Displays how many ticks are needed to break any block with your mining speed.
 
 </details>
 <details open><summary>

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -27,7 +28,7 @@ object BlockNotSpawnable {
         if (!isEnabled()) return
 
         val slot = event.slot ?: return
-        if (slot.inventory.name != "Slayer") return
+        if (InventoryUtils.openInventoryName() != "Slayer") return
 
         if (notSpawnablePattern.anyMatches(slot.stack.getLore())) {
             event.cancel()

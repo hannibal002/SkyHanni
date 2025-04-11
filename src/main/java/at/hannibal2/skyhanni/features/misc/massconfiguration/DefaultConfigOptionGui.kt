@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
 import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
 import kotlin.math.max
 import kotlin.math.min
 
@@ -16,8 +16,7 @@ class DefaultConfigOptionGui(
     private val orderedOptions: Map<Category, List<FeatureToggleableOption>>,
     old: String,
     new: String,
-) :
-    GuiScreen() {
+) : SkyhanniBaseScreen() {
 
     val title = if (old == "null") {
         if (new == "null")
@@ -44,23 +43,22 @@ class DefaultConfigOptionGui(
         orderedOptions.keys.associateWith { ResetSuggestionState.LEAVE_DEFAULTS }.toMutableMap()
 
     @Suppress("CyclomaticComplexMethod", "LongMethod")
-    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        super.drawScreen(mouseX, mouseY, partialTicks)
-        drawDefaultBackground()
+    override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
         RenderUtils.drawFloatingRectDark((width - xSize) / 2, (height - ySize) / 2, xSize, ySize)
         val scaledResolution = ScaledResolution(mc)
         var hoveringTextToDraw: List<String>? = null
-        val x = mouseX - ((width - xSize) / 2) - padding
+        val x = originalMouseX - ((width - xSize) / 2) - padding
         val isMouseDown = MouseCompat.isButtonDown(0)
         val shouldClick = isMouseDown && !wasMouseDown
         wasMouseDown = isMouseDown
         val isMouseInScrollArea =
-            x in 0..xSize && mouseY in ((height - ySize) / 2) + barSize..((height + ySize) / 2 - barSize)
-        var y = mouseY - ((height - ySize) / 2 + barSize) + currentScrollOffset
+            x in 0..xSize && originalMouseY in ((height - ySize) / 2) + barSize..((height + ySize) / 2 - barSize)
+        var y = originalMouseY - ((height - ySize) / 2 + barSize) + currentScrollOffset
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(width / 2F, (height - ySize) / 2F, 0F)
-        GlStateManager.scale(2f, 2f, 1f)
+        context.matrices.pushMatrix()
+        context.matrices.translate(width / 2F, (height - ySize) / 2F, 0F)
+        context.matrices.scale(2f, 2f, 1f)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             title,
             mc.fontRendererObj,
@@ -70,10 +68,10 @@ class DefaultConfigOptionGui(
             xSize / 2 - padding,
             -1,
         )
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(
+        context.matrices.pushMatrix()
+        context.matrices.translate(
             (width - xSize) / 2F + padding,
             (height + ySize) / 2F - mc.fontRendererObj.FONT_HEIGHT * 2,
             0F,
@@ -82,8 +80,8 @@ class DefaultConfigOptionGui(
         fun button(title: String, tooltip: List<String>, func: () -> Unit) {
             val width = mc.fontRendererObj.getStringWidth(title)
             var overMouse = false
-            if (mouseX - ((this.width - xSize) / 2 + padding) in i..(i + width) &&
-                mouseY - (height + ySize) / 2 in -barSize..0
+            if (originalMouseX - ((this.width - xSize) / 2 + padding) in i..(i + width) &&
+                originalMouseY - (height + ySize) / 2 in -barSize..0
             ) {
                 overMouse = true
                 hoveringTextToDraw = tooltip
@@ -132,9 +130,9 @@ class DefaultConfigOptionGui(
         button("Cancel", listOf()) {
             mc.displayGuiScreen(null)
         }
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
 
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
         GlScissorStack.push(
             (width - xSize) / 2,
             (height - ySize) / 2 + barSize,
@@ -142,7 +140,7 @@ class DefaultConfigOptionGui(
             (height + ySize) / 2 - barSize,
             scaledResolution,
         )
-        GlStateManager.translate(
+        context.matrices.translate(
             (width - xSize) / 2F + padding,
             (height - ySize) / 2F + barSize - currentScrollOffset,
             0F,
@@ -186,10 +184,10 @@ class DefaultConfigOptionGui(
             }
 
             y -= cardHeight
-            GlStateManager.translate(0F, cardHeight.toFloat(), 0F)
+            context.matrices.translate(0F, cardHeight.toFloat(), 0F)
         }
 
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
         GlScissorStack.pop(scaledResolution)
         hoveringTextToDraw?.let { tooltip ->
             RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
@@ -201,8 +199,7 @@ class DefaultConfigOptionGui(
             max(0, min(s, (orderedOptions.size + 1) * cardHeight - ySize + barSize + padding * 2))
     }
 
-    override fun handleMouseInput() {
-        super.handleMouseInput()
+    override fun onHandleMouseInput() {
         if (MouseCompat.getScrollDelta() != 0)
             scroll(currentScrollOffset - MouseCompat.getScrollDelta())
     }
