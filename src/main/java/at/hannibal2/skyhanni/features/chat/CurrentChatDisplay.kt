@@ -78,14 +78,6 @@ object CurrentChatDisplay {
         "^§aOpened a chat conversation with (?:§.)*(?:\\[.+])?(?:§.|\\s)*(?<player>.*)§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave"
     )
 
-    /**
-     * REGEX-TEST: §dTo §r§b[MVP§r§5+§r§b] martimavocado§r§7: §r§7balls
-     */
-    private val privateMessagePattern by patternGroun.pattern(
-        "privatel.message",
-        "^§d(?:From|To) (?:§.)*(?:\\[.+])?(?:§.|\\s)*(?<player>.+?)(?:§.)*:"
-    )
-
     private var privateMessageEnd = SimpleTimeMark.farPast()
     private var privateMessagePlayer: String? = null
 
@@ -122,12 +114,13 @@ object CurrentChatDisplay {
             update()
             return
         }
-        privateMessagePattern.findMatcher(event.message) {
-            if (currentChat == ChatTypes.PRIVATE && privateMessagePlayer == group("player")) {
-                privateMessageEnd = maxPrivateMessageTime.fromNow()
-                update()
-            }
-            return
+    }
+
+    @HandleEvent
+    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
+        if (currentChat == ChatType.PRIVATE && privateMessagePlayer == event.author.cleanPlayerName()) {
+            privateMessageEnd = maxPrivateMessageTime.fromNow()
+            update()
         }
     }
 
