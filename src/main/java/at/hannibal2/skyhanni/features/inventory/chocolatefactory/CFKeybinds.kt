@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import net.minecraft.client.gui.inventory.GuiChest
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -30,7 +30,7 @@ object CFKeybinds {
 
             event.cancel()
 
-            clickInventorySlot(28 + index, chest.inventorySlots.windowId, 2, 3)
+            InventoryUtils.clickSlot(28 + index, chest.inventorySlots.windowId, mouseButton = 2, mode = 3)
             break
         }
     }

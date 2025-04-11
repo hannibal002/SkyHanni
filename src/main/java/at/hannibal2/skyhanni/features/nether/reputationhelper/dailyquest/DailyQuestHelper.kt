@@ -137,7 +137,7 @@ object DailyQuestHelper {
 
             for ((slot, stack) in chest.getUpperItems()) {
                 if (stack.displayName.contains(dojoQuest.dojoName)) {
-                    slot.highlight(LorenzColor.AQUA)
+                    slot.highlight(event.context, LorenzColor.AQUA)
                 }
             }
         }
