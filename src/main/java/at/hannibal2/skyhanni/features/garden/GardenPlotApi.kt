@@ -80,7 +80,7 @@ object GardenPlotApi {
     )
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
-        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
+        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!",
     )
 
     /**
