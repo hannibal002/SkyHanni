@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.collection
 
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
@@ -239,6 +240,10 @@ object CollectionUtils {
         return list
     }
 
+    fun <T> Collection<T>.distribute(subs: Int = 2): List<List<T>> {
+        return this.split(ceil(this.size.toDouble() / subs.toDouble()).toInt())
+    }
+
     inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
         val destination = LinkedHashMap<R, V>()
         for (element in this) {
@@ -405,4 +410,12 @@ object CollectionUtils {
             return removedValue
         }
     }
+
+    fun <K> MutableMap<K, SimpleTimeMark>.evictOldestEntry(cap: Int) {
+        if (size > cap) {
+            val oldestKey = minByOrNull { it.value }?.key
+            oldestKey?.let { remove(it) }
+        }
+    }
+
 }

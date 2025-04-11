@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
@@ -49,16 +51,29 @@ object TitleManager {
         val weight: Double = 1.0,
         var discardOnWorldChange: Boolean = true,
     ) {
-        open var endTime: SimpleTimeMark = SimpleTimeMark.farPast()
+        open val alive get() = endTime != null && (endTime?.isInPast() == false)
+
+        var endTime: SimpleTimeMark? = null
+
         open fun getTitleText(): String = titleText
+
         open fun getSubtitleText(): String? = subtitleText
-        open fun start() { endTime = SimpleTimeMark.now() + duration }
-        open fun stop() { endTime = SimpleTimeMark.farPast() }
 
-        val alive get() = !endTime.isInPast()
-        val ended get() = endTime.isInPast()
+        open fun start() {
+            endTime = if (endTime == null) (now() + duration) else endTime
+        }
 
-        fun dataEquivalent(other: TitleContext): Boolean = titleText == other.titleText &&
+        open fun stop() {
+            endTime = farPast()
+        }
+
+        override fun equals(other: Any?): Boolean = this === other || other is TitleContext && this.dataEquivalent(other)
+        override fun hashCode(): Int =
+            titleText.hashCode() * 31 + (subtitleText?.hashCode() ?: 0) * 31 +
+                duration.hashCode() * 31 + height.hashCode() * 31 +
+                fontSize.hashCode() * 31 + weight.hashCode()
+
+        protected fun dataEquivalent(other: TitleContext): Boolean = titleText == other.titleText &&
             subtitleText == other.subtitleText &&
             duration == other.duration &&
             height == other.height &&
@@ -80,15 +95,17 @@ object TitleManager {
         var countdownDuration: Duration = 5.seconds,
         var displayType: CountdownTitleDisplayType = CountdownTitleDisplayType.WHOLE_SECONDS,
         var updateInterval: Duration = 1.seconds,
-        var loomInterval: Duration = 250.milliseconds,
+        var loomInterval: Duration = 250.milliseconds, // TODO add explanation what this is
         var onInterval: () -> Unit = {},
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
-        private var virtualEndTime: SimpleTimeMark = SimpleTimeMark.farPast()
+
+        override val alive get() = super.alive && (virtualEndTime?.isInFuture() == true) && isActive
+
+        private var virtualEndTime: SimpleTimeMark? = null
         private var virtualTimeLeft: Duration = getTimeLeft()
-        private val internalUpdateInterval: Duration = 100.milliseconds.takeIf {
-            it < updateInterval
-        } ?: updateInterval
+        private val internalUpdateInterval: Duration = 100.milliseconds.takeIf { it < updateInterval } ?: updateInterval
+        private var isActive: Boolean = false
 
         private fun String.formatCountdownString() = this
             .replace("%t", virtualTimeLeft.toString())
@@ -96,31 +113,54 @@ object TitleManager {
 
         override fun getTitleText(): String = formattedTitleText.formatCountdownString()
         override fun getSubtitleText(): String? = formattedSubtitleText?.formatCountdownString()
+
         override fun start() {
-            virtualEndTime = SimpleTimeMark.now() + countdownDuration
-            endTime = virtualEndTime + loomInterval
+            if (isActive) return
+            isActive = true
+            virtualEndTime = if (virtualEndTime == null) (now() + countdownDuration) else {
+                virtualEndTime?.also {
+                    endTime = it + loomInterval
+                }
+            }
             onIntervalOutward()
             onIntervalInternal()
         }
+
         override fun stop() {
+            isActive = false
             super.stop()
             onFinish()
         }
 
+        override fun equals(other: Any?): Boolean = this === other || other is CountdownTitleContext && this.dataEquivalent(other)
+        override fun hashCode(): Int = formattedTitleText.hashCode() * 31 + (formattedSubtitleText?.hashCode() ?: 0) * 31 +
+            countdownDuration.hashCode() * 31 + displayType.hashCode() * 31 +
+            updateInterval.hashCode() * 31 + loomInterval.hashCode() * 31 +
+            onInterval.hashCode() * 31 + onFinish.hashCode()
+
+        private fun dataEquivalent(other: CountdownTitleContext): Boolean = super.dataEquivalent(other) &&
+            countdownDuration == other.countdownDuration &&
+            displayType == other.displayType &&
+            updateInterval == other.updateInterval &&
+            loomInterval == other.loomInterval &&
+            onInterval == other.onInterval &&
+            onFinish == other.onFinish
+
         private fun getTimeLeft(): Duration = when (displayType) {
-            CountdownTitleDisplayType.WHOLE_SECONDS -> virtualEndTime.timeUntil().inWholeSeconds.seconds
-            CountdownTitleDisplayType.PARTIAL_SECONDS -> virtualEndTime.timeUntil().inPartialSeconds.seconds
+            CountdownTitleDisplayType.WHOLE_SECONDS -> (virtualEndTime?.timeUntil()?.inWholeSeconds ?: 0).seconds
+            CountdownTitleDisplayType.PARTIAL_SECONDS -> (virtualEndTime?.timeUntil()?.inPartialSeconds ?: 0.0).seconds
         }
 
+        // TODO instead of run delayed, use tick event or similar. inaccuracies below one tick (50 ms) are not relevant imo
         private fun onIntervalOutward() {
-            if (endTime.isInPast()) return
+            if (!alive) return
             onInterval()
             DelayedRun.runDelayed(updateInterval) { onIntervalOutward() }
         }
 
         private fun onIntervalInternal() {
-            if (endTime.isInPast()) return stop()
-            virtualTimeLeft = if (virtualEndTime.isInFuture()) getTimeLeft() else Duration.ZERO
+            if (!alive) return stop()
+            virtualTimeLeft = if (virtualEndTime?.isInFuture() == true) getTimeLeft() else Duration.ZERO
             DelayedRun.runDelayed(internalUpdateInterval) { onIntervalInternal() }
         }
 
@@ -203,13 +243,13 @@ object TitleManager {
                     loomInterval,
                     discardOnWorldChange,
                     onInterval,
-                    onFinish
+                    onFinish,
                 )
             }
         }
 
         val targetQueue = titleLocationQueues.getOrPut(location) { CollectionUtils.OrderedQueue() }
-        if (targetQueue.any { it.item.dataEquivalent(newTitle) } && noDuplicates) return null
+        if (targetQueue.any { it.item == newTitle } && noDuplicates) return null
 
         val weightOverride = if (addType == TitleAddType.FORCE_FIRST) Double.MAX_VALUE else weight
         targetQueue.add(newTitle, weightOverride)
@@ -291,11 +331,27 @@ object TitleManager {
                                 append("Height: ${titleItem.height}\n")
                                 append("Font Size: ${titleItem.fontSize}\n")
                                 append("Weight: ${titleItem.weight}\n")
-                                append("End Time: ${titleItem.endTime.timeUntil().inWholeSeconds}s\n")
+                                append("End Time: ${titleItem.endTime?.timeUntil()?.inWholeSeconds ?: 0.0}s\n")
                             }
                         }
                     }
-                }
+                },
+            )
+            add(
+                "Current titles" + currentTitles.let { titles ->
+                    titles.entries.joinToString("\n\n") { title ->
+                        "${title.key}:\n" + buildString {
+                            val titleItem = title.value
+                            append("Title: ${titleItem?.getTitleText()}\n")
+                            append("Subtitle: ${titleItem?.getSubtitleText()}\n")
+                            append("Duration: ${titleItem?.duration?.inWholeSeconds}s\n")
+                            append("Height: ${titleItem?.height}\n")
+                            append("Font Size: ${titleItem?.fontSize}\n")
+                            append("Weight: ${titleItem?.weight}\n")
+                            append("End Time: ${titleItem?.endTime?.timeUntil()?.inWholeSeconds}s\n")
+                        }
+                    }
+                },
             )
         }
     }
@@ -348,18 +404,20 @@ object TitleManager {
                         dequeueNextTitle(location)
                         return
                     }
-                    if (currentTitle.endTime.isInFuture()) return@forEach
+                    if (currentTitle.alive) return@forEach
                     currentTitle.stop()
                     dequeueNextTitle(location)
                 }
             }
+        }
+        TitleLocation.entries.forEach {
+            currentTitles[it]?.start()
         }
     }
 
     private fun dequeueNextTitle(location: TitleLocation) {
         val titleQueue = titleLocationQueues[location]
         val title = titleQueue?.pollOrNull()
-        title?.start()
         currentTitles[location] = title
     }
 
