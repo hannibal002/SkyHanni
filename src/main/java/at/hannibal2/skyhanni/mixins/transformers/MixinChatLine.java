@@ -32,7 +32,7 @@ public class MixinChatLine implements ChatLineData {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(int updateCounterCreated, IChatComponent line, int chatLineID, CallbackInfo ci) {
-        skyHanni$fullComponent = GuiChatHook.getCurrentComponent();
+        skyHanni$fullComponent = GuiChatHook.getCurrentComponent() == null ? line : GuiChatHook.getCurrentComponent();
     }
 
 }
