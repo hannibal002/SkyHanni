@@ -17,7 +17,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.IChatComponent
 
-class ChatFilterGui(private val history: List<ChatManager.MessageFilteringResult>) : GuiScreen() {
+class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResult>) : GuiScreen() {
 
     private var scroll = -1.0
     private val w = 500

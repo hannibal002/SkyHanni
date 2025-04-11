@@ -61,7 +61,7 @@ public class PestsConfig {
     public boolean pestChanceDisplay = false;
 
     @Expose
-    @ConfigLink(owner = GardenConfig.class, field = "pestChanceDisplay")
+    @ConfigLink(owner = PestsConfig.class, field = "pestChanceDisplay")
     public Position pestChanceDisplayPosition = new Position(5, -115, false, true);
 }
 

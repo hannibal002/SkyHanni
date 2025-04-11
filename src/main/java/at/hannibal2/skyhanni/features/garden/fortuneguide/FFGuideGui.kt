@@ -35,6 +35,7 @@ class FFGuideGui : GuideGui<FFGuideGui.FortuneGuidePage>(FortuneGuidePage.OVERVI
 
         fun open() {
             CaptureFarmingGear.captureFarmingGear()
+            CaptureFarmingGear.removeInvalidItems()
             SkyHanniMod.screenToOpen = FFGuideGui()
         }
 

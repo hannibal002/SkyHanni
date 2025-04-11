@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.command.CommandBase
 import kotlin.time.Duration.Companion.seconds
 
 object FarmingMilestoneCommand {
@@ -84,7 +84,7 @@ object FarmingMilestoneCommand {
 
     fun onComplete(strings: Array<String>): List<String> {
         return if (strings.size <= 1) {
-            CommandBase.getListOfStringsMatchingLastWord(
+            StringUtils.getListOfStringsMatchingLastWord(
                 strings,
                 CropType.entries.map { it.simpleName }
             )
