@@ -265,7 +265,7 @@ object GardenCropMilestoneDisplay {
             duration = timeLeft,
             addType = TitleManager.TitleAddType.FORCE_FIRST,
             countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
-            onInterval = SoundUtils::playBeepSound
+            onInterval = SoundUtils::playBeepSound,
         )
     }
 

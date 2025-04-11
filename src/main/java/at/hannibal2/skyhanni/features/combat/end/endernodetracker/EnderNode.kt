@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 enum class EnderNode(
     val internalName: NeuInternalName,
     val displayName: String,
-    private val dropType: NodeDropType = NodeDropType.MISC
+    private val dropType: NodeDropType = NodeDropType.MISC,
 ) {
     ENCHANTED_ENDSTONE("ENCHANTED_ENDSTONE".toInternalName(), "§aEnchanted End Stone"),
     ENCHANTED_OBSIDIAN("ENCHANTED_OBSIDIAN".toInternalName(), "§aEnchanted Obsidian"),

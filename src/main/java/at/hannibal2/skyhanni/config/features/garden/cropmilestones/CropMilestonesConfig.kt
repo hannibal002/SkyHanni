@@ -46,7 +46,7 @@ class CropMilestonesConfig {
 
     enum class TimeFormatEntry(
         private val displayName: String,
-        private val legacyId: Int = -1
+        private val legacyId: Int = -1,
     ) : HasLegacyId {
         YEAR("Year", 0),
         DAY("Day", 1),
@@ -86,7 +86,7 @@ class CropMilestonesConfig {
 
     enum class MilestoneTextEntry(
         private val displayName: String,
-        private val legacyId: Int = -1
+        private val legacyId: Int = -1,
     ) : HasLegacyId {
         TITLE("§6Crop Milestones", 0),
         MILESTONE_TIER("§7Pumpkin Tier 22", 1),

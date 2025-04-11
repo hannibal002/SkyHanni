@@ -26,6 +26,7 @@ object GardenBestCropTime {
     var display: Renderable? = null
 
     private val config get() = GardenApi.config.cropMilestones
+
     // Todo: Use Duration instead of Long
     val timeTillNextCrop = mutableMapOf<CropType, Long>()
 

@@ -206,7 +206,7 @@ object EnderNodeTracker {
             val price = when (item.isEnderArmor()) {
                 true -> 10_000.0
                 false -> altPrice.coerceAtLeast(
-                    item.internalName.getNpcPrice()
+                    item.internalName.getNpcPrice(),
                 ).coerceAtLeast(item.getGeorgePrice())
             }
             newProfit[item] = price * amount
