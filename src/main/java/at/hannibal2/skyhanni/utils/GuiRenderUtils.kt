@@ -49,6 +49,7 @@ object GuiRenderUtils {
         //#endif
     }
 
+    // TODO change to extend function of DrawContext
     fun drawStringCentered(context: DrawContext, str: String?, x: Int, y: Int) {
         drawStringCentered(
             context, str, x.toFloat(), y.toFloat(), true, 0xffffff,
@@ -65,6 +66,7 @@ object GuiRenderUtils {
         context.matrices.popMatrix()
     }
 
+    // TODO change to extend function of DrawContext
     fun drawString(context: DrawContext, str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
         //#if MC < 1.21
         fr.drawString(str, x, y, color, shadow)
@@ -73,6 +75,7 @@ object GuiRenderUtils {
         //#endif
     }
 
+    // TODO change to extend function of DrawContext
     fun drawString(context: DrawContext, str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
         //#if MC < 1.21
         fr.drawString(str, x.toFloat(), y.toFloat(), color, shadow)
@@ -144,6 +147,7 @@ object GuiRenderUtils {
         )
     }
 
+    // TODO change to extend function of DrawContext
     fun drawRect(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int, color: Int) {
         //#if MC < 1.21
         GuiScreen.drawRect(left, top, right, bottom, color)
