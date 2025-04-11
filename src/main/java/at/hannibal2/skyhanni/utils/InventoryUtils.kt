@@ -15,16 +15,19 @@ import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.client.resources.I18n
+import net.minecraft.entity.IMerchant
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import net.minecraft.world.IWorldNameable
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
@@ -67,8 +70,6 @@ object InventoryUtils {
     fun inAnyInventory() = inInventory() || inOwnInventory()
 
     fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
-
-    fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
     fun getItemsInOwnInventory(): List<ItemStack> =
         getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
@@ -153,6 +154,18 @@ object InventoryUtils {
             val stack = slot.stack ?: continue
             this[slot] = stack
         }
+    }
+
+    fun Gui.getTitle(): String = when (this) {
+        is IWorldNameable -> {
+            name
+        }
+
+        is IMerchant -> {
+            displayName.unformattedText
+        }
+
+        else -> ""
     }
 
     fun ContainerChest.getAllSlots(): Map<Slot, ItemStack?> = buildMap {
