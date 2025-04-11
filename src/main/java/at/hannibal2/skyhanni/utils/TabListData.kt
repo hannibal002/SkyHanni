@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.conditionalTransform
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
@@ -133,17 +133,21 @@ object TabListData {
     }
 
     private fun readTabList(): List<String>? {
-        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return null
-        //#if MC<1.16
-        val players = playerOrdering.sortedCopy(thePlayer.sendQueue.playerInfoMap)
+        val player = MinecraftCompat.localPlayerOrNull ?: return null
+        //#if MC < 1.16
+        val players = playerOrdering.sortedCopy(player.sendQueue.playerInfoMap)
         //#else
-        //$$ val players = playerOrdering.sortedCopy(thePlayer.connection.onlinePlayers)
+        //$$ val players = playerOrdering.sortedCopy(player.connection.onlinePlayers)
         //#endif
         val result = mutableListOf<String>()
         tabListGuard = true
         for (info in players) {
             val name = Minecraft.getMinecraft().ingameGUI.tabList.getPlayerName(info)
+            //#if MC < 1.16
             result.add(name.stripHypixelMessage())
+            //#else
+            //$$ result.add(name.formattedTextCompat().stripHypixelMessage())
+            //#endif
         }
         tabListGuard = false
         return if (result.size < 80) result.dropLast(1)
@@ -160,7 +164,7 @@ object TabListData {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!dirty) return
         dirty = false
 

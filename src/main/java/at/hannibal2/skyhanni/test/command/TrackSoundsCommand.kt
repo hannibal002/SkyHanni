@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -19,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import com.mojang.realmsclient.gui.ChatFormatting
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -74,7 +72,7 @@ object TrackSoundsCommand {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isRecording) return
 
         val soundsToDisplay = sounds.takeWhile { startTime.passedSince() - it.first < 3.seconds }
@@ -124,9 +122,9 @@ object TrackSoundsCommand {
             } else {
                 val sound = value.first()
                 val volumeColor = when (sound.volume) {
-                    in 0.0..0.25 -> ChatFormatting.RED
-                    in 0.25..0.5 -> ChatFormatting.GOLD
-                    else -> ChatFormatting.GREEN
+                    in 0.0..0.25 -> "§c"
+                    in 0.25..0.5 -> "§6"
+                    else -> "§a"
                 }.toString()
 
                 event.drawDynamicText(key, "§7§l${sound.soundName}", 0.8)

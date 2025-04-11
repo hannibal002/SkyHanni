@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.skyhannimodule
 
+import com.google.devtools.ksp.containingFile
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.getDeclaredFunctions
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -12,25 +13,44 @@ import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.validate
+import java.io.File
 import java.io.OutputStreamWriter
 
-class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logger: KSPLogger) : SymbolProcessor {
+class ModuleProcessor(
+    private val codeGenerator: CodeGenerator,
+    private val logger: KSPLogger,
+    private val modVersion: String,
+    private val mcVersion: String,
+    private val buildPaths: String?,
+) : SymbolProcessor {
 
-    // TODO remove once all events are migrated to SkyHanniEvent
+    companion object {
+        private val processedVersions = mutableSetOf<String>()
+    }
+
     private var skyHanniEvent: KSType? = null
     private var minecraftForgeEvent: KSType? = null
     private val warnings = mutableListOf<String>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        if (!processedVersions.add(mcVersion)) {
+            return emptyList()
+        }
+        generateVersionConstants()
 
         skyHanniEvent =
             resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")?.asStarProjectedType()
 
-        minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
-            ?.asStarProjectedType()
-                ?: return emptyList()
+        generatePrimaryFunctionNames(resolver)
 
-        val symbols = resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList()
+        if (mcVersion == "1.8.9") {
+            minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
+                ?.asStarProjectedType()
+                ?: return emptyList()
+        }
+
+        val symbols = processBuildPaths(resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList())
+        logger.warn("Found ${symbols.size} symbols with @SkyHanniModule for mc $mcVersion")
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
 
         if (validSymbols.isNotEmpty()) {
@@ -38,6 +58,24 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         }
 
         return emptyList()
+    }
+
+    private fun processBuildPaths(symbols: List<KSAnnotated>): List<KSAnnotated> {
+        val buildPathsFile = buildPaths?.let { File(it) } ?: return symbols
+        if (!buildPathsFile.exists()) {
+            return symbols
+        }
+
+        val validPaths = buildPathsFile.readText().lineSequence()
+            .map { it.substringBefore("#").trim() }
+            .filter { it.isNotBlank() }
+            .toSet()
+
+        return symbols.filter {
+            val path = it.containingFile?.filePath ?: return@filter false
+            val properPath = path.substringAfter("/main/java/")
+            properPath in validPaths
+        }
     }
 
     private fun validateSymbol(symbol: KSAnnotated): KSClassDeclaration? {
@@ -60,7 +98,7 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         val className = symbol.qualifiedName?.asString() ?: "unknown"
 
         for (function in symbol.getDeclaredFunctions()) {
-            if (function.annotations.any { it.shortName.asString() == "SubscribeEvent" }) {
+            if (function.annotations.any { it.shortName.asString() == "SubscribeEvent" } && mcVersion == "1.8.9") {
                 val firstParameter = function.parameters.firstOrNull()?.type?.resolve()!!
                 if (!minecraftForgeEvent!!.isAssignableFrom(firstParameter)) {
                     warnings.add("Function in $className must have an event assignable from $minecraftForgeEvent because it is annotated with @SubscribeEvent")
@@ -68,8 +106,13 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             }
 
             if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
-                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()!!
-                if (!skyHanniEvent!!.isAssignableFrom(firstParameter)) {
+                val firstParameter = function.parameters.firstOrNull()?.type?.resolve()
+                val handleEventAnnotation = function.annotations.find { it.shortName.asString() == "HandleEvent" }
+                val eventType = handleEventAnnotation?.arguments?.find { it.name?.asString() == "eventType" }?.value
+                val isFirstParameterProblem = firstParameter == null && eventType == null
+                val notAssignable = firstParameter != null && !skyHanniEvent!!.isAssignableFrom(firstParameter)
+
+                if (isFirstParameterProblem || notAssignable) {
                     warnings.add("Function in $className must have an event assignable from $skyHanniEvent because it is annotated with @HandleEvent")
                 }
             }
@@ -125,5 +168,57 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         }
 
         logger.warn("Generated LoadedModules file with ${symbols.size} modules")
+    }
+
+    private fun generateVersionConstants() {
+
+        val file = codeGenerator.createNewFile(
+            Dependencies(false),
+            "at.hannibal2.skyhanni.utils",
+            "VersionConstants",
+        )
+
+        OutputStreamWriter(file).use {
+            it.write("package at.hannibal2.skyhanni.utils\n\n")
+            it.write("object VersionConstants {\n")
+            it.write("    const val MOD_VERSION = \"$modVersion\"\n")
+            it.write("    const val MC_VERSION = \"$mcVersion\"\n")
+            it.write("}\n")
+        }
+        logger.warn("Generated VersionConstants file with mod version $modVersion and mc version $mcVersion")
+    }
+
+    private fun generatePrimaryFunctionNames(resolver: Resolver) {
+        val skyHanniEvent = skyHanniEvent ?: return
+        // Get all class declarations annotated with @PrimaryFunction.
+        val primaryFunctionSymbols = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
+            .filterIsInstance<KSClassDeclaration>()
+            .filter { skyHanniEvent.isAssignableFrom(it.asStarProjectedType()) }
+            .toList()
+
+        val entries = primaryFunctionSymbols.mapNotNull { symbol ->
+            val primaryFunctionAnnotation = symbol.annotations.firstOrNull {
+                it.shortName.asString() == "PrimaryFunction"
+            }
+            val value = primaryFunctionAnnotation?.arguments?.firstOrNull()?.value as? String ?: return@mapNotNull null
+            val fqName = symbol.qualifiedName?.asString() ?: return@mapNotNull null
+            "\"$value\" to $fqName::class.java"
+        }.joinToString(",\n        ")
+
+        val dependencies = Dependencies(true, *primaryFunctionSymbols.mapNotNull { it.containingFile }.toTypedArray())
+        val file = codeGenerator.createNewFile(
+            dependencies,
+            "at.hannibal2.skyhanni.api.event",
+            "GeneratedEventPrimaryFunctionNames"
+        )
+        OutputStreamWriter(file).use { writer ->
+            writer.write("package at.hannibal2.skyhanni.api.event\n\n")
+            writer.write("object GeneratedEventPrimaryFunctionNames {\n")
+            writer.write("    val map: Map<String, Class<out SkyHanniEvent>> = mapOf(\n")
+            writer.write("        $entries\n")
+            writer.write("    )\n")
+            writer.write("}\n")
+        }
+        logger.warn("Generated GeneratedEventPrimaryFunctionNames with ${primaryFunctionSymbols.size} entries")
     }
 }

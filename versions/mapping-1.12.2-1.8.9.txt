@@ -49,6 +49,7 @@ net.minecraft.network.play.server.SPacketOpenWindow net.minecraft.network.play.s
 net.minecraft.network.play.server.SPacketParticles net.minecraft.network.play.server.S2APacketParticles
 net.minecraft.network.play.server.SPacketPlayerListHeaderFooter net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
 net.minecraft.network.play.server.SPacketPlayerListItem net.minecraft.network.play.server.S38PacketPlayerListItem
+net.minecraft.network.play.server.SPacketScoreboardObjective net.minecraft.network.play.server.S3BPacketScoreboardObjective
 net.minecraft.network.play.server.SPacketSetSlot net.minecraft.network.play.server.S2FPacketSetSlot
 net.minecraft.network.play.server.SPacketSoundEffect net.minecraft.network.play.server.S29PacketSoundEffect
 net.minecraft.network.play.server.SPacketSpawnMob net.minecraft.network.play.server.S0FPacketSpawnMob
@@ -58,6 +59,12 @@ net.minecraft.network.play.server.SPacketTeams net.minecraft.network.play.server
 net.minecraft.network.play.server.SPacketTitle net.minecraft.network.play.server.S45PacketTitle
 net.minecraft.network.play.server.SPacketUpdateScore net.minecraft.network.play.server.S3CPacketUpdateScore
 net.minecraft.network.play.server.SPacketWorldBorder net.minecraft.network.play.server.S44PacketWorldBorder
+
+net.minecraft.network.play.server.SPacketScoreboardObjective getRenderType() func_179817_d()
+net.minecraft.network.play.server.SPacketScoreboardObjective getObjectiveName() func_149339_c()
+net.minecraft.network.play.server.SPacketScoreboardObjective getObjectiveValue() func_149337_d()
+
+net.minecraft.scoreboard.IScoreCriteria net.minecraft.scoreboard.IScoreObjectiveCriteria
 
 net.minecraft.util.SoundCategory net.minecraft.client.audio.SoundCategory
 

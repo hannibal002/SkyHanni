@@ -8,11 +8,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
@@ -36,7 +35,7 @@ object PetExpTooltip {
 
         val itemStack = event.itemStack
         val petExperience = itemStack.getPetExp()?.roundTo(1) ?: return
-        val name = itemStack.name
+        val name = itemStack.displayName
         try {
             val index = findIndex(event.toolTip) ?: return
             val fixedIndex = if (index > event.toolTip.size) {
@@ -57,7 +56,7 @@ object PetExpTooltip {
             val (maxLevel, maxXP) = getMaxValues(name, petExperience)
 
             val percentage = petExperience / maxXP
-            val percentageFormat = LorenzUtils.formatPercentage(percentage)
+            val percentageFormat = percentage.formatPercentage()
 
             if (percentage < 1) {
                 val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
