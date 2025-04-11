@@ -37,6 +37,7 @@ object GuiRenderUtils {
 
     private val fr: FontRenderer get() = Minecraft.getMinecraft().fontRendererObj
 
+    // TODO change to extend function of DrawContext
     private fun drawStringCentered(context: DrawContext, str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
         str ?: return
         val strLen = fr.getStringWidth(str)
@@ -158,9 +159,10 @@ object GuiRenderUtils {
         //#endif
     }
 
-    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
+    // TODO change to extend function of DrawContext
+    fun renderItemAndBackground(context: DrawContext, item: ItemStack, x: Int, y: Int, color: Int) {
         renderItemStack(item, x, y)
-        GuiScreen.drawRect(x, y, x + 16, y + 16, color)
+        drawRect(context, x, y, x + 16, y + 16, color)
     }
 
     /** @Mojang */

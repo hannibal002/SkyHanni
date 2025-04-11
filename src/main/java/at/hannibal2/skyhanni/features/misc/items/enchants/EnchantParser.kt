@@ -23,10 +23,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.Loader
 import java.util.TreeSet
 
 /**
@@ -83,7 +83,7 @@ object EnchantParser {
 
     private val loreCache: Cache = Cache()
 
-    val isSbaLoaded by lazy { Loader.isModLoaded("skyblockaddons") }
+    val isSbaLoaded by lazy { PlatformUtils.isModInstalled("skyblockaddons") }
 
     // Maps for all enchants
     private var enchants: EnchantsJson = EnchantsJson()

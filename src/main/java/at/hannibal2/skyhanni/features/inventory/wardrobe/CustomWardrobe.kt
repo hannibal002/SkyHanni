@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.math.min
@@ -94,16 +93,16 @@ object CustomWardrobe {
                 .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(0f, 0f, 100f)
+        event.context.matrices.pushMatrix()
+        event.context.matrices.translate(0f, 0f, 100f)
 
         position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
-            GlStateManager.translate(0f, 0f, 400f)
+            event.context.matrices.translate(0f, 0f, 400f)
             EstimatedItemValue.tryRendering()
         }
-        GlStateManager.popMatrix()
+        event.context.matrices.popMatrix()
         event.cancel()
     }
 
