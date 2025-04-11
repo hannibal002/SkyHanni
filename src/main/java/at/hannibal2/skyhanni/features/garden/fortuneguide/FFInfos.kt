@@ -42,7 +42,12 @@ internal enum class FFInfos(
         TOTAL_ARMOR, { FarmingItemType.currentArmor?.getFFData() ?: FFStats.armorTotalFF }, FFTypes.ABILITY,
         {
             when (FarmingItemType.currentArmor) {
-                FarmingItemType.HELMET, FarmingItemType.CHESTPLATE, FarmingItemType.LEGGINGS -> if (FFStats.usingSpeedBoots) 16.667 else 18.75
+                FarmingItemType.HELMET,
+                FarmingItemType.CHESTPLATE,
+                FarmingItemType.LEGGINGS,
+                ->
+                    if (FFStats.usingSpeedBoots) 16.667 else 18.75
+
                 FarmingItemType.BOOTS -> if (FFStats.usingSpeedBoots) 0 else 18.75
                 else -> if (FFStats.usingSpeedBoots) 50 else 75
             }
