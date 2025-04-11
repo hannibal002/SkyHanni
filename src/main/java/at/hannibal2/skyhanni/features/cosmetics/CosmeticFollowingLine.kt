@@ -6,17 +6,17 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -32,7 +32,7 @@ object CosmeticFollowingLine {
     class LocationSpot(val time: SimpleTimeMark, val onGround: Boolean)
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         locations = emptyMap()
     }
 
@@ -42,11 +42,7 @@ object CosmeticFollowingLine {
 
         updateClose(event)
 
-        //#if MC < 1.16
-        val firstPerson = Minecraft.getMinecraft().gameSettings.thirdPersonView == 0
-        //#else
-        //$$ val firstPerson = Minecraft.getInstance().options.cameraType.isFirstPerson
-        //#endif
+        val firstPerson = PlayerUtils.isFirstPersonView()
         val color = config.lineColor.toSpecialColor()
 
         renderClose(event, firstPerson, color)
@@ -77,10 +73,10 @@ object CosmeticFollowingLine {
     }
 
     private fun updateClose(event: SkyHanniRenderWorldEvent) {
-        val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).up(0.3)
+        val playerLocation = event.exactLocation(MinecraftCompat.localPlayer).up(0.3)
 
         latestLocations = latestLocations.editCopy {
-            val locationSpot = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
+            val locationSpot = LocationSpot(SimpleTimeMark.now(), MinecraftCompat.localPlayer.onGround)
             this[playerLocation] = locationSpot
             values.removeIf { it.time.passedSince() > 600.milliseconds }
         }
@@ -126,7 +122,7 @@ object CosmeticFollowingLine {
             }
 
             locations = locations.editCopy {
-                this[playerLocation] = LocationSpot(SimpleTimeMark.now(), Minecraft.getMinecraft().thePlayer.onGround)
+                this[playerLocation] = LocationSpot(SimpleTimeMark.now(), MinecraftCompat.localPlayer.onGround)
             }
         }
     }

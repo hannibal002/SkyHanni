@@ -12,7 +12,7 @@ class GuideTab(
     val item: ItemStack,
     val tip: Renderable,
     val isVertical: Boolean = false,
-    var lastTab: GuideGUI.tabWrapper,
+    var lastTab: GuideGui.tabWrapper,
     val onClick: (GuideTab) -> Unit
 ) {
 
@@ -28,19 +28,19 @@ class GuideTab(
     }
 
     fun select() {
-        selectColor = SELECTED_COLOR
+        selectColor = GuideGui.SELECTED_COLOR
     }
 
     fun unSelect() {
-        selectColor = NOT_SELECTED_COLOR
+        selectColor = GuideGui.NOT_SELECTED_COLOR
     }
 
-    fun isSelected() = selectColor == SELECTED_COLOR
+    fun isSelected() = selectColor == GuideGui.SELECTED_COLOR
 
-    val width = if (isVertical) TAB_LONG_SIDE else TAB_SHORT_SIDE
-    val height = if (isVertical) TAB_SHORT_SIDE else TAB_LONG_SIDE
+    val width = if (isVertical) GuideGui.TAB_LONG_SIDE else GuideGui.TAB_SHORT_SIDE
+    val height = if (isVertical) GuideGui.TAB_SHORT_SIDE else GuideGui.TAB_LONG_SIDE
 
-    private var selectColor = NOT_SELECTED_COLOR
+    private var selectColor = GuideGui.NOT_SELECTED_COLOR
 
     private val renderable = Renderable.clickable(
         object : Renderable {

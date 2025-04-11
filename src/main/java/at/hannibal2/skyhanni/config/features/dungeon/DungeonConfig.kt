@@ -165,6 +165,11 @@ class DungeonConfig {
     var terminalWaypoints: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Low Health Alert", desc = "")
+    @Accordion
+    var lowHealthAlert: LowHealthAlertConfig = LowHealthAlertConfig()
+
+    @Expose
     @ConfigOption(name = "Dungeon Races Guide", desc = "")
     @Accordion
     var dungeonsRaceGuide: DungeonsRaceGuideConfig = DungeonsRaceGuideConfig()

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
@@ -15,12 +16,14 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.chat.TextHelper.command
-import at.hannibal2.skyhanni.utils.chat.TextHelper.hover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.prefix
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.chat.TextHelper.url
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.addChatMessageToChat
+import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.url
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.util.IChatComponent
@@ -54,7 +57,7 @@ object ChatUtils {
         replaceSameMessage: Boolean = false,
     ) {
         if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
-            LorenzUtils.consoleLog("[Debug] $message")
+            consoleLog("[Debug] $message")
         }
     }
 
@@ -90,7 +93,6 @@ object ChatUtils {
         onlySendOnce: Boolean = false,
         messageId: Int? = null,
     ) {
-
         if (prefix) {
             internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce, messageId = messageId)
         } else {
@@ -126,19 +128,12 @@ object ChatUtils {
         val formattedMessage = message.formattedText
         log.log(formattedMessage)
 
-        val minecraft = Minecraft.getMinecraft()
-
-        val thePlayer = minecraft.thePlayer
-        if (thePlayer == null) {
-            LorenzUtils.consoleLog(formattedMessage.removeColor())
+        if (!MinecraftCompat.localPlayerExists) {
+            consoleLog(formattedMessage.removeColor())
             return false
         }
 
-        //#if FORGE
-        if (send) thePlayer.addChatMessage(message)
-        //#else
-        //$$ if (send) thePlayer.sendMessage(message, false)
-        //#endif
+        if (send) addChatMessageToChat(message)
         return true
     }
 
@@ -156,7 +151,7 @@ object ChatUtils {
      */
     fun clickableChat(
         message: String,
-        onClick: () -> Any,
+        onClick: () -> Unit,
         hover: String = "§eClick here!",
         expireAt: SimpleTimeMark = SimpleTimeMark.farFuture(),
         prefix: Boolean = true,
@@ -176,6 +171,23 @@ object ChatUtils {
         } else {
             chat(text)
         }
+    }
+
+    /**
+     * Sends the message in chat.
+     * Show the lines when on hover.
+     * Offer option to click on the chat message to copy the lines to clipboard.
+     * Sseful for quick debug infos
+     */
+    fun clickToClipboard(message: String, lines: List<String>) {
+        val text = lines.joinToString("\n") { "§7$it" }
+        clickableChat(
+            "$message §7(hover for info)",
+            hover = "$text\n \n§eClick to copy to clipboard!",
+            onClick = {
+                ClipboardUtils.copyToClipboard(text.removeColor())
+            },
+        )
     }
 
     private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
@@ -327,21 +339,16 @@ object ChatUtils {
         (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        val player = Minecraft.getMinecraft().thePlayer
-        if (player == null) {
-            sendQueue.clear()
-            return
-        }
+    fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
-            player.sendChatMessage(sendQueue.poll() ?: return)
+            MinecraftCompat.localPlayer.sendChatMessage(sendQueue.poll() ?: return)
             lastMessageSent = SimpleTimeMark.now()
         }
     }
 
     fun sendMessageToServer(message: String) {
         if (canSendInstantly()) {
-            Minecraft.getMinecraft().thePlayer?.let {
+            MinecraftCompat.localPlayerOrNull?.let {
                 it.sendChatMessage(message)
                 lastMessageSent = SimpleTimeMark.now()
                 return
@@ -371,9 +378,6 @@ object ChatUtils {
             "§eClick to find setting in the config!",
         )
     }
-
-    fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
-        this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
 
     fun clickToActionOrDisable(
         message: String,
@@ -412,5 +416,9 @@ object ChatUtils {
     //$$ val ChatHudLine.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
     //$$ fun ChatHudLine.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
     //#endif
+
+    fun consoleLog(text: String) {
+        SkyHanniMod.consoleLog(text)
+    }
 
 }

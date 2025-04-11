@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-
 //#if MC > 1.16
 //$$ import net.minecraft.world.item.DyeItem
 //#endif
@@ -12,6 +11,8 @@ import net.minecraft.item.ItemStack
 //$$ import net.minecraft.item.tooltip.TooltipType
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
+//$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.text.Text
 //#endif
 
 fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
@@ -47,6 +48,22 @@ fun String.getVanillaItem(): Item? {
     //$$ return item
     //#endif
 }
+
+fun ItemStack.setCustomItemName(name: String): ItemStack {
+    //#if MC < 1.16
+    this.setStackDisplayName(name)
+    //#else
+    //$$ this.set(DataComponentTypes.CUSTOM_NAME, Text.of(name))
+    //#endif
+    return this
+}
+
+//#if MC > 1.21
+//$$    fun ItemStack.setCustomItemName(name: Text): ItemStack {
+//$$     this.set(DataComponentTypes.CUSTOM_NAME, name)
+//$$     return this
+//$$ }
+//#endif
 
 enum class DyeCompat(
     private val dyeColor: Int,

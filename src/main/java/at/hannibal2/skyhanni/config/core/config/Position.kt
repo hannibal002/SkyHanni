@@ -27,11 +27,10 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import java.lang.reflect.Field
-
+//#if MC < 1.21
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+//#endif
 
 class Position @JvmOverloads constructor(
     x: Int,
@@ -130,7 +129,7 @@ class Position @JvmOverloads constructor(
 
     fun moveX(deltaX: Int, objWidth: Int): Int {
         var newDeltaX = deltaX
-        val screenWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+        val screenWidth = GuiScreenUtils.scaledWindowWidth
         val wasPositiveX = x >= 0
         this.x += newDeltaX
 
@@ -162,7 +161,7 @@ class Position @JvmOverloads constructor(
 
     fun moveY(deltaY: Int, objHeight: Int): Int {
         var newDeltaY = deltaY
-        val screenHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
+        val screenHeight = GuiScreenUtils.scaledWindowHeight
         val wasPositiveY = y >= 0
         this.y += newDeltaY
 
@@ -208,7 +207,9 @@ class Position @JvmOverloads constructor(
         val option = editor.getOptionFromField(field) ?: return
         editor.search("")
         if (!editor.goToOption(option)) return
+        //#if MC < 1.21
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
+        //#endif
     }
 
     fun setLink(configLink: ConfigLink) {
@@ -221,6 +222,7 @@ class Position @JvmOverloads constructor(
                 "owner" to configLink.owner,
                 "field" to configLink.field,
             )
+            ErrorManager.crashInDevEnv("Couldn't set config links") { e }
         }
     }
 
