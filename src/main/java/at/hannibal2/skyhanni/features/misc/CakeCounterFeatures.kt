@@ -61,6 +61,14 @@ object CakeCounterFeatures {
         "Souls Found: §b(?<souls>[\\d,]+)",
     )
 
+    /**
+     * REGEX-TEST: §eYou found a §r§dCake Soul§r§e!
+     */
+    private val cakeSoulFoundPattern by RepoPattern.pattern(
+        "misc.cakesoul.found",
+        "§eYou found a §r§dCake Soul§r§e!",
+    )
+
     private val config get() = SkyHanniMod.feature.misc.cakeCounter
     private val storage get() = ProfileStorageData.profileSpecific?.cakeCounterData
 
@@ -216,7 +224,7 @@ object CakeCounterFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent) {
-        if (event.message == "§eYou found a §r§dCake Soul§r§e!") {
+        if (cakeSoulFoundPattern.matches(event.message)) {
             lastSoulFoundBySelf = SimpleTimeMark.now()
         }
 
