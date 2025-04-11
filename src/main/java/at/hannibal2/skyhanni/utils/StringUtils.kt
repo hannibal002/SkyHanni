@@ -496,9 +496,7 @@ object StringUtils {
     fun getListOfStringsMatchingLastWord(words: Array<String>, args: Collection<String>): List<String> {
         val lastWord = words.lastOrNull() ?: return emptyList()
         val matches = args.filter { it.startsWith(lastWord, ignoreCase = true) }
-        return matches.ifEmpty {
-            listOf()
-        }
+        return matches
     }
 
     // Just fully yoinked this one from the font renderer thx dinner bone
