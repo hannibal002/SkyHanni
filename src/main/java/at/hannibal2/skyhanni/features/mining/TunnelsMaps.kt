@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
@@ -16,8 +17,8 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -34,7 +35,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -80,6 +80,7 @@ object TunnelsMaps {
     private var possibleLocations = mapOf<String, List<GraphNode>>()
     private val cooldowns = mutableMapOf<GraphNode, SimpleTimeMark>()
     private var active: String = ""
+    private var lastBaseCampWarp: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private lateinit var fairySouls: Map<String, GraphNode>
 
@@ -267,6 +268,13 @@ object TunnelsMaps {
         }
     }
 
+    @HandleEvent
+    @Suppress("AvoidBritishSpelling")
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(84, "mining.tunnelMaps.pathColour", "mining.tunnelMaps.pathColor")
+        event.move(84, "mining.tunnelMaps.dynamicPathColour", "mining.tunnelMaps.dynamicPathColor")
+    }
+
     init {
         RenderDisplayHelper(
             condition = { isEnabled() },
@@ -383,7 +391,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevclosest = closestNode
@@ -464,11 +472,11 @@ object TunnelsMaps {
         )
     }
 
-    private fun getPathColor(): Color = if (config.dynamicPathColour) {
+    private fun getPathColor(): Color = if (config.dynamicPathColor) {
         goal?.name?.getFirstColorCode()?.toLorenzColor()?.takeIf { it != LorenzColor.WHITE }?.toColor()
     } else {
         null
-    } ?: config.pathColour.toSpecialColor()
+    } ?: config.pathColor.toSpecialColor()
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
@@ -488,11 +496,9 @@ object TunnelsMaps {
 
     private fun campfireKey(event: KeyPressEvent) {
         if (event.keyCode != config.campfireKey) return
-        if (config.travelScroll) {
-            HypixelCommands.warp("basecamp")
-        } else {
-            campfireOverride()
-        }
+        if (lastBaseCampWarp.passedSince() < 2.seconds) return
+        lastBaseCampWarp = SimpleTimeMark.now()
+        if (config.travelScroll) HypixelCommands.warp("basecamp") else campfireOverride()
     }
 
     @HandleEvent
@@ -525,5 +531,5 @@ object TunnelsMaps {
 
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && LorenzUtils.skyBlockArea in areas
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && IslandAreas.currentAreaName in areas
 }

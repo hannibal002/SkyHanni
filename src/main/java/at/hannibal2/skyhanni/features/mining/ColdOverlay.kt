@@ -35,17 +35,17 @@ object ColdOverlay {
 
         Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
 
-        GlStateManager.pushMatrix()
+        event.context.matrices.pushMatrix()
         GlStateManager.pushAttrib()
 
         GL11.glDepthMask(false)
-        GlStateManager.translate(0f, 0f, -500f)
+        event.context.matrices.translate(0f, 0f, -500f)
         GlStateManager.color(1f, 1f, 1f, alpha)
 
         GuiRenderUtils.drawTexturedRect(0f, 0f)
         GL11.glDepthMask(true)
 
-        GlStateManager.popMatrix()
+        event.context.matrices.popMatrix()
         GlStateManager.popAttrib()
     }
 

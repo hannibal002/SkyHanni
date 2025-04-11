@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -44,8 +45,8 @@ object DragonFeatures {
     private val dragonNamesAsRegex = dragonNames.joinToString("|")
     private val dragonNamesAsRegexUppercase = dragonNames.joinToString("|") { it.uppercase() }
 
-    private val protectorRepoGroup = RepoPattern.group("combat.boss.protector")
-    private val repoGroup = RepoPattern.group("combat.boss.dragon")
+    private val protectorRepoGroup = RepoPattern.group("combat.boss.protector.1")
+    private val repoGroup = RepoPattern.group("combat.boss.dragon.1")
     private val chatGroup = repoGroup.group("chat")
     private val scoreBoardGroup = repoGroup.group("scoreboard")
     private val tabListGroup = repoGroup.group("tablist")
@@ -113,7 +114,7 @@ object DragonFeatures {
      */
     private val endZealotsPattern by protectorRepoGroup.pattern(
         "chat.end.zealot",
-        "§f +§r§eZealots Contributed: §r§a(?<Amount>\\d+)§r§e/100",
+        "§f +§r§eZealots Contributed: §r§a(?<amount>\\d+)§r§e/100",
     )
 
     /**
@@ -442,5 +443,11 @@ object DragonFeatures {
     fun onIslandChange(event: IslandChangeEvent) {
         reset()
         eggSpawned = true
+    }
+
+    @HandleEvent
+    fun configFixEvent(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(78, "combat.dragon", "combat.endIsland.dragon")
+        event.move(78, "combat.endstoneProtectorChat", "combat.endIsland.endstoneProtectorChat")
     }
 }
