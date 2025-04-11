@@ -39,7 +39,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestSpawnTimer {
 
-
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
 
@@ -65,7 +64,6 @@ object PestSpawnTimer {
     private var ready = false
     private var shouldRender = false
     private var display: List<Renderable> = emptyList()
-
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -116,7 +114,7 @@ object PestSpawnTimer {
         lastPestSpawnTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldRender) return
         config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
@@ -136,7 +134,8 @@ object PestSpawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (isEnabled()) update() else return
+        if (!isEnabled()) return
+        update()
         if (hasWarned || !config.cooldownOverWarning) return
 
         if (pestCooldownEndTime.isInPast()) {
@@ -151,7 +150,7 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
-        shouldRender()
+        shouldRender = shouldRender()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -211,19 +210,12 @@ object PestSpawnTimer {
         display = drawDisplay()
     }
 
-    private fun shouldRender() {
-        shouldRender = when {
-            config.onlyWithFarmingTool && config.onlyWithVacuum -> {
-                (hasFarmingToolInHand() || hasVacuumInHand())
-            }
-            config.onlyWithFarmingTool -> {
-                (hasFarmingToolInHand())
-            }
-            config.onlyWithVacuum -> {
-                (hasVacuumInHand())
-            }
-            else -> true
-        }
+    private fun shouldRender(): Boolean = when {
+        config.onlyWithFarmingTool && config.onlyWithVacuum -> hasFarmingToolInHand() || hasVacuumInHand()
+        config.onlyWithFarmingTool -> hasFarmingToolInHand()
+        config.onlyWithVacuum -> hasVacuumInHand()
+
+        else -> true
     }
 
     private fun cooldownExpired() {
