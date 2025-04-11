@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.api
+package at.hannibal2.skyhanni.data.effect
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -101,47 +102,6 @@ object EffectApi {
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
-    // TODO move the whole list into the repo
-    enum class NonGodPotEffect(
-        val tabListName: String,
-        val isMixin: Boolean = false,
-        val inventoryItemName: String = tabListName,
-    ) {
-        SMOLDERING("§aSmoldering Polarization I"),
-        GLOWY("§2Mushed Glowy Tonic I"),
-        WISP("§bWisp's Ice-Flavored Water I"),
-        GOBLIN("§2King's Scent I"),
-
-        INVISIBILITY("§8Invisibility I"), // when wearing sorrow armor
-
-        REV("§cZombie Brain Mixin", true),
-        TARA("§6Spider Egg Mixin", true),
-        SVEN("§bWolf Fur Mixin", true),
-        VOID("§6End Portal Fumes", true),
-        BLAZE("§fGabagoey", true),
-        GLOWING_MUSH("§2Glowing Mush Mixin", true),
-        HOT_CHOCOLATE("§6Hot Chocolate Mixin", true),
-
-        DEEP_TERROR("§4Deepterror", true),
-
-        GREAT_SPOOK("§fGreat Spook I", inventoryItemName = "§fGreat Spook Potion"),
-
-        DOUCE_PLUIE_DE_STINKY_CHEESE("§eDouce Pluie de Stinky Cheese I"),
-
-        HARVEST_HARBINGER("§6Harvest Harbinger V"),
-
-        PEST_REPELLENT("§6Pest Repellent I§r"),
-        PEST_REPELLENT_MAX("§6Pest Repellent II"),
-
-        CURSE_OF_GREED("§4Curse of Greed I"),
-
-        COLD_RESISTANCE_4("§bCold Resistance IV"),
-
-        POWDER_PUMPKIN("§fPowder Pumpkin I"),
-        FILET_O_FORTUNE("§fFilet O' Fortune I"),
-        CHILLED_PRISTINE_POTATO("§fChilled Pristine Potato I"),
-    }
-
     // Todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
     @Suppress("MaxLineLength")
@@ -221,23 +181,23 @@ object EffectApi {
         EffectDurationChangeEvent(effect, changeType, duration).post()
     }
 
+    private fun String.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
+        "$this§r".startsWith(it.tabListName)
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         for (line in event.footer.split("\n")) {
+            val effect = line.getNonGodPotEffectOrNull() ?: continue
             godPotTabPattern.matchMatcher(line) {
                 profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
             }
-            for (effect in NonGodPotEffect.entries) {
-                val tabListName = effect.tabListName
-                if ("$line§r".startsWith(tabListName)) {
-                    val string = line.substring(tabListName.length)
-                    try {
-                        val duration = TimeUtils.getDuration(string.split("§f")[1])
-                        EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
-                    } catch (e: IndexOutOfBoundsException) {
-                        ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
-                    }
-                }
+            val durationString = line.substring(effect.tabListName.length)
+            try {
+                val duration = TimeUtils.getDuration(durationString.split("§f")[1])
+                EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
+            } catch (e: IndexOutOfBoundsException) {
+                ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
             }
         }
     }
@@ -287,27 +247,28 @@ object EffectApi {
                 godPotEffectsFilterSelectPattern.matches(it)
             } ?: false
 
+    private fun ItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
+        it.inventoryItemName == displayName
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!event.inventoryName.endsWith("Active Effects")) return
 
         for (stack in event.inventoryItems.values) {
-            val name = stack.displayName
-            for (effect in NonGodPotEffect.entries) {
-                if (!name.contains(effect.inventoryItemName)) continue
-                for (line in stack.getLore()) {
-                    if (!line.contains("Remaining") || line == "§7Time Remaining: §aCompleted!" || line.contains("Remaining Uses")) continue
-                    val duration = try {
-                        TimeUtils.getDuration(line.split("§f")[1])
-                    } catch (e: IndexOutOfBoundsException) {
-                        ErrorManager.logErrorWithData(
-                            e, "Error while reading Non God-Potion effects from tab list",
-                            "line" to line,
-                        )
-                        continue
-                    }
-                    EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
+            val effect = stack.getNonGodPotEffectOrNull() ?: continue
+            for (line in stack.getLore()) {
+                if (!line.contains("Remaining") || line == "§7Time Remaining: §aCompleted!" || line.contains("Remaining Uses")) continue
+                val duration = try {
+                    TimeUtils.getDuration(line.split("§f")[1])
+                } catch (e: IndexOutOfBoundsException) {
+                    ErrorManager.logErrorWithData(
+                        e, "Error while reading Non God-Potion effects from tab list",
+                        "line" to line,
+                    )
+                    continue
                 }
+                EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
             }
         }
     }
