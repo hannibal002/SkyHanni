@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
@@ -129,7 +130,7 @@ object EssenceShopHelper {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled() || essenceShops.isEmpty() || currentProgress == null || event.slot != CUSTOM_STACK_LOCATION) return
-        if (!essenceShopPattern.matches(event.inventory.name)) return
+        if (!essenceShopPattern.matches(InventoryUtils.openInventoryName())) return
         infoItemStack?.let { event.replace(it) }
     }
 
@@ -245,7 +246,7 @@ object EssenceShopHelper {
                 extraData = listOf(
                     "inventoryName" to event.inventoryName,
                     "essenceHeaderStack" to essenceHeaderStack?.displayName.orEmpty(),
-                    "populatedInventorySize" to event.inventoryItems.filter { it.value.hasDisplayName() }.size,
+                    "populatedInventorySize" to event.inventoryItems.filter { it.value.displayName.isNotEmpty() }.size,
                     "eventType" to event.javaClass.simpleName,
                 ).toTypedArray(),
             )

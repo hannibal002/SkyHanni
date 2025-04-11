@@ -8,6 +8,7 @@ net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.player.Loca
 
 net.minecraft.client.network.ClientPlayerEntity sendChatMessage() chat()
 net.minecraft.client.network.ClientPlayerEntity networkHandler connection
+net.minecraft.client.network.ClientPlayerEntity setExperience() setExperienceValues()
 
 net.minecraft.client.option.Perspective net.minecraft.client.CameraType
 net.minecraft.client.option.Perspective isFrontView() isMirrored()

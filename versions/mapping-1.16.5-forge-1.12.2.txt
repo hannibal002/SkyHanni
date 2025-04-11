@@ -72,6 +72,7 @@ net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOther
 net.minecraft.client.player.AbstractClientPlayer getSkinTextureLocation() getLocationSkin()
 
 net.minecraft.client.player.LocalPlayer chat() sendChatMessage()
+net.minecraft.client.player.LocalPlayer setExperienceValues() setXPStats()
 
 net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
 
@@ -271,6 +272,8 @@ net.minecraft.world.entity.Entity zOld prevPosZ
 net.minecraft.world.entity.Entity zo posZ
 net.minecraft.world.entity.Entity isOnGround onGround
 net.minecraft.world.entity.Entity getVehicle() getRidingEntity()
+net.minecraft.world.entity.Entity setCustomName() setCustomNameTag()
+net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
@@ -346,6 +349,8 @@ net.minecraft.world.entity.player.Inventory items mainInventory
 
 net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
 net.minecraft.world.entity.player.Player containerMenu openContainer
+net.minecraft.world.entity.player.Player totalExperience experienceTotal
+net.minecraft.world.entity.player.Player experienceProgress experience
 
 net.minecraft.world.entity.projectile.Arrow net.minecraft.entity.projectile.EntityArrow
 net.minecraft.world.entity.projectile.Fireball net.minecraft.entity.projectile.EntityFireball
@@ -399,6 +404,9 @@ net.minecraft.world.level.block.Blocks SUGAR_CANE REEDS
 net.minecraft.world.level.block.Blocks MELON MELON_BLOCK
 net.minecraft.world.level.block.Blocks TERRACOTTA HARDENED_CLAY
 net.minecraft.world.level.block.Blocks COBBLESTONE_STAIRS STONE_STAIRS
+
+net.minecraft.world.level.block.StainedGlassBlock net.minecraft.block.BlockStainedGlass
+net.minecraft.world.level.block.StainedGlassPaneBlock net.minecraft.block.BlockStainedGlassPane
 
 net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
@@ -503,3 +511,15 @@ net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
 net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
 
 net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots
+
+net.minecraft.entity.projectile.EntityArrow owner shootingEntity
+
+com.mojang.blaze3d.systems.RenderSystem enableDepthTest() enableDepth()
+com.mojang.blaze3d.systems.RenderSystem disableDepthTest() disableDepth()
+com.mojang.blaze3d.systems.RenderSystem blendFuncSeparate() tryBlendFuncSeparate()
+
+com.mojang.blaze3d.platform.Lighting net.minecraft.client.renderer.RenderHelper
+
+com.mojang.blaze3d.platform.Lighting turnOff() disableStandardItemLighting()
+com.mojang.blaze3d.platform.Lighting turnBackOn() enableStandardItemLighting()
+com.mojang.blaze3d.platform.Lighting setupFor3DItems() enableGUIStandardItemLighting()
