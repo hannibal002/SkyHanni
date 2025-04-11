@@ -13,31 +13,6 @@ import net.minecraft.item.ItemStack
 //$$ import net.minecraft.screen.slot.SlotActionType
 //#endif
 
-fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int = 0, mode: Int = 0) {
-    windowId ?: return
-    val controller = Minecraft.getMinecraft().playerController ?: return
-    val player = Minecraft.getMinecraft().thePlayer ?: return
-    //#if FORGE
-    controller.windowClick(windowId, slot, mouseButton, mode, player)
-    //#else
-    //$$ controller.clickSlot(windowId, slot, mouseButton, SlotActionType.entries[mode], player)
-    //#endif
-}
-
-fun GuiContainer.containerSlots(): List<Slot> =
-    //#if FORGE
-    inventorySlots.inventorySlots
-//#else
-//$$ screenHandler.slots
-//#endif
-
-private fun getWindowId(): Int? =
-    //#if FORGE
-    (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
-//#else
-//$$ (MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.screenHandler?.syncId
-//#endif
-
 fun EntityPlayerSP.getItemOnCursor(): ItemStack? {
     //#if MC < 1.21
     return this.inventory?.itemStack
@@ -77,5 +52,31 @@ object InventoryCompat {
         //$$ return currentScreen?.title.formattedTextCompat()
         //#endif
     }
+
+
+    fun clickInventorySlot(slot: Int, windowId: Int? = getWindowId(), mouseButton: Int = 0, mode: Int = 0) {
+        windowId ?: return
+        val controller = Minecraft.getMinecraft().playerController ?: return
+        val player = Minecraft.getMinecraft().thePlayer ?: return
+        //#if FORGE
+        controller.windowClick(windowId, slot, mouseButton, mode, player)
+        //#else
+        //$$ controller.clickSlot(windowId, slot, mouseButton, SlotActionType.entries[mode], player)
+        //#endif
+    }
+
+    fun containerSlots(container: GuiContainer): List<Slot> =
+        //#if FORGE
+        container.inventorySlots.inventorySlots
+//#else
+//$$ container.screenHandler.slots
+//#endif
+
+    private fun getWindowId(): Int? =
+        //#if FORGE
+        (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
+//#else
+//$$ (MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.screenHandler?.syncId
+//#endif
 
 }
