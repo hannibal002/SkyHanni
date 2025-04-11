@@ -68,7 +68,7 @@ class ChatConfig {
 //     )
 //     @ConfigEditorBoolean
 //     @FeatureToggle
-    var copyChat: Boolean = false
+//     var copyChat: Boolean = false
 
     @Expose
     @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in Dungeons.")

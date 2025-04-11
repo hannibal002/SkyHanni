@@ -1,48 +1,48 @@
 package at.hannibal2.skyhanni.features.chat
 
-import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
-import at.hannibal2.skyhanni.utils.ClipboardUtils
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.client.gui.ChatLine
-import net.minecraft.client.gui.GuiChat
-
-@SkyHanniModule
-object CopyChat {
-    private val config get() = SkyHanniMod.feature.chat.copyChat
-
-    @HandleEvent
-    fun onMouseInput(event: GuiMouseInputEvent) {
-        if (event.gui !is GuiChat) return
-        if (!config || !KeyboardManager.isRightMouseClicked()) return
-        val chatLine = getChatLine(MouseCompat.getX(), MouseCompat.getY()) ?: return
-        val formatted = chatLine.fullComponent.formattedText
-
-        val (clipboard, infoMessage) = when {
-            KeyboardManager.isMenuKeyDown() -> formatted.stripHypixelMessage() to "formatted message"
-
-            KeyboardManager.isShiftKeyDown() -> (ModifyVisualWords.modifyText(formatted)?.removeColor() ?: formatted) to "modified message"
-
-            KeyboardManager.isControlKeyDown() -> chatLine.chatComponent.unformattedText to "line"
-
-            else -> formatted.removeColor() to "message"
-        }
-
-        ClipboardUtils.copyToClipboard(clipboard)
-        ChatUtils.chat("Copied $infoMessage to clipboard!")
-    }
-
-    private fun getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
+// import at.hannibal2.skyhanni.SkyHanniMod
+// import at.hannibal2.skyhanni.api.event.HandleEvent
+// import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
+// import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+// import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+// import at.hannibal2.skyhanni.utils.ChatUtils
+// import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
+// import at.hannibal2.skyhanni.utils.ClipboardUtils
+// import at.hannibal2.skyhanni.utils.KeyboardManager
+// import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
+// import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+// import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+// import at.hannibal2.skyhanni.utils.compat.MouseCompat
+// import at.hannibal2.skyhanni.utils.system.PlatformUtils
+// import net.minecraft.client.gui.ChatLine
+// import net.minecraft.client.gui.GuiChat
+//
+// @SkyHanniModule
+// object CopyChat {
+//     private val config get() = SkyHanniMod.feature.chat.copyChat
+//
+//     @HandleEvent
+//     fun onMouseInput(event: GuiMouseInputEvent) {
+//         if (event.gui !is GuiChat) return
+//         if (!config || !KeyboardManager.isRightMouseClicked()) return
+//         val chatLine = getChatLine(MouseCompat.getX(), MouseCompat.getY()) ?: return
+//         val formatted = chatLine.fullComponent.formattedText
+//
+//         val (clipboard, infoMessage) = when {
+//             KeyboardManager.isMenuKeyDown() -> formatted.stripHypixelMessage() to "formatted message"
+//
+//             KeyboardManager.isShiftKeyDown() -> (ModifyVisualWords.modifyText(formatted)?.removeColor() ?: formatted) to "modified message"
+//
+//             KeyboardManager.isControlKeyDown() -> chatLine.chatComponent.unformattedText to "line"
+//
+//             else -> formatted.removeColor() to "message"
+//         }
+//
+//         ClipboardUtils.copyToClipboard(clipboard)
+//         ChatUtils.chat("Copied $infoMessage to clipboard!")
+//     }
+//
+//     private fun getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
 //         val mc = Minecraft.getMinecraft() ?: return null
 //         val chatGui = mc.ingameGUI.chatGUI ?: return null
 //         val access = chatGui as AccessorMixinGuiNewChat
@@ -63,16 +63,16 @@ object CopyChat {
 //                 return chatLines[lineIndex]
 //             }
 //         }
-        return null
-    }
-
-    private val isPatcherLoaded by lazy { PlatformUtils.isModInstalled("patcher") }
-
-    private fun getOffset(): Int {
-        if (!isPatcherLoaded) return 0
-        return runCatching {
-            val patcherConfigClass = Class.forName("club.sk1er.patcher.config.PatcherConfig")
-            if (patcherConfigClass.getDeclaredFieldOrNull("chatPosition")?.getBoolean(null) == true) 12 else 0
-        }.getOrDefault(0)
-    }
-}
+//         return null
+//     }
+//
+//     private val isPatcherLoaded by lazy { PlatformUtils.isModInstalled("patcher") }
+//
+//     private fun getOffset(): Int {
+//         if (!isPatcherLoaded) return 0
+//         return runCatching {
+//             val patcherConfigClass = Class.forName("club.sk1er.patcher.config.PatcherConfig")
+//             if (patcherConfigClass.getDeclaredFieldOrNull("chatPosition")?.getBoolean(null) == true) 12 else 0
+//         }.getOrDefault(0)
+//     }
+// }
