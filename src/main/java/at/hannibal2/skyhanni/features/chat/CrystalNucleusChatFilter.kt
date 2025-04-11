@@ -16,6 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CrystalNucleusChatFilter {
 
+    // TODO add docs for this class
     class NucleusChatFilterRes(private var blockMessage: String? = null, private var newMessage: String? = null) {
         fun getPair(): Pair<String?, String?> {
             return Pair(blockMessage, newMessage)
