@@ -5,12 +5,10 @@ import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -19,17 +17,19 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.isFormatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import java.util.Collections
 
 @SkyHanniModule
 object CollectionTracker {
 
     private const val RECENT_GAIN_TIME = 1_500
 
-    private var display = emptyList<List<Any>>()
+    private var display: Renderable? = null
 
     private var itemName = ""
     private var internalName: NeuInternalName? = null
@@ -93,9 +93,10 @@ object CollectionTracker {
             ChatUtils.userError("Item '$rawName' does not exist!")
             return
         }
-        setNewCollection(foundInternalName, stack.name.removeColor())
+        setNewCollection(foundInternalName, stack.displayName.removeColor())
     }
 
+    // TODO repo
     private fun fixTypo(rawName: String) = when (rawName) {
         "carrots" -> "carrot"
         "melons" -> "melon"
@@ -141,7 +142,7 @@ object CollectionTracker {
         internalName = null
 
         lastAmountInInventory = -1
-        display = emptyList()
+        display = null
 
         recentGain = 0
     }
@@ -163,14 +164,12 @@ object CollectionTracker {
             itemAmount.percentWithColorCode(goalAmount, 1)
         }§f)"
 
-        display = Collections.singletonList(
-            buildList {
-                internalName?.let {
-                    add(it.getItemStack())
-                }
-                add("$itemName collection: §e$format$goal $gainText")
+        display = Renderable.line {
+            internalName?.let {
+                addItemStack(it.getItemStack())
             }
-        )
+            addString("$itemName collection: §e$format$goal $gainText")
+        }
     }
 
     private fun countCurrentlyInInventory(): Int = InventoryUtils.countItemsInLowerInventory {
@@ -193,10 +192,7 @@ object CollectionTracker {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
-        thePlayer.worldObj ?: return
-
+    fun onTick() {
         compareInventory()
         updateGain()
     }
@@ -235,7 +231,9 @@ object CollectionTracker {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        SkyHanniMod.feature.misc.collectionCounterPos.renderStringsAndItems(display, posLabel = "Collection Tracker")
+        display?.let {
+            SkyHanniMod.feature.misc.collectionCounterPos.renderRenderable(it, posLabel = "Collection Tracker")
+        }
     }
 
     @HandleEvent

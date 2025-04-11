@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
@@ -28,6 +28,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         addItem(bucket, SKYBLOCK_COIN, coins)
     }
 
+    // TODO impl in normal item tracker as well
     fun ItemAddEvent.addItemFromEvent() {
         var bucket: E? = null
         modify { data ->
@@ -47,7 +48,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         if (source == ItemAddManager.Source.COMMAND) {
             TrackerManager.commandEditTrackerSuccess = true
             ChatUtils.chat(
-                "Added ${internalName.itemName} §e$amount§7x to ($selectedBucket§7)",
+                "Added ${internalName.repoItemName} §e$amount§7x to ($selectedBucket§7)",
             )
         }
     }
@@ -56,10 +57,10 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         "Use addItem(bucket, internalName, amount) instead",
         ReplaceWith("addItem(bucket, internalName, amount)"),
     )
-    override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) =
+    override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount) instead")
 
-    fun addItem(bucket: E, internalName: NeuInternalName, amount: Int) {
+    fun addItem(bucket: E, internalName: NeuInternalName, amount: Int, message: Boolean = true) {
         modify {
             it.addItem(bucket, internalName, amount)
         }
@@ -72,7 +73,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             }
             sessionProp.hidden = totalProp.hidden
         }
-        handlePossibleRareDrop(internalName, amount)
+        handlePossibleRareDrop(internalName, amount, message)
     }
 
     fun addBucketSelector(

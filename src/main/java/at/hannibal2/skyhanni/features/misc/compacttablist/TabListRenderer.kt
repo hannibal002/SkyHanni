@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -18,7 +18,6 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object TabListRenderer {
@@ -31,12 +30,11 @@ object TabListRenderer {
     private const val COLUMN_SPACING = 6
     private const val TAB_Z_OFFSET = 10f
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (event.type != RenderGameOverlayEvent.ElementType.PLAYER_LIST) return
         if (!config.enabled.get()) return
-        event.isCanceled = true
+        event.cancel()
 
         if (config.toggleTab) return
 
@@ -109,7 +107,7 @@ object TabListRenderer {
             y - TAB_PADDING,
             screenWidth + totalWidth / 2 + COLUMN_SPACING,
             10 + totalHeight + TAB_PADDING,
-            -0x80000000
+            -0x80000000,
         )
 
         var headerY = y
@@ -119,7 +117,7 @@ object TabListRenderer {
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     headerY.toFloat(),
-                    0xFFFFFF
+                    0xFFFFFF,
                 )
                 headerY += 8 + 1
             }
@@ -134,7 +132,7 @@ object TabListRenderer {
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     footerY.toFloat(),
-                    -0x1
+                    -0x1,
                 )
                 footerY += LINE_HEIGHT
             }
@@ -165,7 +163,7 @@ object TabListRenderer {
                 middleY - TAB_PADDING + 1,
                 middleX + column.getMaxWidth() + TAB_PADDING - 2,
                 middleY + column.size() * LINE_HEIGHT + TAB_PADDING - 2,
-                0x20AAAAAA
+                0x20AAAAAA,
             )
 
             for (tabLine in column.lines) {
@@ -194,14 +192,14 @@ object TabListRenderer {
                         text,
                         middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
-                        0xFFFFFF
+                        0xFFFFFF,
                     )
                 } else {
                     minecraft.fontRendererObj.drawStringWithShadow(
                         text,
                         middleX.toFloat(),
                         middleY.toFloat(),
-                        0xFFFFFF
+                        0xFFFFFF,
                     )
                 }
                 middleY += LINE_HEIGHT

@@ -17,18 +17,17 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import kotlin.math.pow
@@ -575,7 +574,7 @@ enum class HotmData(
 
             if (this.handlePowder()) return
 
-            val entry = entries.firstOrNull { it.guiNamePattern.matches(item.name) } ?: return
+            val entry = entries.firstOrNull { it.guiNamePattern.matches(item.displayName) } ?: return
             entry.slot = this
 
             val lore = item.getLore().takeIf { it.isNotEmpty() } ?: return
@@ -616,8 +615,8 @@ enum class HotmData(
             val item = this.stack ?: return false
 
             val isHeartItem = when {
-                heartItemPattern.matches(item.name) -> true
-                resetItemPattern.matches(item.name) -> false
+                heartItemPattern.matches(item.displayName) -> true
+                resetItemPattern.matches(item.displayName) -> false
                 else -> return false
             }
 
