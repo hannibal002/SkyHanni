@@ -2,19 +2,23 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.entity.EntityLivingBase
 import java.awt.Color
 
 @SkyHanniModule
@@ -26,6 +30,7 @@ object DungeonMobManager {
 
     private val staredInvisible = mutableSetOf<Mob>()
     private val felOnTheGround = mutableSetOf<Mob>()
+    private val felMoving = mutableSetOf<Mob>()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -39,18 +44,6 @@ object DungeonMobManager {
             }
             if (!starredConfig.highlight.get()) {
                 staredInvisible.clear()
-            }
-        }
-        onToggle(
-            fel.highlight,
-            fel.colour,
-        ) {
-            if (fel.highlight.get()) {
-                if (felOnTheGround.isEmpty()) {
-                    MobData.skyblockMobs.forEach(::handleFel)
-                }
-            } else {
-                felOnTheGround.clear()
             }
         }
     }
@@ -72,38 +65,56 @@ object DungeonMobManager {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onEntityMove(event: EntityMoveEvent<EntityLivingBase>) {
+        val mob = event.entity.mob ?: return
+        if (felOnTheGround.remove(mob)) {
+            felMoving.add(mob)
+            if (starredConfig.highlight.get()) {
+                mob.highlight(getStarColor())
+            }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onTick() {
         handleInvisibleStar()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!fel.highlight.get()) return
         if (fel.line) {
+            val color = getFelColor()
             felOnTheGround.filter { it.canBeSeen(30) }.forEach {
                 event.draw3DLine(
                     it.baseEntity.getLorenzVec().add(y = 0.15),
                     event.exactPlayerEyeLocation(),
-                    fel.colour.get().toSpecialColor(),
+                    color,
                     3,
                     true,
                 )
             }
         }
 
-        felOnTheGround.removeIf { mob ->
+        val color = when {
+            fel.highlight.get() -> getFelColor()
+            starredConfig.highlight.get() -> getStarColor()
+            else -> return
+        }
+
+        felOnTheGround.forEach { mob ->
             event.drawWaypointFilled(
                 mob.baseEntity.getLorenzVec().add(-0.5, -0.23, -0.5),
-                fel.colour.get().toSpecialColor(),
+                color,
                 seeThroughBlocks = false,
                 beacon = false,
                 extraSize = -0.2,
                 minimumAlpha = 0.8f,
                 inverseAlphaScale = true,
             )
-            !mob.isInvisible()
         }
     }
+
+    private fun getFelColor() = fel.colour.get().toSpecialColor()
 
     private fun handleStar(mob: Mob) {
         if (!starredConfig.highlight.get()) return
@@ -125,6 +136,12 @@ object DungeonMobManager {
     private fun getStarColor(): Color = starredConfig.colour.get().toSpecialColor()
 
     private fun handleStar0(mob: Mob, colour: Color?) {
+        if (mob.name == "Fels") {
+            if (mob in felMoving) {
+                mob.highlight(colour)
+            }
+            return
+        }
         if (mob.isInvisible()) {
             staredInvisible.add(mob)
             return
@@ -133,14 +150,14 @@ object DungeonMobManager {
     }
 
     private fun handleFel(mob: Mob) {
-        if (!fel.highlight.get()) return
         if (mob.name != "Fels") return
-        if (!mob.isInvisible()) return
+        if (mob in felMoving) return
         felOnTheGround.add(mob)
+        EntityMovementData.addToTrack(mob)
     }
 
     private fun handleFelDespawn(mob: Mob) {
-        if (!fel.highlight.get()) return
         felOnTheGround.remove(mob)
+        felMoving.remove(mob)
     }
 }

@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
-import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -416,7 +415,7 @@ object CustomWardrobe {
         val backButton = createLabeledButton(
             "§aBack",
             onClick = {
-                clickInventorySlot(48)
+                InventoryUtils.clickSlot(48)
                 reset()
                 WardrobeApi.currentPage = null
             },
@@ -424,7 +423,7 @@ object CustomWardrobe {
         val exitButton = createLabeledButton(
             "§cClose",
             onClick = {
-                clickInventorySlot(49)
+                InventoryUtils.clickSlot(49)
                 reset()
                 WardrobeApi.currentPage = null
             },
@@ -613,16 +612,16 @@ object CustomWardrobe {
         if (isInCurrentPage()) {
             if (isEmpty() || locked || waitingForInventoryUpdate) return
             WardrobeApi.currentSlot = if (isCurrentSlot()) null else id
-            clickInventorySlot(inventorySlot)
+            InventoryUtils.clickSlot(inventorySlot)
         } else {
             if (page < wardrobePage) {
                 WardrobeApi.currentPage = wardrobePage - 1
                 waitingForInventoryUpdate = true
-                clickInventorySlot(previousPageSlot)
+                InventoryUtils.clickSlot(previousPageSlot)
             } else if (page > wardrobePage) {
                 WardrobeApi.currentPage = wardrobePage + 1
                 waitingForInventoryUpdate = true
-                clickInventorySlot(nextPageSlot)
+                InventoryUtils.clickSlot(nextPageSlot)
             }
         }
         update()
