@@ -22,6 +22,10 @@ object HypixelCommands {
         send("playtime")
     }
 
+    fun skyblockMenu() {
+        send("sbmenu")
+    }
+
     fun skills() {
         send("skills")
     }
@@ -32,6 +36,11 @@ object HypixelCommands {
 
     fun recipe(itemName: String) {
         send("recipe $itemName")
+    }
+
+    // opens the crafting table
+    fun craft() {
+        send("craft")
     }
 
     fun npcOption(npc: String, answer: String) {
@@ -108,6 +117,10 @@ object HypixelCommands {
 
     fun enderChest(position: Int) {
         send("ec $position")
+    }
+
+    fun partyAccept(player: String) {
+        send("party accept $player")
     }
 
     fun partyWarp() {

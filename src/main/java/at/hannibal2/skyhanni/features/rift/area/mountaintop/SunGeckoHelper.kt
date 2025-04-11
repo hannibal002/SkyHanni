@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -160,7 +159,7 @@ object SunGeckoHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled() || !inTimeChamber) return
 
         updateDisplay()
@@ -243,7 +242,7 @@ object SunGeckoHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
-        for (line in event.full) {
+        for (line in event.new) {
             if (line.startsWith(" Big damage in: §d")) {
                 modifiers.add(Modifiers.TIME_SLICED)
                 timeSliceDuration = TimeUtils.getDuration(line.replace(" Big damage in: §d", ""))
