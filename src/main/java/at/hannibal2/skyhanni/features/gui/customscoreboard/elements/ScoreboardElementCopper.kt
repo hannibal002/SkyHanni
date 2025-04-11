@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import kotlinx.coroutines.Job
 
 // scoreboard
@@ -20,7 +21,7 @@ object ScoreboardElementCopper : ScoreboardElement(), CustomScoreboardNumberTrac
 
     override fun getDisplay(): String? {
         val copper = getCopper()
-        checkDifference(copper.toLong())
+        checkDifference(copper.formatLong())
         val line = formatStringNum(copper) + temporaryChangeDisplay.orEmpty()
         if (informationFilteringConfig.hideEmptyLines && line == "0") return null
 
