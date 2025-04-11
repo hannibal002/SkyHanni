@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import kotlinx.coroutines.Job
 
 // scoreboard
 // scoreboard update event
@@ -14,6 +15,7 @@ object ScoreboardElementMotes : ScoreboardElement(), CustomScoreboardNumberTrack
     override var previousAmount: Long = 0
     override var temporaryChangeDisplay: String? = null
     override val numberColor = "§d"
+    override var currentJob: Job? = null
 
     override fun getDisplay(): String? {
         val motes = getMotes()

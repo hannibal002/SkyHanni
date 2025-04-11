@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSoulflow
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import kotlinx.coroutines.Job
 
 // widget
 // widget update event
@@ -13,6 +14,7 @@ object ScoreboardElementSoulflow : ScoreboardElement(), CustomScoreboardNumberTr
     override var previousAmount: Long = 0
     override var temporaryChangeDisplay: String? = null
     override val numberColor = "§3"
+    override var currentJob: Job? = null
 
     override fun getDisplay(): String? {
         val soulflow = getSoulflow()

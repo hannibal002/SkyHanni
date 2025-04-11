@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumbe
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import kotlinx.coroutines.Job
 
 // internal
 // purse change event (add total purse to event)
@@ -13,6 +14,7 @@ object ScoreboardElementPurse : ScoreboardElement(), CustomScoreboardNumberTrack
     override var previousAmount: Long = PurseApi.currentPurse.toLong()
     override var temporaryChangeDisplay: String? = null
     override val numberColor = "§6"
+    override var currentJob: Job? = null
 
     override fun getDisplay(): String? {
         val currentPurse = PurseApi.currentPurse.toLong()

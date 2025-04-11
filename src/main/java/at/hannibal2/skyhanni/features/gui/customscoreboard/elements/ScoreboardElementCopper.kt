@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import kotlinx.coroutines.Job
 
 // scoreboard
 // scoreboard update event
@@ -15,6 +16,7 @@ object ScoreboardElementCopper : ScoreboardElement(), CustomScoreboardNumberTrac
     override var previousAmount: Long = 0
     override var temporaryChangeDisplay: String? = null
     override val numberColor = "§c"
+    override var currentJob: Job? = null
 
     override fun getDisplay(): String? {
         val copper = getCopper()

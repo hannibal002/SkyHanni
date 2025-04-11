@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardNumbe
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import kotlinx.coroutines.Job
 
 // internal
 // update with bits update event
@@ -15,6 +16,7 @@ object ScoreboardElementBits : ScoreboardElement(), CustomScoreboardNumberTracki
     override var previousAmount: Long = BitsApi.bits.toLong()
     override var temporaryChangeDisplay: String? = null
     override val numberColor = "§b"
+    override var currentJob: Job? = null
 
     override fun getDisplay(): String? {
         val bits = BitsApi.bits.toLong()
