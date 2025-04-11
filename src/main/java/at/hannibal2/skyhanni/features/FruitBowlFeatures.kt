@@ -46,6 +46,7 @@ object FruitBowlFeatures {
     private var namesMissing = emptySet<String>()
     private var inHand = false
     private var display = emptyList<Renderable>()
+    private val FRUIT_BOWL = "FRUIT_BOWL".toInternalName()
 
     private val chatGroup = RepoPattern.group("misc.fruit-bowl")
 
@@ -115,18 +116,14 @@ object FruitBowlFeatures {
 
     private fun updateNamesMissing(): Set<String> {
         val hand = InventoryUtils.getItemInHand() ?: return emptySet()
-        if (hand.getInternalNameOrNull() != "FRUIT_BOWL".toInternalName()) return emptySet()
+        if (hand.getInternalNameOrNull() != FRUIT_BOWL) return emptySet()
 
-        val set = mutableSetOf<String>()
-        for (line in hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) }, amount = 20)) {
-            val matcher = itemMissingNameLinePattern.matcher(line)
-            while (matcher.find()) {
-                val name = matcher.group("name")
-                set.add(name)
+        val lore = hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) }, amount = 20)
+        return lore.mapNotNull {
+            itemMissingNameLinePattern.matchMatcher(it) {
+                group("name")
             }
-        }
-
-        return set
+        }.toSet()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -227,7 +224,7 @@ object FruitBowlFeatures {
     fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(canColor, canNotColor) {
-                if (config.playerHighlighter) {
+                if (playerHighlighter) {
                     updateAllPlayers()
                 }
             }
