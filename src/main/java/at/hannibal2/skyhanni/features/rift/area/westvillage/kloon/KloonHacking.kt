@@ -103,7 +103,7 @@ object KloonHacking {
             }
         }
         if (inColorInventory) {
-            if (!config.colour) return
+            if (!config.color) return
             val targetColor = nearestTerminal ?: getNearestTerminal()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.stack.getLore().any { it.contains(targetColor?.name.orEmpty()) }) {
@@ -170,7 +170,11 @@ object KloonHacking {
     }
 
     @HandleEvent
+    @Suppress("AvoidBritishSpelling")
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.westVillageConfig", "rift.area.westVillage")
+
+        val basePath = "rift.area.westVillage"
+        event.move(82, "$basePath.hacking.colour", "$basePath.hacking.color")
     }
 }
