@@ -24,7 +24,7 @@ object GuiChatHook {
         if (!this::replacement.isInitialized) return
 
         // Initialise new component
-        val newComponent = replacement.chatComponentText_TextValue.asComponent {
+        val newComponent = replacement.unformattedTextForChat.asComponent {
             chatStyle = replacement.chatStyle
             chatStyle.chatHoverEvent = hoverEvent
         }
