@@ -180,12 +180,12 @@ object CakeCounterFeatures {
         if (cakesEatenEntityId == null || (soulsStandExists && soulsFoundEntityId == null)) return
 
         val noCakeDiff = cakesDifference == null
-        val noSOulDiff = soulsDifference == null
+        val noSoulDiff = soulsDifference == null
 
         val shouldReturn = when (config.offlineStatsMode) {
             OfflineStatsMode.CAKES_ONLY -> noCakeDiff
-            OfflineStatsMode.SOULS_ONLY -> noSOulDiff
-            OfflineStatsMode.BOTH -> noCakeDiff && noSOulDiff
+            OfflineStatsMode.SOULS_ONLY -> noSoulDiff
+            OfflineStatsMode.BOTH -> noCakeDiff && noSoulDiff
             OfflineStatsMode.DISABLED -> true
         }
 
