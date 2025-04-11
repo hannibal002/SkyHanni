@@ -216,7 +216,7 @@ object CakeCounterFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent) {
-        if (event.message == "§eYou found a §r§dCake Soul§r§e!§r") {
+        if (event.message == "§eYou found a §r§dCake Soul§r§e!") {
             lastSoulFoundBySelf = SimpleTimeMark.now()
         }
 
