@@ -292,6 +292,9 @@ class ProfileSpecificStorage {
         @Expose
         var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
+        @Expose
+        var hotChocolateMixinExpiry = farPast()
+
         class HitmanStatsStorage {
             @Expose
             var availableHitmanEggs: Int = 0
@@ -840,6 +843,9 @@ class ProfileSpecificStorage {
         @Expose
         var museumMilestone: Int? = null
     }
+
+    @Expose
+    var godPotExpiry: SimpleTimeMark = farPast()
 
     @Expose
     var fairySouls: FairySoulsStorage = FairySoulsStorage()
