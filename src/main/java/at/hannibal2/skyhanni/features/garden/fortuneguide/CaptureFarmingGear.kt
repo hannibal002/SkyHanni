@@ -136,7 +136,7 @@ object CaptureFarmingGear {
             val split = armor.getInternalName().asString().split("_")
             if (split.first() in farmingSets) {
                 val category = armor.getItemCategoryOrNull() ?: continue
-                FarmingItems.getFromItemCategoryOne(category)?.setItem(armor)
+                FarmingItemType.getFromItemCategoryOne(category)?.setItem(armor)
             }
         }
 
@@ -311,49 +311,49 @@ object CaptureFarmingGear {
 
     private fun pets(
         items: Map<Int, ItemStack>,
-        outdatedItems: MutableMap<FarmingItems, Boolean>,
+        outdatedItems: MutableMap<FarmingItemType, Boolean>,
     ) {
         // If they've 2 of same pet, one will be overwritten
 
         // setting to current saved level -1 to stop later pages saving low rarity pets
-        var highestElephantRarity = (FarmingItems.ELEPHANT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestMooshroomRarity = (FarmingItems.MOOSHROOM_COW.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestRabbitRarity = (FarmingItems.RABBIT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestBeeRarity = (FarmingItems.BEE.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestSlugRarity = (FarmingItems.SLUG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
-        var highestHedgehogRarity = (FarmingItems.HEDGEHOG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestElephantRarity = (FarmingItemType.ELEPHANT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestMooshroomRarity = (FarmingItemType.MOOSHROOM_COW.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestRabbitRarity = (FarmingItemType.RABBIT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestBeeRarity = (FarmingItemType.BEE.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestSlugRarity = (FarmingItemType.SLUG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestHedgehogRarity = (FarmingItemType.HEDGEHOG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
 
         for ((_, item) in items) {
             if (item.getItemCategoryOrNull() != ItemCategory.PET) continue
             val (name, rarity) = item.getInternalName().asString().split(";")
             if (name == "ELEPHANT" && rarity.toInt() > highestElephantRarity) {
-                FarmingItems.ELEPHANT.setItem(item)
-                outdatedItems[FarmingItems.ELEPHANT] = false
+                FarmingItemType.ELEPHANT.setItem(item)
+                outdatedItems[FarmingItemType.ELEPHANT] = false
                 highestElephantRarity = rarity.toInt()
             }
             if (name == "MOOSHROOM_COW" && rarity.toInt() > highestMooshroomRarity) {
-                FarmingItems.MOOSHROOM_COW.setItem(item)
-                outdatedItems[FarmingItems.MOOSHROOM_COW] = false
+                FarmingItemType.MOOSHROOM_COW.setItem(item)
+                outdatedItems[FarmingItemType.MOOSHROOM_COW] = false
                 highestMooshroomRarity = rarity.toInt()
             }
             if (name == "RABBIT" && rarity.toInt() > highestRabbitRarity) {
-                FarmingItems.RABBIT.setItem(item)
-                outdatedItems[FarmingItems.RABBIT] = false
+                FarmingItemType.RABBIT.setItem(item)
+                outdatedItems[FarmingItemType.RABBIT] = false
                 highestRabbitRarity = rarity.toInt()
             }
             if (name == "BEE" && rarity.toInt() > highestBeeRarity) {
-                FarmingItems.BEE.setItem(item)
-                outdatedItems[FarmingItems.BEE] = false
+                FarmingItemType.BEE.setItem(item)
+                outdatedItems[FarmingItemType.BEE] = false
                 highestBeeRarity = rarity.toInt()
             }
             if (name == "SLUG" && rarity.toInt() > highestSlugRarity) {
-                FarmingItems.SLUG.setItem(item)
-                outdatedItems[FarmingItems.SLUG] = false
+                FarmingItemType.SLUG.setItem(item)
+                outdatedItems[FarmingItemType.SLUG] = false
                 highestSlugRarity = rarity.toInt()
             }
             if (name == "HEDGEHOG" && rarity.toInt() > highestHedgehogRarity) {
-                FarmingItems.HEDGEHOG.setItem(item)
-                outdatedItems[FarmingItems.HEDGEHOG] = false
+                FarmingItemType.HEDGEHOG.setItem(item)
+                outdatedItems[FarmingItemType.HEDGEHOG] = false
                 highestHedgehogRarity = rarity.toInt()
             }
         }
@@ -361,13 +361,13 @@ object CaptureFarmingGear {
 
     private fun equipmentAndStats(
         items: Map<Int, ItemStack>,
-        outdatedItems: MutableMap<FarmingItems, Boolean>,
+        outdatedItems: MutableMap<FarmingItemType, Boolean>,
     ) {
         for ((_, slot) in items) {
             val split = slot.getInternalName().asString().split("_")
             val category = slot.getItemCategoryOrNull() ?: continue
             if (split.first() == "LOTUS") {
-                val item = FarmingItems.getFromItemCategoryOne(category) ?: continue
+                val item = FarmingItemType.getFromItemCategoryOne(category) ?: continue
                 item.setItem(slot)
                 outdatedItems[item] = false
                 FarmingFortuneDisplay.loadFortuneLineData(slot, 0.0)
@@ -402,7 +402,7 @@ object CaptureFarmingGear {
         }
         lotusUpgradePattern.matchMatcher(msg) {
             val piece = group("piece").uppercase()
-            for (item in FarmingItems.entries) {
+            for (item in FarmingItemType.entries) {
                 if (item.name == piece) {
                     outdatedItems[item] = true
                 }
@@ -411,7 +411,7 @@ object CaptureFarmingGear {
         }
         petLevelUpPattern.matchMatcher(msg) {
             val pet = group("pet").uppercase().replace("✦", "").trim().replace(" ", "_")
-            for (item in FarmingItems.entries) {
+            for (item in FarmingItemType.entries) {
                 if (item.name.contains(pet)) {
                     outdatedItems[item] = true
                 }
