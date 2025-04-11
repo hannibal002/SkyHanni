@@ -147,7 +147,7 @@ object DungeonSpiritLeapOverlay {
                 smoothness = 10,
                 padding = 5,
             ),
-            onClick = { InventoryUtils.clickSlot(playerStackInfo.slotNumber) },
+            onLeftClick = { InventoryUtils.clickSlot(playerStackInfo.slotNumber) },
         )
     }
 
