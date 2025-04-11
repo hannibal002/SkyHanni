@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.effect.EffectApi.NonGodPotEffect
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent
