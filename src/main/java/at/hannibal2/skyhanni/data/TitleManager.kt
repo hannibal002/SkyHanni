@@ -103,6 +103,7 @@ object TitleManager {
         override fun getSubtitleText(): String? = formattedSubtitleText?.formatCountdownString()
 
         override fun start() {
+            if (isActive) return
             isActive = true
             virtualEndTime = SimpleTimeMark.now() + countdownDuration
             endTime = virtualEndTime + loomInterval
