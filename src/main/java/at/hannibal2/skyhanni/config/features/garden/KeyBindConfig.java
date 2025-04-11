@@ -13,7 +13,7 @@ import org.lwjgl.input.Keyboard;
 
 public class KeyBindConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or Daedalus Axe in the hand.")
+    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool in your hand.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -52,7 +51,7 @@ object InfernoMinionFeatures {
         if (!inInventory) return
 
         val containsFuel =
-            NeuInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.name) in fuelItemIds
+            NeuInternalName.fromItemNameOrNull(event.container.getSlot(19).stack.displayName) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot?.slotNumber == 19 || event.slot?.slotNumber == 53) {
@@ -66,7 +65,7 @@ object InfernoMinionFeatures {
         if (!config.infernoFuelBlocker) return
         if (!inInventory) return
 
-        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.name) in fuelItemIds
+        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.displayName) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot.slotNumber == 19) {

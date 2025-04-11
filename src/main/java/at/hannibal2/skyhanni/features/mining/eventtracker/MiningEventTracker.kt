@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
@@ -80,7 +79,7 @@ object MiningEventTracker {
     val apiError get() = apiErrorCount > 0
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         eventEndTime = SimpleTimeMark.farPast()
         lastSentEvent = null
     }
@@ -177,7 +176,11 @@ object MiningEventTracker {
 
     private fun sendData(json: String) {
         val response = try {
-            ApiUtils.postJSON("https://api.soopy.dev/skyblock/chevents/set", json)
+            ApiUtils.postJSON(
+                "https://api.soopy.dev/skyblock/chevents/set",
+                json,
+                apiName = "Soopy Mining Events",
+            )
         } catch (e: IOException) {
             if (LorenzUtils.debug) {
                 ErrorManager.logErrorWithData(
@@ -211,7 +214,7 @@ object MiningEventTracker {
         canRequestAt = SimpleTimeMark.now() + defaultCooldown
         SkyHanniMod.coroutineScope.launch {
             val data = try {
-                ApiUtils.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
+                ApiUtils.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get", apiName = "Soopy Mining Events")
             } catch (e: Exception) {
                 apiErrorCount++
                 canRequestAt = SimpleTimeMark.now() + 20.minutes

@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
@@ -27,6 +25,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
@@ -63,7 +63,7 @@ object SackDisplay {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.stack.getLore()
             if (lore.any { it.startsWith("§7Stored: §a") }) {
-                slot highlight LorenzColor.RED
+                slot.highlight(event.context, LorenzColor.RED)
             }
         }
     }
@@ -108,7 +108,7 @@ object SackDisplay {
                     // TODO move replace into itemName
                     val nameText = Renderable.optionalLink(
                         itemName.replace("§k", ""),
-                        onClick = {
+                        onLeftClick = {
                             if (!SackApi.isTrophySack) {
                                 BazaarApi.searchForBazaarItem(itemName)
                             }
@@ -249,7 +249,7 @@ object SackDisplay {
                     add(
                         Renderable.optionalLink(
                             name,
-                            onClick = {},
+                            onLeftClick = {},
                             highlightsOnHoverSlots = listOf(rune.slot),
                         ),
                     )
@@ -280,7 +280,7 @@ object SackDisplay {
                     add(
                         Renderable.optionalLink(
                             name,
-                            onClick = {
+                            onLeftClick = {
                                 BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),

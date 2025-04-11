@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
@@ -43,7 +42,7 @@ class RenderDisplayHelper(
         private var currentlyVisibleDisplays = emptyList<RenderDisplayHelper>()
 
         @HandleEvent
-        fun onTick(event: SkyHanniTickEvent) {
+        fun onTick() {
             currentlyVisibleDisplays = allDisplays.filter { it.checkCondition() }
         }
 
@@ -75,9 +74,11 @@ class RenderDisplayHelper(
         false
     }
 
-    private fun render() = try {
-        onRender()
-    } catch (e: Exception) {
-        ErrorManager.logErrorWithData(e, "Failed to render a display")
+    private fun render() {
+        try {
+            onRender()
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Failed to render a display")
+        }
     }
 }

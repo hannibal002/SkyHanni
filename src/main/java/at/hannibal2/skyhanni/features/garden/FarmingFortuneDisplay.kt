@@ -6,18 +6,16 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -29,10 +27,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -205,27 +204,26 @@ object FarmingFortuneDisplay {
         if (config.hideMissingFortuneWarnings) return@buildList
         if (cropFortune) {
             add(
-
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     if (config.compactFormat) "§cMissing FF!" else "§cMissing Crop Fortune! Enable The Stats Widget",
-                    listOf(
+                    tips = listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing latest Crop Fortune.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.widget()
                     },
                 ),
             )
         } else {
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     if (config.compactFormat) "§cMissing FF!" else "§cNo Farming Fortune Found! Enable The Stats Widget",
-                    listOf(
+                    tips = listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing the Farming Fortune stat.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.widget()
                     },
                 ),
@@ -266,7 +264,7 @@ object FarmingFortuneDisplay {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         display = emptyList()
         gardenJoinTime = SimpleTimeMark.now()
         firstBrokenCropTime = SimpleTimeMark.farPast()
@@ -314,7 +312,7 @@ object FarmingFortuneDisplay {
 
     fun getTurboCropFortune(tool: ItemStack?, cropType: CropType?): Double {
         val crop = cropType ?: return 0.0
-        return tool?.getEnchantments()?.get(crop.getTurboCrop())?.let { it * 5.0 } ?: 0.0
+        return tool?.getHypixelEnchantments()?.get(crop.getTurboCrop())?.let { it * 5.0 } ?: 0.0
     }
 
     fun getCollectionFortune(tool: ItemStack?): Double {
@@ -330,7 +328,7 @@ object FarmingFortuneDisplay {
 
     fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {
         if (cropType == null) return 0.0
-        val dedicationLevel = tool?.getEnchantments()?.get("dedication") ?: 0
+        val dedicationLevel = tool?.getHypixelEnchantments()?.get("dedication") ?: 0
         val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
         val cropMilestone = GardenCropMilestones.getTierForCropCount(
             cropType.getCounter(), cropType,
@@ -338,10 +336,10 @@ object FarmingFortuneDisplay {
         return dedicationMultiplier * cropMilestone
     }
 
-    fun getSunderFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("sunder") ?: 0) * 12.5
-    fun getHarvestingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("harvesting") ?: 0) * 12.5
-    fun getCultivatingFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("cultivating") ?: 0) * 2.0
-    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getEnchantments()?.get("pesterminator") ?: 0) * 2.0
+    fun getSunderFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("sunder") ?: 0) * 12.5
+    fun getHarvestingFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("harvesting") ?: 0) * 12.5
+    fun getCultivatingFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("cultivating") ?: 0) * 2.0
+    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("pesterminator") ?: 0) * 2.0
 
     fun getAbilityFortune(item: ItemStack?) = item?.let {
         getAbilityFortune(it.getInternalName(), it.getLore())
