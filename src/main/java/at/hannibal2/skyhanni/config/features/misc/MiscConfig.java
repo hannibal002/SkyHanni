@@ -13,10 +13,12 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,6 +131,11 @@ public class MiscConfig {
     @Accordion
     public EnchantedClockConfig enchantedClock = new EnchantedClockConfig();
 
+    @ConfigOption(name = "Century Party Invitation", desc = "Features for the Century Party Invitation")
+    @Accordion
+    @Expose
+    public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
+
     @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
@@ -176,15 +183,17 @@ public class MiscConfig {
     public boolean crashOnDeath = false;
 
     @Expose
-    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\nExcept in Catacombs & Rift.\nBest used with the option below.")
-    @SearchTag("skyblockxp")
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\n" +
+        "Except in Catacombs & Rift.\nBest used with the option below.")
+    @SearchTag("skyblockxp skyblocklevel level lvl")
     @ConfigEditorBoolean
     @FeatureToggle
     // TODO rename to skyblockXPBar
     public boolean skyblockXpBar = false;
 
     @Expose
-    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventories that would use your XP.")
+    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventory lore that would use your XP.\n" +
+        "E.g. when hovering over the anvil combine button.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean xpInInventory = true;
@@ -343,10 +352,10 @@ public class MiscConfig {
     public Property<Boolean> replaceRomanNumerals = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
+    @ConfigOption(name = "Charge Bottle Notification", desc = "Send a message when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean thunderBottleNotification = true;
+    public boolean chargeBottleNotification = true;
 
     @Expose
     @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
@@ -371,6 +380,17 @@ public class MiscConfig {
     public boolean maintainGameVolume = false;
 
     @Expose
+    @ConfigOption(name = "NEU Soul Path Find", desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean neuSoulsPathFind = true;
+
+    @Expose
+    @ConfigOption(name = "Fast Fairy Souls", desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island. §eDoes not require NEU. ")
+    @ConfigEditorBoolean
+    public boolean fastFairySouls = false;
+
+    @Expose
     @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -380,6 +400,7 @@ public class MiscConfig {
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to userLuck
     public boolean userluckEnabled = true;
 
     @Expose
@@ -390,4 +411,17 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnAboutPcTimeOffset = true;
+
+    @Expose
+    @ConfigOption(name = "Transparent Tooltips", desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!")
+    @ConfigEditorBoolean
+    public boolean transparentTooltips = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Abiphone Hotkey",
+        desc = "Answer incoming abiphone calls with a hotkey."
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int abiphoneAcceptKey = Keyboard.KEY_NONE;
 }

@@ -7,14 +7,14 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
@@ -24,9 +24,13 @@ import kotlin.time.Duration.Companion.seconds
 object JyrreTimer {
 
     private val config get() = SkyHanniMod.feature.event.winter.jyrreTimer
+
+    /**
+     * REGEX-TEST: §7You consumed a §r§6Refined Bottle of Jyrre §r§7and gained §r§b+300✎ Intelligence §r§7for §r§a60m§r§7!
+     */
     private val drankBottlePattern by RepoPattern.pattern(
         "event.winter.drank.jyrre",
-        "§aYou drank a §r§6Refined Bottle of Jyrre §r§aand gained §r§b\\+300✎ Intelligence §r§afor §r§b60 minutes§r§a!",
+        "§7You consumed a §r§6Refined Bottle of Jyrre §r§7and gained §r§b\\+300✎ Intelligence §r§7for §r§a60m§r§7!",
     )
     private var display: Renderable? = null
     private var duration = 0.seconds

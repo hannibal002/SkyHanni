@@ -197,10 +197,14 @@ object ScoreboardPattern {
         "§3§lSolo",
     )
 
+    /**
+     * REGEX-TEST: §a[H] §6Eisengolem §7[Lv48]
+     * REGEX-TEST: §e[M] §b04032006 §a7,361§c❤
+     */
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSB.pattern(
         "teammates",
-        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
+        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§(?<color>.))*(?<health>[\\w,.]+)(?:§.)*.?)",
     )
 
     /**
@@ -637,10 +641,20 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §d5th Anniversary§f 167:59:54
+     * REGEX-TEST: §bCentury Raffle§f 124:00:00
      */
     val anniversaryPattern by miscSB.pattern(
         "anniversary",
-        "§d\\d+(?:st|nd|rd|th) Anniversary§f (?:\\d|:)+",
+        "(?:§d\\d+(?:st|nd|rd|th) Anniversary|§bCentury Raffle)§f (?:\\d|:)+",
+    )
+
+    /**
+     * REGEX-TEST: §bCentury Raffle§f 124:00:00
+     * To fix custom scoreboard erroring every second
+     */
+    val tempRafflePattern by miscSB.pattern(
+        "tempfix",
+        "§bCentury Raffle§f (?:\\d|:)+",
     )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line

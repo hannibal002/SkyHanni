@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -14,15 +15,15 @@ import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -30,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.math.ceil
@@ -43,30 +45,34 @@ object SlayerRngMeterDisplay {
     private val patternGroup = RepoPattern.group("slayer.rngmeter")
     private val inventoryNamePattern by patternGroup.pattern(
         "inventoryname",
-        "(?<name>.*) RNG Meter"
+        "(?<name>.*) RNG Meter",
     )
     private val slayerInventoryNamePattern by patternGroup.pattern(
         "inventoryname.slayer",
-        "Slayer"
+        "Slayer",
     )
     private val updatePattern by patternGroup.pattern(
         "update",
-        " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP"
+        " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP",
     )
     private val changedItemPattern by patternGroup.pattern(
         "changeditem",
-        "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
+        "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!",
     )
+
     /**
      * REGEX-TEST: §aEnchanted Book (§d§lDuplex I§a)
      */
     private val bookFormatPattern by patternGroup.pattern(
         "book.format",
-        "§aEnchanted Book \\((?<name>.*)§a\\)"
+        "§aEnchanted Book \\((?<name>.*)§a\\)",
     )
 
     private var display = emptyList<Renderable>()
     private var lastItemDroppedTime = SimpleTimeMark.farPast()
+    private var lastRngMeterUpdate = SimpleTimeMark.farPast()
+    private var timesUpdatedTotal = 0
+    private var timesUpdatedSinceLastDrop = 0
 
     var rngScore = mapOf<String, Map<NeuInternalName, Long>>()
 
@@ -98,6 +104,8 @@ object SlayerRngMeterDisplay {
         val currentMeter = updatePattern.matchMatcher(event.message) {
             group("exp").formatLong()
         } ?: return
+        timesUpdatedTotal++
+        timesUpdatedSinceLastDrop++
 
         val storage = getStorage() ?: return
         val old = storage.currentMeter
@@ -108,7 +116,7 @@ object SlayerRngMeterDisplay {
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
                 ChatUtils.userError("No Slayer RNG Meter Item selected!")
-                LorenzUtils.sendTitle("§cNo RNG Meter Item!", 3.seconds)
+                TitleManager.sendTitle("§cNo RNG Meter Item!")
             }
             var blockChat = config.hideChat && hasItemSelected
             val diff = currentMeter - old
@@ -122,14 +130,33 @@ object SlayerRngMeterDisplay {
 
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
-                val percentage = LorenzUtils.formatPercentage(rawPercentage)
+                val percentage = rawPercentage.formatPercentage()
+                if (storage.goalNeeded == -1L) {
+                    ErrorManager.logErrorStateWithData(
+                        "Error Calculating Slayer RNG Meter",
+                        "gaol needed is -1, this should never be the case!",
+                        "goalNeeded" to storage.goalNeeded,
+                        "currentMeter" to storage.currentMeter,
+                        "gainPerBoss" to storage.gainPerBoss,
+                        "itemGoal" to storage.itemGoal,
+                        "rawPercentage" to rawPercentage,
+                        "percentage" to percentage,
+                        "old" to old,
+                        "lastItemDroppedTime" to lastItemDroppedTime,
+                        "lastRngMeterUpdate" to lastRngMeterUpdate,
+                        "timesUpdatedTotal" to timesUpdatedTotal,
+                        "timesUpdatedSinceLastDrop" to timesUpdatedSinceLastDrop,
+                    )
+                }
                 ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/$to§7)")
                 lastItemDroppedTime = SimpleTimeMark.now()
+                timesUpdatedSinceLastDrop = 0
             }
             if (blockChat) {
                 event.blockedReason = "slayer_rng_meter"
             }
         }
+        lastRngMeterUpdate = SimpleTimeMark.farPast()
         update()
     }
 
@@ -156,8 +183,7 @@ object SlayerRngMeterDisplay {
 
         if (name != getCurrentSlayer()) return
 
-        val internalName = event.inventoryItems.values
-            .find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
+        val internalName = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
         setNewGoal(internalName?.getInternalName())
     }
 
@@ -183,14 +209,18 @@ object SlayerRngMeterDisplay {
             storage.itemGoal = ""
             storage.goalNeeded = -1
         } else {
-            storage.itemGoal = internalName.itemName
-            storage.goalNeeded = rngScore[getCurrentSlayer()]?.get(internalName)
-                ?: ErrorManager.skyHanniError(
-                    "RNG Meter goal setting failed",
+            storage.itemGoal = internalName.repoItemName
+            val currentSlayer = getCurrentSlayer()
+            storage.goalNeeded = rngScore[currentSlayer]?.get(internalName) ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Failed reading RNG Meter goal needed amount",
+                    "rngScore does not contain current slayer and current item data",
                     "internalName" to internalName,
-                    "currentSlayer" to getCurrentSlayer(),
-                    "repo" to rngScore
+                    "currentSlayer" to currentSlayer,
+                    "rngScore" to rngScore,
                 )
+                -1
+            }
         }
         update()
     }
@@ -204,21 +234,18 @@ object SlayerRngMeterDisplay {
         display = listOf(makeLink(drawDisplay()))
     }
 
-    private fun makeLink(text: String) =
-        Renderable.clickAndHover(
-            text, listOf("§eClick to open RNG Meter Inventory."),
-            onClick = {
-                HypixelCommands.showRng("slayer", SlayerApi.activeSlayer?.rngName)
-            },
-        )
+    private fun makeLink(text: String) = Renderable.clickable(
+        text,
+        tips = listOf("§eClick to open RNG Meter Inventory."),
+        onLeftClick = {
+            HypixelCommands.showRng("slayer", SlayerApi.activeSlayer?.rngName)
+        },
+    )
 
     fun drawDisplay(): String {
         val storage = getStorage() ?: return ""
 
-        if (SlayerApi.latestSlayerCategory.let {
-                it.endsWith(" I") || it.endsWith(" II")
-            }
-        ) {
+        if (SlayerApi.latestSlayerCategory.let { it.endsWith(" I") || it.endsWith(" II") }) {
             return ""
         }
 

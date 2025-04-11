@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -16,9 +17,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.RiftApi.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getLowerItems
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -34,6 +33,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -112,15 +113,14 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (bypassActive()) return
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
-        val chestName = chest.getInventoryName()
+        val chest = event.container as ContainerChest
+        val chestName = InventoryUtils.openInventoryName()
 
         for ((slot, stack) in chest.getLowerItems()) {
             if (hide(chestName, stack)) {
-                slot highlight LorenzColor.DARK_GRAY.addOpacity(config.opacity)
+                slot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.opacity))
             } else if (showGreenLine && config.itemsGreenLine) {
-                slot drawBorder LorenzColor.GREEN.addOpacity(200)
+                slot.drawBorder(LorenzColor.GREEN.addOpacity(200))
             }
         }
     }
@@ -132,7 +132,7 @@ object HideNotClickableItems {
 
         val guiChest = Minecraft.getMinecraft().currentScreen
         if (guiChest !is GuiChest) return
-        val chestName = (guiChest.inventorySlots as ContainerChest).getInventoryName()
+        val chestName = InventoryUtils.openInventoryName()
 
         val stack = event.itemStack
         if (InventoryUtils.getItemsInOpenChest().map { it.stack }.contains(stack)) return
@@ -199,7 +199,7 @@ object HideNotClickableItems {
             hideSackOfSacks(chestName, stack) -> true
             hideFishingBag(chestName, stack) -> true
             hidePotionBag(chestName, stack) -> true
-            hidePrivateIslandChest(chestName, stack) -> true
+            hidePrivateIslandChest(stack) -> true
             hideAttributeFusion(chestName, stack) -> true
             hideYourEquipment(chestName, stack) -> true
             hideComposter(chestName, stack) -> true
@@ -338,11 +338,9 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hidePrivateIslandChest(chestName: String, stack: ItemStack): Boolean {
-        if (chestName != "Chest" && chestName != "Large Chest") return false
-
-        // TODO make check if player is on private island
-
+    private fun hidePrivateIslandChest(stack: ItemStack): Boolean {
+        if (!InventoryUtils.isInNormalChest()) return false
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return false
         if (!stack.isSoulBound()) return false
 
         hideReason = "This item cannot be stored into a chest!"

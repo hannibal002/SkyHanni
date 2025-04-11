@@ -8,17 +8,17 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.remainingClicksPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -61,7 +61,7 @@ object SuperpairDataDisplay {
             // Render here so they can move it around.
             config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
         }
-        if (ExperimentationTableApi.getCurrentExperiment() == null) return
+        if (ExperimentationTableApi.currentExperiment == null) return
 
         if (display.isEmpty()) display = drawDisplay()
 
@@ -71,9 +71,9 @@ object SuperpairDataDisplay {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-        if (ExperimentationTableApi.getCurrentExperiment() == null) return
+        if (ExperimentationTableApi.currentExperiment == null) return
 
-        val currentExperiment = ExperimentationTableApi.getCurrentExperiment() ?: return
+        val currentExperiment = ExperimentationTableApi.currentExperiment ?: return
 
         val item = event.item ?: return
         if (isOutOfBounds(event.slotId, currentExperiment) || item.displayName.removeColor() == "?") return
@@ -138,8 +138,6 @@ object SuperpairDataDisplay {
             hasFoundMatch(items, item) -> handleFoundMatch(items, item)
             else -> handleNormalReward(item)
         }
-
-        println(found)
     }
 
     private fun handleInstantFind(items: MutableMap<Int, SuperpairItem>, item: SuperpairItem, uncovered: Int) {
@@ -219,7 +217,7 @@ object SuperpairDataDisplay {
     }
 
     private fun drawDisplay() = buildList {
-        val currentExperiment = ExperimentationTableApi.getCurrentExperiment() ?: return emptyList<String>()
+        val currentExperiment = ExperimentationTableApi.currentExperiment ?: return emptyList<String>()
 
         add("§6Superpair Experimentation Data")
         add("")

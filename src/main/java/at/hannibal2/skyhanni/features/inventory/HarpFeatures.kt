@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -73,7 +75,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.inventorySlots.windowId, 2, 3)
+            clickInventorySlot(37 + index, chest.inventorySlots.windowId, 2, 3)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -99,7 +101,7 @@ object HarpFeatures {
             openTime = SimpleTimeMark.now()
         }
         if (config.guiScale && (isMenuGui(event.inventoryName) || isHarpGui(event.inventoryName))) {
-            setGUIScale()
+            setGuiScale()
         }
     }
 
@@ -120,30 +122,37 @@ object HarpFeatures {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!config.guiScale) return
-        unSetGUIScale()
+        unSetGuiScale()
     }
 
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         if (!config.guiScale) return
-        unSetGUIScale()
+        unSetGuiScale()
+
+    }
+
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (!config.guiScale) return
+        unSetGuiScale()
     }
 
     private var guiSetting: Int = 0
-    private var isGUIScaled = false
+    private var isGuiScaled = false
 
-    private fun setGUIScale() {
+    private fun setGuiScale() {
         val gameSettings = Minecraft.getMinecraft().gameSettings
         guiSetting = gameSettings.guiScale
         gameSettings.guiScale = 0
-        isGUIScaled = true
+        isGuiScaled = true
         updateScale()
     }
 
-    private fun unSetGUIScale() {
-        if (!isGUIScaled) return
+    private fun unSetGuiScale() {
+        if (!isGuiScaled) return
         Minecraft.getMinecraft().gameSettings.guiScale = guiSetting
-        isGUIScaled = false
+        isGuiScaled = false
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -168,7 +177,7 @@ object HarpFeatures {
         }.takeIf { it != -1 }?.let {
             val clickType = event.clickType?.id ?: return
             event.cancel()
-            InventoryUtils.clickSlot(it, event.container.windowId, event.clickedButton, clickType)
+            clickInventorySlot(it, event.container.windowId, event.clickedButton, clickType)
         }
     }
 
