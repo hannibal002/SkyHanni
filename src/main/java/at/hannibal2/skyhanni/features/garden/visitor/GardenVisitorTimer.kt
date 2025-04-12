@@ -34,7 +34,7 @@ import kotlin.time.toDuration
 @SkyHanniModule
 object GardenVisitorTimer {
 
-    private val config get() = GardenApi.config.visitors.timer
+    private val config get() = VisitorApi.config.timer
 
     /**
      * REGEX-TEST:  Next Visitor: §r§b11m
