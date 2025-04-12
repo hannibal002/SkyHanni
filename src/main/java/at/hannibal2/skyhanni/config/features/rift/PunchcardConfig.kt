@@ -32,10 +32,11 @@ class PunchcardConfig {
     @ConfigEditorBoolean
     var compact: Property<Boolean> = Property.of(false)
 
+    // TODO rename to reverseGui
     @Expose
     @ConfigOption(name = "Countdown Overlay", desc = "Shows the amount of remaining players in the overlay.")
     @ConfigEditorBoolean
-    var reverseGui: Property<Boolean> = Property.of(false)
+    var reverseGUI: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Only punched players", desc = "Highlights only punched players instead.")

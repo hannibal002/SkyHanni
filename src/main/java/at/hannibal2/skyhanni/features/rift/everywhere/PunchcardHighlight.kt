@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -103,7 +102,7 @@ object PunchcardHighlight {
         ConditionalUtils.onToggle(
             config.gui,
             config.compact,
-            config.reverseGui,
+            config.reverseGUI,
         ) {
             display = drawDisplay()
         }
@@ -226,7 +225,7 @@ object PunchcardHighlight {
     private fun drawDisplay(): Renderable {
         var string = ""
         if (!config.compact.get()) string += "Punchcard Artifact: "
-        string += "§d" + if (!config.reverseGui.get()) playerList.size
+        string += "§d" + if (!config.reverseGUI.get()) playerList.size
         else 20 - playerList.size
 
         return Renderable.horizontalContainer(
@@ -247,10 +246,5 @@ object PunchcardHighlight {
         for (player in MobData.players.filter { (reverse && it.name in playerList) || (!reverse && it.name !in playerList) }) {
             colorPlayer(player.baseEntity)
         }
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(65656, "rift.punchcard.reverseGUI", "rift.punchcard.reverseGui")
     }
 }
