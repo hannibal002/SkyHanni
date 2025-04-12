@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.collection
 
+import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import java.util.Collections
 import java.util.EnumMap
@@ -62,6 +63,9 @@ object CollectionUtils {
 
     fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
         this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
+
+    fun <K> MutableMap<K, MinMaxNumber>.addOrPut(key: K, number: MinMaxNumber): MinMaxNumber =
+        this.merge(key, number, MinMaxNumber::plus)!! // Never returns null since "plus" can't return null
 
     fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0

@@ -1,0 +1,180 @@
+package at.hannibal2.skyhanni.features.inventory.sacks
+
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.SackApi
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemPriceSource
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.MinMaxNumber
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+
+// shows the sack items and price in sacks while not in the sacks
+@SkyHanniModule
+object OutsideSackValue {
+    private val config get() = SkyHanniMod.feature.inventory.outsideSackValue
+
+    private var display = listOf<Renderable>()
+    private var advanced = false
+
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { LorenzUtils.inSkyBlock && config.enabled && !SackApi.inventory.isInside() },
+            onRender = {
+                config.position.renderRenderables(display, posLabel = "Outside Sacks Value")
+            },
+        )
+    }
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (event.repeatSeconds(5)) {
+            update()
+        }
+    }
+
+    @HandleEvent(SackChangeEvent::class)
+    fun onSackChange() {
+        update()
+    }
+
+    @HandleEvent(InventoryOpenEvent::class)
+    fun onInventoryOpen() {
+        if (advanced) {
+            advanced = false
+            update()
+        }
+    }
+
+    @HandleEvent(ProfileJoinEvent::class)
+    fun onProfileJoin() {
+        update()
+    }
+
+    private fun update() {
+        display = if (advanced) {
+            createAdvancedDisplay()
+        } else {
+            createSimpleDisplay()
+        }
+    }
+
+    private fun createAdvancedDisplay() = buildList {
+        val (label, data) = calculateData()
+        add(
+            Renderable.clickable(
+                Renderable.string(label),
+                tips = buildList {
+                    add(label)
+                    add("")
+                    add("§eLeft click to show less infos!")
+                    add("§eRight click to open sacks!")
+                },
+                onAnyClick = onAnyClick(),
+            ),
+        )
+        for ((name, lore) in data.entries) {
+            add(Renderable.hoverTips(name, tips = lore))
+        }
+    }
+
+    private fun Long.formatItemAmount(): String {
+        return "§7(${addSeparators()} items)"
+    }
+
+    private fun createSimpleDisplay(): List<Renderable> {
+        val (label, data) = calculateData()
+        return listOf(
+            Renderable.clickable(
+                Renderable.string(label),
+                tips = buildList {
+                    add(label)
+                    add("")
+                    addAll(data.keys)
+                    add("")
+                    add("§eLeft click to show more infos!")
+                    add("§eRight click to open sacks!")
+                },
+                onAnyClick = onAnyClick(),
+            ),
+        )
+    }
+
+    private fun onAnyClick() = mapOf(
+        KeyboardManager.RIGHT_MOUSE to {
+            HypixelCommands.sacks()
+        },
+        KeyboardManager.LEFT_MOUSE to {
+            advanced = !advanced
+            update()
+        },
+    )
+
+    private fun calculateData(): Pair<String, MutableMap<String, List<String>>> {
+        var totalAmount = 0L
+        var totalPrice = MinMaxNumber(0.0, 0.0)
+        val map = mutableMapOf<String, Double>()
+
+        val sackForItem = mutableMapOf<NeuInternalName, String>()
+        for ((name, items) in SackApi.sacks) {
+            for (item in items) {
+                sackForItem[item] = name
+            }
+        }
+        val pricePerSack = mutableMapOf<String, MinMaxNumber>()
+        val amountPerSack = mutableMapOf<String, Long>()
+        val itemPricesPerSack = mutableMapOf<String, MutableMap<NeuInternalName, MinMaxNumber>>()
+
+        for ((internalName, data) in SackApi.sackData) {
+            val amount = data.amount
+            if (amount == 0) continue
+            if (!internalName.isBazaarItem()) {
+                map[internalName.toString()] = amount * internalName.getPrice()
+                continue
+            }
+            val priceMin = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL) * amount
+            val priceMax = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY) * amount
+            val price = MinMaxNumber(priceMin, priceMax)
+            // edge case for invalid items that fall in "No Sack"
+            val sack = sackForItem[internalName] ?: "§cNo"
+            pricePerSack.addOrPut(sack, price)
+            amountPerSack.addOrPut(sack, amount.toLong())
+            itemPricesPerSack.getOrPut(sack) { mutableMapOf() }.addOrPut(internalName, price)
+            totalAmount += amount
+            totalPrice += price
+        }
+        val result = mutableMapOf<String, List<String>>()
+        for ((sack, sackPrice) in pricePerSack.entries.sortedByDescending { it.value.min }) {
+            val itemPrices = itemPricesPerSack[sack] ?: continue
+            val list = mutableListOf<String>()
+            val name = "§a$sack Sack $sackPrice"
+            list.add(name)
+            val sackAmount = amountPerSack[sack] ?: 0
+            list.add(sackAmount.formatItemAmount())
+            list.add("")
+            for ((item, price) in itemPrices.entries.sortedByDescending { it.value.min }) {
+                val amount = SackApi.sackData[item]?.amount ?: error("no amount for $item")
+                list.add("${item.getNumberedName(amount)}§8: $price")
+            }
+            result[name] = list
+        }
+
+        return "$totalPrice §ein sacks ${totalAmount.formatItemAmount()}" to result
+    }
+}
