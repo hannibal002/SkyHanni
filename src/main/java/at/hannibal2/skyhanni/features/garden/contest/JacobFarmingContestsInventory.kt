@@ -43,9 +43,13 @@ object JacobFarmingContestsInventory {
 
     // Render the contests a tick delayed to feel smoother
     private var hideEverything = true
+
+    /**
+     * REGEX-TEST: §7§7You placed in the §zAmethyst §7bracket!
+     */
     private val medalPattern by RepoPattern.pattern(
         "garden.jacob.contests.inventory.medal",
-        "§7§7You placed in the (?<medal>.*) §7bracket!"
+        "§7§7You placed in the (?<medal>.*) §7bracket!",
     )
 
     @HandleEvent
@@ -87,7 +91,7 @@ object JacobFarmingContestsInventory {
         if (!config.openOnElite.isKeyHeld()) return
 
         val slot = event.slot ?: return
-        val itemName = slot.stack.displayName
+        val itemName = slot.stack?.displayName ?: return
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
@@ -101,9 +105,7 @@ object JacobFarmingContestsInventory {
                 event.cancel()
             }
 
-            else -> {
-                openFromCalendar(chestName, itemName, event, slot)
-            }
+            else -> openFromCalendar(chestName, itemName, event, slot)
         }
     }
 

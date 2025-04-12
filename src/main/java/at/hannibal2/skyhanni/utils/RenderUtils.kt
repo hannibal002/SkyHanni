@@ -98,10 +98,12 @@ object RenderUtils {
         }
     //#endif
 
+    // TODO swap Slot with DrawContext for extended function
     fun Slot.highlight(context: DrawContext, color: LorenzColor) {
         highlight(context, color.toColor())
     }
 
+    // TODO swap Slot with DrawContext for extended function
     fun Slot.highlight(context: DrawContext, color: Color) {
         highlight(context, color, xDisplayPosition, yDisplayPosition)
     }
@@ -114,6 +116,7 @@ object RenderUtils {
         highlight(context, color, x, y)
     }
 
+    // TODO make a DrawContext extended function
     fun highlight(context: DrawContext, color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()

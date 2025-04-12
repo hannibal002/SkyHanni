@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -8,30 +10,26 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isRightMouseClicked
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiChat
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.MathHelper
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Mouse
 
 @SkyHanniModule
-object ChatCopy {
-
+object CopyChat {
     private val config get() = SkyHanniMod.feature.chat.copyChat
 
-    @SubscribeEvent
-    fun onGuiClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
+    @HandleEvent
+    fun onMouseInput(event: GuiMouseInputEvent) {
         if (event.gui !is GuiChat) return
-        if (!config || !isRightMouseClicked()) return
-        val chatLine = getChatLine(Mouse.getX(), Mouse.getY()) ?: return
+        if (!config || !KeyboardManager.isRightMouseClicked()) return
+        val chatLine = getChatLine(MouseCompat.getX(), MouseCompat.getY()) ?: return
         val formatted = chatLine.fullComponent.formattedText
 
         val (clipboard, infoMessage) = when {
@@ -53,7 +51,7 @@ object ChatCopy {
         val chatGui = mc.ingameGUI.chatGUI ?: return null
         val access = chatGui as AccessorMixinGuiNewChat
         val chatScale = chatGui.chatScale
-        val scaleFactor = ScaledResolution(mc).scaleFactor
+        val scaleFactor = GuiScreenUtils.scaleFactor
 
         val x = MathHelper.floor_float((mouseX / scaleFactor - 3) / chatScale)
         val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - getOffset()) / chatScale)
@@ -72,7 +70,7 @@ object ChatCopy {
         return null
     }
 
-    private val isPatcherLoaded by lazy { Loader.isModLoaded("patcher") }
+    private val isPatcherLoaded by lazy { PlatformUtils.isModInstalled("patcher") }
 
     private fun getOffset(): Int {
         if (!isPatcherLoaded) return 0
