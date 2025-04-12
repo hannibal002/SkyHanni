@@ -78,6 +78,10 @@ object GardenPlotApi {
         "chat.clean",
         "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!",
     )
+
+    /**
+     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b6 §r§7with §r§aCompost§r§7!
+     */
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!",
