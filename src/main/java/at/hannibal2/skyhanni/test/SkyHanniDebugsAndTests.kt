@@ -493,7 +493,7 @@ object SkyHanniDebugsAndTests {
                 )
             }
 
-            if (debugConfig.raytracedOreblock) {
+            if (debugConfig.rayTracedOreBlock) {
                 BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
@@ -624,6 +624,8 @@ object SkyHanniDebugsAndTests {
         event.move(3, "dev.showItemRarity", "dev.debug.showItemRarity")
         event.move(3, "dev.copyInternalName", "dev.debug.copyInternalName")
         event.move(3, "dev.showNpcPrice", "dev.debug.showNpcPrice")
+
+        event.move(65656, "dev.debug.raytracedOreblock", "dev.debug.rayTracedOreBlock")
     }
 
     @HandleEvent
