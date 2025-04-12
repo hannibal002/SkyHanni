@@ -31,7 +31,7 @@ import java.util.regex.Pattern
 object DicerRngDropTracker {
 
     private val itemDrops = mutableListOf<ItemDrop>()
-    private val config get() = GardenApi.config.dicerCounters
+    private val config get() = GardenApi.config.dicerRngDropTracker
     private val tracker = SkyHanniTracker("Dicer RNG Drop Tracker", { Data() }, { it.garden.dicerDropTracker }) {
         drawDisplay(it)
     }
@@ -202,6 +202,8 @@ object DicerRngDropTracker {
 
             ConfigManager.gson.toJsonTree(items)
         }
+
+        event.move(65656, "garden.dicerCounters", "garden.dicerRngDropTracker")
     }
 
     @HandleEvent

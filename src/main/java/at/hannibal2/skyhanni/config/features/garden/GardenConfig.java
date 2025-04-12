@@ -64,8 +64,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
     @Accordion
-    // TODO rename to dicerRngDropTracker
-    public DicerRngDropTrackerConfig dicerCounters = new DicerRngDropTrackerConfig();
+    public DicerRngDropTrackerConfig dicerRngDropTracker = new DicerRngDropTrackerConfig();
 
     @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
