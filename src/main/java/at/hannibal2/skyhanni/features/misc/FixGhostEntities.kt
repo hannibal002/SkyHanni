@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
@@ -66,16 +65,11 @@ object FixGhostEntities {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
-        if (!config.hideTemporaryArmorStands) return
+        if (!config.hideTemporaryArmorstands) return
         with(event.entity) {
             if (ticksExisted < 10 && isDefaultValue() && getAllEquipment().all { it == null }) event.cancel()
         }
     }
 
     fun isEnabled() = config.fixGhostEntities
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(65656, "misc.hideTemporaryArmorstands", "misc.hideTemporaryArmorStands")
-    }
 }
