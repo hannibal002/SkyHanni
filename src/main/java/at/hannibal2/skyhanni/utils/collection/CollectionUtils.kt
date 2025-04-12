@@ -64,6 +64,7 @@ object CollectionUtils {
     fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
         this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
 
+    @Suppress("UnsafeCallOnNullableType")
     fun <K> MutableMap<K, MinMaxNumber>.addOrPut(key: K, number: MinMaxNumber): MinMaxNumber =
         this.merge(key, number, MinMaxNumber::plus)!! // Never returns null since "plus" can't return null
 
@@ -261,7 +262,7 @@ object CollectionUtils {
 
     inline fun <T, C : Number, D : Number, R : Number> Iterable<T>.sumOfPair(
         crossinline selector: (T) -> Pair<C, D>,
-        crossinline resultConverter: (Double) -> R
+        crossinline resultConverter: (Double) -> R,
     ): Pair<R, R> {
         var sumFirst = 0.0
         var sumSecond = 0.0
@@ -386,6 +387,7 @@ object CollectionUtils {
             }
             return newQueue
         }
+
         fun pollOrNull(): T? = poll()?.item
         fun getWaitingWeightOrNull(): Double? = peek()?.weight
     }

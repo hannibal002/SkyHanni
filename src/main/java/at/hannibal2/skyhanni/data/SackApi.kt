@@ -361,7 +361,7 @@ object SackApi {
         val uniqueSackItems = mutableSetOf<NeuInternalName>()
 
         sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
-        sacks = sacksData.mapValues { it.value.contents}
+        sacks = sacksData.mapValues { it.value.contents }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
         sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
