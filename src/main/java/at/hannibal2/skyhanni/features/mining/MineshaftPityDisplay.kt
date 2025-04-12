@@ -231,16 +231,19 @@ object MineshaftPityDisplay {
 
     init {
         RenderDisplayHelper(
-            condition = { isDisplayEnabled() },
+            condition = {
+                if (display.isEmpty()) {
+                    update()
+                    return@RenderDisplayHelper false
+                }
+                return@RenderDisplayHelper isDisplayEnabled()
+            },
             outsideInventory = true,
         ) {
-            display.ifEmpty { update() }
-            if (display.isNotEmpty()) {
-                config.position.renderRenderables(
-                    listOf(Renderable.verticalContainer(display, 2)),
-                    posLabel = "Mineshaft Pity Display",
-                )
-            }
+            config.position.renderRenderables(
+                listOf(Renderable.verticalContainer(display, 2)),
+                posLabel = "Mineshaft Pity Display",
+            )
         }
     }
 
