@@ -35,7 +35,7 @@ object ReindrakeWarpHelper {
             "A Reindrake was detected. Click to warp to the Winter Island spawn!",
             config::reindrakeWarpHelper,
             actionName = "warp to winter island spawn",
-            action = { HypixelCommands.warp("winter") }
+            action = { HypixelCommands.warp("winter") },
         )
     }
 
