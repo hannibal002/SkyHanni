@@ -115,7 +115,7 @@ object OutsideSackValue {
                 Renderable.hoverTips(sackData.sackName, tips = sackData.lore),
                 Renderable.hoverTips(sackData.sackPrice.toString(), tips = sackData.lore),
             )
-            tableData[list] = sackData.itemNames.joinToString(",")
+            tableData[list] = "${sackData.sackName},${sackData.itemNames.joinToString(",")}"
         }
         if (tableData.isEmpty()) {
             result.addSearchString("§cNo Items in sacks!")
