@@ -20,7 +20,7 @@ object CrystalHollowsNamesInCore {
         LorenzVec(550, 116, 550) to "§8Precursor Remnants",
         LorenzVec(552, 116, 474) to "§bMithril Deposits",
         LorenzVec(477, 116, 476) to "§aJungle",
-        LorenzVec(474, 116, 554) to "§6Goblin Holdout"
+        LorenzVec(474, 116, 554) to "§6Goblin Holdout",
     )
 
     private var showWaypoints = false
