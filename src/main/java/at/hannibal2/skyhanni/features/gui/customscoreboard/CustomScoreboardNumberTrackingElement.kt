@@ -13,6 +13,7 @@ interface CustomScoreboardNumberTrackingElement {
     var currentJob: Job?
 
     fun checkDifference(currentAmount: Long) {
+        if (!SkyHanniMod.feature.gui.customScoreboard.display.showNumberDifference) return
         if (currentAmount != previousAmount) {
             val changeAmount = currentAmount - previousAmount
             showTemporaryChange(changeAmount)

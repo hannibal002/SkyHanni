@@ -91,7 +91,7 @@ object JacobFarmingContestsInventory {
         if (!config.openOnElite.isKeyHeld()) return
 
         val slot = event.slot ?: return
-        val itemName = slot.stack.displayName
+        val itemName = slot.stack?.displayName ?: return
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
