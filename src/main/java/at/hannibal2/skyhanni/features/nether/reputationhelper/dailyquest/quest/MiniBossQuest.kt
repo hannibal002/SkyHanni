@@ -9,5 +9,5 @@ class MiniBossQuest(val miniBoss: CrimsonMiniBoss, state: QuestState, needAmount
         QuestCategory.MINIBOSS,
         miniBoss.displayName,
         state,
-        needAmount
+        needAmount,
     )

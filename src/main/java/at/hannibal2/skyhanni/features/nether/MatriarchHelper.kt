@@ -35,7 +35,7 @@ object MatriarchHelper {
             ErrorManager.logErrorStateWithData(
                 "Something went wrong with the Heavy Pearl detection",
                 "More then 3 pearls",
-                "pearList" to pearlList.map { getMobInfo(it) }
+                "pearList" to pearlList.map { getMobInfo(it) },
             )
             pearlList.clear()
         }
