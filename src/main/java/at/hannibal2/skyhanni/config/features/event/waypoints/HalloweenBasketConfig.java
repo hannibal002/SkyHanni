@@ -13,8 +13,7 @@ public class HalloweenBasketConfig {
         "§eCoordinates may not always be up to date!")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to "enabled"
-    public boolean allWaypoints = false;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(name = "Only Closest", desc = "Only show the closest waypoint.")
