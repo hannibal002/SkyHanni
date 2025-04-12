@@ -169,7 +169,7 @@ object DicerRngDropTracker {
     }
 
     init {
-        tracker.initRenderer({ config.pos }) { shouldShowDisplay() }
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -202,6 +202,8 @@ object DicerRngDropTracker {
 
             ConfigManager.gson.toJsonTree(items)
         }
+
+        event.move(85, "garden.dicerCounters.pos", "garden.dicerCounters.position")
     }
 
     @HandleEvent

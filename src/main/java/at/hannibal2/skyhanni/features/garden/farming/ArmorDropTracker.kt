@@ -100,7 +100,7 @@ object ArmorDropTracker {
     }
 
     init {
-        tracker.initRenderer({ config.pos }) { shouldShowDisplay() }
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -176,6 +176,7 @@ object ArmorDropTracker {
             new.add("drops", old)
             new
         }
+        event.move(85, "garden.farmingArmorDrop.pos", "garden.armorDropTracker.position")
     }
 
     @HandleEvent
