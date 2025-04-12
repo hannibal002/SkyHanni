@@ -18,7 +18,7 @@ object TeleportPadCompactName {
      */
     private val namePattern by patternGroup.pattern(
         "name",
-        "§.✦ §aWarp To (?<name>.*)"
+        "§.✦ §aWarp To (?<name>.*)",
     )
 
     /**
@@ -26,7 +26,7 @@ object TeleportPadCompactName {
      */
     private val noNamePattern by patternGroup.pattern(
         "noname",
-        "§.✦ §cNo Destination"
+        "§.✦ §cNo Destination",
     )
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.PRIVATE_ISLAND)

@@ -64,7 +64,7 @@ object TeleportPadInventoryNumber {
 
     private val padNumberPattern by RepoPattern.pattern(
         "misc.teleportpad.number",
-        "§.(?<number>.*) teleport pad"
+        "§.(?<number>.*) teleport pad",
     )
 
     @HandleEvent
