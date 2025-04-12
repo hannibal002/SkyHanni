@@ -364,7 +364,7 @@ object ItemAbilityCooldown {
     @HandleEvent
     fun onRenderItem(event: RenderGuiItemOverlayEvent) {
         if (!isEnabled()) return
-        if (!config.itemAbilityCooldownBackground) return
+        if (!config.background) return
 
         val guiOpen = Minecraft.getMinecraft().currentScreen != null
         val stack = event.stack
@@ -424,6 +424,7 @@ object ItemAbilityCooldown {
         event.move(31, "itemAbilities", "inventory.itemAbilities")
 
         event.move(65656, "inventory.itemAbilities.itemAbilityCooldown", "inventory.itemAbilities.")
+        event.move(65656, "inventory.itemAbilities.itemAbilityCooldownBackground", "inventory.itemAbilities.background")
     }
 
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {

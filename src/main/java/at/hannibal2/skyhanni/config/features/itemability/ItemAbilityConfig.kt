@@ -13,14 +13,13 @@ class ItemAbilityConfig {
     @FeatureToggle
     var enabled: Boolean = false
 
-    // TODO rename to "background"
     @Expose
     @ConfigOption(
         name = "Ability Cooldown Background",
         desc = "Show the cooldown color of item abilities in the background."
     )
     @ConfigEditorBoolean
-    var itemAbilityCooldownBackground: Boolean = false
+    var background: Boolean = false
 
     @Expose
     @ConfigOption(name = "Show When Ready", desc = "Show the R and background (if enabled) when the ability is ready.")
