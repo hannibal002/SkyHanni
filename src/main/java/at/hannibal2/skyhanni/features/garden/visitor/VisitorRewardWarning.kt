@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi.lastClickedNpc
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.inventory.Slot
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -32,23 +32,23 @@ object VisitorRewardWarning {
         if (!VisitorApi.inInventory) return
 
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
-        val refuseOfferSlot = event.gui.inventorySlots.getSlot(REFUSE_SLOT)
-        val acceptOfferSlot = event.gui.inventorySlots.getSlot(ACCEPT_SLOT)
+        val refuseOfferSlot = event.container.getSlot(REFUSE_SLOT)
+        val acceptOfferSlot = event.container.getSlot(ACCEPT_SLOT)
         val blockReason = visitor.blockReason ?: return
 
         if (blockReason.blockRefusing) {
-            renderColor(refuseOfferSlot, acceptOfferSlot, LorenzColor.GREEN)
+            renderColor(event.context, refuseOfferSlot, acceptOfferSlot, LorenzColor.GREEN)
         } else {
-            renderColor(acceptOfferSlot, refuseOfferSlot, LorenzColor.RED)
+            renderColor(event.context, acceptOfferSlot, refuseOfferSlot, LorenzColor.RED)
         }
     }
 
-    private fun renderColor(backgroundSlot: Slot?, outlineSlot: Slot?, outlineColor: LorenzColor) {
+    private fun renderColor(context: DrawContext, backgroundSlot: Slot?, outlineSlot: Slot?, outlineColor: LorenzColor) {
         if (!config.bypassKey.isKeyHeld() && backgroundSlot != null) {
-            backgroundSlot highlight LorenzColor.DARK_GRAY.addOpacity(config.opacity)
+            backgroundSlot.highlight(context, LorenzColor.DARK_GRAY.addOpacity(config.opacity))
         }
         if (config.optionOutline && outlineSlot != null) {
-            outlineSlot drawBorder outlineColor.addOpacity(200)
+            outlineSlot.drawBorder(outlineColor.addOpacity(200))
         }
     }
 
@@ -60,8 +60,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         val blockReason = visitor.blockReason
 
-        val isRefuseSlot = stack.name == "§cRefuse Offer"
-        val isAcceptSlot = stack.name == "§aAccept Offer"
+        val isRefuseSlot = stack.displayName == "§cRefuse Offer"
+        val isAcceptSlot = stack.displayName == "§aAccept Offer"
 
         val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
         if (!config.bypassKey.isKeyHeld() && shouldBlock) {
@@ -92,8 +92,8 @@ object VisitorRewardWarning {
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         if (config.bypassKey.isKeyHeld()) return
 
-        val isRefuseSlot = event.itemStack.name == "§cRefuse Offer"
-        val isAcceptSlot = event.itemStack.name == "§aAccept Offer"
+        val isRefuseSlot = event.itemStack.displayName == "§cRefuse Offer"
+        val isAcceptSlot = event.itemStack.displayName == "§aAccept Offer"
 
         val blockReason = visitor.blockReason ?: return
         if (blockReason.blockRefusing && !isRefuseSlot) return

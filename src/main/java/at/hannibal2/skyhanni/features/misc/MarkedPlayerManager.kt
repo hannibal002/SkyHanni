@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -15,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.entity.EntityOtherPlayerMP
 
 @SkyHanniModule
@@ -116,8 +115,8 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
-        if (Minecraft.getMinecraft().thePlayer == null) return
+    fun onWorldChange() {
+        if (!MinecraftCompat.localPlayerExists) return
 
         markedPlayers.clear()
         if (config.markOwnName.get()) {

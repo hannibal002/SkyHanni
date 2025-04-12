@@ -5,6 +5,14 @@ import at.hannibal2.skyhanni.config.commands.CommandsRegistry.addToRegister
 import at.hannibal2.skyhanni.config.commands.CommandsRegistry.hasUniqueName
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
+//#if MC < 1.21
+import net.minecraftforge.client.ClientCommandHandler
+//#else
+//$$ import com.mojang.brigadier.arguments.StringArgumentType
+//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument
+//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal
+//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+//#endif
 
 class CommandRegistrationEvent(private val builders: MutableList<CommandBuilderBase>) : SkyHanniEvent() {
 

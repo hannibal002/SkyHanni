@@ -6,24 +6,22 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
@@ -73,7 +71,7 @@ object OwnInventoryData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (itemAmounts.isEmpty()) {
             itemAmounts = getCurrentItems()
         }
@@ -98,7 +96,7 @@ object OwnInventoryData {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         itemAmounts = emptyMap()
     }
 
@@ -113,7 +111,7 @@ object OwnInventoryData {
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        val item = Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return
+        val item = MinecraftCompat.localPlayer.getItemOnCursor() ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
         ignoreItem(500.milliseconds, internalNameOrNull)
     }
@@ -122,7 +120,7 @@ object OwnInventoryData {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
 
-        val itemName = event.item?.name ?: return
+        val itemName = event.item?.displayName ?: return
         checkAHMovements(itemName)
     }
 
@@ -175,7 +173,7 @@ object OwnInventoryData {
     fun onChat(event: SkyHanniChatEvent) {
         sackToInventoryChatPattern.matchMatcher(event.message) {
             val name = group("name")
-            ignoreItem(500.milliseconds) { it.itemName.contains(name) }
+            ignoreItem(500.milliseconds) { it.repoItemName.contains(name) }
         }
     }
 

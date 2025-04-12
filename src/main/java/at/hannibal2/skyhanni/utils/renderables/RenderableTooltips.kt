@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -10,20 +12,17 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
 
 @SkyHanniModule
 object RenderableTooltips {
 
     private var tooltip: DeferredTooltip? = null
 
-    @SubscribeEvent
-    fun onPostRenderTick(event: RenderTickEvent) {
-        if (event.phase == TickEvent.Phase.START) {
+    @HandleEvent
+    fun onRenderingTick(event: RenderingTickEvent) {
+        if (event.startPhase) {
             tooltip = null
-        } else if (event.phase == TickEvent.Phase.END) {
+        } else {
             drawHoveringText()
         }
     }

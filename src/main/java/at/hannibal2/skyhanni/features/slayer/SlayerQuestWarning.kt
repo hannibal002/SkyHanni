@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.features.event.diana.DianaApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import kotlin.time.Duration.Companion.milliseconds
@@ -108,7 +109,7 @@ object SlayerQuestWarning {
         ChatUtils.chat(chatMessage)
 
         if (config.questWarningTitle) {
-            LorenzUtils.sendTitle("§e$titleMessage", 2.seconds)
+            TitleManager.sendTitle("§e$titleMessage", duration = 2.seconds)
         }
     }
 
@@ -122,7 +123,7 @@ object SlayerQuestWarning {
     }
 
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
-        val slayerType = SlayerApi.getSlayerTypeForCurrentArea() ?: return false
+        val slayerType = SlayerApi.currentAreaType ?: return false
 
         // workaround for rift mob that is unrelated to slayer
         if (entity.name == "Oubliette Guard") return false

@@ -21,9 +21,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -96,7 +95,7 @@ object BazaarApi {
 
     fun NeuInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
         ErrorManager.skyHanniError(
-            "Can not find bazaar data for $itemName",
+            "Can not find bazaar data for $repoItemName",
             "internal name" to this,
         )
     }
@@ -133,7 +132,7 @@ object BazaarApi {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val item = event.item ?: return
-        val itemName = item.name
+        val itemName = item.displayName
         if (isBazaarOrderInventory(InventoryUtils.openInventoryName())) {
             val internalName = item.getInternalNameOrNull() ?: return
             if (itemName.contains("SELL")) {
@@ -186,8 +185,7 @@ object BazaarApi {
         if (currentSearchedItem == "") return
 
         if (event.gui !is GuiChest) return
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (chest.inventorySlots.indexOf(slot) !in 9..44) {
@@ -195,7 +193,7 @@ object BazaarApi {
             }
 
             if (stack.displayName.removeColor() == currentSearchedItem) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(event.context, LorenzColor.GREEN)
             }
         }
     }
@@ -214,13 +212,13 @@ object BazaarApi {
 
     private fun checkIfInBazaar(event: InventoryFullyOpenedEvent): Boolean {
         val items = event.inventorySize.let { listOf(it - 5, it - 6) }.mapNotNull { event.inventoryItems[it] }
-        if (items.any { it.name.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
+        if (items.any { it.displayName.equalsIgnoreColor("Go Back") && it.getLore().firstOrNull() == "§7To Bazaar" }) {
             return true
         }
 
         // check for Buy Instantly
         event.inventoryItems[16]?.let {
-            if (it.name == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
+            if (it.displayName == "§aCustom Amount" && it.getLore().firstOrNull() == "§8Buy Order Quantity") {
                 return true
             }
         }

@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,7 +19,6 @@ import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
-import net.minecraft.client.Minecraft
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 
@@ -53,8 +51,7 @@ object UpdateManager {
     private var hasCheckedForUpdate = false
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        Minecraft.getMinecraft().thePlayer ?: return
+    fun onTick() {
         if (hasCheckedForUpdate) return
         hasCheckedForUpdate = true
 
@@ -181,7 +178,9 @@ object UpdateManager {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
-                    checkUpdate(true, updateStream)
+                    val newUpdateStream = SkyHanniMod.feature.about.updateStream
+                    newUpdateStream.set(UpdateStream.BETA)
+                    checkUpdate(true, newUpdateStream.get())
                 },
                 "§eClick to confirm!",
                 oneTimeClick = true,

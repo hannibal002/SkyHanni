@@ -4,12 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
-import net.minecraft.client.Minecraft
-import net.minecraft.command.CommandBase
 
 @SkyHanniModule
 object DefaultConfigFeatures {
@@ -19,7 +18,6 @@ object DefaultConfigFeatures {
     @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         if (didNotifyOnce) return
-        Minecraft.getMinecraft().thePlayer ?: return
         didNotifyOnce = true
 
         val oldToggles = SkyHanniMod.feature.storage.knownFeatureToggles
@@ -51,7 +49,7 @@ object DefaultConfigFeatures {
                 "Looks like you updated SkyHanni. " +
                     "Click here to configure the newly introduced options, or run $command.",
                 onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
-                "§eClick to run /shdefaultoptions!"
+                "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!"
             )
         }
     }
@@ -116,7 +114,7 @@ object DefaultConfigFeatures {
 
     private fun onComplete(strings: Array<String>): List<String> {
         if (strings.size <= 2)
-            return CommandBase.getListOfStringsMatchingLastWord(
+            return StringUtils.getListOfStringsMatchingLastWord(
                 strings,
                 SkyHanniMod.knownFeaturesData.knownFeatures.keys + listOf("null"),
             )
