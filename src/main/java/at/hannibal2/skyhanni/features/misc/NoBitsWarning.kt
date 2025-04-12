@@ -34,7 +34,7 @@ object NoBitsWarning {
         }
 
         if (config.bitsGainChatMessage) {
-            if (event.bits < config.threshold) return
+            if (event.bits < config.bitsGainChatMessageThreshold) return
             ChatUtils.chat("You have gained §b${event.difference.addSeparators()} §eBits.")
         }
     }
@@ -44,5 +44,7 @@ object NoBitsWarning {
         event.move(35, "misc.noBitsWarning", "misc.noBitsWarning.enabled")
         event.move(40, "misc.noBitsWarning.enabled", "misc.bits.enableWarning")
         event.move(40, "misc.noBitsWarning.notificationSound", "misc.bits.notificationSound")
+
+        event.move(65656, "misc.bits.threshold", "misc.bits.bitsGainChatMessageThreshold")
     }
 }

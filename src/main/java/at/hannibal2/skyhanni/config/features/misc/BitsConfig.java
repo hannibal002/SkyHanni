@@ -46,6 +46,5 @@ public class BitsConfig {
     @Expose
     @ConfigOption(name = "Message Threshhold", desc = "The amount of bits you need to get to show the message.")
     @ConfigEditorSlider(minValue = 0, maxValue = 1000, minStep = 1)
-    // TODO rename
-    public int threshold = 400;
+    public int bitsGainChatMessageThreshold = 400;
 }
