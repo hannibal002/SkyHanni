@@ -70,12 +70,12 @@ object BasketWaypoints {
         if (newClosest == closestBasket) return
 
         closestBasket = newClosest
-        if (config.pathfind.get() && config.enabled) startPathfind()
+        if (config.pathfind.get() && config.allWaypoints) startPathfind()
     }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.enabled) return
+        if (!config.allWaypoints) return
         if (!isActive) return
         if (!isEnabled()) return
 
@@ -98,7 +98,7 @@ object BasketWaypoints {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!isActive) return
-        if (!config.enabled) return
+        if (!config.allWaypoints) return
 
         if (config.onlyClosest) {
             closestBasket.render(event)
@@ -145,7 +145,7 @@ object BasketWaypoints {
                 basketList.add(EventWaypoint(position = node.position, isFound = false))
             }
             closestBasket = getClosest(nodeList)
-            if (config.pathfind.get() && config.enabled) startPathfind()
+            if (config.pathfind.get() && config.allWaypoints) startPathfind()
         }
         isActive = newIsActive
     }
@@ -164,7 +164,7 @@ object BasketWaypoints {
             basket.position,
             "§dNext Basket",
             LorenzColor.LIGHT_PURPLE.toColor(),
-            condition = { config.pathfind.get() && closestBasket != null && config.enabled },
+            condition = { config.pathfind.get() && closestBasket != null && config.allWaypoints }
         )
     }
 
@@ -183,7 +183,7 @@ object BasketWaypoints {
 
     private fun disableFeature() {
         ChatUtils.chat("Disabling Halloween Basket waypoints since you found all of them!")
-        config.enabled = false
+        config.allWaypoints = false
     }
 
     private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
@@ -191,7 +191,5 @@ object BasketWaypoints {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(13, "event.halloweenBasket", "event.lobbyWaypoints.halloweenBasket")
-
-        event.move(65656, "event.lobbyWaypoints.halloweenBasket.allWaypoints", "event.lobbyWaypoints.halloweenBasket.enabled")
     }
 }
