@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
@@ -31,7 +32,7 @@ import java.util.regex.Pattern
 @SkyHanniModule
 object MythologicalCreatureTracker {
 
-    private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
+    private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobTracker
 
     private val patternGroup = RepoPattern.group("event.diana.mythological.tracker")
     private val minotaurPattern by patternGroup.pattern(
@@ -160,5 +161,10 @@ object MythologicalCreatureTracker {
             category = CommandCategory.USERS_RESET
             callback { tracker.resetCommand() }
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(65656, "event.diana.mythologicalMobtracker", "event.diana.mythologicalMobTracker")
     }
 }
