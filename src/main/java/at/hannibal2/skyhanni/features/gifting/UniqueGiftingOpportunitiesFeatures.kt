@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gifting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -47,7 +48,7 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private val config get() = SkyHanniMod.feature.event.gifting.giftingOpportunities
 
-    private fun isHoldingGift() = !config.highlighWithGiftOnly || GiftApi.isHoldingGift()
+    private fun isHoldingGift() = !config.highlightWithGiftOnly || GiftApi.isHoldingGift()
     private fun isEnabled() = isHoldingGift() && config.enabled && WinterApi.isDecember()
 
     @Suppress("UnusedPrivateProperty")
@@ -99,5 +100,14 @@ object UniqueGiftingOpportunitiesFeatures {
             addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(
+            65656,
+            "event.gifting.giftingOpportunities.highlighWithGiftOnly",
+            "event.gifting.giftingOpportunities.highlightWithGiftOnly",
+        )
     }
 }
