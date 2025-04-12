@@ -271,6 +271,11 @@ Allows project specific plugins to run. Eg: Regex Intention
 
 Imports our custom live templates automatically. Live Templates allow for quicker code writing.
 
+### [Minecraft Development](https://plugins.jetbrains.com/plugin/8327-minecraft-development)
+
+Helps you write minecraft specific code such as mixins and access wideners
+
+
 ## Software Used in SkyHanni
 
 ### Basics
@@ -567,3 +572,13 @@ These helper methods should generally be placed in the `at.hannibal2.skyhanni.ut
 compatability methods for. For example, `WorldClient.getAllEntities()` could be placed in `WorldCompat.kt`. This is not a strict rule, but
 it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files
 themselves.
+
+
+### Access wideners
+
+You may want to use private minecraft methods or fields, this is where access wideners come in. 
+
+You can right click on a method or field and select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<vers
+ion number>/src/main/resources/skyhanni.accesswidener`. Then you need to reload gradle for the changes to apply.
+
+This requires you to have the Minecraft Development plugin installed as mentioned earlier.
