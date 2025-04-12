@@ -93,7 +93,7 @@ object GriffinBurrowParticleFinder {
             burrows.filter { (location, burrow) ->
                 burrow.burrowTimeToLive -= 1
                 location.distanceSqToPlayer() < 256 && burrow.burrowTimeToLive < 0
-            }.forEach { (location, _) ->
+            }.forEach { (location, burrow) ->
                 BurrowDugEvent(location).post()
                 burrows.remove(location)
                 lastDugParticleBurrow = null
