@@ -20,7 +20,7 @@ object SlayerBossSpawnSoon {
 
     private val progressPattern by RepoPattern.pattern(
         "slayer.bosswarning.progress",
-        " \\(?(?<progress>[0-9.,k]+)/(?<total>[0-9.,k]+)\\)?.*"
+        " \\(?(?<progress>[0-9.,k]+)/(?<total>[0-9.,k]+)\\)?.*",
     )
 
     private var lastCompletion = 0.0

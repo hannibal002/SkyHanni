@@ -33,7 +33,7 @@ object EndermanSlayerHideParticles {
             EnumParticleTypes.SMOKE_LARGE,
             EnumParticleTypes.FLAME,
             EnumParticleTypes.SPELL_WITCH,
-            -> Unit
+                -> Unit
 
             else -> return
         }

@@ -51,7 +51,7 @@ object BlazeSlayerFirePitsWarning {
             when (entityData.bossType) {
                 BossType.SLAYER_BLAZE_3,
                 BossType.SLAYER_BLAZE_4,
-                -> {
+                    -> {
                     fireFirePits()
                 }
 
