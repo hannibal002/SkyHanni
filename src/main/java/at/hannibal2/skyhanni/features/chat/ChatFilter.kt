@@ -330,7 +330,7 @@ object ChatFilter {
                 northStarsPattern,
                 boostPotionPattern,
                 enchantmentBookPattern,
-                genericRewardPattern
+                genericRewardPattern,
             ).forEach { add(it) }
         }
         addAll(GiftProfitTracker.spamPatterns)
