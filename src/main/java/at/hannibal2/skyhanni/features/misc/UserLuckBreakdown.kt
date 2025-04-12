@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -78,7 +79,7 @@ object UserLuckBreakdown {
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (!config.userluckEnabled) return
+        if (!config.userLuck) return
         if (event.inventory !is ContainerLocalMenu) return
         if (!inMiscStats) return
 
@@ -160,7 +161,7 @@ object UserLuckBreakdown {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipEvent) {
-        if (!config.userluckEnabled) return
+        if (!config.userLuck) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
@@ -230,7 +231,7 @@ object UserLuckBreakdown {
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!config.userluckEnabled) return
+        if (!config.userLuck) return
         if (!inMiscStats) return
         val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
         if (limboUserLuck == 0.0f && !showAllStats) return
@@ -384,5 +385,10 @@ object UserLuckBreakdown {
             val luck = ((overflow - level) / 5) * 50
             skillOverflowLuck.addOrPut(skillType, luck)
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(65656, "misc.userluckEnabled", "misc.userLuck")
     }
 }

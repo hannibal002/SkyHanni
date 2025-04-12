@@ -402,8 +402,7 @@ public class MiscConfig {
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to userLuck
-    public boolean userluckEnabled = true;
+    public boolean userLuck = true;
 
     @Expose
     @ConfigOption(name = "Computer Time Offset Warning",
