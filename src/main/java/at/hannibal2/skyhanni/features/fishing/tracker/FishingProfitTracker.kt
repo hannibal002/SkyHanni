@@ -52,7 +52,7 @@ object FishingProfitTracker {
      */
     private val coinsChatPattern by RepoPattern.pattern(
         "fishing.tracker.chat.coins",
-        "§(?<colorCode>.*)⛃ §r(?<catch>.*) CATCH! §r§fYou caught §r§6(?<coins>[\\d,]+) Coins§r§f!"
+        "§(?<colorCode>.*)⛃ §r(?<catch>.*) CATCH! §r§fYou caught §r§6(?<coins>[\\d,]+) Coins§r§f!",
     )
 
     private var lastCatchTime = SimpleTimeMark.farPast()

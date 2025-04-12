@@ -27,7 +27,7 @@ object SeaCreatureManager {
      */
     private val doubleHookPattern by patternGroup.pattern(
         "doublehook",
-        "§eIt's a §r§aDouble Hook§r§e!(?: Woot woot!)?"
+        "§eIt's a §r§aDouble Hook§r§e!(?: Woot woot!)?",
     )
 
     /**
@@ -35,7 +35,7 @@ object SeaCreatureManager {
      */
     private val thunderBottleChargedPattern by patternGroup.pattern(
         "thundercharged",
-        "§e> Your bottle of thunder has fully charged!"
+        "§e> Your bottle of thunder has fully charged!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)

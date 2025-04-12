@@ -50,11 +50,11 @@ object TotemOfCorruption {
     )
     private val timeRemainingPattern by patternGroup.pattern(
         "timeremaining",
-        "§7Remaining: §e(?:(?<min>\\d+)m )?(?<sec>\\d+)s"
+        "§7Remaining: §e(?:(?<min>\\d+)m )?(?<sec>\\d+)s",
     )
     private val ownerPattern by patternGroup.pattern(
         "owner",
-        "§7Owner: §e(?<owner>.+)"
+        "§7Owner: §e(?<owner>.+)",
     )
 
     @HandleEvent
