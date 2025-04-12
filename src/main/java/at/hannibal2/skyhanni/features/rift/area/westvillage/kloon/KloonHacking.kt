@@ -89,13 +89,13 @@ object KloonHacking {
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.slotIndex == 11 + 10 * i) {
                     val correctButton = slot.stack.displayName.removeColor() == correctButtons[i]
-                    slot.highlight(if (correctButton) LorenzColor.GREEN else LorenzColor.RED)
+                    slot.highlight(event.context, if (correctButton) LorenzColor.GREEN else LorenzColor.RED)
                     continue
                 }
                 if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 &&
                     slot.stack.displayName.removeColor() == correctButtons[i]
                 ) {
-                    slot.highlight(LorenzColor.YELLOW)
+                    slot.highlight(event.context, LorenzColor.YELLOW)
                 }
                 if (slot.slotIndex == i * 9 + 17) {
                     i += 1
@@ -103,11 +103,11 @@ object KloonHacking {
             }
         }
         if (inColorInventory) {
-            if (!config.colour) return
+            if (!config.color) return
             val targetColor = nearestTerminal ?: getNearestTerminal()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.stack.getLore().any { it.contains(targetColor?.name.orEmpty()) }) {
-                    slot.highlight(LorenzColor.GREEN)
+                    slot.highlight(event.context, LorenzColor.GREEN)
                 }
             }
         }
@@ -170,7 +170,11 @@ object KloonHacking {
     }
 
     @HandleEvent
+    @Suppress("AvoidBritishSpelling")
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.westVillageConfig", "rift.area.westVillage")
+
+        val basePath = "rift.area.westVillage"
+        event.move(82, "$basePath.hacking.colour", "$basePath.hacking.color")
     }
 }

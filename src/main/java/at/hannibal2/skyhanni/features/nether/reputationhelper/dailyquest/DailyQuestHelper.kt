@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -129,7 +128,7 @@ object DailyQuestHelper {
 
         if (event.gui !is GuiChest) return
         val chest = event.container as ContainerChest
-        val chestName = chest.getInventoryName()
+        val chestName = InventoryUtils.openInventoryName()
 
         if (chestName == "Challenges") {
             if (LorenzUtils.skyBlockArea != "Dojo") return
@@ -138,7 +137,7 @@ object DailyQuestHelper {
 
             for ((slot, stack) in chest.getUpperItems()) {
                 if (stack.displayName.contains(dojoQuest.dojoName)) {
-                    slot.highlight(LorenzColor.AQUA)
+                    slot.highlight(event.context, LorenzColor.AQUA)
                 }
             }
         }
@@ -224,6 +223,9 @@ object DailyQuestHelper {
 
     private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
+
+        // we do not call getQuestBoardLocation in the first few seconds when faction type is null, since this will show an error
+        if (CrimsonIsleReputationHelper.factionType == null && LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         val location = getQuestBoardLocation()
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)

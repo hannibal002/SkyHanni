@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
@@ -267,11 +268,19 @@ object TunnelsMaps {
         }
     }
 
+    @HandleEvent
+    @Suppress("AvoidBritishSpelling")
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(84, "mining.tunnelMaps.pathColour", "mining.tunnelMaps.pathColor")
+        event.move(84, "mining.tunnelMaps.dynamicPathColour", "mining.tunnelMaps.dynamicPathColor")
+    }
+
     init {
         RenderDisplayHelper(
             condition = { isEnabled() },
             inOwnInventory = true,
         ) {
+            // TODO cache
             val display = buildList {
                 if (active.isNotEmpty()) {
                     if (goal == campfire && active != campfire.name) {
@@ -464,11 +473,11 @@ object TunnelsMaps {
         )
     }
 
-    private fun getPathColor(): Color = if (config.dynamicPathColour) {
+    private fun getPathColor(): Color = if (config.dynamicPathColor) {
         goal?.name?.getFirstColorCode()?.toLorenzColor()?.takeIf { it != LorenzColor.WHITE }?.toColor()
     } else {
         null
-    } ?: config.pathColour.toSpecialColor()
+    } ?: config.pathColor.toSpecialColor()
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {

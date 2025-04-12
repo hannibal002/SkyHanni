@@ -33,9 +33,9 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventEndMark
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventStartMark
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice.menuNamePattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice.menuNamePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -78,7 +78,7 @@ object HoppityEventSummary {
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
      */
-    private val rabbitTheFishPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val rabbitTheFishPattern by CFApi.patternGroup.pattern(
         "rabbit.thefish",
         "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish(?:§.)*!.*",
     )
@@ -89,7 +89,7 @@ object HoppityEventSummary {
      * REGEX-TEST: Chocolate Factory Milestones
      * REGEX-TEST: Chocolate Shop Milestones
      */
-    private val miscCfInventoryPatterns by ChocolateFactoryApi.patternGroup.pattern(
+    private val miscCfInventoryPatterns by CFApi.patternGroup.pattern(
         "cf.inventory",
         "(?:\\(\\d*\\/\\d*\\) )?Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
     )
@@ -101,6 +101,7 @@ object HoppityEventSummary {
     private val storage get() = ProfileStorageData.profileSpecific
     private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val updateCfConfig get() = config.eventSummary.cfReminder
+    private val currentSbYear get() = SkyBlockTime.now().year
 
     private var allowedHoppityIslands: Set<IslandType> = setOf()
     private var displayCardRenderables = listOf<Renderable>()
@@ -111,7 +112,7 @@ object HoppityEventSummary {
     private var lastToggleMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentEventEndMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSnapshotServer: String? = null
-    private var statYear: Int = getCurrentSBYear()
+    private var statYear: Int = currentSbYear
     private var currentTimerActive = false
     private var onHoppityIsland = false
 
@@ -123,7 +124,7 @@ object HoppityEventSummary {
         val inventoryName = InventoryUtils.openInventoryName()
 
         val inChocolateFactory =
-            ChocolateFactoryApi.inChocolateFactory ||
+            CFApi.inChocolateFactory ||
                 menuNamePattern.matches(inventoryName) ||
                 miscCfInventoryPatterns.matches(inventoryName)
 
@@ -157,7 +158,7 @@ object HoppityEventSummary {
     }
 
     private fun MutableList<StatString>.chromafyLiveDisplay(): MutableList<StatString> =
-        if (ChocolateFactoryApi.config.partyMode.get()) map { it.copy(string = it.string.partyModeReplace()) }.toMutableList()
+        if (CFApi.config.partyMode.get()) map { it.copy(string = it.string.partyModeReplace()) }.toMutableList()
         else this
 
     private data class StatString(var string: String, val headed: Boolean = true)
@@ -187,7 +188,6 @@ object HoppityEventSummary {
 
     @HandleEvent
     fun onRabbitFound(event: RabbitFoundEvent) {
-
         val stats = getYearStats() ?: return
         if (!HoppityApi.isHoppityEvent()) {
             DelayedRun.runDelayed(5.seconds) {
@@ -225,7 +225,7 @@ object HoppityEventSummary {
         if (!liveDisplayConfig.enabled) return
         if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
-        if (Minecraft.getMinecraft().currentScreen != null && !ChocolateFactoryApi.inChocolateFactory) return
+        if (Minecraft.getMinecraft().currentScreen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggledOff = !storage.hoppityStatLiveDisplayToggledOff
@@ -281,7 +281,7 @@ object HoppityEventSummary {
         config.eventSummary.statDisplayList.afterChange {
             lastKnownStatHash = 0
         }
-        ChocolateFactoryApi.config.partyMode.afterChange {
+        CFApi.config.partyMode.afterChange {
             lastKnownStatHash = 0
         }
     }
@@ -343,7 +343,7 @@ object HoppityEventSummary {
     private fun checkStatsTypeCountInit() {
         val stats = getYearStats() ?: return
         for (i in 0..2) {
-            if (stats.typeCountSnapshot.getByIndex(i) != 0) return
+            if (stats.typeCountSnapshot?.getByIndex(i) != 0) return
         }
         stats.typeCountSnapshot = HoppityCollectionStats.getTypeCountSnapshot()
     }
@@ -359,7 +359,7 @@ object HoppityEventSummary {
         val showLastXHours = updateCfConfig.showForLastXHours.takeIf { it > 0 } ?: return
 
         // Initialize the current event end mark if it hasn't been set yet
-        if (currentEventEndMark.isFarPast()) currentEventEndMark = getEventEndMark(getCurrentSBYear())
+        if (currentEventEndMark.isFarPast()) currentEventEndMark = getEventEndMark(currentSbYear)
         if (showLastXHours < 30 && currentEventEndMark.timeUntil() >= showLastXHours.hours) return
 
         // If it's been less than {config} minutes since the last warning message, don't send another
@@ -421,15 +421,25 @@ object HoppityEventSummary {
     private fun buildTitle(statYear: Int) = Renderable.verticalContainer(
         buildList {
             addString(
-                "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats".partyModeReplace(),
+                when (statYear) {
+                    Int.MAX_VALUE -> "§dHoppity's Hunt All-Time Stats"
+                    else -> "§dHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats"
+                }.partyModeReplace(),
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
             )
+            if (statYear == Int.MAX_VALUE) {
+                val numberEvents = storage?.hoppityEventStats?.keys?.count { it <= currentSbYear } ?: 0
+                addCenteredString(
+                    "§7Compiled from §f$numberEvents §7events".partyModeReplace(),
+                )
+                return@buildList
+            }
+
             val eventEnd = getEventEndMark(statYear)
-            val yearNow = getCurrentSBYear()
             val isHoppity = HoppityApi.isHoppityEvent()
 
-            val isCurrentEvent = isHoppity && statYear == yearNow
-            val isPastEvent = statYear < yearNow || (statYear == yearNow && !isHoppity)
+            val isCurrentEvent = isHoppity && statYear == currentSbYear
+            val isPastEvent = statYear < currentSbYear || (statYear == currentSbYear && !isHoppity)
 
             val configMatches = when {
                 isCurrentEvent -> liveDisplayConfig.dateTimeDisplay.contains(CURRENT)
@@ -464,45 +474,85 @@ object HoppityEventSummary {
         val storage = storage ?: return null
         val statsStorage = storage.hoppityEventStats
 
-        val nextYear = getCurrentSBYear() + 1
-        val isAlreadyNextEvent = currentStatYear == nextYear
-        val predecessorYear = statsStorage.keys.filter { it < currentStatYear }.maxOrNull()
-        val successorYear = statsStorage.keys.filter { it in (currentStatYear + 1)..<nextYear }.minOrNull()
-        if (predecessorYear == null && successorYear == null) return null
-
         val isNextEventEnabled = liveDisplayConfig.dateTimeDisplay.contains(NEXT_EVENT)
+        val isAllTimeEnabled = liveDisplayConfig.showAllTime
+
+        val isAllTime = currentStatYear == Int.MAX_VALUE
+        val nextYear = currentSbYear + 1
+        val isAlreadyNextEvent = currentStatYear == nextYear
+        val predecessorYear = statsStorage.keys.filter {
+            it < currentStatYear &&
+                (it != nextYear || isNextEventEnabled)
+        }.maxOrNull()
+        val successorYear =
+            if (isAllTime) null
+            else statsStorage.keys.filter { it in (currentStatYear + 1)..<nextYear }.minOrNull()
+
+        val predecessorButton = predecessorYear?.let {
+            buildStatYearSwitcher(
+                "Hunt #${getHoppityEventNumber(it)}".toLeftButtonString(),
+                it,
+            )
+        }
+
+        val successorButton = successorYear?.let {
+            buildStatYearSwitcher(
+                "Hunt #${getHoppityEventNumber(it)}".toRightButtonString(),
+                it,
+            )
+        }
+
+        val nextEventButton = buildStatYearSwitcher(
+            "Next Hunt".toRightButtonString(),
+            nextYear,
+        ).takeIf { isNextEventEnabled && !isAlreadyNextEvent && !isAllTime }
+
+        val allTimeButton = buildStatYearSwitcher(
+            "All-Time".toRightButtonString(),
+            Int.MAX_VALUE,
+        ).takeIf { isAllTimeEnabled && !isAllTime }
+
+        val rightButton = successorButton
+            ?: nextEventButton
+            ?: allTimeButton
 
         return listOfNotNull(
-            predecessorYear?.let {
-                Renderable.optionalLink(
-                    "§d[ §r§f§l<- §r§7Hunt #${getHoppityEventNumber(it)} §r§d]".partyModeReplace(),
-                    onLeftClick = { statYear = it },
-                )
-            },
-            successorYear?.let {
-                Renderable.optionalLink(
-                    "§d[ §7Hunt #${getHoppityEventNumber(it)} §r§f§l-> §r§d]".partyModeReplace(),
-                    onLeftClick = { statYear = it },
-                )
-            } ?: if (isNextEventEnabled && !isAlreadyNextEvent) {
-                Renderable.optionalLink(
-                    "§d[ §7Next Hunt §r§f§l-> §r§d]".partyModeReplace(),
-                    onLeftClick = { statYear = getCurrentSBYear() + 1 },
-                )
-            } else null,
+            predecessorButton,
+            rightButton,
         )
     }
+
+    private fun buildStatYearSwitcher(text: String, year: Int) =
+        Renderable.optionalLink(text, onLeftClick = { statYear = year })
+
+    private fun String.toLeftButtonString() = "§d[ §r§f§l<- §r§7$this §r§d]".partyModeReplace()
+    private fun String.toRightButtonString() = "§d[ §7$this §r§f§l-> §r§d]".partyModeReplace()
 
     private fun getUnsummarizedYearStats(): Map<Int, HoppityEventStats> =
         storage?.hoppityEventStats?.filterValues { !it.summarized }.orEmpty()
 
-    private fun getYearStats(year: Int = getCurrentSBYear()): HoppityEventStats? =
-        storage?.hoppityEventStats?.getOrPut(year, ::HoppityEventStats)
+    private fun getYearStats(year: Int = currentSbYear): HoppityEventStats? =
+        if (year == Int.MAX_VALUE) getAllTimeStats()
+        else storage?.hoppityEventStats?.getOrPut(year) { HoppityEventStats(year) }
 
-    private fun getCurrentSBYear() = SkyBlockTime.now().year
+    private fun getAllTimeStats(): HoppityEventStats {
+        val storageYears = storage?.hoppityEventStats?.keys ?: return HoppityEventStats()
+        val allTimeStats = HoppityEventStats(storageYears)
+        val statsStorage = storage?.hoppityEventStats ?: return allTimeStats
+        statsStorage.values.forEach {
+            allTimeStats += it
+        }
+        allTimeStats.initialLeaderboardPosition = statsStorage.values.firstOrNull {
+            it.initialLeaderboardPosition.position != -1
+        }?.initialLeaderboardPosition ?: LeaderboardPosition(-1, -1.0)
+        allTimeStats.finalLeaderboardPosition = statsStorage.values.reversed().firstOrNull {
+            it.finalLeaderboardPosition.position != -1
+        }?.finalLeaderboardPosition ?: LeaderboardPosition(-1, -1.0)
+        return allTimeStats
+    }
 
     private fun checkAddCfTime() {
-        if (!ChocolateFactoryApi.inChocolateFactory) {
+        if (!CFApi.inChocolateFactory) {
             lastAddedCfMillis = SimpleTimeMark.farPast()
             return
         }
@@ -515,11 +565,11 @@ object HoppityEventSummary {
 
     private fun checkEnded() {
         if (!config.eventSummary.enabled) return
-        val currentYear = getCurrentSBYear()
-        val isSpring = SkyblockSeason.SPRING.isSeason()
+        if (SkyBlockTime.now().isSeasonBorder()) return
 
         getUnsummarizedYearStats().filter {
-            it.key < currentYear || (it.key == currentYear && !isSpring)
+            it.key < currentSbYear || (it.key == currentSbYear && !SkyblockSeason.SPRING.isSeason()) &&
+                (it.key != currentSbYear || !HoppityApi.isHoppityEvent()) // Secondary sanity check
         }.forEach { (year, stats) ->
             storage?.hoppityEventStats?.get(year)?.let {
                 // Only send the message if we're going to be able to set the stats as summarized
@@ -565,7 +615,7 @@ object HoppityEventSummary {
         val chocFormatLine = buildString {
             append(" §6+${chocGained.addSeparators()} Chocolate")
             if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
-                val timeFormatted = ChocolateFactoryApi.timeUntilNeed(chocGained).format(maxUnits = 2)
+                val timeFormatted = CFApi.timeUntilNeed(chocGained).format(maxUnits = 2)
                 append(" §7(§a+§b$timeFormatted§7)")
             }
         }
@@ -591,16 +641,28 @@ object HoppityEventSummary {
                 stats.getMealEggCount().takeIf { it > 0 }?.let {
                     val spawnedMealEggs = getSpawnedEggCount(year)
                     val eggFormat = StringUtils.pluralize(it, "Egg")
-                    statList.addStr("§7You found §b$it§7/§a$spawnedMealEggs §6Chocolate Meal $eggFormat§7.")
+                    val amount = "${it.addSeparators()}§7/§a${spawnedMealEggs.addSeparators()}"
+                    statList.addStr("§7You found §b$amount §6Chocolate Meal $eggFormat§7.")
                 }
             }
 
             put(HoppityStat.HITMAN_EGGS) { statList, stats, year ->
+                val spawnedMealEggs = getSpawnedEggCount(year)
+                val trueMissed = spawnedMealEggs - stats.getMealEggCount()
+                // We only want to show events after hitman was added (Hunt #41)
+                val missedMealEggs = if (year < 41) return@put
+                else if (year == Int.MAX_VALUE) {
+                    stats.containingYears.mapNotNull { containingYear ->
+                        if (containingYear < 41) return@mapNotNull null
+                        val yearMealEggs = getYearStats(containingYear)?.getMealEggCount() ?: 0
+
+                        getSpawnedEggCount(containingYear) - yearMealEggs
+                    }.sum()
+                } else trueMissed
+
                 stats.mealsFound[HoppityEggType.HITMAN]?.let {
-                    val spawnedMealEggs = getSpawnedEggCount(year)
-                    val missedMealEggs = spawnedMealEggs - stats.getMealEggCount()
                     val eggFormat = StringUtils.pluralize(it, "Egg")
-                    val divisorFormat = "§b$it§7/§a$missedMealEggs"
+                    val divisorFormat = "§b${it.addSeparators()}§7/§a${missedMealEggs.addSeparators()}"
                     statList.addStr("§7You recovered $divisorFormat §7missed §6Meal $eggFormat §7from §cRabbit Hitman§7.")
                 }
             }
@@ -608,14 +670,14 @@ object HoppityEventSummary {
             put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { statList, stats, _ ->
                 stats.getBoughtCount().takeIf { it > 0 }?.let {
                     val rabbitFormat = StringUtils.pluralize(it, "Rabbit")
-                    statList.addStr("§7You bought §b$it §f$rabbitFormat §7from §aHoppity§7.")
+                    statList.addStr("§7You bought §b${it.addSeparators()} §f$rabbitFormat §7from §aHoppity§7.")
                 }
             }
 
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->
                 stats.mealsFound[HoppityEggType.SIDE_DISH]?.let {
                     val eggFormat = StringUtils.pluralize(it, "Egg")
-                    statList.addStr("§7You found §b$it §6§lSide Dish $eggFormat §r§7in the §6Chocolate Factory§7.")
+                    statList.addStr("§7You found §b${it.addSeparators()} §6§lSide Dish $eggFormat §r§7in the §6Chocolate Factory§7.")
                 }
             }
 
@@ -744,7 +806,7 @@ object HoppityEventSummary {
             statList.clear()
             statList.addEmptyLine()
             statList.addStr("§c§lNothing to show!")
-            val isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == getCurrentSBYear()
+            val isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == currentSbYear
             val timeFormat = if (isCurrentEvent) "§c§l§oRIGHT NOW§c§o" else "in the future"
             statList.addStr("§c§oFind some eggs $timeFormat!")
         }
@@ -778,7 +840,15 @@ object HoppityEventSummary {
         ChatUtils.chat(summary, prefix = false)
     }
 
+    private fun getAllTimeSpawnedEggCount(): Int {
+        val negativeOffset = if (HoppityApi.isHoppityEvent()) 1 else 0
+        val completedEvents = storage?.hoppityEventStats?.size?.minus(negativeOffset) ?: 0
+        val spawnedThisEvent = if (HoppityApi.isHoppityEvent()) getSpawnedEggCount(currentSbYear) else 0
+        return completedEvents * 279 + spawnedThisEvent
+    }
+
     private fun getSpawnedEggCount(year: Int): Int {
+        if (year == Int.MAX_VALUE) return getAllTimeSpawnedEggCount()
         val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSBYear(year).toMillis()
         val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
         // Calculate total eggs from complete days and incomplete day periods
@@ -794,13 +864,13 @@ object HoppityEventSummary {
         return previousEggs + currentEggs
     }
 
-    fun HoppityEventStats.getPairTriple(
+    private fun HoppityEventStats.getPairTriple(
         year: Int,
         index: Int,
     ): Triple<Int, Int, Int> = getPreviousStats(year)?.let {
-        val currentValue = this.typeCountSnapshot.getByIndex(index)
-        val previousValue = it.typeCountSnapshot.getByIndex(index)
-        val sinceValue = it.typeCountsSince.getByIndex(index) - previousValue
+        val currentValue = this.typeCountSnapshot?.getByIndex(index) ?: 0
+        val previousValue = it.typeCountSnapshot?.getByIndex(index) ?: 0
+        val sinceValue = ((it.typeCountsSince?.getByIndex(index) ?: previousValue) - previousValue)
         val validData = previousValue > 0 && previousValue != currentValue && sinceValue > 0
         Triple(
             if (validData) previousValue else 0,
@@ -824,9 +894,9 @@ object HoppityEventSummary {
         } else ""
 
         return mutableListOf(
-            "§7$name Rabbits: §f$rabbitsSum$countFormat",
+            "§7$name Rabbits: §f${rabbitsSum.addSeparators()}$countFormat",
             HoppityApi.hoppityRarities.joinToString(" §7-") {
-                " ${it.chatColorCode}${rarityMap[it] ?: 0}"
+                " ${it.chatColorCode}${(rarityMap[it] ?: 0).addSeparators()}"
             },
         )
     }

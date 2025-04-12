@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils.collection
 
+import at.hannibal2.skyhanni.utils.MinMaxNumber
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
@@ -61,6 +63,10 @@ object CollectionUtils {
 
     fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
         this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
+
+    @Suppress("UnsafeCallOnNullableType")
+    fun <K> MutableMap<K, MinMaxNumber>.addOrPut(key: K, number: MinMaxNumber): MinMaxNumber =
+        this.merge(key, number, MinMaxNumber::plus)!! // Never returns null since "plus" can't return null
 
     fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
@@ -239,6 +245,10 @@ object CollectionUtils {
         return list
     }
 
+    fun <T> Collection<T>.distribute(subs: Int = 2): List<List<T>> {
+        return this.split(ceil(this.size.toDouble() / subs.toDouble()).toInt())
+    }
+
     inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
         val destination = LinkedHashMap<R, V>()
         for (element in this) {
@@ -252,7 +262,7 @@ object CollectionUtils {
 
     inline fun <T, C : Number, D : Number, R : Number> Iterable<T>.sumOfPair(
         crossinline selector: (T) -> Pair<C, D>,
-        crossinline resultConverter: (Double) -> R
+        crossinline resultConverter: (Double) -> R,
     ): Pair<R, R> {
         var sumFirst = 0.0
         var sumSecond = 0.0
@@ -319,6 +329,12 @@ object CollectionUtils {
         this[pair.first] = pair.second
     }
 
+    fun <K, V> MutableMap<K, V>.addAll(vararg pairs: Pair<K, V>) {
+        for (pair in pairs) {
+            this[pair.first] = pair.second
+        }
+    }
+
     fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {
         val iterator = this.iterator()
         while (iterator.hasNext()) {
@@ -368,7 +384,18 @@ object CollectionUtils {
 
     class OrderedQueue<T> : PriorityQueue<WeightedItem<T>>() {
         fun add(item: T, weight: Double): Boolean = super.add(WeightedItem(item, weight))
+        fun copyWithFilter(predicate: (T) -> Boolean): OrderedQueue<T> {
+            val newQueue = OrderedQueue<T>()
+            for (item in this) {
+                if (!predicate(item.item)) {
+                    newQueue.add(item.item, item.weight)
+                }
+            }
+            return newQueue
+        }
+
         fun pollOrNull(): T? = poll()?.item
+        fun getWaitingWeightOrNull(): Double? = peek()?.weight
     }
 
     data class WeightedItem<T>(val item: T, val weight: Double) : Comparable<WeightedItem<T>> {
@@ -393,6 +420,13 @@ object CollectionUtils {
             val removedValue = map.remove(key)
             postUpdate(key, null)
             return removedValue
+        }
+    }
+
+    fun <K> MutableMap<K, SimpleTimeMark>.evictOldestEntry(cap: Int) {
+        if (size > cap) {
+            val oldestKey = minByOrNull { it.value }?.key
+            oldestKey?.let { remove(it) }
         }
     }
 }

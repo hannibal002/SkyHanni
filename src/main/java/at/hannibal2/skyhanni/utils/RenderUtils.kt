@@ -18,12 +18,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -98,12 +98,14 @@ object RenderUtils {
         }
     //#endif
 
-    fun Slot.highlight(color: LorenzColor) {
-        highlight(color.toColor())
+    // TODO swap Slot with DrawContext for extended function
+    fun Slot.highlight(context: DrawContext, color: LorenzColor) {
+        highlight(context, color.toColor())
     }
 
-    fun Slot.highlight(color: Color) {
-        highlight(color, xDisplayPosition, yDisplayPosition)
+    // TODO swap Slot with DrawContext for extended function
+    fun Slot.highlight(context: DrawContext, color: Color) {
+        highlight(context, color, xDisplayPosition, yDisplayPosition)
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {
@@ -111,17 +113,18 @@ object RenderUtils {
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: Color) {
-        highlight(color, x, y)
+        highlight(context, color, x, y)
     }
 
-    fun highlight(color: Color, x: Int, y: Int) {
+    // TODO make a DrawContext extended function
+    fun highlight(context: DrawContext, color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
         // TODO don't use z
-        GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        Gui.drawRect(x, y, x + 16, y + 16, color.rgb)
-        GlStateManager.popMatrix()
+        context.matrices.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        GuiRenderUtils.drawRect(context, x, y, x + 16, y + 16, color.rgb)
+        context.matrices.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
     }
@@ -445,24 +448,23 @@ object RenderUtils {
         val display = "§f$string"
         GlStateManager.pushMatrix()
         transform()
-        val minecraft = Minecraft.getMinecraft()
-        val renderer = minecraft.renderManager.fontRenderer
+        val fr = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
-            val strLen: Int = renderer.getStringWidth(string)
+            val strLen: Int = fr.getStringWidth(string)
             val x2 = offsetX - strLen / 2f
             GL11.glTranslatef(x2, 0f, 0f)
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
+            fr.drawStringWithShadow(display, 0f, 0f, 0)
             GL11.glTranslatef(-x2, 0f, 0f)
         } else {
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
+            fr.drawStringWithShadow(display, 0f, 0f, 0)
         }
 
         GlStateManager.popMatrix()
 
-        return renderer.getStringWidth(display)
+        return fr.getStringWidth(display)
     }
 
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
@@ -517,60 +519,6 @@ object RenderUtils {
         }
         GlStateManager.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
-    }
-
-    /** This function is discouraged to be used. Please use renderRenderables with List<Renderable> instead with horizontal container.*/
-    private fun Position.renderRenderablesDouble(
-        renderables: List<List<Renderable>>,
-        extraSpace: Int = 0,
-        posLabel: String,
-        addToGuiManager: Boolean = true,
-    ) {
-        if (renderables.isEmpty()) return
-        var longestY = 0
-        var longestX = 0
-        GlStateManager.pushMatrix()
-        val (x, y) = transform()
-        Renderable.withMousePosition(x, y) {
-            for (line in renderables) {
-                GlStateManager.pushMatrix()
-                GlStateManager.translate(0f, longestY.toFloat(), 0F)
-                val lineY = line.maxOf { it.height }
-                var lineX = 0
-                for (element in line) {
-                    element.renderYAligned(lineX, longestY, lineY)
-                    GlStateManager.translate(element.width.toFloat(), 0f, 0f)
-                    lineX += element.width
-                }
-                longestY += lineY + extraSpace + 2
-                longestX = max(longestX, lineX)
-                GlStateManager.popMatrix()
-            }
-        }
-        GlStateManager.popMatrix()
-        if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
-    }
-
-    /**
-     * Accepts a list of lines to print.
-     * Each line is a list of things to print. Can print String or ItemStack objects.
-     */
-    @Deprecated("use List<List<Renderable>>", ReplaceWith("this.renderRenderablesDouble(list,extraSpace,posLabel)"))
-    fun Position.renderStringsAndItems(
-        list: List<List<Any?>>,
-        extraSpace: Int = 0,
-        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-
-        val render = list.map { listEntry ->
-            listEntry.map {
-                Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it")
-            }
-        }
-
-        this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
 
     // totally not modified Autumn Client's TargetStrafe
