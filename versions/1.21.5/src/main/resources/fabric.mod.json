@@ -7,6 +7,7 @@
     "icon": "assets/skyhanni/logo.png",
     "authors": [],
     "environment": "client",
+    "accessWidener": "skyhanni.accesswidener",
     "mixins": [
         "mixins.skyhanni.json"
     ],
