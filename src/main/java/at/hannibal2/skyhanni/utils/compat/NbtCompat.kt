@@ -15,20 +15,20 @@ import net.minecraft.nbt.NBTTagList
 
 object NbtCompat {
 
-    //stolen from some nbt constants file
-    val TAG_END: Int = 0
-    val TAG_BYTE: Int = 1
-    val TAG_SHORT: Int = 2
-    val TAG_INT: Int = 3
-    val TAG_LONG: Int = 4
-    val TAG_FLOAT: Int = 5
-    val TAG_DOUBLE: Int = 6
-    val TAG_BYTE_ARRAY: Int = 7
-    val TAG_STRING: Int = 8
-    val TAG_LIST: Int = 9
-    val TAG_COMPOUND: Int = 10
-    val TAG_INT_ARRAY: Int = 11
-    val TAG_ANY_NUMERIC = 99
+    // stolen from some nbt constants file
+    const val TAG_END: Int = 0
+    const val TAG_BYTE: Int = 1
+    const val TAG_SHORT: Int = 2
+    const val TAG_INT: Int = 3
+    const val TAG_LONG: Int = 4
+    const val TAG_FLOAT: Int = 5
+    const val TAG_DOUBLE: Int = 6
+    const val TAG_BYTE_ARRAY: Int = 7
+    const val TAG_STRING: Int = 8
+    const val TAG_LIST: Int = 9
+    const val TAG_COMPOUND: Int = 10
+    const val TAG_INT_ARRAY: Int = 11
+    const val TAG_ANY_NUMERIC = 99
 
     fun NBTTagCompound.containsList(key: String): Boolean {
         //#if MC < 1.21
