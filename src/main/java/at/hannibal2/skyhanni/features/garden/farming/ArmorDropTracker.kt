@@ -76,11 +76,10 @@ object ArmorDropTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         for (dropType in ArmorDropType.entries) {
-            if (dropType.chatMessage == event.message) {
-                addDrop(dropType)
-                if (config.hideChat) {
-                    event.blockedReason = "farming_armor_drops"
-                }
+            if (dropType.chatMessage != event.message) continue
+            addDrop(dropType)
+            if (config.hideChat) {
+                event.blockedReason = "farming_armor_drops"
             }
         }
     }
@@ -121,8 +120,6 @@ object ArmorDropTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!config.enabled) return
-
         checkArmor()
     }
 
