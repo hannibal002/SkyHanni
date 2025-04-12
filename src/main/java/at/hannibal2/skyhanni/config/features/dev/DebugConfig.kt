@@ -150,10 +150,11 @@ class DebugConfig {
     @ConfigEditorBoolean
     var currentAreaDebug: Boolean = true
 
+    // TODO rename to rayTracedOreBlock
     @Expose
     @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at.")
     @ConfigEditorBoolean
-    var rayTracedOreBlock: Boolean = true
+    var raytracedOreblock: Boolean = true
 
     @Expose
     @ConfigOption(name = "Ore Event Messages", desc = "Shows debug messages every time the Ore Event happens.")
