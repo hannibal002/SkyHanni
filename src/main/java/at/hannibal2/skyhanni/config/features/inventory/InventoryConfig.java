@@ -280,7 +280,8 @@ public class InventoryConfig {
     @ConfigOption(name = "Shift Click NPC sell", desc = "Change normal clicks to shift clicks in npc inventory for selling.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean shiftClickNpcSell = false;
+    // TODO rename to shiftClickNpcSell
+    public boolean shiftClickNPCSell = false;
 
     @Expose
     @ConfigOption(name = "Shift Click Brewing", desc = "Change normal clicks to shift clicks in Brewing Stand inventory.")
