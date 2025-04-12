@@ -26,7 +26,7 @@ enum class FrozenTreasure(
 
     val chatPattern by RepoPattern.pattern(
         "event.jerry.frozentreasure.item." + this.patternName(),
-        patternText()
+        patternText(),
     )
 
     private fun patternName() = name.lowercase().replace("_", "")
