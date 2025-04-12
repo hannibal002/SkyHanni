@@ -285,7 +285,7 @@ object ItemAbilityCooldown {
         lastAbility = ""
     }
 
-    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.itemAbilityCooldown
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.enabled
 
     private fun click(ability: ItemAbility) {
         if (ability.actionBarDetection) {
@@ -422,6 +422,8 @@ object ItemAbilityCooldown {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "itemAbilities", "inventory.itemAbilities")
+
+        event.move(65656, "inventory.itemAbilities.itemAbilityCooldown", "inventory.itemAbilities.")
     }
 
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {

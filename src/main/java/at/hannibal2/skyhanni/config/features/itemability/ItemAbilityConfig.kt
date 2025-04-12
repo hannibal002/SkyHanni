@@ -7,12 +7,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class ItemAbilityConfig {
-    // TODO rename to "enabled"
     @Expose
     @ConfigOption(name = "Ability Cooldown", desc = "Show the cooldown of item abilities.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var itemAbilityCooldown: Boolean = false
+    var enabled: Boolean = false
 
     // TODO rename to "background"
     @Expose
