@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,7 +13,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object ArmorStackDisplay {
-    private val config get() = SkyHanniMod.feature.combat.stackDisplayConfig
+    private val config get() = SkyHanniMod.feature.combat.armorStackDisplay
     private var display = ""
 
     /**
@@ -40,4 +41,9 @@ object ArmorStackDisplay {
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(65656, "combat.stackDisplayConfig", "combat.armorStackDisplay")
+    }
 }

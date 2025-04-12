@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class StackDisplayConfig {
+class ArmorStackDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Enable",
@@ -18,6 +18,6 @@ class StackDisplayConfig {
     var enabled: Boolean = false
 
     @Expose
-    @ConfigLink(owner = StackDisplayConfig::class, field = "enabled")
+    @ConfigLink(owner = ArmorStackDisplayConfig::class, field = "enabled")
     var position: Position = Position(480, -210, 1.9f)
 }
