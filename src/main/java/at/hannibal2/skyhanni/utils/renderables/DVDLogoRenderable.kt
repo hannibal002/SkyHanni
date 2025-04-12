@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import net.minecraft.client.renderer.GlStateManager
@@ -64,7 +63,7 @@ class DVDLogoRenderable(
         y = position.y + velocity.y * deltaTime,
     )
 
-    override fun render(context: DrawContext, posX: Int, posY: Int) {
+    override fun render(posX: Int, posY: Int) {
         val now = SimpleTimeMark.now()
         val deltaTime = now - lastTime
         lastTime = now
@@ -93,7 +92,7 @@ class DVDLogoRenderable(
         val (x, y) = position.x.roundToInt() to position.y.roundToInt()
         GlStateManager.pushMatrix()
         GlStateManager.translate(x.toFloat(), y.toFloat(), 0f)
-        renderable.render(context, posX + x, posY + y)
+        renderable.render(posX + x, posY + y)
         GlStateManager.popMatrix()
     }
 }

@@ -199,7 +199,7 @@ object JacobContestTimeNeeded {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestApi.inInventory) return
-        config.jacobContestTimesPosition.renderRenderables(event.context, display, posLabel = "Jacob Contest Time Needed")
+        config.jacobContestTimesPosition.renderRenderables(display, posLabel = "Jacob Contest Time Needed")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.jacobContestTimes

@@ -418,7 +418,7 @@ object MinionFeatures {
         if (!minionInventoryOpen) return
 
         if (config.hopperProfitDisplay) {
-            config.hopperProfitPos.renderString(event.context, coinsPerDay, posLabel = "Minion Coins Per Day")
+            config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
         }
     }
 

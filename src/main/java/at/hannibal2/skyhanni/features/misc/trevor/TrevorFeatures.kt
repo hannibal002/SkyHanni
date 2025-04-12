@@ -210,7 +210,6 @@ object TrevorFeatures {
         else "$timeUntilNextReady seconds left"
 
         config.trapperCooldownPos.renderString(
-            event.context,
             "${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage",
             posLabel = "Trapper Cooldown GUI",
         )

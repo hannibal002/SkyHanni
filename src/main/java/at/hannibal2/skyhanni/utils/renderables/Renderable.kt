@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGui
@@ -72,7 +72,7 @@ interface Renderable {
      * Pos x and pos y are relative to the mouse position.
      * (the GL matrix stack should already be pre transformed)
      */
-    fun render(context: DrawContext, posX: Int, posY: Int)
+    fun render(posX: Int, posY: Int)
 
     companion object {
 
@@ -201,11 +201,11 @@ interface Renderable {
             override val horizontalAlign = render.horizontalAlign
             override val verticalAlign = render.verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     handleClickChecks()
                 }
-                render.render(context, posX, posY)
+                render.render(posX, posY)
             }
 
             private fun handleClickChecks() {
@@ -268,15 +268,15 @@ interface Renderable {
 
                 val tipsRender = tips.mapNotNull { fromAny(it) }
 
-                override fun render(context: DrawContext, posX: Int, posY: Int) {
-                    render.render(context, posX, posY)
+                override fun render(posX: Int, posY: Int) {
+                    render.render(posX, posY)
                     val pair = Pair(posX, posY)
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
-                            context.matrices.pushMatrix()
-                            context.matrices.translate(0F, 0F, 400F)
+                            DrawContextUtils.pushMatrix()
+                            DrawContextUtils.translate(0F, 0F, 400F)
 
                             RenderableTooltips.setTooltipForRender(
                                 tips = tipsRender,
@@ -285,7 +285,7 @@ interface Renderable {
                                 snapsToTopIfToLong = snapsToTopIfToLong,
                                 spacedTitle = spacedTitle,
                             )
-                            context.matrices.popMatrix()
+                            DrawContextUtils.popMatrix()
                         }
                     } else {
                         HighlightOnHoverSlot.currentSlots.remove(pair)
@@ -358,10 +358,10 @@ interface Renderable {
             override val horizontalAlign = renderable.horizontalAlign
             override val verticalAlign = renderable.verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 Gui.drawRect(0, height, width, 11, color.rgb)
                 GlStateManager.color(1F, 1F, 1F, 1F)
-                renderable.render(context, posX, posY)
+                renderable.render(posX, posY)
             }
         }
 
@@ -380,15 +380,15 @@ interface Renderable {
 
             var isHovered = false
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 val pair = Pair(posX, posY)
                 isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover()
-                    hovered.render(context, posX, posY)
+                    hovered.render(posX, posY)
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                     true
                 } else {
-                    unHovered.render(context, posX, posY)
+                    unHovered.render(posX, posY)
                     HighlightOnHoverSlot.currentSlots.remove(pair)
                     false
                 }
@@ -406,14 +406,14 @@ interface Renderable {
             override val horizontalAlign = bottomLayer.horizontalAlign
             override val verticalAlign = bottomLayer.verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                val (x, y) = topLayer.renderXYAligned(context, posX, posY, width, height)
+            override fun render(posX: Int, posY: Int) {
+                val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
                 val (nPosX, nPosY) = if (topLayer.isHovered(posX + x, posY + y) && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
                     posX to posY
                 }
-                bottomLayer.render(context, nPosX, nPosY)
+                bottomLayer.render(nPosX, nPosY)
             }
         }
 
@@ -454,7 +454,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 if (highlight) {
                     item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
                 }
@@ -468,10 +468,10 @@ interface Renderable {
             override val horizontalAlign = this@darken.horizontalAlign
             override val verticalAlign = this@darken.verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 DarkenShader.darknessLevel = amount
                 ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
-                this@darken.render(context, posX, posY)
+                this@darken.render(posX, posY)
                 ShaderManager.disableShader()
             }
         }
@@ -495,8 +495,8 @@ interface Renderable {
 
             val inverseScale = 1 / scale
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                RenderableUtils.renderString(context, text, scale, color, inverseScale)
+            override fun render(posX: Int, posY: Int) {
+                RenderableUtils.renderString(text, scale, color, inverseScale)
             }
         }
 
@@ -531,20 +531,19 @@ interface Renderable {
 
             val inverseScale = 1 / scale
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                context.matrices.translate(1.0, 1.0, 0.0)
-                context.matrices.scale(scale.toFloat(), scale.toFloat(), 1f)
+            override fun render(posX: Int, posY: Int) {
+                DrawContextUtils.translate(1.0, 1.0, 0.0)
+                DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
                 map.entries.forEachIndexed { index, (text, size) ->
                     GuiRenderUtils.drawString(
-                        context,
                         text,
                         RenderableUtils.calculateAlignmentXOffset(size, rawWidth, internalAlign).toFloat(),
                         index * 10.0f,
                         color.rgb,
                     )
                 }
-                context.matrices.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
-                context.matrices.translate(-1.0, -1.0, 0.0)
+                DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
+                DrawContextUtils.translate(-1.0, -1.0, 0.0)
             }
         }
 
@@ -554,7 +553,7 @@ interface Renderable {
             override val horizontalAlign = HorizontalAlignment.LEFT
             override val verticalAlign = VerticalAlignment.TOP
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
             }
         }
 
@@ -589,19 +588,18 @@ interface Renderable {
             // null = ignored, never filtered
             private fun filter() = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 for ((rowIndex, row) in content.withIndex()) {
                     for ((index, renderable) in row.withIndex()) {
-                        context.matrices.pushMatrix()
-                        context.matrices.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+                        DrawContextUtils.pushMatrix()
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
                         renderable?.renderXYAligned(
-                            context,
                             posX + xOffsets[index],
                             posY + yOffsets[rowIndex],
                             xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
                         )
-                        context.matrices.popMatrix()
+                        DrawContextUtils.popMatrix()
                     }
                 }
             }
@@ -629,19 +627,18 @@ interface Renderable {
             val emptySpaceX = if (useEmptySpace) 0 else xPadding
             val emptySpaceY = if (useEmptySpace) 0 else yPadding
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 for ((rowIndex, row) in content.withIndex()) {
                     for ((index, renderable) in row.withIndex()) {
-                        context.matrices.pushMatrix()
-                        context.matrices.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+                        DrawContextUtils.pushMatrix()
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
                         renderable.renderXYAligned(
-                            context,
                             posX + xOffsets[index],
                             posY + yOffsets[rowIndex],
                             xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
                         )
-                        context.matrices.popMatrix()
+                        DrawContextUtils.popMatrix()
                     }
                 }
             }
@@ -724,10 +721,10 @@ interface Renderable {
                 }
             }
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 if (shouldRenderTopElseBottom && !(hideIfNoText && isTextBoxEmpty)) {
-                    RenderableUtils.renderString(context, searchPrefix + textInput.editText(), scale, color)
-                    context.matrices.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
+                    RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
+                    DrawContextUtils.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
                 }
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
@@ -746,17 +743,17 @@ interface Renderable {
                     textInput.disable()
                 }
                 if (hideIfNoText && isTextBoxEmpty) {
-                    content.render(context, posX, posY)
+                    content.render(posX, posY)
                 } else if (!shouldRenderTopElseBottom) {
-                    content.render(context, posX, posY)
-                    context.matrices.translate(0f, (ySpacing).toFloat(), 0f)
+                    content.render(posX, posY)
+                    DrawContextUtils.translate(0f, (ySpacing).toFloat(), 0f)
                     if (!(hideIfNoText && textInput.textBox.isEmpty())) {
-                        RenderableUtils.renderString(context, searchPrefix + textInput.editText(), scale, color)
+                        RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     }
-                    context.matrices.translate(0f, -(ySpacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, -(ySpacing).toFloat(), 0f)
                 } else {
-                    content.render(context, posX, posY + textBoxHeight + ySpacing)
-                    context.matrices.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
+                    content.render(posX, posY + textBoxHeight + ySpacing)
+                    DrawContextUtils.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
                 }
             }
 
@@ -790,7 +787,7 @@ interface Renderable {
                 startColor
             }
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 if (texture == null) {
                     Gui.drawRect(0, 0, width, height, 0xFF43464B.toInt())
 
@@ -839,9 +836,9 @@ interface Renderable {
             override val horizontalAlign = this@renderBounds.horizontalAlign
             override val verticalAlign = this@renderBounds.verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 Gui.drawRect(0, 0, width, height, color.rgb)
-                this@renderBounds.render(context, posX, posY)
+                this@renderBounds.render(posX, posY)
             }
 
         }
@@ -858,8 +855,8 @@ interface Renderable {
             override val height = render.height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                render.renderXAligned(context, posX, posY, width)
+            override fun render(posX: Int, posY: Int) {
+                render.renderXAligned(posX, posY, width)
             }
         }
 
@@ -879,15 +876,15 @@ interface Renderable {
             val emptySpace = width - render.sumOf { it.width }
             val spacing = emptySpace / render.size
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 var xOffset = posX
                 render.forEach {
                     val x = it.width + spacing
-                    it.renderXYAligned(context, xOffset, posY, x, height)
+                    it.renderXYAligned(xOffset, posY, x, height)
                     xOffset += x
-                    context.matrices.translate(x.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(x.toFloat(), 0f, 0f)
                 }
-                context.matrices.translate(-(xOffset - posX).toFloat(), 0f, 0f)
+                DrawContextUtils.translate(-(xOffset - posX).toFloat(), 0f, 0f)
             }
         }
 
@@ -903,8 +900,8 @@ interface Renderable {
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                render.renderYAligned(context, posX, posY, height)
+            override fun render(posX: Int, posY: Int) {
+                render.renderYAligned(posX, posY, height)
             }
         }
 
@@ -921,8 +918,8 @@ interface Renderable {
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                render.renderXYAligned(context, posX, posY, height, width)
+            override fun render(posX: Int, posY: Int) {
+                render.renderXYAligned(posX, posY, height, width)
             }
         }
 
@@ -947,14 +944,14 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 var xOffset = posX
                 renderables.forEach {
-                    it.renderYAligned(context, xOffset, posY, height)
+                    it.renderYAligned(xOffset, posY, height)
                     xOffset += it.width + spacing
-                    context.matrices.translate((it.width + spacing).toFloat(), 0f, 0f)
+                    DrawContextUtils.translate((it.width + spacing).toFloat(), 0f, 0f)
                 }
-                context.matrices.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
+                DrawContextUtils.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
             }
         }
 
@@ -971,14 +968,14 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 var yOffset = posY
                 renderables.forEach {
-                    it.renderXAligned(context, posX, yOffset, width)
+                    it.renderXAligned(posX, yOffset, width)
                     yOffset += it.height + spacing
-                    context.matrices.translate(0f, (it.height + spacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, (it.height + spacing).toFloat(), 0f)
                 }
-                context.matrices.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
+                DrawContextUtils.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
             }
         }
 
@@ -994,10 +991,10 @@ interface Renderable {
             override val horizontalAlign = content.horizontalAlign
             override val verticalAlign = content.verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                context.matrices.translate(leftSpacing.toFloat(), topSpacing.toFloat(), 0f)
-                content.render(context, posX + leftSpacing, posY + topSpacing)
-                context.matrices.translate(-leftSpacing.toFloat(), -topSpacing.toFloat(), 0f)
+            override fun render(posX: Int, posY: Int) {
+                DrawContextUtils.translate(leftSpacing.toFloat(), topSpacing.toFloat(), 0f)
+                content.render(posX + leftSpacing, posY + topSpacing)
+                DrawContextUtils.translate(-leftSpacing.toFloat(), -topSpacing.toFloat(), 0f)
             }
         }
 
@@ -1023,14 +1020,14 @@ interface Renderable {
                 }
             }
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 var yOffset = posY
                 renderables.forEach {
-                    it.renderXAligned(context, posX, yOffset, width)
+                    it.renderXAligned(posX, yOffset, width)
                     yOffset += it.height + spacing
-                    context.matrices.translate(0f, (it.height + spacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, (it.height + spacing).toFloat(), 0f)
                 }
-                context.matrices.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
+                DrawContextUtils.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
             }
         }
 
@@ -1063,13 +1060,12 @@ interface Renderable {
                 button,
             )
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 scroll.update(
                     isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 scrollListRender(
-                    context,
                     posX,
                     posY,
                     height,
@@ -1127,13 +1123,12 @@ interface Renderable {
                 button,
             )
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 scroll.update(
                     isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
                 )
 
                 scrollListRender(
-                    context,
                     posX,
                     posY,
                     height,
@@ -1148,7 +1143,6 @@ interface Renderable {
         }
 
         private fun scrollListRender(
-            context: DrawContext,
             posX: Int,
             posY: Int,
             height: Int,
@@ -1171,8 +1165,8 @@ interface Renderable {
             // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
             // there are more items above
             if (showScrollableTipsInList && !scroll.atMinimum()) {
-                scrollUpTip.renderXAligned(context, posX, posY, width)
-                context.matrices.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                scrollUpTip.renderXAligned(posX, posY, width)
+                DrawContextUtils.translate(0f, scrollUpTip.height.toFloat(), 0f)
                 renderY += scrollUpTip.height
                 negativeSpace1 -= scrollUpTip.height
             }
@@ -1186,14 +1180,14 @@ interface Renderable {
 
             for (renderable in list) {
                 if ((virtualY..virtualY + renderable.height) in window) {
-                    renderable.renderXAligned(context, posX, posY + renderY, width)
-                    context.matrices.translate(0f, renderable.height.toFloat(), 0f)
+                    renderable.renderXAligned(posX, posY + renderY, width)
+                    DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
                     renderY += renderable.height
                     found = true
                 } else if (found) {
                     if (renderY + renderable.height <= height + negativeSpace2) {
-                        renderable.renderXAligned(context, posX, posY + renderY, width)
-                        context.matrices.translate(0f, renderable.height.toFloat(), 0f)
+                        renderable.renderXAligned(posX, posY + renderY, width)
+                        DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
                         renderY += renderable.height
                     }
                     break
@@ -1204,10 +1198,10 @@ interface Renderable {
             // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
             // there are more items below
             if (showScrollableTipsInList && !atScrollEnd) {
-                scrollDownTip.renderXAligned(context, posX, posY + height - scrollDownTip.height, width)
+                scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
             }
 
-            context.matrices.translate(0f, -renderY.toFloat(), 0f)
+            DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
         }
 
         private fun filterList(content: Map<Renderable, String?>, textBox: String) =
@@ -1318,7 +1312,7 @@ interface Renderable {
                 }
             }
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 scroll.update(
                     isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
                 )
@@ -1328,18 +1322,17 @@ interface Renderable {
                     var offset = 0
                     for ((index, renderable) in header.withIndex()) {
                         renderable.renderXYAligned(
-                            context,
                             posX + offset,
                             posY,
                             xOffsets[index],
                             yOffsets[header] ?: 0,
                         )
-                        context.matrices.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         offset += xOffsets[index]
                     }
-                    context.matrices.translate(-offset.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(-offset.toFloat(), 0f, 0f)
                     val yShift = yOffsets[header] ?: 0
-                    context.matrices.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
 
@@ -1372,10 +1365,10 @@ interface Renderable {
                 }
 
                 if (showScrollableTipsInList && !scroll.atMinimum()) {
-                    scrollUpTip.render(context, posX, posY)
+                    scrollUpTip.render(posX, posY)
                     val yShift = scrollUpTip.height
                     renderY += yShift
-                    context.matrices.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                 }
 
                 for (rowIndex in range) {
@@ -1384,25 +1377,24 @@ interface Renderable {
                     val yShift = yOffsets[row] ?: 0
                     for ((index, renderable) in row.withIndex()) {
                         renderable.renderXYAligned(
-                            context,
                             posX + offset,
                             posY + renderY,
                             xOffsets[index],
                             yShift,
                         )
-                        context.matrices.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         offset += xOffsets[index]
                     }
-                    context.matrices.translate(-offset.toFloat(), 0f, 0f)
-                    context.matrices.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(-offset.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
 
                 if (showScrollableTipsInList && !scroll.atMaximum()) {
-                    scrollDownTip.render(context, posX, posY)
+                    scrollDownTip.render(posX, posY)
                 }
 
-                context.matrices.translate(0f, -renderY.toFloat(), 0f)
+                DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 
@@ -1440,7 +1432,7 @@ interface Renderable {
                 button,
             )
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 scroll.update(
                     isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
                 )
@@ -1448,18 +1440,17 @@ interface Renderable {
                 var renderY = 0
                 if (hasHeader) {
                     for ((index, renderable) in content[0].withIndex()) {
-                        context.matrices.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
-                            context,
                             posX + xOffsets[index],
                             posY + renderY,
                             xOffsets[index + 1] - xOffsets[index],
                             yOffsets[1],
                         )
-                        context.matrices.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
                     val yShift = yOffsets[1] - yOffsets[0]
-                    context.matrices.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
                 val range =
@@ -1476,21 +1467,20 @@ interface Renderable {
 
                 for (rowIndex in range2) {
                     for ((index, renderable) in content[rowIndex].withIndex()) {
-                        context.matrices.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
-                            context,
                             posX + xOffsets[index],
                             posY + renderY,
                             xOffsets[index + 1] - xOffsets[index],
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex],
                         )
-                        context.matrices.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
                     val yShift = yOffsets[rowIndex + 1] - yOffsets[rowIndex]
-                    context.matrices.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                context.matrices.translate(0f, -renderY.toFloat(), 0f)
+                DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 
@@ -1508,11 +1498,11 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
-                context.matrices.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(context, posX + padding, posY + padding)
-                context.matrices.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1533,10 +1523,10 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                context.matrices.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(context, posX + padding, posY + padding)
-                context.matrices.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            override fun render(posX: Int, posY: Int) {
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
 
                 RenderUtils.drawRoundRectOutline(
                     0,
@@ -1566,15 +1556,15 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
                 RenderUtils.drawRoundTexturedRect(0, 0, width, height, GL11.GL_NEAREST, radius)
                 GlStateManager.color(1f, 1f, 1f, 1f)
 
-                context.matrices.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(context, posX + padding, posY + padding)
-                context.matrices.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1597,16 +1587,16 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
 
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
                 GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
                 GlStateManager.color(1f, 1f, 1f, 1f)
 
-                context.matrices.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(context, posX + padding, posY + padding)
-                context.matrices.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1627,7 +1617,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
                 GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
@@ -1653,7 +1643,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
                 RenderUtils.drawRoundRectOutline(
                     0,
@@ -1667,9 +1657,9 @@ interface Renderable {
                     blur,
                 )
 
-                context.matrices.translate(padding.toFloat(), padding.toFloat(), 0f)
-                input.render(context, posX + padding, posY + padding)
-                context.matrices.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1694,13 +1684,13 @@ interface Renderable {
             val playerX = width / 2 + padding
             val playerY = height / 2 + playerHeight / 2 + padding
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
+            override fun render(posX: Int, posY: Int) {
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
                 val mouse = currentRenderPassMousePosition ?: return
                 val mouseXRelativeToPlayer = if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
                 val mouseYRelativeToPlayer = if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
-                context.matrices.translate(0f, 0f, 100f)
+                DrawContextUtils.translate(0f, 0f, 100f)
                 drawEntityOnScreen(
                     playerX,
                     playerY,
@@ -1709,7 +1699,7 @@ interface Renderable {
                     mouseYRelativeToPlayer,
                     player,
                 )
-                context.matrices.translate(0f, 0f, -100f)
+                DrawContextUtils.translate(0f, 0f, -100f)
             }
         }
     }

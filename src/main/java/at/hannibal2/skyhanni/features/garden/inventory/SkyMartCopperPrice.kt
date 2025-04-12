@@ -105,7 +105,6 @@ object SkyMartCopperPrice {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
             config.copperPricePos.renderRenderables(
-                event.context,
                 display,
                 extraSpace = 5,
                 posLabel = "SkyMart Copper Price",

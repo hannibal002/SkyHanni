@@ -255,7 +255,6 @@ object HoppityEventSummary {
         }
 
         config.eventSummary.liveDisplayPosition.renderRenderables(
-            event.context,
             displayCardRenderables,
             posLabel = "Hoppity's Hunt Stats",
         )

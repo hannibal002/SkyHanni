@@ -147,7 +147,7 @@ object JacobContestFFNeededDisplay {
         if (!isEnabled()) return
         if (!FarmingContestApi.inInventory) return
         if (lastToolTipTime.passedSince() > 200.milliseconds) return
-        config.farmingFortuneForContestPos.renderRenderables(event.context, display, posLabel = "Jacob Contest Crop Data")
+        config.farmingFortuneForContestPos.renderRenderables(display, posLabel = "Jacob Contest Crop Data")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.farmingFortuneForContest

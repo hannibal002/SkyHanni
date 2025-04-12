@@ -64,7 +64,7 @@ object ChickenHeadTimer {
             "Chicken Head Timer: §b$formatDuration"
         }
 
-        config.position.renderString(event.context, displayText, posLabel = "Chicken Head Timer")
+        config.position.renderString(displayText, posLabel = "Chicken Head Timer")
     }
 
     @HandleEvent

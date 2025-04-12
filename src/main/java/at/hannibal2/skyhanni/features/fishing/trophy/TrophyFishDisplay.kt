@@ -265,7 +265,6 @@ object TrophyFishDisplay {
         if (config.requireHunterArmor.get() && !FishingApi.wearingTrophyArmor) return
 
         config.position.renderRenderables(
-            event.context,
             display,
             extraSpace = config.extraSpace.get(),
             posLabel = "Trophy Fishing Display",

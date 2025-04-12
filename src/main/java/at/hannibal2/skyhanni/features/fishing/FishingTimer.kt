@@ -211,7 +211,7 @@ object FishingTimer {
         if (!FishingApi.isFishing()) return
 
         val text = display ?: return
-        config.pos.renderString(event.context, text, posLabel = "BarnTimer")
+        config.pos.renderString(text, posLabel = "BarnTimer")
     }
 
     private fun createDisplay(): String {

@@ -233,11 +233,10 @@ object MineshaftPityDisplay {
         RenderDisplayHelper(
             condition = { isDisplayEnabled() },
             outsideInventory = true,
-        ) { context ->
+        ) {
             display.ifEmpty { update() }
             if (display.isNotEmpty()) {
                 config.position.renderRenderables(
-                    context,
                     listOf(Renderable.verticalContainer(display, 2)),
                     posLabel = "Mineshaft Pity Display",
                 )
