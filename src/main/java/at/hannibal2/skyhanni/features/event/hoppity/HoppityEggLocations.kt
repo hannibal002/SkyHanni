@@ -26,8 +26,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 object HoppityEggLocations {
 
     private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
-        get() =
-            CFApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
+        get() = CFApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
 
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
