@@ -710,7 +710,7 @@ object DamageIndicatorManager {
             calcHealth.toLong(), calcMaxHealth.toLong(),
         ).getChatColor() + calcHealth.shortFormat()
 
-        if (!SkyHanniMod.feature.slayer.enderman.phaseDisplay) {
+        if (!SkyHanniMod.feature.slayer.endermen.phaseDisplay) {
             result = ""
             entityData.namePrefix = ""
         }

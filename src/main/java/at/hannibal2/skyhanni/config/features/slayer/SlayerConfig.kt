@@ -12,10 +12,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SlayerConfig {
+    // TODO rename to "enderman"
     @Expose
     @Category(name = "Enderman", desc = "Enderman Slayer Feature")
     @Accordion
-    var enderman: EndermanConfig = EndermanConfig()
+    var endermen: EndermanConfig = EndermanConfig()
 
     // TODO rename to "blaze"
     @Expose

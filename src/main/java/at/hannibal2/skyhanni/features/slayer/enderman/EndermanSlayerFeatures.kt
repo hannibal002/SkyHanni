@@ -41,7 +41,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object EndermanSlayerFeatures {
 
-    private val config get() = SkyHanniMod.feature.slayer.enderman
+    private val config get() = SkyHanniMod.feature.slayer.endermen
     private val beaconConfig get() = config.beacon
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private val flyingBeacons = mutableSetOf<EntityArmorStand>()
@@ -248,7 +248,5 @@ object EndermanSlayerFeatures {
         event.move(3, "slayer.endermanBeaconConfig.lineWidth", "slayer.endermen.endermanBeaconConfig.lineWidth")
         event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
         event.move(9, "slayer.enderman.endermanBeaconConfig", "slayer.endermen.beacon")
-
-        event.move(65656, "slayer.endermen", "slayer.enderman")
     }
 }
