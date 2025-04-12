@@ -169,7 +169,7 @@ object DicerRngDropTracker {
     }
 
     init {
-        tracker.initRenderer({ config.positon }) { shouldShowDisplay() }
+        tracker.initRenderer({ config.pos }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -204,7 +204,6 @@ object DicerRngDropTracker {
         }
 
         event.move(65656, "garden.dicerCounters", "garden.dicerRngDropTracker")
-        event.move(65657, "garden.dicerRngDropTracker.pos", "garden.dicerRngDropTracker.positon")
     }
 
     @HandleEvent
