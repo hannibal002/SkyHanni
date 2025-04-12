@@ -5,7 +5,7 @@ enum class FossilType(
     val totalTiles: Int,
     val firstPercentage: String,
     val fossilShape: FossilShape,
-    val possibleMutations: List<FossilMutation>
+    val possibleMutations: List<FossilMutation>,
 ) {
     TUSK(
         "Tusk", 8, "12.5%",
@@ -18,10 +18,10 @@ enum class FossilType(
                 FossilTile(2, 0),
                 FossilTile(3, 1),
                 FossilTile(3, 3),
-                FossilTile(4, 2)
-            )
+                FossilTile(4, 2),
+            ),
         ),
-        FossilMutation.entries
+        FossilMutation.entries,
     ),
     WEBBED(
         "Webbed", 10, "10%",
@@ -37,12 +37,12 @@ enum class FossilType(
                 FossilTile(4, 0),
                 FossilTile(5, 1),
                 FossilTile(6, 2),
-            )
+            ),
         ),
         listOf(
             FossilMutation.ROTATE_0,
             FossilMutation.FLIP_ROTATE_0,
-        )
+        ),
     ),
     CLUB(
         "Club", 11, "9.1%",
@@ -59,14 +59,14 @@ enum class FossilType(
                 FossilTile(6, 0),
                 FossilTile(6, 2),
                 FossilTile(7, 1),
-            )
+            ),
         ),
         listOf(
             FossilMutation.ROTATE_0,
             FossilMutation.ROTATE_180,
             FossilMutation.FLIP_ROTATE_0,
             FossilMutation.FLIP_ROTATE_180,
-        )
+        ),
     ),
     SPINE(
         "Spine", 12, "8.3%",
@@ -84,9 +84,9 @@ enum class FossilType(
                 FossilTile(4, 1),
                 FossilTile(4, 2),
                 FossilTile(5, 2),
-            )
+            ),
         ),
-        FossilMutation.onlyRotation
+        FossilMutation.onlyRotation,
     ),
     CLAW(
         "Claw", 13, "7.7%",
@@ -105,9 +105,9 @@ enum class FossilType(
                 FossilTile(4, 2),
                 FossilTile(4, 3),
                 FossilTile(5, 1),
-            )
+            ),
         ),
-        FossilMutation.entries
+        FossilMutation.entries,
     ),
     FOOTPRINT(
         "Footprint", 13, "7.7%",
@@ -126,9 +126,9 @@ enum class FossilType(
                 FossilTile(4, 0),
                 FossilTile(4, 2),
                 FossilTile(4, 4),
-            )
+            ),
         ),
-        FossilMutation.onlyRotation
+        FossilMutation.onlyRotation,
     ),
     HELIX(
         "Helix", 14, "7.1%",
@@ -148,9 +148,9 @@ enum class FossilType(
                 FossilTile(3, 2),
                 FossilTile(3, 3),
                 FossilTile(3, 4),
-            )
+            ),
         ),
-        FossilMutation.entries
+        FossilMutation.entries,
     ),
     UGLY(
         "Ugly", 16, "6.2%",
@@ -172,9 +172,9 @@ enum class FossilType(
                 FossilTile(4, 1),
                 FossilTile(4, 2),
                 FossilTile(5, 1),
-            )
+            ),
         ),
-        FossilMutation.onlyRotation
+        FossilMutation.onlyRotation,
     ),
     ;
 

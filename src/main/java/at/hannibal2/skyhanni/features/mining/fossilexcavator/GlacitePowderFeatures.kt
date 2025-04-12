@@ -18,7 +18,7 @@ object GlacitePowderFeatures {
 
     private val glacitePowderPattern by patternGroup.pattern(
         "glacitepowder",
-        "Glacite Powder x(?<amount>.*)"
+        "Glacite Powder x(?<amount>.*)",
     )
 
     @HandleEvent

@@ -15,7 +15,7 @@ enum class FossilMutation(val modification: (FossilShape) -> FossilShape) {
             ROTATE_0,
             ROTATE_90,
             ROTATE_180,
-            ROTATE_270
+            ROTATE_270,
         )
     }
 }
