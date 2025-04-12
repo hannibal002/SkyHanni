@@ -39,7 +39,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GardenVisitorDropStatistics {
 
-    private val config get() = GardenApi.config.visitors.dropsStatistics
+    private val config get() = VisitorApi.config.dropsStatistics
     private var display = emptyList<Renderable>()
 
     private var acceptedVisitors = 0

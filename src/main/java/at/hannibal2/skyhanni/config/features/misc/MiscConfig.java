@@ -42,7 +42,7 @@ public class MiscConfig {
     public MinionsConfig minions = new MinionsConfig();
 
     @Expose
-    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
+    @Category(name = "Stranded", desc = "Features designed for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
     @Expose
