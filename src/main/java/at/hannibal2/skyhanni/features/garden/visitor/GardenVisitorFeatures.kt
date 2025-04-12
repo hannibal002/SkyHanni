@@ -644,7 +644,7 @@ object GardenVisitorFeatures {
 
     private fun renderDisplay() {
         if (showGui() && shouldShowShoppingList()) {
-            config.shoppingList.pos.renderRenderables(display, posLabel = "Visitor Shopping List")
+            config.shoppingList.position.renderRenderables(display, posLabel = "Visitor Shopping List")
         }
     }
 
@@ -786,6 +786,7 @@ object GardenVisitorFeatures {
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")
 
         event.move(65656, "garden.visitors.shoppingList.display", "garden.visitors.shoppingList.enabled")
+        event.move(65656, "garden.visitors.shoppingList.pos", "garden.visitors.shoppingList.position")
     }
 }
 

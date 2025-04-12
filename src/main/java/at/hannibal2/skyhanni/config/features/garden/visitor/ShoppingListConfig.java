@@ -15,9 +15,8 @@ public class ShoppingListConfig {
     public boolean enabled = true;
 
     @Expose
-    // TODO rename "position"
-    public Position pos = new Position(180, 170, false, true);
     @ConfigLink(owner = ShoppingListConfig.class, field = "enabled")
+    public Position position = new Position(180, 170, false, true);
 
     @Expose
     @ConfigOption(name = "Only when Close", desc = "Only show the shopping list when close to the visitors.")
