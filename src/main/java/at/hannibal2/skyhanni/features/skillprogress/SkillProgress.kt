@@ -106,7 +106,7 @@ object SkillProgress {
             SkillProgressConfig.TextAlignment.CENTERED,
             SkillProgressConfig.TextAlignment.LEFT,
             SkillProgressConfig.TextAlignment.RIGHT,
-            -> {
+                -> {
                 val horizontalAlignment = textAlignment.alignment ?: RenderUtils.HorizontalAlignment.LEFT
                 val content = Renderable.horizontalContainer(display, horizontalAlign = horizontalAlignment)
                 val renderables = listOf(Renderable.fixedSizeLine(content, maxWidth))
