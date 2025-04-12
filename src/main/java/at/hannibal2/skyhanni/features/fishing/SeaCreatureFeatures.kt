@@ -39,14 +39,17 @@ object SeaCreatureFeatures {
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
     var lastSeaCreatureKill = SimpleTimeMark.farPast()
+    private val damagedSeaCreatures = TimeLimitedSet<Mob>(60.seconds)
     private val seaCreaturesBosses = BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
+
+    fun Mob.isSeaCreature() = this.name in SeaCreatureManager.allFishingMobs
+    fun Mob.isRareSeaCreature() = this.isSeaCreature() && SeaCreatureManager.allFishingMobs[this.name]?.rare == true
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
-        val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
-        if (!creature.rare) return
+        if (!mob.isRareSeaCreature()) return
 
         rareSeaCreatures.add(mob)
 
@@ -79,19 +82,31 @@ object SeaCreatureFeatures {
     }
 
     @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
+        rareSeaCreatures.remove(event.mob)
+
+        if (!isEnabled()) return
+        val mob = event.mob
+        if (!mob.isSeaCreature()) return
+
+        if (mob !in damagedSeaCreatures) return
+
+        if (mob.centerCords.distanceToPlayer() > 15) return
+
+        lastSeaCreatureKill = SimpleTimeMark.now()
+    }
+
+    @HandleEvent
     fun onMobHurt(event: MobEvent.Hurt.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
-        SeaCreatureManager.allFishingMobs[mob.name] ?: return
+        if (!mob.isSeaCreature()) return
 
-        if (mob.centerCords.distanceToPlayer() > 10) return
         if (!event.source.sourceOfDamage.isLocalPlayer) return
 
         if (lastRareCatch.passedSince() < 1.seconds) return
-        val entity = mob.baseEntity
-        if (mob.name == "Water Hydra" && entity.health == (entity.baseMaxHealth.toFloat() / 2)) return
 
-        lastSeaCreatureKill = SimpleTimeMark.now()
+        damagedSeaCreatures.addIfAbsent(mob)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
