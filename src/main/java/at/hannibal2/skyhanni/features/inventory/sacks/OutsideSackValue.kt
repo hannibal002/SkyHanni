@@ -23,10 +23,12 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
+import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 
 // shows the sack items and price in sacks while not in the sacks
 @SkyHanniModule
@@ -89,21 +91,23 @@ object OutsideSackValue {
         }
     }
 
-    private fun createAdvancedDisplay() = buildList {
+    private fun createAdvancedDisplay(): List<Renderable> {
         val (label, data) = calculateData()
-        add(
-            Renderable.clickable(
-                Renderable.string(label),
-                tips = buildList {
-                    add(label)
-                    add("")
-                    add("§eLeft click to show less infos!")
-                    add("§eRight click to open sacks!")
-                },
-                onAnyClick = onAnyClick(),
-            ),
-        )
+        val result = buildList {
+            add(
+                Renderable.clickable(
+                    Renderable.string(label),
+                    tips = buildList {
+                        add(label)
+                        add("")
+                        add("§eLeft click to show less infos!")
+                        add("§eRight click to open sacks!")
+                    },
+                    onAnyClick = onAnyClick(),
+                ),
+            )
 
+        }.map { it.toSearchable() }.toMutableList()
         val tableData = mutableMapOf<List<Renderable>, String>()
 
         for (sackData in data) {
@@ -114,7 +118,7 @@ object OutsideSackValue {
             tableData[list] = sackData.itemNames.joinToString(",")
         }
         if (tableData.isEmpty()) {
-            addString("§cNo Items in sacks!")
+            result.addSearchString("§cNo Items in sacks!")
         }
         Renderable.searchableScrollable(
             tableData,
@@ -123,7 +127,11 @@ object OutsideSackValue {
             textInput = textInput,
             scrollValue = scrollValue,
             velocity = 5.0,
-        )?.let { add(it) }
+        )?.let {
+            result.add(it.toSearchable())
+        }
+
+        return listOf(result.buildSearchBox(textInput))
     }
 
     private fun Long.formatItemAmount(): String {
