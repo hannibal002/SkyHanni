@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MinMaxNumber
@@ -20,13 +21,20 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 
 // shows the sack items and price in sacks while not in the sacks
 @SkyHanniModule
 object OutsideSackValue {
     private val config get() = SkyHanniMod.feature.inventory.outsideSackValue
+
+    private val textInput = SearchTextInput()
+    private val scrollValue = ScrollValue()
 
     private var display = listOf<Renderable>()
     private var advanced = false
@@ -58,13 +66,19 @@ object OutsideSackValue {
     fun onInventoryOpen() {
         if (advanced) {
             advanced = false
-            update()
+            reset()
         }
+    }
+
+    private fun reset() {
+        scrollValue.setValue(0.0)
+        update()
     }
 
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
-        update()
+        advanced = false
+        reset()
     }
 
     private fun update() {
@@ -89,9 +103,27 @@ object OutsideSackValue {
                 onAnyClick = onAnyClick(),
             ),
         )
-        for ((name, lore) in data.entries) {
-            add(Renderable.hoverTips(name, tips = lore))
+
+        val tableData = mutableMapOf<List<Renderable>, String>()
+
+        for (sackData in data) {
+            val list = listOf(
+                Renderable.hoverTips(sackData.sackName, tips = sackData.lore),
+                Renderable.hoverTips(sackData.sackPrice.toString(), tips = sackData.lore),
+            )
+            tableData[list] = sackData.itemNames.joinToString(",")
         }
+        if (tableData.isEmpty()) {
+            addString("§cNo Items in sacks!")
+        }
+        Renderable.searchableScrollable(
+            tableData,
+            key = 99,
+            lines = 8,
+            textInput = textInput,
+            scrollValue = scrollValue,
+            velocity = 5.0,
+        )?.let { add(it) }
     }
 
     private fun Long.formatItemAmount(): String {
@@ -106,7 +138,11 @@ object OutsideSackValue {
                 tips = buildList {
                     add(label)
                     add("")
-                    addAll(data.keys)
+                    if (data.isEmpty()) {
+                        add("§cNo Items in sacks!")
+                    } else {
+                        addAll(data.map { "${it.sackName} ${it.sackPrice}" })
+                    }
                     add("")
                     add("§eLeft click to show more infos!")
                     add("§eRight click to open sacks!")
@@ -122,21 +158,22 @@ object OutsideSackValue {
         },
         KeyboardManager.LEFT_MOUSE to {
             advanced = !advanced
-            update()
+            reset()
         },
     )
 
-    private fun calculateData(): Pair<String, MutableMap<String, List<String>>> {
-        var totalAmount = 0L
-        var totalPrice = MinMaxNumber(0.0, 0.0)
-        val map = mutableMapOf<String, Double>()
+    class SackData(val sackName: String, val sackPrice: MinMaxNumber, val itemNames: List<String>, val lore: List<String>)
 
+    private fun calculateData(): Pair<String, List<SackData>> {
         val sackForItem = mutableMapOf<NeuInternalName, String>()
         for ((name, items) in SackApi.sacks) {
             for (item in items) {
                 sackForItem[item] = name
             }
         }
+
+        var totalAmount = 0L
+        var totalPrice = MinMaxNumber(0.0, 0.0)
         val pricePerSack = mutableMapOf<String, MinMaxNumber>()
         val amountPerSack = mutableMapOf<String, Long>()
         val itemPricesPerSack = mutableMapOf<String, MutableMap<NeuInternalName, MinMaxNumber>>()
@@ -144,10 +181,8 @@ object OutsideSackValue {
         for ((internalName, data) in SackApi.sackData) {
             val amount = data.amount
             if (amount == 0) continue
-            if (!internalName.isBazaarItem()) {
-                map[internalName.toString()] = amount * internalName.getPrice()
-                continue
-            }
+            if (!internalName.isBazaarItem()) continue
+
             val priceMin = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL) * amount
             val priceMax = internalName.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY) * amount
             val price = MinMaxNumber(priceMin, priceMax)
@@ -159,22 +194,25 @@ object OutsideSackValue {
             totalAmount += amount
             totalPrice += price
         }
-        val result = mutableMapOf<String, List<String>>()
+
+        val datas = mutableListOf<SackData>()
         for ((sack, sackPrice) in pricePerSack.entries.sortedByDescending { it.value.min }) {
             val itemPrices = itemPricesPerSack[sack] ?: continue
-            val list = mutableListOf<String>()
-            val name = "§a$sack Sack $sackPrice"
-            list.add(name)
+            val lore = mutableListOf<String>()
+            val name = "§a$sack Sack"
+            lore.add("$name $sackPrice")
             val sackAmount = amountPerSack[sack] ?: 0
-            list.add(sackAmount.formatItemAmount())
-            list.add("")
+            lore.add(sackAmount.formatItemAmount())
+            lore.add("")
+            val itemNames = mutableListOf<String>()
             for ((item, price) in itemPrices.entries.sortedByDescending { it.value.min }) {
                 val amount = SackApi.sackData[item]?.amount ?: error("no amount for $item")
-                list.add("${item.getNumberedName(amount)}§8: $price")
+                lore.add("${item.getNumberedName(amount)}§8: $price")
+                itemNames.add(item.repoItemName.removeColor())
             }
-            result[name] = list
+            datas.add(SackData(name, sackPrice, itemNames, lore))
         }
 
-        return "$totalPrice §ein sacks ${totalAmount.formatItemAmount()}" to result
+        return "$totalPrice §ein sacks ${totalAmount.formatItemAmount()}" to datas
     }
 }
