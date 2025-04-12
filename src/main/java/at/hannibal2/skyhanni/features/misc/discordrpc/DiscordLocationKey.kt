@@ -52,7 +52,7 @@ object DiscordLocationKey {
         "goblin-holdout",
         "magma-fields",
         "crystal-nucleus",
-        "dungeon-hub"
+        "dungeon-hub",
     )
     // list of tokens where the name can be lowercased and spaces can be replaced with dashes
 
@@ -204,7 +204,7 @@ object DiscordLocationKey {
         "Stronghold",
         "The Dukedom",
         "The Wasteland",
-        "Throne Room"
+        "Throne Room",
     )
     // list of nether locations because there are soo many (truncated some according to scoreboard)
 
@@ -243,7 +243,7 @@ object DiscordLocationKey {
         "Photon Pathway" to "stillgore-chateau",
         "Stillgore Château" to "stillgore-chateau",
         "Oubliette" to "stillgore-chateau",
-        "Fairylosopher Tower" to "stillgore-chateau"
+        "Fairylosopher Tower" to "stillgore-chateau",
     )
 
     private fun getAmbiguousKey(location: String): String {

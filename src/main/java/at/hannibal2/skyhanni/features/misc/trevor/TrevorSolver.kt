@@ -60,7 +60,7 @@ object TrevorSolver {
                     ErrorManager.skyHanniError(
                         "Found trevor mob but current mob is null",
                         "entity" to entity,
-                        "mobDataMob" to MobData.entityToMob[entity]
+                        "mobDataMob" to MobData.entityToMob[entity],
                     )
                 }
 

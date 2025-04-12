@@ -20,7 +20,7 @@ object RestorePieceOfWizardPortalLore {
 
     private val earnedPattern by RepoPattern.pattern(
         "misc.restore.wizard.portal.earned",
-        "§7Earned by:.*"
+        "§7Earned by:.*",
     )
 
     @HandleEvent
