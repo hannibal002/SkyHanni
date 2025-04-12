@@ -24,7 +24,7 @@ object CorpseApi {
      */
     private val startPattern by chatPatternGroup.pattern(
         "start",
-        " {2}§r§b§l§r§(?<color>.)§l(?<name>.*) §r§b§lCORPSE LOOT! ?"
+        " {2}§r§b§l§r§(?<color>.)§l(?<name>.*) §r§b§lCORPSE LOOT! ?",
     )
 
     /**

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 enum class MineshaftWaypointType(
     val displayText: String,
     val color: LorenzColor,
-    itemName: String? = null
+    itemName: String? = null,
 ) {
     LAPIS("Lapis Corpse", LorenzColor.DARK_BLUE, "LAPIS_ARMOR_HELMET"),
     UMBER("Umber Corpse", LorenzColor.GOLD, "ARMOR_OF_YOG_HELMET"),
