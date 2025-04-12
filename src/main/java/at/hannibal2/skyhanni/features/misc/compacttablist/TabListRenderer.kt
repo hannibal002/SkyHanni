@@ -219,7 +219,7 @@ object TabListRenderer {
 
     private val fireSalePattern by RepoPattern.pattern(
         "tablist.firesaletitle",
-        "§.§lFire Sales: §r§f\\([0-9]+\\)"
+        "§.§lFire Sales: §r§f\\([0-9]+\\)",
     )
 
     @HandleEvent

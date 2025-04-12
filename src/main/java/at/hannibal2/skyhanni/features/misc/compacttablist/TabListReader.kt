@@ -73,11 +73,11 @@ object TabListReader {
     )
     private val upgradesPattern by patternGroup.pattern(
         "upgrades",
-        "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)"
+        "(?<firstPart>§e[A-Za-z ]+)(?<secondPart> §f[\\w ]+)",
     )
     private val winterPowerUpsPattern by patternGroup.pattern(
         "winterpowerups",
-        "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*"
+        "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*",
     )
 
     var hypixelAdvertisingString = "HYPIXEL.NET"
