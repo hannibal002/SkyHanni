@@ -190,7 +190,7 @@ object GardenVisitorTimer {
             outsideInventory = true,
             inOwnInventory = true,
         ) {
-            config.position.renderRenderable(display, posLabel = "Garden Visitor Timer")
+            config.pos.renderRenderable(display, posLabel = "Garden Visitor Timer")
         }
     }
 
@@ -243,7 +243,5 @@ object GardenVisitorTimer {
         event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")
         event.move(3, "garden.visitorTimerSixthVisitorWarning", "garden.visitors.timer.sixthVisitorWarning")
         event.move(3, "garden.visitorTimerPos", "garden.visitors.timer.pos")
-
-        event.move(65656, "garden.visitors.timer.pos", "garden.visitors.timer.position")
     }
 }
