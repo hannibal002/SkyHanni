@@ -749,7 +749,7 @@ object DamageIndicatorManager {
             val teleportTime = 7.1.seconds
 
             val teleportCycleTicks = (7.1 * 20).toInt()
-            val ticksAlive = (entity.ticksExisted % teleportCycleTicks).ticks
+            val ticksAlive = (entityData.serverTicksAlive % teleportCycleTicks).ticks
 
             val remainingTime = teleportTime - ticksAlive
             val formatDelay = formatDelay(remainingTime)
