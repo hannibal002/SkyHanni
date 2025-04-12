@@ -349,15 +349,10 @@ object TunnelsMaps {
                 ),
             )
         }
-        if (config.compactGemstone.get()) {
-            add(
-                Renderable.table(
-                    listOf(
-                        gemstones.map(::toCompactGemstoneName)
-                    ),
-                ),
-            )
-        } else addAll(gemstones.toRenderables())
+
+        if (config.compactGemstone.get()) add(Renderable.table(listOf(gemstones.map(::toCompactGemstoneName))))
+        else addAll(gemstones.toRenderables())
+
         addAll(normalLocations.toRenderables())
     }
 

@@ -160,7 +160,7 @@ object DianaProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled },
+            condition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) },
             onRender = {
                 if (DianaApi.hasSpadeInHand()) tracker.firstUpdate()
                 tracker.renderDisplay(config.position)
