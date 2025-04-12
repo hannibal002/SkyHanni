@@ -71,7 +71,7 @@ object TabListRenderer {
 
         if (columns.isEmpty()) return
 
-        GlStateManager.translate(0f, 0f, TAB_Z_OFFSET)
+        context.matrices.translate(0f, 0f, TAB_Z_OFFSET)
 
         var maxLines = 0
         var totalWidth = 0 - COLUMN_SPACING
@@ -142,7 +142,7 @@ object TabListRenderer {
                 footerY += LINE_HEIGHT
             }
         }
-        GlStateManager.translate(0f, 0f, -TAB_Z_OFFSET)
+        context.matrices.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
     private fun drawColumns(context: DrawContext, x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {

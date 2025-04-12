@@ -207,7 +207,7 @@ object CakeTracker {
 
         (event.container as ContainerChest).getUpperItems().forEach { (slot, _) ->
             slotHighlightCache[slot.slotIndex]?.let { color ->
-                slot.highlight(color)
+                slot.highlight(event.context, color)
             }
         }
     }
