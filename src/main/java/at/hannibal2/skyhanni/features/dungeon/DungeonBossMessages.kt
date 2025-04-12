@@ -14,13 +14,13 @@ object DungeonBossMessages {
     private val bossPattern = "§([cd4])\\[BOSS] (.*)".toPattern()
 
     private val excludedMessages = listOf(
-        "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass."
+        "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.",
     )
 
     private val messageList = listOf(
         // M7 – Dragons
         "§cThe Crystal withers your soul as you hold it in your hands!",
-        "§cIt doesn't seem like that is supposed to go there."
+        "§cIt doesn't seem like that is supposed to go there.",
     )
 
     private val messageContainsList = listOf(
@@ -36,13 +36,13 @@ object DungeonBossMessages {
         " Storm§r§c: ",
         " Goldor§r§c: ",
         " Necron§r§c: ",
-        " §r§4§kWither King§r§c:"
+        " §r§4§kWither King§r§c:",
     )
 
     private val messageEndsWithList = listOf(
         " Necron§r§c: That is enough, fool!",
         " Necron§r§c: Adventurers! Be careful of who you are messing with..",
-        " Necron§r§c: Before I have to deal with you myself."
+        " Necron§r§c: Before I have to deal with you myself.",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)

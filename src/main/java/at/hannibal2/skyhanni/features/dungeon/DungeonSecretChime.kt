@@ -30,7 +30,7 @@ object DungeonSecretChime {
             ClickedBlockType.TRAPPED_CHEST,
             ClickedBlockType.LEVER,
             ClickedBlockType.WITHER_ESSENCE,
-            -> playSound()
+                -> playSound()
         }
     }
 

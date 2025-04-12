@@ -126,7 +126,7 @@ object DungeonHideItems {
                 ABILITY_ORB_TEXTURE,
                 SUPPORT_ORB_TEXTURE,
                 DAMAGE_ORB_TEXTURE,
-                -> {
+                    -> {
                     event.cancel()
                     hideParticles[entity] = System.currentTimeMillis()
                     return

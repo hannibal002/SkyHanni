@@ -24,7 +24,7 @@ object DungeonRankTabListColor {
     @Suppress("MaxLineLength")
     private val pattern by patternGroup.pattern(
         "rank",
-        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+) (?<symbols>[^(]*)\\((?:§.)*(?<className>\\S+) (?<classLevel>[CLXVI]+)(?:§.)*\\)(?:§.)*$"
+        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+) (?<symbols>[^(]*)\\((?:§.)*(?<className>\\S+) (?<classLevel>[CLXVI]+)(?:§.)*\\)(?:§.)*$",
     )
 
     @HandleEvent
