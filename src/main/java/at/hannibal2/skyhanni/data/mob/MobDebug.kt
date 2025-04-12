@@ -100,6 +100,6 @@ object MobDebug {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(65656, "dev.mobDebug.mobDetection.displayNPC", "dev.mobDebug.mobDetection.displayNpc")
+        event.move(85, "dev.mobDebug.mobDetection.displayNPC", "dev.mobDebug.mobDetection.displayNpc")
     }
 }

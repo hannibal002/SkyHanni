@@ -177,7 +177,7 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
 
-        event.move(65656, "misc.potionEffect", "misc.nonGodPotEffect")
+        event.move(85, "misc.potionEffect", "misc.nonGodPotEffect")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
