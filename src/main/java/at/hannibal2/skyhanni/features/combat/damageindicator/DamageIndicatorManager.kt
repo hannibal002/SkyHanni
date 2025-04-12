@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -115,6 +117,13 @@ object DamageIndicatorManager {
     fun removeDamageIndicator(type: BossType) {
         data = data.editCopy {
             values.removeIf { it.bossType == type }
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onServerTick(event: ServerTickEvent) {
+        data.forEach {
+            it.value.serverTicksAlive ++
         }
     }
 

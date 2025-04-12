@@ -43,6 +43,8 @@ object MinecraftData {
             }
 
             is S32PacketConfirmTransaction -> {
+                if (packet.actionNumber > 0) return
+
                 totalServerTicks++
                 ServerTickEvent.post()
             }
