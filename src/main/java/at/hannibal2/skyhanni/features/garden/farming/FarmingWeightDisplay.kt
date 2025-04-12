@@ -50,6 +50,7 @@ object FarmingWeightDisplay {
             inOwnInventory = true,
             condition = { shouldShowDisplay() },
             onRender = {
+                // TODO move this into condition
                 val shouldShow = apiError || (config.ignoreLow || weight >= 200)
                 if (isEnabled() && shouldShow) {
                     config.pos.renderRenderables(display, posLabel = "Farming Weight Display")

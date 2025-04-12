@@ -164,6 +164,7 @@ object DianaProfitTracker {
             inOwnInventory = true,
             condition = { config.enabled },
             onRender = {
+                // TODO move this into condition
                 val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
                 if (!DianaApi.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
                 if (spadeInHand) {
