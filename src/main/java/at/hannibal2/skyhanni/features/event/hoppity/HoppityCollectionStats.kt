@@ -319,7 +319,7 @@ object HoppityCollectionStats {
             return
         }
 
-        event.inventoryItems.values.filter { it.hasDisplayName() && missingRabbitStackNeedsFix(it) }.forEach { stack ->
+        event.inventoryItems.values.filter { it.displayName.isNotEmpty() && missingRabbitStackNeedsFix(it) }.forEach { stack ->
             val rarity = HoppityApi.rarityByRabbit(stack.displayName)
             // Add NBT for the dye color itself
             val newItemStack = if (collectionConfig.rarityDyeRecolor) DyeCompat.createDyeStack(
@@ -486,7 +486,7 @@ object HoppityCollectionStats {
 
             if (name.isEmpty()) continue
             highlightMap[name]?.let {
-                slot.highlight(it)
+                slot.highlight(event.context, it)
             }
         }
     }

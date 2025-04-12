@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
@@ -33,10 +32,10 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.block.BlockStainedGlass
+import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.getWoolColor
+import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.isWool
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
-import net.minecraft.init.Blocks
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -103,9 +102,9 @@ object DungeonLividFinder {
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inLividBossRoom()) return
         if (event.location != blockLocation) return
-        if (event.location.getBlockAt() != Blocks.wool) return
+        if (!event.location.getBlockAt().isWool()) return
 
-        val newColor = event.newState.getValue(BlockStainedGlass.COLOR).toLorenzColor()
+        val newColor = event.newState.getWoolColor()
         color = newColor
         ChatUtils.debug("newColor! $newColor")
 
