@@ -194,7 +194,7 @@ object ComposterDisplay {
     }
 
     private fun warn(warningMessage: String) {
-        if (!config.warnAlmostEmpty) return
+        if (!config.warnAlmostClose) return
         val storage = GardenApi.storage ?: return
 
         if (ReminderUtils.isBusy()) return
@@ -206,7 +206,7 @@ object ComposterDisplay {
         } else {
             ChatUtils.clickToActionOrDisable(
                 warningMessage,
-                config::warnAlmostEmpty,
+                config::warnAlmostClose,
                 actionName = "warp to the Garden",
                 action = { HypixelCommands.warp("garden") },
             )
@@ -226,7 +226,5 @@ object ComposterDisplay {
         event.move(3, "garden.composterNotifyLowTitle", "garden.composters.notifyLow.title")
         event.move(3, "garden.composterNotifyLowOrganicMatter", "garden.composters.notifyLow.organicMatter")
         event.move(3, "garden.composterNotifyLowFuel", "garden.composters.notifyLow.fuel")
-
-        event.move(65656, "garden.composters.warnAlmostClose", "garden.composters.warnAlmostEmpty")
     }
 }

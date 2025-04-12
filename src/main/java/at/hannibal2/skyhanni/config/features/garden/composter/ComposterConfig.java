@@ -91,7 +91,8 @@ public class ComposterConfig {
         desc = "Warn when the Composter gets close to empty, even outside Garden."
     )
     @ConfigEditorBoolean
-    public boolean warnAlmostEmpty = false;
+    // TODO rename to warnAlmostEmpty
+    public boolean warnAlmostClose = false;
 
     @Expose
     @ConfigOption(
