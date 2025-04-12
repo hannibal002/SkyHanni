@@ -24,7 +24,7 @@ class ItemAbilityConfig {
     @Expose
     @ConfigOption(name = "Show When Ready", desc = "Show the R and background (if enabled) when the ability is ready.")
     @ConfigEditorBoolean
-    var itemAbilityShowWhenReady: Boolean = true
+    var showWhenReady: Boolean = true
 
     @Expose
     @ConfigOption(name = "Fire Veil", desc = "")
