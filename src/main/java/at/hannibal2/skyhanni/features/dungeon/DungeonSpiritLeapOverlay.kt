@@ -131,7 +131,7 @@ object DungeonSpiritLeapOverlay {
         )
 
         return Renderable.clickable(
-            Renderable.drawInsideRoundedRect(
+            Renderable.drawInsideRoundedRectWithOutline(
                 Renderable.fixedSizeColumn(
                     Renderable.fixedSizeLine(
                         buttonLayout,
@@ -142,11 +142,14 @@ object DungeonSpiritLeapOverlay {
                 ),
                 verticalAlign = VerticalAlignment.CENTER,
                 color = backgroundColor.toSpecialColor(),
+                topOutlineColor = 0xFFFFF,
+                bottomOutlineColor = 0xFFFFF,
+                borderOutlineThickness = 2,
                 radius = 7,
                 smoothness = 10,
                 padding = 5,
             ),
-            onLeftClick = { InventoryUtils.clickSlot(playerStackInfo.slotNumber) },
+            onLeftClick = { InventoryUtils.clickSlot(playerStackInfo.slotNumber, mouseButton = 2, mode = 3) },
         )
     }
 
