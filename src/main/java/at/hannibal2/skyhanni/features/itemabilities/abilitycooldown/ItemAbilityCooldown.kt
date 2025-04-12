@@ -315,7 +315,7 @@ object ItemAbilityCooldown {
 
     private fun createItemText(ability: ItemAbility): ItemText {
         val specialColor = ability.specialColor
-        val readyText = if (config.showWhenReady) "R" else ""
+        val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
             val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
             val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
@@ -380,7 +380,7 @@ object ItemAbilityCooldown {
             var opacity = 130
             if (color == LorenzColor.GREEN) {
                 opacity = 80
-                if (!config.showWhenReady) return
+                if (!config.itemAbilityShowWhenReady) return
             }
             event.highlight(color.addOpacity(opacity))
         }
@@ -425,7 +425,6 @@ object ItemAbilityCooldown {
 
         event.move(65656, "inventory.itemAbilities.itemAbilityCooldown", "inventory.itemAbilities.enabled")
         event.move(65656, "inventory.itemAbilities.itemAbilityCooldownBackground", "inventory.itemAbilities.background")
-        event.move(65656, "inventory.itemAbilities.itemAbilityShowWhenReady", "inventory.itemAbilities.showWhenReady")
     }
 
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
