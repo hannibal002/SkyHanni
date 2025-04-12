@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -410,8 +411,13 @@ object TitleManager {
                 }
             }
         }
+        // Watchdog
         TitleLocation.entries.forEach {
             currentTitles[it]?.start()
+            if (currentTitles[it]?.alive == false) {
+                currentTitles[it]?.stop()
+                currentTitles[it] = null
+            }
         }
     }
 
@@ -425,10 +431,11 @@ object TitleManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (InventoryUtils.inInventory()) return
         val globalTitle = currentTitles[TitleLocation.GLOBAL] ?: return
-        globalTitle.tryRenderGlobalTitle()
+        globalTitle.tryRenderGlobalTitle(event.context)
     }
 
-    private fun TitleContext.tryRenderGlobalTitle() {
+    // TODO move function inside title context class, then make this a extneded function of DrawContext
+    private fun TitleContext.tryRenderGlobalTitle(context: DrawContext) {
         val guiWidth = GuiScreenUtils.scaledWindowWidth
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
@@ -442,7 +449,7 @@ object TitleManager {
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
 
         val mainTextRenderable = Renderable.string(
             getTitleText(),
@@ -471,19 +478,19 @@ object TitleManager {
         val posX = (guiWidth - renderableWidth) / 2
         val posY = (guiHeight - (renderableHeight * 4)) / 2
 
-        GlStateManager.translate(posX.toFloat(), posY.toFloat(), 0f)
+        context.matrices.translate(posX.toFloat(), posY.toFloat(), 0f)
         targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
-        GlStateManager.popMatrix()
+        context.matrices.popMatrix()
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!InventoryUtils.inInventory()) return
         val inventoryTitle = currentTitles[TitleLocation.INVENTORY] ?: return
-        inventoryTitle.tryRenderInventoryTitle()
+        inventoryTitle.tryRenderInventoryTitle(event.context)
     }
 
-    private fun TitleContext.tryRenderInventoryTitle() {
+    private fun TitleContext.tryRenderInventoryTitle(context: DrawContext) {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         val baseStringRenderable = Renderable.string(getTitleText(), 1.5)
@@ -510,8 +517,8 @@ object TitleManager {
             else -> 150f
         }
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(0f, -(heightTranslation), 500f)
+        context.matrices.pushMatrix()
+        context.matrices.translate(0f, -(heightTranslation), 500f)
         Renderable.drawInsideRoundedRect(
             stringRenderable,
             ColorUtils.TRANSPARENT_COLOR,
@@ -519,7 +526,7 @@ object TitleManager {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 0, gui.width, gui.height)
 
-        GlStateManager.translate(0f, heightTranslation, -500f)
-        GlStateManager.popMatrix()
+        context.matrices.translate(0f, heightTranslation, -500f)
+        context.matrices.popMatrix()
     }
 }
