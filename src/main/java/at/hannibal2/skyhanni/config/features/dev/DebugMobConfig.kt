@@ -46,14 +46,13 @@ class DebugMobConfig {
         @ConfigEditorBoolean
         var realPlayerHighlight: Boolean = false
 
-        // TODO rename to displayNpc
         @Expose
         @ConfigOption(
             name = "DisplayNPC",
             desc = "Shows the internal mobs that are 'DisplayNPC' as highlight (in red) or the name."
         )
         @ConfigEditorDropdown
-        var displayNPC: HowToShow = HowToShow.OFF
+        var displayNpc: HowToShow = HowToShow.OFF
 
         @Expose
         @ConfigOption(

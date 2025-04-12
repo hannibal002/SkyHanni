@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.dev.DebugMobConfig.HowToShow
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -56,7 +57,7 @@ object MobDebug {
         if (config.skyblockMob.isHighlight()) {
             MobData.skyblockMobs.highlight(event) { if (it.mobType == Mob.Type.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN }
         }
-        if (config.displayNPC.isHighlight()) {
+        if (config.displayNpc.isHighlight()) {
             MobData.displayNpcs.highlight(event) { LorenzColor.RED }
         }
         if (config.realPlayerHighlight) {
@@ -71,7 +72,7 @@ object MobDebug {
         if (config.skyblockMob.isName()) {
             MobData.skyblockMobs.showName(event)
         }
-        if (config.displayNPC.isName()) {
+        if (config.displayNpc.isName()) {
             MobData.displayNpcs.showName(event)
         }
         if (config.summon.isName()) {
@@ -95,5 +96,10 @@ object MobDebug {
         }"
         MobData.logger.log(text)
         LorenzDebug.log(text)
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(65656, "dev.mobDebug.mobDetection.displayNPC", "dev.mobDebug.mobDetection.displayNpc")
     }
 }
