@@ -273,7 +273,7 @@ Imports our custom live templates automatically. Live Templates allow for quicke
 
 ### [Minecraft Development](https://plugins.jetbrains.com/plugin/8327-minecraft-development)
 
-Helps you write minecraft specific code such as mixins and access wideners
+Helps you write minecraft specific code such as mixins and access wideners.
 
 
 ## Software Used in SkyHanni
@@ -574,7 +574,7 @@ it is a good guideline to follow as for the most part we do not want to be doing
 themselves.
 
 
-### Access wideners
+### Access Wideners
 
 You may want to use private minecraft methods or fields, this is where access wideners come in. 
 
