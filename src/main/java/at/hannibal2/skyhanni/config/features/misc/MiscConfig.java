@@ -191,8 +191,7 @@ public class MiscConfig {
     @SearchTag("skyblockxp skyblocklevel level lvl")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO rename to skyblockXPBar
-    public boolean skyblockXpBar = false;
+    public boolean skyblockXPBar = false;
 
     @Expose
     @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventory lore that would use your XP.\n" +
