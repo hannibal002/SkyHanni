@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatStringNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSoulflow
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import kotlinx.coroutines.Job
 
 // widget
@@ -18,7 +19,7 @@ object ScoreboardElementSoulflow : ScoreboardElement(), CustomScoreboardNumberTr
 
     override fun getDisplay(): String? {
         val soulflow = getSoulflow()
-        checkDifference(soulflow.toLong())
+        checkDifference(soulflow.formatLong())
         val line = formatStringNum(soulflow) + temporaryChangeDisplay.orEmpty()
 
         if (informationFilteringConfig.hideEmptyLines && line == "0") return null

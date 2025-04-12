@@ -411,8 +411,13 @@ object TitleManager {
                 }
             }
         }
+        // Watchdog
         TitleLocation.entries.forEach {
             currentTitles[it]?.start()
+            if (currentTitles[it]?.alive == false) {
+                currentTitles[it]?.stop()
+                currentTitles[it] = null
+            }
         }
     }
 
