@@ -105,7 +105,7 @@ object StatsTuning {
             val lore = stack.getLore()
 
             if (lore.any { it == "§aCurrently selected!" }) {
-                slot.highlight(LorenzColor.GREEN)
+                slot.highlight(event.context, LorenzColor.GREEN)
             }
         }
     }

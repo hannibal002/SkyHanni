@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SensitivityReducer {
-    private val config get() = SkyHanniMod.feature.garden.sensitivityReducerConfig
+    private val config get() = SkyHanniMod.feature.garden.sensitivityReducer
     private val storage get() = SkyHanniMod.feature.storage
     private var isToggled = false
     private var isManualToggle = false
@@ -108,7 +109,7 @@ object SensitivityReducer {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!(isToggled || isManualToggle)) return
-        if (!config.showGUI) return
+        if (!config.showGui) return
         if (LockMouseLook.lockedMouse) return
         config.position.renderString("§eSensitivity Lowered", posLabel = "Sensitivity Lowered")
     }
@@ -209,5 +210,11 @@ object SensitivityReducer {
             add("onlyGround: ${config.onGround.get()}")
             add("onlyPlot: ${config.onlyPlot.get()}")
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(80, "garden.sensitivityReducerConfig", "garden.sensitivityReducer")
+        event.move(81, "garden.sensitivityReducer.showGUI", "garden.sensitivityReducer.showGui")
     }
 }

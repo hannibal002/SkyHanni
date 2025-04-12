@@ -61,6 +61,17 @@ class ChatConfig {
     }
 
     @Expose
+    @ConfigOption(
+        name = "Copy Chat",
+        desc = "Right click a chat message to copy it. Holding Shift will copy the message with " +
+            "Shwords applied, and holding Ctrl will copy only one line.\n" +
+            "§cNote: Will not work correctly with the Chatting mod.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var copyChat: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.guide
 
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.client.renderer.GlStateManager
 
 abstract class GuideRenderablePage(
     val paddingX: Int = 0,
@@ -10,10 +10,10 @@ abstract class GuideRenderablePage(
 
     protected var renderable: Renderable? = null
 
-    final override fun drawPage(mouseX: Int, mouseY: Int) {
-        GlStateManager.translate(paddingX.toFloat(), paddingY.toFloat(), 0f)
+    final override fun drawPage(context: DrawContext, mouseX: Int, mouseY: Int) {
+        context.matrices.translate(paddingX.toFloat(), paddingY.toFloat(), 0f)
         renderable?.render(paddingX, paddingY)
-        GlStateManager.translate(-paddingX.toFloat(), -paddingY.toFloat(), 0f)
+        context.matrices.translate(-paddingX.toFloat(), -paddingY.toFloat(), 0f)
     }
 
     override fun onLeave() {

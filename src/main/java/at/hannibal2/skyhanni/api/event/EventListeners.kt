@@ -26,7 +26,13 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
         val name = buildListenerName(method)
-        val eventConsumer = createEventConsumer(method, instance, options)
+        val eventConsumer = when (method.parameterCount) {
+            0 -> createZeroParameterConsumer(method, instance, options)
+            1 -> createSingleParameterConsumer(method, instance)
+            else -> throw IllegalArgumentException(
+                "Method ${method.name} must have either 0 or 1 parameters."
+            )
+        }
         val generic = if (isGeneric) resolveGenericType(method) else null
 
         listeners.add(Listener(name, eventConsumer, options, generic))
@@ -42,16 +48,6 @@ class EventListeners private constructor(val name: String, private val isGeneric
         ).toString()
 
         return "${method.declaringClass.name}.${method.name}$paramTypesString"
-    }
-
-    private fun createEventConsumer(method: Method, instance: Any, options: HandleEvent): (Any) -> Unit {
-        return when (method.parameterCount) {
-            0 -> createZeroParameterConsumer(method, instance, options)
-            1 -> createSingleParameterConsumer(method, instance)
-            else -> throw IllegalArgumentException(
-                "Method ${method.name} must have either 0 or 1 parameters."
-            )
-        }
     }
 
     private fun createZeroParameterConsumer(method: Method, instance: Any, options: HandleEvent): (Any) -> Unit {
