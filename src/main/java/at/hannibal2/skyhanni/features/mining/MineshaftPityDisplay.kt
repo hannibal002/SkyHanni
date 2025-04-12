@@ -226,22 +226,26 @@ object MineshaftPityDisplay {
             MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
         )
 
-        display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
+        display = listOf(
+            Renderable.verticalContainer(
+                config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] },
+                spacing = 2
+            )
+        )
     }
 
     init {
         RenderDisplayHelper(
             condition = {
-                if (display.isEmpty()) {
+                return@RenderDisplayHelper if (display.isEmpty()) {
                     update()
-                    return@RenderDisplayHelper false
-                }
-                return@RenderDisplayHelper isDisplayEnabled()
+                    false
+                } else isDisplayEnabled()
             },
             outsideInventory = true,
         ) {
             config.position.renderRenderables(
-                listOf(Renderable.verticalContainer(display, 2)),
+                display,
                 posLabel = "Mineshaft Pity Display",
             )
         }
