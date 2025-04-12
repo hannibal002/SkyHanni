@@ -137,7 +137,7 @@ object DailyQuestHelper {
 
             for ((slot, stack) in chest.getUpperItems()) {
                 if (stack.displayName.contains(dojoQuest.dojoName)) {
-                    slot.highlight(LorenzColor.AQUA)
+                    slot.highlight(event.context, LorenzColor.AQUA)
                 }
             }
         }
@@ -223,6 +223,9 @@ object DailyQuestHelper {
 
     private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
+
+        // we do not call getQuestBoardLocation in the first few seconds when faction type is null, since this will show an error
+        if (CrimsonIsleReputationHelper.factionType == null && LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         val location = getQuestBoardLocation()
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)

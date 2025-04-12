@@ -287,10 +287,10 @@ object RepoManager {
         }
     }
 
-    private fun readCurrentCommit(): Pair<String, SimpleTimeMark>? {
+    private fun readCurrentCommit(): Pair<String, SimpleTimeMark?>? {
         val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
         val sha = currentCommitJSON?.get("sha")?.asString
-        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark() ?: SimpleTimeMark.farPast()
+        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark()
         return sha?.let { it to time }
     }
 
@@ -316,12 +316,12 @@ object RepoManager {
             }
             return
         }
-        val currentCommit = readCurrentCommit()
+        val (currentDownloadedCommit, _) = readCurrentCommit() ?: (null to null)
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $currentCommit", prefixColor = "§a")
+            ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             return
         }
-        ChatUtils.chat("Repo has errors! Commit hash: $currentCommit", prefixColor = "§c")
+        ChatUtils.chat("Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",
