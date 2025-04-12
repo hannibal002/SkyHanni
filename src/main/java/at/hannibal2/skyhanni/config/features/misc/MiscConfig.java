@@ -58,8 +58,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Non-God Pot Effects", desc = "")
     @Accordion
-    // TODO rename nonGodPotEffect
-    public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
+    public PotionEffectsConfig nonGodPotEffect = new PotionEffectsConfig();
 
     @Expose
     @ConfigOption(name = "Particle Hider", desc = "")
