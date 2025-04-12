@@ -23,7 +23,7 @@ object ViewRecipeCommand {
      */
     private val pattern by RepoPattern.pattern(
         "commands.viewrecipe",
-        "\\/viewrecipe (?<item>.*)"
+        "\\/viewrecipe (?<item>.*)",
     )
 
     @HandleEvent
