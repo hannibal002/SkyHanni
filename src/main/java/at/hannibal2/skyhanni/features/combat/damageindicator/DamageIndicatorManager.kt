@@ -317,7 +317,7 @@ object DamageIndicatorManager {
         BossType.SLAYER_BLAZE_QUAZII_4,
 
             // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
-        -> true
+            -> true
 
         else -> false
     }
@@ -447,13 +447,13 @@ object DamageIndicatorManager {
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
             BossType.SLAYER_ENDERMAN_4,
-            -> return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
+                -> return checkEnderSlayer(entity as EntityEnderman, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.SLAYER_BLOODFIEND_1,
             BossType.SLAYER_BLOODFIEND_2,
             BossType.SLAYER_BLOODFIEND_3,
             BossType.SLAYER_BLOODFIEND_4,
-            -> return checkVampireSlayer(entity as EntityOtherPlayerMP, entityData, health.toInt(), maxHealth.toInt())
+                -> return checkVampireSlayer(entity as EntityOtherPlayerMP, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.SLAYER_BLAZE_1,
             BossType.SLAYER_BLAZE_2,
@@ -465,7 +465,7 @@ object DamageIndicatorManager {
             BossType.SLAYER_BLAZE_TYPHOEUS_2,
             BossType.SLAYER_BLAZE_TYPHOEUS_3,
             BossType.SLAYER_BLAZE_TYPHOEUS_4,
-            -> return checkBlazeSlayer(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
+                -> return checkBlazeSlayer(entity as EntityLiving, entityData, health.toInt(), maxHealth.toInt())
 
             BossType.NETHER_MAGMA_BOSS -> return checkMagmaCube(
                 entity as EntityMagmaCube,
@@ -487,25 +487,25 @@ object DamageIndicatorManager {
 
             BossType.SLAYER_WOLF_3,
             BossType.SLAYER_WOLF_4,
-            -> {
+                -> {
                 if ((entity as EntityWolf).hasNameTagWith(2, "§bCalling the pups!")) {
                     return "Pups!"
                 }
             }
 
             BossType.NETHER_BARBARIAN_DUKE,
-            -> {
+                -> {
                 val location = entity.getLorenzVec()
                 entityData.ignoreBlocks = location.y == 117.0 && location.distanceToPlayer() < 15
             }
 
             BossType.BACTE,
-            -> {
+                -> {
                 return checkBacte(entityData)
             }
 
             BossType.END_ENDER_DRAGON,
-            -> {
+                -> {
                 return checkEnderDragon(entityData)
             }
 
@@ -553,7 +553,7 @@ object DamageIndicatorManager {
         entityData.namePrefix = when (entityData.bossType) {
             BossType.SLAYER_BLAZE_1,
             BossType.SLAYER_BLAZE_2,
-            -> {
+                -> {
                 val step = maxHealth / 2
                 calcMaxHealth = step
                 if (health > step) {
@@ -567,7 +567,7 @@ object DamageIndicatorManager {
 
             BossType.SLAYER_BLAZE_3,
             BossType.SLAYER_BLAZE_4,
-            -> {
+                -> {
                 val step = maxHealth / 3
                 calcMaxHealth = step
                 if (health > step * 2) {
@@ -665,7 +665,7 @@ object DamageIndicatorManager {
             BossType.SLAYER_ENDERMAN_1,
             BossType.SLAYER_ENDERMAN_2,
             BossType.SLAYER_ENDERMAN_3,
-            -> {
+                -> {
                 val step = maxHealth / 3
                 calcMaxHealth = step
                 if (health > step * 2) {
