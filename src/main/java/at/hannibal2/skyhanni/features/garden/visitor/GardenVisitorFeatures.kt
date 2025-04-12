@@ -181,7 +181,7 @@ object GardenVisitorFeatures {
     }
 
     private fun drawDisplay() = buildList {
-        if (!config.shoppingList.display) return@buildList
+        if (!config.shoppingList.enabled) return@buildList
         val (shoppingList, newVisitors) = prepareDrawingData()
 
         drawShoppingList(shoppingList)
@@ -512,7 +512,7 @@ object GardenVisitorFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!config.shoppingList.display && config.highlightStatus == HighlightMode.DISABLED) return
+        if (!config.shoppingList.enabled && config.highlightStatus == HighlightMode.DISABLED) return
         if (!event.isMod(10, 2)) return
 
         if (GardenApi.onBarnPlot && config.highlightStatus != HighlightMode.DISABLED) {
@@ -561,7 +561,7 @@ object GardenVisitorFeatures {
             event.blockedReason = "garden_visitor_message"
         }
 
-        if (config.shoppingList.display) {
+        if (config.shoppingList.enabled) {
             partialAcceptedPattern.matchMatcher(event.message) {
                 ChatUtils.chat("Talk to the visitor again to update the number of items needed!")
             }
@@ -642,13 +642,13 @@ object GardenVisitorFeatures {
 
     private fun renderDisplay() {
         if (showGui() && shouldShowShoppingList()) {
-            config.shoppingList.pos.renderRenderables(display, posLabel = "Visitor Shopping List")
+            config.shoppingList.position.renderRenderables(display, posLabel = "Visitor Shopping List")
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onScreenDrawn(event: ScreenDrawnEvent) {
-        if (!config.shoppingList.display) return
+        if (!config.shoppingList.enabled) return
         val gui = event.gui
         if (gui !is GuiEditSign) return
 
@@ -657,7 +657,7 @@ object GardenVisitorFeatures {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.shoppingList.display) return
+        if (!config.shoppingList.enabled) return
         val currentScreen = Minecraft.getMinecraft().currentScreen
         if (currentScreen is GuiEditSign) return
 
@@ -782,6 +782,9 @@ object GardenVisitorFeatures {
         }
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")
+
+        event.move(85, "garden.visitors.shoppingList.display", "garden.visitors.shoppingList.enabled")
+        event.move(85, "garden.visitors.shoppingList.pos", "garden.visitors.shoppingList.position")
     }
 }
 
