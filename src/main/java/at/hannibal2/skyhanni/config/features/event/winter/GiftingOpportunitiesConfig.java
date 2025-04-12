@@ -15,7 +15,8 @@ public class GiftingOpportunitiesConfig {
     @Expose
     @ConfigOption(name = "Only While Holding Gift", desc = "Only highlight players you haven't gifted while holding a gift.")
     @ConfigEditorBoolean
-    public boolean highlightWithGiftOnly = true;
+    // TODO highlightWithGiftOnly
+    public boolean highlighWithGiftOnly = true;
 
 
     @Expose
