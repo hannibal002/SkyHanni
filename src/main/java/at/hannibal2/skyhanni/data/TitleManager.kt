@@ -52,18 +52,18 @@ object TitleManager {
         val weight: Double = 1.0,
         var discardOnWorldChange: Boolean = true,
     ) {
+        var endTime: SimpleTimeMark? = null
+        var hasBeenRequeued: Boolean = false
+
         open val alive get() = endTime != null && (endTime?.isInPast() == false)
 
-        var endTime: SimpleTimeMark? = null
-
         open fun getTitleText(): String = titleText
-
         open fun getSubtitleText(): String? = subtitleText
-
         open fun start() {
-            endTime = if (endTime == null) (now() + duration) else endTime
+            if (endTime == null || endTime?.isInPast() == true) {
+                endTime = now() + duration
+            }
         }
-
         open fun stop() {
             endTime = farPast()
         }
@@ -397,13 +397,18 @@ object TitleManager {
                 null -> dequeueNextTitle(location)
                 else -> {
                     val titleLocationQueue = titleLocationQueues[location]
-                    titleLocationQueue?.getWaitingWeightOrNull()?.let {
-                        if (it <= currentTitle.weight) return@let
-                        currentTitle.stop()
-                        // Re-queue for insertion after the new title
-                        titleLocationQueue.add(currentTitle, currentTitle.weight)
-                        dequeueNextTitle(location)
-                        return
+                    titleLocationQueue?.getWaitingWeightOrNull()?.let { waitingWeight ->
+                        if (waitingWeight > currentTitle.weight) {
+                            if (currentTitle.alive && currentTitle.endTime?.isInFuture() == true) {
+                                currentTitle.duration = currentTitle.endTime?.timeUntil() ?: Duration.ZERO
+                                if (currentTitle.duration > Duration.ZERO && !currentTitle.hasBeenRequeued) {
+                                    currentTitle.hasBeenRequeued = true
+                                    titleLocationQueue.add(currentTitle, currentTitle.weight)
+                                }
+                            }
+                            dequeueNextTitle(location)
+                            return@forEach
+                        }
                     }
                     if (currentTitle.alive) return@forEach
                     currentTitle.stop()

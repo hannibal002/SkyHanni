@@ -157,6 +157,7 @@ object SlayerProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
+        // TODO remove is config enabled check for tracker
         if (!isEnabled()) return
         if (!SlayerApi.isInCorrectArea) return
         if (!SlayerApi.hasActiveSlayerQuest()) return
