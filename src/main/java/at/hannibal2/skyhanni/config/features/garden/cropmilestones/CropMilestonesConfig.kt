@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.garden.cropmilestones
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.TimeUnit
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -46,7 +47,7 @@ class CropMilestonesConfig {
 
     enum class TimeFormatEntry(
         private val displayName: String,
-        private val legacyId: Int = -1
+        private val legacyId: Int = -1,
     ) : HasLegacyId {
         YEAR("Year", 0),
         DAY("Day", 1),
@@ -55,8 +56,9 @@ class CropMilestonesConfig {
         SECOND("Second", 4),
         ;
 
-        override fun getLegacyId() = legacyId
-        override fun toString() = displayName
+        val timeUnit = TimeUnit.entries.firstOrNull { it.name == this.name } ?: TimeUnit.SECOND
+        override fun getLegacyId(): Int = legacyId
+        override fun toString(): String = displayName
     }
 
     @Expose
@@ -85,7 +87,7 @@ class CropMilestonesConfig {
 
     enum class MilestoneTextEntry(
         private val displayName: String,
-        private val legacyId: Int = -1
+        private val legacyId: Int = -1,
     ) : HasLegacyId {
         TITLE("§6Crop Milestones", 0),
         MILESTONE_TIER("§7Pumpkin Tier 22", 1),
