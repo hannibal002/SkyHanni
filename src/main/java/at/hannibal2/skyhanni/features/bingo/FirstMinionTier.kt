@@ -62,7 +62,7 @@ object FirstMinionTier {
                         "Attempted to add $minionId to tierOneMinionsDone when it already exists",
                         "tierOneMinionsFiltered" to tierOneMinionsFiltered,
                         "minions" to minions,
-                        "tierOneMinionsDone" to tierOneMinionsDone
+                        "tierOneMinionsDone" to tierOneMinionsDone,
                     )
                 }
             }

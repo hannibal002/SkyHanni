@@ -24,15 +24,15 @@ object CompactBingoChat {
     private val patternGroup = RepoPattern.group("bingo.compactchat")
     private val healthPattern by patternGroup.pattern(
         "health",
-        " {3}§r§7§8\\+§a.* §c❤ Health"
+        " {3}§r§7§8\\+§a.* §c❤ Health",
     )
     private val strengthPattern by patternGroup.pattern(
         "strength",
-        " {3}§r§7§8\\+§a. §c❁ Strength"
+        " {3}§r§7§8\\+§a. §c❁ Strength",
     )
     private val borderPattern by patternGroup.pattern(
         "border",
-        "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
+        "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
 
     @HandleEvent
