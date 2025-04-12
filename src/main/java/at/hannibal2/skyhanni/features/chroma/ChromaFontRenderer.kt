@@ -47,7 +47,7 @@ class ChromaFontRenderer(private val baseColor: Int) {
             ColorUtils.getRed(baseColor).toFloat() / 255f,
             ColorUtils.getGreen(baseColor).toFloat() / 255f,
             ColorUtils.getBlue(baseColor).toFloat() / 255f,
-            alpha
+            alpha,
         )
         return this
     }
