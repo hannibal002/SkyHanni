@@ -9,13 +9,13 @@ data class MiningEventDataSend(
     @Expose @SerializedName("server_id") val serverId: String,
     @Expose val event: MiningEventType,
     @Expose @SerializedName("time_left") val timeRemaining: Long,
-    @Expose @SerializedName("reporter_uuid") val uuid: String
+    @Expose @SerializedName("reporter_uuid") val uuid: String,
 )
 
 data class MiningEventDataReceive(
     @Expose val success: Boolean,
     @Expose val data: MiningEventData,
-    @Expose val cause: String
+    @Expose val cause: String,
 )
 
 data class MiningEventData(
@@ -23,7 +23,7 @@ data class MiningEventData(
     @Expose @SerializedName("running_events") val runningEvents: Map<IslandType, List<RunningEventType>>,
     @Expose @SerializedName("total_lobbys") val totalLobbies: Map<IslandType, Int>,
     @Expose @SerializedName("update_in") val updateIn: Long,
-    @Expose @SerializedName("curr_time") val currentTime: Long
+    @Expose @SerializedName("curr_time") val currentTime: Long,
 )
 
 data class EventData(
@@ -31,12 +31,12 @@ data class EventData(
     @Expose @SerializedName("starts_at_max") val startMax: Long,
     @Expose @SerializedName("ends_at_min") val endMin: Long,
     @Expose @SerializedName("ends_at_max") val endMax: Long,
-    @Expose @SerializedName("lobby_count") val lobbyCount: Int
+    @Expose @SerializedName("lobby_count") val lobbyCount: Int,
 )
 
 data class RunningEventType(
     @Expose val event: MiningEventType,
     @Expose @SerializedName("ends_at") val endsAt: Long,
     @Expose @SerializedName("lobby_count") val lobbyCount: Int,
-    @Expose @SerializedName("is_double") val isDoubleEvent: Boolean
+    @Expose @SerializedName("is_double") val isDoubleEvent: Boolean,
 )

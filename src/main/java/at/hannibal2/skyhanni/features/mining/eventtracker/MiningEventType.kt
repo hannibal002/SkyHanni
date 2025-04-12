@@ -74,7 +74,7 @@ enum class MiningEventType(
 
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, LorenzColor.RED, true,
-        Renderable.itemStack(Items.skull.toItemStack(3), 0.36) // Late init when skull texture holder is loaded
+        Renderable.itemStack(Items.skull.toItemStack(3), 0.36), // Late init when skull texture holder is loaded
     ),
 
     BETTER_TOGETHER(
@@ -120,7 +120,7 @@ enum class MiningEventType(
         "Gourmand", 10.minutes,
         color = LorenzColor.AQUA,
         dwarvenSpecific = true,
-        iconInput = DyeCompat.CYAN.createStack().overrideId("MITHRIL_GOURMAND")
+        iconInput = DyeCompat.CYAN.createStack().overrideId("MITHRIL_GOURMAND"),
     ),
     ;
 
