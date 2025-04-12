@@ -14,6 +14,8 @@ import net.minecraft.util.ResourceLocation
 //#if MC > 1.21
 //$$ import net.minecraft.text.PlainTextContent
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
+//$$ import net.minecraft.network.message.MessageSignatureData
+//$$ import kotlin.math.abs
 //#endif
 
 fun IChatComponent.unformattedTextForChatCompat(): String =
@@ -154,10 +156,26 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
     //#if MC < 1.16
     Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
     //#else
-    //$$ // todo convert the id int to the middle variable of MessageSignatureData
-    //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, null, MessageIndicator.system())
+    //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
     //#endif
 }
+
+//#if MC > 1.21
+//$$ val map = mutableMapOf<Int, MessageSignatureData>()
+//$$
+//$$ fun idToMessageSignature(id: Int): MessageSignatureData {
+//$$     val newId = abs(id % (255*128))
+//$$     if (map.contains(newId)) return map[newId]!!
+//$$     val bytes = ByteArray(256)
+//$$     val div = newId / 128
+//$$     val mod = newId % 128
+//$$     for (i in 0 until div) {
+//$$         bytes[i] = 127
+//$$     }
+//$$     bytes[div] = mod.toByte()
+//$$     return MessageSignatureData(bytes)
+//$$ }
+//#endif
 
 val defaultStyleConstructor: ChatStyle get() =
     //#if MC < 1.16

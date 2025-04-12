@@ -23,10 +23,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.Loader
 import java.util.TreeSet
 
 /**
@@ -73,6 +73,8 @@ object EnchantParser {
     // enchants stacked in a single column
     private var shouldBeSingleColumn = false
 
+    private var stackingEnchant: Enchant.Stacking? = null
+
     // Used to determine how many enchants are used on each line
     // for this particular item, since consistency is not Hypixel's strong point
     private var maxEnchantsPerLine = 0
@@ -81,7 +83,7 @@ object EnchantParser {
 
     private val loreCache: Cache = Cache()
 
-    val isSbaLoaded by lazy { Loader.isModLoaded("skyblockaddons") }
+    val isSbaLoaded by lazy { PlatformUtils.isModInstalled("skyblockaddons") }
 
     // Maps for all enchants
     private var enchants: EnchantsJson = EnchantsJson()
@@ -173,6 +175,7 @@ object EnchantParser {
             return
         }
 
+        stackingEnchant = null
         shouldBeSingleColumn = false
         loreLines = mutableListOf()
         orderedEnchants = TreeSet()
@@ -242,6 +245,16 @@ object EnchantParser {
 
         // Add our parsed enchants back into the lore
         loreList.addAll(startEnchant, insertEnchants)
+
+        if (config.stackingEnchantProgress) {
+            // TODO check if SBA's feature is enabled and show a chat prompt to decide what to disable. Maybe use OtherModsSettings.kt
+            stackingEnchant?.let { stacking ->
+                currentItem?.let { item ->
+                    loreList.add(loreList.size - 1, stacking.progressString(item))
+                }
+            }
+        }
+
         // Cache parsed lore
         loreCache.updateAfter(loreList)
 
@@ -286,6 +299,10 @@ object EnchantParser {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
                 } else "empty"
+
+                if (enchant is Enchant.Stacking) {
+                    stackingEnchant = enchant
+                }
 
                 // Last found enchant
                 lastEnchant = FormattedEnchant(enchant, level, stacking, isRoman)

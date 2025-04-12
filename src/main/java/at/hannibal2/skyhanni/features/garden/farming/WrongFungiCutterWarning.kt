@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -48,7 +48,7 @@ object WrongFungiCutterWarning {
     private fun notifyWrong() {
         if (!GardenApi.config.fungiCutterWarn) return
 
-        TitleManager.sendTitle("§cWrong Fungi Cutter Mode!", 2.seconds)
+        TitleManager.sendTitle("§cWrong Fungi Cutter Mode!", duration = 2.seconds)
         if (System.currentTimeMillis() > lastPlaySoundTime + 3_00) {
             lastPlaySoundTime = System.currentTimeMillis()
             SoundUtils.playBeepSound()
