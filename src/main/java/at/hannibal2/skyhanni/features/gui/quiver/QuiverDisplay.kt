@@ -90,7 +90,7 @@ object QuiverDisplay {
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.whenToShow,
-            config.showIcon
+            config.showIcon,
         ) {
             updateDisplay()
         }
