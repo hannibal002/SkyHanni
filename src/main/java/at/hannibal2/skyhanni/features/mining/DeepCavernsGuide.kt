@@ -135,7 +135,7 @@ object DeepCavernsGuide {
         }
         @Suppress("MaxLineLength")
         ChatUtils.chat(
-            "Automatically enabling the Deep Caverns Guide, helping you find the way to the bottom of the Deep Caverns and the path to Rhys."
+            "Automatically enabling the Deep Caverns Guide, helping you find the way to the bottom of the Deep Caverns and the path to Rhys.",
         )
     }
 
