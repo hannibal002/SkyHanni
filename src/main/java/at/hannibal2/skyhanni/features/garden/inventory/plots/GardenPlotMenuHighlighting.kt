@@ -54,7 +54,7 @@ object GardenPlotMenuHighlighting {
             if (plot.key.inventorySlot in items.indices) {
                 val slot = items[plot.key.inventorySlot]
                 slot.stack.stackSize = handleStackSize(plot.key, plot.value)
-                slot.highlight(plot.value.highlightColor)
+                slot.highlight(event.context, plot.value.highlightColor)
             }
         }
     }

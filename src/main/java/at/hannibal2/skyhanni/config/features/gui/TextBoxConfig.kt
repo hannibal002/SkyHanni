@@ -17,7 +17,7 @@ class TextBoxConfig {
     @Expose
     @ConfigOption(name = "Only in GUI", desc = "Only show the textbox while an inventory is open.")
     @ConfigEditorBoolean
-    var onlyInGUI: Boolean = false
+    var onlyInGui: Boolean = false
 
     @Expose
     @ConfigOption(

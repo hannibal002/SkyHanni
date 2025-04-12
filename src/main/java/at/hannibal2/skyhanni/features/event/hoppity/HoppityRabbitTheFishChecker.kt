@@ -59,7 +59,7 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled()) return
 
         val index = rabbitTheFishIndex ?: return
-        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
+        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(event.context, LorenzColor.RED)
     }
 
     @HandleEvent
@@ -68,7 +68,7 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
         rabbitTheFishIndex = event.inventoryItems.filter {
-            it.value.hasDisplayName() && it.key != 22
+            it.value.displayName.isNotEmpty() && it.key != 22
         }.entries.firstOrNull {
             rabbitTheFishItemPattern.matches(it.value.displayName)
         }?.key

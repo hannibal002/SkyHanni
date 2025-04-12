@@ -20,6 +20,7 @@ import java.util.Locale
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.item.Items
 //#endif
 
 object SkyBlockItemModifierUtils {

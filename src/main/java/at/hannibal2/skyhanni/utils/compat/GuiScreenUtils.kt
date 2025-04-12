@@ -41,6 +41,14 @@ object GuiScreenUtils {
 //$$            mc.window.height
 //#endif
 
+    val scaleFactor
+        get() =
+//#if MC < 1.16
+            ScaledResolution(mc).scaleFactor
+//#else
+//$$            mc.window.scaleFactor
+//#endif
+
     private val globalMouseX get() = MouseCompat.getX()
     private val globalMouseY get() = MouseCompat.getY()
 

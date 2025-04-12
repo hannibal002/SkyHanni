@@ -8,6 +8,9 @@ import net.minecraft.util.IChatComponent
 
 object GuiChatHook {
 
+    @JvmStatic
+    var currentComponent: IChatComponent? = null
+
     lateinit var replacement: ChatComponentText
 
     fun replaceEntireComponent(title: String, chatStyle: ChatStyle) {
@@ -24,7 +27,7 @@ object GuiChatHook {
         if (!this::replacement.isInitialized) return
 
         // Initialise new component
-        val newComponent = replacement.chatComponentText_TextValue.asComponent {
+        val newComponent = replacement.unformattedTextForChat.asComponent {
             chatStyle = replacement.chatStyle
             chatStyle.chatHoverEvent = hoverEvent
         }
