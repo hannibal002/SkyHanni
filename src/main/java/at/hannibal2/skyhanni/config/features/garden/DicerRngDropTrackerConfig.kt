@@ -13,7 +13,7 @@ class DicerRngDropTrackerConfig {
     @ConfigOption(name = "Enable Tracker", desc = "Track RNG drops for Melon Dicer and Pumpkin Dicer.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var display: Boolean = true
+    var enabled: Boolean = true
 
     @Expose
     @ConfigOption(name = "Compact Format", desc = "Compact the Dicer RNG Drop Tracker Display.")
