@@ -40,9 +40,6 @@ import kotlin.math.absoluteValue
 
 @SkyHanniModule
 object ExperimentsProfitTracker {
-
-    //  Todo: Move more data handling out of this class and into the ExperimentationTableApi
-
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
 
     private val tracker = SkyHanniItemTracker(

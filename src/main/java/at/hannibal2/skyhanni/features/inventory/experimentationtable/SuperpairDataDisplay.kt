@@ -28,7 +28,13 @@ object SuperpairDataDisplay {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
 
     private data class SuperpairItem(val slotId: Int, val reward: String, val damage: Int)
-    private data class FoundData(val item: SuperpairItem? = null, val first: SuperpairItem? = null, val second: SuperpairItem? = null)
+    private data class FoundData(
+        val item: SuperpairItem? = null,
+        val first: SuperpairItem? = null,
+        val second: SuperpairItem? = null
+    ) {
+        val displayReward: String get() = item?.reward ?: first?.reward.orEmpty()
+    }
 
     private enum class FoundType {
         NORMAL,
@@ -74,13 +80,13 @@ object SuperpairDataDisplay {
         val item = event.item ?: return
         if (isOutOfBounds(event.slotId, currentExperiment) || item.displayName.removeColor() == "?") return
 
+        val items = uncoveredItems.toMutableMap()
+        val itemExistsInData = items.any { it.value.slotId == event.slotId && it.key == items.keys.max() }
         val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
         val hasRemainingClicks = remainingClicksPattern.matchMatcher(clicksItem?.displayName?.removeColor().orEmpty()) {
             group("clicks").toInt() > 0
         } ?: false
 
-        val items = uncoveredItems.toMutableMap()
-        val itemExistsInData = items.any { it.value.slotId == event.slotId && it.key == items.keys.max() }
         if (!itemExistsInData && hasRemainingClicks) handleItem(items, event.slotId)
         uncoveredItems = items
     }
@@ -93,7 +99,6 @@ object SuperpairDataDisplay {
         val uncovered = items.keys.maxOrNull() ?: -1
 
         if (isWaiting(itemName)) return@runDelayed
-
         if (items.none { it.key == uncovered && it.value.slotId == slot }) items[uncovered + 1] = itemData
 
         when {
@@ -103,9 +108,10 @@ object SuperpairDataDisplay {
 
         val since = clicksSinceSeparator(items)
 
-        val lastReward = items.entries.lastOrNull()?.value?.reward
-        if ((since >= 2 || (since == -1 && items.size >= 2)) && !instantFindNamePattern.matches(lastReward)) items[uncovered + 2] =
-            emptySuperpairItem
+        val lastReward = items.entries.lastOrNull()?.value?.reward.orEmpty()
+        val isLastInstantFind = instantFindNamePattern.matches(lastReward)
+        if ((since >= 2 || (since == -1 && items.size >= 2)) && !isLastInstantFind)
+            items[uncovered + 2] = emptySuperpairItem
 
         display = drawDisplay()
     }
@@ -235,7 +241,7 @@ object SuperpairDataDisplay {
         val lastIndex = sourceList.lastIndex
         for ((index, entry) in sourceList.withIndex()) {
             val prefix = determinePrefix(index, lastIndex)
-            this.add(" $prefix ${entry.item?.reward.orEmpty()}")
+            this.add(" $prefix ${entry.displayReward}")
         }
     }
 
