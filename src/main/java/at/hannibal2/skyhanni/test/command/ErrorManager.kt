@@ -65,7 +65,7 @@ object ErrorManager {
 
     // this hides the whole stack trace of one error of the list of all errors in the error message
     // where the error class name is the key and the first line contains one of the entries in the list of values
-    private val skipErroEntry = mapOf(
+    private val skipErrorEntry = mapOf(
         "java.lang.reflect.InvocationTargetException" to listOf(
             "EventListeners.createZeroParameterConsumer",
             "EventListeners.createSingleParameterConsumer",
@@ -313,7 +313,7 @@ object ErrorManager {
     fun Throwable.maybeSkipError(): Throwable {
         val cause = cause ?: return this
         val causeClassName = this@maybeSkipError.javaClass.name
-        val breakOnFirstLine = skipErroEntry[causeClassName]
+        val breakOnFirstLine = skipErrorEntry[causeClassName]
 
         for (traceElement in stackTrace) {
             val line = traceElement.toString()
