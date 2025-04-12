@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
@@ -79,7 +78,7 @@ object ItemPickupLog {
         fun isExpired() = timeUntilExpiry.passedSince() > config.expireAfter.seconds
     }
 
-    private val config get() = SkyHanniMod.feature.inventory.itemPickupLog
+    private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
     private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
@@ -347,9 +346,4 @@ object ItemPickupLog {
     private fun worldChangeCooldown(): Boolean = LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(65656, "inventory.itemPickupLogConfig", "inventory.itemPickupLog")
-    }
 }
