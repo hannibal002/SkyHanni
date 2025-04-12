@@ -43,6 +43,7 @@ enum class EnderNode(
     companion object {
         val miscEntries = entries.filter { it.dropType == NodeDropType.MISC }
         val armorEntries = entries.filter { it.dropType == NodeDropType.ARMOR }
+        val petEntries = entries.filter { it.dropType == NodeDropType.PET }
     }
 
     // Todo: We really shouldn't have this - the enums should be in sync enough that we can 1:1 go name to name
@@ -56,7 +57,6 @@ enum class EnderNode(
         END_STONE_SHULKER -> EnderNodeConfig.EnderNodeDisplayEntry.END_STONE_SHULKER
         ENDSTONE_GEODE -> EnderNodeConfig.EnderNodeDisplayEntry.END_STONE_GEODE
         MAGIC_RUNE -> EnderNodeConfig.EnderNodeDisplayEntry.MAGICAL_RUNE_I
-        ENDER_GAUNTLET -> EnderNodeConfig.EnderNodeDisplayEntry.ENDER_GAUNTLET
         MITE_GEL -> EnderNodeConfig.EnderNodeDisplayEntry.MITE_GEL
         SHRIMP_THE_FISH -> EnderNodeConfig.EnderNodeDisplayEntry.SHRIMP_THE_FISH
         END_HELMET -> EnderNodeConfig.EnderNodeDisplayEntry.ENDER_HELMET
@@ -64,6 +64,7 @@ enum class EnderNode(
         END_LEGGINGS -> EnderNodeConfig.EnderNodeDisplayEntry.ENDER_LEGGINGS
         END_BOOTS -> EnderNodeConfig.EnderNodeDisplayEntry.ENDER_BOOTS
         ENDER_NECKLACE -> EnderNodeConfig.EnderNodeDisplayEntry.ENDER_NECKLACE
+        ENDER_GAUNTLET -> EnderNodeConfig.EnderNodeDisplayEntry.ENDER_GAUNTLET
         COMMON_ENDERMAN_PET -> EnderNodeConfig.EnderNodeDisplayEntry.ENDERMAN_PET
         UNCOMMON_ENDERMAN_PET -> EnderNodeConfig.EnderNodeDisplayEntry.ENDERMAN_PET
         else -> null

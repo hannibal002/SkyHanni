@@ -423,7 +423,4 @@ object CollectionUtils {
             oldestKey?.let { remove(it) }
         }
     }
-
-    fun <K, V> MutableMap<K, V>.countKeys(condition: (K) -> Boolean) = this.count { condition(it.key) }
-    fun <K, V> MutableMap<K, V>.countValues(condition: (V) -> Boolean) = this.count { condition(it.value) }
 }

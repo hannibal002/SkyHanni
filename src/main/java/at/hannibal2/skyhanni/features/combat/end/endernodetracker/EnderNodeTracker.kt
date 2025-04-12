@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.countKeys
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -242,15 +242,15 @@ object EnderNodeTracker {
                 list.addSearchString("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest", "Endermite Nest")
             },
             EnderNodeDisplayEntry.ENDER_ARMOR to { data, list, _ ->
-                val totalEnderArmor = data.lootCount.countKeys { it.isEnderArmor() }
+                val totalEnderArmor = data.lootCount.filterKeys { it.isEnderArmor() }.sumAllValues()
                 list.addSearchString(
                     "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)",
                 )
             },
             EnderNodeDisplayEntry.ENDERMAN_PET to { data, list, _ ->
                 val lootProfit = getLootProfit(data)
-                val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (data.lootCount[it] ?: 0).addSeparators() }
-                val profit = EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 }.shortFormat()
+                val (c, u, r, e, l) = EnderNode.petEntries.map { (data.lootCount[it] ?: 0).addSeparators() }
+                val profit = EnderNode.petEntries.sumOf { lootProfit[it] ?: 0.0 }.shortFormat()
                 list.addSearchString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
             },
 
@@ -258,13 +258,7 @@ object EnderNodeTracker {
             EnderNodeDisplayEntry.SPACER_2 to { _, list, _ -> list.addSearchString(" ") },
         )
 
-        addFromNodeEntries(EnderNode.miscEntries) { data, list, nodeItem ->
-            if (nodeItem == null) return@addFromNodeEntries
-            val count = (data.lootCount[nodeItem] ?: 0).addSeparators()
-            list.addSearchString("§b$count ${nodeItem.displayName}", nodeItem.displayName)
-        }
-
-        addFromNodeEntries(EnderNode.armorEntries) { data, list, nodeItem ->
+        addFromNodeEntries(EnderNode.miscEntries + EnderNode.armorEntries) { data, list, nodeItem ->
             if (nodeItem == null) return@addFromNodeEntries
             val lootProfit = getLootProfit(data)
             val count = (data.lootCount[nodeItem] ?: 0).addSeparators()
