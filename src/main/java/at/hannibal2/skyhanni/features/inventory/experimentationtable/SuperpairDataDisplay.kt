@@ -212,38 +212,35 @@ object SuperpairDataDisplay {
         add("")
 
         val normals = found.entries.firstOrNull { it.key == FoundType.NORMAL }?.value.orEmpty()
-        val powerups = found.entries.firstOrNull { it.key == FoundType.POWERUP }?.value.orEmpty()
-        val matches = found.entries.firstOrNull { it.key == FoundType.MATCH }?.value.orEmpty()
         val pairs = found.entries.firstOrNull { it.key == FoundType.PAIR }?.value.orEmpty()
+        val matches = found.entries.firstOrNull { it.key == FoundType.MATCH }?.value.orEmpty()
+        val powerups = found.entries.firstOrNull { it.key == FoundType.POWERUP }?.value.orEmpty()
         val possiblePairs = calculatePossiblePairs(currentExperiment)
-
-        handleFoundDataList(pairs, "§2Collected")
-        handleFoundDataList(matches, "§eMatched")
-        handleFoundDataList(powerups, "§bPowerUp")
-
-        buildList {
+        val notCollected = buildList {
             if (possiblePairs >= 1) add("§ePairs - $possiblePairs")
             if (2 - powerups.size >= 1) add("§bPowerUps - ${2 - powerups.size}")
             if (normals.isNotEmpty()) add("§7Normals - ${normals.size}")
-            if (this.isNotEmpty()) {
-                add("")
-                add("§4Not collected")
-            }
-        }.forEach { displayLine ->
-            if (displayLine != this@buildList.last()) add(" ├ $displayLine")
-            else add(" └ $displayLine")
+        }
+
+        addFoundData(pairs, "§2Collected")
+        addFoundData(matches, "§eMatched")
+        addFoundData(powerups, "§bPowerUp")
+        addDataStrings(notCollected, "§4Not Collected")
+    }
+
+    private fun MutableList<String>.addDataStrings(dataList: List<String>, header: String) {
+        if (dataList.isEmpty()) return
+        this.add("")
+        this.add(header)
+        val lastIndex = dataList.lastIndex
+        for ((index, entry) in dataList.withIndex()) {
+            val prefix = determinePrefix(index, lastIndex)
+            this.add(" $prefix $entry")
         }
     }
 
-    private fun MutableList<String>.handleFoundDataList(sourceList: List<FoundData>, header: String) {
-        if (sourceList.isEmpty()) return
-        this.add(header)
-        val lastIndex = sourceList.lastIndex
-        for ((index, entry) in sourceList.withIndex()) {
-            val prefix = determinePrefix(index, lastIndex)
-            this.add(" $prefix ${entry.displayReward}")
-        }
-    }
+    private fun MutableList<String>.addFoundData(sourceList: List<FoundData>, header: String) =
+        addDataStrings(sourceList.map { it.displayReward }, header)
 
     private fun calculatePossiblePairs(currentExperiment: ExperimentationTableApi.ExperimentationTier) =
         ((currentExperiment.gridSize - 2) / 2) - found.filter { it.key != FoundType.POWERUP }.values.sumOf { it.size }
@@ -258,15 +255,21 @@ object SuperpairDataDisplay {
         second: SuperpairItem,
     ) = first.slotId != second.slotId && first.sameAs(second)
 
-    // TODO extract logic greatly
-    private fun hasFoundMatch(items: Map<Int, SuperpairItem>, firstItem: SuperpairItem) =
-        items.any { it.value.slotId != firstItem.slotId && it.value.sameAs(firstItem) } &&
-            found.entries.none {
-                it.key.isAnyOf(FoundType.PAIR, FoundType.MATCH) &&
-                    it.value.any { data ->
-                        firstItem.slotId.equalsOneOf(data.first?.slotId ?: -1, data.second?.slotId ?: -1)
-                    }
-            }
+    private fun existsMatchingItem(
+        items: Map<Int, SuperpairItem>,
+        targetItem: SuperpairItem
+    ): Boolean = items.any { (_, item) ->
+        item.slotId != targetItem.slotId && item.sameAs(targetItem)
+    }
+
+    private fun isItemAlreadyFound(targetItem: SuperpairItem): Boolean = found.any { (type, list) ->
+        type.isAnyOf(FoundType.PAIR, FoundType.MATCH) && list.any { data ->
+            targetItem.slotId.equalsOneOf(data.first?.slotId ?: -1, data.second?.slotId ?: -1)
+        }
+    }
+
+    private fun hasFoundMatch(items: Map<Int, SuperpairItem>, firstItem: SuperpairItem): Boolean =
+        existsMatchingItem(items, firstItem) && !isItemAlreadyFound(firstItem)
 
     private fun isPowerUp(reward: String) = ExperimentationTableApi.powerUpPattern.matches(reward)
 
