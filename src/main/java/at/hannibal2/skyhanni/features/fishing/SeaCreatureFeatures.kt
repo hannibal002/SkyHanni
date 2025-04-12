@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import kotlin.time.Duration.Companion.minutes
@@ -37,7 +38,7 @@ object SeaCreatureFeatures {
     private var lastRareCatch = SimpleTimeMark.farPast()
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
-    var lastRareSeaCreatureDespawn = SimpleTimeMark.farPast()
+    var lastSeaCreatureKill = SimpleTimeMark.farPast()
     private val seaCreaturesBosses = BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
 
     @HandleEvent
@@ -78,12 +79,19 @@ object SeaCreatureFeatures {
     }
 
     @HandleEvent
-    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        rareSeaCreatures.remove(event.mob)
+    fun onMobHurt(event: MobEvent.Hurt.SkyblockMob) {
+        if (!isEnabled()) return
+        val mob = event.mob
+        SeaCreatureManager.allFishingMobs[mob.name] ?: return
 
-        val creature = SeaCreatureManager.allFishingMobs[event.mob.name] ?: return
-        if (!creature.rare) return
-        lastRareSeaCreatureDespawn = SimpleTimeMark.now()
+        if (mob.centerCords.distanceToPlayer() > 10) return
+        if (!event.source.sourceOfDamage.isLocalPlayer) return
+
+        if (lastRareCatch.passedSince() < 1.seconds) return
+        val entity = mob.baseEntity
+        if (mob.name == "Water Hydra" && entity.health == (entity.baseMaxHealth.toFloat() / 2)) return
+
+        lastSeaCreatureKill = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -110,7 +118,7 @@ object SeaCreatureFeatures {
     fun onWorldChange() {
         rareSeaCreatures.clear()
         entityIds.clear()
-        lastRareSeaCreatureDespawn = SimpleTimeMark.farPast()
+        lastSeaCreatureKill = SimpleTimeMark.farPast()
     }
 
     @HandleEvent
