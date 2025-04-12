@@ -23,6 +23,6 @@ object DVDTest {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!SkyHanniMod.feature.dev.debug.dvdLogo) return
-        position.renderRenderable(event.context, dvdRenderable, posLabel = "DVDTest")
+        position.renderRenderable(dvdRenderable, posLabel = "DVDTest")
     }
 }

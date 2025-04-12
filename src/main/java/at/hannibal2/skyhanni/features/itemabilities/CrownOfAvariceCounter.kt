@@ -54,7 +54,7 @@ object CrownOfAvariceCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!isWearingCrown) return
-        config.position.renderRenderables(event.context, display, posLabel = "Crown of Avarice Counter")
+        config.position.renderRenderables(display, posLabel = "Crown of Avarice Counter")
     }
 
     @HandleEvent

@@ -113,7 +113,7 @@ object CarryTracker {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent) {
 
-        config.carryPosition.renderRenderables(event.context, display, posLabel = "Carry Tracker")
+        config.carryPosition.renderRenderables(display, posLabel = "Carry Tracker")
     }
 
     @HandleEvent

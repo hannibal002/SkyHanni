@@ -82,7 +82,7 @@ object CFStrayTimer {
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled() || !CFApi.inChocolateFactory) return
-        eventConfig.strayTimerPosition.renderRenderable(event.context, getTimerRenderable(), posLabel = "Stray Timer")
+        eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }
 
     private fun getTimerRenderable(): Renderable = Renderable.verticalContainer(

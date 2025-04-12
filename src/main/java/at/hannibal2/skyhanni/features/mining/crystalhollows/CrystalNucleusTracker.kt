@@ -193,8 +193,8 @@ object CrystalNucleusTracker {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { isEnabled() },
-            onRender = { context ->
-                tracker.renderDisplay(context, config.position)
+            onRender = {
+                tracker.renderDisplay(config.position)
             },
         )
     }

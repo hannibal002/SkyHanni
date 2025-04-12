@@ -97,7 +97,7 @@ object CurrentPetDisplay {
         if (RiftApi.inRift()) return
         if (!config.display) return
 
-        config.displayPos.renderString(event.context, PetApi.currentPet, posLabel = "Current Pet")
+        config.displayPos.renderString(PetApi.currentPet, posLabel = "Current Pet")
     }
 
     @HandleEvent

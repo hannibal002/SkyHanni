@@ -58,7 +58,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
@@ -483,13 +482,12 @@ object SkyHanniDebugsAndTests {
     @Suppress("ConstantConditionIf")
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (false) {
-            itemRenderDebug(event.context)
+            itemRenderDebug()
         }
 
         if (Minecraft.getMinecraft().gameSettings.showDebugInfo) {
             if (debugConfig.currentAreaDebug) {
                 config.debugLocationPos.renderString(
-                    event.context,
                     "Current Area: ${HypixelData.skyBlockArea}",
                     posLabel = "SkyBlock Area (Debug)",
                 )
@@ -499,7 +497,6 @@ object SkyHanniDebugsAndTests {
                 BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
-                            event.context,
                             "Looking at: ${ore.name} (${pos.toCleanString()})",
                             posLabel = "OreBlock",
                         )
@@ -512,25 +509,24 @@ object SkyHanniDebugsAndTests {
         if (!debugConfig.enabled) return
 
         if (displayLine.isNotEmpty()) {
-            config.debugPos.renderString(event.context, "test: $displayLine", posLabel = "Test")
+            config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
-        config.debugPos.renderRenderables(event.context, displayList, posLabel = "Test Display")
+        config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
     }
 
     @HandleEvent
     @Suppress("ConstantConditionIf")
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (false) {
-            dragAbleTest(event.context)
+            dragAbleTest()
         }
     }
 
-    private fun dragAbleTest(context: DrawContext) {
+    private fun dragAbleTest() {
         val bone = ItemStack(Items.bone, 1).toDragItem()
         val leaf = ItemStack(Blocks.leaves, 1).toDragItem()
 
         config.debugItemPos.renderRenderables(
-            context,
             listOf(
                 DragNDrop.draggable(Renderable.string("A Bone"), { bone }),
                 Renderable.placeholder(0, 30),
@@ -557,7 +553,7 @@ object SkyHanniDebugsAndTests {
         )
     }
 
-    private fun itemRenderDebug(context: DrawContext) {
+    private fun itemRenderDebug() {
         val scale = 0.1
         val renderables = listOf(
             ItemStack(Blocks.glass_pane), ItemStack(Items.diamond_sword), ItemStack(Items.skull),
@@ -573,7 +569,6 @@ object SkyHanniDebugsAndTests {
             )
         }
         config.debugItemPos.renderRenderables(
-            context,
             listOf(
                 Renderable.table(renderables),
                 Renderable.horizontalContainer(

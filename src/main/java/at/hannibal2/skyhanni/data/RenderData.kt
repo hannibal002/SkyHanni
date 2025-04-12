@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -23,9 +24,9 @@ object RenderData {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
-        event.context.matrices.translate(0f, 0f, -3f)
+        DrawContextUtils.translate(0f, 0f, -3f)
         renderOverlay(event.context)
-        event.context.matrices.translate(0f, 0f, 3f)
+        DrawContextUtils.translate(0f, 0f, 3f)
     }
 
     @HandleEvent
@@ -35,18 +36,18 @@ object RenderData {
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 
-        event.context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
         GlStateManager.enableDepth()
 
         if (GuiEditManager.isInGui()) {
-            event.context.matrices.translate(0f, 0f, -3f)
+            DrawContextUtils.translate(0f, 0f, -3f)
             renderOverlay(event.context)
-            event.context.matrices.translate(0f, 0f, 3f)
+            DrawContextUtils.translate(0f, 0f, 3f)
         }
 
         GuiRenderEvent.ChestGuiOverlayRenderEvent(event.context).post()
 
-        event.context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     var outsideInventory = false

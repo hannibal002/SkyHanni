@@ -165,7 +165,6 @@ object NonGodPotEffectDisplay {
         if (RiftApi.inRift()) return
 
         config.nonGodPotEffectPos.renderStrings(
-            event.context,
             display,
             extraSpace = 3,
             posLabel = "Non God Pot Effects",

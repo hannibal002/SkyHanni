@@ -132,7 +132,7 @@ object CFCustomReminder {
         if (!inChocolateMenu()) return
         if (ReminderUtils.isBusy()) return
 
-        configReminder.position.renderRenderables(event.context, display, posLabel = "Chocolate Factory Custom Reminder")
+        configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")
     }
 
     @HandleEvent
@@ -142,7 +142,7 @@ object CFCustomReminder {
         if (Minecraft.getMinecraft().currentScreen is GuiChest) return
         if (ReminderUtils.isBusy()) return
 
-        configReminder.position.renderRenderables(event.context, display, posLabel = "Chocolate Factory Custom Reminder")
+        configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")
     }
 
     @HandleEvent

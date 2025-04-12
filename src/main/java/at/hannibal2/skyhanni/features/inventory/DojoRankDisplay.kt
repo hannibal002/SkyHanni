@@ -38,7 +38,7 @@ object DojoRankDisplay {
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.dojoRankDisplayPosition.renderStrings(event.context, display, posLabel = "Dojo Rank Display")
+        config.dojoRankDisplayPosition.renderStrings(display, posLabel = "Dojo Rank Display")
     }
 
     private fun drawDisplay(items: Collection<ItemStack>) = buildList {

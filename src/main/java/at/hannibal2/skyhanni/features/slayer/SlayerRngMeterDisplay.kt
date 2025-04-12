@@ -274,8 +274,8 @@ object SlayerRngMeterDisplay {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { shouldShowDisplay() },
-            onRender = { context ->
-                config.pos.renderRenderables(context, display, posLabel = "RNG Meter Display")
+            onRender = {
+                config.pos.renderRenderables(display, posLabel = "RNG Meter Display")
             },
         )
     }

@@ -117,7 +117,7 @@ object IslandAreas {
         if (isInOwnInventory) return
 
         display?.let {
-            config.pathfinder.position.renderRenderable(event.context, it, posLabel = "Island Areas")
+            config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
         }
     }
 
@@ -129,7 +129,7 @@ object IslandAreas {
         if (!isInOwnInventory) return
 
         display?.let {
-            config.pathfinder.position.renderRenderable(event.context, it, posLabel = "Island Areas")
+            config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
         }
     }
 

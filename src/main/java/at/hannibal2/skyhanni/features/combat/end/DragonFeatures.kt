@@ -422,7 +422,7 @@ object DragonFeatures {
         if (dirty) {
             display = if (widgetActive) display() else widgetErrorMessage
         }
-        config.displayPosition.renderRenderables(event.context, display, posLabel = "Dragon Weight")
+        config.displayPosition.renderRenderables(display, posLabel = "Dragon Weight")
     }
 
     private fun display() = listOf(

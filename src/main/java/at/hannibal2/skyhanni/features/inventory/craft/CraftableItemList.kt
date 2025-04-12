@@ -174,7 +174,7 @@ object CraftableItemList {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        config.position.renderRenderables(event.context, display, posLabel = "Craftable Item List")
+        config.position.renderRenderables(display, posLabel = "Craftable Item List")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

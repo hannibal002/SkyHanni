@@ -40,7 +40,7 @@ object FirePillarDisplay {
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
-        config.firePillarDisplayPosition.renderString(event.context, display, posLabel = "Fire Pillar")
+        config.firePillarDisplayPosition.renderString(display, posLabel = "Fire Pillar")
     }
 
     fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.firePillarDisplay

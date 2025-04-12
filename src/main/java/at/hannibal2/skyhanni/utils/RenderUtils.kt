@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
@@ -98,14 +98,12 @@ object RenderUtils {
         }
     //#endif
 
-    // TODO swap Slot with DrawContext for extended function
-    fun Slot.highlight(context: DrawContext, color: LorenzColor) {
-        highlight(context, color.toColor())
+    fun Slot.highlight(color: LorenzColor) {
+        highlight(color.toColor())
     }
 
-    // TODO swap Slot with DrawContext for extended function
-    fun Slot.highlight(context: DrawContext, color: Color) {
-        highlight(context, color, xDisplayPosition, yDisplayPosition)
+    fun Slot.highlight(color: Color) {
+        highlight(color, xDisplayPosition, yDisplayPosition)
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {
@@ -113,18 +111,17 @@ object RenderUtils {
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: Color) {
-        highlight(context, color, x, y)
+        highlight(color, x, y)
     }
 
-    // TODO make a DrawContext extended function
-    fun highlight(context: DrawContext, color: Color, x: Int, y: Int) {
+    fun highlight(color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
-        context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
         // TODO don't use z
-        context.matrices.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        GuiRenderUtils.drawRect(context, x, y, x + 16, y + 16, color.rgb)
-        context.matrices.popMatrix()
+        DrawContextUtils.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
+        DrawContextUtils.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
     }
@@ -430,27 +427,27 @@ object RenderUtils {
         return lastValue + (currentValue - lastValue) * multiplier
     }
 
-    fun Position.transform(context: DrawContext): Pair<Int, Int> {
-        context.matrices.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
-        context.matrices.scale(effectiveScale, effectiveScale, 1F)
+    fun Position.transform(): Pair<Int, Int> {
+        DrawContextUtils.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
+        DrawContextUtils.scale(effectiveScale, effectiveScale, 1F)
         val x = ((GuiScreenUtils.mouseX - getAbsX()) / effectiveScale).toInt()
         val y = ((GuiScreenUtils.mouseY - getAbsY()) / effectiveScale).toInt()
         return x to y
     }
 
-    fun Position.renderString(context: DrawContext, string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
+    fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
         if (string.isNullOrBlank()) return
-        val x = renderString0(context, string, offsetX, offsetY, centerX)
+        val x = renderString0(string, offsetX, offsetY, centerX)
         GuiEditManager.add(this, posLabel, x, 10)
     }
 
-    private fun Position.renderString0(context: DrawContext, string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
+    private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
         val display = "§f$string"
-        context.matrices.pushMatrix()
-        transform(context)
+        DrawContextUtils.pushMatrix()
+        transform()
         val fr = Minecraft.getMinecraft().fontRendererObj
 
-        context.matrices.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
+        DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
             val strLen: Int = fr.getStringWidth(string)
@@ -460,18 +457,18 @@ object RenderUtils {
             fr.drawStringWithShadow(display, 0f, 0f, 0)
         }
 
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
 
         return fr.getStringWidth(display)
     }
 
-    fun Position.renderStrings(context: DrawContext, list: List<String>, extraSpace: Int = 0, posLabel: String) {
+    fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
         if (list.isEmpty()) return
 
         var offsetY = 0
         var longestX = 0
         for (s in list) {
-            val x = renderString0(context, s, offsetY = offsetY, centered = false)
+            val x = renderString0(s, offsetY = offsetY, centered = false)
             if (x > longestX) {
                 longestX = x
             }
@@ -481,7 +478,6 @@ object RenderUtils {
     }
 
     fun Position.renderRenderables(
-        context: DrawContext,
         renderables: List<Renderable>,
         extraSpace: Int = 0,
         posLabel: String,
@@ -491,33 +487,32 @@ object RenderUtils {
         var longestY = 0
         val longestX = renderables.maxOf { it.width }
         for (line in renderables) {
-            context.matrices.pushMatrix()
-            val (x, y) = transform(context)
-            context.matrices.translate(0f, longestY.toFloat(), 0F)
+            DrawContextUtils.pushMatrix()
+            val (x, y) = transform()
+            DrawContextUtils.translate(0f, longestY.toFloat(), 0F)
             Renderable.withMousePosition(x, y) {
                 line.renderXAligned(0, longestY, longestX)
             }
 
             longestY += line.height + extraSpace + 2
 
-            context.matrices.popMatrix()
+            DrawContextUtils.popMatrix()
         }
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
     fun Position.renderRenderable(
-        context: DrawContext,
         renderable: Renderable?,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
         if (renderable == null) return
-        context.matrices.pushMatrix()
-        val (x, y) = transform(context)
+        DrawContextUtils.pushMatrix()
+        val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
             renderable.render(0, 0)
         }
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 

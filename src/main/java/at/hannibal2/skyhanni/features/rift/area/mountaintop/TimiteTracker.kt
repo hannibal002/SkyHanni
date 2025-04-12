@@ -101,7 +101,7 @@ object TimiteTracker {
     fun onRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
-        tracker.renderDisplay(event.context, config.trackerPosition)
+        tracker.renderDisplay(config.trackerPosition)
     }
 
     @HandleEvent

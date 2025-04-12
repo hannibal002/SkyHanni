@@ -38,7 +38,6 @@ object AshfangFreezeCooldown {
 
         val format = unfrozenTime.timeUntil().format(showMilliSeconds = true)
         config.freezeCooldownPos.renderString(
-            event.context,
             "§cAshfang Freeze: §a$format",
             posLabel = "Ashfang Freeze Cooldown",
         )

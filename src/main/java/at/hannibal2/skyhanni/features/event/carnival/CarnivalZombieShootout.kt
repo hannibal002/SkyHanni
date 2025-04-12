@@ -140,7 +140,7 @@ object CarnivalZombieShootout {
             lastUpdate.content = SimpleTimeMark.now()
         }
 
-        config.lampPosition.renderRenderable(event.context, content, posLabel = "Lantern Timer")
+        config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
     @HandleEvent

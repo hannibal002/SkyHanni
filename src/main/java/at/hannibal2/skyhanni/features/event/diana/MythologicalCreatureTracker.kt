@@ -141,14 +141,14 @@ object MythologicalCreatureTracker {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { config.enabled },
-            onRender = { context ->
+            onRender = {
                 val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
                 if (!DianaApi.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
                 if (spadeInHand) {
                     tracker.firstUpdate()
                 }
 
-                tracker.renderDisplay(context, config.position)
+                tracker.renderDisplay(config.position)
             },
         )
     }

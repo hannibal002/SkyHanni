@@ -184,7 +184,6 @@ object CFShopPrice {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
             config.position.renderRenderables(
-                event.context,
                 display,
                 extraSpace = 5,
                 posLabel = "Chocolate Shop Price",

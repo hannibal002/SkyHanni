@@ -87,7 +87,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
-            display?.let { config.position.renderRenderable(event.context, it, posLabel = "Mayor Overlay") }
+            display?.let { config.position.renderRenderable(it, posLabel = "Mayor Overlay") }
         }
 
         private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.MAYOR_OVERLAY.isSelected()) && config.enabled

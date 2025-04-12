@@ -150,17 +150,17 @@ object TheGreatSpook {
 
         if (config.primalFearTimer) {
             displayMobCooldown.let {
-                config.positionTimer.renderRenderable(event.context, it, posLabel = "Primal Fear Timer")
+                config.positionTimer.renderRenderable(it, posLabel = "Primal Fear Timer")
             }
         }
         if (config.fearStatDisplay) {
             SkyblockStat.FEAR.displayValue?.let {
-                config.positionFear.renderString(event.context, it, posLabel = "Fear Stat Display")
+                config.positionFear.renderString(it, posLabel = "Fear Stat Display")
             }
         }
         if (config.greatSpookTimeLeft) {
             displayGreatSpookEnd.let {
-                config.positionTimeLeft.renderRenderable(event.context, it, posLabel = "Great Spook Time Left")
+                config.positionTimeLeft.renderRenderable(it, posLabel = "Great Spook Time Left")
             }
         }
     }

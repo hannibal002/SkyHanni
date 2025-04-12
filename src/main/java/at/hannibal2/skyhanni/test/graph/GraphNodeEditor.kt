@@ -38,7 +38,6 @@ object GraphNodeEditor {
         if (!isEnabled()) return
 
         config.namedNodesList.renderRenderables(
-            event.context,
             getNodeNames(),
             posLabel = "Graph Nodes List",
         )

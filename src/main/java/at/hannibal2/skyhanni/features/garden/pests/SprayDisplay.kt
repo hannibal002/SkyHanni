@@ -53,7 +53,7 @@ object SprayDisplay {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.displayEnabled) return
         val display = display ?: return
-        config.displayPosition.renderString(event.context, display, posLabel = "Active Plot Spray Display")
+        config.displayPosition.renderString(display, posLabel = "Active Plot Spray Display")
     }
 
     private fun sendExpiredPlotsToChat(wasAway: Boolean) {
