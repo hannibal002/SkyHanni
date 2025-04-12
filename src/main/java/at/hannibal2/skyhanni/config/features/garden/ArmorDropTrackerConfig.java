@@ -22,6 +22,5 @@ public class ArmorDropTrackerConfig {
 
     @Expose
     @ConfigLink(owner = ArmorDropTrackerConfig.class, field = "enabled")
-    // TODO rename to position
-    public Position pos = new Position(16, -232, false, true);
+    public Position position = new Position(16, -232, false, true);
 }
