@@ -7,10 +7,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import java.time.Instant
 import kotlin.math.sin
@@ -35,7 +35,7 @@ object HoppityCallWarning {
      * REGEX-TEST: §e✆ §r§bHoppity§r§e ✆
      * REGEX-TEST: §e✆ §r§aHoppity§r§e ✆
      */
-    private val initHoppityCallPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val initHoppityCallPattern by CFApi.patternGroup.pattern(
         "hoppity.call.init",
         "§e✆ §r(?:§a|§b)Hoppity§r§e ✆.*",
     )
@@ -43,7 +43,7 @@ object HoppityCallWarning {
     /**
      * REGEX-TEST: §e[NPC] §aHoppity§f: §b✆ §f§rWhat's up, §boBlazin§f?
      */
-    private val pickupHoppityCallPattern by ChocolateFactoryApi.patternGroup.pattern(
+    private val pickupHoppityCallPattern by CFApi.patternGroup.pattern(
         "hoppity.call.pickup",
         "§e\\[NPC] §aHoppity§f: §b✆ §f§rWhat's up, .*§f\\?",
     )
@@ -96,7 +96,8 @@ object HoppityCallWarning {
         val randomizationAlphaInt = randomizationAlphaDouble.toInt().coerceIn(0..255)
         // Shift the alpha value 24 bits to the left to position it in the color's alpha channel.
         val shiftedRandomAlpha = randomizationAlphaInt shl 24
-        Gui.drawRect(
+        GuiRenderUtils.drawRect(
+            event.context,
             0,
             0,
             GuiScreenUtils.displayWidth,

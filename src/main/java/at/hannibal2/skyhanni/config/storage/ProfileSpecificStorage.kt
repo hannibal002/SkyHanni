@@ -30,12 +30,12 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
-import at.hannibal2.skyhanni.features.garden.pests.VinylType
+import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
@@ -183,9 +183,9 @@ class ProfileSpecificStorage {
 
     // -- hoppity
     @Expose
-    var chocolateFactory: ChocolateFactoryStorage = ChocolateFactoryStorage()
+    var chocolateFactory: CFStorage = CFStorage()
 
-    class ChocolateFactoryStorage {
+    class CFStorage {
         @Expose
         var currentRabbits: Int = 0
 
@@ -284,13 +284,16 @@ class ProfileSpecificStorage {
         var hoppityShopYearOpened: Int? = null
 
         @Expose
-        var strayTracker: ChocolateFactoryStrayTracker.Data = ChocolateFactoryStrayTracker.Data()
+        var strayTracker: CFStrayTracker.Data = CFStrayTracker.Data()
 
         @Expose
         var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
         @Expose
         var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+
+        @Expose
+        var hotChocolateMixinExpiry = farPast()
 
         class HitmanStatsStorage {
             @Expose
@@ -529,7 +532,7 @@ class ProfileSpecificStorage {
 
         class Fortune {
             @Expose
-            var outdatedItems: MutableMap<FarmingItems, Boolean> = enumMapOf()
+            var outdatedItems: MutableMap<FarmingItemType, Boolean> = enumMapOf()
 
             @Expose
             var farmingLevel: Int = -1
@@ -553,7 +556,7 @@ class ProfileSpecificStorage {
             var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
 
             @Expose
-            var farmingItems: MutableMap<FarmingItems, ItemStack> = enumMapOf()
+            var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
         }
 
         @Expose
@@ -842,6 +845,9 @@ class ProfileSpecificStorage {
     }
 
     @Expose
+    var godPotExpiry: SimpleTimeMark = farPast()
+
+    @Expose
     var fairySouls: FairySoulsStorage = FairySoulsStorage()
 
     class FairySoulsStorage {
@@ -851,4 +857,12 @@ class ProfileSpecificStorage {
         @Expose
         var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
     }
+
+    @Expose
+    var cakeCounterData: CakeCounterData = CakeCounterData()
+
+    class CakeCounterData(
+        @Expose var cakesEaten: Int? = -1,
+        @Expose var soulsFound: Int = 0,
+    )
 }

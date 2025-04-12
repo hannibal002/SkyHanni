@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
-import at.hannibal2.skyhanni.utils.guide.GuideGUI
+import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -303,7 +303,7 @@ interface Renderable {
 
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
+            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null || GuiData.preDrawEventCancelled
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
