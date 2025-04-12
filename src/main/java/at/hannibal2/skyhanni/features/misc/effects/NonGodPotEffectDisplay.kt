@@ -164,7 +164,7 @@ object NonGodPotEffectDisplay {
         if (!isEnabled() || !config.nonGodPotEffectDisplay) return
         if (RiftApi.inRift()) return
 
-        config.position.renderStrings(
+        config.nonGodPotEffectPos.renderStrings(
             display,
             extraSpace = 3,
             posLabel = "Non God Pot Effects",
@@ -178,7 +178,6 @@ object NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
 
         event.move(65656, "misc.potionEffect", "misc.nonGodPotEffect")
-        event.move(65657, "misc.nonGodPotEffect.nonGodPotEffectPos", "misc.nonGodPotEffect.position")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonApi.inDungeon() && !LorenzUtils.inKuudraFight
