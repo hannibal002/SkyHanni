@@ -112,5 +112,6 @@ public class EstimatedItemValueConfig {
 
     @Expose
     @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
-    public Position itemPriceDataPosition = new Position(140, 90, false, true);
+    // TODO rename "position"
+    public Position itemPriceDataPos = new Position(140, 90, false, true);
 }

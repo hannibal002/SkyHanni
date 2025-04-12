@@ -142,7 +142,7 @@ object EstimatedItemValue {
         }
 
         try {
-            config.itemPriceDataPosition.renderRenderables(display, posLabel = "Estimated Item Value")
+            config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
             // that tries to over-render the tooltip, and is not explicitly something we can solve here?
@@ -295,8 +295,6 @@ object EstimatedItemValue {
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
 
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
-
-        event.move(65656, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.itemPriceDataPosition")
     }
 
     fun renderInNeuStorageOverlay() {
