@@ -423,7 +423,7 @@ object ItemAbilityCooldown {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "itemAbilities", "inventory.itemAbilities")
 
-        event.move(65656, "inventory.itemAbilities.itemAbilityCooldown", "inventory.itemAbilities.enabled")
+        event.move(65656, "inventory.itemAbilities.itemAbilityCooldown", "inventory.itemAbilities.")
         event.move(65656, "inventory.itemAbilities.itemAbilityCooldownBackground", "inventory.itemAbilities.background")
     }
 
