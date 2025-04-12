@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -117,8 +118,8 @@ object DamageIndicatorManager {
         }
     }
 
-    @HandleEvent
-    fun onServerTick(event : ServerTickEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onServerTick(event: ServerTickEvent) {
         data.forEach {
             it.value.serverTicksAlive ++
         }
