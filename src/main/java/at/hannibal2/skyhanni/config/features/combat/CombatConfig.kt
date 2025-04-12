@@ -29,10 +29,11 @@ class CombatConfig {
     @Accordion
     var quiverConfig: QuiverConfig = QuiverConfig()
 
+    // TODO rename to armor stack display
     @Expose
     @ConfigOption(name = "Armor Stack Display", desc = "")
     @Accordion
-    var armorStackDisplay: ArmorStackDisplayConfig = ArmorStackDisplayConfig()
+    var stackDisplayConfig: StackDisplayConfig = StackDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Summonings", desc = "")
