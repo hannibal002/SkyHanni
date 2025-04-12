@@ -111,7 +111,7 @@ object RiftApi {
     fun inMountainTop() = when (LorenzUtils.skyBlockArea) {
         "Continuum", "The Mountaintop", "Trial Grounds", "Time-Torn Isles",
         "Wizardman Bureau", "Wizard Brawl", "Walk of Fame", "Time Chamber",
-        -> true
+            -> true
 
         else -> false
     }

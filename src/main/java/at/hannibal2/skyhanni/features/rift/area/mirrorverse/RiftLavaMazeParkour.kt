@@ -28,7 +28,7 @@ object RiftLavaMazeParkour {
             data.locations,
             data.shortCuts,
             platformSize = 1.0,
-            detectionRange = 1.0
+            detectionRange = 1.0,
         )
         updateConfig()
     }

@@ -123,7 +123,7 @@ object EnigmaSoulWaypoints {
                             it,
                             "$name Enigma Soul",
                             config.color.toSpecialColor(),
-                            condition = { config.showPathFinder }
+                            condition = { config.showPathFinder },
                         )
                     }
                 }

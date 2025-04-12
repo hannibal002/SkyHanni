@@ -99,7 +99,7 @@ object LivingCaveDefenseBlocks {
         "Autochest ",
         "Autopants ",
         "Autoboots ",
-        -> true
+            -> true
 
         else -> false
     }
