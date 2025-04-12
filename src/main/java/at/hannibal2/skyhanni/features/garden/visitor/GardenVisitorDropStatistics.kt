@@ -45,7 +45,7 @@ private typealias VisitorDrops = ProfileSpecificStorage.GardenStorage.VisitorDro
 object GardenVisitorDropStatistics {
 
     private val patternGroup = RepoPattern.group("garden.visitor.droptracker")
-    private val config get() = GardenApi.config.visitors.dropsStatistics
+    private val config get() = VisitorApi.config.dropsStatistics
     private val visitorRarityEntries: List<LorenzRarity> = listOf(
         LorenzRarity.UNCOMMON,
         LorenzRarity.RARE,
@@ -53,7 +53,6 @@ object GardenVisitorDropStatistics {
         LorenzRarity.MYTHIC,
         LorenzRarity.SPECIAL,
     )
-
     private var display = emptyList<Renderable>()
     private var lastAccept = SimpleTimeMark.farPast()
 
