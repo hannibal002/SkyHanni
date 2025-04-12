@@ -54,27 +54,27 @@ object CFInventory {
             val currentUpdates = CFApi.factoryUpgrades
             currentUpdates.find { it.slotIndex == slotIndex }?.let { upgrade ->
                 if (upgrade.canAfford()) {
-                    slot.highlight(LorenzColor.GREEN.addOpacity(75))
+                    slot.highlight(event.context, LorenzColor.GREEN.addOpacity(75))
                 }
             }
             if (slotIndex == CFApi.bestAffordableSlot) {
-                slot.highlight(LorenzColor.GREEN.addOpacity(200))
+                slot.highlight(event.context, LorenzColor.GREEN.addOpacity(200))
             }
 
             if (slotIndex == CFApi.barnIndex && CFBarnManager.isBarnFull()) {
-                slot.highlight(LorenzColor.RED)
+                slot.highlight(event.context, LorenzColor.RED)
             }
             if (slotIndex == CFApi.milestoneIndex) {
                 unclaimedRewardsPattern.firstMatcher(slot.stack?.getLore().orEmpty()) {
-                    slot.highlight(LorenzColor.RED)
+                    slot.highlight(event.context, LorenzColor.RED)
                 }
             }
             if (slotIndex == CFApi.timeTowerIndex) {
                 if (CFTimeTowerManager.timeTowerActive()) {
-                    slot.highlight(LorenzColor.LIGHT_PURPLE.addOpacity(200))
+                    slot.highlight(event.context, LorenzColor.LIGHT_PURPLE.addOpacity(200))
                 }
                 if (CFTimeTowerManager.timeTowerFull()) {
-                    slot.highlight(LorenzColor.RED)
+                    slot.highlight(event.context, LorenzColor.RED)
                 }
             }
         }
