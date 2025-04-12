@@ -24,11 +24,11 @@ class SeaCreatureTrackerConfig {
     @ConfigEditorBoolean
     var showPercentage: Property<Boolean> = Property.of(false)
 
+    // TODO move into sea creature category as this is now independent of the tracker
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat messages when catching a sea creature.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO move into sea creature category as this is now independent of the tracker
     var hideChat: Boolean = false
 
     @Expose
