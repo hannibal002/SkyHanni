@@ -49,7 +49,7 @@ object BlazeSlayerClearView {
         }
     }
 
-    private fun isEnabled() = SkyHanniMod.feature.slayer.blaze.clearView && nearBlaze
+    private fun isEnabled() = SkyHanniMod.feature.slayer.blazes.clearView && nearBlaze
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

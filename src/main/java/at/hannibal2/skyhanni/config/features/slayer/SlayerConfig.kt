@@ -17,9 +17,10 @@ class SlayerConfig {
     @Accordion
     var enderman: EndermanConfig = EndermanConfig()
 
+    // TODO rename to "blaze"
     @Expose
     @Category(name = "Blaze", desc = "Blaze Slayer Features")
-    var blaze: BlazeConfig = BlazeConfig()
+    var blazes: BlazeConfig = BlazeConfig()
 
     @Expose
     @Category(name = "Vampire", desc = "Vampire Slayer Features")
