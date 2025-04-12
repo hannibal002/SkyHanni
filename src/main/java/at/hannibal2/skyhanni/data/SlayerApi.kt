@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -172,5 +173,10 @@ object SlayerApi {
         -> SlayerType.VAMPIRE
 
         else -> null
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(65656, "slayer.blazes", "slayer.blaze")
     }
 }

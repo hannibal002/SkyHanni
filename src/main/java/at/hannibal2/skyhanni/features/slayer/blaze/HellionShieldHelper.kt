@@ -30,7 +30,7 @@ object HellionShieldHelper {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 this,
                 shield.color.toColor().addAlpha(80),
-            ) { LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blazes.hellion.coloredMobs }
+            ) { LorenzUtils.inSkyBlock && SkyHanniMod.feature.slayer.blaze.hellion.coloredMobs }
         } else {
             hellionShieldMobs.remove(this)
             RenderLivingEntityHelper.removeCustomRender(this)

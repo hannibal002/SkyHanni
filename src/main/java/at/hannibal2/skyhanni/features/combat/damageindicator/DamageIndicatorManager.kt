@@ -546,7 +546,7 @@ object DamageIndicatorManager {
             entity.setHellionShield(null)
         }
 
-        if (!SkyHanniMod.feature.slayer.blazes.phaseDisplay) return ""
+        if (!SkyHanniMod.feature.slayer.blaze.phaseDisplay) return ""
 
         var calcHealth = health
         val calcMaxHealth: Int

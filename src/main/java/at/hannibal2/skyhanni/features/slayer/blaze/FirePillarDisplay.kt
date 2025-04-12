@@ -15,7 +15,7 @@ import net.minecraft.entity.item.EntityArmorStand
 @SkyHanniModule
 object FirePillarDisplay {
 
-    private val config get() = SkyHanniMod.feature.slayer.blazes
+    private val config get() = SkyHanniMod.feature.slayer.blaze
 
     /**
      * REGEX-TEST: §6§l2s §c§l8 hits
