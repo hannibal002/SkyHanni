@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -296,6 +297,12 @@ object ExperimentationTableApi {
      * REGEX-TEST: §8 +§8 §7[Lvl 1] §5Guardian
      * REGEX-TEST: §8 +§3300,000 Enchanting Exp (Stakes)
      * REGEX-TEST: §8 +§3151,000 Enchanting Exp (Pairs)
+     * REGEX-TEST: §8 +§8 §9Growth VI
+     * REGEX-TEST: §8 +§3300,000 Enchanting Exp (Stakes)
+     * REGEX-TEST: §8 +§3172,000 Enchanting Exp (Pairs)
+     * REGEX-TEST: §8 +§3300,000 Enchanting Exp (Stakes)
+     * REGEX-TEST: §8 +§8 §9Titanic Experience Bottle
+     * REGEX-TEST: §8 +§8 §7[Lvl 1] §6Guardian
      */
     private val expOverRewardsLorePattern by patternGroup.pattern(
         "inventory.experiment-over.rewards",
@@ -426,10 +433,20 @@ object ExperimentationTableApi {
         }
 
     private fun InventoryOpenEvent.processExperimentOver() {
-        val item = when (currentExperimentType) {
-            ExperimentationTaskType.SUPERPAIRS -> inventoryItems[SUPERPAIRS_OVER_DATA_SLOT]
-            else -> inventoryItems[ADDONS_OVER_DATA_SLOT]
-        } ?: return
+        tryUpdateCurrentActivity()
+        val slotIndex = when (currentData.type) {
+            null -> ErrorManager.skyHanniError(
+                "Found Experiment Over GUI without a set task type!",
+                "inventoryName" to inventoryName,
+                "inventoryItems" to inventoryItems,
+                "currentData" to currentData,
+                "currentType" to currentExperimentType,
+                "currentTier" to currentExperimentTier,
+            )
+            ExperimentationTaskType.SUPERPAIRS -> SUPERPAIRS_OVER_DATA_SLOT
+            else -> ADDONS_OVER_DATA_SLOT
+        }
+        val item = inventoryItems[slotIndex] ?: return
         val lore = item.getLore().takeIfNotEmpty()?.toList() ?: return
 
         val taskType = ExperimentationTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
