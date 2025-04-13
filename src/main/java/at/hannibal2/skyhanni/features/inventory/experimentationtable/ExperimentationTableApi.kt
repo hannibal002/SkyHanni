@@ -220,6 +220,8 @@ object ExperimentationTableApi {
     /**
      * REGEX-TEST: 131k Enchanting Exp
      * REGEX-TEST: 42,000 Enchanting Exp
+     * REGEX-TEST: 300,000 Enchanting Exp
+     * REGEX-TEST: 151,000 Enchanting Exp
      */
     private val enchantingExpPattern by patternGroup.pattern(
         "exp",
@@ -467,7 +469,7 @@ object ExperimentationTableApi {
         }
 
         val rewardsBeginIndex = lore.indexOfFirst { expOverRewardsStartLorePattern.matches(it) } + 1
-        val rewardsEndIndex = lore.indexOfFirst { expOverRewardsEndLorePattern.matches(it) } - 2
+        val rewardsEndIndex = lore.indexOfFirst { expOverRewardsEndLorePattern.matches(it) } - 1
         val rewards: List<String> = lore
             .subList(rewardsBeginIndex, rewardsEndIndex)
             .mapNotNull { expOverRewardsLorePattern.matchGroup(it, "reward") }
