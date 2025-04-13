@@ -19,15 +19,18 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemCategory.Companion.containsItem
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -60,13 +63,12 @@ object EnderNodeTracker {
         "§5§lENDER NODE! §r§fYou found §r§8(?<amount>\\d+)x §r(?<name>.*)§r§f!",
     )
 
+    // TODO use repo patterns
     // TODO add abstract logic with ohter pet drop chat messages
     private val endermanRegex = Regex("""(RARE|PET) DROP! §r(.+) §r§b\(""")
 
     private val tracker = SkyHanniTracker("Ender Node Tracker", { Data() }, { it.enderNodeTracker }) {
-        formatDisplay(
-            drawDisplay(it),
-        )
+        drawDisplay(it)
     }
 
     class Data : TrackerData() {
@@ -112,9 +114,9 @@ object EnderNodeTracker {
             item = it.groups[2]?.value
         }
 
-        when {
-            item == null -> return
-            item == "§cEndermite Nest" -> {
+        when (item) {
+            null -> return
+            "§cEndermite Nest" -> {
                 tracker.modify { storage ->
                     storage.totalEndermiteNests++
                 }
@@ -176,7 +178,7 @@ object EnderNodeTracker {
     }
 
     init {
-        tracker.initRenderer({ config.position }) { isEnabled() }
+        tracker.initRenderer({ config.position }) { config.enabled && isEnabled() }
     }
 
     @HandleEvent
@@ -201,89 +203,85 @@ object EnderNodeTracker {
 
         val newProfit = mutableMapOf<EnderNode, Double>()
         for ((item, amount) in storage.lootCount) {
-            val price = if (isEnderArmor(item)) {
-                10_000.0
-            } else {
-                (if (!LorenzUtils.noTradeMode) item.internalName.getPriceOrNull() else 0.0)?.coerceAtLeast(
-                    item.internalName.getNpcPriceOrNull() ?: 0.0,
-                )?.coerceAtLeast(georgePrice(item) ?: 0.0) ?: 0.0
+            val altPrice = (if (!LorenzUtils.noTradeMode) item.internalName.getPrice() else 0.0)
+            val price = when (item.isEnderArmor()) {
+                true -> 10_000.0
+                false -> altPrice.coerceAtLeast(
+                    item.internalName.getNpcPrice(),
+                ).coerceAtLeast(item.getGeorgePrice())
             }
             newProfit[item] = price * amount
         }
         return newProfit
     }
 
-    private fun isEnabled() = IslandType.THE_END.isInIsland() && config.enabled && (!config.onlyPickaxe || hasItemInHand())
+    private fun isEnabled() = IslandType.THE_END.isInIsland() && (!config.onlyPickaxe || hasItemInHand())
 
     private fun hasItemInHand() = ItemCategory.miningTools.containsItem(InventoryUtils.getItemInHand())
 
-    private fun isEnderArmor(displayName: EnderNode) = when (displayName) {
-        EnderNode.END_HELMET,
-        EnderNode.END_CHESTPLATE,
-        EnderNode.END_LEGGINGS,
-        EnderNode.END_BOOTS,
-        EnderNode.ENDER_NECKLACE,
-        EnderNode.ENDER_GAUNTLET,
-        -> true
+    private fun EnderNode.isEnderArmor() = this in EnderNode.armorEntries
 
-        else -> false
-    }
-
-    private fun georgePrice(petRarity: EnderNode): Double? = when (petRarity) {
+    private fun EnderNode.getGeorgePrice(): Double = when (this) {
         EnderNode.COMMON_ENDERMAN_PET -> 100.0
         EnderNode.UNCOMMON_ENDERMAN_PET -> 500.0
         EnderNode.RARE_ENDERMAN_PET -> 2_000.0
         EnderNode.EPIC_ENDERMAN_PET -> 10_000.0
         EnderNode.LEGENDARY_ENDERMAN_PET -> 1_000_000.0
-        else -> null
+        else -> 0.0
     }
 
-    private fun drawDisplay(data: Data) = buildList<Searchable> {
-        val lootProfit = getLootProfit(data)
+    private val transformMap: Map<EnderNodeDisplayEntry, (Data, MutableList<Searchable>, EnderNode?) -> Unit> = buildMap {
+        addAll(
+            EnderNodeDisplayEntry.TITLE to { _, list, _ -> list.addSearchString("§5§lEnder Node Tracker") },
+            EnderNodeDisplayEntry.NODES_MINED to { data, list, _ ->
+                list.addSearchString("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
+            },
+            EnderNodeDisplayEntry.COINS_MADE to { data, list, _ ->
+                list.addSearchString("§6${getLootProfit(data).values.sum().shortFormat()} Coins made")
+            },
+            EnderNodeDisplayEntry.ENDERMITE_NEST to { data, list, _ ->
+                list.addSearchString("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest", "Endermite Nest")
+            },
+            EnderNodeDisplayEntry.ENDER_ARMOR to { data, list, _ ->
+                val totalEnderArmor = data.lootCount.filterKeys { it.isEnderArmor() }.sumAllValues()
+                list.addSearchString(
+                    "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)",
+                )
+            },
+            EnderNodeDisplayEntry.ENDERMAN_PET to { data, list, _ ->
+                val lootProfit = getLootProfit(data)
+                val (c, u, r, e, l) = EnderNode.petEntries.map { (data.lootCount[it] ?: 0).addSeparators() }
+                val profit = EnderNode.petEntries.sumOf { lootProfit[it] ?: 0.0 }.shortFormat()
+                list.addSearchString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
+            },
 
-        addSearchString("§5§lEnder Node Tracker")
-        addSearchString("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
-        addSearchString("§6${lootProfit.values.sum().shortFormat()} Coins made")
-        addSearchString(" ")
-        addSearchString("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest", "Endermite Nest")
-
-        for (item in EnderNode.entries.subList(0, 11)) {
-            val count = (data.lootCount[item] ?: 0).addSeparators()
-            val profit = (lootProfit[item] ?: 0.0).shortFormat()
-            addSearchString("§b$count ${item.displayName} §7(§6$profit§7)", item.displayName)
-        }
-        addSearchString(" ")
-
-        val totalEnderArmor = calculateEnderArmor(data)
-        addSearchString(
-            "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)",
+            EnderNodeDisplayEntry.SPACER_1 to { _, list, _ -> list.addSearchString(" ") },
+            EnderNodeDisplayEntry.SPACER_2 to { _, list, _ -> list.addSearchString(" ") },
         )
-        for (item in EnderNode.entries.subList(11, 16)) {
-            val count = (data.lootCount[item] ?: 0).addSeparators()
-            val profit = (lootProfit[item] ?: 0.0).shortFormat()
-            addSearchString("§b$count ${item.displayName} §7(§6$profit§7)")
+
+        addFromNodeEntries(EnderNode.miscEntries + EnderNode.armorEntries) { data, list, nodeItem ->
+            if (nodeItem == null) return@addFromNodeEntries
+            val lootProfit = getLootProfit(data)
+            val count = (data.lootCount[nodeItem] ?: 0).addSeparators()
+            val profit = (lootProfit[nodeItem] ?: 0.0).shortFormat()
+            list.addSearchString("§b$count ${nodeItem.displayName} §7(§6$profit§7)")
         }
-        // enderman pet rarities
-        val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (data.lootCount[it] ?: 0).addSeparators() }
-        val profit = EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 }.shortFormat()
-        addSearchString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }
 
-    private fun calculateEnderArmor(storage: Data) = storage.lootCount.filter {
-        isEnderArmor(it.key)
-    }.map {
-        it.value
-    }.sum()
+    private fun MutableMap<EnderNodeDisplayEntry, (Data, MutableList<Searchable>, EnderNode?) -> Unit>.addFromNodeEntries(
+        entries: List<EnderNode>,
+        invoker: (Data, MutableList<Searchable>, EnderNode?) -> Unit,
+    ) = entries.forEach { node ->
+        val configItem = node.toEnderNodeDisplayEntryOrNull() ?: return@forEach
+        add(configItem to invoker)
+    }
 
-    private fun formatDisplay(map: List<Searchable>): List<Searchable> {
-        if (!ProfileStorageData.loaded) return emptyList()
-
-        val newList = mutableListOf<Searchable>()
-        for (index in config.textFormat.get()) {
-            // TODO, change functionality to use enum rather than ordinals
-            newList.add(map[index.ordinal])
+    private fun drawDisplay(data: Data) = buildList {
+        for (enabledOption in config.textFormat.get()) {
+            val transformer = transformMap[enabledOption] ?: continue
+            val nodeItem = enabledOption.toEnderNodeOrNull()
+            transformer(data, this, nodeItem)
         }
-        return newList
     }
 
     @HandleEvent

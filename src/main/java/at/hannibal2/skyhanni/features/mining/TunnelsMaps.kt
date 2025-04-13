@@ -280,6 +280,7 @@ object TunnelsMaps {
             condition = { isEnabled() },
             inOwnInventory = true,
         ) {
+            // TODO cache
             val display = buildList {
                 if (active.isNotEmpty()) {
                     if (goal == campfire && active != campfire.name) {
