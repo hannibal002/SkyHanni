@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -365,6 +366,11 @@ object SackApi {
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
         sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
+    }
+
+    @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
+    fun onProfileJoin() {
+        sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
     }
 
     private fun updateSacks(changes: SackChangeEvent) {
