@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
@@ -23,8 +24,12 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -124,7 +129,7 @@ object ExperimentationTableApi {
     data class ExperimentationDataSet(
         var type: ExperimentationTaskType? = null,
         var tier: ExperimentationTier? = null,
-        var enchantingXpGained: Long? = null,
+        var enchantingXpGained: Long = 0L,
         var rareFoundFired: Boolean = false,
     ) : ResettableStorageSet() {
         @Transient private var lastUpdatedAt: SimpleTimeMark? = null
@@ -136,11 +141,19 @@ object ExperimentationTableApi {
             lastUpdatedAt = timeInCall
             DelayedRun.runDelayed(500.milliseconds) {
                 if (lastUpdatedAt != timeInCall) return@runDelayed
-                createTaskCompleteEventOrNull()?.post()
+                currentData.toCompletedTaskEventOrNull()?.post()
             }
         }
 
-        fun getRewards(): Map<NeuInternalName, Int> = otherRewards
+        fun toCompletedTaskEventOrNull(): TableTaskCompletedEvent? = when {
+            type == null || tier == null -> null
+            else -> TableTaskCompletedEvent(
+                type = type ?: error("impossible"),
+                tier = tier ?: error("impossible"),
+                enchantingXpGained = enchantingXpGained,
+                loot = otherRewards,
+            )
+        }
     }
 
     // <editor-fold desc="Patterns">
@@ -189,10 +202,11 @@ object ExperimentationTableApi {
      * REGEX-TEST:  §r§8+§r§3149k Enchanting Exp
      * REGEX-TEST: §8 +§r§3400k Enchanting Exp
      * REGEX-TEST:  §r§8+§r§327k Enchanting Exp
+     * REGEX-TEST: §r§8+§r§7[Lvl 1] §r§5Guardian
      */
     private val experimentsDropPattern by patternGroup.pattern(
         "drop",
-        "^(?: |§. ?)(?:§.)*\\+(?:§.)*(?<reward>.*)\$",
+        "^(?: |§. ?)(?:§.)*\\+(?:§.|\\[Lvl 1] (?:§r)?)*(?<reward>.*)\$",
     )
 
     /**
@@ -255,10 +269,11 @@ object ExperimentationTableApi {
     /**
      * REGEX-TEST: §dGuardian
      * REGEX-TEST: §9Guardian§e
+     * REGEX-TEST: §5Guardian
      */
     private val guardianPetNamePattern by patternGroup.pattern(
         "guardianpet",
-        "§[956d]Guardian.*",
+        "§(?<color>[956d])Guardian.*",
     )
 
     /**
@@ -280,14 +295,13 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: §8 +§3400,000 Enchanting Exp (Stakes)
-     * REGEX-TEST: §8 +§3352,000 Enchanting Exp (Pairs)
-     * REGEX-TEST: §8 +§354,000 Enchanting Exp
-     * REGEX-TEST: §8 +§342,000 Enchanting Exp
+     * REGEX-TEST: §8 +§8 §7[Lvl 1] §5Guardian
+     * REGEX-TEST: §8 +§3300,000 Enchanting Exp (Stakes)
+     * REGEX-TEST: §8 +§3151,000 Enchanting Exp (Pairs)
      */
-    private val experimentOverRewardsEnchantingXpPattern by patternGroup.pattern(
-        "inventory.experiment-over.rewards.enchanting-xp",
-        "§8 \\+(?:§.)+(?<amount>[\\d,]+) Enchanting Exp(?: \\(.*\\))?",
+    private val expOverRewardsPattern by patternGroup.pattern(
+        "inventory.experiment-over.rewards",
+        "§8 \\+(?:§.| )*(?:\\[Lvl \\d+])?(?<reward>.*)(?: \\(.*\\))?",
     )
 
     /**
@@ -339,28 +353,17 @@ object ExperimentationTableApi {
         }
     }
 
+    private fun String.isMiscReward() =
+        this == "Metaphysical Serum" || this == "Experiment The Fish" || this.endsWith("Guardian")
+
     private fun SkyHanniChatEvent.tryBlockChat(reward: String) {
         blockedReason = when {
             enchantingExpPattern.matches(reward) && ExperimentationMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
             experienceBottleChatPattern.matches(reward) && ExperimentationMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
-            listOf("Metaphysical Serum", "Experiment The Fish").contains(reward) && ExperimentationMessages.MISC.isSelected() -> "MISC_DROP"
+            reward.isMiscReward() && ExperimentationMessages.MISC.isSelected() -> "MISC_DROP"
             ExperimentationMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
             else -> ""
         }
-
-        enchantingExpPattern.matchMatcher(reward) {
-            try {
-                val amount = group("amount").formatLong().takeIf { it > 0 } ?: return@matchMatcher
-                currentData.enchantingXpGained = currentData.enchantingXpGained?.plus(amount)
-            } catch (e: NumberFormatException) {
-                ErrorManager.skyHanniError("Could not read enchanting exp from $reward")
-            }
-        }
-
-        val internalName = NeuInternalName.fromItemNameOrNull(reward) ?: return
-        if (!experienceBottleChatPattern.matches(reward)) {
-            currentData.addReward(internalName, 1)
-        } else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
     }
 
     private fun handleExpBottles(addToLoot: Boolean) {
@@ -392,16 +395,6 @@ object ExperimentationTableApi {
     @HandleEvent
     fun onTableTaskCompleted(event: TableTaskCompletedEvent) {
         currentData.reset()
-    }
-
-    private fun createTaskCompleteEventOrNull(): TableTaskCompletedEvent? = when {
-        currentData.tier == null || currentData.type == null -> null
-        else -> TableTaskCompletedEvent(
-            type = currentData.type ?: error("impossible"),
-            tier = currentData.tier ?: error("impossible"),
-            enchantingXpGained = currentData.enchantingXpGained ?: 0L,
-            loot = currentData.getRewards(),
-        )
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -446,31 +439,45 @@ object ExperimentationTableApi {
             ExperimentationTier.byNameOrNull(group("stakes"))
         } ?: return
 
+        currentData.apply {
+            type = taskType
+            tier = taskTier
+        }
+
         val rewardsBeginIndex = lore.indexOfFirst { experimentOverRewardsStartLorePattern.matches(it) } + 1
         val rewardsEndIndex = lore.indexOfFirst { experimentOverRewardsEndLorePattern.matches(it) } - 2
         val rewards: List<String> = lore
             .subList(rewardsBeginIndex, rewardsEndIndex)
             .takeIfNotEmpty()?.toList() ?: return
 
-        val enchantingXp = rewards.sumOf { reward ->
-            experimentOverRewardsEnchantingXpPattern.matchMatcher(reward) {
-                group("amount").formatIntOrNull()
-            } ?: 0
-        }.toLong()
+        rewards.forEach { rewardString ->
+            guardianPetNamePattern.matchMatcher(rewardString) {
+                val color = group("color")[0].toLorenzColor() ?: return@matchMatcher
+                val rarity = LorenzRarity.getByColor(color) ?: return@matchMatcher
+                val internalName = "GUARDIAN;${rarity.id}".toInternalName()
+                currentData.addReward(internalName, 1)
+                return@forEach
+            }
+            enchantingExpPattern.matchMatcher(rewardString) {
+                val amount = group("amount").formatLong().takeIf { it > 0 } ?: return@matchMatcher
+                currentData.enchantingXpGained += amount
+                return@forEach
+            }
+            if (experienceBottleChatPattern.matches(rewardString)) {
+                DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
+                return@forEach
+            }
 
-        currentData.apply {
-            type = taskType
-            tier = taskTier
+            val internalName = NeuInternalName.fromItemNameOrNull(rewardString) ?: run {
+                ChatUtils.chat("Could not read item name from $rewardString")
+                return@forEach
+            }
+            currentData.addReward(internalName, 1)
         }
 
-        // TODO I'm leaving it like this because I'm not 100% sure if the
-        //  list of rewards can get too long for the item lore at any point
-        //  If it doesn't, we can read it here and get rid of chat reading
-        // Superpairs rewards are added in onChat
-        if (taskType == ExperimentationTaskType.SUPERPAIRS) return
-
-        currentData.enchantingXpGained = enchantingXp
-        queuedAddonCompletion = createTaskCompleteEventOrNull()
+        val newEvent = currentData.toCompletedTaskEventOrNull()
+        if (taskType == ExperimentationTaskType.SUPERPAIRS) newEvent?.post()
+        else queuedAddonCompletion = newEvent
     }
 
     private fun InventoryOpenEvent.tryFireRareBookUncovered() {
