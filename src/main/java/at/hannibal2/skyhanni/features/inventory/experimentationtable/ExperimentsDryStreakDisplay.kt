@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 
 @SkyHanniModule
@@ -35,10 +36,11 @@ object ExperimentsDryStreakDisplay {
     fun onTableRareUncover(event: TableRareUncoverEvent) {
         if (!isEnabled()) return
         val storage = storage ?: return
+        val attemptsFormat = StringUtils.pluralize(storage.attemptsSince, "attempt")
         ChatUtils.chat(
             "§a§lDRY-STREAK ENDED! §eYou have (finally) " +
                 "found a §5ULTRA-RARE §eafter §3${storage.xpSince.shortFormat()} Enchanting Exp " +
-                "§eand §2${storage.attemptsSince} attempts§e!",
+                "§eand §2${storage.attemptsSince} $attemptsFormat§e!",
         )
         storage.attemptsSince = 0
         storage.xpSince = 0
