@@ -308,6 +308,7 @@ object ExperimentationTableApi {
      * REGEX-TEST: §8 +§8 §9Titanic Experience Bottle
      * REGEX-TEST: §8 +§8 §7[Lvl 1] §6Guardian
      * REGEX-TEST: §8 +§8 §aGrand Experience Bottle
+     * REGEX-TEST: §8 +§8 §9Blast Protection VI
      */
     private val expOverRewardsLorePattern by patternGroup.pattern(
         "inventory.experiment-over.rewards",
