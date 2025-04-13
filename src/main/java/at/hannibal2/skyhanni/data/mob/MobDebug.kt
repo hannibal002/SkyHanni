@@ -90,7 +90,15 @@ object MobDebug {
     @HandleEvent
     fun onMobEvent(event: MobEvent) {
         if (!config.logEvents) return
-        val text = "Mob ${if (event is MobEvent.Spawn) "Spawn" else "Despawn"}: ${
+        val eventType = when (event) {
+            is MobEvent.Spawn -> "Spawn"
+            is MobEvent.DeSpawn -> "DeSpawn"
+            is MobEvent.FirstSeen -> "FirstSeen"
+            is MobEvent.Hurt -> "Hurt"
+            else -> "Unknown"
+        }
+
+        val text = "Mob $eventType: ${
             getMobInfo(event.mob).joinToString(", ")
         }"
         MobData.logger.log(text)
