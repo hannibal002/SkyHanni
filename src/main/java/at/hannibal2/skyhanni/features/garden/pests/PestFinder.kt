@@ -188,7 +188,7 @@ object PestFinder {
         event.drawDynamicText(location, "§e$number §c$pestsName §7in §b$plotName", 1.5)
     }
 
-    private var lastKeyPress = SimpleTimeMark.farPast()
+    private var lastTeleport = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
@@ -203,8 +203,8 @@ object PestFinder {
         if (NeuItems.neuHasFocus()) return
 
         if (event.keyCode != config.teleportHotkey) return
-        if (lastKeyPress.passedSince() < 2.seconds) return
-        lastKeyPress = SimpleTimeMark.now()
+        if (lastTeleport.passedSince() < 2.seconds) return
+        lastTeleport = SimpleTimeMark.now()
 
         teleportNearestInfestedPlot()
     }
