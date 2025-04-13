@@ -423,6 +423,12 @@ public class MiscConfig {
     public boolean transparentTooltips = false;
 
     @Expose
+    @ConfigOption(name = "Hide ex co-op Members", desc = "Hides ex co-op members from collections.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideExCoopMembers = false;
+
+    @Expose
     @ConfigOption(
         name = "Abiphone Hotkey",
         desc = "Answer incoming abiphone calls with a hotkey."

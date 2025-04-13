@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
+import at.hannibal2.skyhanni.features.misc.HideExCoopMembers
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
@@ -191,6 +192,16 @@ object Commands {
             @Suppress("AvoidBritishSpelling")
             aliases = listOf("shcolor", "shcolours", "shcolour")
             callback { ColorFormattingHelper.printColorCodeList() }
+        }
+        event.register("shaddexcoopmember") {
+            description = "Manually add a name of an ex co-op member."
+            category = CommandCategory.USERS_ACTIVE
+            callback { HideExCoopMembers.addExMemberCommand(it) }
+        }
+        event.register("shremoveexcoopmember") {
+            description = "Manually remove a name of an ex co-op member."
+            category = CommandCategory.USERS_ACTIVE
+            callback { HideExCoopMembers.removeExMemberCommand(it) }
         }
     }
 
