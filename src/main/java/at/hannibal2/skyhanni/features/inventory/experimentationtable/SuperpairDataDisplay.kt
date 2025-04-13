@@ -208,11 +208,17 @@ object SuperpairDataDisplay {
         found.getOrPut(FoundType.NORMAL) { mutableListOf(itemData) }.apply { if (!contains(itemData)) add(itemData) }
     }
 
+    private val disallowedTypes = listOf(
+        TaskType.ULTRASEQUENCER,
+        TaskType.CHRONOMATRON,
+    )
+
     private fun drawDisplay() = buildList {
-        val currentExperimentType = ExperimentationTableApi.currentExperimentType?.takeIf {
-            it != TaskType.ULTRASEQUENCER && it != TaskType.CHRONOMATRON
-        }
+        val currentExperimentType = ExperimentationTableApi.currentExperimentType.takeIf {
+            it == null || it !in disallowedTypes
+        } ?: return@buildList
         add("§6Superpair Experimentation Data")
+
         val currentTier = ExperimentationTableApi.currentExperimentTier.takeIf {
             currentExperimentType == TaskType.SUPERPAIRS
         } ?: return@buildList
