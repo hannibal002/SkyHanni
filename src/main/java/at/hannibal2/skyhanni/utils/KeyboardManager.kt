@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
@@ -127,6 +128,7 @@ object KeyboardManager {
             if (isDown) {
                 postKeyPressEvent(keyCode)
             } else {
+                postKeyUpEvent(keyCode)
                 pressedKeys.remove(keyCode)
             }
         }
@@ -153,6 +155,16 @@ object KeyboardManager {
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyDownEvent(keyCode).post()
+        }
+    }
+
+    private fun postKeyUpEvent(keyCode: Int) {
+        // This cooldown is here to make sure the Text input features in graph editor
+        // and in renderable calls have time to react first,
+        // and lock this key press event properly
+        DelayedRun.runDelayed(50.milliseconds) {
+            if (TextInput.isActive()) return@runDelayed
+            KeyUpEvent(keyCode).post()
         }
     }
 
