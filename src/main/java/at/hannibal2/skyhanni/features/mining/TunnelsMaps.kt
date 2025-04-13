@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
@@ -480,7 +480,7 @@ object TunnelsMaps {
     } ?: config.pathColor.toSpecialColor()
 
     @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
+    fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         campfireKey(event)
@@ -495,7 +495,7 @@ object TunnelsMaps {
         nextSpot()
     }
 
-    private fun campfireKey(event: KeyPressEvent) {
+    private fun campfireKey(event: KeyDownEvent) {
         if (event.keyCode != config.campfireKey) return
         if (lastBaseCampWarp.passedSince() < 2.seconds) return
         lastBaseCampWarp = SimpleTimeMark.now()
@@ -519,7 +519,7 @@ object TunnelsMaps {
 
     private var nextSpotDelay = SimpleTimeMark.farPast()
 
-    private fun nextSpotKey(event: KeyPressEvent) {
+    private fun nextSpotKey(event: KeyDownEvent) {
         if (event.keyCode != config.nextSpotHotkey) return
         nextSpot()
     }
