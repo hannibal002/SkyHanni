@@ -86,11 +86,8 @@ object ExperimentsProfitTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onItemAdd(event: ItemAddEvent) {
-        if (isEnabled() && event.source == ItemAddManager.Source.COMMAND) {
-            if (config.enabled) {
-                tracker.addItem(event.internalName, event.amount, command = true)
-            }
-        }
+        if (!isEnabled() || !config.enabled || event.source != ItemAddManager.Source.COMMAND) return
+        tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -159,19 +156,31 @@ object ExperimentsProfitTracker {
 
         val experimentsDone = data.experimentsDone
         addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
-        val startCostFormat = data.startCost.absoluteValue.shortFormat()
-        val bitCostFormat = data.bitCost.shortFormat()
+
+        val startCostFormat = data.startCost.absoluteValue
+        val bitCostFormat = data.bitCost
         add(
             Renderable.hoverTips(
-                "§eTotal Cost: §c-$startCostFormat§e/§b-$bitCostFormat",
+                "§eTotal Cost: §c-${startCostFormat.shortFormat()}§e/§b-${bitCostFormat.shortFormat()}",
                 listOf(
-                    "§7You paid §c$startCostFormat §7coins and", "§b$bitCostFormat §7bits for starting",
+                    "§7You paid §c${startCostFormat.addSeparators()} §7coins and",
+                    "§b${bitCostFormat.addSeparators()} §7bits for starting",
                     "§7experiments.",
                 ),
             ).toSearchable(),
         )
         add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
-        addSearchString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
+
+        val enchantingXpGained = data.xpGained
+        add(
+            Renderable.hoverTips(
+                "§eTotal Enchanting Exp: §b${enchantingXpGained.shortFormat()}",
+                listOf(
+                    "§7You gained §b${enchantingXpGained.addSeparators()} §7Enchanting Exp",
+                    "§7from experiments.",
+                ),
+            ).toSearchable(),
+        )
 
         tracker.addPriceFromButton(this)
     }

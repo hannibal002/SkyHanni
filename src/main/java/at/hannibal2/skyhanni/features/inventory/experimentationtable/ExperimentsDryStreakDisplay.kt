@@ -13,21 +13,20 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 
 @SkyHanniModule
 object ExperimentsDryStreakDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.dryStreak
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation?.dryStreak
-
     private var display = emptyList<String>()
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (!ExperimentationTableApi.inventoriesPattern.matches(InventoryUtils.openInventoryName())) return
+        if (!isEnabled() || !ExperimentationTableApi.inTable) return
 
-        display = drawDisplay()
+        display = display.takeIfNotEmpty() ?: drawDisplay()
         config.position.renderStrings(
             display,
             posLabel = "Experimentation Table Dry Streak",
@@ -45,6 +44,7 @@ object ExperimentsDryStreakDisplay {
         )
         storage.attemptsSince = 0
         storage.xpSince = 0
+        display = drawDisplay()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -54,6 +54,7 @@ object ExperimentsDryStreakDisplay {
         if (event.type == ExperimentationTableApi.ExperimentationTaskType.SUPERPAIRS) {
             storage.attemptsSince++
         }
+        display = drawDisplay()
     }
 
     private fun drawDisplay() = buildList {
@@ -61,18 +62,17 @@ object ExperimentsDryStreakDisplay {
 
         add("§cDry-Streak since last §5ULTRA-RARE")
 
-        val colorPrefix = "§e"
         val attemptsSince = storage.attemptsSince
         val xpSince = storage.xpSince.shortFormat()
         val attemptsSuffix = if (attemptsSince == 1) "" else "s"
 
         if (config.attemptsSince && config.xpSince) {
-            add("$colorPrefix ├ $attemptsSince Attempt$attemptsSuffix")
-            add("$colorPrefix └ $xpSince XP")
+            add("§e ├ $attemptsSince Attempt$attemptsSuffix")
+            add("§e └ $xpSince XP")
         } else if (config.attemptsSince) {
-            add("$colorPrefix └ $attemptsSince Attempt$attemptsSuffix")
+            add("§e └ $attemptsSince Attempt$attemptsSuffix")
         } else {
-            add("$colorPrefix └ $xpSince XP")
+            add("§e └ $xpSince XP")
         }
     }
 

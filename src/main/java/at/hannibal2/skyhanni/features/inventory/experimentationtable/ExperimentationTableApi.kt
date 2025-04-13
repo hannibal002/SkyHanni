@@ -127,8 +127,8 @@ object ExperimentationTableApi {
         var enchantingXpGained: Long? = null,
         var rareFoundFired: Boolean = false,
     ) : ResettableStorageSet() {
-        private var lastUpdatedAt: SimpleTimeMark? = null
-        private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
+        @Transient private var lastUpdatedAt: SimpleTimeMark? = null
+        @Transient private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
 
         fun addReward(internalName: NeuInternalName, amount: Int = 1) {
             otherRewards.addOrPut(internalName, amount)
@@ -136,7 +136,10 @@ object ExperimentationTableApi {
             lastUpdatedAt = timeInCall
             DelayedRun.runDelayed(500.milliseconds) {
                 if (lastUpdatedAt != timeInCall) return@runDelayed
-                createTaskCompleteEventOrNull()?.post()
+                createTaskCompleteEventOrNull(
+                    type ?: return@runDelayed,
+                    tier ?: return@runDelayed,
+                ).post()
             }
         }
 
@@ -393,8 +396,8 @@ object ExperimentationTableApi {
     private fun createTaskCompleteEventOrNull(): TableTaskCompletedEvent? = when {
         currentData.tier == null || currentData.type == null -> null
         else -> TableTaskCompletedEvent(
-            type = currentData.type ?: error("impossible null check miss"),
-            tier = currentData.tier ?: error("impossible null check miss"),
+            type = currentData.type ?: error("impossible"),
+            tier = currentData.tier ?: error("impossible"),
             enchantingXpGained = currentData.enchantingXpGained ?: 0L,
             loot = currentData.getRewards(),
         )
@@ -437,18 +440,10 @@ object ExperimentationTableApi {
             else -> inventoryItems[ADDONS_OVER_DATA_SLOT]
         } ?: return
         val lore = item.getLore().takeIfNotEmpty()?.toList() ?: return
+
         val taskType = ExperimentationTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
-        // If this doesn't match the current stored task type, something has gone horribly wrong
-        if (taskType != currentData.type && currentData.type != null) {
-            ErrorManager.skyHanniError(
-                "ExperimentationTableApi: Experiment type mismatch! " +
-                    "Expected ${currentData.type}, but got $taskType",
-            )
-        }
-        val stake = experimentOverStakesLorePattern.firstMatcher(lore) {
-            ExperimentationTier.byNameOrNull(group("stakes")).takeIf {
-                it != ExperimentationTier.NONE
-            }
+        val taskTier = experimentOverStakesLorePattern.firstMatcher(lore) {
+            ExperimentationTier.byNameOrNull(group("stakes"))
         } ?: return
 
         val rewardsBeginIndex = lore.indexOfFirst { experimentOverRewardsStartLorePattern.matches(it) } + 1
@@ -465,13 +460,12 @@ object ExperimentationTableApi {
 
         currentData.apply {
             type = taskType
-            tier = stake
+            tier = taskTier
             enchantingXpGained = enchantingXp
         }
 
         if (taskType == ExperimentationTaskType.SUPERPAIRS) return
-
-        createTaskCompleteEventOrNull()?.post()
+        queuedAddonCompletion = createTaskCompleteEventOrNull()
     }
 
     private fun InventoryOpenEvent.tryFireRareBookUncovered() {
