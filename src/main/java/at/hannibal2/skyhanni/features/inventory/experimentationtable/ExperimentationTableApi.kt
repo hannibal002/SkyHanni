@@ -65,7 +65,8 @@ object ExperimentationTableApi {
     val currentExperimentType get() = currentData.type
 
     private var lastProcessedExperimentOverHash: Int = 0
-    private var queuedAddonCompletion: TableTaskCompletedEvent? = null
+    private var queuedCompleteEvent: TableTaskCompletedEvent? = null
+    private var handleBottlesOnInvClose: Boolean = false
 
     enum class ExperimentationMessages(private val displayName: String) {
         DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
@@ -227,6 +228,7 @@ object ExperimentationTableApi {
 
     /**
      * REGEX-TEST: Titanic Experience Bottle
+     * REGEX-TEST: Grand Experience Bottle
      */
     private val experienceBottleChatPattern by patternGroup.pattern(
         "chat.xpbottle",
@@ -303,6 +305,7 @@ object ExperimentationTableApi {
      * REGEX-TEST: §8 +§3300,000 Enchanting Exp (Stakes)
      * REGEX-TEST: §8 +§8 §9Titanic Experience Bottle
      * REGEX-TEST: §8 +§8 §7[Lvl 1] §6Guardian
+     * REGEX-TEST: §8 +§8 §aGrand Experience Bottle
      */
     private val expOverRewardsLorePattern by patternGroup.pattern(
         "inventory.experiment-over.rewards",
@@ -339,10 +342,14 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
         lastProcessedExperimentOverHash = 0
-        if (queuedAddonCompletion == null) return
-        DelayedRun.runDelayed(50.milliseconds) {
-            queuedAddonCompletion?.post()
-            queuedAddonCompletion = null
+        if (queuedCompleteEvent == null) return
+        if (handleBottlesOnInvClose) DelayedRun.runDelayed(100.milliseconds) {
+            handleExpBottles(true)
+            handleBottlesOnInvClose = false
+        }
+        DelayedRun.runDelayed(150.milliseconds) {
+            queuedCompleteEvent?.post()
+            queuedCompleteEvent = null
         }
     }
 
@@ -415,7 +422,7 @@ object ExperimentationTableApi {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inTable || event.item?.displayName != "§cDecline") return
-        queuedAddonCompletion = null
+        queuedCompleteEvent = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -480,7 +487,7 @@ object ExperimentationTableApi {
                 return@forEach
             }
             if (experienceBottleChatPattern.matches(rewardString)) {
-                DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
+                handleBottlesOnInvClose = true
                 return@forEach
             }
 
@@ -491,9 +498,7 @@ object ExperimentationTableApi {
             currentData.addReward(internalName, 1)
         }
 
-        val newEvent = currentData.toCompletedTaskEventOrNull()
-        if (taskType == ExperimentationTaskType.SUPERPAIRS) newEvent?.post()
-        else queuedAddonCompletion = newEvent
+        queuedCompleteEvent = currentData.toCompletedTaskEventOrNull()
     }
 
     private fun InventoryOpenEvent.tryFireRareBookUncovered() {
