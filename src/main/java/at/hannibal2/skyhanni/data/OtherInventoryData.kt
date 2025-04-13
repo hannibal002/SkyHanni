@@ -5,9 +5,10 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils.getTitle
+import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
@@ -22,16 +23,16 @@ object OtherInventoryData {
 
     @HandleEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
-        close()
+        close(event.gui.getTitle())
     }
 
-    fun close(reopenSameName: Boolean = false) {
-        InventoryCloseEvent(reopenSameName).post()
+    fun close(title: String?, reopenSameName: Boolean = false) {
+        InventoryCloseEvent(title ?: "Null", reopenSameName).post()
         currentInventory = null
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         lateEvent?.let {
             it.post()
             lateEvent = null
@@ -43,14 +44,14 @@ object OtherInventoryData {
         val packet = event.packet
 
         if (packet is S2EPacketCloseWindow) {
-            close()
+            close(Minecraft.getMinecraft().currentScreen?.getTitle())
         }
 
         if (packet is S2DPacketOpenWindow) {
             val windowId = packet.windowId
             val title = packet.windowTitle.unformattedText
             val slotCount = packet.slotCount
-            close(reopenSameName = title == currentInventory?.title)
+            close(title, reopenSameName = title == currentInventory?.title)
 
             currentInventory = Inventory(windowId, title, slotCount)
             acceptItems = true

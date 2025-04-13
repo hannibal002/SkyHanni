@@ -99,8 +99,7 @@ object BingoCardTips {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots as ContainerChest
+        val chest = event.container as ContainerChest
         for ((slot, _) in chest.getAllItems()) {
             val goal = BingoApi.bingoGoals[slot.slotNumber] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
@@ -109,7 +108,7 @@ object BingoCardTips {
                 val difficulty = Difficulty.valueOf(it.difficulty.uppercase())
                 difficulty.color
             } ?: LorenzColor.GRAY
-            slot highlight color.addOpacity(120)
+            slot.highlight(event.context, color.addOpacity(120))
         }
     }
 

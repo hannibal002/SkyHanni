@@ -98,9 +98,10 @@ object WardrobeApi {
         add("§aEstimated Armor Value:")
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
-            val price = EstimatedItemValueCalculator.getTotalPrice(stack)
-            add("  §7- ${stack.displayName}: §6${price.shortFormat()}")
-            totalPrice += price
+            EstimatedItemValueCalculator.getTotalPrice(stack)?.let { price ->
+                add("  §7- ${stack.displayName}: §6${price.shortFormat()}")
+                totalPrice += price
+            }
         }
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
@@ -179,6 +180,11 @@ object WardrobeApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {
+            if (slots.isEmpty()) {
+                add("No slots")
+                return@addIrrelevant
+            }
+
             for (slot in slots) {
                 val slotInfo = buildString {
                     append("Slot ${slot.id}")

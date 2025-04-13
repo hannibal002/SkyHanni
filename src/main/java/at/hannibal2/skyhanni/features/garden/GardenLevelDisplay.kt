@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -161,7 +162,7 @@ object GardenLevelDisplay {
 
         val iterator = event.toolTip.listIterator()
         if (slotIndex == 4 && currentLevel > 15) {
-            event.itemStack.setStackDisplayName("§aGarden Level ${currentLevel.toRomanIfNecessary()}")
+            event.itemStack.setCustomItemName("§aGarden Level ${currentLevel.toRomanIfNecessary()}")
         }
         var next = false
         for (line in iterator) {

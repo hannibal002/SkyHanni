@@ -7,6 +7,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntitySkeleton
 import net.minecraft.item.ItemStack
 import net.minecraft.world.World
+
 //#if MC > 1.12
 //$$ import net.minecraft.entity.monster.EntityWitherSkeleton
 //$$ import net.minecraft.inventory.EntityEquipmentSlot
@@ -64,4 +65,9 @@ fun createWitherSkeleton(world: World?): EntityLivingBase =
 //$$ EntityWitherSkeleton(world)
 //#else
 //$$ WitherSkeleton(EntityType.WITHER_SKELETON, world)
+//#endif
+
+//#if MC > 1.21
+//$$ val Entity.deceased: Boolean
+//$$     get() = this.isRemoved
 //#endif

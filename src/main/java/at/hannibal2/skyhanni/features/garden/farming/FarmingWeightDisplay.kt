@@ -12,10 +12,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -51,6 +50,7 @@ object FarmingWeightDisplay {
             inOwnInventory = true,
             condition = { shouldShowDisplay() },
             onRender = {
+                // TODO move this into condition
                 val shouldShow = apiError || (config.ignoreLow || weight >= 200)
                 if (isEnabled() && shouldShow) {
                     config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
@@ -60,9 +60,7 @@ object FarmingWeightDisplay {
     }
 
     private fun shouldShowDisplay(): Boolean {
-        if (GardenApi.hideExtraGuis()) return false
-
-        return true
+        return !GardenApi.hideExtraGuis()
     }
 
     @HandleEvent
@@ -72,7 +70,7 @@ object FarmingWeightDisplay {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         // We want to try to connect to the api again after a world switch.
         resetData()
     }

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import com.google.gson.JsonSyntaxException
 import org.apache.http.HttpEntity
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
@@ -99,7 +98,7 @@ object ApiUtils {
                     val returnedData = inputStream.bufferedReader().use { it.readText() }
                     try {
                         return parser.parse(returnedData)
-                    } catch (e: JsonSyntaxException) {
+                    } catch (e: Exception) {
                         val name = e.javaClass.name
                         val message = "$name: ${e.message}"
                         if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {

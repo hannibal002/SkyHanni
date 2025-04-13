@@ -35,7 +35,6 @@ plugins {
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
     id("io.gitlab.arturbosch.detekt")
-    id("net.kyori.blossom")
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
@@ -207,7 +206,12 @@ dependencies {
         isTransitive = false
     }
 
-    shadowModImpl(libs.moulconfig)
+    if (target == ProjectTarget.MAIN) {
+        shadowModImpl(libs.moulconfig)
+    } else if (target == ProjectTarget.MODERN) {
+        shadowModImpl(libs.moulconfigModern)
+    }
+
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
@@ -239,7 +243,8 @@ afterEvaluate {
         programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
-        this.options.add(SubpluginOption("apoption", "skyhanni.sourceset=${target.minecraftVersion.versionName}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
         this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
     }
 }
@@ -297,7 +302,7 @@ fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
     if (buildPathsFile.exists()) {
         sourceSet.get().apply {
             val buildPaths = buildPathsFile.readText().lineSequence()
-                .map { it.substringBefore("#").trim() }
+                .map { it.substringBefore("#").trim().replace(Regex("\\.(?!kt|java|\\()"), "/") }
                 .filter { it.isNotBlank() }
                 .toSet()
             kotlin.include(buildPaths)
@@ -397,11 +402,6 @@ preprocess {
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
-}
-
-blossom {
-    replaceToken("@MOD_VERSION@", version)
-    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
