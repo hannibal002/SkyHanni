@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
@@ -276,4 +278,14 @@ object NumberUtil {
 
     fun Int.intPow(n: Int): Int = toDouble().pow(n).toInt()
 
+    fun Double.formatPercentage(): String = formatPercentage(this, "0.00")
+
+    private fun formatPercentage(percentage: Double, format: String?): String =
+        DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
+}
+
+class MinMaxNumber(val min: Double, val max: Double) {
+    override fun toString(): String = "${min.formatCoin()}§7-${max.formatCoin()}"
+
+    operator fun plus(other: MinMaxNumber): MinMaxNumber = MinMaxNumber(min + other.min, max + other.max)
 }

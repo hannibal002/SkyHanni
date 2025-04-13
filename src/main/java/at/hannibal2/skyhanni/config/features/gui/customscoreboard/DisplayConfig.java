@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.data.DateFormat;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -61,15 +62,9 @@ public class DisplayConfig {
     public Property<Boolean> hideVanillaScoreboard = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Display Numbers First", desc = "Whether the number or line name displays first.\n" +
-        "§eNote: Will not update the preview above!")
+    @ConfigOption(name = "Show earned/lost", desc = "Show the amount you earned/lost on any Number display.")
     @ConfigEditorBoolean
-    public boolean displayNumbersFirst = false;
-
-    @Expose
-    @ConfigOption(name = "Hide coins earned/lost", desc = "Hide the amount of coins earned or lost.")
-    @ConfigEditorBoolean
-    public boolean hideCoinsDifference = false;
+    public boolean showNumberDifference = false;
 
     @Expose
     @ConfigOption(name = "Use Custom Lines", desc = "Use custom lines instead of the default ones.")
@@ -110,7 +105,7 @@ public class DisplayConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Number Format", desc = "")
+    @ConfigOption(name = "Number Format", desc = "Select how numbers should be formatted.")
     @ConfigEditorDropdown
     public NumberFormat numberFormat = NumberFormat.LONG;
 
@@ -129,6 +124,11 @@ public class DisplayConfig {
             return displayName;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Number Display Format", desc = "Select how numbers with their prefix and color should be formatted.")
+    @ConfigEditorDropdown
+    public CustomScoreboardUtils.NumberDisplayFormat numberDisplayFormat = CustomScoreboardUtils.NumberDisplayFormat.TEXT_COLOR_NUMBER;
 
     @Expose
     @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.")

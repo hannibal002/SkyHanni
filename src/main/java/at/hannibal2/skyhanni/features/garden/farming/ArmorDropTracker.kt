@@ -15,13 +15,13 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -76,11 +76,10 @@ object ArmorDropTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         for (dropType in ArmorDropType.entries) {
-            if (dropType.chatMessage == event.message) {
-                addDrop(dropType)
-                if (config.hideChat) {
-                    event.blockedReason = "farming_armor_drops"
-                }
+            if (dropType.chatMessage != event.message) continue
+            addDrop(dropType)
+            if (config.hideChat) {
+                event.blockedReason = "farming_armor_drops"
             }
         }
     }
@@ -121,8 +120,6 @@ object ArmorDropTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!config.enabled) return
-
         checkArmor()
     }
 
