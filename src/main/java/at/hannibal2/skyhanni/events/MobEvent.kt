@@ -32,6 +32,18 @@ open class MobEvent(val mob: Mob) : SkyHanniEvent() {
         class Projectile(mob: Mob) : FirstSeen(mob)
     }
 
+
+    /** Triggers when the drops should go to the player, so if the player had the last hit.
+     * But because we can't properly detect if another play hit the mob, in those cases this is wrong */ // TODO: Fix this
+    open class KilledByLocalPlayer(mob: Mob) : MobEvent(mob) {
+        class SkyblockMob(mob: Mob) : KilledByLocalPlayer(mob)
+        class Summon(mob: Mob) : KilledByLocalPlayer(mob)
+        class Player(mob: Mob) : KilledByLocalPlayer(mob)
+        class DisplayNpc(mob: Mob) : KilledByLocalPlayer(mob)
+        class Special(mob: Mob) : KilledByLocalPlayer(mob)
+        class Projectile(mob: Mob) : KilledByLocalPlayer(mob)
+    }
+
     open class Hurt(mob: Mob, val source: DamageSource, val amount: Float) : MobEvent(mob) {
         class SkyblockMob(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)
         class Summon(mob: Mob, source: DamageSource, amount: Float) : Hurt(mob, source, amount)

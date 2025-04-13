@@ -94,6 +94,7 @@ object MobDebug {
             is MobEvent.Spawn -> "Spawn"
             is MobEvent.DeSpawn -> "DeSpawn"
             is MobEvent.FirstSeen -> "FirstSeen"
+            is MobEvent.KilledByLocalPlayer -> "KilledByLocalPlayer"
             is MobEvent.Hurt -> "Hurt"
             else -> "Unknown"
         }
