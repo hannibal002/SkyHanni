@@ -118,7 +118,7 @@ object KeyboardManager {
             }
         }
 
-        for (keyCode in pressedKeys) {
+        for (keyCode in pressedKeys.toList()) {
             val isDown = if (keyCode < 0) {
                 Mouse.isButtonDown(keyCode + 100)
             } else {
@@ -129,7 +129,9 @@ object KeyboardManager {
                 postKeyPressEvent(keyCode)
             } else {
                 postKeyUpEvent(keyCode)
-                pressedKeys.remove(keyCode)
+                if (pressedKeys.contains(keyCode)) {
+                    pressedKeys.remove(keyCode)
+                }
             }
         }
 
