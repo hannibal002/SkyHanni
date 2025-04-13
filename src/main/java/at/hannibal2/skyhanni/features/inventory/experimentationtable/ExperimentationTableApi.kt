@@ -136,10 +136,7 @@ object ExperimentationTableApi {
             lastUpdatedAt = timeInCall
             DelayedRun.runDelayed(500.milliseconds) {
                 if (lastUpdatedAt != timeInCall) return@runDelayed
-                createTaskCompleteEventOrNull(
-                    type ?: return@runDelayed,
-                    tier ?: return@runDelayed,
-                ).post()
+                createTaskCompleteEventOrNull()?.post()
             }
         }
 
@@ -188,12 +185,14 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST:  +Smite VII
-     * REGEX-TEST:  +42,000 Enchanting Exp
+     * REGEX-TEST:  §r§8+§r§5Metaphysical Serum
+     * REGEX-TEST:  §r§8+§r§3149k Enchanting Exp
+     * REGEX-TEST: §8 +§r§3400k Enchanting Exp
+     * REGEX-TEST:  §r§8+§r§327k Enchanting Exp
      */
     private val experimentsDropPattern by patternGroup.pattern(
         "drop",
-        "^ \\+(?<reward>.*)\$",
+        "^(?: |§. ?)(?:§.)*\\+(?:§.)*(?<reward>.*)\$",
     )
 
     /**
@@ -210,7 +209,7 @@ object ExperimentationTableApi {
      */
     private val enchantingExpPattern by patternGroup.pattern(
         "exp",
-        "(?<amount>\\d+|\\d+,\\d+)k? Enchanting Exp",
+        "(?:§.)*(?<amount>(?:\\d+|\\d+,\\d+)[MBk]?) Enchanting Exp",
     )
 
     /**
@@ -348,9 +347,7 @@ object ExperimentationTableApi {
         enchantingExpPattern.matchMatcher(reward) {
             try {
                 val amount = group("amount").formatLong().takeIf { it > 0 } ?: return@matchMatcher
-                if (amount != currentData.enchantingXpGained) {
-                    currentData.enchantingXpGained = amount
-                }
+                currentData.enchantingXpGained = currentData.enchantingXpGained?.plus(amount)
             } catch (e: NumberFormatException) {
                 ErrorManager.skyHanniError("Could not read enchanting exp from $reward")
             }
@@ -461,10 +458,12 @@ object ExperimentationTableApi {
         currentData.apply {
             type = taskType
             tier = taskTier
-            enchantingXpGained = enchantingXp
         }
 
+        // Superpairs rewards are added from chat
         if (taskType == ExperimentationTaskType.SUPERPAIRS) return
+
+        currentData.enchantingXpGained = enchantingXp
         queuedAddonCompletion = createTaskCompleteEventOrNull()
     }
 
