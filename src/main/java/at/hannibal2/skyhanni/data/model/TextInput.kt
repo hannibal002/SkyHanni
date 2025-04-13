@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.model
 
-import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.data.KeyboardManager
+import at.hannibal2.skyhanni.data.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.data.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
-import at.hannibal2.skyhanni.utils.KeyboardManager;
+import at.hannibal2.skyhanni.data.KeyboardManager;
 import net.minecraft.client.gui.inventory.GuiEditSign;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

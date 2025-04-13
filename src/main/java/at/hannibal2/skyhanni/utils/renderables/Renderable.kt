@@ -4,6 +4,9 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
+import at.hannibal2.skyhanni.data.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.data.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.skyhanni.data.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
@@ -16,9 +19,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -149,7 +149,7 @@ interface Renderable {
             text: String,
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
-             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.data.KeyboardManager].
              * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
              */
             onAnyClick: Map<Int, () -> Unit>,
@@ -163,7 +163,7 @@ interface Renderable {
             render: Renderable,
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
-             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.data.KeyboardManager].
              * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
              */
             onAnyClick: Map<Int, () -> Unit>,
