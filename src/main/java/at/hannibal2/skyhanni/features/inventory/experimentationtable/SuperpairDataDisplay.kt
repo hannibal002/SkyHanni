@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.instantFindNamePattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.remainingClicksPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
@@ -15,12 +13,14 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
+
+private typealias TaskType = ExperimentationTableApi.ExperimentationTaskType
 
 @SkyHanniModule
 object SuperpairDataDisplay {
@@ -43,6 +43,19 @@ object SuperpairDataDisplay {
         PAIR
     }
 
+    private val instantFindNamePattern by ExperimentationTableApi.patternGroup.pattern(
+        "powerups.instantfind.name",
+        "Instant Find",
+    )
+
+    /**
+     * REGEX-TEST: Remaining Clicks: 22
+     */
+    private val remainingClicksPattern by ExperimentationTableApi.patternGroup.pattern(
+        "clicks",
+        "Remaining Clicks: (?<clicks>\\d+)",
+    )
+
     private val emptySuperpairItem = SuperpairItem(-1, "", -1)
 
     private var display = emptyList<String>()
@@ -58,17 +71,9 @@ object SuperpairDataDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!config.superpairDisplay) return
-        if (InventoryUtils.openInventoryName() == "Experimentation Table") {
-            config.superpairDisplayPosition.renderString(
-                "§6Superpair Experimentation Data",
-                posLabel = "Superpair Experimentation Data"
-            )
-        }
-        if (ExperimentationTableApi.currentExperimentTier == null) return
+        if (!config.superpairDisplay || !ExperimentationTableApi.inTable) return
 
-        if (display.isEmpty()) display = drawDisplay()
-
+        display = display.takeIfNotEmpty() ?: drawDisplay()
         config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experimentation Data")
     }
 
@@ -206,16 +211,20 @@ object SuperpairDataDisplay {
     }
 
     private fun drawDisplay() = buildList {
-        val currentExperiment = ExperimentationTableApi.currentExperimentTier ?: return emptyList<String>()
-
+        val currentExperimentType = ExperimentationTableApi.currentExperimentType?.takeIf {
+            it != TaskType.ULTRASEQUENCER && it != TaskType.CHRONOMATRON
+        }
         add("§6Superpair Experimentation Data")
+        val currentTier = ExperimentationTableApi.currentExperimentTier.takeIf {
+            currentExperimentType == TaskType.SUPERPAIRS
+        } ?: return@buildList
         add("")
 
         val normals = found.entries.firstOrNull { it.key == FoundType.NORMAL }?.value.orEmpty()
         val pairs = found.entries.firstOrNull { it.key == FoundType.PAIR }?.value.orEmpty()
         val matches = found.entries.firstOrNull { it.key == FoundType.MATCH }?.value.orEmpty()
         val powerups = found.entries.firstOrNull { it.key == FoundType.POWERUP }?.value.orEmpty()
-        val possiblePairs = calculatePossiblePairs(currentExperiment)
+        val possiblePairs = calculatePossiblePairs(currentTier)
         val notCollected = buildList {
             if (possiblePairs >= 1) add("§ePairs - $possiblePairs")
             if (2 - powerups.size >= 1) add("§bPowerUps - ${2 - powerups.size}")

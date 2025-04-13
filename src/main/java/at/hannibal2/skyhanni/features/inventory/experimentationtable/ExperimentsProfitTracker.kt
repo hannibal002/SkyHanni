@@ -14,9 +14,8 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experienceBottlePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experimentRenewPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.inventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -113,44 +112,39 @@ object ExperimentsProfitTracker {
             }
             it.xpGained += event.enchantingXpGained ?: 0L
         }
-
+        event.loot.forEach { (item, count) ->
+            tracker.addItem(item, count, command = false)
+        }
     }
 
     private val allowedSlots = listOf(11, 12, 14, 15)
+    private val bottlesInventory = InventoryDetector { name -> name == "Bottles of Enchanting"}
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled() ||
-            InventoryUtils.openInventoryName() != "Bottles of Enchanting" ||
-            !allowedSlots.contains(event.slotId)
-        ) return
-        val stack = event.slot?.stack ?: return
+        if (!isEnabled() || !bottlesInventory.isInside() || !allowedSlots.contains(event.slotId)) return
+        val internalName =  event.slot?.stack?.getInternalName()?.takeIf {
+            experienceBottlePattern.matches(it.asString())
+        } ?: return
 
-        val internalName = stack.getInternalName()
-        if (internalName.isExpBottle()) {
-            tracker.modify {
-                it.startCost -= calculateBottlePrice(internalName)
-            }
+        tracker.modify {
+            it.startCost -= calculateBottlePrice(internalName)
         }
     }
 
-    private fun NeuInternalName.isExpBottle() = experienceBottlePattern.matches(asString())
-
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || !ExperimentationTableApi.inTable) return
 
-        if (inventoriesPattern.matches(event.inventoryName)) {
-            var startCostTemp = 0
-            for (item in lastSplashes) {
-                startCostTemp += calculateBottlePrice(item.getInternalName())
-            }
-            lastSplashes.clear()
-            tracker.modify {
-                it.startCost -= startCostTemp
-            }
-            lastSplashTime = SimpleTimeMark.farPast()
+        var startCostTemp = 0
+        for (item in lastSplashes) {
+            startCostTemp += calculateBottlePrice(item.getInternalName())
         }
+        lastSplashes.clear()
+        tracker.modify {
+            it.startCost -= startCostTemp
+        }
+        lastSplashTime = SimpleTimeMark.farPast()
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {
@@ -185,7 +179,7 @@ object ExperimentsProfitTracker {
     init {
         tracker.initRenderer(
             { config.position },
-            ExperimentationTableApi.superpairInventory,
+            ExperimentationTableApi.superpairsInventory,
         ) { config.enabled && isEnabled() }
     }
 
