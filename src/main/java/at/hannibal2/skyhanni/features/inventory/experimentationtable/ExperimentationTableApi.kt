@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -24,15 +23,14 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -279,17 +277,17 @@ object ExperimentationTableApi {
     /**
      * REGEX-TEST: §7Stakes: §dMetaphysical
      */
-    private val experimentOverStakesLorePattern by patternGroup.pattern(
+    private val expOverStakesLorePattern by patternGroup.pattern(
         "inventory.experiment-over.stakes",
         "§7Stakes: (?:§.)+(?<stakes>.*)",
     )
 
-    private val experimentOverRewardsStartLorePattern by patternGroup.pattern(
+    private val expOverRewardsStartLorePattern by patternGroup.pattern(
         "inventory.experiment-over.rewards-start",
         "§7Rewards:",
     )
 
-    private val experimentOverRewardsEndLorePattern by patternGroup.pattern(
+    private val expOverRewardsEndLorePattern by patternGroup.pattern(
         "inventory.experiment-over.rewards-end",
         "§eClick to claim rewards!",
     )
@@ -299,9 +297,9 @@ object ExperimentationTableApi {
      * REGEX-TEST: §8 +§3300,000 Enchanting Exp (Stakes)
      * REGEX-TEST: §8 +§3151,000 Enchanting Exp (Pairs)
      */
-    private val expOverRewardsPattern by patternGroup.pattern(
+    private val expOverRewardsLorePattern by patternGroup.pattern(
         "inventory.experiment-over.rewards",
-        "§8 \\+(?:§.| )*(?:\\[Lvl \\d+])?(?<reward>.*)(?: \\(.*\\))?",
+        "§8 \\+(?:§.| )*(?:\\[Lvl \\d+] )?(?<reward>.*?)(?=\\s\\((?:Stakes|Pairs)\\)|\$)(?:\\s\\((?:Stakes|Pairs)\\))?",
     )
 
     /**
@@ -318,7 +316,7 @@ object ExperimentationTableApi {
      * REGEX-TEST: Superpairs Rewards
      * REGEX-TEST: Experiment Over
      */
-    private val experimentOverInventoryPattern by patternGroup.pattern(
+    private val expOverInventoryPattern by patternGroup.pattern(
         "inventory.experiment-over",
         "Experiment [Oo]ver|Superpairs Rewards",
     )
@@ -420,7 +418,7 @@ object ExperimentationTableApi {
     }
 
     private fun InventoryOpenEvent.tryReadExperimentOver() =
-        experimentOverInventoryPattern.matchMatcher(this.inventoryName) {
+        expOverInventoryPattern.matchMatcher(this.inventoryName) {
             lastProcessedExperimentOverHash = inventoryItems.hashCode().takeIf {
                 it != lastProcessedExperimentOverHash
             } ?: return@matchMatcher
@@ -435,7 +433,7 @@ object ExperimentationTableApi {
         val lore = item.getLore().takeIfNotEmpty()?.toList() ?: return
 
         val taskType = ExperimentationTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
-        val taskTier = experimentOverStakesLorePattern.firstMatcher(lore) {
+        val taskTier = expOverStakesLorePattern.firstMatcher(lore) {
             ExperimentationTier.byNameOrNull(group("stakes"))
         } ?: return
 
@@ -444,10 +442,11 @@ object ExperimentationTableApi {
             tier = taskTier
         }
 
-        val rewardsBeginIndex = lore.indexOfFirst { experimentOverRewardsStartLorePattern.matches(it) } + 1
-        val rewardsEndIndex = lore.indexOfFirst { experimentOverRewardsEndLorePattern.matches(it) } - 2
+        val rewardsBeginIndex = lore.indexOfFirst { expOverRewardsStartLorePattern.matches(it) } + 1
+        val rewardsEndIndex = lore.indexOfFirst { expOverRewardsEndLorePattern.matches(it) } - 2
         val rewards: List<String> = lore
             .subList(rewardsBeginIndex, rewardsEndIndex)
+            .mapNotNull { expOverRewardsLorePattern.matchGroup(it, "reward") }
             .takeIfNotEmpty()?.toList() ?: return
 
         rewards.forEach { rewardString ->
