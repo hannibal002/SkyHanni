@@ -54,8 +54,8 @@ object ExperimentationTableApi {
     private val currentData = ExperimentationDataSet()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
-    val superpairsInventory = InventoryDetector { name -> inventoriesPattern.matches(name) }
-    val inTable get() = superpairsInventory.isInside()
+    val experimentationTableInventory = InventoryDetector { name -> inventoriesPattern.matches(name) }
+    val inTable get() = experimentationTableInventory.isInside()
     val isActive get() = currentData.tier != null
     val currentExperimentTier get() = currentData.tier
     val currentExperimentType get() = currentData.type

@@ -188,7 +188,7 @@ object ExperimentsProfitTracker {
     init {
         tracker.initRenderer(
             { config.position },
-            ExperimentationTableApi.superpairsInventory,
+            ExperimentationTableApi.experimentationTableInventory,
         ) { config.enabled && isEnabled() }
     }
 
