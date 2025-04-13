@@ -162,6 +162,7 @@ object ExcavatorProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
+        if (!config.enabled) return
         if (!isEnabled()) return
 
         val internalName = event.internalName
@@ -217,6 +218,7 @@ object ExcavatorProfitTracker {
     }
 
     private fun shouldShowDisplay(): Boolean {
+        if (!config.enabled) return false
         if (!isEnabled()) return false
         val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
         // Only show in excavation menu
@@ -232,8 +234,7 @@ object ExcavatorProfitTracker {
         }
     }
 
-    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled &&
-        LorenzUtils.skyBlockArea == "Fossil Research Center"
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "Fossil Research Center"
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

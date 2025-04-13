@@ -34,7 +34,7 @@ import kotlin.time.toDuration
 @SkyHanniModule
 object GardenVisitorTimer {
 
-    private val config get() = GardenApi.config.visitors.timer
+    private val config get() = VisitorApi.config.timer
 
     /**
      * REGEX-TEST:  Next Visitor: §r§b11m
@@ -55,7 +55,7 @@ object GardenVisitorTimer {
     private var lastVisitors: Int = -1
 
     // TODO nea?
-//    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
+    // private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Duration?
         get() = GardenApi.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
         set(value) {
