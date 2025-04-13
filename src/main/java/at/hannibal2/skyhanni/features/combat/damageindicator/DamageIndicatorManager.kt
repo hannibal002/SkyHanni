@@ -120,7 +120,7 @@ object DamageIndicatorManager {
     @HandleEvent(onlyOnSkyblock = true)
     fun onServerTick(event: ServerTickEvent) {
         data.forEach {
-            it.value.serverTicksAlive ++
+            it.value.serverTicksAlive++
         }
     }
 
