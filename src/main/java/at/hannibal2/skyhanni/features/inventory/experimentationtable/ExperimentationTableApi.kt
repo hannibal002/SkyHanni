@@ -48,12 +48,12 @@ object ExperimentationTableApi {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
-    val patternGroup = RepoPattern.group("enchanting.experiments")
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val lastBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
     private val currentBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
     private val currentData = ExperimentationDataSet()
 
+    val patternGroup = RepoPattern.group("enchanting.experiments")
     val superpairsInventory = InventoryDetector { name -> inventoriesPattern.matches(name) }
     val inTable get() = superpairsInventory.isInside()
     val isActive get() = currentData.tier != null
@@ -300,6 +300,10 @@ object ExperimentationTableApi {
         "(?<type>Superpairs|Chronomatron|Ultrasequencer) \\((?<tier>.*)\\)",
     )
 
+    /**
+     * REGEX-TEST: Superpairs Rewards
+     * REGEX-TEST: Experiment Over
+     */
     private val experimentOverInventoryPattern by patternGroup.pattern(
         "inventory.experiment-over",
         "Experiment [Oo]ver|Superpairs Rewards",
@@ -406,7 +410,7 @@ object ExperimentationTableApi {
 
         updateTablePos()
         event.tryFireRareBookUncovered()
-        event.tryUpdateCurrentData()
+        event.tryUpdateCurrentActivity()
         handleExpBottles(false)
     }
 
@@ -419,7 +423,6 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!inTable) return
-
         event.tryReadExperimentOver()
     }
 
@@ -460,7 +463,10 @@ object ExperimentationTableApi {
             tier = taskTier
         }
 
-        // Superpairs rewards are added from chat
+        // TODO I'm leaving it like this because I'm not 100% sure if the
+        //  list of rewards can get too long for the item lore at any point
+        //  If it doesn't, we can read it here and get rid of chat reading
+        // Superpairs rewards are added in onChat
         if (taskType == ExperimentationTaskType.SUPERPAIRS) return
 
         currentData.enchantingXpGained = enchantingXp
@@ -481,7 +487,7 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun InventoryOpenEvent.tryUpdateCurrentData() = currentTypeAndTierPattern.matchMatcher(inventoryName) {
+    private fun InventoryOpenEvent.tryUpdateCurrentActivity() = currentTypeAndTierPattern.matchMatcher(inventoryName) {
         val type = ExperimentationTaskType.fromStringOrNull(group("type")) ?: return@matchMatcher
         val tier = ExperimentationTier.byNameOrNull(group("tier")) ?: return@matchMatcher
         if (type == currentExperimentType && tier == currentExperimentTier) return@matchMatcher

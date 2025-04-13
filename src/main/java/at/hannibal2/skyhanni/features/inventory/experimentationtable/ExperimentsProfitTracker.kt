@@ -115,12 +115,12 @@ object ExperimentsProfitTracker {
     }
 
     private val allowedSlots = listOf(11, 12, 14, 15)
-    private val bottlesInventory = InventoryDetector { name -> name == "Bottles of Enchanting"}
+    private val bottlesInventory = InventoryDetector { name -> name == "Bottles of Enchanting" }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !bottlesInventory.isInside() || !allowedSlots.contains(event.slotId)) return
-        val internalName =  event.slot?.stack?.getInternalName()?.takeIf {
+        val internalName = event.slot?.stack?.getInternalName()?.takeIf {
             experienceBottlePattern.matches(it.asString())
         } ?: return
 

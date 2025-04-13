@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -33,9 +32,7 @@ object SuperpairDataDisplay {
         val item: SuperpairItem? = null,
         val first: SuperpairItem? = null,
         val second: SuperpairItem? = null
-    ) {
-        val displayReward: String get() = item?.reward ?: first?.reward.orEmpty()
-    }
+    )
 
     private enum class FoundType {
         NORMAL,
@@ -70,20 +67,9 @@ object SuperpairDataDisplay {
         found.clear()
     }
 
-    private fun getDebugStrings(): List<String> = buildList {
-        if (!ExperimentationTableApi.isActive) return@buildList
-
-        add("Current type: ${ExperimentationTableApi.currentExperimentType}")
-        add("Current tier: ${ExperimentationTableApi.currentExperimentTier}")
-    }
-
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.superpairDisplay || !ExperimentationTableApi.inTable) return
-
-        Renderable.verticalContainer(
-            getDebugStrings().map { Renderable.string(it) }
-        ).render(100, 100)
 
         display = display.takeIfNotEmpty() ?: drawDisplay()
         config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experimentation Data")
@@ -245,7 +231,7 @@ object SuperpairDataDisplay {
 
         addFoundData(pairs, "§2Collected")
         addFoundData(matches, "§eMatched")
-        addFoundData(powerups, "§bPowerUp")
+        addFoundData(powerups, "§bPowerUp") { it.item?.reward.orEmpty() }
         addDataStrings(notCollected, "§4Not Collected")
     }
 
@@ -260,8 +246,11 @@ object SuperpairDataDisplay {
         }
     }
 
-    private fun MutableList<String>.addFoundData(sourceList: List<FoundData>, header: String) =
-        addDataStrings(sourceList.map { it.displayReward }, header)
+    private fun MutableList<String>.addFoundData(
+        sourceList: List<FoundData>,
+        header: String,
+        displayAccessor: (FoundData) -> String = { it.first?.reward.orEmpty() }
+    ) = addDataStrings(sourceList.map { displayAccessor.invoke(it) }, header)
 
     private fun calculatePossiblePairs(currentExperiment: ExperimentationTableApi.ExperimentationTier) =
         ((currentExperiment.gridSize - 2) / 2) - found.filter { it.key != FoundType.POWERUP }.values.sumOf { it.size }
