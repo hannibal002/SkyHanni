@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -137,10 +138,14 @@ object SackApi {
     private val stackList = mutableMapOf<Int, ItemStack>()
     private const val GEMSTONE_FILTER_SLOT = 41
 
+    // TODO replace string with internal name, but also test if this works for all items as expected!
     var sackListInternalNames = emptySet<String>()
         private set
 
     var sackListNames = emptySet<String>()
+        private set
+
+    var sacks = mapOf<String, List<NeuInternalName>>()
         private set
 
     @HandleEvent
@@ -357,9 +362,15 @@ object SackApi {
         val uniqueSackItems = mutableSetOf<NeuInternalName>()
 
         sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
+        sacks = sacksData.mapValues { it.value.contents }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
         sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
+    }
+
+    @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
+    fun onProfileJoin() {
+        sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
     }
 
     private fun updateSacks(changes: SackChangeEvent) {

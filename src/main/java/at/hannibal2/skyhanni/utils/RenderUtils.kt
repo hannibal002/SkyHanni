@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
@@ -97,12 +98,14 @@ object RenderUtils {
         }
     //#endif
 
-    fun Slot.highlight(color: LorenzColor) {
-        highlight(color.toColor())
+    // TODO swap Slot with DrawContext for extended function
+    fun Slot.highlight(context: DrawContext, color: LorenzColor) {
+        highlight(context, color.toColor())
     }
 
-    fun Slot.highlight(color: Color) {
-        highlight(color, xDisplayPosition, yDisplayPosition)
+    // TODO swap Slot with DrawContext for extended function
+    fun Slot.highlight(context: DrawContext, color: Color) {
+        highlight(context, color, xDisplayPosition, yDisplayPosition)
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {
@@ -110,17 +113,18 @@ object RenderUtils {
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: Color) {
-        highlight(color, x, y)
+        highlight(context, color, x, y)
     }
 
-    fun highlight(color: Color, x: Int, y: Int) {
+    // TODO make a DrawContext extended function
+    fun highlight(context: DrawContext, color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
         // TODO don't use z
-        GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        Gui.drawRect(x, y, x + 16, y + 16, color.rgb)
-        GlStateManager.popMatrix()
+        context.matrices.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        GuiRenderUtils.drawRect(context, x, y, x + 16, y + 16, color.rgb)
+        context.matrices.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
     }

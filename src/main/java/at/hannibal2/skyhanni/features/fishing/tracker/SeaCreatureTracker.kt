@@ -189,6 +189,7 @@ object SeaCreatureTracker {
     }
 
     private fun shouldShowDisplay(): Boolean {
+        if (!config.enabled) return false
         if (!isEnabled()) return false
         if (!FishingApi.isFishing(checkRodInHand = false)) return false
 
@@ -204,5 +205,5 @@ object SeaCreatureTracker {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !FishingApi.wearingTrophyArmor && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !FishingApi.wearingTrophyArmor && !LorenzUtils.inKuudraFight
 }
