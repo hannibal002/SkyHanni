@@ -69,6 +69,7 @@ object KeyboardManager {
     private fun getKeyboardEventKeys(): List<EventKey> {
         val keys = mutableListOf<EventKey>()
         // if multiple keys are pressed at the same time, only 1 key is processed. The other ones may randomly be processed later.
+        @Suppress("unused")
         for (i in 0 until 10) {
             val keyCode = getSyntheticKeyboardKeyCode(Keyboard.getEventKey(), Keyboard.getEventCharacter())
             val keyState = Keyboard.getEventKeyState()
