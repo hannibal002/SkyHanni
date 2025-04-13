@@ -26,7 +26,8 @@ object NoBitsWarning {
                 "§bNo Bits Available! §eClick to buy booster cookies on the bazaar.",
                 onClick = {
                     HypixelCommands.bazaar("booster cookie")
-                }, "§eClick to run /bz booster cookie!"
+                },
+                "§eClick to run /bz booster cookie!",
             )
             // TODO use reminder utils
             TitleManager.sendTitle("§bNo Bits Available", duration = 5.seconds)
