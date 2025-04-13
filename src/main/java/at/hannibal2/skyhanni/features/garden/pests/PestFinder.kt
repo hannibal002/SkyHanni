@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
@@ -198,7 +198,7 @@ object PestFinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onKeyPress(event: KeyPressEvent) {
+    fun onKeyDown(event: KeyDownEvent) {
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NeuItems.neuHasFocus()) return
 
