@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -235,9 +236,9 @@ object SuperpairDataDisplay {
             if (normals.isNotEmpty()) add("§7Normals - ${normals.size}")
         }
 
-        addFoundData(pairs, "§2Collected")
-        addFoundData(matches, "§eMatched")
-        addFoundData(powerups, "§bPowerUp") { it.item?.reward.orEmpty() }
+        addFoundData(pairs, "§2Collected", LorenzColor.GREEN)
+        addFoundData(matches, "§eMatched", LorenzColor.YELLOW)
+        addFoundData(powerups, "§bPowerUp", LorenzColor.BLUE) { it.item?.reward.orEmpty() }
         addDataStrings(notCollected, "§4Not Collected")
     }
 
@@ -255,8 +256,9 @@ object SuperpairDataDisplay {
     private fun MutableList<String>.addFoundData(
         sourceList: List<FoundData>,
         header: String,
+        color: LorenzColor,
         displayAccessor: (FoundData) -> String = { it.first?.reward.orEmpty() }
-    ) = addDataStrings(sourceList.map { displayAccessor.invoke(it) }, header)
+    ) = addDataStrings(sourceList.map { "${color.getChatColor()}${displayAccessor.invoke(it)}" }, header)
 
     private fun calculatePossiblePairs(currentExperiment: ExperimentationTableApi.ExperimentationTier) =
         ((currentExperiment.gridSize - 2) / 2) - found.filter { it.key != FoundType.POWERUP }.values.sumOf { it.size }
