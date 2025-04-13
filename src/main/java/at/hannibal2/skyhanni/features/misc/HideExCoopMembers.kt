@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
@@ -22,6 +24,8 @@ object HideExCoopMembers {
     private val config get() = SkyHanniMod.feature.misc
     private val storage get() = ProfileStorageData.profileSpecific?.exCoopMembers
 
+    private const val usage = "§c/shedithiddenexcoopmembers <add|remove> <name>"
+
     private val patternGroup = RepoPattern.group("data.exmembers")
 
     /**
@@ -30,7 +34,7 @@ object HideExCoopMembers {
      */
     private val validNamePattern by patternGroup.pattern(
         "name",
-        "[a-zA-Z0-9_]{3,16}",
+        "[a-zA-Z0-9_]{2,16}",
     )
 
     /**
@@ -48,7 +52,7 @@ object HideExCoopMembers {
      */
     private val namePattern by patternGroup.pattern(
         "inventory.historic.name",
-        "(?:§.\\[[^]]+(?:§\\++§b)?] |§7)(?<name>\\S{3,16})",
+        "(?:§.\\[[^]]+(?:§\\++§b)?] |§7)(?<name>\\S{2,16})",
     )
 
     /**
@@ -67,7 +71,7 @@ object HideExCoopMembers {
      */
     private val collectedPattern by patternGroup.pattern(
         "inventory.collections.collected",
-        "(?:§.\\[[^]]+(?:§\\++§b)?] |§7)(?<name>[^§]{3,16})§7: §e(?<amount>.+)",
+        "(?:§.\\[[^]]+(?:§\\++§b)?] |§7)(?<name>[^§]{2,16})§7: §e(?<amount>.+)",
     )
 
     /**
@@ -137,34 +141,40 @@ object HideExCoopMembers {
             }
     }
 
-    fun addExMemberCommand(args: Array<String>) {
-        val name = args.firstOrNull()?.takeIf { validNamePattern.matches(it) } ?: run {
+    private fun editExCoopMembers(args: Array<String>) {
+        if (args.isEmpty()) return ChatUtils.userError(usage)
+
+        val action = args.firstOrNull()?.takeIf { it in setOf("add", "remove") }
+            ?: return ChatUtils.userError(usage)
+
+        val name = args.getOrNull(1)?.takeIf { validNamePattern.matches(it) } ?: run {
             return ChatUtils.userError("Invalid username! Did you enter it correctly?")
         }
 
-        val new = addExMember(name)
-        if (new.isEmpty()) {
-            return ChatUtils.userError("That username is already in the list!")
+        val new = when (action) {
+            "add" -> addExMember(name)
+            "remove" -> removeExMember(name)
+            else -> return ChatUtils.userError(usage)
         }
 
+        if (new.isEmpty()) return ChatUtils.userError(
+            when (action) {
+                "add" -> "That username is already in the list!"
+                "remove" -> "That username wasn't in the list!"
+                else -> ""
+            },
+        )
+
         ChatUtils.hoverableChat(
-            "Added $name to your ex co-op members (Hover to see current list).",
+            "${action.successString()} $name (Hover to see current list).",
             new,
         )
     }
 
-    fun removeExMemberCommand(args: Array<String>) {
-        val name = args.firstOrNull()?.takeIf { validNamePattern.matches(it) } ?: run {
-            return ChatUtils.userError("Invalid username! Did you enter it correctly?")
-        }
-
-        val new = removeExMember(name)
-        if (new.isEmpty()) return ChatUtils.userError("That username isn't in the list!")
-
-        ChatUtils.hoverableChat(
-            "Removed $name from your ex co-op members (Hover to see current list).",
-            new,
-        )
+    private fun String.successString(): String = when (this) {
+        "add" -> "Added"
+        "remove" -> "Removed"
+        else -> ""
     }
 
     private fun addExMember(name: String): List<String> {
@@ -177,5 +187,14 @@ object HideExCoopMembers {
         val storage = storage ?: return listOf()
         if (!storage.remove(name)) return listOf()
         return storage.toList()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shedithiddenexcoopmembers") {
+            description = "Manually edit the list of ex co-op members you want to hide."
+            category = CommandCategory.USERS_ACTIVE
+            callback { editExCoopMembers(it) }
+        }
     }
 }
