@@ -342,11 +342,11 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
         lastProcessedExperimentOverHash = 0
-        if (queuedCompleteEvent == null) return
         if (handleBottlesOnInvClose) DelayedRun.runDelayed(100.milliseconds) {
             handleExpBottles(true)
             handleBottlesOnInvClose = false
         }
+        if (queuedCompleteEvent == null) return
         DelayedRun.runDelayed(150.milliseconds) {
             queuedCompleteEvent?.post()
             queuedCompleteEvent = null
