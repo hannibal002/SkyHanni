@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.data.ElectionApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.mayorConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 // internal
 // set 1s timer
 object ScoreboardElementMayor : ScoreboardElement() {
+    private val mayorConfig get() = displayConfig.mayor
+
     override fun getDisplay() = buildList {
         val currentMayorName = ElectionApi.currentMayor?.mayorName?.let {
             ElectionApi.mayorNameWithColorCode(it)

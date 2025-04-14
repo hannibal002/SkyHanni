@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConf
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.backgroundConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 object RenderBackground {
 
+    private val backgroundConfig get() = config.background
     private val textureLocation = createResourceLocation("skyhanni", "scoreboard.png")
 
     internal fun addBackground(renderable: Renderable): Renderable {
@@ -63,7 +64,7 @@ object RenderBackground {
 
     internal fun updatePosition(renderable: Renderable) {
         if (GuiEditManager.isInGui()) return
-        val alignmentConfig = CustomScoreboard.alignmentConfig
+        val alignmentConfig = CustomScoreboard.displayConfig.alignment
 
         with(alignmentConfig) {
             if (horizontalAlignment == RenderUtils.HorizontalAlignment.DONT_ALIGN &&

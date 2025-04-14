@@ -4,13 +4,15 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.partyConfig
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
 // internal
 // add party update event
 object ScoreboardElementParty : ScoreboardElement() {
+    private val partyConfig get() = displayConfig.party
+
     // TODO cache until next party update event
     override fun getDisplay() = buildList {
         if (PartyApi.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) return@buildList
