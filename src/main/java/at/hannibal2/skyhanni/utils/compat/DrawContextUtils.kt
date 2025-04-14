@@ -72,7 +72,7 @@ object DrawContextUtils {
     }
 
     @Suppress("deprecation")
-    fun pushPop(action: () -> Unit) {
+    inline fun pushPop(action: () -> Unit) {
         pushMatrix()
         action()
         popMatrix()
