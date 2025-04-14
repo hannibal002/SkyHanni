@@ -31,7 +31,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
         }
         val generic = if (isGeneric) resolveGenericType(method) else null
 
-        listeners.add(Listener(name, eventConsumer, options, generic))
+        listeners.add(Listener(name, eventConsumer, method, options, generic))
     }
 
     private fun buildListenerName(method: Method): String {
