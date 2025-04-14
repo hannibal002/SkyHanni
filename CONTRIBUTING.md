@@ -209,8 +209,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
-    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples.
-      for more information and usages.
+    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples, more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
@@ -270,6 +269,10 @@ Allows project specific plugins to run. Eg: Regex Intention
 ### [Live Templates Sharing](https://plugins.jetbrains.com/plugin/25007-live-templates-sharing)
 
 Imports our custom live templates automatically. Live Templates allow for quicker code writing.
+
+### [Minecraft Development](https://plugins.jetbrains.com/plugin/8327-minecraft-development)
+
+Helps you write minecraft specific code such as mixins and access wideners.
 
 ## Software Used in SkyHanni
 
@@ -567,3 +570,15 @@ These helper methods should generally be placed in the `at.hannibal2.skyhanni.ut
 compatability methods for. For example, `WorldClient.getAllEntities()` could be placed in `WorldCompat.kt`. This is not a strict rule, but
 it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files
 themselves.
+
+
+### Access Wideners
+
+You may want to use private minecraft methods or fields, this is where access wideners come in. 
+Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or 
+field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
+To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and 
+select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<version number>/src/main/resources/skyhanni.accesswidener`.
+Then you need to reload gradle for the changes to apply.
+
+This requires you to have the Minecraft Development plugin installed as mentioned earlier.

@@ -19,7 +19,7 @@ enum class NonGodPotEffect(
     VOID("§6End Portal Fumes", true),
     BLAZE("§fGabagoey", true),
     GLOWING_MUSH("§2Glowing Mush Mixin", true),
-    HOT_CHOCOLATE("§6Hot Chocolate Mixin", true),
+    HOT_CHOCOLATE("§6Hot Chocolate Mixin I", true),
 
     DEEP_TERROR("§4Deepterror", true),
 

@@ -61,7 +61,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isBazaarSign
 import at.hannibal2.skyhanni.utils.SignUtils.isSupercraftAmountSetSign
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -363,7 +362,7 @@ object GardenVisitorFeatures {
     @HandleEvent
     fun onVisitorRefused(event: VisitorRefusedEvent) {
         update()
-        GardenVisitorDropStatistics.deniedVisitors += 1
+        GardenApi.storage?.visitorDrops?.let { it.deniedVisitors += 1 }
         GardenVisitorDropStatistics.saveAndUpdate()
     }
 
@@ -371,8 +370,7 @@ object GardenVisitorFeatures {
     fun onVisitorAccepted(event: VisitorAcceptedEvent) {
         VisitorAcceptEvent(event.visitor).post()
         update()
-        GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
-        GardenVisitorDropStatistics.lastAccept = SimpleTimeMark.now()
+        GardenApi.storage?.visitorDrops?.let { it.coinsSpent += round(lastFullPrice).toLong() }
     }
 
     @HandleEvent
