@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.util.Vec3
-import scala.swing.Action
 
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
