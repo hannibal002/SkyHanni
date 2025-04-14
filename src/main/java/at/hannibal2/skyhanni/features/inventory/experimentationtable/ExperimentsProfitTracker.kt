@@ -153,6 +153,7 @@ object ExperimentsProfitTracker {
         val displayName = getItemStackOrNull()?.displayName ?: "XP Bottle"
         appendLine("§aExperiments Tracker§7:")
         appendLine("§eAutomatically tracked usage of $displayName §ewhile near the Experimentation Table§7.")
+        appendLine("§7This warning can also be disabled in the config.")
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {
