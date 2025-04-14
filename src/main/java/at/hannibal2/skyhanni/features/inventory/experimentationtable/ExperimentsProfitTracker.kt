@@ -130,23 +130,23 @@ object ExperimentsProfitTracker {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTableXpBottleUsed(event: TableXPBottleUsedEvent) {
         if (!isEnabled() || !config.trackUsedBottles) return
+        val bottlePrice = calculateBottlePrice(event.internalName)
         tracker.modify {
-            it.startCost -= calculateBottlePrice(event.internalName)
+            it.startCost -= (bottlePrice * event.amount)
         }
-        if (!warnedAboutTracking && config.bottleWarnings) {
-            warnedAboutTracking = true
-            ChatUtils.clickToActionOrDisable(
-                event.internalName.formatWarningString(),
-                config::trackUsedBottles,
-                actionName = "undo",
-                action = {
-                    tracker.modify {
-                        it.startCost += calculateBottlePrice(event.internalName)
-                    }
-                },
-                oneTimeClick = true,
-            )
-        }
+        if (warnedAboutTracking || !config.bottleWarnings) return
+        warnedAboutTracking = true
+        ChatUtils.clickToActionOrDisable(
+            event.internalName.formatWarningString(),
+            config::trackUsedBottles,
+            actionName = "undo",
+            action = {
+                tracker.modify {
+                    it.startCost += (bottlePrice * event.amount)
+                }
+            },
+            oneTimeClick = true,
+        )
     }
 
     private fun NeuInternalName.formatWarningString() = buildString {
