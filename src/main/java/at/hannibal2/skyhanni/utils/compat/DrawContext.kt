@@ -8,7 +8,7 @@ class DrawContext {
     val matrices: MatrixStack
         get() = _matrices
 
-    fun drawString(fr: FontRenderer, text: String, x: Int, y: Int, color: Int, shadow: Boolean) {
+    fun drawText(fr: FontRenderer, text: String, x: Int, y: Int, color: Int, shadow: Boolean) {
         fr.drawString(text, x.toFloat(), y.toFloat(), color, shadow)
     }
 

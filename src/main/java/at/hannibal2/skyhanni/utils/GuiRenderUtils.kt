@@ -41,7 +41,7 @@ object GuiRenderUtils {
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
-        DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+        DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
@@ -59,11 +59,11 @@ object GuiRenderUtils {
     }
 
     fun drawString(str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
+        DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
+        DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
     private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
