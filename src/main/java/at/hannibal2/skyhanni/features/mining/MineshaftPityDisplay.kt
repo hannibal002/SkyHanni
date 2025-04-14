@@ -234,6 +234,7 @@ object MineshaftPityDisplay {
             condition = { isDisplayEnabled() },
             outsideInventory = true,
         ) {
+            // TODO dont do this logic in render, do this in tick
             display.ifEmpty { update() }
             if (display.isNotEmpty()) {
                 config.position.renderRenderables(

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -40,7 +40,7 @@ object TabListRenderer {
 
         if (config.toggleTab) return
 
-        drawTabList(event.context)
+        drawTabList()
     }
 
     private var isPressed = false
@@ -62,16 +62,16 @@ object TabListRenderer {
         }
 
         if (isTabToggled) {
-            drawTabList(event.context)
+            drawTabList()
         }
     }
 
-    private fun drawTabList(context: DrawContext) {
+    private fun drawTabList() {
         val columns = TabListReader.renderColumns
 
         if (columns.isEmpty()) return
 
-        context.matrices.translate(0f, 0f, TAB_Z_OFFSET)
+        DrawContextUtils.translate(0f, 0f, TAB_Z_OFFSET)
 
         var maxLines = 0
         var totalWidth = 0 - COLUMN_SPACING
@@ -105,7 +105,6 @@ object TabListRenderer {
         val y = 10
 
         GuiRenderUtils.drawRect(
-            context,
             x - COLUMN_SPACING,
             y - TAB_PADDING,
             screenWidth + totalWidth / 2 + COLUMN_SPACING,
@@ -117,7 +116,6 @@ object TabListRenderer {
         if (header.isNotEmpty()) {
             for (line in header) {
                 GuiRenderUtils.drawString(
-                    context,
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     headerY.toFloat(),
@@ -127,13 +125,12 @@ object TabListRenderer {
             }
         }
 
-        drawColumns(context, x, headerY, columns, minecraft)
+        drawColumns(x, headerY, columns, minecraft)
 
         if (footer.isNotEmpty()) {
             var footerY = y + totalHeight - footer.size * LINE_HEIGHT + TAB_PADDING / 2 + 1
             for (line in footer) {
                 GuiRenderUtils.drawString(
-                    context,
                     line,
                     x + totalWidth / 2f - minecraft.fontRendererObj.getStringWidth(line) / 2f,
                     footerY.toFloat(),
@@ -142,10 +139,10 @@ object TabListRenderer {
                 footerY += LINE_HEIGHT
             }
         }
-        context.matrices.translate(0f, 0f, -TAB_Z_OFFSET)
+        DrawContextUtils.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
-    private fun drawColumns(context: DrawContext, x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {
+    private fun drawColumns(x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {
         var middleX = x
         var lastTitle: TabLine? = null
         var lastSubTitle: TabLine? = null
@@ -164,7 +161,6 @@ object TabListRenderer {
             }.let(::RenderColumn)
 
             GuiRenderUtils.drawRect(
-                context,
                 middleX - TAB_PADDING + 1,
                 middleY - TAB_PADDING + 1,
                 middleX + column.getMaxWidth() + TAB_PADDING - 2,
@@ -195,7 +191,6 @@ object TabListRenderer {
                 if (text.contains("§l")) text = "§r$text"
                 if (tabLine.type == TabStringType.TITLE) {
                     GuiRenderUtils.drawString(
-                        context,
                         text,
                         middleX + column.getMaxWidth() / 2f - tabLine.getWidth() / 2f,
                         middleY.toFloat(),
@@ -203,7 +198,6 @@ object TabListRenderer {
                     )
                 } else {
                     GuiRenderUtils.drawString(
-                        context,
                         text,
                         middleX.toFloat(),
                         middleY.toFloat(),

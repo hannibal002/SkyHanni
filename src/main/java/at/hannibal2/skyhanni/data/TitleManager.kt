@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -52,18 +52,18 @@ object TitleManager {
         val weight: Double = 1.0,
         var discardOnWorldChange: Boolean = true,
     ) {
+        var endTime: SimpleTimeMark? = null
+        var hasBeenRequeued: Boolean = false
+
         open val alive get() = endTime != null && (endTime?.isInPast() == false)
 
-        var endTime: SimpleTimeMark? = null
-
         open fun getTitleText(): String = titleText
-
         open fun getSubtitleText(): String? = subtitleText
-
         open fun start() {
-            endTime = if (endTime == null) (now() + duration) else endTime
+            if (endTime == null || endTime?.isInPast() == true) {
+                endTime = now() + duration
+            }
         }
-
         open fun stop() {
             endTime = farPast()
         }
@@ -397,13 +397,18 @@ object TitleManager {
                 null -> dequeueNextTitle(location)
                 else -> {
                     val titleLocationQueue = titleLocationQueues[location]
-                    titleLocationQueue?.getWaitingWeightOrNull()?.let {
-                        if (it <= currentTitle.weight) return@let
-                        currentTitle.stop()
-                        // Re-queue for insertion after the new title
-                        titleLocationQueue.add(currentTitle, currentTitle.weight)
-                        dequeueNextTitle(location)
-                        return
+                    titleLocationQueue?.getWaitingWeightOrNull()?.let { waitingWeight ->
+                        if (waitingWeight > currentTitle.weight) {
+                            if (currentTitle.alive && currentTitle.endTime?.isInFuture() == true) {
+                                currentTitle.duration = currentTitle.endTime?.timeUntil() ?: Duration.ZERO
+                                if (currentTitle.duration > Duration.ZERO && !currentTitle.hasBeenRequeued) {
+                                    currentTitle.hasBeenRequeued = true
+                                    titleLocationQueue.add(currentTitle, currentTitle.weight)
+                                }
+                            }
+                            dequeueNextTitle(location)
+                            return@forEach
+                        }
                     }
                     if (currentTitle.alive) return@forEach
                     currentTitle.stop()
@@ -431,11 +436,11 @@ object TitleManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (InventoryUtils.inInventory()) return
         val globalTitle = currentTitles[TitleLocation.GLOBAL] ?: return
-        globalTitle.tryRenderGlobalTitle(event.context)
+        globalTitle.tryRenderGlobalTitle()
     }
 
-    // TODO move function inside title context class, then make this a extneded function of DrawContext
-    private fun TitleContext.tryRenderGlobalTitle(context: DrawContext) {
+    // TODO move function inside title context class
+    private fun TitleContext.tryRenderGlobalTitle() {
         val guiWidth = GuiScreenUtils.scaledWindowWidth
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
@@ -449,7 +454,7 @@ object TitleManager {
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
 
         val mainTextRenderable = Renderable.string(
             getTitleText(),
@@ -478,19 +483,19 @@ object TitleManager {
         val posX = (guiWidth - renderableWidth) / 2
         val posY = (guiHeight - (renderableHeight * 4)) / 2
 
-        context.matrices.translate(posX.toFloat(), posY.toFloat(), 0f)
+        DrawContextUtils.translate(posX.toFloat(), posY.toFloat(), 0f)
         targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!InventoryUtils.inInventory()) return
         val inventoryTitle = currentTitles[TitleLocation.INVENTORY] ?: return
-        inventoryTitle.tryRenderInventoryTitle(event.context)
+        inventoryTitle.tryRenderInventoryTitle()
     }
 
-    private fun TitleContext.tryRenderInventoryTitle(context: DrawContext) {
+    private fun TitleContext.tryRenderInventoryTitle() {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         val baseStringRenderable = Renderable.string(getTitleText(), 1.5)
@@ -517,8 +522,8 @@ object TitleManager {
             else -> 150f
         }
 
-        context.matrices.pushMatrix()
-        context.matrices.translate(0f, -(heightTranslation), 500f)
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate(0f, -(heightTranslation), 500f)
         Renderable.drawInsideRoundedRect(
             stringRenderable,
             ColorUtils.TRANSPARENT_COLOR,
@@ -526,7 +531,7 @@ object TitleManager {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 0, gui.width, gui.height)
 
-        context.matrices.translate(0f, heightTranslation, -500f)
-        context.matrices.popMatrix()
+        DrawContextUtils.translate(0f, heightTranslation, -500f)
+        DrawContextUtils.popMatrix()
     }
 }

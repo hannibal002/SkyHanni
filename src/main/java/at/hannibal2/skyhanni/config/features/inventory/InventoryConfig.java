@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
+import at.hannibal2.skyhanni.config.features.inventory.sacks.OutsideSackValueConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
 import at.hannibal2.skyhanni.config.features.misc.PocketSackInASackConfig;
@@ -109,6 +110,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Sack Items Display", desc = "")
     @Accordion
     public SackDisplayConfig sackDisplay = new SackDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Outside Sack Value", desc = "")
+    @Accordion
+    public OutsideSackValueConfig outsideSackValue = new OutsideSackValueConfig();
 
     @Expose
     @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")

@@ -209,8 +209,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
-    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples.
-      for more information and usages.
+    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples, more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
@@ -232,9 +231,9 @@ looking in the `at.hannibal2.skyhanni.utils.compat` package is a good idea, as t
 both have a nullable version as well: `MinecraftCompat.localPlayerOrNull()` and `MinecraftCompat.localWorldOrNull()`. This is because on
 1.8.9 while the player and world can be nullable at times, Minecraft's source code does not reflect this.
 - Rendering on modern versions is done completely differently than on 1.8.9. As such, on 1.8.9 we have adjusted our rendering code to more
-closely resemble modern rendering code. You will notice that we pass around both a `DrawContext` and a `WorldRenderContext` object. Both of
-these objects both hold a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack,
-translating and scaling. Where possible you should use these objects instead of the `GlStateManager` directly. If you are unsure, make sure
+closely resemble modern rendering code. You may notice a `DrawContext` or `WorldRenderContext` object being passed around. These both hold
+a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack, translating and scaling.
+To do most of these calls instead of using `GlStateManager` directly, you should use `DrawContextUtils` instead. If you are unsure, make sure
 to look at existing code to see how it is done and if you are still unsure, ask for help.
 - When making GUI screens or other GUI elements, you should try to use Renderables where possible as these should already account for
 most modern rendering changes. If you are making a new GUI screen, make sure to extend `SkyHanniBaseScreen` instead of `GuiScreen` to ensure
@@ -273,8 +272,7 @@ Imports our custom live templates automatically. Live Templates allow for quicke
 
 ### [Minecraft Development](https://plugins.jetbrains.com/plugin/8327-minecraft-development)
 
-Helps you write minecraft specific code such as mixins and access wideners
-
+Helps you write minecraft specific code such as mixins and access wideners.
 
 ## Software Used in SkyHanni
 
@@ -574,11 +572,13 @@ it is a good guideline to follow as for the most part we do not want to be doing
 themselves.
 
 
-### Access wideners
+### Access Wideners
 
 You may want to use private minecraft methods or fields, this is where access wideners come in. 
-
-You can right click on a method or field and select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<vers
-ion number>/src/main/resources/skyhanni.accesswidener`. Then you need to reload gradle for the changes to apply.
+Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or 
+field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
+To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and 
+select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<version number>/src/main/resources/skyhanni.accesswidener`.
+Then you need to reload gradle for the changes to apply.
 
 This requires you to have the Minecraft Development plugin installed as mentioned earlier.
