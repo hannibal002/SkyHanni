@@ -41,7 +41,7 @@ object SlayerApi {
     var latestSlayerProgress = ""
 
     val currentAreaType by RecalculatingValue(500.milliseconds) {
-        checkSlayerTypeForCurrentArea(IslandAreas.currentAreaName) ?: checkSlayerTypeForCurrentArea(HypixelData.skyBlockArea ?: "")
+        checkSlayerTypeForCurrentArea(IslandAreas.currentAreaName) ?: checkSlayerTypeForCurrentArea(HypixelData.skyBlockArea.orEmpty())
     }
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
@@ -81,7 +81,7 @@ object SlayerApi {
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
                 add(" hypixel area: ${HypixelData.skyBlockArea}")
-                add( "graph area: ${IslandAreas.currentAreaName}")
+                add("graph area: ${IslandAreas.currentAreaName}")
             }
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: ${latestSlayerProgress.removeColor()}")
