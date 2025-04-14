@@ -867,5 +867,5 @@ class ProfileSpecificStorage {
     )
 
     @Expose
-    var exCoopMembers: MutableSet<String> = mutableSetOf()
+    var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
 }

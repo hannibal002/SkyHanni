@@ -9,12 +9,14 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.StringUtils.isPlayerName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 
@@ -22,20 +24,14 @@ import net.minecraft.init.Items
 object HideExCoopMembers {
 
     private val config get() = SkyHanniMod.feature.misc
-    private val storage get() = ProfileStorageData.profileSpecific?.exCoopMembers
+    private val storage get() = ProfileStorageData.profileSpecific
 
-    private const val usage = "§c/shedithiddenexcoopmembers <add|remove> <name>"
+    private val historicMembersInventory = InventoryDetector { name -> inventoryPattern.matches(name) }
+    private val collectionInventory = InventoryDetector { name -> collectionInventoryPattern.matches(name) }
 
-    private val patternGroup = RepoPattern.group("data.exmembers")
+    private var changedSlotNumber: Int? = null
 
-    /**
-     * REGEX-TEST: oxsss
-     * REGEX-TEST: Gillsplash
-     */
-    private val validNamePattern by patternGroup.pattern(
-        "name",
-        "[a-zA-Z0-9_]{2,16}",
-    )
+    private val patternGroup = RepoPattern.group("data.hiddenmembers")
 
     /**
      * REGEX-TEST: Historic Members
@@ -43,16 +39,6 @@ object HideExCoopMembers {
     private val inventoryPattern by patternGroup.pattern(
         "inventory.historic",
         "Historic Members",
-    )
-
-    /**
-     * REGEX-TEST: §c[§fYouTube§c] oxsss
-     * REGEX-TEST: §b[MVP§f+§b] oxsss
-     * REGEX-TEST: §a[VIP] oxsss
-     */
-    private val namePattern by patternGroup.pattern(
-        "inventory.historic.name",
-        "(?:§.\\[[^]]+(?:§\\++§b)?] |§7)(?<name>\\S{2,16})",
     )
 
     /**
@@ -85,11 +71,11 @@ object HideExCoopMembers {
 
     @HandleEvent
     fun onTooltip(event: ToolTipEvent) {
-        if (!config.hideExCoopMembers || !collectionInventoryPattern.matches(InventoryUtils.openInventoryName())) return
-        val storage = storage ?: return
-        if (storage.isEmpty()) return
+        if (!config.hideExCoopMembers || !collectionInventory.isInside()) return
+        val hiddenMembers = storage?.hiddenCoopMembers.takeIf { !it.isNullOrEmpty() } ?: return
 
-        event.toolTip = event.toolTipRemovedPrefix().handleTooltip(storage)
+        event.toolTip = event.toolTipRemovedPrefix().handleTooltip(hiddenMembers)
+        changedSlotNumber = event.slot.slotNumber
     }
 
     private fun List<String>.handleTooltip(storage: MutableSet<String>): MutableList<String> = this.toMutableList().apply {
@@ -100,12 +86,12 @@ object HideExCoopMembers {
         var totalCollected = 0
         val itemsToRemove = mutableListOf<Int>()
 
-        for (i in (coopIndex + 1) until size) {
-            if (this[i].isBlank()) break
+        drop(coopIndex).forEachIndexed { index, line ->
+            if (line.isBlank()) return@forEachIndexed  // Stop processing on blank line
 
-            collectedPattern.matchMatcher(this[i]) {
+            collectedPattern.matchMatcher(line) {
                 if (group("name") in storage) {
-                    itemsToRemove.add(i)
+                    itemsToRemove.add(coopIndex + index)
                 } else {
                     remainingPlayers++
                 }
@@ -114,50 +100,48 @@ object HideExCoopMembers {
             }
         }
 
-        itemsToRemove.sortedDescending().forEach { removeAt(it) }
+        itemsToRemove.sortedDescending().forEach { removeAt(it - 1) }
 
-        if (remainingPlayers <= 1) {
-            if (!dontDisplayMaxedPattern.anyMatches(this)) {
-                if (coopIndex + 1 < size) this[coopIndex + 1] = "§7Total collected: §e${totalCollected.addSeparators()}"
-                if (coopIndex < size) this[coopIndex] = "§a§lCOLLECTION MAXED OUT!"
-            } else {
-                if (coopIndex + 1 < size) removeAt(coopIndex + 1)
-                if (coopIndex < size) removeAt(coopIndex)
-                if (coopIndex - 1 < size) removeAt(coopIndex - 1)
+        if (remainingPlayers >= 2) return this
+
+        if (!dontDisplayMaxedPattern.anyMatches(this)) {
+            if (coopIndex + 1 < size) this[coopIndex + 1] = "§7Total collected: §e${totalCollected.addSeparators()}"
+            if (coopIndex < size) this[coopIndex] = "§a§lCOLLECTION MAXED OUT!"
+        } else {
+            for (i in (coopIndex + 1) downTo (coopIndex - 1)) {
+                if (i < size) removeAt(i)
             }
         }
     }
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!config.hideExCoopMembers || !inventoryPattern.matches(event.inventoryName)) return
+        if (!config.hideExCoopMembers || !historicMembersInventory.isInside()) return
 
         event.inventoryItems.values
             .filter { it.item == Items.skull }
             .forEach { item ->
-                namePattern.matchMatcher(item.displayName) {
-                    addExMember(group("name"))
-                }
+                addHiddenMember(item.displayName.cleanPlayerName())
             }
     }
 
-    private fun editExCoopMembers(args: Array<String>) {
-        if (args.isEmpty()) return ChatUtils.userError(usage)
+    private fun editHiddenCoopMembers(args: Array<String>) {
+        if (args.isEmpty()) return sendUsage()
 
-        val action = args.firstOrNull()?.takeIf { it in setOf("add", "remove") }
-            ?: return ChatUtils.userError(usage)
+        val validActions = setOf("add", "remove")
+        val action = args.firstOrNull()?.takeIf { it in validActions } ?: return sendUsage()
 
-        val name = args.getOrNull(1)?.takeIf { validNamePattern.matches(it) } ?: run {
+        val name = args.getOrNull(1)?.takeIf { it.isPlayerName() } ?: run {
             return ChatUtils.userError("Invalid username! Did you enter it correctly?")
         }
 
         val new = when (action) {
-            "add" -> addExMember(name)
-            "remove" -> removeExMember(name)
-            else -> return ChatUtils.userError(usage)
+            "add" -> addHiddenMember(name)
+            "remove" -> removeHiddenMember(name)
+            else -> return sendUsage()
         }
 
-        if (new.isEmpty()) return ChatUtils.userError(
+        if (new == null) return ChatUtils.userError(
             when (action) {
                 "add" -> "That username is already in the list!"
                 "remove" -> "That username wasn't in the list!"
@@ -165,11 +149,11 @@ object HideExCoopMembers {
             },
         )
 
-        ChatUtils.hoverableChat(
-            "${action.successString()} $name (Hover to see current list).",
-            new,
-        )
+        ChatUtils.hoverableChat("${action.successString()} $name (Hover to see current list).", hover = new)
     }
+
+    private const val usage = "§c/shedithiddencoopmembers <add|remove> <name>"
+    private fun sendUsage() = ChatUtils.userError(usage)
 
     private fun String.successString(): String = when (this) {
         "add" -> "Added"
@@ -177,24 +161,24 @@ object HideExCoopMembers {
         else -> ""
     }
 
-    private fun addExMember(name: String): List<String> {
-        val storage = storage ?: return listOf()
-        if (!storage.add(name)) return listOf()
-        return storage.toList()
+    private fun addHiddenMember(name: String): List<String>? {
+        val exMembers = storage?.hiddenCoopMembers ?: return null
+        if (!exMembers.add(name)) return null
+        return exMembers.toList()
     }
 
-    private fun removeExMember(name: String): List<String> {
-        val storage = storage ?: return listOf()
-        if (!storage.remove(name)) return listOf()
-        return storage.toList()
+    private fun removeHiddenMember(name: String): List<String>? {
+        val exMembers = storage?.hiddenCoopMembers ?: return null
+        if (!exMembers.remove(name)) return null
+        return exMembers.toList()
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shedithiddenexcoopmembers") {
+        event.register("shedithiddencoopmembers") {
             description = "Manually edit the list of ex co-op members you want to hide."
             category = CommandCategory.USERS_ACTIVE
-            callback { editExCoopMembers(it) }
+            callback { editHiddenCoopMembers(it) }
         }
     }
 }
