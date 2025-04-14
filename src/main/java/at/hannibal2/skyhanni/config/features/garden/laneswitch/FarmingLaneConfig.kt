@@ -14,7 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class FarmingLaneConfig {
     @ConfigOption(
         name = "Create Lanes",
-        desc = "In order for those features to work, you first need to create a lane with §e/shlanedetection§7!"
+        desc = "In order for those features to work, you first need to create a lane with §e/shlanedetection§7!",
     )
     @ConfigEditorInfoText(infoTitle = "Tutorial")
     var tutorial: Boolean = false
@@ -27,7 +27,7 @@ class FarmingLaneConfig {
     @Expose
     @ConfigOption(
         name = "Distance Display",
-        desc = "Show the remaining distance and time until you reach the end of the current lane."
+        desc = "Show the remaining distance and time until you reach the end of the current lane.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

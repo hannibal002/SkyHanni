@@ -8,14 +8,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 // TODO moulconfig runnable support
 class MushroomPetPerkConfig {
     @Expose
     @ConfigOption(
         name = "Display Enabled",
-        desc = "Show the progress and ETA for mushroom crops when farming other crops because of the Mooshroom Cow perk."
+        desc = "Show the progress and ETA for mushroom crops when farming other crops because of the Mooshroom Cow perk.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -24,24 +23,22 @@ class MushroomPetPerkConfig {
     @Expose
     @ConfigOption(
         name = "Mushroom Text",
-        desc = "Drag text to change the appearance of the overlay.\n" +
-            "Hold a farming tool to show the overlay."
+        desc = "Drag text to change the appearance of the overlay.\n" + "Hold a farming tool to show the overlay.",
     )
     @ConfigEditorDraggableList
     var text: MutableList<MushroomTextEntry> = mutableListOf(
         MushroomTextEntry.TITLE,
         MushroomTextEntry.MUSHROOM_TIER,
         MushroomTextEntry.NUMBER_OUT_OF_TOTAL,
-        MushroomTextEntry.TIME
+        MushroomTextEntry.TIME,
     )
 
-    // TODO Change MUSHROOM_TIER to MUSHROOM_MILESTONE
     enum class MushroomTextEntry(
         private val displayName: String,
-        private val legacyId: Int = -1
+        private val legacyId: Int = -1,
     ) : HasLegacyId {
         TITLE("§6Mooshroom Cow Perk", 0),
-        MUSHROOM_TIER("§7Mushroom Milestone 8", 1),
+        MUSHROOM_TIER("§7Mushroom Milestone 8", 1), // TODO Change MUSHROOM_TIER to MUSHROOM_MILESTONE
         NUMBER_OUT_OF_TOTAL("§e6,700§8/§e15,000", 2),
         TIME("§7In §b12m 34s", 3),
         PERCENTAGE("§7Percentage: §e12.34%", 4),
