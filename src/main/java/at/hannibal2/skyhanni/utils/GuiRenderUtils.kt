@@ -45,7 +45,7 @@ object GuiRenderUtils {
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
-        DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+        DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
@@ -63,11 +63,11 @@ object GuiRenderUtils {
     }
 
     fun drawString(str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
+        DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
+        DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
     private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
@@ -79,7 +79,7 @@ object GuiRenderUtils {
         itemRender.zLevel = 0f
         RenderHelper.disableStandardItemLighting()
         //#else
-        //$$ context.drawItem(item, x, y)
+        //$$ DrawContextUtils.drawContext.drawItem(item, x, y)
         //#endif
     }
 
@@ -180,7 +180,7 @@ object GuiRenderUtils {
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
         //#else
-        //$$ context.fillGradient(left, top, right, bottom, startColor, endColor)
+        //$$ DrawContextUtils.drawContext.fillGradient(left, top, right, bottom, startColor, endColor)
         //#endif
     }
 
@@ -264,7 +264,7 @@ object GuiRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1f, 1f, 1f, 1f)
         //#else
-        //$$ context.drawTexture(RenderLayer::getGuiTextured, texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
+        //$$ DrawContextUtils.drawContext.drawTexture(RenderLayer::getGuiTextured, texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
         //#endif
     }
 
@@ -273,7 +273,7 @@ object GuiRenderUtils {
         val sr = net.minecraft.client.gui.ScaledResolution(Minecraft.getMinecraft())
         io.github.moulberry.notenoughupdates.core.GlScissorStack.push(left, top, right, bottom, sr)
         //#else
-        //$$ context.enableScissor(left, top, right, bottom)
+        //$$ DrawContextUtils.drawContext.enableScissor(left, top, right, bottom)
         //#endif
     }
 
@@ -281,7 +281,7 @@ object GuiRenderUtils {
         //#if MC < 1.21
         io.github.moulberry.notenoughupdates.core.GlScissorStack.pop(net.minecraft.client.gui.ScaledResolution(Minecraft.getMinecraft()))
         //#else
-        //$$ context.disableScissor()
+        //$$ DrawContextUtils.drawContext.disableScissor()
         //#endif
     }
 
@@ -351,7 +351,7 @@ object GuiRenderUtils {
         Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
         RenderHelper.disableStandardItemLighting()
         //#else
-        //$$ renderItemStack(context, item, 0, 0)
+        //$$ renderItemStack(item, 0, 0)
         //#endif
 
         DrawContextUtils.popMatrix()
