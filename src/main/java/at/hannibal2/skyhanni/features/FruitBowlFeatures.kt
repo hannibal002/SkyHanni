@@ -94,6 +94,7 @@ object FruitBowlFeatures {
     /**
      * REGEX-TEST: §7§bPapaya§7
      * REGEX-TEST: §bLime§7, §bMango§7
+     * REGEX-TEST: §7§bBlueberry§7, §bCucumber§7, §bGrapes§7, §bKiwi§7, §bLime§7, §bMango§7,
      */
     private val itemMissingNameLinePattern by chatGroup.pattern(
         "item-lore.missing-name-line",
@@ -119,9 +120,12 @@ object FruitBowlFeatures {
         if (hand.getInternalNameOrNull() != FRUIT_BOWL) return emptySet()
 
         val lore = hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) }, amount = 20)
-        return lore.mapNotNull {
-            itemMissingNameLinePattern.matchMatcher(it) {
-                group("name")
+        return lore.flatMap {
+            buildList {
+                val matcher = itemMissingNameLinePattern.matcher(it)
+                while (matcher.find()) {
+                    add(matcher.group("name"))
+                }
             }
         }.toSet()
     }
