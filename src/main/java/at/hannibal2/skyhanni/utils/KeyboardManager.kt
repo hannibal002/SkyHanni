@@ -65,22 +65,16 @@ object KeyboardManager {
     //#if MC < 1.21
     private data class EventKey(val keyCode: Int, val pressed: Boolean)
 
-    private fun getKeyboardEventKeys(): List<EventKey> {
-        val keys = mutableListOf<EventKey>()
-        // if multiple keys are pressed at the same time, only 1 key is processed. The other ones may randomly be processed later.
-        @Suppress("unused")
-        for (i in 0 until 10) {
-            val keyCode = getSyntheticKeyboardKeyCode(Keyboard.getEventKey(), Keyboard.getEventCharacter())
-            val keyState = Keyboard.getEventKeyState()
-            if (keyCode != 0) {
-                keys.add(EventKey(keyCode, keyState))
-            }
-            if (!Keyboard.next()) break
+    private fun getKeyboardEventKey(): EventKey? {
+        val keyCode = getSyntheticKeyboardKeyCode(Keyboard.getEventKey(), Keyboard.getEventCharacter())
+        val keyState = Keyboard.getEventKeyState()
+        if (keyCode != 0) {
+            return EventKey(keyCode, keyState)
         }
-        return keys
+        return null
     }
 
-    private fun getSingleMouseEventKey(): EventKey? {
+    private fun getMouseEventKey(): EventKey? {
         if (MouseCompat.getEventButton() != -1) {
             val keyCode = MouseCompat.getEventButton() - 100
             lastClickedMouseButton = keyCode
@@ -108,8 +102,8 @@ object KeyboardManager {
         if (isConfigScreen || currentScreen is GuiChat) return
 
         val keys: List<EventKey> = buildList {
-            addAll(getKeyboardEventKeys())
-            getSingleMouseEventKey()?.let { add(it) }
+            getKeyboardEventKey()?.let { add(it) }
+            getMouseEventKey()?.let { add(it) }
         }
 
         for (key in keys) {
