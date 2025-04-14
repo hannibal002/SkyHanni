@@ -215,14 +215,12 @@ object SuperpairDataDisplay {
     )
 
     private fun drawDisplay() = buildList {
-        val currentExperimentType = ExperimentationTableApi.currentExperimentType.takeIf {
-            it == null || it !in disallowedTypes
-        } ?: return@buildList
+        val currentExperimentType = ExperimentationTableApi.currentExperimentType
+        val isValid = currentExperimentType == null || currentExperimentType !in disallowedTypes
+        if (!isValid) return@buildList
         add("§6Superpair Experimentation Data")
 
-        val currentTier = ExperimentationTableApi.currentExperimentTier.takeIf {
-            currentExperimentType == TaskType.SUPERPAIRS
-        } ?: return@buildList
+        val currentTier = ExperimentationTableApi.currentExperimentTier ?: return@buildList
         add("")
 
         val normals = found.entries.firstOrNull { it.key == FoundType.NORMAL }?.value.orEmpty()
