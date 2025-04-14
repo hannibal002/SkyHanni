@@ -17,16 +17,20 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //#if MC < 1.21
     final override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         super.drawScreen(mouseX, mouseY, partialTicks)
-        onDrawScreen(DrawContext(), mouseX, mouseY, partialTicks)
+        DrawContextUtils.setContext(DrawContext())
+        onDrawScreen(mouseX, mouseY, partialTicks)
+        DrawContextUtils.clearContext()
     }
     //#else
     //$$ override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
     //$$    super.render(context, mouseX, mouseY, delta)
-    //$$    onDrawScreen(context, mouseX, mouseY, delta)
+    //$$    DrawContextUtils.setContext(context)
+    //$$    onDrawScreen(mouseX, mouseY, delta)
+    //$$    DrawContextUtils.clearContext()
     //$$ }
     //#endif
 
-    open fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {}
+    open fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {}
 
     //#if MC < 1.21
     final override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
@@ -125,11 +129,11 @@ abstract class SkyhanniBaseScreen : GuiScreen(
 
     open fun onInitGui() {}
 
-    fun drawDefaultBackground(context: DrawContext, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    fun drawDefaultBackground(mouseX: Int, mouseY: Int, partialTicks: Float) {
         //#if MC < 1.21
         drawDefaultBackground()
         //#else
-        //$$ renderBackground(context, mouseX, mouseY, partialTicks)
+        //$$ renderBackground(DrawContextUtils.drawContext, mouseX, mouseY, partialTicks)
         //#endif
     }
 }

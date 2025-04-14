@@ -48,20 +48,15 @@ object FarmingWeightDisplay {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { shouldShowDisplay() },
+            condition = { shouldShowDisplay() && isEnabled() },
             onRender = {
-                // TODO move this into condition
-                val shouldShow = apiError || (config.ignoreLow || weight >= 200)
-                if (isEnabled() && shouldShow) {
-                    config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
-                }
+                config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
             },
         )
     }
 
-    private fun shouldShowDisplay(): Boolean {
-        return !GardenApi.hideExtraGuis()
-    }
+    private fun shouldShowDisplay(): Boolean =
+        !GardenApi.hideExtraGuis() && (apiError || (config.ignoreLow || weight >= 200))
 
     @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
