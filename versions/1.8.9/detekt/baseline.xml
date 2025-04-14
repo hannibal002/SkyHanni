@@ -67,6 +67,7 @@
     <ID>NoNameShadowing:RepoManager.kt$RepoManager${ unsuccessfulConstants.add(it) }</ID>
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
+    <ID>PreprocessingImportOrdering:MouseCompat.kt$//#if MC &lt; 1.16</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:BasketWaypoints.kt$BasketWaypoints$by patternGroup.pattern( "basket", "^(?:(?:§.)+You found a Candy Basket! (?:(?:§.)+\\((?:§.)+(?&lt;current&gt;\\d+)(?:§.)+/(?:§.)+(?&lt;max&gt;\\d+)(?:§.)+\\))?|(?:§.)+You already found this Candy Basket!)\$" )</ID>
     <ID>RepoPatternRegexTestMissing:BasketWaypoints.kt$BasketWaypoints$by patternGroup.pattern( "main.scoreboard.basket", "^Baskets Found: §a\\d+§f/§a\\d+\$" )</ID>
