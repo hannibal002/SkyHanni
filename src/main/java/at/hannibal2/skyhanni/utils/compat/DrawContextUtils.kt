@@ -78,6 +78,9 @@ object DrawContextUtils {
         popMatrix()
     }
 
+    /**
+     * Run operations inside a DrawContext translation
+     */
     inline fun translated(x: Number = 0, y: Number = 0, z: Number = 0, action: () -> Unit) {
         pushPop {
             translate(x.toFloat(), y.toFloat(), z.toFloat())
@@ -85,6 +88,9 @@ object DrawContextUtils {
         }
     }
 
+    /**
+     * Run operations inside a DrawContext scale
+     */
     inline fun scaled(x: Number = 1, y: Number = 1, z: Number = 1, action: () -> Unit) {
         pushPop {
             scale(x.toFloat(), y.toFloat(), z.toFloat())
