@@ -439,8 +439,7 @@ object ExperimentationTableApi {
     }
 
     private fun InventoryOpenEvent.tryProcessExperimentOver() {
-        if (!expOverInventoryPattern.matches(inventoryName)) return
-        if (currentExpOverHash != 0) return
+        if (!expOverInventoryPattern.matches(inventoryName) || currentExpOverHash != 0) return
         tryUpdateCurrentActivity()
         val slotIndex = when (currentData.type) {
             null -> ErrorManager.skyHanniError(
@@ -454,58 +453,54 @@ object ExperimentationTableApi {
             ExperimentationTaskType.SUPERPAIRS -> SUPERPAIRS_OVER_DATA_SLOT
             else -> ADDONS_OVER_DATA_SLOT
         }
-        val item = inventoryItems[slotIndex] ?: return
-        val lore = item.getLore().takeIfNotEmpty()?.toList() ?: return
+        val item = inventoryItems[slotIndex]
+        val lore = item?.getLore()?.takeIfNotEmpty()?.toList() ?: return
 
         currentExpOverHash = lore.hashCode().takeIf {
             it != lastExpOverHash && it != currentExpOverHash && it != 0
         } ?: return
 
-        val taskType = ExperimentationTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
-        val taskTier = expOverStakesLorePattern.firstMatcher(lore) {
+        currentData.type = ExperimentationTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
+        currentData.tier = expOverStakesLorePattern.firstMatcher(lore) {
             ExperimentationTier.byNameOrNull(group("stakes"))
         } ?: return
 
-        currentData.apply {
-            type = taskType
-            tier = taskTier
-        }
-
         val rewardsBeginIndex = lore.indexOfFirst { expOverRewardsStartLorePattern.matches(it) } + 1
         val rewardsEndIndex = lore.indexOfFirst { expOverRewardsEndLorePattern.matches(it) } - 1
-        val rewards: List<String> = lore
-            .subList(rewardsBeginIndex, rewardsEndIndex)
+
+        lore.subList(rewardsBeginIndex, rewardsEndIndex)
             .mapNotNull { expOverRewardsLorePattern.matchGroup(it, "reward") }
-            .takeIfNotEmpty()?.toList() ?: return
-
-        rewards.forEach { rewardString ->
-            if (rewardString.endsWith("Superpairs clicks")) return@forEach
-
-            guardianPetNamePattern.matchMatcher(rewardString) {
-                val color = group("color")[0].toLorenzColor() ?: return@matchMatcher
-                val rarity = LorenzRarity.getByColor(color) ?: return@matchMatcher
-                val internalName = "GUARDIAN;${rarity.id}".toInternalName()
-                currentData.addReward(internalName, 1)
-                return@forEach
-            }
-            enchantingExpPattern.matchMatcher(rewardString) {
-                val amount = group("amount").formatLong().takeIf { it > 0 } ?: return@matchMatcher
-                currentData.enchantingXpGained += amount
-                return@forEach
-            }
-            if (experienceBottleChatPattern.matches(rewardString)) {
-                handleBottlesOnInvClose = true
-                return@forEach
-            }
-
-            val internalName = NeuInternalName.fromItemNameOrNull(rewardString) ?: run {
-                ChatUtils.chat("Could not read item name from $rewardString")
-                return@forEach
-            }
-            currentData.addReward(internalName, 1)
-        }
+            .takeIfNotEmpty()?.toList().orEmpty()
+            .forEach { it.processRewardOrNull() }
 
         queuedCompleteEvent = currentData.toCompletedTaskEventOrNull()
+    }
+
+    private fun String.processRewardOrNull() {
+        if (this.endsWith("Superpairs clicks")) return
+
+        guardianPetNamePattern.matchMatcher(this) {
+            val color = group("color")[0].toLorenzColor() ?: return@matchMatcher
+            val rarity = LorenzRarity.getByColor(color) ?: return@matchMatcher
+            val internalName = "GUARDIAN;${rarity.id}".toInternalName()
+            currentData.addReward(internalName, 1)
+            return
+        }
+        enchantingExpPattern.matchMatcher(this) {
+            val amount = group("amount").formatLong().takeIf { it > 0 } ?: return@matchMatcher
+            currentData.enchantingXpGained += amount
+            return
+        }
+        if (experienceBottleChatPattern.matches(this)) {
+            handleBottlesOnInvClose = true
+            return
+        }
+
+        val internalName = NeuInternalName.fromItemNameOrNull(this) ?: run {
+            ChatUtils.debug("Could not read item name from $this")
+            return
+        }
+        currentData.addReward(internalName, 1)
     }
 
     private fun InventoryOpenEvent.tryFireRareBookUncovered() {
