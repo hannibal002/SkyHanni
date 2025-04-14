@@ -7,25 +7,26 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
+import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experienceBottlePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.experimentRenewPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -34,21 +35,16 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraft.item.ItemStack
 import kotlin.math.absoluteValue
 
 @SkyHanniModule
 object ExperimentsProfitTracker {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
-
     private val tracker = SkyHanniItemTracker(
         "Experiments Profit Tracker",
         { Data() },
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
-
-    private val lastSplashes = mutableListOf<ItemStack>()
-    private var lastSplashTime = SimpleTimeMark.farPast()
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
@@ -129,19 +125,34 @@ object ExperimentsProfitTracker {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled() || !ExperimentationTableApi.inTable) return
+    private var warnedAboutTracking = false
 
-        var startCostTemp = 0
-        for (item in lastSplashes) {
-            startCostTemp += calculateBottlePrice(item.getInternalName())
-        }
-        lastSplashes.clear()
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onTableXpBottleUsed(event: TableXPBottleUsedEvent) {
+        if (!isEnabled() || !config.trackUsedBottles) return
         tracker.modify {
-            it.startCost -= startCostTemp
+            it.startCost -= calculateBottlePrice(event.internalName)
         }
-        lastSplashTime = SimpleTimeMark.farPast()
+        if (!warnedAboutTracking && config.bottleWarnings) {
+            warnedAboutTracking = true
+            ChatUtils.clickToActionOrDisable(
+                event.internalName.formatWarningString(),
+                config::trackUsedBottles,
+                actionName = "undo",
+                action = {
+                    tracker.modify {
+                        it.startCost += calculateBottlePrice(event.internalName)
+                    }
+                },
+                oneTimeClick = true,
+            )
+        }
+    }
+
+    private fun NeuInternalName.formatWarningString() = buildString {
+        val displayName = getItemStackOrNull()?.displayName ?: "XP Bottle"
+        appendLine("§aExperiments Tracker§7:")
+        appendLine("§aAutomatically tracked usage of $displayName while near the Experimentation Table.")
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {

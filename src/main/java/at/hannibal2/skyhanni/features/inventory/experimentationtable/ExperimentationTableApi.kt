@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -10,10 +11,12 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
+import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -34,7 +37,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -133,17 +135,10 @@ object ExperimentationTableApi {
         var enchantingXpGained: Long = 0L,
         var rareFoundFired: Boolean = false,
     ) : ResettableStorageSet() {
-        @Transient private var lastUpdatedAt: SimpleTimeMark? = null
         @Transient private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
 
         fun addReward(internalName: NeuInternalName, amount: Int = 1) {
             otherRewards.addOrPut(internalName, amount)
-            val timeInCall = SimpleTimeMark.now()
-            lastUpdatedAt = timeInCall
-            DelayedRun.runDelayed(500.milliseconds) {
-                if (lastUpdatedAt != timeInCall) return@runDelayed
-                currentData.toCompletedTaskEventOrNull()?.post()
-            }
         }
 
         fun toCompletedTaskEventOrNull(): TableTaskCompletedEvent? = when {
@@ -353,12 +348,13 @@ object ExperimentationTableApi {
             handleExpBottles(true)
             handleBottlesOnInvClose = false
         }
-        if (queuedCompleteEvent == null) return
+        val queuedEvent = queuedCompleteEvent ?: return
         DelayedRun.runDelayed(150.milliseconds) {
             // Catch early closes triggering the event before the inventory is fully opened
             if (expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return@runDelayed
-            queuedCompleteEvent?.post()
+            queuedEvent.post()
             queuedCompleteEvent = null
+            currentData.reset()
         }
     }
 
@@ -413,9 +409,15 @@ object ExperimentationTableApi {
         currentBottlesInInventory.clear()
     }
 
-    @HandleEvent
-    fun onTableTaskCompleted(event: TableTaskCompletedEvent) {
-        currentData.reset()
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onClick(event: WorldClickEvent) {
+        if (!inDistanceToTable(10.0)) return
+        if (event.clickType != ClickType.RIGHT_CLICK) return
+
+        val bottleUsed = event.itemInHand?.getInternalNameOrNull()?.takeIf {
+            experienceBottlePattern.matches(it.asString())
+        } ?: return
+        TableXPBottleUsedEvent(bottleUsed).post()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)

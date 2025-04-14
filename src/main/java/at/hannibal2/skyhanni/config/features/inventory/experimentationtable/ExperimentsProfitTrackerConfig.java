@@ -32,6 +32,16 @@ public class ExperimentsProfitTrackerConfig {
     public int timeDisplayed = 30;
 
     @Expose
+    @ConfigOption(name = "Track Used Bottles", desc = "Track thrown XP bottles while near the experimentation table.")
+    @ConfigEditorBoolean
+    public boolean trackUsedBottles = true;
+
+    @Expose
+    @ConfigOption(name = "Bottle Warnings", desc = "Display warnings once per session about bottles being auto-tracked.")
+    @ConfigEditorBoolean
+    public boolean bottleWarnings = true;
+
+    @Expose
     @ConfigLink(owner = ExperimentsProfitTrackerConfig.class, field = "enabled")
     public Position position = new Position(20, 20, false, true);
 }
