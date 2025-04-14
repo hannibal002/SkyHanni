@@ -57,7 +57,7 @@ open class Enchant : Comparable<Enchant> {
         val chatColor = color.get().getChatColor()
         return if ((level >= maxLevel || color == config.perfectEnchantColor) && config.boldPerfectEnchant.get()) {
             "$chatColor§l"
-        } else return chatColor
+        } else chatColor
     }
 
     /**
