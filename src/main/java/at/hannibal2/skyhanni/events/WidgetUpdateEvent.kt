@@ -10,7 +10,7 @@ open class WidgetUpdateEvent(
     val lines: List<String>,
 ) : SkyHanniEvent() {
 
-    override fun post(): Boolean = post(widget)
+    override fun post(): Boolean = post(widget, null)
     override fun post(onError: (Throwable) -> Unit): Boolean = post(widget, onError)
 
     @Deprecated("Consider using the @OnlyWidget annotation instead", ReplaceWith(""))

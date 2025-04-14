@@ -13,18 +13,22 @@ abstract class SkyHanniEvent protected constructor() {
     var isCancelled: Boolean = false
         private set
 
-    fun post() = prePost(onError = null)
+    // Events that want to add something to the context of the post event should override this method
+    // and call the protected post function instead. See WidgetUpdateEvent for an example.
+    open fun post() = post(null, null)
 
-    fun post(onError: (Throwable) -> Unit = {}) = prePost(onError)
+    // If events that add something to the context of the post also want to be able to post with
+    // an onError lambda, they should also override this method.
+    open fun post(onError: (Throwable) -> Unit = {}) = post(null, onError)
 
-    private fun prePost(onError: ((Throwable) -> Unit)?): Boolean {
+    protected fun post(context: Any? = null, onError: ((Throwable) -> Unit)? = null): Boolean {
         if (this is Rendering) {
-            DrawContextUtils.setContext(this.context)
-            val result = SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+            DrawContextUtils.setContext(this.drawContext)
+            val result = SkyHanniEvents.getEventHandler(javaClass).post(this, context, onError)
             DrawContextUtils.clearContext()
             return result
         }
-        return SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
+        return SkyHanniEvents.getEventHandler(javaClass).post(this, context, onError)
     }
 
     interface Cancellable {
@@ -35,6 +39,6 @@ abstract class SkyHanniEvent protected constructor() {
     }
 
     interface Rendering {
-        val context: DrawContext
+        val drawContext: DrawContext
     }
 }

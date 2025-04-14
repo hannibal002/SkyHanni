@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack
 abstract class GuiContainerEvent(open val gui: GuiContainer, open val container: Container) : SkyHanniEvent() {
 
     data class BackgroundDrawnEvent(
-        override val context: DrawContext,
+        override val drawContext: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
@@ -20,7 +20,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     ) : GuiContainerEvent(gui, container), Rendering
 
     data class PreDraw(
-        override val context: DrawContext,
+        override val drawContext: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
@@ -29,7 +29,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     ) : GuiContainerEvent(gui, container), Cancellable, Rendering
 
     data class PostDraw(
-        override val context: DrawContext,
+        override val drawContext: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
@@ -59,7 +59,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     }
 
     data class ForegroundDrawnEvent(
-        override val context: DrawContext,
+        override val drawContext: DrawContext,
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
