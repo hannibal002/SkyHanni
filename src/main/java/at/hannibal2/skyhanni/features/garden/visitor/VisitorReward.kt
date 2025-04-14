@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.HasLegacyId
+import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+
+private typealias StatsEntry = DropsStatisticsConfig.DropsStatisticsTextEntry
 
 enum class VisitorReward(
     rawInternalName: String,
@@ -21,6 +24,7 @@ enum class VisitorReward(
     DELICATE("DELICATE;5", "§9Delicate V"),
     COPPER_DYE("DYE_COPPER", "§8Copper Dye"),
     JUNGLE_KEY("JUNGLE_KEY", "§5Jungle Key"),
+    FRUIT_BOWL("FRUIT_BOWL", "§9Fruit Bowl"),
     ;
 
     private val internalName = rawInternalName.toInternalName()
@@ -29,15 +33,24 @@ enum class VisitorReward(
 //     val displayName by lazy { itemStack.nameWithEnchantment ?: internalName.asString() }
 
     companion object {
-
         fun getByInternalName(internalName: NeuInternalName) = entries.firstOrNull { it.internalName == internalName }
     }
 
-    override fun getLegacyId(): Int {
-        return legacyId
+    // Todo: Remove this when enum names of this and DropsStatisticsTextEntry are in sync
+    fun toStatsTextEntryOrNull() = when (this) {
+        DEDICATION -> StatsEntry.DEDICATION_IV
+        MUSIC_RUNE -> StatsEntry.MUSIC_RUNE_I
+        CULTIVATING -> StatsEntry.CULTIVATING_I
+        REPLENISH -> StatsEntry.REPLENISH_I
+        else -> {
+            try {
+                StatsEntry.valueOf(name)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
     }
 
-    override fun toString(): String {
-        return displayName
-    }
+    override fun getLegacyId() = legacyId
+    override fun toString() = displayName
 }
