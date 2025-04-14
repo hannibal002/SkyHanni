@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils.collection
 
+import at.hannibal2.skyhanni.utils.MinMaxNumber
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
@@ -61,6 +63,10 @@ object CollectionUtils {
 
     fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
         this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
+
+    @Suppress("UnsafeCallOnNullableType")
+    fun <K> MutableMap<K, MinMaxNumber>.addOrPut(key: K, number: MinMaxNumber): MinMaxNumber =
+        this.merge(key, number, MinMaxNumber::plus)!! // Never returns null since "plus" can't return null
 
     fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
@@ -129,8 +135,24 @@ object CollectionUtils {
      * @return A list containing up to `amount` elements starting `skip` elements after the first occurrence of `after`,
      *         or an empty list if `after` is not found.
      */
-    fun List<String>.sublistAfter(after: String, skip: Int = 1, amount: Int = 1): List<String> {
+    fun <T> List<T>.sublistAfter(after: T, skip: Int = 1, amount: Int = 1): List<T> {
         val startIndex = indexOf(after)
+        if (startIndex == -1) return emptyList()
+
+        return this.drop(startIndex + skip).take(amount)
+    }
+
+    /**
+     * Returns a sublist of this list, starting after the first occurrence that matches the condition.
+     *
+     * @param conditionAfter The element's condition after which the sublist should start.
+     * @param skip The number of elements to skip after the occurrence of `after` (default is 1).
+     * @param amount The number of elements to include in the returned sublist (default is 1).
+     * @return A list containing up to `amount` elements starting `skip` elements after the first occurrence of `after`,
+     *         or an empty list if `after` is not found.
+     */
+    fun <T> List<T>.sublistAfter(conditionAfter: (T) -> Boolean, skip: Int = 1, amount: Int = 1): List<T> {
+        val startIndex = indexOfFirst { conditionAfter(it) }
         if (startIndex == -1) return emptyList()
 
         return this.drop(startIndex + skip).take(amount)
@@ -221,7 +243,7 @@ object CollectionUtils {
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
-    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>) = this.toSet() == other.toSet()
 
     fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
@@ -239,6 +261,10 @@ object CollectionUtils {
         return list
     }
 
+    fun <T> Collection<T>.distribute(subs: Int = 2): List<List<T>> {
+        return this.split(ceil(this.size.toDouble() / subs.toDouble()).toInt())
+    }
+
     inline fun <K, V, R : Any> Map<K, V>.mapKeysNotNull(transform: (Map.Entry<K, V>) -> R?): Map<R, V> {
         val destination = LinkedHashMap<R, V>()
         for (element in this) {
@@ -250,13 +276,20 @@ object CollectionUtils {
         return destination
     }
 
-    inline fun <T, C : Number, D : Number> Iterable<T>.sumOfPair(selector: (T) -> Pair<C, D>): Pair<Double, Double> {
-        var sum = Pair(0.0, 0.0)
+    inline fun <T, C : Number, D : Number, R : Number> Iterable<T>.sumOfPair(
+        crossinline selector: (T) -> Pair<C, D>,
+        crossinline resultConverter: (Double) -> R,
+    ): Pair<R, R> {
+        var sumFirst = 0.0
+        var sumSecond = 0.0
+
         for (element in this) {
-            val add = selector(element)
-            sum = sum.first + add.first.toDouble() to sum.second + add.second.toDouble()
+            val (c, d) = selector(element)
+            sumFirst += c.toDouble()
+            sumSecond += d.toDouble()
         }
-        return sum
+
+        return resultConverter(sumFirst) to resultConverter(sumSecond)
     }
 
     inline fun <T, R> Iterable<T>.zipWithNext3(transform: (a: T, b: T, c: T) -> R): List<R> {
@@ -312,6 +345,12 @@ object CollectionUtils {
         this[pair.first] = pair.second
     }
 
+    fun <K, V> MutableMap<K, V>.addAll(vararg pairs: Pair<K, V>) {
+        for (pair in pairs) {
+            this[pair.first] = pair.second
+        }
+    }
+
     fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {
         val iterator = this.iterator()
         while (iterator.hasNext()) {
@@ -359,19 +398,51 @@ object CollectionUtils {
         return null
     }
 
-    fun <T> List<T>.insertAfterEach(extra: T): List<T> = buildList(size * 2) {
-        for (item in this@insertAfterEach) {
-            add(item)
-            add(extra)
-        }
-    }
-
     class OrderedQueue<T> : PriorityQueue<WeightedItem<T>>() {
         fun add(item: T, weight: Double): Boolean = super.add(WeightedItem(item, weight))
+        fun copyWithFilter(predicate: (T) -> Boolean): OrderedQueue<T> {
+            val newQueue = OrderedQueue<T>()
+            for (item in this) {
+                if (!predicate(item.item)) {
+                    newQueue.add(item.item, item.weight)
+                }
+            }
+            return newQueue
+        }
+
         fun pollOrNull(): T? = poll()?.item
+        fun getWaitingWeightOrNull(): Double? = peek()?.weight
     }
 
     data class WeightedItem<T>(val item: T, val weight: Double) : Comparable<WeightedItem<T>> {
         override fun compareTo(other: WeightedItem<T>): Int = this.weight.compareTo(other.weight)
+    }
+
+    class ObservableMutableMap<K, V>(
+        private val map: MutableMap<K, V> = mutableMapOf(),
+        private val preUpdate: (K, V?) -> Unit = { _, _ -> },
+        private val postUpdate: (K, V?) -> Unit = { _, _ -> },
+    ) : MutableMap<K, V> by map {
+
+        override fun put(key: K, value: V): V? {
+            preUpdate(key, value)
+            val oldValue = map.put(key, value)
+            postUpdate(key, value)
+            return oldValue
+        }
+
+        override fun remove(key: K): V? {
+            preUpdate(key, null)
+            val removedValue = map.remove(key)
+            postUpdate(key, null)
+            return removedValue
+        }
+    }
+
+    fun <K> MutableMap<K, SimpleTimeMark>.evictOldestEntry(cap: Int) {
+        if (size > cap) {
+            val oldestKey = minByOrNull { it.value }?.key
+            oldestKey?.let { remove(it) }
+        }
     }
 }

@@ -28,6 +28,8 @@ RepoRules:
 ImportRules:
     CustomImportOrdering:
         active: true
+    PreprocessingImportOrdering:
+        active: true
 
 SkyHanniStyle:
     InSkyBlockEarlyReturn:
