@@ -298,7 +298,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                     GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
                 }
 
-                DrawContextUtils.scaled(0.75f, 0.75f) {
+                DrawContextUtils.scaled(scale, scale) {
                     // TODO remove more code duplication
                     drawUnmodifiedString(
                         "§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale,
