@@ -274,7 +274,6 @@ Imports our custom live templates automatically. Live Templates allow for quicke
 
 Helps you write minecraft specific code such as mixins and access wideners.
 
-
 ## Software Used in SkyHanni
 
 ### Basics
@@ -576,8 +575,10 @@ themselves.
 ### Access Wideners
 
 You may want to use private minecraft methods or fields, this is where access wideners come in. 
-
-You can right click on a method or field and select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<vers
-ion number>/src/main/resources/skyhanni.accesswidener`. Then you need to reload gradle for the changes to apply.
+Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or 
+field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
+To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and 
+select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<version number>/src/main/resources/skyhanni.accesswidener`.
+Then you need to reload gradle for the changes to apply.
 
 This requires you to have the Minecraft Development plugin installed as mentioned earlier.
