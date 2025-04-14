@@ -24,7 +24,7 @@ object RenderData {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
-        DrawContextUtils.translated(0, 0, -3) {
+        DrawContextUtils.translated(z = -3) {
             renderOverlay(event.context)
         }
     }

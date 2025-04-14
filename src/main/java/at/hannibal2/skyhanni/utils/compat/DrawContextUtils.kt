@@ -78,7 +78,7 @@ object DrawContextUtils {
         popMatrix()
     }
 
-    inline fun translated(x: Number, y: Number, z: Number, action: () -> Unit) {
+    inline fun translated(x: Number = 0, y: Number = 0, z: Number = 0, action: () -> Unit) {
         pushPop {
             translate(x.toFloat(), y.toFloat(), z.toFloat())
             action()
