@@ -116,7 +116,6 @@ class DungeonConfig {
     @Accordion
     var lividFinder: LividFinderConfig = LividFinderConfig()
 
-
     @Expose
     @ConfigOption(name = "Terracotta Phase", desc = "")
     @Accordion

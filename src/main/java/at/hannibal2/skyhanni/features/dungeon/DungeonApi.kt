@@ -43,6 +43,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object DungeonApi {
 
+    // TODO repo patterns
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
     private val uniqueClassBonus = "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
 
@@ -377,7 +378,6 @@ object DungeonApi {
         TANK("Tank"),
         ;
 
-
         companion object {
             fun getByClassName(className: String): DungeonClass? {
                 return DungeonClass.entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
@@ -426,7 +426,7 @@ object DungeonApi {
         val username: String,
         val dungeonClass: DungeonClass? = null,
         val classLevel: Int = 0,
-        val playerDead: Boolean = false
+        val playerDead: Boolean = false,
     )
 
     private val playerTeamClasses: MutableList<TeamMember> = mutableListOf()
@@ -443,7 +443,7 @@ object DungeonApi {
     @Suppress("MaxLineLength")
     val playerDungeonTeamPattern by patternGroup.pattern(
         "tablist.playerteam",
-        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+) (?<symbols>[^(]*)\\((?:§.)*(?:(?<className>\\S+) (?<classLevel>[CLXVI]+)|(?<playerDead>DEAD))(?:§.)*\\)(?:§.)*\$"
+        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+) (?<symbols>[^(]*)\\((?:§.)*(?:(?<className>\\S+) (?<classLevel>[CLXVI]+)|(?<playerDead>DEAD))(?:§.)*\\)(?:§.)*\$",
     )
 
     @HandleEvent
@@ -467,8 +467,8 @@ object DungeonApi {
                     username = username,
                     dungeonClass = dungeonClass,
                     classLevel = dungeonClassLevel,
-                    playerDead = playerDead
-                )
+                    playerDead = playerDead,
+                ),
             )
         }
 

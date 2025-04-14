@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.TabListLineRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
@@ -20,11 +21,9 @@ object DungeonRankTabListColor {
         if (!isEnabled()) return
 
         DungeonApi.playerDungeonTeamPattern.matchMatcher(event.text.stripHypixelMessage()) {
-            val className = group("className")
-            val classLevel = group("classLevel")
-
-            if (className == null || classLevel == null) return
-
+            val className = groupOrNull("className") ?: return
+            val classLevel = groupOrNull("classLevel") ?: return
+            
             val sbLevel = group("sbLevel")
             val rank = groupOrEmpty("rank")
             val playerName = group("playerName")
