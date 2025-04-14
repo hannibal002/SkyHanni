@@ -84,4 +84,11 @@ object DrawContextUtils {
             action()
         }
     }
+
+    inline fun scaled(x: Number = 1, y: Number = 1, z: Number = 1, action: () -> Unit) {
+        pushPop {
+            scale(x.toFloat(), y.toFloat(), z.toFloat())
+            action()
+        }
+    }
 }
