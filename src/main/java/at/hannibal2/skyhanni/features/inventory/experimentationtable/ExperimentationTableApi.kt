@@ -349,10 +349,10 @@ object ExperimentationTableApi {
             handleExpBottles(true)
             handleBottlesOnInvClose = false
         }
-        val queuedEvent = queuedCompleteEvent ?: return
         DelayedRun.runDelayed(150.milliseconds) {
             // Catch early closes triggering the event before the inventory is fully opened
             if (expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return@runDelayed
+            val queuedEvent = queuedCompleteEvent ?: return@runDelayed
             queuedEvent.post()
             queuedCompleteEvent = null
             currentData.reset()
