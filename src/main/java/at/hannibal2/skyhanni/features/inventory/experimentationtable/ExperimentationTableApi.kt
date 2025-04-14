@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -55,8 +56,6 @@ object ExperimentationTableApi {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
-    private val lastBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
-    private val currentBottlesInInventory = mutableMapOf<NeuInternalName, Int>()
     private val currentData = ExperimentationDataSet()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
@@ -70,6 +69,8 @@ object ExperimentationTableApi {
     private var currentExpOverHash: Int = 0
     private var queuedCompleteEvent: TableTaskCompletedEvent? = null
     private var handleBottlesOnInvClose: Boolean = false
+    private var lastBottlesInInventory = mapOf<NeuInternalName, Int>()
+    private var currentBottlesInInventory = mapOf<NeuInternalName, Int>()
 
     enum class ExperimentationMessages(private val displayName: String) {
         DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
@@ -383,30 +384,28 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun handleExpBottles(addToLoot: Boolean) {
-        for (item in InventoryUtils.getItemsInOwnInventory()) {
-            val internalName = item.getInternalNameOrNull() ?: continue
-            if (internalName.asString() !in listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE")) continue
-            currentBottlesInInventory.addOrPut(internalName, item.stackSize)
+    private fun getBottlesInOwnInventory(): Map<NeuInternalName, Int> = buildMap {
+        InventoryUtils.getItemsInOwnInventory().forEach { itemStack ->
+            val internalName = itemStack.getInternalNameOrNull()?.takeIf { internalName ->
+                experienceBottlePattern.matches(internalName.asString())
+            } ?: return@forEach
+            addOrPut(internalName, itemStack.stackSize)
         }
+    }
 
-        for ((internalName, amount) in currentBottlesInInventory) {
-            val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0)
-            if (lastInInv >= amount) {
-                lastBottlesInInventory[internalName] = amount
-                continue
-            }
+    private fun handleExpBottles(addToLoot: Boolean = false, fireEvent: Boolean = false) {
+        lastBottlesInInventory = currentBottlesInInventory
+        currentBottlesInInventory = getBottlesInOwnInventory()
+        for ((internalName, currentInInv) in currentBottlesInInventory) {
+            val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0).takeIf {
+                it != currentInInv
+            } ?: continue
 
-            if (lastInInv == 0) {
-                lastBottlesInInventory[internalName] = amount
-                if (addToLoot) currentData.addReward(internalName, amount)
-                continue
-            }
-
-            lastBottlesInInventory[internalName] = amount
-            if (addToLoot) currentData.addReward(internalName, amount - lastInInv)
+            val change = currentInInv - lastInInv
+            if (change < 0 && inDistanceToTable(10.0) && fireEvent) {
+                TableXPBottleUsedEvent(internalName, abs(change)).post()
+            } else if (addToLoot) currentData.addReward(internalName, change)
         }
-        currentBottlesInInventory.clear()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -414,10 +413,13 @@ object ExperimentationTableApi {
         if (!inDistanceToTable(10.0)) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
-        val bottleUsed = event.itemInHand?.getInternalNameOrNull()?.takeIf {
+        event.itemInHand?.getInternalNameOrNull()?.takeIf {
             experienceBottlePattern.matches(it.asString())
         } ?: return
-        TableXPBottleUsedEvent(bottleUsed).post()
+
+        DelayedRun.runDelayed(200.milliseconds) {
+            handleExpBottles(false, fireEvent = true)
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
