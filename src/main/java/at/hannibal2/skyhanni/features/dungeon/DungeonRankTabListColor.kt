@@ -23,7 +23,7 @@ object DungeonRankTabListColor {
         DungeonApi.playerDungeonTeamPattern.matchMatcher(event.text.stripHypixelMessage()) {
             val className = groupOrNull("className") ?: return
             val classLevel = groupOrNull("classLevel") ?: return
-            
+
             val sbLevel = group("sbLevel")
             val rank = groupOrEmpty("rank")
             val playerName = group("playerName")

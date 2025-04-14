@@ -115,6 +115,18 @@ object DungeonApi {
         "§r§r§7No Buffs active\\. Find them by exploring the Dungeon!§r",
     )
 
+    /**
+     * REGEX-TEST: §8[§r§9319§r§8] §r§bEmpa_ §r§7α §r§f(§r§dMage XXXIV§r§f)
+     * REGEX-TEST: §8[§r§5393§r§8] §r§c[§r§fYOUTUBE§r§c] Remittal§r§f §r§7Σ§r§7♲ §r§f(§r§dMage XL§r§f)
+     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dMage XXXVI§r§f)
+     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dDEAD§r§f)
+     */
+    @Suppress("MaxLineLength")
+    val playerDungeonTeamPattern by patternGroup.pattern(
+        "tablist.playerteam",
+        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+) (?<symbols>[^(]*)\\((?:§.)*(?:(?<className>\\S+) (?<classLevel>[CLXVI]+)|(?<playerDead>DEAD))(?:§.)*\\)(?:§.)*\$",
+    )
+
     enum class DungeonBlessings(var power: Int) {
         LIFE(0),
         POWER(0),
@@ -433,18 +445,6 @@ object DungeonApi {
 
     fun getPlayerInfo(username: String): TeamMember =
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
-
-    /**
-     * REGEX-TEST: §8[§r§9319§r§8] §r§bEmpa_ §r§7α §r§f(§r§dMage XXXIV§r§f)
-     * REGEX-TEST: §8[§r§5393§r§8] §r§c[§r§fYOUTUBE§r§c] Remittal§r§f §r§7Σ§r§7♲ §r§f(§r§dMage XL§r§f)
-     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dMage XXXVI§r§f)
-     * REGEX-TEST: §8[§r§3273§r§8] §r§bOvi_1 §r§7§lӃ §r§f(§r§dDEAD§r§f)
-     */
-    @Suppress("MaxLineLength")
-    val playerDungeonTeamPattern by patternGroup.pattern(
-        "tablist.playerteam",
-        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+) (?<symbols>[^(]*)\\((?:§.)*(?:(?<className>\\S+) (?<classLevel>[CLXVI]+)|(?<playerDead>DEAD))(?:§.)*\\)(?:§.)*\$",
-    )
 
     @HandleEvent
     fun onTabUpdate(event: TabListUpdateEvent) {
