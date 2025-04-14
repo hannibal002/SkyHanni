@@ -25,6 +25,7 @@ enum class VisitorReward(
     COPPER_DYE("DYE_COPPER", "§8Copper Dye"),
     JUNGLE_KEY("JUNGLE_KEY", "§5Jungle Key"),
     FRUIT_BOWL("FRUIT_BOWL", "§9Fruit Bowl"),
+    HARVEST_HARBINGER("POTION_HARVEST_HARBINGER;5", "§9Harvest Harbinger V"),
     ;
 
     private val internalName = rawInternalName.toInternalName()
