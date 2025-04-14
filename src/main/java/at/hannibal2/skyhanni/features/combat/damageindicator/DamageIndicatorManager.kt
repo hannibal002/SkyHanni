@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
@@ -15,9 +16,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.combat.DragonFightAPI
+import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
@@ -47,6 +46,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
@@ -80,6 +80,8 @@ object DamageIndicatorManager {
 
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
+
+    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
 
     fun isDamageSplash(entity: EntityArmorStand): Boolean {
         if (entity.ticksExisted > 300) return false
@@ -116,7 +118,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         mobFinder = MobFinder()
         data = emptyMap()
     }
@@ -215,7 +217,6 @@ object DamageIndicatorManager {
                 NameVisibility.HIDDEN -> ""
                 NameVisibility.FULL_NAME -> data.bossType.fullName
                 NameVisibility.SHORT_NAME -> data.bossType.shortName
-                else -> data.bossType.fullName
             }
 
             if (data.namePrefix.isNotEmpty()) {
@@ -226,8 +227,37 @@ object DamageIndicatorManager {
             }
             event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
 
+            val icons = iconCache.getOrPut(data) {
+                buildList {
+                    if (config.shurikenIndicator && entity.getNameTagWith(3, "§b✯") != null) {
+                        add(
+                            if (config.compactStatusEffects) "§b✯"
+                            else "§bShuriken",
+                        )
+                    }
+                    if (config.twilightIndicator && entity.getNameTagWith(3, "§5ᛤ") != null) {
+                        add(
+                            if (config.compactStatusEffects) "§5ᛤ"
+                            else "§5Twilight",
+                        )
+                    }
+                }
+            }
+
+            val iconString = icons.joinToString(if (config.compactStatusEffects) "" else " ")
+            var diff = 9f
+            if (iconString.isNotEmpty()) {
+                event.drawDynamicText(
+                    location,
+                    iconString,
+                    sizeBossName,
+                    diff,
+                    smallestDistanceVew = smallestDistanceVew,
+                )
+                diff += 22f
+            } else diff += 4f
+
             if (config.showDamageOverTime) {
-                var diff = 13f
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
                 if (currentDamage != 0L || currentHealing != 0L) {
@@ -288,7 +318,7 @@ object DamageIndicatorManager {
         BossType.SLAYER_BLAZE_QUAZII_4,
 
             // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
-            -> true
+        -> true
 
         else -> false
     }
@@ -324,7 +354,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         data = data.editCopy {
             EntityUtils.getEntities<EntityLivingBase>()
@@ -517,7 +547,7 @@ object DamageIndicatorManager {
             entity.setHellionShield(null)
         }
 
-        if (!SkyHanniMod.feature.slayer.blazes.phaseDisplay) return ""
+        if (!SlayerApi.config.blazes.phaseDisplay) return ""
 
         var calcHealth = health
         val calcMaxHealth: Int
@@ -681,7 +711,7 @@ object DamageIndicatorManager {
             calcHealth.toLong(), calcMaxHealth.toLong(),
         ).getChatColor() + calcHealth.shortFormat()
 
-        if (!SkyHanniMod.feature.slayer.endermen.phaseDisplay) {
+        if (!SlayerApi.config.endermen.phaseDisplay) {
             result = ""
             entityData.namePrefix = ""
         }

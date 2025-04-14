@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -49,7 +48,7 @@ object HideMobNames {
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
-        if (!SkyHanniMod.feature.slayer.hideMobNames) return
+        if (!SlayerApi.config.hideMobNames) return
 
         val entity = event.entity
         if (!entity.hasCustomName()) return
@@ -73,7 +72,7 @@ object HideMobNames {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastMobName.clear()
         mobNamesHidden.clear()
     }
