@@ -157,6 +157,7 @@ object CompactJacobClaim {
         bitsPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             rewardSet.bits += amount
+            // Bits are always the last reward, if we get them, we can assume no more rewards will come
             eventDelay = 0.milliseconds
         }
 
