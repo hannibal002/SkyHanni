@@ -64,7 +64,8 @@ object ExperimentationTableApi {
     val currentExperimentTier get() = currentData.tier
     val currentExperimentType get() = currentData.type
 
-    private var lastProcessedExperimentOverHash: Int = 0
+    private var lastExpOverHash: Int = 0
+    private var currentExpOverHash: Int = 0
     private var queuedCompleteEvent: TableTaskCompletedEvent? = null
     private var handleBottlesOnInvClose: Boolean = false
 
@@ -344,7 +345,10 @@ object ExperimentationTableApi {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
-        lastProcessedExperimentOverHash = 0
+        if (currentExpOverHash != 0) {
+            lastExpOverHash = currentExpOverHash
+            currentExpOverHash = 0
+        }
         if (handleBottlesOnInvClose) DelayedRun.runDelayed(100.milliseconds) {
             handleExpBottles(true)
             handleBottlesOnInvClose = false
@@ -431,18 +435,12 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!inTable) return
-        event.tryReadExperimentOver()
+        event.tryProcessExperimentOver()
     }
 
-    private fun InventoryOpenEvent.tryReadExperimentOver() =
-        expOverInventoryPattern.matchMatcher(this.inventoryName) {
-            lastProcessedExperimentOverHash = inventoryItems.hashCode().takeIf {
-                it != lastProcessedExperimentOverHash
-            } ?: return@matchMatcher
-            processExperimentOver()
-        }
-
-    private fun InventoryOpenEvent.processExperimentOver() {
+    private fun InventoryOpenEvent.tryProcessExperimentOver() {
+        if (!expOverInventoryPattern.matches(inventoryName)) return
+        if (currentExpOverHash != 0) return
         tryUpdateCurrentActivity()
         val slotIndex = when (currentData.type) {
             null -> ErrorManager.skyHanniError(
@@ -458,6 +456,10 @@ object ExperimentationTableApi {
         }
         val item = inventoryItems[slotIndex] ?: return
         val lore = item.getLore().takeIfNotEmpty()?.toList() ?: return
+
+        currentExpOverHash = lore.hashCode().takeIf {
+            it != lastExpOverHash && it != currentExpOverHash && it != 0
+        } ?: return
 
         val taskType = ExperimentationTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
         val taskTier = expOverStakesLorePattern.firstMatcher(lore) {
@@ -477,6 +479,8 @@ object ExperimentationTableApi {
             .takeIfNotEmpty()?.toList() ?: return
 
         rewards.forEach { rewardString ->
+            if (rewardString.endsWith("Superpairs clicks")) return@forEach
+
             guardianPetNamePattern.matchMatcher(rewardString) {
                 val color = group("color")[0].toLorenzColor() ?: return@matchMatcher
                 val rarity = LorenzRarity.getByColor(color) ?: return@matchMatcher
