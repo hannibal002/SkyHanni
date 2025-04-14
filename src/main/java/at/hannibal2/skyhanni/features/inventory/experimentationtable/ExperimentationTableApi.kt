@@ -355,6 +355,8 @@ object ExperimentationTableApi {
         }
         if (queuedCompleteEvent == null) return
         DelayedRun.runDelayed(150.milliseconds) {
+            // Catch early closes triggering the event before the inventory is fully opened
+            if (expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return@runDelayed
             queuedCompleteEvent?.post()
             queuedCompleteEvent = null
         }
