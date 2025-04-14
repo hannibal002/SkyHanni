@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -38,6 +37,6 @@ class FruitBowlConfig {
     var display: Boolean = true
 
     @Expose
-    @ConfigLink(owner = FlareConfig::class, field = "display")
+    @ConfigLink(owner = FruitBowlConfig::class, field = "display")
     var position: Position = Position(150, 200)
 }
