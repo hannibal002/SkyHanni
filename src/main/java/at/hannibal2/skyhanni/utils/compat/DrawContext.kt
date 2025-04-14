@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import io.github.moulberry.notenoughupdates.core.GlScissorStack
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.ScaledResolution
 
 class DrawContext {
     private val _matrices = MatrixStack()
@@ -14,6 +17,14 @@ class DrawContext {
 
     fun fill(left: Int, top: Int, right: Int, bottom: Int, color: Int) {
         GuiScreen.drawRect(left, top, right, bottom, color)
+    }
+
+    fun enableScissor(left: Int, top: Int, right: Int, bottom: Int) {
+        GlScissorStack.push(left, top, right, bottom, ScaledResolution(Minecraft.getMinecraft()))
+    }
+
+    fun disableScissor() {
+        GlScissorStack.pop(ScaledResolution(Minecraft.getMinecraft()))
     }
 
 }
