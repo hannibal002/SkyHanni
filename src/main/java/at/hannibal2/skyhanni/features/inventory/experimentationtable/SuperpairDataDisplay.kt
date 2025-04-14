@@ -219,6 +219,7 @@ object SuperpairDataDisplay {
         val isValid = currentExperimentType == null || currentExperimentType !in disallowedTypes
         if (!isValid) return@buildList
         add("§6Superpair Experimentation Data")
+        if (currentExperimentType == null) return@buildList
 
         val currentTier = ExperimentationTableApi.currentExperimentTier ?: return@buildList
         add("")
