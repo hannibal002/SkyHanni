@@ -65,8 +65,8 @@ object FlareDisplay {
         if (!enabled) return
 
         if (config.flashScreen && activeWarning) {
-            val alpha = ((2 + sin(SimpleTimeMark.now().toMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
-            Gui.drawRect(
+            val alpha = ((2 + sin(SimpleTimeMark.now().toMillis() / 1000.0)) * 255 / 4).toInt().coerceIn(0..255)
+            GuiRenderUtils.drawRect(
                 0,
                 0,
                 GuiScreenUtils.displayWidth,
