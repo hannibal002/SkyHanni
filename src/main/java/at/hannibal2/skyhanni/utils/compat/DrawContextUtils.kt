@@ -62,7 +62,7 @@ object DrawContextUtils {
         drawContext.matrices.scale(x, y, z)
     }
 
-   @Deprecated("Use pushPop instead")
+    @Deprecated("Use pushPop instead")
     fun pushMatrix() {
         drawContext.matrices.pushMatrix()
     }
