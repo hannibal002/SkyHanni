@@ -231,9 +231,9 @@ looking in the `at.hannibal2.skyhanni.utils.compat` package is a good idea, as t
 both have a nullable version as well: `MinecraftCompat.localPlayerOrNull()` and `MinecraftCompat.localWorldOrNull()`. This is because on
 1.8.9 while the player and world can be nullable at times, Minecraft's source code does not reflect this.
 - Rendering on modern versions is done completely differently than on 1.8.9. As such, on 1.8.9 we have adjusted our rendering code to more
-closely resemble modern rendering code. You will notice that we pass around both a `DrawContext` and a `WorldRenderContext` object. Both of
-these objects both hold a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack,
-translating and scaling. Where possible you should use these objects instead of the `GlStateManager` directly. If you are unsure, make sure
+closely resemble modern rendering code. You may notice a `DrawContext` or `WorldRenderContext` object being passed around. These both hold
+a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack, translating and scaling.
+To do most of these calls instead of using `GlStateManager` directly, you should use `DrawContextUtils` instead. If you are unsure, make sure
 to look at existing code to see how it is done and if you are still unsure, ask for help.
 - When making GUI screens or other GUI elements, you should try to use Renderables where possible as these should already account for
 most modern rendering changes. If you are making a new GUI screen, make sure to extend `SkyHanniBaseScreen` instead of `GuiScreen` to ensure

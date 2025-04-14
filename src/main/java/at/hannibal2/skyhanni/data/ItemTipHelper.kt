@@ -67,7 +67,7 @@ object ItemTipHelper {
             } else 0
             val y = guiTop + yDisplayPosition + 9 + itemTipEvent.offsetY
 
-            GuiRenderUtils.drawString(event.context, stackTip, x, y, 16777215)
+            GuiRenderUtils.drawString(stackTip, x, y, 16777215)
         }
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
