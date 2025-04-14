@@ -187,7 +187,9 @@ object CompactJacobClaim {
             getBooksFormat(),
             getMedalsFormat(),
             getBitsFormat()
-        ).joinToString(separator = " §8§l| §r"),
+        ).filterNot {
+            it.isEmpty()
+        }.joinToString(separator = " §8§l| §r"),
         hover = messages,
         prefix = false
     )
