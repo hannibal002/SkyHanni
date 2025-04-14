@@ -128,6 +128,7 @@ object CompactJacobClaim {
             return event.block("compact_jacob_bulk_claim")
         }
 
+        // Store the hash before processing this message so we can see if rewards changed
         val startingHash = rewardSet.hashCode()
 
         ticketPattern.matchMatcher(message) {
@@ -141,7 +142,7 @@ object CompactJacobClaim {
         bookPattern.matchMatcher(message) {
             val crop = CropType.getByNameOrNull(group("crop")) ?: when (group("crop").lowercase()) {
                 "cacti" -> CropType.CACTUS
-                else -> return
+                else -> return@matchMatcher
             }
             val amount = group("amount").formatInt()
             rewardSet.books += (crop to amount)
@@ -150,7 +151,7 @@ object CompactJacobClaim {
         medalsPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             val type = group("type")
-            val medalType = AnitaMedalProfit.MedalType.bySimpleNameOrNull(type) ?: return
+            val medalType = AnitaMedalProfit.MedalType.bySimpleNameOrNull(type) ?: return@matchMatcher
             rewardSet.medals += (medalType to amount)
         }
 
@@ -161,6 +162,7 @@ object CompactJacobClaim {
             eventDelay = 0.milliseconds
         }
 
+        // If the rewards changed, we need to block the 'offending' chat message
         if (rewardSet.hashCode() != startingHash) event.block("compact_jacob_bulk_claim")
 
         val hashNow = rewardSet.hashCode()
