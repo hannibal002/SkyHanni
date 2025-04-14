@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -42,7 +41,7 @@ import com.google.gson.annotations.Expose
 @SkyHanniModule
 object SlayerProfitTracker {
 
-    private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
+    private val config get() = SlayerApi.config.itemProfitTracker
 
     private var category = ""
     private val categoryName get() = ReplaceRomanNumerals.replaceLine(category)
@@ -157,6 +156,7 @@ object SlayerProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
+        // TODO remove is config enabled check for tracker
         if (!isEnabled()) return
         if (!SlayerApi.isInCorrectArea) return
         if (!SlayerApi.hasActiveSlayerQuest()) return

@@ -102,9 +102,11 @@ object ExperimentsProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
-
-        tracker.addItem(event.internalName, event.amount, command = true)
+        if (isEnabled() && event.source == ItemAddManager.Source.COMMAND) {
+            if (config.enabled) {
+                tracker.addItem(event.internalName, event.amount, command = true)
+            }
+        }
     }
 
     @HandleEvent
@@ -113,7 +115,9 @@ object ExperimentsProfitTracker {
 
         val message = event.message.removeColor()
         if (claimMessagePattern.matches(message) && ExperimentMessages.DONE.isSelected()) {
-            event.blockedReason = "CLAIM_MESSAGE"
+            if (config.enabled) {
+                event.blockedReason = "CLAIM_MESSAGE"
+            }
         }
 
         experimentsDropPattern.matchMatcher(message) {
@@ -150,11 +154,13 @@ object ExperimentsProfitTracker {
         else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
     }
 
+    private val allowedSlots = listOf(11, 12, 14, 15)
+
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() ||
             InventoryUtils.openInventoryName() != "Bottles of Enchanting" ||
-            !listOf(11, 12, 14, 15).contains(event.slotId)
+            !allowedSlots.contains(event.slotId)
         ) return
         val stack = event.slot?.stack ?: return
 
@@ -251,7 +257,7 @@ object ExperimentsProfitTracker {
         tracker.initRenderer(
             { config.position },
             ExperimentationTableApi.superpairInventory,
-        ) { isEnabled() }
+        ) { config.enabled && isEnabled() }
     }
 
     @HandleEvent
@@ -299,7 +305,7 @@ object ExperimentsProfitTracker {
     private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
     private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
-        IslandType.PRIVATE_ISLAND.isInIsland() && config.enabled &&
+        IslandType.PRIVATE_ISLAND.isInIsland() &&
             (!checkDistanceToExperimentationTable || ExperimentationTableApi.inDistanceToTable(5.0))
 
 }

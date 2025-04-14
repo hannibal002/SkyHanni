@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -46,10 +47,12 @@ object AcceptLastPartyInvite {
         if (!config.acceptLastInvite) return
         inviteReceivedPattern.findMatcher(event.message) {
             lastInviter = group("player")
+            ChatUtils.debug("Party invite received from $lastInviter")
             return
         }
-        inviteExpiredPattern.findMatcher(event.message) {
+        inviteExpiredPattern.matchMatcher(event.message) {
             if (lastInviter == group("player")) {
+                ChatUtils.debug("Party invite from $lastInviter expired")
                 lastInviter = ""
                 return
             }
@@ -61,7 +64,7 @@ object AcceptLastPartyInvite {
         if (!config.acceptLastInvite) return
         if (event.senderIsSkyhanni()) return
         val message = event.message.lowercase()
-        if (!message.startsWith("/party accept") && !message.startsWith("/p accept")) return
+        if (message != "/party accept" && message != "/p accept") return
 
         event.cancel()
         if (lastInviter == "") {
