@@ -15,7 +15,7 @@ class PestSpawnConfig {
 
     enum class ChatMessageFormatEntry(
         private val displayName: String,
-        private val legacyId: Int = -1
+        private val legacyId: Int = -1,
     ) : HasLegacyId {
         HYPIXEL("Hypixel Style", 0),
         COMPACT("Compact", 1),

@@ -98,11 +98,11 @@ object CFStrayWarning {
 
     private fun GuiContainerEvent.BackgroundDrawnEvent.partyModeHighlight() {
         val eventChest = getEventChest() ?: return
-        eventChest.getUpperItems().keys.forEach { it.highlight(context, CHROMA_COLOR_ALT.toSpecialColor()) }
+        eventChest.getUpperItems().keys.forEach { it.highlight(CHROMA_COLOR_ALT.toSpecialColor()) }
         eventChest.inventorySlots.filter {
             it.slotNumber != it.slotIndex
         }.forEach {
-            it.highlight(context, CHROMA_COLOR_ALT2.toSpecialColor())
+            it.highlight(CHROMA_COLOR_ALT2.toSpecialColor())
         }
     }
 
@@ -111,7 +111,7 @@ object CFStrayWarning {
         eventChest.getUpperItems().keys.filter {
             it.slotNumber in activeStraySlots
         }.forEach {
-            it.highlight(context, warningConfig.inventoryHighlightColor.toSpecialColor())
+            it.highlight(warningConfig.inventoryHighlightColor.toSpecialColor())
         }
     }
 
@@ -163,7 +163,7 @@ object CFStrayWarning {
         val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
         val toUse = if (config.partyMode.get()) CHROMA_COLOR else warningConfig.flashColor
         val color = (alpha shl 24) or (toUse.toSpecialColorInt() and 0xFFFFFF)
-        GuiRenderUtils.drawRect(event.context, 0, 0, GuiScreenUtils.displayWidth, GuiScreenUtils.displayHeight, color)
+        GuiRenderUtils.drawRect(0, 0, GuiScreenUtils.displayWidth, GuiScreenUtils.displayHeight, color)
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 }

@@ -20,7 +20,7 @@ class CropMilestonesConfig {
     @ConfigOption(
         name = "Progress Display",
         desc = "Show the progress and ETA until the next crop milestone is reached and the current crops/minute value.\n" +
-            "§eRequires a tool with either a counter or Cultivating enchantment for full accuracy."
+            "§eRequires a tool with either a counter or Cultivating enchantment for full accuracy.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -35,7 +35,7 @@ class CropMilestonesConfig {
     @ConfigOption(
         name = "Warn When Close",
         desc = "Warn with title and sound when the next crop milestone upgrade happens in 5 seconds. " +
-            "Useful for switching to a different pet for leveling."
+            "Useful for switching to a different pet for leveling.",
     )
     @ConfigEditorBoolean
     var warnClose: Boolean = false
@@ -64,7 +64,7 @@ class CropMilestonesConfig {
     @Expose
     @ConfigOption(
         name = "Maxed Milestone",
-        desc = "Calculate the progress and ETA till maxed milestone (46) instead of next milestone."
+        desc = "Calculate the progress and ETA till maxed milestone (46) instead of next milestone.",
     )
     @ConfigEditorBoolean
     var bestShowMaxedNeeded: Property<Boolean> = Property.of(false)
@@ -73,7 +73,7 @@ class CropMilestonesConfig {
     @ConfigOption(
         name = "Milestone Text",
         desc = "Drag text to change the appearance of the overlay.\n" +
-            "Hold a farming tool to show the overlay."
+            "Hold a farming tool to show the overlay.",
     )
     @ConfigEditorDraggableList
     var text: MutableList<MilestoneTextEntry> = mutableListOf(
@@ -82,7 +82,7 @@ class CropMilestonesConfig {
         MilestoneTextEntry.NUMBER_OUT_OF_TOTAL,
         MilestoneTextEntry.TIME,
         MilestoneTextEntry.CROPS_PER_MINUTE,
-        MilestoneTextEntry.BLOCKS_PER_SECOND
+        MilestoneTextEntry.BLOCKS_PER_SECOND,
     )
 
     enum class MilestoneTextEntry(

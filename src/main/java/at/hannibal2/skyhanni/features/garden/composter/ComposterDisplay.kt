@@ -227,6 +227,6 @@ object ComposterDisplay {
         event.move(3, "garden.composterNotifyLowOrganicMatter", "garden.composters.notifyLow.organicMatter")
         event.move(3, "garden.composterNotifyLowFuel", "garden.composters.notifyLow.fuel")
 
-        event.move(84, "garden.composters.warnAlmostClose", "garden.composters.warnAlmostEmpty")
+        event.move(85, "garden.composters.warnAlmostClose", "garden.composters.warnAlmostEmpty")
     }
 }

@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -96,7 +96,10 @@ object TitleManager {
         var countdownDuration: Duration = 5.seconds,
         var displayType: CountdownTitleDisplayType = CountdownTitleDisplayType.WHOLE_SECONDS,
         var updateInterval: Duration = 1.seconds,
-        var loomInterval: Duration = 250.milliseconds, // TODO add explanation what this is
+        /**
+         * How long the title will 'stick around' for after the countdown is done.
+         */
+        var loomDuration: Duration = 250.milliseconds,
         var onInterval: () -> Unit = {},
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
@@ -120,7 +123,7 @@ object TitleManager {
             isActive = true
             virtualEndTime = if (virtualEndTime == null) (now() + countdownDuration) else {
                 virtualEndTime?.also {
-                    endTime = it + loomInterval
+                    endTime = it + loomDuration
                 }
             }
             onIntervalOutward()
@@ -136,14 +139,14 @@ object TitleManager {
         override fun equals(other: Any?): Boolean = this === other || other is CountdownTitleContext && this.dataEquivalent(other)
         override fun hashCode(): Int = formattedTitleText.hashCode() * 31 + (formattedSubtitleText?.hashCode() ?: 0) * 31 +
             countdownDuration.hashCode() * 31 + displayType.hashCode() * 31 +
-            updateInterval.hashCode() * 31 + loomInterval.hashCode() * 31 +
+            updateInterval.hashCode() * 31 + loomDuration.hashCode() * 31 +
             onInterval.hashCode() * 31 + onFinish.hashCode()
 
         private fun dataEquivalent(other: CountdownTitleContext): Boolean = super.dataEquivalent(other) &&
             countdownDuration == other.countdownDuration &&
             displayType == other.displayType &&
             updateInterval == other.updateInterval &&
-            loomInterval == other.loomInterval &&
+            loomDuration == other.loomDuration &&
             onInterval == other.onInterval &&
             onFinish == other.onFinish
 
@@ -169,7 +172,7 @@ object TitleManager {
             fun TitleContext.fromTitleData(
                 displayType: CountdownTitleDisplayType,
                 updateInterval: Duration,
-                loomInterval: Duration,
+                loomDuration: Duration,
                 discardOnWorldChange: Boolean = true,
                 onInterval: () -> Unit = {},
                 onFinish: () -> Unit = {},
@@ -179,7 +182,7 @@ object TitleManager {
                 formattedSubtitleText = getSubtitleText(),
                 displayType = displayType,
                 updateInterval = updateInterval,
-                loomInterval = loomInterval,
+                loomDuration = loomDuration,
                 onInterval = onInterval,
                 onFinish = onFinish,
             ).apply {
@@ -232,8 +235,10 @@ object TitleManager {
         countDownInterval: Duration = 1.seconds,
         onInterval: () -> Unit = {},
         onFinish: () -> Unit = {},
-        // How long the title will stay around for after the countdown is done.
-        loomInterval: Duration = 250.milliseconds,
+        /**
+         * How long the title will 'stick around' for after the countdown is done.
+         */
+        loomDuration: Duration = 250.milliseconds,
     ): TitleContext? {
         val newTitle = TitleContext(titleText, subtitleText, duration, height, fontSize, weight).let {
             when (countDownDisplayType) {
@@ -241,7 +246,7 @@ object TitleManager {
                 else -> it.fromTitleData(
                     countDownDisplayType,
                     countDownInterval,
-                    loomInterval,
+                    loomDuration,
                     discardOnWorldChange,
                     onInterval,
                     onFinish,
@@ -436,11 +441,11 @@ object TitleManager {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (InventoryUtils.inInventory()) return
         val globalTitle = currentTitles[TitleLocation.GLOBAL] ?: return
-        globalTitle.tryRenderGlobalTitle(event.context)
+        globalTitle.tryRenderGlobalTitle()
     }
 
-    // TODO move function inside title context class, then make this a extneded function of DrawContext
-    private fun TitleContext.tryRenderGlobalTitle(context: DrawContext) {
+    // TODO move function inside title context class
+    private fun TitleContext.tryRenderGlobalTitle() {
         val guiWidth = GuiScreenUtils.scaledWindowWidth
         val guiHeight = GuiScreenUtils.scaledWindowHeight
 
@@ -454,7 +459,7 @@ object TitleManager {
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
 
         val mainTextRenderable = Renderable.string(
             getTitleText(),
@@ -483,19 +488,19 @@ object TitleManager {
         val posX = (guiWidth - renderableWidth) / 2
         val posY = (guiHeight - (renderableHeight * 4)) / 2
 
-        context.matrices.translate(posX.toFloat(), posY.toFloat(), 0f)
+        DrawContextUtils.translate(posX.toFloat(), posY.toFloat(), 0f)
         targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!InventoryUtils.inInventory()) return
         val inventoryTitle = currentTitles[TitleLocation.INVENTORY] ?: return
-        inventoryTitle.tryRenderInventoryTitle(event.context)
+        inventoryTitle.tryRenderInventoryTitle()
     }
 
-    private fun TitleContext.tryRenderInventoryTitle(context: DrawContext) {
+    private fun TitleContext.tryRenderInventoryTitle() {
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
         val baseStringRenderable = Renderable.string(getTitleText(), 1.5)
@@ -522,8 +527,8 @@ object TitleManager {
             else -> 150f
         }
 
-        context.matrices.pushMatrix()
-        context.matrices.translate(0f, -(heightTranslation), 500f)
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate(0f, -(heightTranslation), 500f)
         Renderable.drawInsideRoundedRect(
             stringRenderable,
             ColorUtils.TRANSPARENT_COLOR,
@@ -531,7 +536,7 @@ object TitleManager {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 0, gui.width, gui.height)
 
-        context.matrices.translate(0f, heightTranslation, -500f)
-        context.matrices.popMatrix()
+        DrawContextUtils.translate(0f, heightTranslation, -500f)
+        DrawContextUtils.popMatrix()
     }
 }

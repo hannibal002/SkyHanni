@@ -323,7 +323,7 @@ object GardenVisitorDropStatistics {
 
         // Was a list of longs, now a map of rarity to count
         event.move(
-            79,
+            85,
             "#profile.garden.visitorDrops.visitorRarities",
             "#profile.garden.visitorDrops.acceptedRarities",
         ) { element ->
