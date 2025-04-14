@@ -76,8 +76,9 @@ object CorpseTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
-        with(tracker) { event.addItemFromEvent() }
+        if (isEnabled() && event.source == ItemAddManager.Source.COMMAND) {
+            with(tracker) { event.addItemFromEvent() }
+        }
     }
 
     @HandleEvent
@@ -158,7 +159,7 @@ object CorpseTracker {
         }
     }
 
-    fun isEnabled() =
+    private fun isEnabled() =
         LorenzUtils.inSkyBlock && config.enabled && (
             IslandType.MINESHAFT.isInIsland() ||
                 (!config.onlyInMineshaft && MiningApi.inGlacialTunnels())

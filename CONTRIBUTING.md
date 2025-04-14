@@ -209,8 +209,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
-    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples.
-      for more information and usages.
+    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples, more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
