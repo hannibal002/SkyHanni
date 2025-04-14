@@ -43,6 +43,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the gray brackets in front of and behind the level numbers.
 + Level Color As Name. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1483)
     + Use the color of the SkyBlock level for the player color.
++ Added Right Click to Copy Chat. - Empa (https://github.com/hannibal002/SkyHanni/pull/2149)
+    + Hold Shift to copy with `/shwords`, Control for a single line, and Alt to format color codes.
 
 #### Chat Filter
 
@@ -255,6 +257,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + This ensures XP visibility even when replaced by the SkyBlock XP bar.
 + Added Superpair Exp Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/3342)
     + Displays XP for super pairs in the bottom right corner of the item.
++ Added Outside Sack Value Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3778)
+    + Show value of all items in Sacks as GUI while not in Sacks.
 
 </details>
 <details open><summary>
@@ -1110,6 +1114,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Requires `Chat Compact` for Hoppity enabled to work.
 + Added an All-Time Stats view for the Hoppity Live Display card. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3242)
     + Navigate to the very right using the Event History keys.
++ Added Chocolate Factory Hot Chocolate Mixin Block. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3024)
+    + Blocks opening Chocolate Factory without Hot Chocolate Mixin active.
 
 ### The Carnival
 
@@ -1442,6 +1448,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Allowed the use of the Custom Scoreboard outside of SkyBlock, but only on Hypixel. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
     + Added an option to disable custom lines in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1881)
 + Added SkyBlock Level to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2895)
++ Added Number Differences to all number displays in Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2898)
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
 + Added Display for Bits on Cookie buy. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2265)
@@ -1559,6 +1566,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + View all Mayor-related information on your screen: Current Mayor, Minister, Candidates.
     + Hover over their perks to see the perk description.
     + Added to the Outside SkyBlock list to display information even when not in SkyBlock.
++ Added Cake Soul Found Alert. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/3340)
+    + Notify when a player finds a Cake Soul while you are on your Private Island.
+    + Requires Cake Counter placed on Private Island.
++ Added Offline Cake Counter. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/3340)
+    + Customizable chat message detailing any Century Cakes eaten (and, if lucky, Cake Souls found) while away from your Private Island.
+    + Requires Cake Counter placed on Private Island.
+    + Prompts you to enable this feature when placing Cake Counter.
 
 </details>
 <details open><summary>

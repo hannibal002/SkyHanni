@@ -52,18 +52,18 @@ object TitleManager {
         val weight: Double = 1.0,
         var discardOnWorldChange: Boolean = true,
     ) {
+        var endTime: SimpleTimeMark? = null
+        var hasBeenRequeued: Boolean = false
+
         open val alive get() = endTime != null && (endTime?.isInPast() == false)
 
-        var endTime: SimpleTimeMark? = null
-
         open fun getTitleText(): String = titleText
-
         open fun getSubtitleText(): String? = subtitleText
-
         open fun start() {
-            endTime = if (endTime == null) (now() + duration) else endTime
+            if (endTime == null || endTime?.isInPast() == true) {
+                endTime = now() + duration
+            }
         }
-
         open fun stop() {
             endTime = farPast()
         }
@@ -96,7 +96,10 @@ object TitleManager {
         var countdownDuration: Duration = 5.seconds,
         var displayType: CountdownTitleDisplayType = CountdownTitleDisplayType.WHOLE_SECONDS,
         var updateInterval: Duration = 1.seconds,
-        var loomInterval: Duration = 250.milliseconds, // TODO add explanation what this is
+        /**
+         * How long the title will 'stick around' for after the countdown is done.
+         */
+        var loomDuration: Duration = 250.milliseconds,
         var onInterval: () -> Unit = {},
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
@@ -120,7 +123,7 @@ object TitleManager {
             isActive = true
             virtualEndTime = if (virtualEndTime == null) (now() + countdownDuration) else {
                 virtualEndTime?.also {
-                    endTime = it + loomInterval
+                    endTime = it + loomDuration
                 }
             }
             onIntervalOutward()
@@ -136,14 +139,14 @@ object TitleManager {
         override fun equals(other: Any?): Boolean = this === other || other is CountdownTitleContext && this.dataEquivalent(other)
         override fun hashCode(): Int = formattedTitleText.hashCode() * 31 + (formattedSubtitleText?.hashCode() ?: 0) * 31 +
             countdownDuration.hashCode() * 31 + displayType.hashCode() * 31 +
-            updateInterval.hashCode() * 31 + loomInterval.hashCode() * 31 +
+            updateInterval.hashCode() * 31 + loomDuration.hashCode() * 31 +
             onInterval.hashCode() * 31 + onFinish.hashCode()
 
         private fun dataEquivalent(other: CountdownTitleContext): Boolean = super.dataEquivalent(other) &&
             countdownDuration == other.countdownDuration &&
             displayType == other.displayType &&
             updateInterval == other.updateInterval &&
-            loomInterval == other.loomInterval &&
+            loomDuration == other.loomDuration &&
             onInterval == other.onInterval &&
             onFinish == other.onFinish
 
@@ -169,7 +172,7 @@ object TitleManager {
             fun TitleContext.fromTitleData(
                 displayType: CountdownTitleDisplayType,
                 updateInterval: Duration,
-                loomInterval: Duration,
+                loomDuration: Duration,
                 discardOnWorldChange: Boolean = true,
                 onInterval: () -> Unit = {},
                 onFinish: () -> Unit = {},
@@ -179,7 +182,7 @@ object TitleManager {
                 formattedSubtitleText = getSubtitleText(),
                 displayType = displayType,
                 updateInterval = updateInterval,
-                loomInterval = loomInterval,
+                loomDuration = loomDuration,
                 onInterval = onInterval,
                 onFinish = onFinish,
             ).apply {
@@ -232,8 +235,10 @@ object TitleManager {
         countDownInterval: Duration = 1.seconds,
         onInterval: () -> Unit = {},
         onFinish: () -> Unit = {},
-        // How long the title will stay around for after the countdown is done.
-        loomInterval: Duration = 250.milliseconds,
+        /**
+         * How long the title will 'stick around' for after the countdown is done.
+         */
+        loomDuration: Duration = 250.milliseconds,
     ): TitleContext? {
         val newTitle = TitleContext(titleText, subtitleText, duration, height, fontSize, weight).let {
             when (countDownDisplayType) {
@@ -241,7 +246,7 @@ object TitleManager {
                 else -> it.fromTitleData(
                     countDownDisplayType,
                     countDownInterval,
-                    loomInterval,
+                    loomDuration,
                     discardOnWorldChange,
                     onInterval,
                     onFinish,
@@ -397,13 +402,18 @@ object TitleManager {
                 null -> dequeueNextTitle(location)
                 else -> {
                     val titleLocationQueue = titleLocationQueues[location]
-                    titleLocationQueue?.getWaitingWeightOrNull()?.let {
-                        if (it <= currentTitle.weight) return@let
-                        currentTitle.stop()
-                        // Re-queue for insertion after the new title
-                        titleLocationQueue.add(currentTitle, currentTitle.weight)
-                        dequeueNextTitle(location)
-                        return
+                    titleLocationQueue?.getWaitingWeightOrNull()?.let { waitingWeight ->
+                        if (waitingWeight > currentTitle.weight) {
+                            if (currentTitle.alive && currentTitle.endTime?.isInFuture() == true) {
+                                currentTitle.duration = currentTitle.endTime?.timeUntil() ?: Duration.ZERO
+                                if (currentTitle.duration > Duration.ZERO && !currentTitle.hasBeenRequeued) {
+                                    currentTitle.hasBeenRequeued = true
+                                    titleLocationQueue.add(currentTitle, currentTitle.weight)
+                                }
+                            }
+                            dequeueNextTitle(location)
+                            return@forEach
+                        }
                     }
                     if (currentTitle.alive) return@forEach
                     currentTitle.stop()
