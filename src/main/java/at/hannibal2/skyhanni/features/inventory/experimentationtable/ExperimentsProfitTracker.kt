@@ -137,7 +137,7 @@ object ExperimentsProfitTracker {
         if (warnedAboutTracking || !config.bottleWarnings) return
         warnedAboutTracking = true
         ChatUtils.clickToActionOrDisable(
-            event.internalName.formatWarningString(),
+            event.internalName.formatWarningString(event.amount),
             config::trackUsedBottles,
             actionName = "undo",
             action = {
@@ -149,10 +149,11 @@ object ExperimentsProfitTracker {
         )
     }
 
-    private fun NeuInternalName.formatWarningString() = buildString {
+    private fun NeuInternalName.formatWarningString(amount: Int) = buildString {
         val displayName = getItemStackOrNull()?.displayName ?: "XP Bottle"
+        val amountFormat = "§8${amount}x ".takeIf { amount > 1 }.orEmpty()
         appendLine("§aExperiments Tracker§7:")
-        appendLine("§eAutomatically tracked usage of $displayName §ewhile near the Experimentation Table§7.")
+        appendLine("§eAutomatically tracked usage of $amountFormat$displayName §ewhile near the Experimentation Table§7.")
         appendLine("§7This warning can also be disabled in the config.")
     }
 
