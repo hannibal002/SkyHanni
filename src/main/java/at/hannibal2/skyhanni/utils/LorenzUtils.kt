@@ -90,10 +90,4 @@ object LorenzUtils {
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
     fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
-
-    fun hashAll(vararg objects: Any?): Int {
-        var result = 1
-        for (element in objects) result = 31 * result + element.hashCode()
-        return result
-    }
 }
