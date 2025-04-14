@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -23,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -41,7 +41,7 @@ import com.google.gson.annotations.Expose
 @SkyHanniModule
 object SlayerProfitTracker {
 
-    private val config get() = SkyHanniMod.feature.slayer.itemProfitTracker
+    private val config get() = SlayerApi.config.itemProfitTracker
 
     private var category = ""
     private val categoryName get() = ReplaceRomanNumerals.replaceLine(category)
@@ -71,7 +71,7 @@ object SlayerProfitTracker {
 
         override fun getDescription(timesDropped: Long): List<String> {
             val percentage = timesDropped.toDouble() / slayerCompletedCount
-            val perBoss = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val perBoss = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
                 "§7Dropped §e${timesDropped.addSeparators()} §7times.",
@@ -156,6 +156,7 @@ object SlayerProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
+        // TODO remove is config enabled check for tracker
         if (!isEnabled()) return
         if (!SlayerApi.isInCorrectArea) return
         if (!SlayerApi.hasActiveSlayerQuest()) return

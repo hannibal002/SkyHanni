@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.features.slayer.enderman
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -42,7 +41,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object EndermanSlayerFeatures {
 
-    private val config get() = SkyHanniMod.feature.slayer.endermen
+    private val config get() = SlayerApi.config.endermen
     private val beaconConfig get() = config.beacon
     private val endermenWithBeacons = mutableListOf<EntityEnderman>()
     private val flyingBeacons = mutableSetOf<EntityArmorStand>()
@@ -74,7 +73,7 @@ object EndermanSlayerFeatures {
                         beaconConfig.highlightBeacon
                     }
                     if (beaconConfig.showWarning) {
-                        TitleManager.sendTitle("§4Beacon", 2.seconds)
+                        TitleManager.sendTitle("§4Beacon", duration = 2.seconds)
                     }
                     logger.log("Added flying beacons at ${entity.getLorenzVec()}")
                 }
@@ -227,7 +226,7 @@ object EndermanSlayerFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         endermenWithBeacons.clear()
         flyingBeacons.clear()
         nukekubiSkulls.clear()

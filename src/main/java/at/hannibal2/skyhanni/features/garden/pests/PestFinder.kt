@@ -129,9 +129,7 @@ object PestFinder {
             inOwnInventory = true,
             condition = { shouldShowDisplay() },
             onRender = {
-                if (GardenApi.inGarden() && config.showDisplay) {
-                    config.position.renderRenderables(display, posLabel = "Pest Finder")
-                }
+                config.position.renderRenderables(display, posLabel = "Pest Finder")
             },
         )
     }
@@ -196,7 +194,7 @@ object PestFinder {
     fun onChat(event: SkyHanniChatEvent) {
         if (!config.noPestTitle) return
 
-        if (PestApi.noPestsChatPattern.matches(event.message)) TitleManager.sendTitle("§eNo pests!", 2.seconds)
+        if (PestApi.noPestsChatPattern.matches(event.message)) TitleManager.sendTitle("§eNo pests!", duration = 2.seconds)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

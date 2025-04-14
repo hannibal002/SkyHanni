@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -49,7 +50,7 @@ object ExcavatorProfitTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / timesExcavated
-            val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$dropRate.",
@@ -161,6 +162,7 @@ object ExcavatorProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
+        if (!config.enabled) return
         if (!isEnabled()) return
 
         val internalName = event.internalName
@@ -216,6 +218,7 @@ object ExcavatorProfitTracker {
     }
 
     private fun shouldShowDisplay(): Boolean {
+        if (!config.enabled) return false
         if (!isEnabled()) return false
         val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
         // Only show in excavation menu
@@ -231,8 +234,7 @@ object ExcavatorProfitTracker {
         }
     }
 
-    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled &&
-        LorenzUtils.skyBlockArea == "Fossil Research Center"
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "Fossil Research Center"
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

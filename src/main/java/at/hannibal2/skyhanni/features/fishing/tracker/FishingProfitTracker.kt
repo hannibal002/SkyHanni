@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -52,7 +52,7 @@ object FishingProfitTracker {
      */
     private val coinsChatPattern by RepoPattern.pattern(
         "fishing.tracker.chat.coins",
-        "§(?<colorCode>.*)⛃ §r(?<catch>.*) CATCH! §r§fYou caught §r§6(?<coins>[\\d,]+) Coins§r§f!"
+        "§(?<colorCode>.*)⛃ §r(?<catch>.*) CATCH! §r§fYou caught §r§6(?<coins>[\\d,]+) Coins§r§f!",
     )
 
     private var lastCatchTime = SimpleTimeMark.farPast()
@@ -70,7 +70,7 @@ object FishingProfitTracker {
 
         override fun getDescription(timesCaught: Long): List<String> {
             val percentage = timesCaught.toDouble() / totalCatchAmount
-            val catchRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val catchRate = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
                 "§7Caught §e${timesCaught.addSeparators()} §7times.",
@@ -200,6 +200,7 @@ object FishingProfitTracker {
         if (!isEnabled()) return
 
         if (event.source == ItemAddManager.Source.COMMAND) {
+            if (!config.enabled) return
             tryAddItem(event.internalName, event.amount, command = true)
             return
         }
@@ -224,22 +225,25 @@ object FishingProfitTracker {
         lastCatchTime = SimpleTimeMark.now()
     }
 
+    private val isRecentPickup: Boolean
+        get() = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
+
+    private val shouldShow: Boolean
+        get() = isRecentPickup || FishingApi.isFishing(checkRodInHand = false)
+
     init {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() },
+            condition = { isEnabled() && config.enabled && shouldShow },
             onRender = {
-                val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
-                if (recentPickup || FishingApi.isFishing(checkRodInHand = false)) {
-                    tracker.renderDisplay(config.position)
-                }
+                tracker.renderDisplay(config.position)
             },
         )
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastCatchTime = SimpleTimeMark.farPast()
     }
 
@@ -261,7 +265,7 @@ object FishingProfitTracker {
         tracker.firstUpdate()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.inKuudraFight
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

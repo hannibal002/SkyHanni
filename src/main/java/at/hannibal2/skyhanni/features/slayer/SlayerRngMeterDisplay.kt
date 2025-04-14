@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -23,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -39,7 +39,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerRngMeterDisplay {
 
-    private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
+    private val config get() = SlayerApi.config.rngMeterDisplay
 
     private val patternGroup = RepoPattern.group("slayer.rngmeter")
     private val inventoryNamePattern by patternGroup.pattern(
@@ -115,7 +115,7 @@ object SlayerRngMeterDisplay {
             val hasItemSelected = item != "" && item != "?"
             if (!hasItemSelected && config.warnEmpty) {
                 ChatUtils.userError("No Slayer RNG Meter Item selected!")
-                TitleManager.sendTitle("§cNo RNG Meter Item!", 3.seconds)
+                TitleManager.sendTitle("§cNo RNG Meter Item!")
             }
             var blockChat = config.hideChat && hasItemSelected
             val diff = currentMeter - old
@@ -129,7 +129,7 @@ object SlayerRngMeterDisplay {
 
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
-                val percentage = LorenzUtils.formatPercentage(rawPercentage)
+                val percentage = rawPercentage.formatPercentage()
                 if (storage.goalNeeded == -1L) {
                     ErrorManager.logErrorStateWithData(
                         "Error Calculating Slayer RNG Meter",

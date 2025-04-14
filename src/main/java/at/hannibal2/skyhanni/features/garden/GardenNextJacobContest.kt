@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -349,7 +351,7 @@ object GardenNextJacobContest {
         if (inCalendar) {
             val size = contests.size
             val percentage = size.toDouble() / MAX_CONTESTS_PER_YEAR
-            val formatted = LorenzUtils.formatPercentage(percentage)
+            val formatted = percentage.formatPercentage()
             addString("§eDetected $formatted of farming contests this year")
             return@line
         }
@@ -371,11 +373,8 @@ object GardenNextJacobContest {
             return@line
         }
 
-        if (isCloseToNewYear()) {
-            addString(CLOSE_TO_NEW_YEAR_TEXT)
-        } else {
-            addString("§cOpen calendar to read Jacob contest times!")
-        }
+        if (isCloseToNewYear()) addString(CLOSE_TO_NEW_YEAR_TEXT)
+        else addString("§cOpen calendar to read Jacob contest times!")
 
         fetchedFromElite = false
         contests.clear()
@@ -399,7 +398,8 @@ object GardenNextJacobContest {
         }
         for (crop in nextContest.crops) {
             val isBoosted = crop == boostedCrop
-            val stack = Renderable.itemStack(crop.icon, 1.0, highlight = isBoosted)
+            val cropStack = crop.getItemStackCopy("garden_next_jacob:$crop-$isBoosted-$activeContest")
+            val stack = Renderable.itemStack(cropStack, 1.0, highlight = isBoosted)
             if (config.additionalBoostedHighlight && isBoosted) {
                 add(stack.renderBounds(config.additionalBoostedHighlightColor.toSpecialColor()))
             } else add(stack)
@@ -436,7 +436,7 @@ object GardenNextJacobContest {
         lastWarningTime = SimpleTimeMark.now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         ChatUtils.chat("Next farming contest: $cropText")
-        TitleManager.sendTitle("§eFarming Contest!", 5.seconds)
+        TitleManager.sendTitle("§eFarming Contest!", duration = 5.seconds)
         SoundUtils.playBeepSound()
 
         val cropTextNoColor = crops.joinToString(", ") {

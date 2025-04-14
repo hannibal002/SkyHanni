@@ -95,7 +95,8 @@ object ElectionApi {
 
     private var lastUpdate = SimpleTimeMark.farPast()
 
-    private var rawMayorData: MayorJson? = null
+    var rawMayorData: MayorJson? = null
+        private set
     private var candidates = mapOf<Int, MayorCandidate>()
 
     var nextMayorTimestamp = SimpleTimeMark.farPast()
@@ -282,4 +283,10 @@ object ElectionApi {
         }
 
     }
+
+    val isDerpy get() = Perk.DOUBLE_MOBS_HP.isActive
+
+    fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
 }
