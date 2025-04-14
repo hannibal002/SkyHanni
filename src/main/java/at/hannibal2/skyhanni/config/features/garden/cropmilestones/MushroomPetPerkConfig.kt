@@ -15,7 +15,7 @@ class MushroomPetPerkConfig {
     @Expose
     @ConfigOption(
         name = "Display Enabled",
-        desc = "Show the progress and ETA for mushroom crops when farming other crops because of the Mooshroom Cow perk."
+        desc = "Show the progress and ETA for mushroom crops when farming other crops because of the Mooshroom Cow perk.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -25,20 +25,20 @@ class MushroomPetPerkConfig {
     @ConfigOption(
         name = "Mushroom Text",
         desc = "Drag text to change the appearance of the overlay.\n" +
-            "Hold a farming tool to show the overlay."
+            "Hold a farming tool to show the overlay.",
     )
     @ConfigEditorDraggableList
     var text: MutableList<MushroomTextEntry> = mutableListOf(
         MushroomTextEntry.TITLE,
         MushroomTextEntry.MUSHROOM_TIER,
         MushroomTextEntry.NUMBER_OUT_OF_TOTAL,
-        MushroomTextEntry.TIME
+        MushroomTextEntry.TIME,
     )
 
     // TODO Change MUSHROOM_TIER to MUSHROOM_MILESTONE
     enum class MushroomTextEntry(
         private val displayName: String,
-        private val legacyId: Int = -1
+        private val legacyId: Int = -1,
     ) : HasLegacyId {
         TITLE("§6Mooshroom Cow Perk", 0),
         MUSHROOM_TIER("§7Mushroom Milestone 8", 1),

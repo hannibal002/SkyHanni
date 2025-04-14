@@ -173,7 +173,7 @@ object JacobFarmingContestsInventory {
 
         for ((slot, stack) in chest.getUpperItems()) {
             if (stack.getLore().any { it == "§eClick to claim reward!" }) {
-                slot.highlight(event.context, LorenzColor.GREEN)
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }

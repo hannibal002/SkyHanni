@@ -82,7 +82,7 @@ object CustomScoreboard {
     @HandleEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == GUI_NAME) {
-            with(alignmentConfig) {
+            with(displayConfig.alignment) {
                 if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN || verticalAlignment != VerticalAlignment.DONT_ALIGN) {
                     val tempHori = horizontalAlignment
                     val tempVert = verticalAlignment
@@ -126,18 +126,10 @@ object CustomScoreboard {
         dirty = true
     }
 
-    // TODO move those into their respective classes and make them private
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
     internal val displayConfig get() = config.display
-    internal val alignmentConfig get() = displayConfig.alignment
-    internal val arrowConfig get() = displayConfig.arrow
-    internal val chunkedConfig get() = displayConfig.chunkedStats
-    internal val eventsConfig get() = displayConfig.events
-    internal val mayorConfig get() = displayConfig.mayor
-    internal val partyConfig get() = displayConfig.party
-    internal val maxwellConfig get() = displayConfig.maxwell
     internal val informationFilteringConfig get() = config.informationFiltering
-    internal val backgroundConfig get() = config.background
+    private val eventsConfig get() = displayConfig.events
 
     private fun createLines() = when {
         !LorenzUtils.inSkyBlock -> addAllNonSkyBlockLines()

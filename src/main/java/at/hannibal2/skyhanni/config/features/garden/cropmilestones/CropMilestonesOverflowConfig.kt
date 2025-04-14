@@ -19,6 +19,7 @@ class CropMilestonesOverflowConfig {
     @ConfigOption(
         name = "Inventory",
         desc = "Show overflow levels as stack size in the Crop Milestones inventory (will also change milestone average)."
+    ,
     )
     @ConfigEditorBoolean
     var inventoryStackSize: Boolean = false
@@ -27,6 +28,7 @@ class CropMilestonesOverflowConfig {
     @ConfigOption(
         name = "Tooltip",
         desc = "Show overflow level progress in the item tooltip in the Crop Milestones inventory."
+    ,
     )
     @ConfigEditorBoolean
     var inventoryTooltip: Boolean = false
