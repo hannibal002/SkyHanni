@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -58,7 +59,8 @@ object LimboPlaytime {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!enabled) return
         if (event.inventory !is ContainerLocalMenu) return
-        if (event.inventory.name != "Detailed /playtime") return
+        // TODO replace with InventoryDetector
+        if (InventoryUtils.openInventoryName() != "Detailed /playtime") return
         if (event.slot != 43) return
         val playtime = storage?.playtime ?: 0
         if (playtime < 60) return
@@ -88,7 +90,8 @@ object LimboPlaytime {
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
         if (!enabled) return
-        if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
+        // TODO replace with InventoryDetector
+        if (!InventoryUtils.openInventoryName().startsWith("Detailed /playtime")) return
         if (event.slot.slotIndex != 4) return
         val playtime = storage?.playtime ?: 0
         if (playtime <= 120) return

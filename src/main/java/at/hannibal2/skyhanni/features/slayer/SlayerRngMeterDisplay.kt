@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -40,7 +39,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerRngMeterDisplay {
 
-    private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
+    private val config get() = SlayerApi.config.rngMeterDisplay
 
     private val patternGroup = RepoPattern.group("slayer.rngmeter")
     private val inventoryNamePattern by patternGroup.pattern(

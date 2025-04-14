@@ -8,23 +8,24 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.clickInventorySlot
-import at.hannibal2.skyhanni.utils.compat.containerSlots
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.client.resources.I18n
+import net.minecraft.entity.IMerchant
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import net.minecraft.world.IWorldNameable
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
@@ -43,7 +44,7 @@ object InventoryUtils {
 
     fun getItemsInOpenChestWithNull(): List<Slot> {
         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList()
-        return guiChest.containerSlots()
+        return guiChest.slots()
             .filter { it.inventory !is InventoryPlayer }
     }
 
@@ -56,7 +57,7 @@ object InventoryUtils {
     // only works while not in an inventory
     fun getSlotsInOwnInventory(): List<Slot> {
         val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return emptyList()
-        return guiInventory.containerSlots()
+        return guiInventory.slots()
             .filter { it.inventory is InventoryPlayer && it.stack != null }
     }
 
@@ -69,8 +70,6 @@ object InventoryUtils {
     fun inAnyInventory() = inInventory() || inOwnInventory()
 
     fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
-
-    fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
     fun getItemsInOwnInventory(): List<ItemStack> =
         getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
@@ -105,7 +104,7 @@ object InventoryUtils {
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.slotNumber?.let { slotNumber ->
-            clickInventorySlot(slotNumber, container.windowId, 0, 1)
+            clickSlot(slotNumber, container.windowId, mouseButton = 0, mode = 1)
             this.cancel()
         }
     }
@@ -157,6 +156,18 @@ object InventoryUtils {
         }
     }
 
+    fun Gui.getTitle(): String = when (this) {
+        is IWorldNameable -> {
+            name
+        }
+
+        is IMerchant -> {
+            displayName.unformattedText
+        }
+
+        else -> ""
+    }
+
     fun ContainerChest.getAllSlots(): Map<Slot, ItemStack?> = buildMap {
         for (slot in inventorySlots) {
             if (slot == null) continue
@@ -185,4 +196,17 @@ object InventoryUtils {
     }
 
     fun isInNormalChest(): Boolean = openInventoryName() in normalChestInternalNames.map { I18n.format(it) }
+
+    // TODO replace mode with GuiContainerEvent.ClickType
+    fun clickSlot(slotNumber: Int, windowId: Int? = null, mouseButton: Int = 0, mode: Int = 0) {
+        if (windowId != null) {
+            InventoryCompat.clickInventorySlot(slotNumber, windowId, mouseButton = mouseButton, mode = mode)
+        } else {
+            InventoryCompat.clickInventorySlot(slotNumber, mouseButton = mouseButton, mode = mode)
+        }
+    }
+
+    fun GuiContainer.slots(): List<Slot> {
+        return InventoryCompat.containerSlots(this)
+    }
 }

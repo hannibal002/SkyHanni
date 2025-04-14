@@ -11,10 +11,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -114,9 +112,11 @@ object DianaProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!(DianaApi.isDoingDiana() && config.enabled)) return
+        if (!(DianaApi.isDoingDiana())) return
+        val isCommand = event.source == ItemAddManager.Source.COMMAND
+        if (isCommand && !config.enabled) return
 
-        tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
+        tryAddItem(event.internalName, event.amount, isCommand)
     }
 
     private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
@@ -162,14 +162,9 @@ object DianaProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled },
+            condition = { config.enabled && (DianaApi.isDoingDiana() || DianaApi.hasSpadeInHand()) },
             onRender = {
-                val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
-                if (!DianaApi.isDoingDiana() && !spadeInHand) return@RenderDisplayHelper
-                if (spadeInHand) {
-                    tracker.firstUpdate()
-                }
-
+                if (DianaApi.hasSpadeInHand()) tracker.firstUpdate()
                 tracker.renderDisplay(config.position)
             },
         )
