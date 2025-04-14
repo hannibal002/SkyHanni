@@ -24,7 +24,7 @@ object HotmFeatures {
         HotmData.entries.forEach { entry ->
             val color = if (!entry.isUnlocked) LorenzColor.DARK_GRAY
             else if (entry.enabled) LorenzColor.GREEN else LorenzColor.RED
-            entry.slot?.highlight(event.context, color)
+            entry.slot?.highlight(color)
         }
     }
 
