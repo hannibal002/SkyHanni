@@ -21,38 +21,6 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config) {
         Debt.FIVE_MINS,
     )
 
-    companion object {
-        private val importOrder = ImportSorter()
-
-        private val packageImportOrdering = listOf("java.", "javax.", "kotlin.")
-
-        private class ImportSorter : Comparator<KtImportDirective> {
-            override fun compare(
-                import1: KtImportDirective,
-                import2: KtImportDirective,
-            ): Int {
-                val importPath1 = import1.importPath!!.pathStr
-                val importPath2 = import2.importPath!!.pathStr
-
-                val isTypeAlias1 = import1.aliasName != null
-                val isTypeAlias2 = import2.aliasName != null
-
-                val index1 = packageImportOrdering.indexOfFirst { importPath1.startsWith(it) }
-                val index2 = packageImportOrdering.indexOfFirst { importPath2.startsWith(it) }
-
-                return when {
-                    isTypeAlias1 && isTypeAlias2 -> importPath1.compareTo(importPath2)
-                    isTypeAlias1 && !isTypeAlias2 -> 1
-                    !isTypeAlias1 && isTypeAlias2 -> -1
-                    index1 == -1 && index2 == -1 -> importPath1.compareTo(importPath2)
-                    index1 == -1 -> -1
-                    index2 == -1 -> 1
-                    else -> index1.compareTo(index2)
-                }
-            }
-        }
-    }
-
     private fun isImportsCorrectlyOrdered(imports: List<KtImportDirective>, rawText: List<String>): Boolean {
         if (rawText.any { it.isBlank() }) {
             return false
@@ -81,7 +49,7 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config) {
         val originalImports = rawText.filter { !it.containsPreprocessingPattern() && !linesToIgnore.contains(it) }
         val formattedOriginal = originalImports.joinToString("\n") { it }
 
-        val expectedImports = imports.sortedWith(importOrder).map { "import ${it.importPath}" }
+        val expectedImports = imports.sortedWith(ImportOrdering.getOrdering()).map { "import ${it.importPath}" }
         val formattedExpected = expectedImports.filter { !linesToIgnore.contains(it) }.joinToString("\n")
 
         return formattedOriginal == formattedExpected
