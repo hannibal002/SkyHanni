@@ -409,6 +409,6 @@ object FarmingFortuneDisplay {
         event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
         event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
 
-        event.move(85, "garden.farmingFortunes.pos", "garden.farmingFortunes.position")
+        event.move(86, "garden.farmingFortunes.pos", "garden.farmingFortunes.position")
     }
 }
