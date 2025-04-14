@@ -14,6 +14,7 @@ at/hannibal2/skyhanni/config/HasLegacyId.java
 # at/hannibal2/skyhanni/utils/compat/MinecraftCompat.kt
 # at/hannibal2/skyhanni/utils/compat/InventoryCompat.kt
 # at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
+# at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 
 # at/hannibal2/skyhanni/mixins/transformers/MixinClientConnection.java
 
@@ -71,7 +72,6 @@ at/hannibal2/skyhanni/utils/compat/GuiScreenUtils.kt
 at/hannibal2/skyhanni/utils/compat/ItemCompat.kt
 at/hannibal2/skyhanni/utils/compat/MouseCompat.kt
 at/hannibal2/skyhanni/utils/compat/ScoreboardCompat.kt
-at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 at/hannibal2/skyhanni/utils/compat/TextCompat.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 

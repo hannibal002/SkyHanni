@@ -156,6 +156,7 @@ object PowderTracker {
         @Expose
         var totalHardStoneCompacted = 0
 
+        // TODO remove this field and transform this in to a ItemProfitTracker
         @Expose
         var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf()
     }

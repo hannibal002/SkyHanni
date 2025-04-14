@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
@@ -54,22 +54,22 @@ class GuiPositionEditor(
         OtherInventoryData.close("ShPositionEditor")
     }
 
-    override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
+    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         // Items aren't drawn due to a bug in neu rendering
-        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
+        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
             val accessor = oldScreen as AccessorGuiContainer
             accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
         }
 
         GlStateManager.disableLighting()
-        val hoveredPos = renderRectangles(context)
+        val hoveredPos = renderRectangles()
 
-        renderLabels(context, hoveredPos)
+        renderLabels(hoveredPos)
     }
 
-    private fun renderLabels(context: DrawContext, hoveredPos: Int) {
-        GuiRenderUtils.drawStringCentered(context, "§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
+    private fun renderLabels(hoveredPos: Int) {
+        GuiRenderUtils.drawStringCentered("§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
 
         var displayPos = -1
         if (clickedPos != -1 && positions[clickedPos].clicked) {
@@ -81,22 +81,22 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         if (displayPos == -1) {
-            GuiRenderUtils.drawStringCentered(context, "§eTo edit hidden GUI elements set a key in /sh edit", getScaledWidth() / 2, 20)
-            GuiRenderUtils.drawStringCentered(context, "§ethen click that key while the GUI element is visible", getScaledWidth() / 2, 32)
+            GuiRenderUtils.drawStringCentered("§eTo edit hidden GUI elements set a key in /sh edit", getScaledWidth() / 2, 20)
+            GuiRenderUtils.drawStringCentered("§ethen click that key while the GUI element is visible", getScaledWidth() / 2, 32)
             return
         }
 
         val pos = positions[displayPos]
         val location = "§7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}"
-        GuiRenderUtils.drawStringCentered(context, "§b ${pos.internalName}", getScaledWidth() / 2, 18)
-        GuiRenderUtils.drawStringCentered(context, location, getScaledWidth() / 2, 28)
+        GuiRenderUtils.drawStringCentered("§b ${pos.internalName}", getScaledWidth() / 2, 18)
+        GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
         if (pos.canJumpToConfigOptions())
-            GuiRenderUtils.drawStringCentered(context, "§aRight-Click to open associated config options", getScaledWidth() / 2, 38)
+            GuiRenderUtils.drawStringCentered("§aRight-Click to open associated config options", getScaledWidth() / 2, 38)
     }
 
-    private fun renderRectangles(context: DrawContext): Int {
+    private fun renderRectangles(): Int {
         var hoveredPos = -1
-        context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
         width = getScaledWidth()
         height = getScaledHeight()
 
@@ -115,7 +115,6 @@ class GuiPositionEditor(
             elementWidth = position.getDummySize().x
             elementHeight = position.getDummySize().y
             GuiRenderUtils.drawRect(
-                context,
                 x - border,
                 y - border,
                 x + elementWidth + border * 2,
@@ -135,7 +134,7 @@ class GuiPositionEditor(
                 hoveredPos = index
             }
         }
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
         return hoveredPos
     }
 

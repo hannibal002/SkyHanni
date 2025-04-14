@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -34,15 +34,15 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
     private val historySize =
         history.sumOf { splitLine(it.message).size * 10 + (it.modified?.let { mod -> splitLine(mod).size * 10 } ?: 0) }
 
-    override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
+    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         var queuedTooltip: List<String>? = null
-        context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
         val l = (width / 2.0 - w / 2.0).toInt()
         val t = (height / 2.0 - h / 2.0).toInt()
-        context.matrices.translate(l + 0.0, t + 0.0, 0.0)
+        DrawContextUtils.translate(l + 0.0, t + 0.0, 0.0)
         RenderUtils.drawFloatingRectDark(0, 0, w, h)
-        context.matrices.translate(5.0, 5.0 - scroll, 0.0)
+        DrawContextUtils.translate(5.0, 5.0 - scroll, 0.0)
         val mouseX = originalMouseX - l
         val isMouseButtonDown = mouseX in 0..w && originalMouseY in t..(t + h) && MouseCompat.isButtonDown(0)
         var mouseY = originalMouseY - (t - scroll).toInt()
@@ -50,16 +50,12 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         GlScissorStack.push(l + 5, t + 5, w + l - 5, h + t - 5, sr)
 
         for (msg in history) {
-            GuiRenderUtils.drawString(context, msg.actionKind.renderedString, 0, 0, -1)
-            msg.actionReason?.let { GuiRenderUtils.drawString(context, it, ChatManager.ActionKind.maxLength + 5, 0, -1) }
-            var size = drawMultiLineText(context, msg.message, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
+            GuiRenderUtils.drawString(msg.actionKind.renderedString, 0, 0, -1)
+            msg.actionReason?.let { GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1) }
+            var size = drawMultiLineText(msg.message, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             msg.modified?.let {
-                GuiRenderUtils.drawString(
-                    context,
-                    "§e§lNEW TEXT",
-                    0, size * 10, -1,
-                )
-                size += drawMultiLineText(context, it, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
+                GuiRenderUtils.drawString("§e§lNEW TEXT", 0, size * 10, -1)
+                size += drawMultiLineText(it, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             }
             val isHovered = mouseX in 0..w && mouseY in 0..(size * 10)
             if (isHovered && msg.hoverInfo.isNotEmpty())
@@ -80,7 +76,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         }
         GlScissorStack.pop(sr)
         wasMouseButtonDown = isMouseButtonDown
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
         queuedTooltip?.let { tooltip ->
             RenderableTooltips.setTooltipForRender(tooltip.map { Renderable.string(it) })
         }
@@ -101,11 +97,11 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
         this.scroll = newScroll.coerceAtMost(historySize - h + 10.0).coerceAtLeast(0.0)
     }
 
-    private fun drawMultiLineText(context: DrawContext, comp: IChatComponent, xPos: Int): Int {
+    private fun drawMultiLineText(comp: IChatComponent, xPos: Int): Int {
         val lines = splitLine(comp)
         for (line in lines) {
-            GuiRenderUtils.drawString(context, line, xPos, 0, -1)
-            context.matrices.translate(0f, 10f, 0f)
+            GuiRenderUtils.drawString(line, xPos, 0, -1)
+            DrawContextUtils.translate(0f, 10f, 0f)
         }
         return lines.size
     }
