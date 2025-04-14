@@ -25,7 +25,6 @@ object CompactJacobClaim {
     private val patternGroup = RepoPattern.group("chat.jacobcompact")
 
     // <editor-fold desc="Patterns">
-
     /**
      * REGEX-TEST:   §r§6§lFARMING CONTEST REWARDS CLAIMED
      */
@@ -82,9 +81,9 @@ object CompactJacobClaim {
     )
     // </editor-fold>
 
-    private var inLoop = false
-    private var rewardSet = ContestRewardSet()
+    private val rewardSet = ContestRewardSet()
     private val messageSet: MutableList<String> = mutableListOf()
+    private var inLoop = false
 
     private fun publishEvent() {
         ContestRewardsClaimedEvent(rewardSet, messageSet).post()
@@ -134,8 +133,8 @@ object CompactJacobClaim {
         ticketPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             when (group("type")) {
-                "Jacob's" -> rewardSet = rewardSet.copy(jacobTickets = amount)
-                "Carnival" -> rewardSet = rewardSet.copy(carnivalTickets = amount)
+                "Jacob's" -> rewardSet.jacobTickets += amount
+                "Carnival" -> rewardSet.carnivalTickets += amount
             }
         }
 
@@ -145,19 +144,19 @@ object CompactJacobClaim {
                 else -> return
             }
             val amount = group("amount").formatInt()
-            rewardSet = rewardSet.copy(books = rewardSet.books + (crop to amount))
+            rewardSet.books += (crop to amount)
         }
 
         medalsPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
             val type = group("type")
             val medalType = AnitaMedalProfit.MedalType.bySimpleNameOrNull(type) ?: return
-            rewardSet = rewardSet.copy(medals = rewardSet.medals + (medalType to amount))
+            rewardSet.medals += (medalType to amount)
         }
 
         bitsPattern.matchMatcher(message) {
             val amount = group("amount").formatInt()
-            rewardSet = rewardSet.copy(bits = amount)
+            rewardSet.bits += amount
             eventDelay = 0.milliseconds
         }
 
