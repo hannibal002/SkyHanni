@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -19,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerItemsOnGround {
 
-    private val config get() = SkyHanniMod.feature.slayer.itemsOnGround
+    private val config get() = SlayerApi.config.itemsOnGround
 
     private val itemsOnGround = TimeLimitedCache<EntityItem, String>(2.seconds)
 

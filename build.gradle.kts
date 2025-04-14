@@ -62,6 +62,9 @@ loom {
             mixinConfig("mixins.skyhanni.json")
         }
     }
+    if (target == ProjectTarget.MODERN) {
+        accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
+    }
     mixin {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
@@ -181,8 +184,8 @@ dependencies {
         modImplementation("net.fabricmc:fabric-loader:0.16.7")
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
-        modImplementation("net.fabricmc:fabric-loader:0.16.10")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
+        modImplementation("net.fabricmc:fabric-loader:0.16.13")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
 
         modLocalRuntime(libs.modmenu)
     }
