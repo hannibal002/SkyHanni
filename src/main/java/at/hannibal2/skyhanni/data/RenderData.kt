@@ -36,18 +36,17 @@ object RenderData {
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 
-        DrawContextUtils.pushMatrix()
-        GlStateManager.enableDepth()
+        DrawContextUtils.pushPop {
+            GlStateManager.enableDepth()
 
-        if (GuiEditManager.isInGui()) {
-            DrawContextUtils.translate(0f, 0f, -3f)
-            renderOverlay(event.context)
-            DrawContextUtils.translate(0f, 0f, 3f)
+            if (GuiEditManager.isInGui()) {
+                DrawContextUtils.translate(0f, 0f, -3f)
+                renderOverlay(event.context)
+                DrawContextUtils.translate(0f, 0f, 3f)
+            }
+
+            GuiRenderEvent.ChestGuiOverlayRenderEvent(event.context).post()
         }
-
-        GuiRenderEvent.ChestGuiOverlayRenderEvent(event.context).post()
-
-        DrawContextUtils.popMatrix()
     }
 
     var outsideInventory = false

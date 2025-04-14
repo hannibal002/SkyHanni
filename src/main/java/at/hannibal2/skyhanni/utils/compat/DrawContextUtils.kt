@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.util.Vec3
+import scala.swing.Action
+
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
 //#endif
@@ -61,11 +63,20 @@ object DrawContextUtils {
         drawContext.matrices.scale(x, y, z)
     }
 
+   @Deprecated("Use pushPop instead")
     fun pushMatrix() {
         drawContext.matrices.pushMatrix()
     }
 
+    @Deprecated("Use pushPop instead")
     fun popMatrix() {
         drawContext.matrices.popMatrix()
+    }
+
+    @Suppress("deprecation")
+    fun pushPop(action: () -> Unit) {
+        pushMatrix()
+        action()
+        popMatrix()
     }
 }
