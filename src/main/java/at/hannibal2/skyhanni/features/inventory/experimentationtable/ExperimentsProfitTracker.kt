@@ -152,7 +152,7 @@ object ExperimentsProfitTracker {
     private fun NeuInternalName.formatWarningString() = buildString {
         val displayName = getItemStackOrNull()?.displayName ?: "XP Bottle"
         appendLine("§aExperiments Tracker§7:")
-        appendLine("§aAutomatically tracked usage of $displayName while near the Experimentation Table.")
+        appendLine("§eAutomatically tracked usage of $displayName §ewhile near the Experimentation Table§7.")
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {

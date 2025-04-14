@@ -69,8 +69,8 @@ object ExperimentationTableApi {
     private var currentExpOverHash: Int = 0
     private var queuedCompleteEvent: TableTaskCompletedEvent? = null
     private var handleBottlesOnInvClose: Boolean = false
-    private var lastBottlesInInventory = mapOf<NeuInternalName, Int>()
-    private var currentBottlesInInventory = mapOf<NeuInternalName, Int>()
+    private var lastBottlesInInventory: Map<NeuInternalName, Int> = getBottlesInOwnInventory()
+    private var currentBottlesInInventory: Map<NeuInternalName, Int> = mapOf()
 
     enum class ExperimentationMessages(private val displayName: String) {
         DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
@@ -359,6 +359,11 @@ object ExperimentationTableApi {
         }
     }
 
+    @HandleEvent
+    fun onWorldChange() {
+        lastBottlesInInventory = getBottlesInOwnInventory()
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent) {
         if (claimMessagePattern.matches(event.message) && ExperimentationMessages.DONE.isSelected()) {
@@ -393,7 +398,7 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun handleExpBottles(addToLoot: Boolean = false, fireEvent: Boolean = false) {
+    private fun handleExpBottles(addToLoot: Boolean = false, fireUsageEvent: Boolean = false) {
         lastBottlesInInventory = currentBottlesInInventory
         currentBottlesInInventory = getBottlesInOwnInventory()
         for ((internalName, currentInInv) in currentBottlesInInventory) {
@@ -401,10 +406,10 @@ object ExperimentationTableApi {
                 it != currentInInv
             } ?: continue
 
-            val change = currentInInv - lastInInv
-            if (change < 0 && inDistanceToTable(10.0) && fireEvent) {
-                TableXPBottleUsedEvent(internalName, abs(change)).post()
-            } else if (addToLoot) currentData.addReward(internalName, change)
+            val absChange = currentInInv - lastInInv
+            if (absChange < 0 && inDistanceToTable(10.0) && fireUsageEvent) {
+                TableXPBottleUsedEvent(internalName, abs(absChange)).post()
+            } else if (addToLoot) currentData.addReward(internalName, absChange)
         }
     }
 
@@ -418,7 +423,7 @@ object ExperimentationTableApi {
         } ?: return
 
         DelayedRun.runDelayed(200.milliseconds) {
-            handleExpBottles(false, fireEvent = true)
+            handleExpBottles(false, fireUsageEvent = true)
         }
     }
 
