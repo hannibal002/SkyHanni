@@ -9,12 +9,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 // internal
 // power update event?
 object ScoreboardElementPower : ScoreboardElement() {
-    private val maxwellConfig get() = displayConfig.maxwell
-
     override fun getDisplay(): String = MaxwellApi.currentPower?.let {
         CustomScoreboardUtils.formatNumberDisplay(
             "Power",
-            it + if (maxwellConfig.showMagicalPower) " §7(§6${MaxwellApi.magicalPower?.addSeparators()}§7)" else "",
+            it + if (displayConfig.maxwell.showMagicalPower) " §7(§6${MaxwellApi.magicalPower?.addSeparators()}§7)" else "",
             "§a",
         )
     } ?: "§cOpen \"Your Bags\"!"
