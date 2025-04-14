@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
@@ -98,8 +98,8 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         }
     }
 
-    override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
+    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         screenHeight = height
         guiLeft = (width - sizeX) / 2
         guiTop = (height - sizeY) / 2
@@ -107,8 +107,8 @@ open class VisualWordGui : SkyhanniBaseScreen() {
         mouseX = GuiScreenUtils.mouseX
         mouseY = GuiScreenUtils.mouseY
 
-        context.matrices.pushMatrix()
-        drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
+        DrawContextUtils.pushMatrix()
+        GuiRenderUtils.drawRect(guiLeft, guiTop, guiLeft + sizeX, guiTop + sizeY, 0x50000000)
         val scale = 0.75f
         val inverseScale = 1 / scale
 
@@ -123,22 +123,20 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
             drawUnmodifiedStringCentered("§aAdd New", x, y)
             val color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, color)
+            GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
             if (shouldDrawImport) {
                 val importX = guiLeft + sizeX - 45
                 val importY = guiTop + sizeY - 10
                 GuiRenderUtils.drawStringCentered("§aImport from SBE", importX, importY)
                 val importColor = if (isPointInMousePos(importX - 45, importY - 10, 90, 20)) colorA else colorB
-                drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
+                GuiRenderUtils.drawRect(importX - 45, importY - 10, importX + 45, importY + 10, importColor)
             }
 
-            context.matrices.scale(scale, scale, 1f)
+            DrawContextUtils.scale(scale, scale, 1f)
 
             drawUnmodifiedStringCentered(
-                "§7Modify Words. Replaces the top with the bottom",
-                (guiLeft + 180) * inverseScale,
-                (guiTop + 9) * inverseScale,
+                "§7Modify Words. Replaces the top with the bottom", (guiLeft + 180) * inverseScale, (guiTop + 9) * inverseScale,
             )
             drawUnmodifiedString("§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
             drawUnmodifiedString("§bStatus", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
@@ -206,7 +204,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                     ItemStack(Blocks.stained_hardened_clay, 1, 14)
                 }
 
-                context.matrices.scale(inverseScale, inverseScale, 1f)
+                DrawContextUtils.scale(inverseScale, inverseScale, 1f)
 
                 if (index != 0) {
                     GuiRenderUtils.renderItemAndBackground(itemUp, guiLeft + 295, top, colorA)
@@ -217,7 +215,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
 
                 GuiRenderUtils.renderItemAndBackground(statusBlock, guiLeft + 335, top, colorA)
 
-                context.matrices.scale(scale, scale, 1f)
+                DrawContextUtils.scale(scale, scale, 1f)
 
                 if (inBox) {
                     drawUnmodifiedString(
@@ -253,7 +251,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 saveChanges()
             }
 
-            context.matrices.scale(inverseScale, inverseScale, 1f)
+            DrawContextUtils.scale(inverseScale, inverseScale, 1f)
 
             scrollScreen()
         } else {
@@ -261,11 +259,11 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             var y = guiTop + 140
             drawUnmodifiedStringCentered("§cDelete", x, y)
             var color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, color)
+            GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
             y += 30
             drawUnmodifiedStringCentered("§eBack", x, y)
             color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, color)
+            GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
                 val currentPhrase = modifiedWords[currentIndex]
@@ -275,60 +273,48 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                 var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
                 drawUnmodifiedStringCentered(status, x, y)
                 color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                drawRect(x - 30, y - 10, x + 30, y + 10, color)
+                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
                 x += 200
                 drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
                 status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
                 drawUnmodifiedStringCentered(status, x, y)
                 color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                drawRect(x - 30, y - 10, x + 30, y + 10, color)
+                GuiRenderUtils.drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
                 drawUnmodifiedString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
 
                 if (isPointInMousePos(guiLeft, guiTop + 35, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
+                    GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorB)
                 }
                 if (currentTextBox == SelectedTextBox.PHRASE) {
-                    drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
+                    GuiRenderUtils.drawRect(guiLeft, guiTop + 35, guiLeft + sizeX, guiTop + 35 + 30, colorA)
                 }
 
                 if (isPointInMousePos(guiLeft, guiTop + 90, sizeX, 30)) {
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
+                    GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorB)
                 }
                 if (currentTextBox == SelectedTextBox.REPLACEMENT) {
-                    drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
+                    GuiRenderUtils.drawRect(guiLeft, guiTop + 90, guiLeft + sizeX, guiTop + 90 + 30, colorA)
                 }
 
-                context.matrices.scale(0.75f, 0.75f, 1f)
+                DrawContextUtils.scale(0.75f, 0.75f, 1f)
 
                 // TODO remove more code duplication
                 drawUnmodifiedString(
-                    "§bThe top line of each section",
-                    (guiLeft + 10) * inverseScale,
-                    (guiTop + 12) * inverseScale,
+                    "§bThe top line of each section", (guiLeft + 10) * inverseScale, (guiTop + 12) * inverseScale,
                 )
                 drawUnmodifiedString(
-                    "§bis the preview of the bottom text",
-                    (guiLeft + 10) * inverseScale,
-                    (guiTop + 22) * inverseScale,
+                    "§bis the preview of the bottom text", (guiLeft + 10) * inverseScale, (guiTop + 22) * inverseScale,
+                )
+
+                drawUnmodifiedString("§bTo get the Minecraft", (guiLeft + 220) * inverseScale, (guiTop + 12) * inverseScale)
+                drawUnmodifiedString(
+                    "§b formatting character use \"&&\"", (guiLeft + 220) * inverseScale, (guiTop + 22) * inverseScale,
                 )
 
                 drawUnmodifiedString(
-                    "§bTo get the Minecraft",
-                    (guiLeft + 220) * inverseScale,
-                    (guiTop + 12) * inverseScale,
-                )
-                drawUnmodifiedString(
-                    "§b formatting character use \"&&\"",
-                    (guiLeft + 220) * inverseScale,
-                    (guiTop + 22) * inverseScale,
-                )
-
-                drawUnmodifiedString(
-                    currentPhrase.phrase.convertToFormatted(),
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 40) * inverseScale,
+                    currentPhrase.phrase.convertToFormatted(), (guiLeft + 30) * inverseScale, (guiTop + 40) * inverseScale,
                 )
                 drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
 
@@ -337,13 +323,9 @@ open class VisualWordGui : SkyhanniBaseScreen() {
                     (guiLeft + 30) * inverseScale,
                     (guiTop + 95) * inverseScale,
                 )
-                drawUnmodifiedString(
-                    currentPhrase.replacement,
-                    (guiLeft + 30) * inverseScale,
-                    (guiTop + 110) * inverseScale,
-                )
+                drawUnmodifiedString(currentPhrase.replacement, (guiLeft + 30) * inverseScale, (guiTop + 110) * inverseScale)
 
-                context.matrices.scale(inverseScale, inverseScale, 1f)
+                DrawContextUtils.scale(inverseScale, inverseScale, 1f)
             }
         }
 
@@ -367,7 +349,7 @@ open class VisualWordGui : SkyhanniBaseScreen() {
             saveChanges()
         }
 
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     private fun isPointInMousePos(left: Int, top: Int, width: Int, height: Int) =

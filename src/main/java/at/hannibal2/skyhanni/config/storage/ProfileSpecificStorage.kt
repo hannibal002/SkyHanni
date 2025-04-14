@@ -292,6 +292,9 @@ class ProfileSpecificStorage {
         @Expose
         var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
+        @Expose
+        var hotChocolateMixinExpiry = farPast()
+
         class HitmanStatsStorage {
             @Expose
             var availableHitmanEggs: Int = 0
@@ -466,6 +469,7 @@ class ProfileSpecificStorage {
         @Expose
         var visitorDrops: VisitorDrops = VisitorDrops()
 
+        // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
         class VisitorDrops {
             @Expose
             var acceptedVisitors: Int = 0
@@ -473,8 +477,10 @@ class ProfileSpecificStorage {
             @Expose
             var deniedVisitors: Int = 0
 
+            fun getTotalVisitors() = acceptedVisitors + deniedVisitors
+
             @Expose
-            var visitorRarities: MutableList<Long> = mutableListOf()
+            var acceptedRarities: MutableMap<LorenzRarity, Long> = enumMapOf()
 
             @Expose
             var copper: Int = 0
@@ -498,7 +504,7 @@ class ProfileSpecificStorage {
             var gemstonePowder: Long = 0
 
             @Expose
-            var rewardsCount: Map<VisitorReward, Int> = enumMapOf()
+            var rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
         }
 
         @Expose
@@ -842,6 +848,9 @@ class ProfileSpecificStorage {
     }
 
     @Expose
+    var godPotExpiry: SimpleTimeMark = farPast()
+
+    @Expose
     var fairySouls: FairySoulsStorage = FairySoulsStorage()
 
     class FairySoulsStorage {
@@ -851,4 +860,12 @@ class ProfileSpecificStorage {
         @Expose
         var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
     }
+
+    @Expose
+    var cakeCounterData: CakeCounterData = CakeCounterData()
+
+    class CakeCounterData(
+        @Expose var cakesEaten: Int? = -1,
+        @Expose var soulsFound: Int = 0,
+    )
 }
