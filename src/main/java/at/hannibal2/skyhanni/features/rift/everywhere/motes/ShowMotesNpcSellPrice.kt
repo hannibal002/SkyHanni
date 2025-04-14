@@ -50,7 +50,6 @@ object ShowMotesNpcSellPrice {
         if (!isInventoryValueEnabled()) return
         if (inInventory) {
             config.inventoryValue.position.renderRenderables(
-                event.context,
                 display,
                 posLabel = "Inventory Motes Value",
             )

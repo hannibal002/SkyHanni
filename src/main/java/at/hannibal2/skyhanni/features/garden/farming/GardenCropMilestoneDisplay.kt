@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -79,19 +78,17 @@ object GardenCropMilestoneDisplay {
         if (GardenApi.hideExtraGuis()) return
 
         config.progressDisplayPos.renderRenderables(
-            event.context,
             progressDisplay, posLabel = "Crop Milestone Progress",
         )
 
         if (config.mushroomPetPerk.enabled) {
             config.mushroomPetPerk.pos.renderRenderables(
-                event.context,
                 mushroomCowPerkDisplay, posLabel = "Mushroom Cow Perk",
             )
         }
 
         if (config.next.bestDisplay) {
-            config.next.displayPos.renderRenderable(event.context, GardenBestCropTime.display, posLabel = "Best Crop Time")
+            config.next.displayPos.renderRenderable(GardenBestCropTime.display, posLabel = "Best Crop Time")
         }
     }
 
@@ -200,8 +197,7 @@ object GardenCropMilestoneDisplay {
                 val millis = missingTime.inWholeMilliseconds
                 GardenBestCropTime.timeTillNextCrop[crop] = millis
                 tryWarn(missingTime, "§b${crop.cropName} $nextTier in %t", crop)
-                // TODO, change functionality to use enum rather than ordinals
-                val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
+                val biggestUnit = config.highestTimeFormat.get().timeUnit
                 val duration = missingTime.format(biggestUnit)
                 val speedText = "§7In §b$duration"
                 lineMap[MilestoneTextEntry.TIME] = Renderable.string(speedText)
@@ -269,7 +265,7 @@ object GardenCropMilestoneDisplay {
             duration = timeLeft,
             addType = TitleManager.TitleAddType.FORCE_FIRST,
             countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
-            onInterval = SoundUtils::playBeepSound
+            onInterval = SoundUtils::playBeepSound,
         )
     }
 
@@ -325,8 +321,7 @@ object GardenCropMilestoneDisplay {
             val blocksPerSecond = speed * (GardenApi.getCurrentlyFarmedCrop()?.multiplier ?: 1)
 
             val missingTime = (missing / blocksPerSecond).seconds
-            // TODO, change functionality to use enum rather than ordinals
-            val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
+            val biggestUnit = config.highestTimeFormat.get().timeUnit
             val duration = missingTime.format(biggestUnit)
             lineMap[MushroomTextEntry.TIME] = Renderable.string("§7In §b$duration")
         }

@@ -126,7 +126,7 @@ object CropSpeedMeter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        GardenApi.config.cropSpeedMeterPos.renderStrings(event.context, display, posLabel = "Crop Speed Meter")
+        GardenApi.config.cropSpeedMeterPos.renderStrings(display, posLabel = "Crop Speed Meter")
     }
 
     fun isEnabled() = enabled && GardenApi.inGarden()

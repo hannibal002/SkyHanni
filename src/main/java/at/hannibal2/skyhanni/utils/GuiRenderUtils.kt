@@ -8,12 +8,11 @@ import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
@@ -41,54 +40,37 @@ object GuiRenderUtils {
 
     private val fr: FontRenderer get() = Minecraft.getMinecraft().fontRendererObj
 
-    private fun drawStringCentered(context: DrawContext, str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
+    private fun drawStringCentered(str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
         str ?: return
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
-        //#if MC < 1.21
-        fr.drawString(str, x2, y2, color, shadow)
-        //#else
-        //$$ context.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
-        //#endif
+        DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawStringCentered(context: DrawContext, str: String?, x: Int, y: Int) {
-        drawStringCentered(
-            context, str, x.toFloat(), y.toFloat(), true, 0xffffff,
-        )
+    fun drawStringCentered(str: String?, x: Int, y: Int) {
+        drawStringCentered(str, x.toFloat(), y.toFloat(), true, 0xffffff)
     }
 
-    fun drawStringCenteredScaledMaxWidth(context: DrawContext, text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
-        context.matrices.pushMatrix()
+    fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
+        DrawContextUtils.pushMatrix()
         val strLength = fr.getStringWidth(text)
         val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
-        context.matrices.translate(x, y, 0f)
-        context.matrices.scale(factor, factor, 1f)
-        drawString(context, text, -strLength / 2, -fr.FONT_HEIGHT / 2, color, shadow)
-        context.matrices.popMatrix()
+        DrawContextUtils.translate(x, y, 0f)
+        DrawContextUtils.scale(factor, factor, 1f)
+        drawString(text, -strLength / 2, -fr.FONT_HEIGHT / 2, color, shadow)
+        DrawContextUtils.popMatrix()
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawString(context: DrawContext, str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
-        //#if MC < 1.21
-        fr.drawString(str, x, y, color, shadow)
-        //#else
-        //$$ context.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
-        //#endif
+    fun drawString(str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawString(context: DrawContext, str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
-        //#if MC < 1.21
-        fr.drawString(str, x.toFloat(), y.toFloat(), color, shadow)
-        //#else
-        //$$ context.drawText(fr, str, x, y, color, shadow)
-        //#endif
+    fun drawString(str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
 
-    private fun renderItemStack(context: DrawContext, item: ItemStack, x: Int, y: Int) {
+    private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
         //#if MC < 1.21
         val itemRender = Minecraft.getMinecraft().renderItem
         RenderHelper.enableGUIStandardItemLighting()
@@ -144,9 +126,8 @@ object GuiRenderUtils {
         )
     }
 
-    fun drawScaledRec(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
+    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
         drawRect(
-            context,
             (left * inverseScale).toInt(),
             (top * inverseScale).toInt(),
             (right * inverseScale).toInt(),
@@ -155,23 +136,17 @@ object GuiRenderUtils {
         )
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawRect(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int, color: Int) {
-        //#if MC < 1.21
-        GuiScreen.drawRect(left, top, right, bottom, color)
-        //#else
-        //$$ context.fill(left, top, right, bottom, color)
-        //#endif
+    fun drawRect(left: Int, top: Int, right: Int, bottom: Int, color: Int) {
+        DrawContextUtils.drawContext.fill(left, top, right, bottom, color)
     }
 
-    fun renderItemAndBackground(context: DrawContext, item: ItemStack, x: Int, y: Int, color: Int) {
-        renderItemStack(context, item, x, y)
-        drawRect(context, x, y, x + 16, y + 16, color)
+    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
+        renderItemStack(item, x, y)
+        drawRect(x, y, x + 16, y + 16, color)
     }
 
     /** @Mojang */
     fun drawGradientRect(
-        context: DrawContext,
         left: Int,
         top: Int,
         right: Int,
@@ -209,9 +184,8 @@ object GuiRenderUtils {
         //#endif
     }
 
-    fun drawTexturedRect(context: DrawContext, x: Float, y: Float, texture: ResourceLocation, alpha: Float = 1f) {
+    fun drawTexturedRect(x: Float, y: Float, texture: ResourceLocation, alpha: Float = 1f) {
         drawTexturedRect(
-            context,
             x,
             y,
             GuiScreenUtils.scaledWindowWidth.toFloat(),
@@ -223,7 +197,6 @@ object GuiRenderUtils {
     }
 
     fun drawTexturedRect(
-        context: DrawContext,
         x: Int,
         y: Int,
         width: Int,
@@ -237,7 +210,6 @@ object GuiRenderUtils {
         filter: Int = GL11.GL_NEAREST,
     ) {
         drawTexturedRect(
-            context,
             x.toFloat(),
             y.toFloat(),
             width.toFloat(),
@@ -254,7 +226,6 @@ object GuiRenderUtils {
 
     // Taken from NEU
     private fun drawTexturedRect(
-        context: DrawContext,
         x: Float,
         y: Float,
         width: Float,
@@ -297,7 +268,7 @@ object GuiRenderUtils {
         //#endif
     }
 
-    fun enableScissor(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int) {
+    fun enableScissor(left: Int, top: Int, right: Int, bottom: Int) {
         //#if MC < 1.21
         val sr = net.minecraft.client.gui.ScaledResolution(Minecraft.getMinecraft())
         io.github.moulberry.notenoughupdates.core.GlScissorStack.push(left, top, right, bottom, sr)
@@ -306,7 +277,7 @@ object GuiRenderUtils {
         //#endif
     }
 
-    fun disableScissor(context: DrawContext) {
+    fun disableScissor() {
         //#if MC < 1.21
         io.github.moulberry.notenoughupdates.core.GlScissorStack.pop(net.minecraft.client.gui.ScaledResolution(Minecraft.getMinecraft()))
         //#else
@@ -315,7 +286,6 @@ object GuiRenderUtils {
     }
 
     fun drawFloatingRectDark(
-        context: DrawContext,
         x: Int,
         y: Int,
         width: Int,
@@ -335,19 +305,18 @@ object GuiRenderUtils {
         val main = alpha or 0x202026
         val light = -0xcfcfca
         val dark = -0xefefea
-        drawRect(context, x, y, x + 1, y + height, light) // Left
-        drawRect(context, x + 1, y, x + width, y + 1, light) // Top1
-        drawRect(context, x + width - 1, y + 1, x + width, y + height, dark) // Right
-        drawRect(context, x + 1, y + height - 1, x + width - 1, y + height, dark) // Bottom
-        drawRect(context, x + 1, y + 1, x + width - 1, y + height - 1, main) // Middle
+        drawRect(x, y, x + 1, y + height, light) // Left
+        drawRect(x + 1, y, x + width, y + 1, light) // Top1
+        drawRect(x + width - 1, y + 1, x + width, y + height, dark) // Right
+        drawRect(x + 1, y + height - 1, x + width - 1, y + height, dark) // Bottom
+        drawRect(x + 1, y + 1, x + width - 1, y + height - 1, main) // Middle
         if (shadow) {
-            drawRect(context, x + width, y + 2, x + width + 2, y + height + 2, 0x70000000) // Right shadow
-            drawRect(context, x + 2, y + height, x + width, y + height + 2, 0x70000000) // Bottom shadow
+            drawRect(x + width, y + 2, x + width + 2, y + height + 2, 0x70000000) // Right shadow
+            drawRect(x + 2, y + height, x + width, y + height + 2, 0x70000000) // Bottom shadow
         }
     }
 
     fun ItemStack.renderOnScreen(
-        context: DrawContext,
         x: Float,
         y: Float,
         scaleMultiplier: Double = NeuItems.ITEM_FONT_SIZE,
@@ -370,10 +339,10 @@ object GuiRenderUtils {
             translateY = y
         }
 
-        context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
 
-        context.matrices.translate(translateX, translateY, -19f)
-        context.matrices.scale(finalScale, finalScale, 0.2f)
+        DrawContextUtils.translate(translateX, translateY, -19f)
+        DrawContextUtils.scale(finalScale, finalScale, 0.2f)
         GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
 
         //#if MC < 1.21
@@ -385,7 +354,7 @@ object GuiRenderUtils {
         //$$ renderItemStack(context, item, 0, 0)
         //#endif
 
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     //#if MC < 1.21

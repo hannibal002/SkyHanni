@@ -121,8 +121,8 @@ object HoppityEggDisplayManager {
             outsideInventory = true,
             inOwnInventory = true,
             condition = { HoppityEggsManager.isActive() },
-            onRender = { context ->
-                unclaimedEggsConfig.position.renderRenderables(context, display, posLabel = "Hoppity Eggs")
+            onRender = {
+                unclaimedEggsConfig.position.renderRenderables(display, posLabel = "Hoppity Eggs")
             },
         )
     }

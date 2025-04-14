@@ -101,7 +101,7 @@ object LimboTimeTracker {
             return
         }
         val duration = limboJoinTime.passedSince().format()
-        config.showTimeInLimboPosition.renderString(event.context, "§eIn Limbo since §b$duration", posLabel = "Limbo Time Tracker")
+        config.showTimeInLimboPosition.renderString("§eIn Limbo since §b$duration", posLabel = "Limbo Time Tracker")
     }
 
     private fun leaveLimbo() {

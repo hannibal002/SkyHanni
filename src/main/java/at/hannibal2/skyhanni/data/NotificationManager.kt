@@ -44,18 +44,18 @@ object NotificationManager {
         val midX = GuiScreenUtils.scaledWindowWidth / 2
         val topY = (GuiScreenUtils.scaledWindowHeight * 0.75 - notification.height / 2).toInt()
 
-        GuiRenderUtils.drawFloatingRectDark(event.context, midX - notification.width / 2, topY, notification.width, notification.height)
+        GuiRenderUtils.drawFloatingRectDark(midX - notification.width / 2, topY, notification.width, notification.height)
         val closeTextWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(CLOSE_TEXT)
 
-        GuiRenderUtils.drawString(event.context, CLOSE_TEXT, midX + notification.width / 2 - 3 - closeTextWidth, topY + 4)
+        GuiRenderUtils.drawString(CLOSE_TEXT, midX + notification.width / 2 - 3 - closeTextWidth, topY + 4)
 
         if (notification.length.isFinite()) {
             val remainingTime = "§8" + notification.endTime.timeUntil().format()
-            GuiRenderUtils.drawString(event.context, remainingTime, midX - notification.width / 2 + 4, topY + 4)
+            GuiRenderUtils.drawString(remainingTime, midX - notification.width / 2 + 4, topY + 4)
         }
 
         notification.message.forEachIndexed { index, line ->
-            GuiRenderUtils.drawStringCentered(event.context, "§7$line", midX, topY + 19 + index * 10)
+            GuiRenderUtils.drawStringCentered("§7$line", midX, topY + 19 + index * 10)
         }
     }
 

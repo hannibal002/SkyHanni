@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -35,16 +36,16 @@ object ColdOverlay {
 
         Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
 
-        event.context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
         GlStateManager.pushAttrib()
 
         GL11.glDepthMask(false)
-        event.context.matrices.translate(0f, 0f, -500f)
-        GuiRenderUtils.drawTexturedRect(event.context, 0f, 0f, textureLocation, alpha)
+        DrawContextUtils.translate(0f, 0f, -500f)
+        GuiRenderUtils.drawTexturedRect(0f, 0f, textureLocation, alpha)
 
         GL11.glDepthMask(true)
 
-        event.context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
         GlStateManager.popAttrib()
     }
 

@@ -70,7 +70,7 @@ object LockMouseLook {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!lockedMouse) return
-        config.lockedMouseDisplay.renderString(event.context, "§eMouse Locked", posLabel = "Mouse Locked")
+        config.lockedMouseDisplay.renderString("§eMouse Locked", posLabel = "Mouse Locked")
     }
 
     fun autoDisable() {

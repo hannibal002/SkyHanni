@@ -499,9 +499,9 @@ object GardenNextJacobContest {
         if (!isEnabled()) return
 
         if (display == null) {
-            config.pos.renderStrings(event.context, simpleDisplay, posLabel = "Next Jacob Contest")
+            config.pos.renderStrings(simpleDisplay, posLabel = "Next Jacob Contest")
         } else {
-            config.pos.renderRenderable(event.context, display, posLabel = "Next Jacob Contest")
+            config.pos.renderRenderable(display, posLabel = "Next Jacob Contest")
         }
     }
 
@@ -512,7 +512,6 @@ object GardenNextJacobContest {
 
         if (display != null) {
             SkyHanniMod.feature.misc.inventoryLoadPos.renderRenderable(
-                event.context,
                 display,
                 posLabel = "Load SkyBlock Calendar",
             )

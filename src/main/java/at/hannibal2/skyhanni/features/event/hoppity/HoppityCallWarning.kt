@@ -97,7 +97,6 @@ object HoppityCallWarning {
         // Shift the alpha value 24 bits to the left to position it in the color's alpha channel.
         val shiftedRandomAlpha = randomizationAlphaInt shl 24
         GuiRenderUtils.drawRect(
-            event.context,
             0,
             0,
             GuiScreenUtils.displayWidth,

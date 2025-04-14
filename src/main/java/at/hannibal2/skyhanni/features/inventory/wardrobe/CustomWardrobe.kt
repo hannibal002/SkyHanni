@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -48,7 +49,7 @@ object CustomWardrobe {
 
     private var displayRenderable: Renderable? = null
     private var inventoryButton: Renderable? = null
-    private var editMode = false
+    var editMode = false
     private var waitingForInventoryUpdate = false
 
     private val position: Position = Position().ignoreScale()
@@ -58,6 +59,7 @@ object CustomWardrobe {
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
+
     // TODO use inventory InventoryDetector
     private const val GUI_NAME = "Custom Wardrobe"
 
@@ -90,19 +92,19 @@ object CustomWardrobe {
                 scale = activeScale / 100.0,
             )
             loadingPosition.moveTo(position.x + (width - loadingRenderable.width) / 2, position.y - loadingRenderable.height)
-                .renderRenderable(event.context, loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
+                .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
-        event.context.matrices.pushMatrix()
-        event.context.matrices.translate(0f, 0f, 100f)
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate(0f, 0f, 100f)
 
-        position.renderRenderable(event.context, renderable, posLabel = GUI_NAME, addToGuiManager = false)
+        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
-            event.context.matrices.translate(0f, 0f, 400f)
+            DrawContextUtils.translate(0f, 0f, 400f)
             EstimatedItemValue.tryRendering()
         }
-        event.context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
         event.cancel()
     }
 
@@ -117,7 +119,7 @@ object CustomWardrobe {
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
         val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
         inventoryButtonPosition.moveTo(posX, posY)
-            .renderRenderable(event.context, renderable, posLabel = GUI_NAME, addToGuiManager = false)
+            .renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
     @HandleEvent

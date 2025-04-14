@@ -103,7 +103,7 @@ object TrackParticlesCommand {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (cutOffTime.isInPast()) return
-        position.renderRenderables(event.context, display, posLabel = "Track particles log")
+        position.renderRenderables(display, posLabel = "Track particles log")
     }
 
     @HandleEvent

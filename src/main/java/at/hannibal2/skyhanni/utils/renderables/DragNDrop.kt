@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
@@ -34,9 +33,9 @@ object DragNDrop {
         }
         GlStateManager.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 0f)
         if (isInvalidDrop) {
-            invalidItem.render(event.context, event.mouseX, event.mouseY)
+            invalidItem.render(event.mouseX, event.mouseY)
         } else {
-            item.onRender(event.context, event.mouseX, event.mouseY)
+            item.onRender(event.mouseX, event.mouseY)
         }
         GlStateManager.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
     }
@@ -59,11 +58,11 @@ object DragNDrop {
         bypassChecks: Boolean = false,
         condition: () -> Boolean = { true },
     ): Renderable = object : RenderableWrapper(display) {
-        override fun render(context: DrawContext, posX: Int, posY: Int) {
+        override fun render(posX: Int, posY: Int) {
             if (isHovered(posX, posY) && condition() && Renderable.shouldAllowLink(true, bypassChecks)) {
                 handelDroppable(drop)
             }
-            content.render(context, posX, posY)
+            content.render(posX, posY)
         }
     }
 
@@ -87,13 +86,13 @@ fun ItemStack.toDragItem(scale: Double = 1.0) = object : DragItem<ItemStack> {
 
     override fun get(): ItemStack = this@toDragItem
 
-    override fun onRender(context: DrawContext, mouseX: Int, mouseY: Int) = render.render(context, mouseX, mouseY)
+    override fun onRender(mouseX: Int, mouseY: Int) = render.render(mouseX, mouseY)
 }
 
 interface DragItem<T> {
 
     fun get(): T
-    fun onRender(context: DrawContext, mouseX: Int, mouseY: Int)
+    fun onRender(mouseX: Int, mouseY: Int)
 
 }
 

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darken
@@ -41,12 +41,12 @@ enum class MiningEventType(
             val compass = Renderable.itemStack(Items.compass.toItemStack(), 0.45)
             val wind = Renderable.string("§9≈", scale = 0.75)
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                context.matrices.translate(1f, 1f, -2f)
-                compass.render(context, posX, posY)
-                context.matrices.translate(-1f, -2f, 2f)
-                wind.render(context, posX, posY)
-                context.matrices.translate(0f, 1f, 0f)
+            override fun render(posX: Int, posY: Int) {
+                DrawContextUtils.translate(1f, 1f, -2f)
+                compass.render(posX, posY)
+                DrawContextUtils.translate(-1f, -2f, 2f)
+                wind.render(posX, posY)
+                DrawContextUtils.translate(0f, 1f, 0f)
             }
         },
     ),
@@ -61,12 +61,12 @@ enum class MiningEventType(
             val dyeGreen = Renderable.itemStack(DyeCompat.LIME.createStack(), 0.45)
             val dyePink = Renderable.itemStack(DyeCompat.PINK.createStack(), 0.45)
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                context.matrices.translate(1f, 0f, 0f)
-                dyePink.render(context, posX + 1, posY - 1)
-                context.matrices.translate(-2f, 1.5f, 0f)
-                dyeGreen.render(context, posX, posY)
-                context.matrices.translate(1f, -1.5f, 0f)
+            override fun render(posX: Int, posY: Int) {
+                DrawContextUtils.translate(1f, 0f, 0f)
+                dyePink.render(posX + 1, posY - 1)
+                DrawContextUtils.translate(-2f, 1.5f, 0f)
+                dyeGreen.render(posX, posY)
+                DrawContextUtils.translate(1f, -1.5f, 0f)
             }
 
         },
@@ -74,7 +74,7 @@ enum class MiningEventType(
 
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, LorenzColor.RED, true,
-        Renderable.itemStack(Items.skull.toItemStack(3), 0.36) // Late init when skull texture holder is loaded
+        Renderable.itemStack(Items.skull.toItemStack(3), 0.36), // Late init when skull texture holder is loaded
     ),
 
     BETTER_TOGETHER(
@@ -97,12 +97,12 @@ enum class MiningEventType(
                 )
             }
 
-            override fun render(context: DrawContext, posX: Int, posY: Int) {
-                context.matrices.translate(-1f, 0f, 0f)
-                alexHead.render(context, posX, posY)
-                context.matrices.translate(+4f, +3f, 0f)
-                steveHead.render(context, posX, posY)
-                context.matrices.translate(-3f, -3f, 0f)
+            override fun render(posX: Int, posY: Int) {
+                DrawContextUtils.translate(-1f, 0f, 0f)
+                alexHead.render(posX, posY)
+                DrawContextUtils.translate(+4f, +3f, 0f)
+                steveHead.render(posX, posY)
+                DrawContextUtils.translate(-3f, -3f, 0f)
             }
 
         },
@@ -120,7 +120,7 @@ enum class MiningEventType(
         "Gourmand", 10.minutes,
         color = LorenzColor.AQUA,
         dwarvenSpecific = true,
-        iconInput = DyeCompat.CYAN.createStack().overrideId("MITHRIL_GOURMAND")
+        iconInput = DyeCompat.CYAN.createStack().overrideId("MITHRIL_GOURMAND"),
     ),
     ;
 

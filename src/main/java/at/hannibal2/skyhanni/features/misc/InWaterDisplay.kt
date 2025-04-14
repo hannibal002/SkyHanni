@@ -18,7 +18,7 @@ object InWaterDisplay {
         if (!isEnabled()) return
 
         val text = "§7In Water: " + if (MinecraftCompat.localPlayer.isInWater) "§aTrue" else "§cFalse"
-        config.inWaterPosition.renderStrings(event.context, listOf(text), posLabel = "In Water Display")
+        config.inWaterPosition.renderStrings(listOf(text), posLabel = "In Water Display")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.inWaterDisplay

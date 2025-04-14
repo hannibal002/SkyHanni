@@ -68,7 +68,7 @@ object SprayFeatures {
             return
         }
 
-        config.position.renderString(event.context, display, posLabel = "Pest Spray Selector")
+        config.position.renderString(display, posLabel = "Pest Spray Selector")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

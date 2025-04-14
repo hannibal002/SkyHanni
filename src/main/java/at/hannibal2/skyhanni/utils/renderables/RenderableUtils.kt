@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
@@ -102,7 +102,7 @@ internal object RenderableUtils {
         else -> 0
     }
 
-    fun Renderable.renderAndScale(context: DrawContext, posX: Int, posY: Int, xSpace: Int, ySpace: Int, padding: Int = 5) {
+    fun Renderable.renderAndScale(posX: Int, posY: Int, xSpace: Int, ySpace: Int, padding: Int = 5) {
         val xWithoutPadding = xSpace - padding * 2
         val yWithoutPadding = ySpace - padding * 2
 
@@ -125,57 +125,55 @@ internal object RenderableUtils {
             Renderable.currentRenderPassMousePosition =
                 ((preScaleMouse.first - padding) * inverseScale).toInt() to ((preScaleMouse.second - padding) * inverseScale).toInt()
 
-            context.matrices.translate(xOffsetRender, yOffsetRender, 0f)
-            context.matrices.scale(scale.toFloat(), scale.toFloat(), 1.0f)
+            DrawContextUtils.translate(xOffsetRender, yOffsetRender, 0f)
+            DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1.0f)
             render(
-                context,
                 posX + (xOffset * inverseScale).toInt(),
                 posY + (yOffset * inverseScale).toInt(),
             )
-            context.matrices.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1.0f)
-            context.matrices.translate(-xOffsetRender, -yOffsetRender, 0f)
+            DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1.0f)
+            DrawContextUtils.translate(-xOffsetRender, -yOffsetRender, 0f)
         } finally {
             Renderable.currentRenderPassMousePosition = preScaleMouse
         }
     }
 
-    fun Renderable.renderXYAligned(context: DrawContext, posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
+    fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         val yOffset = calculateAlignmentYOffset(this, ySpace)
-        context.matrices.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
-        this.render(context, posX + xOffset, posY + yOffset)
-        context.matrices.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
+        this.render(posX + xOffset, posY + yOffset)
+        DrawContextUtils.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
         return xOffset to yOffset
     }
 
-    fun Renderable.renderXAligned(context: DrawContext, posX: Int, posY: Int, xSpace: Int): Int {
+    fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int): Int {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
-        context.matrices.translate(xOffset.toFloat(), 0f, 0f)
-        this.render(context, posX + xOffset, posY)
-        context.matrices.translate(-xOffset.toFloat(), 0f, 0f)
+        DrawContextUtils.translate(xOffset.toFloat(), 0f, 0f)
+        this.render(posX + xOffset, posY)
+        DrawContextUtils.translate(-xOffset.toFloat(), 0f, 0f)
         return xOffset
     }
 
-    fun Renderable.renderYAligned(context: DrawContext, posX: Int, posY: Int, ySpace: Int): Int {
+    fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int): Int {
         val yOffset = calculateAlignmentYOffset(this, ySpace)
-        context.matrices.translate(0f, yOffset.toFloat(), 0f)
-        this.render(context, posX, posY + yOffset)
-        context.matrices.translate(0f, -yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(0f, yOffset.toFloat(), 0f)
+        this.render(posX, posY + yOffset)
+        DrawContextUtils.translate(0f, -yOffset.toFloat(), 0f)
         return yOffset
     }
 
     inline fun renderString(
-        context: DrawContext,
         text: String,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
         inverseScale: Double = 1 / scale,
     ) {
-        context.matrices.translate(1.0, 1.0, 0.0)
-        context.matrices.scale(scale.toFloat(), scale.toFloat(), 1f)
-        GuiRenderUtils.drawString(context, text, 0f, 0f, color.rgb)
-        context.matrices.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
-        context.matrices.translate(-1.0, -1.0, 0.0)
+        DrawContextUtils.translate(1.0, 1.0, 0.0)
+        DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
+        GuiRenderUtils.drawString(text, 0f, 0f, color.rgb)
+        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
+        DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
 
     inline fun <T> MutableList<Searchable>.addNullableButton(

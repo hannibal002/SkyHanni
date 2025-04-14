@@ -212,7 +212,7 @@ object GardenLevelDisplay {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
 
-        config.pos.renderString(event.context, display, posLabel = "Garden Level")
+        config.pos.renderString(display, posLabel = "Garden Level")
     }
 
     @HandleEvent

@@ -58,7 +58,7 @@ object BonusPestChanceDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.pestChanceDisplayPosition.renderString(event.context, display, posLabel = "Bonus Pest Chance")
+        config.pestChanceDisplayPosition.renderString(display, posLabel = "Bonus Pest Chance")
     }
 
     private fun isEnabled() = GardenApi.inGarden() && config.pestChanceDisplay && !GardenApi.hideExtraGuis()

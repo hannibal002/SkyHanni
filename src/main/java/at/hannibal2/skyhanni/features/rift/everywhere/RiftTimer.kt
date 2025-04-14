@@ -128,7 +128,7 @@ object RiftTimer {
         if (!isEnabled()) return
         if (RiftApi.inMirrorVerse) return
 
-        config.timerPosition.renderStrings(event.context, display, posLabel = "Rift Timer")
+        config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)

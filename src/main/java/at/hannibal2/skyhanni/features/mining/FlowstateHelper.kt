@@ -82,7 +82,7 @@ object FlowstateHelper {
             createDisplay()
         }
 
-        config.position.renderRenderables(event.context, display, extraSpace = 1, "Flowstate Helper")
+        config.position.renderRenderables(display, extraSpace = 1, "Flowstate Helper")
     }
 
     private fun shouldAutoHide(): Boolean {

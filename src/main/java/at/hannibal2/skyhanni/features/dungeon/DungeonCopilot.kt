@@ -150,7 +150,7 @@ object DungeonCopilot {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.pos.renderString(event.context, nextStep, posLabel = "Dungeon Copilot")
+        config.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
     }
 
     @HandleEvent

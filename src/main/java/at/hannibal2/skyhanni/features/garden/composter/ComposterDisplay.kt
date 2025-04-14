@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addHorizontalSpacer
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.time.Duration
@@ -161,13 +160,13 @@ object ComposterDisplay {
         if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
 
         if (GardenApi.inGarden() && config.displayEnabled) {
-            config.displayPos.renderRenderable(event.context, display, posLabel = "Composter Display")
+            config.displayPos.renderRenderable(display, posLabel = "Composter Display")
         }
 
-        checkWarningsAndOutsideGarden(event.context)
+        checkWarningsAndOutsideGarden()
     }
 
-    private fun checkWarningsAndOutsideGarden(context: DrawContext) {
+    private fun checkWarningsAndOutsideGarden() {
         val format = GardenApi.storage?.let {
             if (!it.composterEmptyTime.isFarPast()) {
                 val duration = it.composterEmptyTime.timeUntil()
@@ -190,12 +189,12 @@ object ComposterDisplay {
                 addItemStack(bucket)
                 addString("§b$format")
             }
-            config.outsideGardenPos.renderRenderable(context, outsideGardenDisplay, posLabel = "Composter Outside Garden")
+            config.outsideGardenPos.renderRenderable(outsideGardenDisplay, posLabel = "Composter Outside Garden")
         }
     }
 
     private fun warn(warningMessage: String) {
-        if (!config.warnAlmostClose) return
+        if (!config.warnAlmostEmpty) return
         val storage = GardenApi.storage ?: return
 
         if (ReminderUtils.isBusy()) return
@@ -207,7 +206,7 @@ object ComposterDisplay {
         } else {
             ChatUtils.clickToActionOrDisable(
                 warningMessage,
-                config::warnAlmostClose,
+                config::warnAlmostEmpty,
                 actionName = "warp to the Garden",
                 action = { HypixelCommands.warp("garden") },
             )
@@ -227,5 +226,7 @@ object ComposterDisplay {
         event.move(3, "garden.composterNotifyLowTitle", "garden.composters.notifyLow.title")
         event.move(3, "garden.composterNotifyLowOrganicMatter", "garden.composters.notifyLow.organicMatter")
         event.move(3, "garden.composterNotifyLowFuel", "garden.composters.notifyLow.fuel")
+
+        event.move(85, "garden.composters.warnAlmostClose", "garden.composters.warnAlmostEmpty")
     }
 }

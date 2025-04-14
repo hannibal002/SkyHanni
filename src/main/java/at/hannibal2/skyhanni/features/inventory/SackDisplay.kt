@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 
+// Shows the price of iems in sacks while being in the sacks
 @SkyHanniModule
 object SackDisplay {
 
@@ -49,9 +50,8 @@ object SackDisplay {
         RenderDisplayHelper(
             inventory = SackApi.inventory,
             condition = { isEnabled() },
-        ) { context ->
+        ) {
             config.position.renderRenderables(
-                context,
                 display, extraSpace = config.extraSpace, posLabel = "Sacks Items",
             )
         }
@@ -64,7 +64,7 @@ object SackDisplay {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.stack.getLore()
             if (lore.any { it.startsWith("§7Stored: §a") }) {
-                slot.highlight(event.context, LorenzColor.RED)
+                slot.highlight(LorenzColor.RED)
             }
         }
     }

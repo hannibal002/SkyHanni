@@ -117,7 +117,7 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldRender) return
-        config.position.renderRenderables(event.context, display, posLabel = "Pest Spawn Timer")
+        config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
     }
 
     @HandleEvent

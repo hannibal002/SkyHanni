@@ -242,10 +242,10 @@ object BingoCardDisplay {
         }
         if (displayMode == 0) {
             if (Minecraft.getMinecraft().currentScreen !is GuiChat) {
-                config.bingoCardPos.renderRenderables(event.context, display, posLabel = "Bingo Card")
+                config.bingoCardPos.renderRenderables(display, posLabel = "Bingo Card")
             }
         } else if (displayMode == 1) {
-            config.bingoCardPos.renderStrings(event.context, BingoNextStepHelper.currentHelp, posLabel = "Bingo Card")
+            config.bingoCardPos.renderStrings(BingoNextStepHelper.currentHelp, posLabel = "Bingo Card")
         }
     }
 

@@ -45,7 +45,7 @@ object VolcanoExplosivityDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.positionVolcano.renderString(event.context, display, posLabel = "Volcano Explosivity")
+        config.positionVolcano.renderString(display, posLabel = "Volcano Explosivity")
     }
 
     private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.volcanoExplosivity

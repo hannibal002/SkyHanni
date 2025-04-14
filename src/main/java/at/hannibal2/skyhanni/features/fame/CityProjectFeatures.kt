@@ -223,7 +223,7 @@ object CityProjectFeatures {
         if (!config.showMaterials) return
         if (!inInventory) return
 
-        config.pos.renderRenderable(event.context, display, posLabel = "City Project Materials")
+        config.pos.renderRenderable(display, posLabel = "City Project Materials")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -239,7 +239,7 @@ object CityProjectFeatures {
             if (lore.isEmpty()) continue
             val last = lore.last()
             if (last == "§eClick to contribute!") {
-                slot.highlight(event.context, LorenzColor.YELLOW)
+                slot.highlight(LorenzColor.YELLOW)
             }
         }
     }

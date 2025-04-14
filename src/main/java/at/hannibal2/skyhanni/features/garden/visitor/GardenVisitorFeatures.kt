@@ -61,13 +61,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isBazaarSign
 import at.hannibal2.skyhanni.utils.SignUtils.isSupercraftAmountSetSign
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -364,7 +362,7 @@ object GardenVisitorFeatures {
     @HandleEvent
     fun onVisitorRefused(event: VisitorRefusedEvent) {
         update()
-        GardenVisitorDropStatistics.deniedVisitors += 1
+        GardenApi.storage?.visitorDrops?.let { it.deniedVisitors += 1 }
         GardenVisitorDropStatistics.saveAndUpdate()
     }
 
@@ -372,8 +370,7 @@ object GardenVisitorFeatures {
     fun onVisitorAccepted(event: VisitorAcceptedEvent) {
         VisitorAcceptEvent(event.visitor).post()
         update()
-        GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
-        GardenVisitorDropStatistics.lastAccept = SimpleTimeMark.now()
+        GardenApi.storage?.visitorDrops?.let { it.coinsSpent += round(lastFullPrice).toLong() }
     }
 
     @HandleEvent
@@ -643,9 +640,9 @@ object GardenVisitorFeatures {
         return ready
     }
 
-    private fun renderDisplay(context: DrawContext) {
+    private fun renderDisplay() {
         if (showGui() && shouldShowShoppingList()) {
-            config.shoppingList.pos.renderRenderables(context, display, posLabel = "Visitor Shopping List")
+            config.shoppingList.pos.renderRenderables(display, posLabel = "Visitor Shopping List")
         }
     }
 
@@ -655,7 +652,7 @@ object GardenVisitorFeatures {
         val gui = event.gui
         if (gui !is GuiEditSign) return
 
-        renderDisplay(event.context)
+        renderDisplay()
     }
 
     @HandleEvent
@@ -664,7 +661,7 @@ object GardenVisitorFeatures {
         val currentScreen = Minecraft.getMinecraft().currentScreen
         if (currentScreen is GuiEditSign) return
 
-        renderDisplay(event.context)
+        renderDisplay()
     }
 
     private fun shouldShowShoppingList(): Boolean {

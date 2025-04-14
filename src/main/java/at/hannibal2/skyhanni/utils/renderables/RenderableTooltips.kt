@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import net.minecraft.client.Minecraft
@@ -24,7 +23,7 @@ object RenderableTooltips {
         if (event.startPhase) {
             tooltip = null
         } else {
-            drawHoveringText(event.context)
+            drawHoveringText()
         }
     }
 
@@ -38,7 +37,7 @@ object RenderableTooltips {
         tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfToLong, spacedTitle)
     }
 
-    private fun drawHoveringText(context: DrawContext) {
+    private fun drawHoveringText() {
         val tooltip = tooltip ?: return
         val tips = tooltip.tips
         if (tips.isEmpty()) return
@@ -77,13 +76,13 @@ object RenderableTooltips {
         val zLevel = 400f
         GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
-        drawTooltipBackground(context, tooltipTextWidth, tooltipHeight, borderColorStart)
+        drawTooltipBackground(tooltipTextWidth, tooltipHeight, borderColorStart)
 
         GlStateManager.translate(-1f, -1f, 0f)
 
         var yTranslateSum = 0
         tips.forEachIndexed { index, line ->
-            line.renderXAligned(context, tooltipX, tooltipY, tooltipTextWidth)
+            line.renderXAligned(tooltipX, tooltipY, tooltipTextWidth)
             var yShift = line.height
             if (index == 0 && isSpacedTitle) yShift += 2
             GlStateManager.translate(0f, yShift.toFloat(), 0f)
@@ -97,43 +96,37 @@ object RenderableTooltips {
         GlStateManager.disableLighting()
     }
 
-    private fun drawTooltipBackground(context: DrawContext, tooltipTextWidth: Int, tooltipHeight: Int, borderColorStart: Int) {
+    private fun drawTooltipBackground(tooltipTextWidth: Int, tooltipHeight: Int, borderColorStart: Int) {
         val borderColorEnd = borderColorStart and 0xFEFEFE shr 1 or (borderColorStart and -0x1000000)
 
-        GuiRenderUtils.drawGradientRect(context, left = -3, top = -4, right = tooltipTextWidth + 2, bottom = -3)
+        GuiRenderUtils.drawGradientRect(left = -3, top = -4, right = tooltipTextWidth + 2, bottom = -3)
         GuiRenderUtils.drawGradientRect(
-            context,
             left = -3,
             top = tooltipHeight + 3,
             right = tooltipTextWidth + 2,
             bottom = tooltipHeight + 4,
         )
-        GuiRenderUtils.drawGradientRect(context, left = -3, top = -3, right = tooltipTextWidth + 2, bottom = tooltipHeight + 3)
-        GuiRenderUtils.drawGradientRect(context, left = -4, top = -3, right = -3, bottom = tooltipHeight + 3)
+        GuiRenderUtils.drawGradientRect(left = -3, top = -3, right = tooltipTextWidth + 2, bottom = tooltipHeight + 3)
+        GuiRenderUtils.drawGradientRect(left = -4, top = -3, right = -3, bottom = tooltipHeight + 3)
         GuiRenderUtils.drawGradientRect(
-            context,
             left = tooltipTextWidth + 2,
             top = -3,
             right = tooltipTextWidth + 3,
             bottom = tooltipHeight + 3,
         )
         GuiRenderUtils.drawGradientRect(
-            context,
             left = -3, top = -3 + 1, right = -3 + 1, bottom = tooltipHeight + 3 - 1,
             startColor = borderColorStart, endColor = borderColorEnd,
         )
         GuiRenderUtils.drawGradientRect(
-            context,
             left = tooltipTextWidth + 1, top = -3 + 1, right = tooltipTextWidth + 2, bottom = tooltipHeight + 3 - 1,
             startColor = borderColorStart, endColor = borderColorEnd,
         )
         GuiRenderUtils.drawGradientRect(
-            context,
             left = -3, top = -3, right = tooltipTextWidth + 2, bottom = -3 + 1,
             startColor = borderColorStart, endColor = borderColorStart,
         )
         GuiRenderUtils.drawGradientRect(
-            context,
             left = -3, top = tooltipHeight + 2, right = tooltipTextWidth + 2, bottom = tooltipHeight + 3,
             startColor = borderColorEnd, endColor = borderColorEnd,
         )
