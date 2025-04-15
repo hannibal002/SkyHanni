@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import net.minecraft.item.ItemStack
@@ -38,6 +39,7 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
  * Since this logic only works via packets, and the player inventory (pressing E) is client side,
  * this event does not get fired when opening the inventory via pressing E.
  */
+@PrimaryFunction("onInventoryFullyOpened")
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)

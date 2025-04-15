@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
