@@ -81,7 +81,7 @@ object SlayerApi {
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
                 add(" hypixel area: ${HypixelData.skyBlockArea}")
-                add("graph area: ${IslandAreas.currentAreaName}")
+                add(" graph area: ${IslandAreas.currentAreaName}")
             }
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: ${latestSlayerProgress.removeColor()}")
