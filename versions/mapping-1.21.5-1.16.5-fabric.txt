@@ -24,3 +24,5 @@ net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext at.hannibal2.skyh
 
 net.minecraft.client.util.math.MatrixStack push() pushMatrix()
 net.minecraft.client.util.math.MatrixStack pop() popMatrix()
+
+net.minecraft.entity.player.PlayerInventory mainStacks main
