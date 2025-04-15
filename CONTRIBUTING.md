@@ -231,9 +231,9 @@ looking in the `at.hannibal2.skyhanni.utils.compat` package is a good idea, as t
 both have a nullable version as well: `MinecraftCompat.localPlayerOrNull()` and `MinecraftCompat.localWorldOrNull()`. This is because on
 1.8.9 while the player and world can be nullable at times, Minecraft's source code does not reflect this.
 - Rendering on modern versions is done completely differently than on 1.8.9. As such, on 1.8.9 we have adjusted our rendering code to more
-closely resemble modern rendering code. You will notice that we pass around both a `DrawContext` and a `WorldRenderContext` object. Both of
-these objects both hold a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack,
-translating and scaling. Where possible you should use these objects instead of the `GlStateManager` directly. If you are unsure, make sure
+closely resemble modern rendering code. You may notice a `DrawContext` or `WorldRenderContext` object being passed around. These both hold
+a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack, translating and scaling.
+To do most of these calls instead of using `GlStateManager` directly, you should use `DrawContextUtils` instead. If you are unsure, make sure
 to look at existing code to see how it is done and if you are still unsure, ask for help.
 - When making GUI screens or other GUI elements, you should try to use Renderables where possible as these should already account for
 most modern rendering changes. If you are making a new GUI screen, make sure to extend `SkyHanniBaseScreen` instead of `GuiScreen` to ensure
@@ -269,6 +269,10 @@ Allows project specific plugins to run. Eg: Regex Intention
 ### [Live Templates Sharing](https://plugins.jetbrains.com/plugin/25007-live-templates-sharing)
 
 Imports our custom live templates automatically. Live Templates allow for quicker code writing.
+
+### [Minecraft Development](https://plugins.jetbrains.com/plugin/8327-minecraft-development)
+
+Helps you write minecraft specific code such as mixins and access wideners.
 
 ## Software Used in SkyHanni
 
@@ -566,3 +570,15 @@ These helper methods should generally be placed in the `at.hannibal2.skyhanni.ut
 compatability methods for. For example, `WorldClient.getAllEntities()` could be placed in `WorldCompat.kt`. This is not a strict rule, but
 it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files
 themselves.
+
+
+### Access Wideners
+
+You may want to use private minecraft methods or fields, this is where access wideners come in. 
+Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or 
+field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
+To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and 
+select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<version number>/src/main/resources/skyhanni.accesswidener`.
+Then you need to reload gradle for the changes to apply.
+
+This requires you to have the Minecraft Development plugin installed as mentioned earlier.

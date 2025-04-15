@@ -53,7 +53,7 @@ object FishingProfitTracker {
      */
     private val coinsChatPattern by RepoPattern.pattern(
         "fishing.tracker.chat.coins",
-        "§(?<colorCode>.*)⛃ §r(?<catch>.*) CATCH! §r§fYou caught §r§6(?<coins>[\\d,]+) Coins§r§f!"
+        "§(?<colorCode>.*)⛃ §r(?<catch>.*) CATCH! §r§fYou caught §r§6(?<coins>[\\d,]+) Coins§r§f!",
     )
 
     private var lastCatchTime = SimpleTimeMark.farPast()
@@ -201,6 +201,7 @@ object FishingProfitTracker {
         if (!isEnabled()) return
 
         if (event.source == ItemAddManager.Source.COMMAND) {
+            if (!config.enabled) return
             tryAddItem(event.internalName, event.amount, command = true)
             return
         }
@@ -225,16 +226,19 @@ object FishingProfitTracker {
         lastCatchTime = SimpleTimeMark.now()
     }
 
+    private val isRecentPickup: Boolean
+        get() = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
+
+    private val shouldShow: Boolean
+        get() = isRecentPickup || FishingApi.isFishing(checkRodInHand = false)
+
     init {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() },
+            condition = { isEnabled() && config.enabled && shouldShow },
             onRender = {
-                val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
-                if (recentPickup || FishingApi.isFishing(checkRodInHand = false)) {
-                    tracker.renderDisplay(config.position)
-                }
+                tracker.renderDisplay(config.position)
             },
         )
     }
@@ -263,7 +267,7 @@ object FishingProfitTracker {
         tracker.firstUpdate()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.inKuudraFight
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

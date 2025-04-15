@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -27,6 +26,7 @@ object GardenBestCropTime {
     var display: Renderable? = null
 
     private val config get() = GardenApi.config.cropMilestones
+
     // Todo: Use Duration instead of Long
     val timeTillNextCrop = mutableMapOf<CropType, Long>()
 
@@ -110,8 +110,7 @@ object GardenBestCropTime {
     private fun createCropEntry(crop: CropType, index: Int, useOverflow: Boolean, gardenExp: Boolean, currentCrop: CropType?): Renderable? {
         if (crop.isMaxed(useOverflow)) return null
         val millis = timeTillNextCrop[crop]?.milliseconds ?: return null
-        // TODO, change functionality to use enum rather than ordinals
-        val biggestUnit = TimeUnit.entries[config.highestTimeFormat.get().ordinal]
+        val biggestUnit = config.highestTimeFormat.get().timeUnit
         val duration = millis.format(biggestUnit, maxUnits = 2)
         val isCurrent = crop == currentCrop
         if (index > config.next.showOnlyBest && (!config.next.showCurrent || !isCurrent)) return null
