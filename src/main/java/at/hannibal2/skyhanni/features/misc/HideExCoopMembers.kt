@@ -87,7 +87,7 @@ object HideExCoopMembers {
         val itemsToRemove = mutableListOf<Int>()
 
         drop(coopIndex).forEachIndexed { index, line ->
-            if (line.isBlank()) return@forEachIndexed  // Stop processing on blank line
+            if (line.isBlank()) return@forEachIndexed
 
             collectedPattern.matchMatcher(line) {
                 if (group("name") in storage) {
