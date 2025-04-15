@@ -42,7 +42,7 @@ object SlayerApi {
     var latestSlayerProgress = ""
 
     val currentAreaType by RecalculatingValue(500.milliseconds) {
-        checkSlayerTypeForCurrentArea(IslandAreas.currentAreaName)
+        checkSlayerTypeForCurrentArea()
     }
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
@@ -146,7 +146,7 @@ object SlayerApi {
     }
 
     // TODO USE SH-REPO
-    private fun checkSlayerTypeForCurrentArea(area: String) = when (area) {
+    private fun checkSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
         "Graveyard",
         "Coal Mine",
         "Revenant Cave",
