@@ -202,7 +202,7 @@ object StringUtils {
     }
 
     fun String.pluralize(number: Int, plural: String? = null, withNumber: Boolean = false): String {
-        return pluralize(number, this, plural, false)
+        return pluralize(number, this, plural, withNumber)
     }
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
