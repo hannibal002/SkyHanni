@@ -19,7 +19,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiChat
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CurrentChatDisplay {
@@ -86,6 +89,8 @@ object CurrentChatDisplay {
         set(value) {
             storage?.currentChat = value
         }
+
+    private var lastOpenChatTime = SimpleTimeMark.farPast()
 
     private var display: String? = null
 
@@ -154,7 +159,13 @@ object CurrentChatDisplay {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if (Minecraft.getMinecraft().currentScreen !is GuiChat && lastOpenChatTime.passedSince() > 2.seconds) return
         config.currentChatDisplayPos.renderString(display, posLabel = "Current Chat")
+    }
+
+    @JvmStatic
+    fun onCloseChat() {
+        lastOpenChatTime = SimpleTimeMark.now()
     }
 
     private fun isEnabled() = config.currentChatDisplay
