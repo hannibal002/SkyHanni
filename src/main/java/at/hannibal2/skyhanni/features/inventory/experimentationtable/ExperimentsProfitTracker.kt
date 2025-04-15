@@ -27,6 +27,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -143,6 +145,8 @@ object ExperimentsProfitTracker {
             action = {
                 tracker.modify {
                     it.startCost += (bottlePrice * event.amount)
+                    val bottleFormat = "bottle".pluralize(event.amount)
+                    ChatUtils.chat("Undid the tracking of ${event.amount} $bottleFormat.")
                 }
             },
             oneTimeClick = true,
