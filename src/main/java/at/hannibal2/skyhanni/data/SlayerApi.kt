@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -82,8 +83,8 @@ object SlayerApi {
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
                 add(" graph area: ${IslandAreas.currentAreaName}")
-                MinecraftCompat.localPlayer.position.let {
-                    add(" player pos: ${it.x}, ${it.y}, ${it.z}")
+                with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
+                    add(" /shtestwaypoint $x $y $z pathfind")
                 }
             }
             add("isInAnyArea: $isInAnyArea")
