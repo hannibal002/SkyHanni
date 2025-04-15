@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConf
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.backgroundConfig
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -13,11 +12,12 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 object RenderBackground {
 
+    private val config get() = CustomScoreboard.config.background
     private val textureLocation = createResourceLocation("skyhanni", "scoreboard.png")
 
     internal fun addBackground(renderable: Renderable): Renderable {
-        with(backgroundConfig) {
-            if (!backgroundConfig.enabled) return renderable
+        with(config) {
+            if (!config.enabled) return renderable
 
             val backgroundRenderable = createBackground(renderable)
 
@@ -26,7 +26,7 @@ object RenderBackground {
             return Renderable.drawInsideRoundedRectOutline(
                 backgroundRenderable,
                 0,
-                backgroundConfig.roundedCornerSmoothness,
+                config.roundedCornerSmoothness,
                 1,
                 outline.colorTop.toSpecialColor().rgb,
                 outline.colorBottom.toSpecialColor().rgb,
@@ -39,22 +39,22 @@ object RenderBackground {
     }
 
     private fun BackgroundConfig.createBackground(renderable: Renderable): Renderable =
-        if (backgroundConfig.useCustomBackgroundImage) {
+        if (config.useCustomBackgroundImage) {
             Renderable.drawInsideImage(
                 renderable,
                 textureLocation,
-                (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
+                (config.customBackgroundImageOpacity * 255) / 100,
                 borderSize,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                radius = backgroundConfig.roundedCornerSmoothness,
+                radius = config.roundedCornerSmoothness,
             )
         } else {
             Renderable.drawInsideRoundedRect(
                 renderable,
-                backgroundConfig.color.toSpecialColor(),
+                config.color.toSpecialColor(),
                 borderSize,
-                backgroundConfig.roundedCornerSmoothness,
+                config.roundedCornerSmoothness,
                 1,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -63,7 +63,7 @@ object RenderBackground {
 
     internal fun updatePosition(renderable: Renderable) {
         if (GuiEditManager.isInGui()) return
-        val alignmentConfig = CustomScoreboard.alignmentConfig
+        val alignmentConfig = CustomScoreboard.displayConfig.alignment
 
         with(alignmentConfig) {
             if (horizontalAlignment == RenderUtils.HorizontalAlignment.DONT_ALIGN &&
@@ -94,20 +94,20 @@ object RenderBackground {
                 else -> 0
             }
 
-            val outlineConfig = backgroundConfig.outline
+            val outlineConfig = config.outline
             if (outlineConfig.enabled) {
                 val thickness = outlineConfig.thickness
 
                 when (horizontalAlignment) {
                     RenderUtils.HorizontalAlignment.RIGHT -> x -= thickness / 2
                     RenderUtils.HorizontalAlignment.LEFT -> x += thickness / 2
-                    else -> x
+                    else -> {}
                 }
 
                 when (verticalAlignment) {
                     RenderUtils.VerticalAlignment.TOP -> y += thickness / 2
                     RenderUtils.VerticalAlignment.BOTTOM -> y -= thickness / 2
-                    else -> y
+                    else -> {}
                 }
             }
             CustomScoreboard.config.position.moveTo(x, y)
