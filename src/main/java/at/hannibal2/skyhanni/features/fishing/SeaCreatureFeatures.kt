@@ -50,9 +50,9 @@ object SeaCreatureFeatures {
         rareSeaCreatures.add(mob)
 
         if (!config.highlight) return
-        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
-            if (seaCreaturesBosses.none { it.fullName.removeColor() == mob.name }) return
-        }
+        // if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
+        //     if (seaCreaturesBosses.none { it.fullName.removeColor() == mob.name }) return
+        // }
         mob.highlight(LorenzColor.GREEN.toColor())
     }
 
@@ -110,7 +110,7 @@ object SeaCreatureFeatures {
 
     @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
-        if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.NO_XRAY) {
+        if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.XRAY) {
             event.queueEntitiesToOutline(getEntityOutlineColor)
         }
     }
