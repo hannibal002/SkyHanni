@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -205,7 +206,7 @@ object ExperimentsProfitTracker {
         tracker.initRenderer(
             { config.position },
             ExperimentationTableApi.experimentationTableInventory,
-        ) { config.enabled && isEnabled() }
+        ) { config.enabled && isEnabled() && IslandType.PRIVATE_ISLAND.isInIsland() }
     }
 
     @HandleEvent

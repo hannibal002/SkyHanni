@@ -444,7 +444,7 @@ object ExperimentationTableApi {
         handleExpBottles(false)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inTable || event.item?.displayName != "§cDecline") return
         queuedCompleteEvent = null
