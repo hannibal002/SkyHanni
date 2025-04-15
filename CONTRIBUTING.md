@@ -182,8 +182,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
-    - If the feature needs to use events or a repo pattern, annotate it with `@SkyHanniModule`
-    - This will automatically register it to the event bus and load the repo patterns.
+    - If the feature needs to register Forge/Fabric events, use SkyHanni events or creates repo pattern, annotate it with `@SkyHanniModule`
+    - This will automatically register the mod loaders events, register SkyHanni events and load the repo patterns.
     - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error in `SkyHanniMod.kt`.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
@@ -192,7 +192,13 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it. Do not use Forge events.
-    - (We inject the calls with Mixin)
+    - To expand the event systems you can create a new event that is called from a Mixin
+    - Or you can  subscribe to a Forge event and then post a SkyHanni event from that. See the `api/minecraftevents` package for examples.
+    - If you make a new event there are a few different types of events that you can make, make sure your event extends one of these.
+      - SkyHanniEvent: This is just a normal event.
+      - CancelableSkyHanniEvent: This is a cancellable event. It has a `cancel()` method that you can call to cancel the event.
+      - GenericSkyHanniEvent: This is a generic event, typically used for entities but can be used for any generics.
+      - RenderingSkyHanniEvent: This is an event that you are allowed to do gui rendering in.
 - Please use existing utils methods.
 - We try to avoid calling the NEU code too often.
     - (We plan to remove NEU as a dependency in the future.)
