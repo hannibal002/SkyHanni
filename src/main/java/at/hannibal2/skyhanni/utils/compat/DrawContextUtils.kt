@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.util.Vec3
+
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
 //#endif
@@ -34,6 +35,7 @@ object DrawContextUtils {
         }
         _drawContext = context
     }
+
     fun clearContext() {
         if (renderDepth == 1) {
             _drawContext = null
@@ -85,19 +87,17 @@ object DrawContextUtils {
      * Run operations inside a DrawContext translation
      */
     inline fun translated(x: Number = 0, y: Number = 0, z: Number = 0, action: () -> Unit) {
-        pushPop {
-            translate(x.toFloat(), y.toFloat(), z.toFloat())
-            action()
-        }
+        translate(x.toFloat(), y.toFloat(), z.toFloat())
+        action()
+        translate(-x.toFloat(), -y.toFloat(), -z.toFloat())
     }
 
     /**
      * Run operations inside a DrawContext scale
      */
     inline fun scaled(x: Number = 1, y: Number = 1, z: Number = 1, action: () -> Unit) {
-        pushPop {
-            scale(x.toFloat(), y.toFloat(), z.toFloat())
-            action()
-        }
+        scale(x.toFloat(), y.toFloat(), z.toFloat())
+        action()
+        scale(1 / x.toFloat(), 1 / y.toFloat(), 1 / z.toFloat())
     }
 }
