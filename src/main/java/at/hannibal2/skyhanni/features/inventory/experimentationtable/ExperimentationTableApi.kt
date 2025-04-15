@@ -131,12 +131,19 @@ object ExperimentationTableApi {
     }
 
     data class ExperimentationDataSet(
-        var type: ExperimentationTaskType? = null,
-        var tier: ExperimentationTier? = null,
+        @Transient var type: ExperimentationTaskType? = null,
+        @Transient var tier: ExperimentationTier? = null,
         var enchantingXpGained: Long = 0L,
         var rareFoundFired: Boolean = false,
     ) : ResettableStorageSet() {
         @Transient private val otherRewards: MutableMap<NeuInternalName, Int> = mutableMapOf()
+
+        override fun reset() {
+            super.reset()
+            otherRewards.clear()
+            type = null
+            tier = null
+        }
 
         fun addReward(internalName: NeuInternalName, amount: Int = 1) {
             otherRewards.addOrPut(internalName, amount)

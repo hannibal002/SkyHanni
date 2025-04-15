@@ -18,8 +18,8 @@ open class ResettableStorageSet {
         if (this::class != other::class) return
         mutableMemberProperties.forEach { prop ->
             try {
-                val otherPropVal = with(other) { prop.forceGet() }
-                prop.forceSet(otherPropVal)
+                val otherPropVal = prop.forceGet(other)
+                prop.forceSet(this, otherPropVal)
             } catch (e: Exception) {
                 e.printStackTrace()
                 ErrorManager.skyHanniError(
@@ -29,22 +29,22 @@ open class ResettableStorageSet {
         }
     }
 
-    private fun KMutableProperty1<Any, Any?>.forceSet(value: Any?) {
+    private fun KMutableProperty1<Any, Any?>.forceGet(target: Any): Any? {
         val wasAccessible = this.isAccessible
         this.isAccessible = true
-        this.set(this@ResettableStorageSet, value)
-        this.isAccessible = wasAccessible
-    }
-
-    private fun KMutableProperty1<Any, Any?>.forceGet(): Any? {
-        val wasAccessible = this.isAccessible
-        this.isAccessible = true
-        val value = this.get(this@ResettableStorageSet)
+        val value = this.get(target)
         this.isAccessible = wasAccessible
         return value
     }
 
+    private fun KMutableProperty1<Any, Any?>.forceSet(target: Any, value: Any?) {
+        val wasAccessible = this.isAccessible
+        this.isAccessible = true
+        this.set(target, value)
+        this.isAccessible = wasAccessible
+    }
+
     override fun toString(): String = mutableMemberProperties.joinToString("\n") { prop ->
-        "${prop.name} = ${prop.forceGet() ?: ""}"
+        "${prop.name} = ${prop.forceGet(this) ?: ""}"
     }
 }
