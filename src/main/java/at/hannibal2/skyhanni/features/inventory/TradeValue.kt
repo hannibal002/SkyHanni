@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.inventory.ChestValue.ChestItem
 import at.hannibal2.skyhanni.features.inventory.ChestValue.addToList
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -52,45 +52,47 @@ object TradeValue {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        if (!inventory.isInside()) {
-            otherPrevTotal = 0.0
-            yourPrevTotal = 0.0
-            update(emptyMap(), TradeSide.You.ordinal)
-            update(emptyMap(), TradeSide.Other.ordinal)
-            return
-        }
-        var otherTotal = 0.0
-        var yourTotal = 0.0
-        val otherMap = mutableMapOf<Int, ItemStack>()
-        val yourMap = mutableMapOf<Int, ItemStack>()
-        // Gets total value of trade
-        for (slot in InventoryUtils.getItemsInOpenChest()) {
-            // Gets value of their trade
-            if (slot.slotIndex in otherList) {
-                otherMap[slot.slotIndex] = slot.stack
-                val stack = slot.stack
-                otherTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
-            }
-            // Gets value of your trade
-            if (slot.slotIndex in yourList) {
-                yourMap[slot.slotIndex] = slot.stack
-                val stack = slot.stack
-                yourTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
-            }
-        }
-        println("total: ${otherTotal.shortFormat()}")
-        println("total: ${yourTotal.shortFormat()}")
-        if (otherTotal != otherPrevTotal) {
-            otherPrevTotal = otherTotal
-            val otherItems = ChestValue.createItems(otherMap)
-            update(otherItems, TradeSide.Other.ordinal)
-        }
-        if (yourTotal != yourPrevTotal) {
-            yourPrevTotal = yourTotal
-            val yourItems = ChestValue.createItems(yourMap)
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        otherPrevTotal = 0.0
+        yourPrevTotal = 0.0
+        update(emptyMap(), TradeSide.YOU.ordinal)
+        update(emptyMap(), TradeSide.OTHER.ordinal)
+        return
+    }
 
-            update(yourItems, TradeSide.You.ordinal)
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (inventory.isInside()) {
+            var otherTotal = 0.0
+            var yourTotal = 0.0
+            val otherMap = mutableMapOf<Int, ItemStack>()
+            val yourMap = mutableMapOf<Int, ItemStack>()
+            // Gets total value of trade
+            for (slot in InventoryUtils.getItemsInOpenChest()) {
+                // Gets value of their trade
+                if (slot.slotIndex in otherList) {
+                    otherMap[slot.slotIndex] = slot.stack
+                    val stack = slot.stack
+                    otherTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
+                }
+                // Gets value of your trade
+                if (slot.slotIndex in yourList) {
+                    yourMap[slot.slotIndex] = slot.stack
+                    val stack = slot.stack
+                    yourTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
+                }
+            }
+            if (otherTotal != otherPrevTotal) {
+                otherPrevTotal = otherTotal
+                val otherItems = ChestValue.createItems(otherMap)
+                update(otherItems, TradeSide.OTHER.ordinal)
+            }
+            if (yourTotal != yourPrevTotal) {
+                yourPrevTotal = yourTotal
+                val yourItems = ChestValue.createItems(yourMap)
+
+                update(yourItems, TradeSide.YOU.ordinal)
+            }
         }
     }
 
@@ -109,6 +111,6 @@ object TradeValue {
 }
 
 enum class TradeSide {
-    You,
-    Other
+    YOU,
+    OTHER
 }
