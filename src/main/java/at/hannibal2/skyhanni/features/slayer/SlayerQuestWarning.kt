@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -28,7 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerQuestWarning {
 
-    private val config get() = SkyHanniMod.feature.slayer
+    private val config get() = SlayerApi.config
 
     private var lastWeaponUse = SimpleTimeMark.farPast()
     private val voidItem = "ASPECT_OF_THE_VOID".toInternalName()

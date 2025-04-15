@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
@@ -161,9 +162,9 @@ object QuickModMenuSwitch {
     fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!isEnabled()) return
 
-        event.context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
         config.pos.renderRenderables(display, posLabel = "Quick Mod Menu Switch")
-        event.context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
