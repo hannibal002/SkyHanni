@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -41,7 +42,7 @@ object SlayerApi {
     var latestSlayerProgress = ""
 
     val currentAreaType by RecalculatingValue(500.milliseconds) {
-        checkSlayerTypeForCurrentArea(IslandAreas.currentAreaName) ?: checkSlayerTypeForCurrentArea(HypixelData.skyBlockArea.orEmpty())
+        checkSlayerTypeForCurrentArea(IslandAreas.currentAreaName)
     }
 
     fun hasActiveSlayerQuest() = latestSlayerCategory != ""
@@ -80,8 +81,10 @@ object SlayerApi {
             add("isInCorrectArea: $isInCorrectArea")
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
-                add(" hypixel area: ${HypixelData.skyBlockArea}")
                 add(" graph area: ${IslandAreas.currentAreaName}")
+                MinecraftCompat.localPlayer.position.let {
+                    add(" player pos: ${it.x}, ${it.y}, ${it.z}")
+                }
             }
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: ${latestSlayerProgress.removeColor()}")

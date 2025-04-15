@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -145,6 +146,9 @@ object DebugCommand {
             add("skyBlockArea:")
             add("  scoreboard: '${LorenzUtils.skyBlockArea}'")
             add("  graph network: '${IslandAreas.currentAreaName}'")
+            MinecraftCompat.localPlayer.position.let {
+                add("  player pos: ${it.x}, ${it.y}, ${it.z}")
+            }
             add("isOnAlphaServer: '${LorenzUtils.isOnAlphaServer}'")
         }
     }
