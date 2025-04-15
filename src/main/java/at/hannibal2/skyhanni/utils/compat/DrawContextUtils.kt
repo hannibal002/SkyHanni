@@ -72,6 +72,9 @@ object DrawContextUtils {
     }
 
     @Suppress("deprecation")
+    /**
+     * Push and pop the matrix stack, run the action in between.
+     */
     inline fun pushPop(action: () -> Unit) {
         pushMatrix()
         action()

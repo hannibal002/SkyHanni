@@ -40,9 +40,9 @@ object RenderData {
             GlStateManager.enableDepth()
 
             if (GuiEditManager.isInGui()) {
-                DrawContextUtils.translate(0f, 0f, -3f)
-                renderOverlay(event.context)
-                DrawContextUtils.translate(0f, 0f, 3f)
+                DrawContextUtils.translated(z = -3) {
+                    renderOverlay(event.context)
+                }
             }
 
             GuiRenderEvent.ChestGuiOverlayRenderEvent(event.context).post()
