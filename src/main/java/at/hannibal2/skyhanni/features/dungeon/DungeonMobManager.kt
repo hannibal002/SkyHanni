@@ -69,7 +69,7 @@ object DungeonMobManager {
         val mob = event.entity.mob ?: return
         if (felOnTheGround.remove(mob)) {
             felMoving.add(mob)
-            if (starredConfig.highlight.get()) {
+            if (mob.hasStar && starredConfig.highlight.get()) {
                 mob.highlight(getStarColor())
             }
         }

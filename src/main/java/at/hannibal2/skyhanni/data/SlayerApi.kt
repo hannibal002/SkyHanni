@@ -29,7 +29,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerApi {
 
-    private val trackerConfig get() = SkyHanniMod.feature.slayer.itemProfitTracker
+    val config get() = SkyHanniMod.feature.slayer
+    private val trackerConfig get() = config.itemProfitTracker
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
 
     var questStartTime = SimpleTimeMark.farPast()
