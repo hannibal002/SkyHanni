@@ -30,6 +30,7 @@ object DungeonSpiritLeapOverlay {
     private var overlayPosition: Position? = null
     private var containerWidth = 0
     private var containerHeight = 0
+    private val validInventoryNames = setOf("Spirit Leap", "Teleport to Player")
 
     data class PlayerStackInfo(val playerInfo: DungeonApi.TeamMember?, val stack: ItemStack, val slotNumber: Int)
 
@@ -38,7 +39,7 @@ object DungeonSpiritLeapOverlay {
         if (!isEnabled()) return
 
         val gui = event.gui
-        if (gui !is GuiChest || InventoryUtils.openInventoryName().removeColor() !in setOf("Spirit Leap", "Teleport to Player")) return
+        if (gui !is GuiChest || InventoryUtils.openInventoryName().removeColor() !in validInventoryNames) return
         containerWidth = gui.width
         containerHeight = gui.height
         scaleFactor = min(containerWidth, containerHeight).toDouble() / max(containerWidth, containerHeight).toDouble()
