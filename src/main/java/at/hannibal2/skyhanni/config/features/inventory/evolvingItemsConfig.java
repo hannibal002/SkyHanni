@@ -7,13 +7,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class evolvingItemsConfig {
     @Expose
-    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Evolving Items (Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck) in the lore.")
+    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Evolving Items (Bottle of Jyrre, Dark Cacao Truffle, etc.) in the lore.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeHeldInLore = false;
 
     @Expose
-    @ConfigOption(name = "Time Left in Lore", desc = "Show time until maxed for Evolving Items (Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck) in the lore.")
+    @ConfigOption(name = "Time Left in Lore", desc = "Show time until maxed for Evolving Items (Bottle of Jyrre, Dark Cacao Truffle, etc.) in the lore.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeLeftInLore = false;

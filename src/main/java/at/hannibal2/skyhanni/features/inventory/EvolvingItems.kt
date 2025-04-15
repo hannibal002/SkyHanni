@@ -29,6 +29,6 @@ object EvolvingItems {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(76, "inventory.timeHeldInLore", "inventory.evolvingItems.timeHeldInLore")
+        event.move(86, "inventory.timeHeldInLore", "inventory.evolvingItems.timeHeldInLore")
     }
 }
