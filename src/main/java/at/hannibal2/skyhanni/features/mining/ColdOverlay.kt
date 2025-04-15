@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
-import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
@@ -33,8 +32,6 @@ object ColdOverlay {
         if (!isEnabled()) return
         val alpha = getColdAlpha()
         if (alpha == 0f) return
-
-        Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
 
         DrawContextUtils.pushMatrix()
         GlStateManager.pushAttrib()

@@ -1447,7 +1447,7 @@ object RenderUtils {
         text: String,
         scale: Float,
     ) {
-        drawSlotText(xPos, yPos, text, scale)
+        drawSlotText0(xPos, yPos, text, scale)
     }
 
     fun GuiContainerEvent.ForegroundDrawnEvent.drawSlotText(
@@ -1456,10 +1456,10 @@ object RenderUtils {
         text: String,
         scale: Float,
     ) {
-        drawSlotText(xPos, yPos, text, scale)
+        drawSlotText0(xPos, yPos, text, scale)
     }
 
-    private fun drawSlotText(
+    private fun drawSlotText0(
         xPos: Int,
         yPos: Int,
         text: String,
