@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
@@ -116,11 +117,11 @@ object RenderUtils {
     fun highlight(color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
         // TODO don't use z
-        GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        Gui.drawRect(x, y, x + 16, y + 16, color.rgb)
-        GlStateManager.popMatrix()
+        DrawContextUtils.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
+        DrawContextUtils.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
     }
@@ -444,24 +445,23 @@ object RenderUtils {
         val display = "§f$string"
         GlStateManager.pushMatrix()
         transform()
-        val minecraft = Minecraft.getMinecraft()
-        val renderer = minecraft.renderManager.fontRenderer
+        val fr = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
-            val strLen: Int = renderer.getStringWidth(string)
+            val strLen: Int = fr.getStringWidth(string)
             val x2 = offsetX - strLen / 2f
             GL11.glTranslatef(x2, 0f, 0f)
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
+            fr.drawStringWithShadow(display, 0f, 0f, 0)
             GL11.glTranslatef(-x2, 0f, 0f)
         } else {
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
+            fr.drawStringWithShadow(display, 0f, 0f, 0)
         }
 
         GlStateManager.popMatrix()
 
-        return renderer.getStringWidth(display)
+        return fr.getStringWidth(display)
     }
 
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {

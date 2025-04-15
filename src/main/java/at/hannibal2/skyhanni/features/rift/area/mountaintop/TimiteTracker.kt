@@ -97,6 +97,7 @@ object TimiteTracker {
         }
     }
 
+    // TODO use RenderDisplayHelper
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRender(event: GuiRenderEvent) {
         if (!isEnabled()) return

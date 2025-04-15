@@ -1,15 +1,15 @@
 [versions]
 libautoupdate = "1.3.1"
-moulconfig = "3.5.0"
+moulconfig = "3.6.0"
 headlessLwjgl = "1.7.2"
 jbAnnotations = "24.1.0"
 hypixelmodapi = "1.0.1.2"
-modmenu = "13.0.3"
+modmenu = "14.0.0-rc.2"
 
 
 [libraries]
 moulconfig = { module = "org.notenoughupdates.moulconfig:legacy", version.ref = "moulconfig" }
-moulconfigModern = { module = "org.notenoughupdates.moulconfig:modern", version.ref = "moulconfig" }
+moulconfigModern = { module = "org.notenoughupdates.moulconfig:modern-1.21.5", version.ref = "moulconfig" }
 libautoupdate = { module = "moe.nea:libautoupdate", version.ref = "libautoupdate" }
 headlessLwjgl = { module = "com.github.3arthqu4ke.HeadlessMc:headlessmc-lwjgl", version.ref = "headlessLwjgl" }
 jbAnnotations = { module = "org.jetbrains:annotations", version.ref = "jbAnnotations" }

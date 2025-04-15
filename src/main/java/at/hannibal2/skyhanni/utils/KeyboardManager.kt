@@ -15,8 +15,8 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
-import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 //#else
 //$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
@@ -35,9 +35,9 @@ object KeyboardManager {
     private fun isCommandKeyDown() = Keyboard.KEY_LMETA.isKeyHeld() || Keyboard.KEY_RMETA.isKeyHeld()
 
     // Windows: Alt key Mac: Option key
-    private fun isMenuKeyDown() = Keyboard.KEY_LMENU.isKeyHeld() || Keyboard.KEY_RMENU.isKeyHeld()
+    fun isMenuKeyDown() = Keyboard.KEY_LMENU.isKeyHeld() || Keyboard.KEY_RMENU.isKeyHeld()
 
-    private fun isControlKeyDown() = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
+    fun isControlKeyDown() = Keyboard.KEY_LCONTROL.isKeyHeld() || Keyboard.KEY_RCONTROL.isKeyHeld()
 
     fun isDeleteWordDown() =
         Keyboard.KEY_BACK.isKeyHeld() && if (SystemUtils.IS_OS_MAC) isMenuKeyDown() else isControlKeyDown()
@@ -52,6 +52,8 @@ object KeyboardManager {
     fun isCopyingKeysDown() = isModifierKeyDown() && Keyboard.KEY_C.isKeyHeld()
 
     fun isModifierKeyDown() = if (SystemUtils.IS_OS_MAC) isCommandKeyDown() else isControlKeyDown()
+
+    fun isRightMouseClicked() = RIGHT_MOUSE.isKeyClicked()
 
     /**
      * TODO make use of this function unnecessary: Try to avoid using `isModifierKeyDown` as the only option,

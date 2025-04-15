@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -118,13 +117,13 @@ object DragonProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+        if (!DragonFightAPI.inNestArea() || event.source != ItemAddManager.Source.COMMAND) return
         with(tracker) { event.addItemFromEvent() }
         ChatUtils.debug("Added item to tracker: ${event.internalName} (amount: ${event.amount})")
     }
 
     init {
-        tracker.initRenderer({ config.position }) { isEnabled() }
+        tracker.initRenderer({ config.position }) { config.enabled && DragonFightAPI.inNestArea() }
     }
 
     fun addEyes(amount: Int) {
@@ -175,9 +174,6 @@ object DragonProfitTracker {
 
         ChatUtils.hoverableChat(totalMessage, hover)
     }
-
-    fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && DragonFightAPI.inNestArea()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.farming.lane
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingLaneSwitchEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -144,7 +144,7 @@ object FarmingLaneFeatures {
                     duration = secondsBefore.seconds,
                     weight = 1.1,
                 )
-                else -> titleContext.takeIf { it?.ended == false }
+                else -> titleContext.takeIf { it?.alive == true }
             }
             if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
                 lastPlaySound = SimpleTimeMark.now()
