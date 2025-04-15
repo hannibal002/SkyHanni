@@ -180,6 +180,11 @@ object WardrobeApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {
+            if (slots.isEmpty()) {
+                add("No slots")
+                return@addIrrelevant
+            }
+
             for (slot in slots) {
                 val slotInfo = buildString {
                     append("Slot ${slot.id}")
