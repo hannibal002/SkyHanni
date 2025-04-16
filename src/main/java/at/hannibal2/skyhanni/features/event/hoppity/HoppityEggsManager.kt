@@ -267,13 +267,14 @@ object HoppityEggsManager {
         if (warningActive && allEggsRemaining) warn()
     }
 
-    private val warpClickAction: Pair<() -> Unit, String> get() =
-        if (LorenzUtils.inSkyBlock) {
-            { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) } to
-                "warp to ${unclaimedEggsConfig.warpClickDestination}".trim()
-        } else {
-            { HypixelCommands.skyblock() } to "join /skyblock!"
-        }
+    private val warpClickAction: Pair<() -> Unit, String>
+        get() =
+            if (LorenzUtils.inSkyBlock) {
+                { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) } to
+                    "warp to ${unclaimedEggsConfig.warpClickDestination}".trim()
+            } else {
+                { HypixelCommands.skyblock() } to "join /skyblock!"
+            }
 
     private fun warn() {
         if (!unclaimedEggsConfig.warningsEnabled) return
