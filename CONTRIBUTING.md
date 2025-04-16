@@ -193,7 +193,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - To expand the event systems you can create a new event that is called from a Mixin
-    - Or you can  subscribe to a Forge event and then post a SkyHanni event from that. See the `api/minecraftevents` package for examples.
+    - Or you can subscribe to a Forge event and then post a SkyHanni event from that. See the `api/minecraftevents` package for examples.
     - If you make a new event there are a few different types of events that you can make, make sure your event extends one of these.
       - SkyHanniEvent: This is just a normal event.
       - CancelableSkyHanniEvent: This is a cancellable event. It has a `cancel()` method that you can call to cancel the event.
