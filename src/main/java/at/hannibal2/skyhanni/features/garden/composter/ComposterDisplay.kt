@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -154,19 +155,22 @@ object ComposterDisplay {
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
 
         if (GardenApi.inGarden() && config.displayEnabled) {
             config.displayPos.renderRenderable(display, posLabel = "Composter Display")
         }
-
-        checkWarningsAndOutsideGarden()
     }
 
-    private fun checkWarningsAndOutsideGarden() {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!event.repeatSeconds(5)) return
+        @Suppress("InSkyBlockEarlyReturn")
+        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
+
         val format = GardenApi.storage?.let {
             if (!it.composterEmptyTime.isFarPast()) {
                 val duration = it.composterEmptyTime.timeUntil()
@@ -194,19 +198,18 @@ object ComposterDisplay {
     }
 
     private fun warn(warningMessage: String) {
-        if (!config.warnAlmostClose) return
+        if (!config.warnAlmostEmpty) return
         val storage = GardenApi.storage ?: return
 
         if (ReminderUtils.isBusy()) return
-
-        if (storage.lastComposterEmptyWarningTime.passedSince() >= 2.0.minutes) return
+        if (storage.lastComposterEmptyWarningTime.passedSince() < 2.0.minutes) return
         storage.lastComposterEmptyWarningTime = SimpleTimeMark.now()
         if (IslandType.GARDEN.isInIsland()) {
             ChatUtils.chat(warningMessage)
         } else {
             ChatUtils.clickToActionOrDisable(
                 warningMessage,
-                config::warnAlmostClose,
+                config::warnAlmostEmpty,
                 actionName = "warp to the Garden",
                 action = { HypixelCommands.warp("garden") },
             )
@@ -226,5 +229,7 @@ object ComposterDisplay {
         event.move(3, "garden.composterNotifyLowTitle", "garden.composters.notifyLow.title")
         event.move(3, "garden.composterNotifyLowOrganicMatter", "garden.composters.notifyLow.organicMatter")
         event.move(3, "garden.composterNotifyLowFuel", "garden.composters.notifyLow.fuel")
+
+        event.move(85, "garden.composters.warnAlmostClose", "garden.composters.warnAlmostEmpty")
     }
 }

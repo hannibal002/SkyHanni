@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLineNea
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawPyramid
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
@@ -317,7 +317,7 @@ object GraphEditor {
             else -> edgeColor
         }
 
-        this.draw3DLineNea(
+        draw3DLine(
             edge.node1.position.add(0.5, 0.5, 0.5),
             edge.node2.position.add(0.5, 0.5, 0.5),
             color,
@@ -865,9 +865,7 @@ class GraphingNode(
 
         other as GraphingNode
 
-        if (id != other.id) return false
-
-        return true
+        return id == other.id
     }
 }
 

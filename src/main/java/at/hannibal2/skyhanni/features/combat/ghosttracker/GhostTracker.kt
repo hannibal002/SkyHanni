@@ -180,7 +180,7 @@ object GhostTracker {
 
     @HandleEvent
     fun onSkillExp(event: SkillExpGainEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         if (event.gained > 10_000) return
         tracker.modify {
             it.combatXpGained += event.gained.toLong()
@@ -212,14 +212,14 @@ object GhostTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+        if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
 
         tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         if (event.coins !in 200.0..2_000.0) return
         tracker.addCoins(event.coins.toInt(), false)
@@ -227,7 +227,7 @@ object GhostTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         itemDropPattern.matchMatcher(event.message) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val mf = group("mf").formatInt()
@@ -288,7 +288,7 @@ object GhostTracker {
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BESTIARY)) return
-        if (isMaxBestiary || !isEnabled()) return
+        if (isMaxBestiary || !inArea) return
         parseBestiaryWidget(event.lines)
     }
 
