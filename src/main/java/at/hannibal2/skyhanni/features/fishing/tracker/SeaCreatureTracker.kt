@@ -205,5 +205,6 @@ object SeaCreatureTracker {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && !FishingApi.wearingTrophyArmor && !LorenzUtils.inKuudraFight
+    private fun isEnabled() =
+        LorenzUtils.inSkyBlock && !FishingApi.hasTreasureHook && !FishingApi.wearingTrophyArmor && !LorenzUtils.inKuudraFight
 }
