@@ -64,50 +64,54 @@ object CFBarnManager {
 
         HoppityEggsManager.duplicateRabbitFound.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
-            val amount = group("amount").formatLong()
-            if (config.showDuplicateTime && !hoppityChatConfig.compact) {
-                val format = CFApi.timeUntilNeed(amount).format(maxUnits = 2)
-                DelayedRun.runNextTick {
-                    ChatUtils.chat("§7(§a+§b$format §aof production§7)")
-                }
-            }
-            ChocolateAmount.addToAll(amount)
-            HoppityApi.attemptFireRabbitFound(event, lastDuplicateAmount = amount)
-
-            var changedMessage = event.message
-
-            // Add duplicate number to the duplicate rabbit message
-            if (hoppityChatConfig.showDuplicateNumber && !hoppityChatConfig.compact) {
-                val dupeNumber = when {
-                    virtualCountHolder[lastRabbit] != null -> (virtualCountHolder[lastRabbit] ?: 0) + 1
-                    else -> HoppityCollectionStats.getRabbitCount(lastRabbit).takeIf { it > 0 }?.also {
-                        virtualCountHolder[lastRabbit] = it
-                    }
-                }
-
-                dupeNumber?.let {
-                    changedMessage = changedMessage.replace(
-                        "§7§lDUPLICATE RABBIT!",
-                        "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r",
-                    )
-                }
-            }
-
-            // Replace §6\+(?<amount>[\d,]+) Chocolate with §6\+§d(?<amount>[\d,]+) §6Chocolate
-            if (hoppityChatConfig.recolorTTChocolate && CFTimeTowerManager.timeTowerActive()) {
-                changedMessage = changedMessage.replace(
-                    "§6\\+(?<amount>[\\d,]+) Chocolate",
-                    "§6\\+§d${group("amount")} §6Chocolate",
-                )
-            }
-
-            if (event.message != changedMessage) event.chatComponent = changedMessage.asComponent()
+            event.duplicateFoundMessage(group("amount"))
         }
 
         rabbitCrashedPattern.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
             ChocolateAmount.addToAll(group("amount").formatLong())
         }
+    }
+
+    private fun SkyHanniChatEvent.duplicateFoundMessage(rawAmount: String) {
+        val amount = rawAmount.formatLong()
+        if (config.showDuplicateTime && !hoppityChatConfig.compact) {
+            val format = CFApi.timeUntilNeed(amount).format(maxUnits = 2)
+            DelayedRun.runNextTick {
+                ChatUtils.chat("§7(§a+§b$format §aof production§7)")
+            }
+        }
+        ChocolateAmount.addToAll(amount)
+        HoppityApi.attemptFireRabbitFound(this, lastDuplicateAmount = amount)
+
+        var changedMessage = message
+
+        // Add duplicate number to the duplicate rabbit message
+        if (hoppityChatConfig.showDuplicateNumber && !hoppityChatConfig.compact) {
+            val dupeNumber = when {
+                virtualCountHolder[lastRabbit] != null -> (virtualCountHolder[lastRabbit] ?: 0) + 1
+                else -> HoppityCollectionStats.getRabbitCount(lastRabbit).takeIf { it > 0 }?.also {
+                    virtualCountHolder[lastRabbit] = it
+                }
+            }
+
+            dupeNumber?.let {
+                changedMessage = changedMessage.replace(
+                    "§7§lDUPLICATE RABBIT!",
+                    "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r",
+                )
+            }
+        }
+
+        // Replace §6\+(?<amount>[\d,]+) Chocolate with §6\+§d(?<amount>[\d,]+) §6Chocolate
+        if (hoppityChatConfig.recolorTTChocolate && CFTimeTowerManager.timeTowerActive()) {
+            changedMessage = changedMessage.replace(
+                "§6\\+(?<amount>[\\d,]+) Chocolate",
+                "§6\\+§d$rawAmount §6Chocolate",
+            )
+        }
+
+        if (message != changedMessage) chatComponent = changedMessage.asComponent()
     }
 
     @HandleEvent
