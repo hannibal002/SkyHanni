@@ -103,7 +103,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             event.container.inventorySlots
                 .filter { missing.contains(it.slotNumber) }
-                .forEach { it.highlight(event.context, LorenzColor.RED) }
+                .forEach { it.highlight(LorenzColor.RED) }
         }
 
         @HandleEvent

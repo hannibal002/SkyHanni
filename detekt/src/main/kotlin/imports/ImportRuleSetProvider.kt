@@ -11,7 +11,8 @@ class ImportRuleSetProvider : RuleSetProvider {
 
     override fun instance(config: Config): RuleSet {
         return RuleSet(ruleSetId, listOf(
-            CustomImportOrdering(config)
+            CustomImportOrdering(config),
+            PreprocessingImportOrdering(config),
         ))
     }
 }
