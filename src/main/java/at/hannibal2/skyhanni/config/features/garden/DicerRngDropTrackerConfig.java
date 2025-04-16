@@ -13,6 +13,7 @@ public class DicerRngDropTrackerConfig {
     @ConfigOption(name = "Enable Tracker", desc = "Track RNG drops for Melon Dicer and Pumpkin Dicer.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to display for consistency with other trackers
     public boolean display = true;
 
     @Expose

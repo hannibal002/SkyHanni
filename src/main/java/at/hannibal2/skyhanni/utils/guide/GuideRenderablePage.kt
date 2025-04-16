@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.guide
 
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 abstract class GuideRenderablePage(
@@ -10,10 +10,10 @@ abstract class GuideRenderablePage(
 
     protected var renderable: Renderable? = null
 
-    final override fun drawPage(context: DrawContext, mouseX: Int, mouseY: Int) {
-        context.matrices.translate(paddingX.toFloat(), paddingY.toFloat(), 0f)
+    final override fun drawPage(mouseX: Int, mouseY: Int) {
+        DrawContextUtils.translate(paddingX.toFloat(), paddingY.toFloat(), 0f)
         renderable?.render(paddingX, paddingY)
-        context.matrices.translate(-paddingX.toFloat(), -paddingY.toFloat(), 0f)
+        DrawContextUtils.translate(-paddingX.toFloat(), -paddingY.toFloat(), 0f)
     }
 
     override fun onLeave() {
