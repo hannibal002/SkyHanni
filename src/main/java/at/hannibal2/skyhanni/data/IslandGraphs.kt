@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoUtils
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -31,6 +32,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -103,6 +105,9 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object IslandGraphs {
     var currentIslandGraph: Graph? = null
+    private var lastLoadedIslandType = "nothing"
+    private var lastLoadedTime = SimpleTimeMark.farPast()
+
     var disabledNodesReason: String? = null
         private set
 
@@ -177,7 +182,7 @@ object IslandGraphs {
         reset()
     }
 
-    fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
+    private fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
 
     @HandleEvent
     fun onAreaChange(event: ScoreboardAreaChangeEvent) {
@@ -217,7 +222,43 @@ object IslandGraphs {
         }
     }
 
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Island Graphs")
+        val islandType = LorenzUtils.skyBlockIsland.name
+        val important = LorenzUtils.inSkyBlock && lastLoadedIslandType != islandType
+        val list = buildList {
+            add("")
+            if (important) {
+                add("wrong island!")
+                add("island is correct!")
+            }
+            add("")
+            add("lastLoadedIslandType: $lastLoadedIslandType")
+            if (important) {
+                add("current islandType: $islandType")
+            }
+
+            add("")
+            add("lastLoadedTime: ${lastLoadedTime.passedSince()}")
+            if (important) {
+                add("last world switch: ${LorenzUtils.lastWorldSwitch.passedSince()}")
+            }
+
+            add("")
+            add("currentIslandGraph is null: ${currentIslandGraph == null}")
+        }
+        if (important) {
+            event.addData(list)
+        } else {
+            event.addIrrelevant(list)
+        }
+    }
+
     private fun reloadFromJson(islandName: String) {
+        lastLoadedIslandType = islandName
+        lastLoadedTime = SimpleTimeMark.now()
+
         val constant = "island_graphs/$islandName"
         val name = "constants/$constant.json"
         val jsonFile = File(RepoManager.repoLocation, name)
@@ -365,7 +406,7 @@ object IslandGraphs {
 
     private fun setFastestPath(path: Pair<Graph, Double>, setPath: Boolean = true) {
         // TODO cleanup
-        val (fastestPath, distance) = path.takeIf { it.first.isNotEmpty() } ?: return
+        val (fastestPath, _) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.nodes.toMutableList()
         if (MinecraftCompat.localPlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
@@ -373,7 +414,7 @@ object IslandGraphs {
         renderPath(setPath, nodes)
     }
 
-    fun renderPath(
+    private fun renderPath(
         setPath: Boolean = true,
         nodes: List<GraphNode>,
     ) {

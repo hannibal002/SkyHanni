@@ -136,6 +136,11 @@ public class MiscConfig {
     @Expose
     public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
 
+    @ConfigOption(name = "Fruit Bowl", desc = "Features for Fruit Bowl")
+    @Accordion
+    @Expose
+    public FruitBowlConfig fruitBowl = new FruitBowlConfig();
+
     @Expose
     @ConfigOption(name = "Cake Counter Features", desc = "")
     @Accordion
