@@ -182,8 +182,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
-    - If the feature needs to register Forge/Fabric events, use SkyHanni events or creates repo pattern, annotate it with `@SkyHanniModule`
-    - This will automatically register the mod loaders events, register SkyHanni events and load the repo patterns.
+    - If the feature needs to register Forge/Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature classs it with `@SkyHanniModule`
+    - This will automatically register all events to the respective event bus, and loads the repo patterns.
     - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error in `SkyHanniMod.kt`.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
@@ -198,7 +198,7 @@ Make sure such pull requests have a good explanation in the **What** section.
       - SkyHanniEvent: This is just a normal event.
       - CancelableSkyHanniEvent: This is a cancellable event. It has a `cancel()` method that you can call to cancel the event.
       - GenericSkyHanniEvent: This is a generic event, typically used for entities but can be used for any generics.
-      - RenderingSkyHanniEvent: This is an event that you are allowed to do gui rendering in.
+      - RenderingSkyHanniEvent: This is an event that you are allowed to do GUI rendering in.
 - Please use existing utils methods.
 - We try to avoid calling the NEU code too often.
     - (We plan to remove NEU as a dependency in the future.)
