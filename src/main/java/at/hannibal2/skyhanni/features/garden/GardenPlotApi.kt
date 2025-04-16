@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -373,49 +374,47 @@ object GardenPlotApi {
         val plot = getCurrentPlot() ?: return
         if (plot.isBarn()) return
 
-        for (line in event.lines) {
-            plotSprayedTablistPattern.matchMatcher(line.trim()) {
+        plotSprayedTablistPattern.firstMatcher(event.lines.map { it.trim() }) {
 
-                val sprayName = group("spray").trim()
-                val minutes = group("minutes")?.toInt() ?: 0
-                val seconds = group("seconds")?.toInt() ?: 0
+            val sprayName = group("spray").trim()
+            val minutes = group("minutes")?.toInt() ?: 0
+            val seconds = group("seconds")?.toInt() ?: 0
 
-                val time = if (seconds == 0) (minutes + 1).minutes
-                else minutes.minutes + seconds.seconds
+            val time = if (seconds == 0) (minutes + 1).minutes
+            else minutes.minutes + seconds.seconds
 
-                val timeString = when {
-                    minutes != 0 && seconds != 0 -> "${minutes}m ${seconds}s"
-                    minutes != 0 -> "${minutes + 1}m"
-                    else -> "${seconds}s"
-                }
+            val timeString = when {
+                minutes != 0 && seconds != 0 -> "${minutes}m ${seconds}s"
+                minutes != 0 -> "${minutes + 1}m"
+                else -> "${seconds}s"
+            }
 
-                val newSpray: SprayType? = SprayType.getByNameOrNull(sprayName)
+            val newSpray: SprayType? = SprayType.getByNameOrNull(sprayName)
 
-                if (plot.currentSpray != null) {
-                    val expectedExpireTime = SimpleTimeMark.now() + time
-                    val data = plot.getData() ?: return
+            if (plot.currentSpray != null) {
+                val expectedExpireTime = SimpleTimeMark.now() + time
+                val data = plot.getData() ?: return
 
-                    val sprayExpiryTime = data.sprayExpiryTime ?: return
-                    val currentSpray = data.sprayType ?: return
+                val sprayExpiryTime = data.sprayExpiryTime ?: return
+                val currentSpray = data.sprayType ?: return
 
-                    if (newSpray == null) {
-                        plot.removeSpray()
-                        return
-                    } else {
-                        if (isSprayAccurate(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
-                            if (sprayMessageEligible(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
-                                sendSprayMessage(plot.name, sprayName, timeString)
-                            }
-                            plot.setSpray(newSpray, time)
-                        }
-                    }
+                if (newSpray == null) {
+                    plot.removeSpray()
+                    return
                 } else {
-                    if (newSpray == null) return
-                    if (config.newSprayNotification) {
-                        sendSprayMessage(plot.name, sprayName, timeString)
+                    if (isSprayAccurate(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
+                        if (sprayMessageEligible(sprayExpiryTime, expectedExpireTime, currentSpray, newSpray)) {
+                            sendSprayMessage(plot.name, sprayName, timeString)
+                        }
+                        plot.setSpray(newSpray, time)
                     }
-                    plot.setSpray(newSpray, time)
                 }
+            } else {
+                if (newSpray == null) return
+                if (config.newSprayNotification) {
+                    sendSprayMessage(plot.name, sprayName, timeString)
+                }
+                plot.setSpray(newSpray, time)
             }
         }
     }
