@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.inventory.ChestValue.ChestItem
 import at.hannibal2.skyhanni.features.inventory.ChestValue.addToList
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -35,7 +35,7 @@ object TradeValue {
     private var yourDisplay = emptyList<Renderable>()
 
     // Detects trade menu thx NEU
-    val inventory = InventoryDetector { name -> name.startsWith("You     ") }
+    val inventory = InventoryDetector({ onOpen() }) { name -> name.startsWith("You     ") }
 
     init {
         RenderDisplayHelper(
@@ -47,57 +47,51 @@ object TradeValue {
         }
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inSkyBlock && config.enabled
-    }
-
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onOpen() {
         otherPrevTotal = 0.0
         yourPrevTotal = 0.0
-        update(emptyMap(), TradeSide.YOU.ordinal)
-        update(emptyMap(), TradeSide.OTHER.ordinal)
-        return
+        otherDisplay = emptyList()
+        yourDisplay = emptyList()
     }
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        if (inventory.isInside()) {
-            var otherTotal = 0.0
-            var yourTotal = 0.0
-            val otherMap = mutableMapOf<Int, ItemStack>()
-            val yourMap = mutableMapOf<Int, ItemStack>()
-            // Gets total value of trade
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                // Gets value of their trade
-                if (slot.slotIndex in otherList) {
-                    otherMap[slot.slotIndex] = slot.stack
-                    val stack = slot.stack
-                    otherTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
-                }
-                // Gets value of your trade
-                if (slot.slotIndex in yourList) {
-                    yourMap[slot.slotIndex] = slot.stack
-                    val stack = slot.stack
-                    yourTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
-                }
+    @HandleEvent(SkyHanniTickEvent::class)
+    fun onTick() {
+        if (!inventory.isInside()) return
+        var otherTotal = 0.0
+        var yourTotal = 0.0
+        val otherMap = mutableMapOf<Int, ItemStack>()
+        val yourMap = mutableMapOf<Int, ItemStack>()
+        // Gets total value of trade
+        for (slot in InventoryUtils.getItemsInOpenChest()) {
+            // Gets value of their trade
+            if (slot.slotIndex in otherList) {
+                otherMap[slot.slotIndex] = slot.stack
+                val stack = slot.stack
+                otherTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
             }
-            if (otherTotal != otherPrevTotal) {
-                otherPrevTotal = otherTotal
-                val otherItems = ChestValue.createItems(otherMap)
-                update(otherItems, TradeSide.OTHER.ordinal)
+            // Gets value of your trade
+            if (slot.slotIndex in yourList) {
+                yourMap[slot.slotIndex] = slot.stack
+                val stack = slot.stack
+                yourTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
             }
-            if (yourTotal != yourPrevTotal) {
-                yourPrevTotal = yourTotal
-                val yourItems = ChestValue.createItems(yourMap)
+        }
+        if (otherTotal != otherPrevTotal) {
+            otherPrevTotal = otherTotal
+            val otherItems = ChestValue.createItems(otherMap)
+            update(otherItems, TradeSide.OTHER.ordinal)
+        }
+        if (yourTotal != yourPrevTotal) {
+            yourPrevTotal = yourTotal
+            val yourItems = ChestValue.createItems(yourMap)
 
-                update(yourItems, TradeSide.YOU.ordinal)
-            }
+            update(yourItems, TradeSide.YOU.ordinal)
         }
     }
 
     // Display trade value breakdown
     private fun update(items: Map<String, ChestItem>, indicator: Int = 0) {
+        ChatUtils.chat("update!")
         if (indicator == 0) {
             yourDisplay = buildList {
                 addToList(items.values, "§eTrade Value")
@@ -108,9 +102,11 @@ object TradeValue {
             }
         }
     }
-}
 
-enum class TradeSide {
-    YOU,
-    OTHER
+    private fun isEnabled(): Boolean = LorenzUtils.inSkyBlock && config.enabled
+
+    enum class TradeSide {
+        YOU,
+        OTHER
+    }
 }
