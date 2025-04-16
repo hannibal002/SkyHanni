@@ -486,7 +486,7 @@ object HoppityCollectionStats {
 
             if (name.isEmpty()) continue
             highlightMap[name]?.let {
-                slot.highlight(event.context, it)
+                slot.highlight(it)
             }
         }
     }

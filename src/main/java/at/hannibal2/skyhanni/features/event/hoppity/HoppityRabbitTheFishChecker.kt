@@ -59,7 +59,7 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled()) return
 
         val index = rabbitTheFishIndex ?: return
-        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(event.context, LorenzColor.RED)
+        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
     }
 
     @HandleEvent
