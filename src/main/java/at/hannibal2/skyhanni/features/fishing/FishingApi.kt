@@ -70,6 +70,7 @@ object FishingApi {
 
     private var lavaRods = listOf<NeuInternalName>()
     private var waterRods = listOf<NeuInternalName>()
+    private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
     var bobber: EntityFishHook? = null
         private set
@@ -130,7 +131,7 @@ object FishingApi {
 
     fun NeuInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.getRodPart(part: RodPart): NeuInternalName? =
+    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? =
         getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")?.toInternalName()
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
@@ -144,7 +145,7 @@ object FishingApi {
 
         if (holdingRod) {
             // If the player is not holding a rod, we want to just save the last state
-            hasTreasureHook = InventoryUtils.getItemInHand()?.getRodPart(RodPart.HOOK) == "TREASURE_HOOK".toInternalName()
+            hasTreasureHook = InventoryUtils.getItemInHand()?.getFishingRodPart(RodPart.HOOK) == TREASURE_HOOK
         }
     }
 
