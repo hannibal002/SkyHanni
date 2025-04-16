@@ -27,7 +27,7 @@ object BingoBoopParty {
     )
 
     @HandleEvent
-    fun onChat(event: PrivateMessageChatEvent) {
+    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         val message = event.messageComponent.textComponent.formattedText.removeResets()
         if (!boopPattern.matches(message)) return

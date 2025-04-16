@@ -9,11 +9,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
@@ -37,53 +36,34 @@ object GuiRenderUtils {
 
     private val fr: FontRenderer get() = Minecraft.getMinecraft().fontRendererObj
 
-    // TODO change to extend function of DrawContext
-    private fun drawStringCentered(context: DrawContext, str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
+    private fun drawStringCentered(str: String?, x: Float, y: Float, shadow: Boolean, color: Int) {
         str ?: return
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
-        //#if MC < 1.21
-        fr.drawString(str, x2, y2, color, shadow)
-        //#else
-        //$$ context.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
-        //#endif
+        DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawStringCentered(context: DrawContext, str: String?, x: Int, y: Int) {
-        drawStringCentered(
-            context, str, x.toFloat(), y.toFloat(), true, 0xffffff,
-        )
+    fun drawStringCentered(str: String?, x: Int, y: Int) {
+        drawStringCentered(str, x.toFloat(), y.toFloat(), true, 0xffffff)
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawStringCenteredScaledMaxWidth(context: DrawContext, text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
-        context.matrices.pushMatrix()
+    fun drawStringCenteredScaledMaxWidth(text: String, x: Float, y: Float, shadow: Boolean, length: Int, color: Int) {
+        DrawContextUtils.pushMatrix()
         val strLength = fr.getStringWidth(text)
         val factor = min((length / strLength.toFloat()).toDouble(), 1.0).toFloat()
-        context.matrices.translate(x, y, 0f)
-        context.matrices.scale(factor, factor, 1f)
-        drawString(context, text, -strLength / 2, -fr.FONT_HEIGHT / 2, color, shadow)
-        context.matrices.popMatrix()
+        DrawContextUtils.translate(x, y, 0f)
+        DrawContextUtils.scale(factor, factor, 1f)
+        drawString(text, -strLength / 2, -fr.FONT_HEIGHT / 2, color, shadow)
+        DrawContextUtils.popMatrix()
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawString(context: DrawContext, str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
-        //#if MC < 1.21
-        fr.drawString(str, x, y, color, shadow)
-        //#else
-        //$$ context.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
-        //#endif
+    fun drawString(str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawString(context: DrawContext, str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
-        //#if MC < 1.21
-        fr.drawString(str, x.toFloat(), y.toFloat(), color, shadow)
-        //#else
-        //$$ context.drawText(fr, str, x, y, color, shadow)
-        //#endif
+    fun drawString(str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
     }
 
     private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
@@ -138,10 +118,8 @@ object GuiRenderUtils {
         )
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawScaledRec(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
+    fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
         drawRect(
-            context,
             (left * inverseScale).toInt(),
             (top * inverseScale).toInt(),
             (right * inverseScale).toInt(),
@@ -150,19 +128,13 @@ object GuiRenderUtils {
         )
     }
 
-    // TODO change to extend function of DrawContext
-    fun drawRect(context: DrawContext, left: Int, top: Int, right: Int, bottom: Int, color: Int) {
-        //#if MC < 1.21
-        GuiScreen.drawRect(left, top, right, bottom, color)
-        //#else
-        //$$ context.fill(left, top, right, bottom, color)
-        //#endif
+    fun drawRect(left: Int, top: Int, right: Int, bottom: Int, color: Int) {
+        DrawContextUtils.drawContext.fill(left, top, right, bottom, color)
     }
 
-    // TODO change to extend function of DrawContext
-    fun renderItemAndBackground(context: DrawContext, item: ItemStack, x: Int, y: Int, color: Int) {
+    fun renderItemAndBackground(item: ItemStack, x: Int, y: Int, color: Int) {
         renderItemStack(item, x, y)
-        drawRect(context, x, y, x + 16, y + 16, color)
+        drawRect(x, y, x + 16, y + 16, color)
     }
 
     /** @Mojang */

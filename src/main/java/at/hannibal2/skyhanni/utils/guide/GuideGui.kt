@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils.guide
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
@@ -51,45 +51,45 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
         pageList[currentPage]?.refresh()
     }
 
-    private fun renderHorizontalTabs(context: DrawContext) {
+    private fun renderHorizontalTabs() {
         var offset = Pair(TAB_SPACING.toFloat() * 3f, -TAB_LONG_SIDE.toFloat())
-        context.matrices.translate(offset.first, offset.second, 0f)
+        DrawContextUtils.translate(offset.first, offset.second, 0f)
         for (tab in horizontalTabs) {
             tab.render(offset.first.toInt(), offset.second.toInt())
             val xShift = (TAB_SHORT_SIDE + TAB_SPACING).toFloat()
             offset = offset.first + xShift to offset.second
-            context.matrices.translate(xShift, 0f, 0f)
+            DrawContextUtils.translate(xShift, 0f, 0f)
         }
-        context.matrices.translate(-offset.first, -offset.second, 0f)
+        DrawContextUtils.translate(-offset.first, -offset.second, 0f)
     }
 
-    private fun renderVerticalTabs(context: DrawContext) {
+    private fun renderVerticalTabs() {
         var offset = Pair(-TAB_LONG_SIDE.toFloat(), TAB_SPACING.toFloat() * 3f)
-        context.matrices.translate(offset.first, offset.second, 0f)
+        DrawContextUtils.translate(offset.first, offset.second, 0f)
         for (tab in verticalTabs) {
             tab.render(offset.first.toInt(), offset.second.toInt())
             val yShift = (TAB_SHORT_SIDE + TAB_SPACING).toFloat()
             offset = offset.first to offset.second + yShift
-            context.matrices.translate(0f, yShift, 0f)
+            DrawContextUtils.translate(0f, yShift, 0f)
         }
-        context.matrices.translate(-offset.first, -offset.second, 0f)
+        DrawContextUtils.translate(-offset.first, -offset.second, 0f)
     }
 
-    override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) = try {
-        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
+    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) = try {
+        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         val guiLeft = (width - sizeX) / 2
         val guiTop = (height - sizeY) / 2
 
         val relativeMouseX = originalMouseX - guiLeft
         val relativeMouseY = originalMouseY - guiTop
 
-        context.matrices.pushMatrix()
-        context.matrices.translate(guiLeft.toFloat(), guiTop.toFloat(), 0f)
-        GuiRenderUtils.drawRect(context, 0, 0, sizeX, sizeY, 0x50000000)
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate(guiLeft.toFloat(), guiTop.toFloat(), 0f)
+        GuiRenderUtils.drawRect(0, 0, sizeX, sizeY, 0x50000000)
 
         Renderable.withMousePosition(relativeMouseX, relativeMouseY) {
-            renderHorizontalTabs(context)
-            renderVerticalTabs(context)
+            renderHorizontalTabs()
+            renderVerticalTabs()
 
             Renderable.string(
                 "§7SkyHanni ",
@@ -98,13 +98,13 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyhanniB
             ).renderXYAligned(0, 0, sizeX, sizeY)
 
             val page = pageList[currentPage]
-            page?.drawPage(context, relativeMouseX, relativeMouseY)
+            page?.drawPage(relativeMouseX, relativeMouseY)
 
-            context.matrices.translate(-guiLeft.toFloat(), -guiTop.toFloat(), 0f)
+            DrawContextUtils.translate(-guiLeft.toFloat(), -guiTop.toFloat(), 0f)
         }
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
     } catch (e: Exception) {
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
         ErrorManager.logErrorWithData(
             e, "Something broke in GuideGUI",
             "Guide" to this.javaClass.typeName,

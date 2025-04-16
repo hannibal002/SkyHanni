@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -15,7 +14,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 @SkyHanniModule
 object SlayerMiniBossFeatures {
 
-    private val config get() = SkyHanniMod.feature.slayer
+    private val config get() = SlayerApi.config
     private var miniBosses = mutableSetOf<Mob>()
 
     @HandleEvent
