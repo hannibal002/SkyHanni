@@ -64,7 +64,11 @@ object GardenOptimalSpeed {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
+        //#if MC < 1.21
         currentSpeed = (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
+        //#else
+        //$$ currentSpeed = MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED).toInt()
+        //#endif
 
         if (sneaking && !sneakingSince.isInPast()) {
             sneakingSince = SimpleTimeMark.now()

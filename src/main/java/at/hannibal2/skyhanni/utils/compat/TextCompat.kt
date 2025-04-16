@@ -16,6 +16,7 @@ import net.minecraft.util.ResourceLocation
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //$$ import net.minecraft.network.message.MessageSignatureData
 //$$ import java.net.URI
+//$$ import kotlin.jvm.optionals.getOrNull
 //$$ import kotlin.math.abs
 //#endif
 
@@ -196,3 +197,31 @@ val defaultStyleConstructor: ChatStyle get() =
 //#else
 //$$ Style.EMPTY
 //#endif
+
+fun ClickEvent.value(): String {
+    //#if MC < 1.21
+    return this.value
+    //#else
+    //$$ if (this.action == ClickEvent.Action.OPEN_URL) return (this as ClickEvent.OpenUrl).uri.toString()
+    //$$ if (this.action == ClickEvent.Action.RUN_COMMAND) return (this as ClickEvent.RunCommand).command
+    //$$ if (this.action == ClickEvent.Action.SUGGEST_COMMAND) return (this as ClickEvent.SuggestCommand).command
+    //$$ // we dont use these bottom 3 but might as well have them here
+    //$$ if (this.action == ClickEvent.Action.CHANGE_PAGE) return (this as ClickEvent.ChangePage).page.toString()
+    //$$ if (this.action == ClickEvent.Action.COPY_TO_CLIPBOARD) return (this as ClickEvent.CopyToClipboard).value
+    //$$ if (this.action == ClickEvent.Action.OPEN_FILE) return (this as ClickEvent.OpenFile).path
+    //$$ // todo use error manager here probably, not doing it now because it doesnt compile on 1.21
+    //$$ return ""
+    //#endif
+
+}
+
+fun HoverEvent.value(): IChatComponent {
+    //#if MC < 1.21
+    return this.value
+    //#else
+    //$$ if (this.action == HoverEvent.Action.SHOW_TEXT) return (this as HoverEvent.ShowText).value
+    //$$ if (this.action == HoverEvent.Action.SHOW_ITEM) return (this as HoverEvent.ShowItem).item.name
+    //$$ if (this.action == HoverEvent.Action.SHOW_ENTITY) return (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Text.empty()
+    //$$ return Text.empty()
+    //#endif
+}

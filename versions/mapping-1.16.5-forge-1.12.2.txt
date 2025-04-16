@@ -26,6 +26,11 @@ net.minecraft.client.Options keyScreenshot keyBindScreenshot
 net.minecraft.client.Options keyFullscreen keyBindFullscreen
 net.minecraft.client.Options getSoundSourceVolume() getSoundLevel()
 
+net.minecraft.client.KeyMapping net.minecraft.client.settings.KeyBinding
+net.minecraft.client.KeyMapping boundKey.getCode() getKeyCode()
+net.minecraft.client.KeyMapping releaseAll() unPressAllKeys()
+net.minecraft.client.KeyMapping isDown() isKeyDown()
+
 net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
 net.minecraft.client.Minecraft setScreen() displayGuiScreen()
 net.minecraft.client.Minecraft submit() addScheduledTask()
@@ -523,3 +528,7 @@ com.mojang.blaze3d.platform.Lighting net.minecraft.client.renderer.RenderHelper
 com.mojang.blaze3d.platform.Lighting turnOff() disableStandardItemLighting()
 com.mojang.blaze3d.platform.Lighting turnBackOn() enableStandardItemLighting()
 com.mojang.blaze3d.platform.Lighting setupFor3DItems() enableGUIStandardItemLighting()
+
+net.minecraft.world.phys.HitResult net.minecraft.util.math.RayTraceResult
+net.minecraft.world.phys.HitResult type typeOfHit
+net.minecraft.world.phys.HitResult getLocation() getBlockPos()
