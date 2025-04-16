@@ -192,7 +192,8 @@ object IslandGraphs {
         }
 
         // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
-        @Suppress("DEPRECATION") val now = isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)
+        @Suppress("DEPRECATION")
+        val now = isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
             loadDwarvenMines()
@@ -205,7 +206,8 @@ object IslandGraphs {
 
     private fun loadDwarvenMines() {
         // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
-        @Suppress("DEPRECATION") if (isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)) {
+        @Suppress("DEPRECATION")
+        if (isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)) {
             reloadFromJson("GLACITE_TUNNELS")
         } else {
             reloadFromJson("DWARVEN_MINES")
@@ -226,11 +228,9 @@ object IslandGraphs {
         val islandType = LorenzUtils.skyBlockIsland.name
         val important = LorenzUtils.inSkyBlock && lastLoadedIslandType != islandType
         val list = buildList {
+            add("")
             if (important) {
-                add("")
                 add("wrong island!")
-            } else {
-                add("")
                 add("island is correct!")
             }
             add("")
@@ -638,7 +638,9 @@ object IslandGraphs {
         if (args.isEmpty()) {
             ChatUtils.userError("Usage: /shreportlocation <reason>")
             ChatUtils.chat(
-                "Give a reason that explains what's wrong at this location, e.g.: " + "pathfinding goes through wall, ignores obvious shortcut, " + "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
+                "Give a reason that explains what's wrong at this location, e.g.: " +
+                    "pathfinding goes through wall, ignores obvious shortcut, " +
+                    "missing npc/fishing hotspot/skyblock area name in /shnavigate..",
             )
             return
         }
