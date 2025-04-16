@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 @SkyHanniModule
 object ShortenWarpCommand {
 
-    private var warps = listOf<String>()
+    private var warps = emptyList<String>()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -29,6 +29,7 @@ object ShortenWarpCommand {
         if (!message.startsWith("/")) return
 
         val command = message.removePrefix("/")
+        // doing /barn in garden should not warp to the farming islands
         if (command == "barn" && IslandType.GARDEN.isInIsland() && SkyHanniMod.feature.garden.gardenCommands.warpCommands) return
 
         if (command in warps) {

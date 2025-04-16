@@ -57,7 +57,7 @@ class CommandsConfig {
     @Expose
     @ConfigEditorBoolean
     @FeatureToggle
-    var shortenWarp: Boolean = true
+    var shortenWarp: Boolean = false
 
     @Expose
     @ConfigOption(name = "Replace §e/warp is", desc = "Add §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")
