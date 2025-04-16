@@ -12,7 +12,7 @@ class DungeonConfig {
     @Expose
     @ConfigOption(
         name = "Clicked Blocks",
-        desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons."
+        desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons.",
     )
     @Accordion
     var clickedBlocks: HighlightClickedBlocksConfig = HighlightClickedBlocksConfig()
@@ -20,7 +20,7 @@ class DungeonConfig {
     @Expose
     @ConfigOption(
         name = "Secret Chime",
-        desc = "Play a sound effect when levers, chests, and wither essence are clicked in dungeons."
+        desc = "Play a sound effect when levers, chests, and wither essence are clicked in dungeons.",
     )
     @Accordion
     var secretChime: SecretChimeConfig = SecretChimeConfig()
@@ -53,7 +53,7 @@ class DungeonConfig {
     @Expose
     @ConfigOption(
         name = "Boss Damage Splash",
-        desc = "Hide damage splashes while inside the boss room (fixes a Skytils feature)."
+        desc = "Hide damage splashes while inside the boss room (fixes a Skytils feature).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -75,7 +75,7 @@ class DungeonConfig {
     @ConfigOption(
         name = "Architect Notifier",
         desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed.\n" +
-            "§cOnly works when having enough §5Architect First Drafts §cin the sack."
+            "§cOnly works when having enough §5Architect First Drafts §cin the sack.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -116,7 +116,6 @@ class DungeonConfig {
     @Accordion
     var lividFinder: LividFinderConfig = LividFinderConfig()
 
-
     @Expose
     @ConfigOption(name = "Terracotta Phase", desc = "")
     @Accordion
@@ -126,7 +125,7 @@ class DungeonConfig {
     @ConfigOption(
         name = "Moving Skeleton Skulls",
         desc = "Highlight Skeleton Skulls when combining into an " +
-            "orange Skeletor (not useful when combined with feature Hide Skeleton Skull)."
+            "orange Skeletor (not useful when combined with feature Hide Skeleton Skull).",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -142,7 +141,7 @@ class DungeonConfig {
     @ConfigOption(
         name = "Croesus Chest",
         desc = "Add a visual highlight to the Croesus inventory that " +
-            "shows unopened chests."
+            "shows unopened chests.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -152,7 +151,7 @@ class DungeonConfig {
     @ConfigOption(
         name = "SA Jump Notification",
         desc = "Notifies you when a Shadow Assassin is about " +
-            "to jump on you."
+            "to jump on you.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -173,4 +172,10 @@ class DungeonConfig {
     @ConfigOption(name = "Dungeon Races Guide", desc = "")
     @Accordion
     var dungeonsRaceGuide: DungeonsRaceGuideConfig = DungeonsRaceGuideConfig()
+
+    @Expose
+    @ConfigOption(name = "Spirit Leap", desc = "Configure the Spirit Leap feature to modify its behavior in-game.")
+    @Accordion
+    var spiritLeapOverlay: SpiritLeapConfig = SpiritLeapConfig()
+
 }

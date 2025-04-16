@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
@@ -98,14 +98,12 @@ object RenderUtils {
         }
     //#endif
 
-    // TODO swap Slot with DrawContext for extended function
-    fun Slot.highlight(context: DrawContext, color: LorenzColor) {
-        highlight(context, color.toColor())
+    fun Slot.highlight(color: LorenzColor) {
+        highlight(color.toColor())
     }
 
-    // TODO swap Slot with DrawContext for extended function
-    fun Slot.highlight(context: DrawContext, color: Color) {
-        highlight(context, color, xDisplayPosition, yDisplayPosition)
+    fun Slot.highlight(color: Color) {
+        highlight(color, xDisplayPosition, yDisplayPosition)
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {
@@ -113,18 +111,17 @@ object RenderUtils {
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: Color) {
-        highlight(context, color, x, y)
+        highlight(color, x, y)
     }
 
-    // TODO make a DrawContext extended function
-    fun highlight(context: DrawContext, color: Color, x: Int, y: Int) {
+    fun highlight(color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
-        context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
         // TODO don't use z
-        context.matrices.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        GuiRenderUtils.drawRect(context, x, y, x + 16, y + 16, color.rgb)
-        context.matrices.popMatrix()
+        DrawContextUtils.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
+        DrawContextUtils.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
     }
