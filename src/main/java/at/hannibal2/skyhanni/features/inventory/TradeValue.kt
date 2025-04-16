@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.features.inventory.ChestValue.ChestItem
 import at.hannibal2.skyhanni.features.inventory.ChestValue.addToList
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -91,7 +90,6 @@ object TradeValue {
 
     // Display trade value breakdown
     private fun update(items: Map<String, ChestItem>, indicator: Int = 0) {
-        ChatUtils.chat("update!")
         if (indicator == 0) {
             yourDisplay = buildList {
                 addToList(items.values, "§eTrade Value")
