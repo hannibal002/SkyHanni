@@ -2,18 +2,17 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -35,7 +34,7 @@ import kotlin.time.toDuration
 @SkyHanniModule
 object GardenVisitorTimer {
 
-    private val config get() = GardenApi.config.visitors.timer
+    private val config get() = VisitorApi.config.timer
 
     /**
      * REGEX-TEST:  Next Visitor: §r§b11m
@@ -56,7 +55,7 @@ object GardenVisitorTimer {
     private var lastVisitors: Int = -1
 
     // TODO nea?
-//    private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
+    // private val visitorInterval by dynamic(GardenAPI::config, Storage.ProfileSpecific.GardenStorage::visitorInterval)
     private var visitorInterval: Duration?
         get() = GardenApi.storage?.visitorInterval?.toDuration(DurationUnit.MILLISECONDS)
         set(value) {
@@ -132,7 +131,7 @@ object GardenVisitorTimer {
                 if (!sixthVisitorReady) {
                     sixthVisitorReady = true
                     if (isSixthVisitorWarningEnabled()) {
-                        LorenzUtils.sendTitle("§a6th Visitor Ready", 5.seconds)
+                        TitleManager.sendTitle("§a6th Visitor Ready", duration = 5.seconds)
                         SoundUtils.playBeepSound()
                     }
                 }
@@ -179,10 +178,10 @@ object GardenVisitorTimer {
         display = createDisplayText("§b$visitorsAmount $visitorLabel §7($next§7)")
     }
 
-    private fun createDisplayText(text: String) = Renderable.clickAndHover(
+    private fun createDisplayText(text: String) = Renderable.clickable(
         text,
-        listOf("§eClick to teleport to the barn!"),
-        onClick = { HypixelCommands.teleportToPlot("barn") },
+        tips = listOf("§eClick to teleport to the barn!"),
+        onLeftClick = { HypixelCommands.teleportToPlot("barn") },
     )
 
     init {
@@ -196,7 +195,7 @@ object GardenVisitorTimer {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastVisitors = -1
         GardenApi.storage?.nextSixthVisitorArrival?.let {
             if (it.isFarFuture() && it.toMillis() != -9223370336633802065) {

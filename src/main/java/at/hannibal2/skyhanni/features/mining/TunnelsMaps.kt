@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
@@ -16,12 +17,10 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
-import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -29,12 +28,13 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -49,6 +49,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullKeys
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -78,12 +80,10 @@ object TunnelsMaps {
     private var possibleLocations = mapOf<String, List<GraphNode>>()
     private val cooldowns = mutableMapOf<GraphNode, SimpleTimeMark>()
     private var active: String = ""
+    private var lastBaseCampWarp: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private lateinit var fairySouls: Map<String, GraphNode>
-
-    // TODO what is this? why is there a difference? can this be replaced with GraphNodeTag.GRIND_ORES?
-    private lateinit var newGemstones: Map<String, List<GraphNode>>
-    private lateinit var oldGemstones: Map<String, List<GraphNode>>
+    private lateinit var gemstones: Map<String, List<GraphNode>>
     private lateinit var normalLocations: Map<String, List<GraphNode>>
 
     private var locationDisplay: List<Renderable> = emptyList()
@@ -113,14 +113,13 @@ object TunnelsMaps {
         return list.size > 1
     }
 
-    private val oldGemstonePattern by RepoPattern.pattern(
-        "mining.tunnels.maps.gem.old", ".*(?:Ruby|Amethyst|Jade|Sapphire|Amber|Topaz).*",
-    )
-    private val newGemstonePattern by RepoPattern.pattern(
-        "mining.tunnels.maps.gem.new", ".*(?:Aquamarine|Onyx|Citrine|Peridot).*",
-    )
-    private val commissionInvPattern by RepoPattern.pattern(
-        "mining.commission.inventory", "Commissions",
+    // <editor-fold desc="Patterns">
+    /**
+     * REGEX-TEST: §9Glacite Collector
+     */
+    private val collectorCommissionPattern by RepoPattern.pattern(
+        "mining.commisson.collector",
+        "§9(?<what>\\w+(?: \\w+)?) Collector",
     )
 
     /**
@@ -131,10 +130,7 @@ object TunnelsMaps {
         "mining.commisson.reward.glacite",
         "§7- §b[\\d,]+ Glacite Powder",
     )
-    private val collectorCommissionPattern by RepoPattern.pattern(
-        "mining.commisson.collector",
-        "§9(?<what>\\w+(?: \\w+)?) Collector",
-    )
+
     private val invalidGoalPattern by RepoPattern.pattern(
         "mining.commisson.collector.invalid",
         "Glacite|Scrap",
@@ -143,7 +139,21 @@ object TunnelsMaps {
         "mining.commisson.completed",
         "§a§lCOMPLETED",
     )
+    private val commissionInvPattern by RepoPattern.pattern(
+        "mining.commission.inventory",
+        "Commissions",
+    )
+    private val oldGemstonePattern by RepoPattern.pattern(
+        "mining.tunnels.maps.gem.old",
+        ".*(?:Ruby|Amethyst|Jade|Sapphire|Amber|Topaz).*",
+    )
+    private val newGemstonePattern by RepoPattern.pattern(
+        "mining.tunnels.maps.gem.new",
+        ".*(?:Aquamarine|Onyx|Citrine|Peridot).*",
+    )
+    // </editor-fold>
 
+    private val ROYAL_PIGEON = "ROYAL_PIGEON".toInternalName()
     private val translateTable = mutableMapOf<String, String>()
 
     /** @return Errors with an empty String */
@@ -152,10 +162,9 @@ object TunnelsMaps {
     }
 
     private var clickTranslate = mapOf<Int, String>()
-
-    private val ROYAL_PIGEON = "ROYAL_PIGEON".toInternalName()
-
     private var isCommission = false
+    private var lastDisplayHash: Int = 0
+    private var display: List<Renderable> = listOf()
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -245,8 +254,7 @@ object TunnelsMaps {
             }
         }
         fairySouls = fairy
-        this.newGemstones = newGemstone
-        this.oldGemstones = oldGemstone
+        this.gemstones = newGemstone + oldGemstone
         normalLocations = other
         translateTable.clear()
         DelayedRun.runNextTick {
@@ -265,64 +273,66 @@ object TunnelsMaps {
         }
     }
 
+    @HandleEvent
+    @Suppress("AvoidBritishSpelling")
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(84, "mining.tunnelMaps.pathColour", "mining.tunnelMaps.pathColor")
+        event.move(84, "mining.tunnelMaps.dynamicPathColour", "mining.tunnelMaps.dynamicPathColor")
+    }
+
+    private fun drawDisplay(): List<Renderable> {
+        lastDisplayHash = (locationDisplay.hashCode() * 31 + config.hashCode() * 31 + goal.hashCode() * 31).takeIf {
+            it != lastDisplayHash
+        } ?: return display
+
+        if (active.isEmpty()) return buildList {
+            addString("")
+            addString("")
+            addAll(locationDisplay)
+        }
+
+        return buildList {
+            if (goal == campfire && active != campfire.name) {
+                add(Renderable.string("§6Override for ${campfire.name}"))
+                add(Renderable.clickable("§eMake §f$active §eactive", onLeftClick = ::setNextGoal))
+            } else {
+                add(
+                    Renderable.clickable(
+                        "§6Active: §f$active",
+                        tips = listOf("§eClick to disable current Waypoint"),
+                        onLeftClick = ::clearPath,
+                    ),
+                )
+                if (hasNext()) add(Renderable.clickable("§eNext Spot", onLeftClick = ::setNextGoal))
+                else addString("")
+            }
+            addAll(locationDisplay)
+        }
+    }
+
     init {
         RenderDisplayHelper(
             condition = { isEnabled() },
             inOwnInventory = true,
         ) {
-            val display = buildList<Renderable> {
-                if (active.isNotEmpty()) {
-                    if (goal == campfire && active != campfire.name) {
-                        add(Renderable.string("§6Override for ${campfire.name}"))
-                        add(
-                            Renderable.clickable(
-                                Renderable.string("§eMake §f$active §eactive"),
-                                onClick = {
-                                    goal = getNext()
-                                },
-                            ),
-                        )
-                    } else {
-                        add(
-                            Renderable.clickAndHover(
-                                Renderable.string("§6Active: §f$active"),
-                                listOf("§eClick to disable current Waypoint"),
-                                onClick = ::clearPath,
-                            ),
-                        )
-                        if (hasNext()) {
-                            add(
-                                Renderable.clickable(
-                                    Renderable.string("§eNext Spot"),
-                                    onClick = {
-                                        goal = getNext()
-                                    },
-                                ),
-                            )
-                        } else {
-                            addString("")
-                        }
-                    }
-                } else {
-                    addString("")
-                    addString("")
-                }
-                addAll(locationDisplay)
-            }
+            display = drawDisplay()
             config.position.renderRenderables(display, posLabel = "Tunnels Maps")
         }
     }
 
     private fun generateLocationsDisplay() = buildList {
+        val campfireName = campfire.name ?: return@buildList
         add(Renderable.string("§6Locations:"))
         add(
-            Renderable.multiClickAndHover(
-                campfire.name!!,
-                listOf(
-                    "§eLeft Click to set active", "§eRight Click for override",
+            Renderable.clickable(
+                campfireName,
+                tips = listOf(
+                    "§eLeft Click to set active",
+                    "§eRight Click for override",
                 ),
-                click = mapOf(
-                    0 to guiSetActive(campfire.name!!), 1 to ::campfireOverride,
+                onAnyClick = mapOf(
+                    LEFT_MOUSE to guiSetActive(campfireName),
+                    RIGHT_MOUSE to ::campfireOverride,
                 ),
             ),
         )
@@ -332,51 +342,35 @@ object TunnelsMaps {
                     Renderable.horizontalContainer(
                         listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[$name]"), onClick = guiSetActive(it.key))
+                            Renderable.clickable(Renderable.string("§d[$name]"), onLeftClick = guiSetActive(it.key))
                         },
                     ),
                     Renderable.string("§dFairy Souls"),
                 ),
             )
         }
-        if (config.compactGemstone.get()) {
-            add(
-                Renderable.table(
-                    listOf(
-                        newGemstones.map(::toCompactGemstoneName), oldGemstones.map(::toCompactGemstoneName),
-                    ),
-                ),
-            )
-        } else {
-            addAll(
-                newGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-                },
-            )
-            addAll(
-                oldGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-                },
-            )
-        }
-        addAll(
-            normalLocations.map {
-                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
-            },
-        )
+
+        if (config.compactGemstone.get()) add(Renderable.table(listOf(gemstones.map(::toCompactGemstoneName))))
+        else addAll(gemstones.toRenderables())
+
+        addAll(normalLocations.toRenderables())
     }
 
-    private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
+    private fun Map<String, List<GraphNode>>.toRenderables() = map {
+        Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
+    }
+
+    private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickable(
         Renderable.string(
             (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
                 "ROUGH_".plus(
                     it.key.removeColor().removeSuffix("stone"),
-                ).toInternalName().itemName.takeWhile { it != ' ' }.removeColor()
+                ).toInternalName().repoItemName.takeWhile { it != ' ' }.removeColor()
                 ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
         tips = listOf(it.key),
-        onClick = guiSetActive(it.key),
+        onLeftClick = guiSetActive(it.key),
     )
 
     private fun campfireOverride() {
@@ -395,14 +389,14 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         if (checkGoalReached()) return
-        val prevclosest = closestNode
+        val prevClosest = closestNode
         closestNode = graph.minBy { it.position.distanceSqToPlayer() }
         val closest = closestNode ?: return
         val goal = goal ?: return
-        if (closest == prevclosest && goal == prevGoal) return
+        if (closest == prevClosest && goal == prevGoal) return
         val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
@@ -432,7 +426,7 @@ object TunnelsMaps {
         }
         if (goalReached) {
             if (goal == campfire && active != campfire.name) {
-                this.goal = getNext()
+                setNextGoal()
             } else {
                 cooldowns[goal] = 60.0.seconds.fromNow()
                 clearPath()
@@ -445,6 +439,10 @@ object TunnelsMaps {
     private fun clearPath() {
         path = null
         goal = null
+    }
+
+    private fun setNextGoal() {
+        goal = getNext()
     }
 
     @HandleEvent
@@ -472,11 +470,11 @@ object TunnelsMaps {
         )
     }
 
-    private fun getPathColor(): Color = if (config.dynamicPathColour) {
+    private fun getPathColor(): Color = if (config.dynamicPathColor) {
         goal?.name?.getFirstColorCode()?.toLorenzColor()?.takeIf { it != LorenzColor.WHITE }?.toColor()
     } else {
         null
-    } ?: config.pathColour.toSpecialColor()
+    } ?: config.pathColor.toSpecialColor()
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
@@ -496,21 +494,15 @@ object TunnelsMaps {
 
     private fun campfireKey(event: KeyPressEvent) {
         if (event.keyCode != config.campfireKey) return
-        if (config.travelScroll) {
-            HypixelCommands.warp("basecamp")
-        } else {
-            campfireOverride()
-        }
+        if (lastBaseCampWarp.passedSince() < 2.seconds) return
+        lastBaseCampWarp = SimpleTimeMark.now()
+        if (config.travelScroll) HypixelCommands.warp("basecamp") else campfireOverride()
     }
 
     @HandleEvent
     fun onWarp(event: SkyHanniWarpEvent) {
-        if (!isEnabled()) return
-        if (goal != null) {
-            DelayedRun.runNextTick {
-                goal = getNext()
-            }
-        }
+        if (!isEnabled() || goal == null) return
+        DelayedRun.runNextTick { setNextGoal() }
     }
 
     @HandleEvent
@@ -532,10 +524,10 @@ object TunnelsMaps {
     private fun nextSpot() {
         if (!nextSpotDelay.isInPast()) return
         nextSpotDelay = 0.5.seconds.fromNow()
-        goal = getNext()
+        setNextGoal()
     }
 
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && LorenzUtils.skyBlockArea in areas
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && IslandAreas.currentAreaName in areas
 }

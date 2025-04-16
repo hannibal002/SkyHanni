@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -21,23 +20,22 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
-import net.minecraft.block.BlockStainedGlass
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.getWoolColor
+import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.isWool
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
-import net.minecraft.init.Blocks
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -104,9 +102,9 @@ object DungeonLividFinder {
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inLividBossRoom()) return
         if (event.location != blockLocation) return
-        if (event.location.getBlockAt() != Blocks.wool) return
+        if (!event.location.getBlockAt().isWool()) return
 
-        val newColor = event.newState.getValue(BlockStainedGlass.COLOR).toLorenzColor()
+        val newColor = event.newState.getWoolColor()
         color = newColor
         ChatUtils.debug("newColor! $newColor")
 
@@ -158,7 +156,7 @@ object DungeonLividFinder {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         color = null
         lividArmorStandId = null
     }
@@ -170,7 +168,7 @@ object DungeonLividFinder {
         if (event.entity.mob in fakeLivids) event.cancel()
     }
 
-    private fun isCurrentlyBlind() = (Minecraft.getMinecraft().thePlayer?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
+    private fun isCurrentlyBlind() = (MinecraftCompat.localPlayerOrNull?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
 
     private fun Mob.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()
@@ -191,7 +189,7 @@ object DungeonLividFinder {
         event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
 
         val color = lorenzColor.toColor()
-        event.drawFilledBoundingBoxNea(boundingBox, color, 0.5f)
+        event.drawFilledBoundingBox(boundingBox, color, 0.5f)
 
         if (location.distanceSqToPlayer() > 50) {
             event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)

@@ -114,7 +114,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Sensitivity Reducer", desc = "")
     @Accordion
-    public SensitivityReducerConfig sensitivityReducerConfig = new SensitivityReducerConfig();
+    public SensitivityReducerConfig sensitivityReducer = new SensitivityReducerConfig();
 
     @Expose
     @ConfigOption(name = "Crop Start Location", desc = "")

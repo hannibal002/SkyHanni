@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.render.gui.GuiActionPerformedEvent
+import at.hannibal2.skyhanni.events.render.gui.InitializeGuiEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ButtonOnPause {
@@ -17,8 +17,8 @@ object ButtonOnPause {
     private val config get() = SkyHanniMod.feature.gui
     private val buttonId = System.nanoTime().toInt()
 
-    @SubscribeEvent
-    fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
+    @HandleEvent
+    fun onGuiActionPerformed(event: GuiActionPerformedEvent) {
         if (!LorenzUtils.onHypixel) return
 
         if (config.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == buttonId) {
@@ -26,8 +26,8 @@ object ButtonOnPause {
         }
     }
 
-    @SubscribeEvent
-    fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
+    @HandleEvent
+    fun onInitializeGuiPost(event: InitializeGuiEvent) {
         if (!LorenzUtils.onHypixel) return
 
         if (config.configButtonOnPause && event.gui is GuiIngameMenu) {

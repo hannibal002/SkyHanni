@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
@@ -60,6 +61,15 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.api.event.SkyHanniEvent.post",
         "at at.hannibal2.skyhanni.api.event.EventHandler.post",
         "at net.minecraft.launchwrapper.",
+    )
+
+    // this hides the whole stack trace of one error of the list of all errors in the error message
+    // where the error class name is the key and the first line contains one of the entries in the list of values
+    private val skipErrorEntry = mapOf(
+        "java.lang.reflect.InvocationTargetException" to listOf(
+            "EventListeners.createZeroParameterConsumer",
+            "EventListeners.createSingleParameterConsumer",
+        ),
     )
 
     fun resetCache() {
@@ -111,11 +121,11 @@ object ErrorManager {
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ) {
+    ): Boolean {
         if (extraData.isNotEmpty()) {
             cachedExtraData = null
         }
-        logError(
+        return logError(
             IllegalStateException(internalMessage),
             userMessage,
             ignoreErrorCache,
@@ -134,33 +144,32 @@ object ErrorManager {
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
-    ) {
-        logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
-    }
+    ): Boolean = logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly)
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
     private fun logError(
-        throwable: Throwable,
+        originalThrowable: Throwable,
         message: String,
         ignoreErrorCache: Boolean,
         noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ) {
-        if (betaOnly && !SkyHanniMod.isBetaVersion) return
+    ): Boolean {
+        if (betaOnly && !SkyHanniMod.isBetaVersion) return false
+        val throwable = originalThrowable.maybeSkipError()
         if (!ignoreErrorCache) {
             val cachedError = throwable.stackTrace.getOrNull(0)?.let {
                 CachedError(it.fileName ?: "<unknown>", it.lineNumber, message)
             } ?: CachedError("<empty stack trace>", 0, message)
-            if (cachedError in cache) return
+            if (cachedError in cache) return false
             cache.add(cachedError)
         }
-        if (!condition()) return
+        if (!condition()) return false
 
         Error(message, throwable).printStackTrace()
-        Minecraft.getMinecraft().thePlayer ?: return
+        MinecraftCompat.localPlayerOrNull ?: return false
 
         val fullStackTrace: String
         val stackTrace: String
@@ -180,13 +189,14 @@ object ErrorManager {
         fullErrorMessages[randomId] =
             "```\nSkyHanni ${SkyHanniMod.VERSION}: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
-        val finalMessage = buildFinalMessage(message) ?: return
+        val finalMessage = buildFinalMessage(message) ?: return false
         ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.VERSION}]: $finalMessage Click here to copy the error into the clipboard.",
             onClick = { copyError(randomId) },
             "§eClick to copy!",
             prefix = false,
         )
+        return true
     }
 
     private fun getExtraDataOrCached(extraData: Array<out Pair<String, Any?>>): String {
@@ -297,5 +307,21 @@ object ErrorManager {
         cause?.let {
             addAll(it.getCustomStackTrace(fullStackTrace, this))
         }
+    }
+
+    // tries to use the cause instead of the actual error. Returns itself if doesnt work.
+    fun Throwable.maybeSkipError(): Throwable {
+        val cause = cause ?: return this
+        val causeClassName = this@maybeSkipError.javaClass.name
+        val breakOnFirstLine = skipErrorEntry[causeClassName]
+
+        for (traceElement in stackTrace) {
+            val line = traceElement.toString()
+            breakOnFirstLine?.let { list ->
+                if (list.any { line.contains(it) }) return cause
+            }
+        }
+
+        return this
     }
 }
