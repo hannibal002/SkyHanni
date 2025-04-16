@@ -129,6 +129,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows enchantment name in rare drop messages and sends a custom one if none is provided by Hypixel.
 + Added Dungeon Low Health Alert. - jani (https://github.com/hannibal002/SkyHanni/pull/3734)
     + Shows a title and plays a sound when a teammate's health is low.
++ Added Spirit Leap Overlay. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2514)
+    + Highlights specific Dungeon Classes with customizable colors.
+    + Displays player's Dungeon Class.
+    + Shows Class Level (toggleable).
+    + Added "(Dead)" text for dead teammates with customizable colors.
 
 </details>
 <details open><summary>
@@ -1573,6 +1578,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Customizable chat message detailing any Century Cakes eaten (and, if lucky, Cake Souls found) while away from your Private Island.
     + Requires Cake Counter placed on Private Island.
     + Prompts you to enable this feature when placing Cake Counter.
++ Added Fruit Bowl Player Highlighter and Stats Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3394)
 
 </details>
 <details open><summary>
