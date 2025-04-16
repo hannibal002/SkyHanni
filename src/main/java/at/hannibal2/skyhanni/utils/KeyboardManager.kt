@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+//#if MC < 1.21
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
@@ -8,6 +9,8 @@ import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
@@ -15,9 +18,7 @@ import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
-//#if MC < 1.21
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
+
 //#else
 //$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
@@ -67,11 +68,9 @@ object KeyboardManager {
 
     private fun getKeyboardEventKey(): EventKey? {
         val keyCode = getSyntheticKeyboardKeyCode(Keyboard.getEventKey(), Keyboard.getEventCharacter())
+        if (keyCode == 0) return null
         val keyState = Keyboard.getEventKeyState()
-        if (keyCode != 0) {
-            return EventKey(keyCode, keyState)
-        }
-        return null
+        return EventKey(keyCode, keyState)
     }
 
     private fun getMouseEventKey(): EventKey? {
@@ -91,7 +90,7 @@ object KeyboardManager {
 
     private val pressedKeys = mutableSetOf<Int>()
 
-    fun getSyntheticKeyboardKeyCode(key: Int, char: Char): Int = if (key == 0) char.code + 256 else key
+    private fun getSyntheticKeyboardKeyCode(key: Int, char: Char): Int = if (key == 0) char.code + 256 else key
     //#endif
 
     @HandleEvent(priority = HandleEvent.LOWEST)
