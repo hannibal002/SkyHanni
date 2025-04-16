@@ -30,7 +30,7 @@ object CompactJacobClaim {
      */
     private val openingPattern by patternGroup.pattern(
         "opening",
-        " {2}§r§6§lFARMING CONTEST REWARDS CLAIMED"
+        " {2}§r§6§lFARMING CONTEST REWARDS CLAIMED",
     )
 
     /**
@@ -38,7 +38,7 @@ object CompactJacobClaim {
      */
     private val rewardsPattern by patternGroup.pattern(
         "rewards",
-        " {2}§r§a§lREWARDS"
+        " {2}§r§a§lREWARDS",
     )
 
     /**
@@ -47,7 +47,7 @@ object CompactJacobClaim {
      */
     private val ticketPattern by patternGroup.pattern(
         "tickets",
-        " {4}§r§7§a(?<type>Jacob's|Carnival) Ticket §8x(?<amount>[\\d,]+)"
+        " {4}§r§7§a(?<type>Jacob's|Carnival) Ticket §8x(?<amount>[\\d,]+)",
     )
 
     /**
@@ -59,7 +59,7 @@ object CompactJacobClaim {
      */
     private val bookPattern by patternGroup.pattern(
         "book",
-        " {4}§r§7§8(?<amount>[\\d,]+)x §9Turbo-(?<crop>[^ ]+) I Book"
+        " {4}§r§7§8(?<amount>[\\d,]+)x §9Turbo-(?<crop>[^ ]+) I Book",
     )
 
     /**
@@ -69,7 +69,7 @@ object CompactJacobClaim {
      */
     private val medalsPattern by patternGroup.pattern(
         "medals",
-        " {4}§r§7§8\\+§e(?<amount>[\\d,]+) §7(?<type>[^ ]+) medals?"
+        " {4}§r§7§8\\+§e(?<amount>[\\d,]+) §7(?<type>[^ ]+) medals?",
     )
 
     /**
@@ -77,7 +77,7 @@ object CompactJacobClaim {
      */
     private val bitsPattern by patternGroup.pattern(
         "bits",
-        " {4}§r§8\\+§r§b(?<amount>[\\d,]+) Bits"
+        " {4}§r§8\\+§r§b(?<amount>[\\d,]+) Bits",
     )
     // </editor-fold>
 
@@ -186,19 +186,19 @@ object CompactJacobClaim {
             getTicketsFormat(),
             getBooksFormat(),
             getMedalsFormat(),
-            getBitsFormat()
+            getBitsFormat(),
         ).filterNot {
             it.isEmpty()
         }.joinToString(separator = " §8§l| §r"),
         hover = messages,
-        prefix = false
+        prefix = false,
     )
 
     private fun ContestRewardsClaimedEvent.getTicketsFormat() = buildString {
         if (rewards.jacobTickets == 0 && rewards.carnivalTickets == 0) return@buildString
         val ticketList = listOf(
             "§a${rewards.jacobTickets} Ja".takeIf { rewards.jacobTickets > 0 }.orEmpty(),
-            "§a${rewards.carnivalTickets} Ca".takeIf { rewards.carnivalTickets > 0 }.orEmpty()
+            "§a${rewards.carnivalTickets} Ca".takeIf { rewards.carnivalTickets > 0 }.orEmpty(),
         ).filterNot { it.isEmpty() }
         append("Tickets: " + ticketList.joinToString(separator = "§7, ") { it })
     }
@@ -206,7 +206,7 @@ object CompactJacobClaim {
     private fun ContestRewardsClaimedEvent.getBooksFormat() = buildString {
         val books = rewards.books.takeIf { it.isNotEmpty() } ?: return@buildString
         val bookList = books.map { (crop, amount) ->
-            val (color, shortName) = shorteningMap[crop] ?: return@map ""
+            val (color, shortName) = shorteningMap[crop] ?: error("unknown crop type $crop")
             "${color.getChatColor()}$amount $shortName".takeIf { amount > 0 }.orEmpty()
         }.filterNot { it.isEmpty() }.sortedBy { it.removeColor() }
         append("Books: " + bookList.joinToString(separator = "§7, ") { it })
