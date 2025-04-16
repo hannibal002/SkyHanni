@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.EnumChatFormatting
 import java.awt.Color
@@ -50,7 +52,12 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     override fun toString(): String = coloredLabel
 
+    @Suppress("AvoidBritishSpelling")
+    @Deprecated("Use ChromaColour instead", ReplaceWith("toChromaColor()"))
     fun toConfigColor(): String = "0:255:${color.red}:${color.green}:${color.blue}"
+
+    @JvmOverloads
+    fun toChromaColor(alpha: Int = this.color.alpha, chroma: Int = 0): ChromaColour = color.toChromaColor(alpha, chroma)
 
     fun toDyeColor(): EnumDyeColor = when (this) {
         WHITE -> EnumDyeColor.WHITE

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -291,4 +292,26 @@ object PartyApi {
             callback { listMembers() }
         }
     }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Party")
+        event.addIrrelevant {
+            val size = partyMembers.size
+            if (size == 0) {
+                add("No tracked party members!")
+            } else {
+                add("Tracked party members ($size)")
+                for (member in partyMembers) {
+                    add(" - $member" + if (partyLeader == member) " (Leader)" else "")
+                }
+            }
+
+            if (partyLeader == LorenzUtils.getPlayerName()) {
+                add("")
+                add("You are leader")
+            }
+        }
+    }
+
 }

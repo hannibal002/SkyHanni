@@ -77,6 +77,7 @@ object CrystalHollowsWalls {
                 if (!config.nucleus) return
                 drawNucleus(event)
             }
+
             position.x > MIDDLE_X -> {
                 if (position.z > MIDDLE_Z) {
                     drawPrecursor(event)
@@ -84,6 +85,7 @@ object CrystalHollowsWalls {
                     drawMithril((event))
                 }
             }
+
             else -> {
                 if (position.z > MIDDLE_Z) {
                     drawGoblin(event)
