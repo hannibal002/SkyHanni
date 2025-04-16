@@ -39,4 +39,13 @@ class SlayerProfitTrackerConfig {
     )
     @ConfigEditorBoolean
     var voidgloomInNoArea: Boolean = true
+
+    // TODO move out of slayer profit tracker and into the generic slayer config.
+    @Expose
+    @ConfigOption(
+        name = "Revenant In Graveyard",
+        desc = "Show all Revenant Slayer Features while inside the Graveyard.",
+    )
+    @ConfigEditorBoolean
+    var revenantInGraveyard: Boolean = true
 }

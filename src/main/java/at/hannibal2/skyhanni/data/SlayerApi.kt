@@ -140,10 +140,8 @@ object SlayerApi {
 
     // TODO USE SH-REPO
     private fun checkSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
-        "Graveyard",
-        "Coal Mine",
-        "Revenant Cave",
-        -> SlayerType.REVENANT
+        "Graveyard" -> if (trackerConfig.revenantInGraveyard && IslandType.HUB.isInIsland()) SlayerType.REVENANT else null
+        "Revenant Cave" -> SlayerType.REVENANT
 
         "Spider Mound",
         "Arachne's Burrow",
@@ -159,7 +157,7 @@ object SlayerApi {
         "Zealot Bruiser Hideout",
         -> SlayerType.VOID
 
-        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest) SlayerType.VOID else null
+        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest && IslandType.THE_END.isInIsland()) SlayerType.VOID else null
         "no_area" -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isInIsland()) SlayerType.VOID else null
 
         "Stronghold",
