@@ -381,6 +381,7 @@ net.minecraft.world.item.Items net.minecraft.init.Items
 net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
 net.minecraft.world.item.ItemStack isEnchanted() isItemEnchanted()
 net.minecraft.world.item.ItemStack getTag() getTagCompound()
+net.minecraft.world.item.ItemStack getEnchantmentTags() getEnchantmentTagList()
 net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 
 net.minecraft.world.item.Item byBlock() getItemFromBlock()

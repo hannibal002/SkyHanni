@@ -23,6 +23,7 @@ net.minecraft.client.util.Window getHandle() getWindow()
 
 net.minecraft.item.ItemStack net.minecraft.world.item.ItemsStack
 net.minecraft.item.ItemStack getName() getDisplayName()
+net.minecraft.item.ItemStack getEnchantments() getEnchantmentTags()
 
 net.minecraft.entity.passive.VillagerEntity net.minecraft.world.entity.npc.Villager
 net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.decoration.ArmorStand
