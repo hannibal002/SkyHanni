@@ -53,9 +53,11 @@ object TradeValue {
         yourDisplay = emptyList()
     }
 
-    @HandleEvent(SkyHanniTickEvent::class)
-    fun onTick() {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!inventory.isInside()) return
+        if (!event.isMod(2)) return
+
         var otherTotal = 0.0
         var yourTotal = 0.0
         val otherMap = mutableMapOf<Int, ItemStack>()
