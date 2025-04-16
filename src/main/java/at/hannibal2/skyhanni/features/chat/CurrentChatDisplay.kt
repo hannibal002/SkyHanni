@@ -33,7 +33,7 @@ object CurrentChatDisplay {
     enum class ChatType(
         color: LorenzColor? = null,
         chatName: String? = null,
-        displayName: String? = null
+        displayName: String? = null,
     ) {
         ALL(LorenzColor.YELLOW),
         PARTY(LorenzColor.BLUE),
@@ -59,7 +59,7 @@ object CurrentChatDisplay {
      */
     private val changedChatPattern by patternGroun.pattern(
         "changed",
-        "§aYou are now in the §r§6(?<chat>.+)§r§a channel"
+        "§aYou are now in the §r§6(?<chat>.+)§r§a channel",
     )
 
     /**
@@ -69,7 +69,7 @@ object CurrentChatDisplay {
     @Suppress("MaxLineLength")
     private val allChatPattern by patternGroun.pattern(
         "all",
-        "§cYou are not in a party and were moved to the ALL channel\\.|§cThe conversation you were in expired and you have been moved back to the ALL channel\\."
+        "§cYou are not in a party and were moved to the ALL channel\\.|§cThe conversation you were in expired and you have been moved back to the ALL channel\\.",
     )
 
     /**
@@ -78,7 +78,7 @@ object CurrentChatDisplay {
     @Suppress("MaxLineLength")
     private val openPrivateMessagePattern by patternGroun.pattern(
         "private.open",
-        "^§aOpened a chat conversation with (?:§.)*(?:\\[.+])?(?:§.|\\s)*(?<player>.*)§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave"
+        "^§aOpened a chat conversation with (?:§.)*(?:\\[.+])?(?:§.|\\s)*(?<player>.*)§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave",
     )
 
     private var privateMessageEnd = SimpleTimeMark.farPast()
@@ -91,18 +91,15 @@ object CurrentChatDisplay {
         }
 
     private var lastOpenChatTime = SimpleTimeMark.farPast()
-
     private var display: String? = null
-
     private val maxPrivateMessageTime = 5.minutes
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
         changedChatPattern.matchMatcher(message) {
-            val chat = group("chat")
+            currentChat = ChatType.fromName(group("chat"))
             privateMessagePlayer = null
-            currentChat = ChatType.fromName(chat)
             update()
             return
         }
@@ -142,12 +139,12 @@ object CurrentChatDisplay {
         val size = PartyApi.partyMembers.size
         append(
             if (size == 0) " §c(NOT IN PARTY)"
-            else " §a(${size + 1} members)" // Add 1 because the party list in PartyApi doesn't include yourself
+            else " §a(${size + 1} members)", // Add 1 because the party list in PartyApi doesn't include yourself
         )
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         update()
     }
@@ -156,8 +153,8 @@ object CurrentChatDisplay {
         display = drawDisplay()
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    @HandleEvent(GuiRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen !is GuiChat && lastOpenChatTime.passedSince() > 2.seconds) return
         config.currentChatDisplayPos.renderString(display, posLabel = "Current Chat")
