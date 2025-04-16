@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 object WarpTabComplete {
 
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
-    private var warps = listOf<String>()
+    private var warps = emptyList<String>()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
