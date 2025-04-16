@@ -25,8 +25,8 @@ import at.hannibal2.skyhanni.utils.StringUtils
 @SkyHanniModule
 object HoppityEggLocations {
 
-    private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>> get() =
-        CFApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
+    private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
+        get() = CFApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
 
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
@@ -105,7 +105,7 @@ object HoppityEggLocations {
                 loadApiCollectedEggs(collectedEggsApiData)
                 ChatUtils.chat("Updated Hoppity egg location data!")
             },
-            oneTimeClick = true
+            oneTimeClick = true,
         )
     }
 
