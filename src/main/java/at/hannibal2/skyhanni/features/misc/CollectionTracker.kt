@@ -216,7 +216,6 @@ object CollectionTracker {
         name == internalName
     }
 
-
     fun handleTabComplete(command: String): List<String>? {
         if (command != "shtrackcollection") return null
 
