@@ -30,27 +30,18 @@ object CurrentChatDisplay {
     private val config get() = SkyHanniMod.feature.chat
     private val storage get() = ProfileStorageData.playerSpecific
 
-    enum class ChatType(
-        color: LorenzColor? = null,
-        chatName: String? = null,
-        displayName: String? = null,
-    ) {
-        ALL(LorenzColor.YELLOW),
-        PARTY(LorenzColor.BLUE),
-        GUILD(LorenzColor.DARK_GREEN),
-        OFFICER(LorenzColor.DARK_AQUA),
-        PRIVATE,
-        SKYBLOCK_COOP(LorenzColor.AQUA, "SKYBLOCK CO-OP", "CO-OP"),
-        ;
+    private var privateMessageEnd = SimpleTimeMark.farPast()
+    private var privateMessagePlayer: String? = null
 
-        private val chatName = chatName ?: name
-
-        val displayName = color?.getChatColor().orEmpty() + (displayName ?: toFormattedName())
-
-        companion object {
-            fun fromName(name: String) = entries.find { it.chatName.equals(name, true) }
+    private var currentChat: ChatType?
+        get() = storage?.currentChat
+        set(value) {
+            storage?.currentChat = value
         }
-    }
+
+    private var lastOpenChatTime = SimpleTimeMark.farPast()
+    private var display: String? = null
+    private val maxPrivateMessageTime = 5.minutes
 
     private val patternGroun = RepoPattern.group("chat.currentchat")
 
@@ -80,19 +71,6 @@ object CurrentChatDisplay {
         "private.open",
         "^§aOpened a chat conversation with (?:§.)*(?:\\[.+])?(?:§.|\\s)*(?<player>.*)§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave",
     )
-
-    private var privateMessageEnd = SimpleTimeMark.farPast()
-    private var privateMessagePlayer: String? = null
-
-    private var currentChat: ChatType?
-        get() = storage?.currentChat
-        set(value) {
-            storage?.currentChat = value
-        }
-
-    private var lastOpenChatTime = SimpleTimeMark.farPast()
-    private var display: String? = null
-    private val maxPrivateMessageTime = 5.minutes
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -166,5 +144,27 @@ object CurrentChatDisplay {
     }
 
     private fun isEnabled() = config.currentChatDisplay
+
+    enum class ChatType(
+        color: LorenzColor? = null,
+        chatName: String? = null,
+        displayName: String? = null,
+    ) {
+        ALL(LorenzColor.YELLOW),
+        PARTY(LorenzColor.BLUE),
+        GUILD(LorenzColor.DARK_GREEN),
+        OFFICER(LorenzColor.DARK_AQUA),
+        PRIVATE,
+        SKYBLOCK_COOP(LorenzColor.AQUA, "SKYBLOCK CO-OP", "CO-OP"),
+        ;
+
+        private val chatName = chatName ?: name
+
+        val displayName = color?.getChatColor().orEmpty() + (displayName ?: toFormattedName())
+
+        companion object {
+            fun fromName(name: String) = entries.find { it.chatName.equals(name, true) }
+        }
+    }
 
 }
