@@ -12,7 +12,7 @@ class SlayerProfitTrackerConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Count all items you pick up while doing slayer, " +
-                "keeping track of how much you pay for starting slayers and calculating the overall profit.",
+            "keeping track of how much you pay for starting slayers and calculating the overall profit.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
