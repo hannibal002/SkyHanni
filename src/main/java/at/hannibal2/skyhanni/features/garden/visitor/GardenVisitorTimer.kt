@@ -79,6 +79,8 @@ object GardenVisitorTimer {
         sixthVisitorReady = false
     }
 
+    // TODO split up into multiple smaller functions
+    @Suppress("CyclomaticComplexMethod")
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
         var visitorsAmount = VisitorApi.visitorsInTabList(TabListData.getTabList()).size
