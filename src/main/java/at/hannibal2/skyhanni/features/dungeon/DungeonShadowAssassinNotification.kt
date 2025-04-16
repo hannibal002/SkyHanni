@@ -25,7 +25,7 @@ object DungeonShadowAssassinNotification {
         val warningTime = packet.warningTime
 
         if (action == S44PacketWorldBorder.Action.INITIALIZE && warningTime == 10000) {
-            TitleManager.sendTitle("§cShadow Assassin Jumping!", height = 3.6, fontSize = 7.0f)
+            TitleManager.sendTitle("§cShadow Assassin Jumping!")
             SoundUtils.playBeepSound()
         }
     }

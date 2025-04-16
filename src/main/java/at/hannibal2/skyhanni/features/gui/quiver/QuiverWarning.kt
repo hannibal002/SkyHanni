@@ -58,7 +58,7 @@ object QuiverWarning {
             val rarity = arrowType.internalName.getItemStackOrNull()?.getItemRarityOrNull()?.chatColorCode ?: "§f"
             "$rarity${arrowType.arrow}"
         }.createCommaSeparatedList()
-        TitleManager.sendTitle("§cLow on arrows!", duration = 5.seconds, height = 3.6, fontSize = 7f)
+        TitleManager.sendTitle("§cLow on arrows!")
         ChatUtils.chat("Low on $arrowsText!")
         SoundUtils.repeatSound(100, 30, SoundUtils.plingSound)
     }
@@ -66,7 +66,7 @@ object QuiverWarning {
     private fun lowQuiverAlert(amount: Int) {
         if (lastLowQuiverReminder.passedSince() < 30.seconds) return
         lastLowQuiverReminder = SimpleTimeMark.now()
-        TitleManager.sendTitle("§cLow on arrows!", duration = 5.seconds, height = 3.6, fontSize = 7f)
+        TitleManager.sendTitle("§cLow on arrows!")
         ChatUtils.chat("Low on arrows §e(${amount.addSeparators()} left)")
     }
 
