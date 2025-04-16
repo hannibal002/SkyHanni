@@ -101,7 +101,8 @@ object UpdateManager {
                         queueUpdate()
                     } else if (config.autoUpdates) {
                         ChatUtils.chatAndOpenConfig(
-                            "§aSkyHanni found a new update: ${it.update.versionName}. Check §b/sh download update §afor more info.",
+                            "§aSkyHanni found a new update: ${it.update.versionName}. " +
+                                "Check §b/sh download update §afor more info.",
                             config::autoUpdates,
                         )
                     }
