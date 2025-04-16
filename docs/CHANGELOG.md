@@ -26,6 +26,11 @@
 
 + Added Dungeon Low Health Alert. - jani (https://github.com/hannibal002/SkyHanni/pull/3734)
     + Shows a title and plays a sound when a teammate's health is low.
++ Added Spirit Leap Overlay. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2514)
+    + Highlights specific Dungeon Classes with customizable colors.
+    + Displays player's Dungeon Class.
+    + Shows Class Level (toggleable).
+    + Added "(Dead)" text for dead teammates with customizable colors.
 
 #### Crimson
 
@@ -91,6 +96,7 @@
     + Customizable chat message detailing any Century Cakes eaten (and, if lucky, Cake Souls found) while away from your Private Island.
     + Requires Cake Counter placed on Private Island.
     + Prompts you to enable this feature when placing Cake Counter.
++ Added Fruit Bowl Player Highlighter and Stats Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3394)
 
 ### Improvements
 
@@ -99,6 +105,8 @@
 + Added /shlockmouse as an alias for /shmouselock. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3470)
 + Added Pest Spawn Cooldown and Average Pest Spawn Time to Pest Timer. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3343)
 + Added option to show Crops instead of Music Discs in Stereo Harmony menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3715)
++ Added Fruit Bowl and Jungle Key to visitor rewards list. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3710)
+    + Updates both the Visitor Stats counter and the "prevent denying" feature.
 
 #### Mining
 
@@ -175,6 +183,7 @@
 + All Trackers now count items even when disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3786)
     + Config option now only toggles display.
 + Always show estimated Armor Value while in Custom Wardrobe edit mode. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3771)
++ Added option to format perfect enchantments on items as bold. - Goo (https://github.com/hannibal002/SkyHanni/pull/3681)
 
 ### Bug Fixes
 
@@ -239,6 +248,7 @@
 + Fixed titles in inventories overstaying their welcome. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3692)
 + Fixed an issue where the Estimated Item Value was not displayed for Kuudra Armors when using an outdated repository. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3689)
 + Fixed spacing in ultra-rare discovery message. - kwissss (https://github.com/hannibal002/SkyHanni/pull/3784)
++ Fixed Hot Chocolate Mixin detection. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3796)
 
 #### Dungeon
 
@@ -296,6 +306,7 @@
 + Fixed long server restart titles blocking other messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3741)
 + Fixed the Accept Last Party Invite feature that completely prevented joining parties. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/3760)
 + Fixed titles getting stuck on screen. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3785)
++ Fixed SkyHanni warning incorrectly about invalid tablist. - nopo (https://github.com/hannibal002/SkyHanni/pull/3798)
 
 ### Technical Details
 
@@ -453,6 +464,21 @@
 + Use DrawContext in GuiRenderUtils. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/3678)
     + Ensures these methods work on modern versions.
 + Used DrawContext instead of GlStateManager everywhere except in renderables. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3679)
++ Added `onlyOnIsland` property to `RenderDisplayHelper`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3789)
++ Added Dungeon Teammate Info. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2514)
+    + Displays player and teammate class, class level, and alive status.
++ Addressed various todos. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3789)
++ Created a Detekt rule to warn on broken preprocessed imports. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3777)
++ Reworked how DrawContext is used. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3775)
+    + Avoids unnecessary passing of the DrawContext.
++ Rewrote `GardenVisitorDropStatistics` to use a transformer instead of a map and ordinals. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3710)
++ Simplified Slayer config access. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3782)
++ Started porting `Garden` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3766)
++ Update changelog builder. - CalMWolfs & hannibal2. (https://github.com/hannibal002/SkyHanni/pull/3794)
++ Update contributing.md to mention Minecraft Development Plugin and Access Wideners. - nopo (https://github.com/hannibal002/SkyHanni/pull/3774)
++ Update loom. - nopo (https://github.com/hannibal002/SkyHanni/pull/3774)
++ Update Moulconfig to 3.6.0 for 1.21.5 support. - nea (https://github.com/hannibal002/SkyHanni/pull/3774)
++ Updates the modern project to 1.21.5. - nopo (https://github.com/hannibal002/SkyHanni/pull/3774)
 
 ### Removed Features
 

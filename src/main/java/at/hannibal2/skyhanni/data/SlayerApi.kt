@@ -22,6 +22,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -78,6 +80,13 @@ object SlayerApi {
         event.addData {
             add("activeSlayer: $activeSlayer")
             add("isInCorrectArea: $isInCorrectArea")
+            if (!isInCorrectArea) {
+                add("currentAreaType: $currentAreaType")
+                add(" graph area: ${IslandAreas.currentAreaName}")
+                with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
+                    add(" /shtestwaypoint $x $y $z pathfind")
+                }
+            }
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: ${latestSlayerProgress.removeColor()}")
         }
