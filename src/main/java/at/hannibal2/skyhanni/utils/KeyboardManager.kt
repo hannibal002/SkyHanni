@@ -81,8 +81,11 @@ object KeyboardManager {
         if (lastClickedMouseButton != -1 && MouseCompat.getEventButton() == -1) {
             Mouse.poll()
             val originalButton = lastClickedMouseButton + 100
-            if (Mouse.isButtonDown(originalButton)) return EventKey(lastClickedMouseButton, true)
-            else lastClickedMouseButton = -1
+            if (Mouse.isButtonDown(originalButton)) {
+                return EventKey(lastClickedMouseButton, true)
+            } else {
+                lastClickedMouseButton = -1
+            }
         }
         return null
     }
