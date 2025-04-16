@@ -39,7 +39,7 @@ object CurrentChatDisplay {
             storage?.currentChat = value
         }
 
-    private var lastOpenChatTime = SimpleTimeMark.farPast()
+    private var lastClosedChatTime = SimpleTimeMark.farPast()
     private var display: String? = null
     private val maxPrivateMessageTime = 5.minutes
 
@@ -134,13 +134,13 @@ object CurrentChatDisplay {
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
-        if (Minecraft.getMinecraft().currentScreen !is GuiChat && lastOpenChatTime.passedSince() > 2.seconds) return
+        if (Minecraft.getMinecraft().currentScreen !is GuiChat && lastClosedChatTime.passedSince() > 2.seconds) return
         config.currentChatDisplayPos.renderString(display, posLabel = "Current Chat")
     }
 
     @JvmStatic
     fun onCloseChat() {
-        lastOpenChatTime = SimpleTimeMark.now()
+        lastClosedChatTime = SimpleTimeMark.now()
     }
 
     private fun isEnabled() = config.currentChatDisplay
