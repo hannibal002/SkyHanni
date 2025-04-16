@@ -168,6 +168,7 @@ object ComposterDisplay {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!event.repeatSeconds(5)) return
+        @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
 
         val format = GardenApi.storage?.let {
