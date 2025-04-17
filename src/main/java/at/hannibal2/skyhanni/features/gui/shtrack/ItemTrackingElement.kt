@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.shtrack
 
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -15,7 +15,7 @@ class ItemTrackingElement(
     override val includeSack: Boolean,
 ) : ItemTrackingInterface() {
 
-    override val name get() = item.itemName
+    override val name get() = item.repoItemName
     override val saveName = item.asString()
 
     override fun similarElement(other: TrackingElement<*>): Boolean {

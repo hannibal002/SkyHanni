@@ -164,14 +164,12 @@ object CollectionTracker {
             itemAmount.percentWithColorCode(goalAmount, 1)
         }§f)"
 
-        display = Collections.singletonList(
-            buildList {
-                internalName?.let {
-                    add(it.getItemStack())
-                }
-                add("$itemName collection: §e$format$goal $gainText")
-            },
-        )
+        display = Renderable.line {
+            internalName?.let {
+                addItemStack(it.getItemStack())
+            }
+            addString("$itemName collection: §e$format$goal $gainText")
+        }
     }
 
     private fun countCurrentlyInInventory(): Int = InventoryUtils.countItemsInLowerInventory {

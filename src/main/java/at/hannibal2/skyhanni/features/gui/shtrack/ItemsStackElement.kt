@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.shtrack
 
 import at.hannibal2.skyhanni.api.CollectionApi.getMultipleMap
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -19,7 +19,7 @@ class ItemsStackElement(
     override val includeSack: Boolean,
 ) : ItemTrackingInterface() {
 
-    override val name get() = main.itemName
+    override val name get() = main.repoItemName
     override val saveName = main.asString()
 
     val map = NeuItems.getPrimitiveMultiplier(main).internalName.getMultipleMap()

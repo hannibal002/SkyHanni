@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.shtrack
 
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.getZero
 import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
@@ -54,7 +54,7 @@ abstract class TrackingElement<T : Number> {
     fun notify(string: String) {
         shouldNotify = false
         SoundUtils.playPlingSound()
-        LorenzUtils.sendTitle(string, 4.0.seconds)
+        TitleManager.sendTitle(string, duration = 4.0.seconds)
     }
 
     fun delete() {

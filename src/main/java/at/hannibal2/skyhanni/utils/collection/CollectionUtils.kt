@@ -292,6 +292,12 @@ object CollectionUtils {
         return resultConverter(sumFirst) to resultConverter(sumSecond)
     }
 
+    fun <E> MutableList<E>.move(from: Int, to: Int) {
+        val element = this[from]
+        this.removeAt(from)
+        add(to, element)
+    }
+
     inline fun <T, R> Iterable<T>.zipWithNext3(transform: (a: T, b: T, c: T) -> R): List<R> {
         val iterator = iterator()
         if (!iterator.hasNext()) return emptyList()
