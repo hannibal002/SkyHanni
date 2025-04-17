@@ -8,21 +8,19 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
 
 @SkyHanniModule
 object SulphurSkitterBox {
@@ -59,24 +57,15 @@ object SulphurSkitterBox {
     }
 
     private fun calculateSpongeLocations() {
-        val location = LocationUtils.playerLocation()
-        val from = location.add(-15, -15, -15).toBlockPos()
-        val to = location.add(15, 15, 15).toBlockPos()
-
-        spongeLocations = BlockPos.getAllInBox(from, to).filter {
-            val loc = it.toLorenzVec()
-            loc.getBlockAt() == Blocks.sponge && loc.distanceToPlayer() <= 15
-        }.filter {
-            val pos1 = it.add(-RADIUS, -RADIUS, -RADIUS)
-            val pos2 = it.add(RADIUS, RADIUS, RADIUS)
-            BlockPos.getAllInBox(pos1, pos2).any { pos ->
-                pos.toLorenzVec().getBlockAt() in FishingApi.lavaBlocks
-            }
-        }.map { it.toLorenzVec() }
+        spongeLocations = BlockUtils.nearbyBlocks(
+            LocationUtils.playerLocation(),
+            distance = 15,
+            filter = Blocks.sponge,
+        ).map { it.key }
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         spongeLocations = emptyList()
         closestSponge = null
         renderBox = null
@@ -87,27 +76,18 @@ object SulphurSkitterBox {
         if (!isEnabled()) return
         val location = closestSponge ?: return
         if (location.distanceToPlayer() >= 50) return
-        renderBox?.let { drawBox(it, event.partialTicks) }
-    }
-
-    private fun drawBox(axis: AxisAlignedBB, partialTicks: Float) {
+        val axis = renderBox ?: return
         val color = config.boxColor.toSpecialColor()
         when (config.boxType) {
             SulphurSkitterBoxConfig.BoxType.FULL -> {
-                RenderUtils.drawFilledBoundingBoxNea(
+                event.drawFilledBoundingBox(
                     axis,
                     color,
-                    partialTicks = partialTicks,
-                    renderRelativeToCamera = false,
                 )
             }
 
             SulphurSkitterBoxConfig.BoxType.WIREFRAME -> {
-                RenderUtils.drawWireframeBoundingBoxNea(axis, color, partialTicks)
-            }
-
-            else -> {
-                RenderUtils.drawWireframeBoundingBoxNea(axis, color, partialTicks)
+                event.drawWireframeBoundingBox(axis, color)
             }
         }
     }

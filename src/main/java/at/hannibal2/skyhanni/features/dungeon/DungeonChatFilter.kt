@@ -5,9 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonChatFilter.messagesEndsWithMap
-import at.hannibal2.skyhanni.features.dungeon.DungeonChatFilter.messagesMap
-import at.hannibal2.skyhanni.features.dungeon.DungeonChatFilter.patternsMap
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.util.regex.Pattern
@@ -58,6 +55,7 @@ object DungeonChatFilter {
         "§6Rapid Fire§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
         "§6Castle of Stone§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
         "§6Ragnarok§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
+        "§bThunderstorm§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
     )
     private val damagePatterns = listOf(
         "(.*) §r§aused §r(.*) §r§aon you!".toPattern(),

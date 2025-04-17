@@ -56,7 +56,8 @@ object CommandUtils {
         notFoundResponse: (String) -> String = { "Could not find a valid item for: '$it'" },
     ): Pair<Int, Any?> {
         // This replacement does not work for iterable interface. Therefore, the suppression.
-        @Suppress("ReplaceSizeZeroCheckWithIsEmpty") if (args.count() == 0) {
+        @Suppress("ReplaceSizeZeroCheckWithIsEmpty")
+        if (args.count() == 0) {
             context.errorMessage = "No item specified"
             return 0 to null
         }

@@ -11,6 +11,7 @@ enum class ItemCategory {
     WAND,
     FISHING_WEAPON,
     FISHING_ROD,
+    ROD_PART,
     AXE,
     GAUNTLET,
     HOE,

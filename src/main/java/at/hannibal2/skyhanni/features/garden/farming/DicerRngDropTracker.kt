@@ -7,18 +7,17 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -104,8 +103,6 @@ object DicerRngDropTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.hideChat && !config.display) return
-
         val message = event.message
         for (drop in itemDrops) {
             drop.pattern.matchMatcher(message) {
@@ -157,7 +154,7 @@ object DicerRngDropTracker {
         val crop = event.crop
         cropInHand = if (crop == CropType.MELON || crop == CropType.PUMPKIN) crop else null
         if (cropInHand != null) {
-            toolName = event.toolItem!!.name
+            toolName = event.toolItem!!.displayName
         }
         tracker.update()
     }
@@ -182,7 +179,7 @@ object DicerRngDropTracker {
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Pattern)
 
-    fun isEnabled() = GardenApi.inGarden() && config.display
+    private fun isEnabled() = GardenApi.inGarden() && config.display
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

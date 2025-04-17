@@ -1,17 +1,15 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.client.renderer.culling.ICamera
@@ -29,7 +27,7 @@ object EntityData {
     private val lastVisibilityCheck = TimeLimitedCache<Entity, Pair<SimpleTimeMark, Boolean>>(500.milliseconds)
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         for (entity in EntityUtils.getEntities<EntityLivingBase>()) { // this completely ignores the ignored entities list?
             val maxHealth = entity.baseMaxHealth
             val id = entity.entityId
@@ -47,7 +45,7 @@ object EntityData {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         maxHealthMap.clear()
     }
 

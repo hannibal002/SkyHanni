@@ -11,26 +11,27 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.CollectionUtils.contains
-import at.hannibal2.skyhanni.utils.CollectionUtils.firstTwiceOf
-import at.hannibal2.skyhanni.utils.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NeuItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
-import at.hannibal2.skyhanni.utils.guide.GuideGUI
+import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
@@ -91,7 +92,7 @@ interface Renderable {
             }
         }
 
-        fun fromAny(any: Any?, itemScale: Double = NeuItems.itemFontSize): Renderable? = when (any) {
+        fun fromAny(any: Any?, itemScale: Double = NeuItems.ITEM_FONT_SIZE): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
             is String -> string(any)
@@ -306,7 +307,7 @@ interface Renderable {
 
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
+            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null || GuiData.preDrawEventCancelled
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
@@ -421,7 +422,7 @@ interface Renderable {
 
         fun itemStackWithTip(
             item: ItemStack,
-            scale: Double = NeuItems.itemFontSize,
+            scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
             ySpacing: Int = 0,
             rescaleSkulls: Boolean = true,
@@ -443,12 +444,13 @@ interface Renderable {
 
         fun itemStack(
             item: ItemStack,
-            scale: Double = NeuItems.itemFontSize,
+            scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+            highlight: Boolean = false,
         ) = object : Renderable {
             override val width = (15.5 * scale + 0.5).toInt() + xSpacing
             override val height = (15.5 * scale + 0.5).toInt() + ySpacing
@@ -456,6 +458,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
+                if (highlight) {
+                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+                }
                 item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
         }
@@ -992,7 +997,6 @@ interface Renderable {
             }
         }
 
-        // TODO use this to render current boosted crop in next jacob contest crops
         fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor().addAlpha(100)) = object : Renderable {
             override val width = this@renderBounds.width
             override val height = this@renderBounds.height
@@ -1088,6 +1092,10 @@ interface Renderable {
 
         fun line(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
             return horizontalContainer(buildList { builderAction() })
+        }
+
+        fun vertical(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
+            return verticalContainer(buildList { builderAction() }, spacing = 2)
         }
 
         fun horizontalContainer(
@@ -1498,7 +1506,7 @@ interface Renderable {
                 val range = if (list.size == 1) {
                     0..0
                 } else {
-
+                    val list = list
                     val nStart = scroll.asInt()
 
                     val endReduce1 = if (showScrollableTipsInList && !scroll.atMinimum()) scrollUpTip.height else 0
@@ -1508,12 +1516,17 @@ interface Renderable {
 
                     val sequence = list.asSequence().withIndex()
                     val folded = sequence.runningIndexedFold(0) { past, value -> past + (yOffsets[value] ?: 0) }
-                    val pair = folded.firstTwiceOf({ it.value >= nStart }, { it.value >= nEnd })
+                    val pair = folded.firstTwiceOf({ it.value >= nStart }, { it.value >= nEnd || it.index == list.lastIndex })
+                    val firstElement = pair.first ?: return // Never null
+                    val lastElement = pair.second ?: return // Never null
 
-                    val subEnd = if ((pair.second?.value?.minus(pair.first?.value ?: 0) ?: 0) <= nEnd - nStart) 0 else 1
+                    val spaceLeft = nEnd - nStart - if (lastElement.index == list.lastIndex && lastElement.value < nEnd) 1 else 0
 
-                    val start = pair.first?.index ?: 0
-                    val end = pair.second?.index?.minus(subEnd) ?: list.size
+                    val subEnd = if ((lastElement.value - firstElement.value) < spaceLeft) 0 else 1
+
+                    val start = firstElement.index
+
+                    val end = (lastElement.takeIf { it.value >= nEnd }?.index ?: list.size).minus(subEnd)
 
                     start until end
                 }

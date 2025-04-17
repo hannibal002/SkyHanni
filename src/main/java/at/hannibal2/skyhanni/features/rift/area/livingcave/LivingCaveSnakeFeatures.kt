@@ -7,20 +7,19 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.livingcave.snake.LivingCaveSnake
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.block.Block
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import java.util.concurrent.ConcurrentLinkedQueue
 
@@ -110,10 +109,10 @@ object LivingCaveSnakeFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
-        if (LorenzUtils.debug && Minecraft.getMinecraft().thePlayer.isSneaking && snakes.isNotEmpty()) {
+        if (LorenzUtils.debug && MinecraftCompat.localPlayer.isSneaking && snakes.isNotEmpty()) {
             snakes.clear()
             ChatUtils.debug("Snakes reset.", replaceSameMessage = true)
             return

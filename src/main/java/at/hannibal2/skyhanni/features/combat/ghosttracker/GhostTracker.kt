@@ -23,21 +23,21 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -108,7 +108,7 @@ object GhostTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / kills
-            val perKill = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val perKill = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
@@ -139,10 +139,11 @@ object GhostTracker {
 
     /**
      * REGEX-TEST: §cYour Kill Combo has expired! You reached a 32 Kill Combo!
+     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 1,187 Kill Combo!
      */
     private val killComboEndPattern by patternGroup.pattern(
         "killcombo.end",
-        "§cYour Kill Combo has expired! You reached a (?<kill>\\d+) Kill Combo!",
+        "§cYour Kill Combo has expired! You reached a (?<kill>[\\d,.]+) Kill Combo!",
     )
     private val bagOfCashPattern by patternGroup.pattern(
         "bagofcash",
@@ -179,7 +180,7 @@ object GhostTracker {
 
     @HandleEvent
     fun onSkillExp(event: SkillExpGainEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         if (event.gained > 10_000) return
         tracker.modify {
             it.combatXpGained += event.gained.toLong()
@@ -211,14 +212,14 @@ object GhostTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+        if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
 
         tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         if (event.coins !in 200.0..2_000.0) return
         tracker.addCoins(event.coins.toInt(), false)
@@ -226,7 +227,7 @@ object GhostTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         itemDropPattern.matchMatcher(event.message) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val mf = group("mf").formatInt()
@@ -287,7 +288,7 @@ object GhostTracker {
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BESTIARY)) return
-        if (isMaxBestiary || !isEnabled()) return
+        if (isMaxBestiary || !inArea) return
         parseBestiaryWidget(event.lines)
     }
 
