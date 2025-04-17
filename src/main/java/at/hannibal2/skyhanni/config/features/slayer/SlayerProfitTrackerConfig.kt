@@ -12,7 +12,7 @@ class SlayerProfitTrackerConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Count all items you pick up while doing slayer, " +
-            "keeping track of how much you pay for starting slayers and calculating the overall profit."
+            "keeping track of how much you pay for starting slayers and calculating the overall profit.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -22,11 +22,30 @@ class SlayerProfitTrackerConfig {
     @ConfigLink(owner = SlayerProfitTrackerConfig::class, field = "enabled")
     var pos: Position = Position(20, 20, false, true)
 
+    // TODO move out of slayer profit tracker and into the generic slayer config.
     @Expose
     @ConfigOption(
         name = "Voidgloom in Dragon's Nest",
-        desc = "Show the Voidgloom Tracker in the Dragon's Nest.",
+        desc = "Show all Enderman Slayer Features while in the Dragon's Nest.",
     )
     @ConfigEditorBoolean
     var voidgloomInNest: Boolean = false
+
+    // TODO move out of slayer profit tracker and into the generic slayer config.
+    @Expose
+    @ConfigOption(
+        name = "Voidgloom Everywhere",
+        desc = "Show all Enderman Slayer Features while outside of Void Sepulture and Zealot Bruiser Hideout.",
+    )
+    @ConfigEditorBoolean
+    var voidgloomInNoArea: Boolean = true
+
+    // TODO move out of slayer profit tracker and into the generic slayer config.
+    @Expose
+    @ConfigOption(
+        name = "Revenant In Graveyard",
+        desc = "Show all Revenant Slayer Features while inside the Graveyard.",
+    )
+    @ConfigEditorBoolean
+    var revenantInGraveyard: Boolean = true
 }

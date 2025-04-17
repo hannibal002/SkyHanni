@@ -45,6 +45,11 @@ public class EnchantParsingConfig {
     public Property<LorenzColor> perfectEnchantColor = Property.of(LorenzColor.CHROMA);
 
     @Expose
+    @ConfigOption(name = "Perfect Enchantment Bold", desc = "Enchantments at max level will be bold.")
+    @ConfigEditorBoolean
+    public Property<Boolean> boldPerfectEnchant = Property.of(false);
+
+    @Expose
     @ConfigOption(name = "Great Enchantment Color", desc = "The color an enchantment will be at a great level.")
     @ConfigEditorDropdown
     public Property<LorenzColor> greatEnchantColor = Property.of(LorenzColor.GOLD);

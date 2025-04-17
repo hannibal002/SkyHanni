@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import kotlinx.coroutines.Job
 
 // scoreboard
@@ -19,7 +20,7 @@ object ScoreboardElementMotes : ScoreboardElement(), CustomScoreboardNumberTrack
 
     override fun getDisplay(): String? {
         val motes = getMotes()
-        checkDifference(motes.toLong())
+        checkDifference(motes.formatLong())
         val line = formatStringNum(motes) + temporaryChangeDisplay.orEmpty()
         if (informationFilteringConfig.hideEmptyLines && line == "0") return null
 

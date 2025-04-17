@@ -32,7 +32,7 @@ object HighlightVisitorsOutsideOfGarden {
 
     private var visitorJson = mapOf<String?, List<GardenVisitor>>()
 
-    private val config get() = GardenApi.config.visitors
+    private val config get() = VisitorApi.config
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -97,7 +97,7 @@ object HighlightVisitorsOutsideOfGarden {
             if (event.clickType == ClickType.RIGHT_CLICK) {
                 ChatUtils.chatAndOpenConfig(
                     "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
-                    GardenApi.config.visitors::blockInteracting,
+                    VisitorApi.config::blockInteracting,
                 )
             }
             event.cancel()

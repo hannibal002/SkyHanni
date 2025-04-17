@@ -129,9 +129,7 @@ object PestFinder {
             inOwnInventory = true,
             condition = { shouldShowDisplay() },
             onRender = {
-                if (GardenApi.inGarden() && config.showDisplay) {
-                    config.position.renderRenderables(display, posLabel = "Pest Finder")
-                }
+                config.position.renderRenderables(display, posLabel = "Pest Finder")
             },
         )
     }
