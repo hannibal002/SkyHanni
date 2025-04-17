@@ -62,6 +62,9 @@
     + Warns when pests are about to spawn.
 + Added Pest Spawn Time Message. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3343)
     + Sends a chat message showing how long it took for a pest to spawn.
++ Added Compact Jacob Claim. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3235)
+    + When collecting the rewards from many farming contests at the same time at Anita.
+    + Compact the Jacob Claim message, only showing full information when hovering.
 
 #### Mining
 
@@ -77,6 +80,8 @@
 
 + Added Right Click to Copy Chat. - Empa (https://github.com/hannibal002/SkyHanni/pull/2149)
     + Hold Shift to copy with `/shwords`, Control for a single line, and Alt to format color codes.
++ Added Current Chat Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/3491)
+    + Displays a GUI element that indicates what chat you are in (e.g. Party, Guild, Coop, All).
 
 #### Misc
 
@@ -97,6 +102,8 @@
     + Requires Cake Counter placed on Private Island.
     + Prompts you to enable this feature when placing Cake Counter.
 + Added Fruit Bowl Player Highlighter and Stats Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3394)
++ Added Shorten /warp option. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3524)
+    + `/gold` warps to Gold Mines, `/crimson` to Crimson Isles, etc.
 
 ### Improvements
 
@@ -107,6 +114,8 @@
 + Added option to show Crops instead of Music Discs in Stereo Harmony menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3715)
 + Added Fruit Bowl and Jungle Key to visitor rewards list. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3710)
     + Updates both the Visitor Stats counter and the "prevent denying" feature.
++ Added Harvest Harbinger V potion to Visitor Rewards list. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3806)
+    + Updated Visitor Stats counter and Prevent Denying features accordingly.
 
 #### Mining
 
@@ -122,6 +131,7 @@
     + Clicking on the message allows sharing the data in Discord, so we can easily fix the bug.
 + Added Double Hook text to Rare Sea Creature Party Announcer. - Empa (https://github.com/hannibal002/SkyHanni/pull/3697)
 + Updated custom Trophy Fish catch messages (with Trophy Counter enabled) to retain Hypixel's trophy fish symbol. - Luna (https://github.com/hannibal002/SkyHanni/pull/3762)
++ Sea Creature Tracker and Trophy Fish Display are now hidden when using a rod with Treasure Hook. - Luna (https://github.com/hannibal002/SkyHanni/pull/3812)
 
 #### The Rift
 
@@ -158,6 +168,14 @@
 + Added option to enable Voidgloom Tracker in Dragon's Nest. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3705)
     + Disabled by default to avoid interference with Dragon Tracker.
 + Improved Dragon Profit Tracker to now always render everything. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3705)
++ Added option to disable Ender Slayer features outside specific areas in the End. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3814)
+    + This was only a problem when outside of Void Sepulture, Zealot Bruiser Hideout and Dragon's Nest.
++ Added option to disable Revenant Slayer features in Graveyard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3814)
+
+#### Dungeons
+
++ Added Ghost support for Spirit Leap Overlay. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/3807)
+    + Spirit Leap Overlay works when dead, as a ghost.
 
 #### Misc
 
@@ -184,6 +202,7 @@
     + Config option now only toggles display.
 + Always show estimated Armor Value while in Custom Wardrobe edit mode. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3771)
 + Added option to format perfect enchantments on items as bold. - Goo (https://github.com/hannibal002/SkyHanni/pull/3681)
++ Improved performance of customizable colors in config. - Empa (https://github.com/hannibal002/SkyHanni/pull/3213)
 
 ### Bug Fixes
 
@@ -204,6 +223,7 @@
 + Fixed saving of item data in /ff and Wardrobe. - nopo (https://github.com/hannibal002/SkyHanni/pull/3752)
     + Takes effect after the second startup, once the data has been reloaded.
 + Fixed error message when clicking in Jacob Contest overview menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3764)
++ Fixed Garden Composter empty warnings not showing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3818)
 
 #### The Rift
 
@@ -263,11 +283,15 @@
 + Fixed Dragon Profit tracker overwriting edit commands for other Trackers. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3704)
 + Fixed Slayer Profit Tracker & Custom Scoreboard line not showing for Revenant Slayer in Revenant Cave. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3744)
 + Fixed players randomly disappearing in Kuudra. - Luna (https://github.com/hannibal002/SkyHanni/pull/3758)
++ Fixed Ender Slayer features showing outside designated areas. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3814)
+    + Void Sepulture, Zealot Bruiser Hideout and Dragon's Nest.
+    + Mainly affected Slayer Profit Tracker.
 
 #### Hoppity
 
 + Fixed Rabbit Barn sometimes being incorrectly highlighted as full in the Chocolate Factory. - Luna (https://github.com/hannibal002/SkyHanni/pull/3726)
     + This mainly happened when using multiple profiles.
++ Fixed Hoppity Display showing duplicate Rabbit number when acquiring the same rabbit twice quickly. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3809)
 
 #### Crimson
 
@@ -307,6 +331,7 @@
 + Fixed the Accept Last Party Invite feature that completely prevented joining parties. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/3760)
 + Fixed titles getting stuck on screen. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3785)
 + Fixed SkyHanni warning incorrectly about invalid tablist. - nopo (https://github.com/hannibal002/SkyHanni/pull/3798)
++ Fixed errors with shortened party command. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3817)
 
 ### Technical Details
 
@@ -479,6 +504,11 @@
 + Update loom. - nopo (https://github.com/hannibal002/SkyHanni/pull/3774)
 + Update Moulconfig to 3.6.0 for 1.21.5 support. - nea (https://github.com/hannibal002/SkyHanni/pull/3774)
 + Updates the modern project to 1.21.5. - nopo (https://github.com/hannibal002/SkyHanni/pull/3774)
++ Added ChromaColour support in config and related functions. - Empa (https://github.com/hannibal002/SkyHanni/pull/3213)
++ Added party infos to `/shdebug`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3817)
++ Formatted files in Features package. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3797)
++ Included Navigation Graph data in `/shdebug`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3813)
++ Updated Contributing guide with detailed events info. - rueblimaster & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3808)
 
 ### Removed Features
 

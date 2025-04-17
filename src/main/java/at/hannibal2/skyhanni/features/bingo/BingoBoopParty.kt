@@ -17,6 +17,7 @@ object BingoBoopParty {
 
     private val config get() = SkyHanniMod.feature.event.bingo.boopParty
     private val patternGroup = RepoPattern.group("bingo")
+
     /**
      * REGEX-TEST: §dFrom §b[MVP§3+§b] Tryp0MC§7: §d§lBoop!
      * REGEX-TEST: §dFrom §b[MVP§5+§b] martimavocado§7: §d§lBoop!
@@ -27,7 +28,7 @@ object BingoBoopParty {
     )
 
     @HandleEvent
-    fun onChat(event: PrivateMessageChatEvent) {
+    fun onPrivateMessageChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         val message = event.messageComponent.textComponent.formattedText.removeResets()
         if (!boopPattern.matches(message)) return
