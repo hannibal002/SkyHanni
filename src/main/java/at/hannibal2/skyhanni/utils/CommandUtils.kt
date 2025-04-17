@@ -173,7 +173,7 @@ interface CommandContextAwareObject {
  *
  * A needed parameter should be specified with: "&lt;>", inside the brackets there should be short name of what type it is
  * eg: "&lt;item>", "&lt;number>", "&lt;number/calculation>".
- * If no argument is present prefix it with: " - " and then add the rest.
+ * If no argument is present prefix it with: "- " and then add the rest.
  * @param prefix A prefix that can be used to directly access that argument. Eg: "-i", "-p", "-cc".
  * @param defaultPosition The position where it is expected to be called if no prefix was specified by the user.
  *
