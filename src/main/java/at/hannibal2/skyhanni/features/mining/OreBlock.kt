@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.mining
 
+//#if MC < 1.16
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.MiningApi.currentAreaOreBlocks
 import at.hannibal2.skyhanni.data.MiningApi.inCrimsonIsle
@@ -12,21 +13,22 @@ import at.hannibal2.skyhanni.data.MiningApi.inSpidersDen
 import at.hannibal2.skyhanni.data.MiningApi.inTunnels
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import io.github.moulberry.notenoughupdates.miscfeatures.customblockzones.CustomBiomes.isTitanium
 import net.minecraft.block.Block
+import net.minecraft.block.BlockColored
+import net.minecraft.block.BlockSand
+import net.minecraft.block.BlockSilverfish
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.block.BlockStainedGlassPane
+import net.minecraft.block.BlockStone
+import net.minecraft.block.BlockStoneSlab
+import net.minecraft.block.BlockStoneSlabNew
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import kotlin.math.ceil
 import kotlin.math.round
-//#if MC < 1.16
-import net.minecraft.block.BlockColored
-import net.minecraft.block.BlockSand
-import net.minecraft.block.BlockSilverfish
-import net.minecraft.block.BlockStone
-import net.minecraft.block.BlockStoneSlab
-import net.minecraft.block.BlockStoneSlabNew
+
 //#endif
 
 enum class OreCategory {
@@ -135,6 +137,12 @@ enum class OreBlock(
         speed >= speedSoftCap -> 4
         else -> round((strength * 30.0) / speed).toInt()
     }
+
+    /**
+     * Assume below softcap
+     */
+    fun speedNeededForNextTick(currentSpeed: Double): Double =
+        (strength * 30) / (miningTicks(currentSpeed) - 0.5) - currentSpeed
 
     constructor(block: Block, checkArea: () -> Boolean, category: OreCategory, hasInitSound: Boolean = true) :
         this({ it.block == block }, checkArea, category, hasInitSound)

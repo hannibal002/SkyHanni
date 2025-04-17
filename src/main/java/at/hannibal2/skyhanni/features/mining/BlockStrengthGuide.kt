@@ -36,6 +36,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import java.awt.Color
+import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -170,21 +171,41 @@ object BlockStrengthGuide {
                 this.insert(this.length - 1, '5')
             }
 
-            val (progressBar, percentLine) = when (ticks) {
-                1 -> Renderable.progressBar(1.0, InstantMineColor, InstantMineColor, width = 100) to "§6Instant Mine"
-                4 -> Renderable.progressBar(
-                    speed.fractionOf(ore.speedForInstantMine),
-                    SoftCapColor,
-                    InstantMineColor,
-                    width = 100,
-                ) to "§a${speed.fractionOf(ore.speedForInstantMine).times(100).roundTo(1)}% §fto Instant Mine"
+            val progressBar: Renderable
+            val percentLine: String
+            val untilNextLine: String?
+            when (ticks) {
+                1 -> {
+                    progressBar = Renderable.progressBar(1.0, InstantMineColor, InstantMineColor, width = 100)
+                    percentLine = "§6Instant Mine"
+                    untilNextLine = null
+                }
 
-                else -> Renderable.progressBar(
-                    speed.fractionOf(ore.speedSoftCap),
-                    BaseColor,
-                    SoftCapColor,
-                    width = 100,
-                ) to "§a${speed.fractionOf(ore.speedSoftCap).times(100).roundTo(1)}% §fto Soft Cap"
+                4 -> {
+                    progressBar = Renderable.progressBar(
+                        speed.fractionOf(ore.speedForInstantMine),
+                        SoftCapColor,
+                        InstantMineColor,
+                        width = 100,
+                    )
+                    percentLine = "§a${speed.fractionOf(ore.speedForInstantMine).times(100).roundTo(1)}% §fto Instant Mine"
+                    untilNextLine = "§6${
+                        ceil(ore.speedForInstantMine - speed).toInt().addSeparators()
+                    } ${SkyblockStat.MINING_SPEED.icon} §cmissing §fto §b1 §ftick"
+                }
+
+                else -> {
+                    progressBar = Renderable.progressBar(
+                        speed.fractionOf(ore.speedSoftCap),
+                        BaseColor,
+                        SoftCapColor,
+                        width = 100,
+                    )
+                    percentLine = "§a${speed.fractionOf(ore.speedSoftCap).times(100).roundTo(1)}% §fto Soft Cap"
+                    untilNextLine = "§6${
+                        ceil(ore.speedNeededForNextTick(speed)).toInt().addSeparators()
+                    } ${SkyblockStat.MINING_SPEED.icon} §cmissing §fto §b${ticks - 1} §ftick"
+                }
             }
 
             return Renderable.hoverTips(
@@ -208,6 +229,11 @@ object BlockStrengthGuide {
                     addExtraInfo("You have §6${speed.toInt().addSeparators()} mining speed")
                     addExtraInfo("when breaking $blockName :)")
 
+                    untilNextLine?.let {
+                        addString(it)
+                        addExtraInfo("The mining speed you need more")
+                        addExtraInfo("to mine $blockName in §b${ticks - 1}")
+                    }
                     addString(percentLine)
                     add(Renderable.placeholder(0, 5))
 
@@ -258,15 +284,11 @@ object BlockStrengthGuide {
     private fun requestSpeed(): SpeedClass {
         val itemInHand = InventoryUtils.getItemInHand()
         speed = SpeedClass(
-            base = (
-                SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0
-                ) + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
+            base = (SkyblockStat.MINING_SPEED.lastKnownValue
+                ?: 0.0) + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
             dwarven = HotmData.STRONG_ARM.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
-            gemstone = (
-                HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0
-                ) + (
-                itemInHand?.getHypixelEnchantments()?.get("lapidary")?.times(20.0) ?: 0.0
-                ) + when (itemInHand?.getInternalNameOrNull()?.asString()) {
+            gemstone = (HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0) + (itemInHand?.getHypixelEnchantments()
+                ?.get("lapidary")?.times(20.0) ?: 0.0) + when (itemInHand?.getInternalNameOrNull()?.asString()) {
                 "GEMSTONE_DRILL_1", "GEMSTONE_DRILL_2", "GEMSTONE_DRILL_3", "GEMSTONE_DRILL_4" -> 800.0
                 else -> 0.0
             },
