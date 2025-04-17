@@ -81,7 +81,7 @@ object ShTrack {
             }
         },
         CommandArgument(
-            "<> - Sets the current amount from sacks and inventory",
+            "- Sets the current amount from sacks and inventory",
             "-s",
             validity = ShTrack::validIfItemState,
         ) { _, c ->
@@ -89,14 +89,14 @@ object ShTrack {
             0
         },
         CommandArgument(
-            "<> - Sets the current amount from inventory", "-v",
+            "- Sets the current amount from inventory", "-v",
             validity = ShTrack::validIfItemState,
         ) { _, c ->
             c.currentFetch = ContextObject.CurrentFetch.INVENTORY
             0
         },
         CommandArgument(
-            "<> - Sets the current amount from collections (Does also do -m)", "-cc",
+            "- Sets the current amount from collections (Does also do -m)", "-cc",
             validity = { validIfItemState(it) },
         ) { _, c ->
             c.currentFetch = ContextObject.CurrentFetch.COLLECTION
@@ -104,7 +104,7 @@ object ShTrack {
             0
         },
         CommandArgument(
-            "<> - Uses all tiers of an item", "-m",
+            "- Uses all tiers of an item", "-m",
             validity = ShTrack::validIfItemState,
         ) { _, c ->
             c.multiItem = true
@@ -114,14 +114,14 @@ object ShTrack {
 
     val shTrackSpecifiers = listOf<CommandArgument<ContextObject>>(
         CommandArgument(
-            "<> - Sets the tracking type to items",
+            "- Sets the tracking type to items",
             "-i",
         ) { _, c ->
             c.state = ContextObject.StateType.ITEM
             0
         },
         CommandArgument(
-            "<> - Sets the tracking type to powder",
+            "- Sets the tracking type to powder",
             "-p",
         ) { _, c ->
             c.state = ContextObject.StateType.POWDER
@@ -139,7 +139,7 @@ object ShTrack {
     )
 
     val globalSpecifiers = listOf<CommandArgument<ContextObject>>(
-        CommandArgument("<> - Does save the tracker on game close", "-t") { _, c ->
+        CommandArgument("- Does save the tracker on game close", "-t") { _, c ->
             c.shouldSave = true
             0
         },
@@ -168,23 +168,23 @@ object ShTrack {
             r.second?.let { c.item = it }
             r.first
         },
-        CommandArgument("<> - Does not replace the last equivalent tracking instance", "-d") { _, c ->
+        CommandArgument("- Does not replace the last equivalent tracking instance", "-d") { _, c ->
             c.allowDupe = true
             0
         },
-        CommandArgument("<> - Does not delete the tracker on target completion", "-k") { _, c ->
+        CommandArgument("- Does not delete the tracker on target completion", "-k") { _, c ->
             c.autoDelete = false
             0
         },
-        CommandArgument("<> - Sends a notification on completion", "-n") { _, c ->
+        CommandArgument("- Sends a notification on completion", "-n") { _, c ->
             c.notify = true
             0
         },
-        CommandArgument("<> - Removes the percent value", "-np") { _, c ->
+        CommandArgument("- Removes the percent value", "-np") { _, c ->
             c.showPercent = false
             0
         },
-        CommandArgument("<> - Removes the gain value", "-ng") { _, c ->
+        CommandArgument("- Removes the gain value", "-ng") { _, c ->
             c.showGain = false
             0
         },
