@@ -202,15 +202,17 @@ fun ClickEvent.value(): String {
     //#if MC < 1.21
     return this.value
     //#else
-    //$$ if (this.action == ClickEvent.Action.OPEN_URL) return (this as ClickEvent.OpenUrl).uri.toString()
-    //$$ if (this.action == ClickEvent.Action.RUN_COMMAND) return (this as ClickEvent.RunCommand).command
-    //$$ if (this.action == ClickEvent.Action.SUGGEST_COMMAND) return (this as ClickEvent.SuggestCommand).command
-    //$$ // we dont use these bottom 3 but might as well have them here
-    //$$ if (this.action == ClickEvent.Action.CHANGE_PAGE) return (this as ClickEvent.ChangePage).page.toString()
-    //$$ if (this.action == ClickEvent.Action.COPY_TO_CLIPBOARD) return (this as ClickEvent.CopyToClipboard).value
-    //$$ if (this.action == ClickEvent.Action.OPEN_FILE) return (this as ClickEvent.OpenFile).path
-    //$$ // todo use error manager here probably, not doing it now because it doesnt compile on 1.21
-    //$$ return ""
+    //$$ return when (this.action) {
+    //$$     ClickEvent.Action.OPEN_URL -> (this as ClickEvent.OpenUrl).uri.toString()
+    //$$     ClickEvent.Action.RUN_COMMAND -> (this as ClickEvent.RunCommand).command
+    //$$     ClickEvent.Action.SUGGEST_COMMAND -> (this as ClickEvent.SuggestCommand).command
+    //$$     // we don't use these bottom 3 but might as well have them here
+    //$$     ClickEvent.Action.CHANGE_PAGE -> (this as ClickEvent.ChangePage).page.toString()
+    //$$     ClickEvent.Action.COPY_TO_CLIPBOARD -> (this as ClickEvent.CopyToClipboard).value
+    //$$     ClickEvent.Action.OPEN_FILE -> (this as ClickEvent.OpenFile).path
+    //$$     // todo use error manager here probably, not doing it now because it doesnt compile on 1.21
+    //$$     else -> ""
+    //$$ }
     //#endif
 
 }
@@ -219,9 +221,11 @@ fun HoverEvent.value(): IChatComponent {
     //#if MC < 1.21
     return this.value
     //#else
-    //$$ if (this.action == HoverEvent.Action.SHOW_TEXT) return (this as HoverEvent.ShowText).value
-    //$$ if (this.action == HoverEvent.Action.SHOW_ITEM) return (this as HoverEvent.ShowItem).item.name
-    //$$ if (this.action == HoverEvent.Action.SHOW_ENTITY) return (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Text.empty()
-    //$$ return Text.empty()
+    //$$ return when (this.action) {
+    //$$     HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
+    //$$     HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.name
+    //$$     HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Text.empty()
+    //$$     else -> Text.empty()
+    //$$ }
     //#endif
 }
