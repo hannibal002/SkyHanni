@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsLine.Companion.getChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsLine.Companion.shouldShowChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsLine.Companion.showChunkedStatsIsland
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 
 // internal, widget and scoreboard
 // a bit of everything
 object ScoreboardElementChunkedStats : ScoreboardElement() {
-    override fun getDisplay() = getChunkedStats().chunked(chunkedConfig.maxStatsPerLine)
+    override fun getDisplay() = getChunkedStats().chunked(displayConfig.chunkedStats.maxStatsPerLine)
         .map { it.joinToString(" §f| ") }
 
     override fun showWhen() = shouldShowChunkedStats()
