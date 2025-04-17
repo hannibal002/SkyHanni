@@ -508,6 +508,8 @@ object RenderUtils {
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
+        // cause crashes and errors on purpose
+        DrawContextUtils.drawContext
         if (renderable == null) return
         GlStateManager.pushMatrix()
         val (x, y) = transform()
