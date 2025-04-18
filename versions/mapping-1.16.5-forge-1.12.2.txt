@@ -1,6 +1,11 @@
 
-com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
+com.mojang.blaze3d.platform.Lighting net.minecraft.client.renderer.RenderHelper
 
+com.mojang.blaze3d.platform.Lighting turnOff() disableStandardItemLighting()
+com.mojang.blaze3d.platform.Lighting turnBackOn() enableStandardItemLighting()
+com.mojang.blaze3d.platform.Lighting setupFor3DItems() enableGUIStandardItemLighting()
+
+com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
 
 com.mojang.blaze3d.systems.RenderSystem enableDepthTest() enableDepth()
 com.mojang.blaze3d.systems.RenderSystem disableDepthTest() disableDepth()
@@ -12,6 +17,15 @@ com.mojang.math.Matrix4f org.lwjgl.util.vector.Matrix4f
 net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
 net.minecraft.client.Options net.minecraft.client.settings.GameSettings
+net.minecraft.client.KeyMapping net.minecraft.client.settings.KeyBinding
+
+net.minecraft.client.KeyMapping boundKey.getCode() getKeyCode()
+net.minecraft.client.KeyMapping releaseAll() unPressAllKeys()
+net.minecraft.client.KeyMapping isDown() isKeyDown()
+
+net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
+net.minecraft.client.Minecraft setScreen() displayGuiScreen()
+net.minecraft.client.Minecraft submit() addScheduledTask()
 
 net.minecraft.client.Options keyUp keyBindForward
 net.minecraft.client.Options keyDown keyBindBack
@@ -25,10 +39,6 @@ net.minecraft.client.Options keyInventory keyBindInventory
 net.minecraft.client.Options keyScreenshot keyBindScreenshot
 net.minecraft.client.Options keyFullscreen keyBindFullscreen
 net.minecraft.client.Options getSoundSourceVolume() getSoundLevel()
-
-net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
-net.minecraft.client.Minecraft setScreen() displayGuiScreen()
-net.minecraft.client.Minecraft submit() addScheduledTask()
 
 net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
 
@@ -46,12 +56,11 @@ net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
 
 net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
 
-net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
-net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
-
 net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiChest
 net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
 net.minecraft.client.gui.screens.inventory.SignEditScreen net.minecraft.client.gui.inventory.GuiEditSign
+
+net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots
 
 net.minecraft.client.gui.screens.inventory.SignEditScreen sign tileSign
 net.minecraft.client.gui.screens.inventory.SignEditScreen line editLine
@@ -105,9 +114,10 @@ net.minecraft.core.particles.ParticleTypes POOF EXPLOSION_NORMAL
 net.minecraft.core.particles.ParticleTypes SMOKE SMOKE_NORMAL
 net.minecraft.core.particles.ParticleTypes WITCH SPELL_WITCH
 
+net.minecraft.entity.projectile.EntityArrow owner shootingEntity
+
 net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
 net.minecraft.nbt.ListTag net.minecraft.nbt.NBTTagList
-net.minecraft.nbt.ListTag add() appendTag()
 net.minecraft.nbt.StringTag net.minecraft.nbt.NBTTagString
 
 net.minecraft.nbt.CompoundTag getCompound() getCompoundTag()
@@ -122,6 +132,7 @@ net.minecraft.nbt.CompoundTag getInt() getInteger()
 net.minecraft.nbt.CompoundTag putString() setString()
 net.minecraft.nbt.CompoundTag remove() removeTag()
 
+net.minecraft.nbt.ListTag add() appendTag()
 net.minecraft.nbt.ListTag getSize() tagCount()
 net.minecraft.nbt.ListTag getString() getStringTagAt()
 net.minecraft.nbt.ListTag getCompound() getCompoundTagAt()
@@ -131,9 +142,10 @@ net.minecraft.network.chat.Style net.minecraft.util.text.Style
 net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
 net.minecraft.network.chat.BaseComponent net.minecraft.util.text.TextComponentBase
 
+net.minecraft.network.chat.BaseComponent append() appendSibling()
+
 net.minecraft.network.chat.Component copy() createCopy()
 
-net.minecraft.network.chat.BaseComponent append() appendSibling()
 net.minecraft.network.chat.MutableComponent append() appendSibling()
 
 net.minecraft.network.chat.Style withColor() setColor()
@@ -153,7 +165,6 @@ net.minecraft.network.protocol.game.ClientboundContainerClosePacket net.minecraf
 net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket net.minecraft.network.play.server.SPacketSetSlot
 net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.SPacketEntityStatus
 net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.SPacketEffect
-net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
 net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.network.play.server.SPacketEntity
 net.minecraft.network.protocol.game.ClientboundOpenScreenPacket net.minecraft.network.play.server.SPacketOpenWindow
@@ -181,8 +192,8 @@ net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.netw
 net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.CPacketPlayer
 net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.network.play.client.CPacketHeldItemChange
 net.minecraft.network.protocol.game.ServerboundUseItemOnPacket net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock
-
-net.minecraft.network.protocol.game.ServerboundUseItemOnPacket hitResult.getBlockPos() getPos()
+net.minecraft.network.protocol.game.ClientboundLoginPacket net.minecraft.network.play.server.SPacketJoinGame
+net.minecraft.network.protocol.game.ServerboundPlayerActionPacket net.minecraft.network.play.client.CPacketPlayerDigging
 
 net.minecraft.network.protocol.game.ClientboundAddEntityPacket getId() getEntityID()
 
@@ -230,11 +241,15 @@ net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getE
 
 net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEntityFromWorld()
 
+net.minecraft.network.protocol.game.ServerboundPlayerActionPacket getPos() getPosition()
+
 net.minecraft.network.protocol.game.ServerboundUseItemOnPacket hitResult.getBlockPos() getPos()
+
+net.minecraft.server.level.ServerPlayer net.minecraft.entity.player.EntityPlayerMP
 
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
-net.minecraft.server.level.ServerPlayer net.minecraft.entity.player.EntityPlayerMP
+net.minecraft.world.SimpleContainer net.minecraft.client.player.inventory.ContainerLocalMenu
 
 net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
 net.minecraft.world.effect.MobEffectInstance net.minecraft.potion.PotionEffect
@@ -245,8 +260,6 @@ net.minecraft.world.entity.EquipmentSlot net.minecraft.inventory.EntityEquipment
 net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
 net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 net.minecraft.world.entity.Mob net.minecraft.entity.EntityLiving
-
-net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
 
 net.minecraft.world.entity.Entity customName setCustomNameTag()
 net.minecraft.world.entity.Entity deltaMovement.x motionX
@@ -274,14 +287,18 @@ net.minecraft.world.entity.Entity isOnGround onGround
 net.minecraft.world.entity.Entity getVehicle() getRidingEntity()
 net.minecraft.world.entity.Entity setCustomName() setCustomNameTag()
 net.minecraft.world.entity.Entity getCustomName() getCustomNameTag()
+net.minecraft.world.entity.Entity position.z posZ
+net.minecraft.world.entity.Entity position.y posY
+net.minecraft.world.entity.Entity position.x posX
+net.minecraft.world.entity.Entity getPosition() getPositionVector()
 
+net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
 net.minecraft.world.entity.LivingEntity getItemInHand() getHeldItem()
 net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItemMainhand()
 net.minecraft.world.entity.LivingEntity getOffhandItem() getHeldItemOffhand()
 net.minecraft.world.entity.LivingEntity hasEffect() isPotionActive()
-net.minecraft.world.entity.LivingEntity isAlive() isEntityAlive()
 net.minecraft.world.entity.LivingEntity isBaby() isChild()
 
 net.minecraft.world.entity.ambient.Bat net.minecraft.entity.passive.EntityBat
@@ -304,6 +321,7 @@ net.minecraft.world.entity.animal.horse.Horse net.minecraft.entity.passive.Entit
 net.minecraft.world.entity.boss.enderdragon.EnderDragon net.minecraft.entity.boss.EntityDragon
 
 net.minecraft.world.entity.boss.wither.WitherBoss net.minecraft.entity.boss.EntityWither
+
 net.minecraft.world.entity.boss.wither.WitherBoss getInvulnerableTicks() getInvulTime()
 
 net.minecraft.world.entity.decoration.ArmorStand net.minecraft.entity.item.EntityArmorStand
@@ -327,14 +345,17 @@ net.minecraft.world.entity.monster.MagmaCube net.minecraft.entity.monster.Entity
 net.minecraft.world.entity.monster.Silverfish net.minecraft.entity.monster.EntitySilverfish
 net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntitySkeleton
 net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
-net.minecraft.world.entity.monster.Slime getSize() getSlimeSize()
 net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
 net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch
 net.minecraft.world.entity.monster.WitherSkeleton net.minecraft.entity.monster.EntityWitherSkeleton
 net.minecraft.world.entity.monster.Zombie net.minecraft.entity.monster.EntityZombie
 net.minecraft.world.entity.monster.ZombifiedPiglin net.minecraft.entity.monster.EntityPigZombie
 
+net.minecraft.world.entity.monster.Creeper isPowered() getPowered()
+
 net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
+
+net.minecraft.world.entity.monster.Slime getSize() getSlimeSize()
 
 net.minecraft.world.entity.npc.Villager net.minecraft.entity.passive.EntityVillager
 
@@ -360,9 +381,13 @@ net.minecraft.world.entity.projectile.SmallFireball net.minecraft.entity.project
 net.minecraft.world.entity.projectile.FishingHook getPlayerOwner() getAngler()
 
 net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
-net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
-
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
+net.minecraft.world.inventory.AbstractContainerMenu net.minecraft.inventory.Container
+
+net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
+net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
+
+net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
 
 net.minecraft.world.inventory.Slot getItem() getStack()
 net.minecraft.world.inventory.Slot hasItem() getHasStack()
@@ -374,14 +399,14 @@ net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
 net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
-net.minecraft.world.item.ItemStack isEnchanted() isItemEnchanted()
-net.minecraft.world.item.ItemStack getTag() getTagCompound()
-net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
+net.minecraft.world.item.DyeColor net.minecraft.item.EnumDyeColor
+
+net.minecraft.world.item.DyeColor LIGHT_GRAY SILVER
 
 net.minecraft.world.item.Item byBlock() getItemFromBlock()
 
-net.minecraft.world.item.DyeColor net.minecraft.item.EnumDyeColor
-net.minecraft.world.item.DyeColor LIGHT_GRAY SILVER
+net.minecraft.world.item.ItemStack isEnchanted() isItemEnchanted()
+net.minecraft.world.item.ItemStack getTag() getTagCompound()
 
 net.minecraft.world.item.Items PLAYER_HEAD SKULL
 net.minecraft.world.item.Items COD FISH
@@ -392,11 +417,15 @@ net.minecraft.world.item.enchantment.Enchantments net.minecraft.init.Enchantment
 net.minecraft.world.item.enchantment.Enchantments ALL_DAMAGE_PROTECTION PROTECTION
 
 net.minecraft.world.level.Level net.minecraft.world.World
+
 net.minecraft.world.level.Level getEntity() getEntityByID()
 net.minecraft.world.level.Level getBlockEntity() getTileEntity()
 net.minecraft.world.level.Level getDayTime() getWorldTime()
 
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
+net.minecraft.world.level.block.StainedGlassBlock net.minecraft.block.BlockStainedGlass
+net.minecraft.world.level.block.StainedGlassPaneBlock net.minecraft.block.BlockStainedGlassPane
+
 net.minecraft.world.level.block.Blocks PLAYER_HEAD SKULL
 net.minecraft.world.level.block.Blocks DANDELION YELLOW_FLOWER
 net.minecraft.world.level.block.Blocks NETHER_QUARTZ_ORE QUARTZ_ORE
@@ -405,13 +434,9 @@ net.minecraft.world.level.block.Blocks MELON MELON_BLOCK
 net.minecraft.world.level.block.Blocks TERRACOTTA HARDENED_CLAY
 net.minecraft.world.level.block.Blocks COBBLESTONE_STAIRS STONE_STAIRS
 
-net.minecraft.world.level.block.StainedGlassBlock net.minecraft.block.BlockStainedGlass
-net.minecraft.world.level.block.StainedGlassPaneBlock net.minecraft.block.BlockStainedGlassPane
-
-net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
-
 net.minecraft.world.level.block.entity.SignBlockEntity net.minecraft.tileentity.TileEntitySign
 net.minecraft.world.level.block.entity.SkullBlockEntity net.minecraft.tileentity.TileEntitySkull
+net.minecraft.world.level.block.entity.BeaconBlockEntity net.minecraft.tileentity.TileEntityBeacon
 
 net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
 
@@ -421,13 +446,18 @@ net.minecraft.world.level.block.state.properties.BooleanProperty net.minecraft.b
 net.minecraft.world.level.block.state.properties.DirectionProperty net.minecraft.block.properties.PropertyDirection
 
 net.minecraft.world.phys.Vec3 net.minecraft.util.math.Vec3d
+net.minecraft.world.phys.HitResult net.minecraft.util.math.RayTraceResult
+
+net.minecraft.world.phys.HitResult type typeOfHit
+net.minecraft.world.phys.HitResult getLocation() getBlockPos()
+
+net.minecraft.world.phys.Vec3 distanceToSqr() squareDistanceTo()
+
+net.minecraft.world.scores.Team net.minecraft.scoreboard.Team
+net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
 
 net.minecraft.world.scores.criteria.ObjectiveCriteria net.minecraft.scoreboard.IScoreCriteria
 net.minecraft.world.scores.criteria.ObjectiveCriteria$RenderType net.minecraft.scoreboard.IScoreCriteria$EnumRenderType
-
-net.minecraft.world.scores.Team net.minecraft.scoreboard.Team
-
-net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
 
 net.minecraftforge.api.distmarker.Dist net.minecraftforge.fml.relauncher.Side
 net.minecraftforge.api.distmarker.OnlyIn net.minecraftforge.fml.relauncher.SideOnly
@@ -505,21 +535,3 @@ org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
 
-net.minecraft.world.inventory.AbstractContainerMenu net.minecraft.inventory.Container
-
-net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
-net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
-
-net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots
-
-net.minecraft.entity.projectile.EntityArrow owner shootingEntity
-
-com.mojang.blaze3d.systems.RenderSystem enableDepthTest() enableDepth()
-com.mojang.blaze3d.systems.RenderSystem disableDepthTest() disableDepth()
-com.mojang.blaze3d.systems.RenderSystem blendFuncSeparate() tryBlendFuncSeparate()
-
-com.mojang.blaze3d.platform.Lighting net.minecraft.client.renderer.RenderHelper
-
-com.mojang.blaze3d.platform.Lighting turnOff() disableStandardItemLighting()
-com.mojang.blaze3d.platform.Lighting turnBackOn() enableStandardItemLighting()
-com.mojang.blaze3d.platform.Lighting setupFor3DItems() enableGUIStandardItemLighting()

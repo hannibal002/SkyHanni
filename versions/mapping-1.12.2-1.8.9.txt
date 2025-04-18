@@ -8,11 +8,6 @@ net.minecraft.client.renderer.entity.RenderLivingBase net.minecraft.client.rende
 
 net.minecraft.entity.player.EntityPlayer getHeldItemMainhand() getHeldItem()
 
-# Workaround for it not letting stackSize be mapped to count.
-temp.net.minecraft.item.ItemStack net.minecraft.item.ItemStack
-temp.net.minecraft.item.ItemStack count stackSize
-net.minecraft.item.ItemStack temp.net.minecraft.item.ItemStack
-
 net.minecraft.network.play.client.CPacketAnimation net.minecraft.network.play.client.C0APacketAnimation
 net.minecraft.network.play.client.CPacketChatMessage net.minecraft.network.play.client.C01PacketChatMessage
 net.minecraft.network.play.client.CPacketClickWindow net.minecraft.network.play.client.C0EPacketClickWindow
@@ -74,7 +69,6 @@ net.minecraft.util.math.MathHelper net.minecraft.util.MathHelper
 net.minecraft.util.math.RayTraceResult net.minecraft.util.MovingObjectPosition
 net.minecraft.util.math.RayTraceResult$Type net.minecraft.util.math.RayTraceResult$MovingObjectType
 net.minecraft.util.math.Rotations net.minecraft.util.Rotations
-net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
 net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
 
 net.minecraft.util.text.ITextComponent net.minecraft.util.IChatComponent
