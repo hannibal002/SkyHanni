@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.insert
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
@@ -231,8 +232,8 @@ object BlockStrengthGuide {
 
                     untilNextLine?.let {
                         addString(it)
-                        addExtraInfo("The missing mining speed until you")
-                        addExtraInfo("mine $blockName in §b${ticks - 1}")
+                        addExtraInfo("The mining speed you need more")
+                        addExtraInfo("to mine $blockName in §b${ticks - 1}")
                     }
                     addString(percentLine)
                     add(Renderable.placeholder(0, 5))
