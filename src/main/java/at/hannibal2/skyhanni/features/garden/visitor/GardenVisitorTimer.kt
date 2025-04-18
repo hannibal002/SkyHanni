@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -49,7 +51,7 @@ object GardenVisitorTimer {
     private var lastMillis = 0.seconds
     private var sixthVisitorArrivalTime = SimpleTimeMark.farPast()
     private var visitorJustArrived = false
-    private var sixthVisitorReady = false
+    private var lastSixthVisitorWarning = SimpleTimeMark.farPast()
     private var lastTimerValue = ""
     private var lastTimerUpdate = SimpleTimeMark.farPast()
     private var lastVisitors: Int = -1
@@ -75,13 +77,12 @@ object GardenVisitorTimer {
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
         visitorJustArrived = false
-        sixthVisitorReady = false
     }
 
-    @HandleEvent
+    // TODO split up into multiple smaller functions
+    @Suppress("CyclomaticComplexMethod")
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-
         var visitorsAmount = VisitorApi.visitorsInTabList(TabListData.getTabList()).size
         var visitorInterval = visitorInterval ?: return
         var millis = visitorInterval
@@ -120,20 +121,15 @@ object GardenVisitorTimer {
             if (visitorJustArrived && visitorsAmount - lastVisitors == 1) {
                 updateSixthVisitorArrivalTime()
                 visitorJustArrived = false
-                sixthVisitorReady = false
             }
             millis = sixthVisitorArrivalTime.timeUntil()
 
             val nextSixthVisitorArrival = SimpleTimeMark.now() + millis + (visitorInterval * (5 - visitorsAmount))
             GardenApi.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival
-            if (isSixthVisitorEnabled() && millis.isNegative()) {
+            if (millis.isNegative()) {
                 visitorsAmount++
-                if (!sixthVisitorReady) {
-                    sixthVisitorReady = true
-                    if (isSixthVisitorWarningEnabled()) {
-                        TitleManager.sendTitle("§a6th Visitor Ready", duration = 5.seconds)
-                        SoundUtils.playBeepSound()
-                    }
+                if (config.sixthVisitorWarning) {
+                    warn6thVisitor()
                 }
             }
         }
@@ -171,11 +167,21 @@ object GardenVisitorTimer {
         }
 
         val formatDuration = millis.format()
-        val next = if (queueFull && (!isSixthVisitorEnabled() || millis.isNegative())) "§cQueue Full!" else {
+        val next = if (queueFull && (!config.sixthVisitorEnabled || millis.isNegative())) "§cQueue Full!" else {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }
         val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
         display = createDisplayText("§b$visitorsAmount $visitorLabel §7($next§7)")
+    }
+
+    private fun warn6thVisitor() {
+        // do not warn immediately on world switch
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 3.seconds) return
+
+        if (lastSixthVisitorWarning.passedSince() < 2.minutes) return
+        lastSixthVisitorWarning = SimpleTimeMark.now()
+        TitleManager.sendTitle("§a6th Visitor Ready")
+        SoundUtils.playBeepSound()
     }
 
     private fun createDisplayText(text: String) = Renderable.clickable(
@@ -202,7 +208,6 @@ object GardenVisitorTimer {
                 sixthVisitorArrivalTime = it
             }
         }
-        sixthVisitorReady = false
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
@@ -233,8 +238,6 @@ object GardenVisitorTimer {
         }
     }
 
-    private fun isSixthVisitorEnabled() = config.sixthVisitorEnabled
-    private fun isSixthVisitorWarningEnabled() = config.sixthVisitorWarning
     private fun isEnabled() = GardenApi.inGarden() && config.enabled
 
     @HandleEvent
