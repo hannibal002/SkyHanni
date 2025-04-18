@@ -266,6 +266,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays XP for super pairs in the bottom right corner of the item.
 + Added Outside Sack Value Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3778)
     + Show value of all items in Sacks as GUI while not in Sacks.
++ Added Trade Value Overlay. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
+    + Doesn't suppport coins.
 
 </details>
 <details open><summary>
