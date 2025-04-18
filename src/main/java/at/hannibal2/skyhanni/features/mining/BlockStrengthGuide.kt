@@ -231,8 +231,8 @@ object BlockStrengthGuide {
 
                     untilNextLine?.let {
                         addString(it)
-                        addExtraInfo("The mining speed you need more")
-                        addExtraInfo("to mine $blockName in §b${ticks - 1}")
+                        addExtraInfo("The missing mining speed until you")
+                        addExtraInfo("mine $blockName in §b${ticks - 1}")
                     }
                     addString(percentLine)
                     add(Renderable.placeholder(0, 5))
