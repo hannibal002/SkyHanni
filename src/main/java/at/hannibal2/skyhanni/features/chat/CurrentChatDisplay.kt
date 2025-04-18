@@ -68,7 +68,7 @@ object CurrentChatDisplay {
      */
     @Suppress("MaxLineLength")
     private val guildChatPattern by patternGroup.pattern(
-        "all",
+        "guild",
         "§cYou cannot send guild chat with your guild chat disabled! Use \\/g toggle to enable it!",
     )
 
