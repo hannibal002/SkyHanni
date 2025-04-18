@@ -113,8 +113,8 @@ object FrogMaskFeatures {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(86, "misc.frogMaskDisplay", "misc.frogMaskFeatures.frogMaskDisplay")
-        event.move(86, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.frogMaskDisplayPosition")
+        event.move(86, "misc.frogMaskDisplay", "misc.frogMaskFeatures.display")
+        event.move(86, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.displayPosition")
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_PARK)
