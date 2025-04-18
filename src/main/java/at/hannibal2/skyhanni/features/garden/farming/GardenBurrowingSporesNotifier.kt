@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.seconds
 
 private typealias Type = GardenConfig.BurrowingSporesNotificationType
 
@@ -33,7 +32,7 @@ object GardenBurrowingSporesNotifier {
         if (!titleEnabled && !blinkEnabled) return
         if (!sporeDropMessage.matches(event.message)) return
 
-        if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!", duration = 5.seconds)
+        if (titleEnabled) TitleManager.sendTitle("§9Burrowing Spores!")
         if (blinkEnabled) ItemBlink.setBlink(NeuItems.getItemStackOrNull("BURROWING_SPORES"), 5_000)
     }
 }

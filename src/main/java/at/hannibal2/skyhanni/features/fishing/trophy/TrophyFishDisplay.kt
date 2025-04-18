@@ -262,6 +262,7 @@ object TrophyFishDisplay {
         if (!canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
 
+        if (FishingApi.hasTreasureHook) return
         if (config.requireHunterArmor.get() && !FishingApi.wearingTrophyArmor) return
 
         config.position.renderRenderables(
