@@ -77,7 +77,7 @@ abstract class CleanupMappingFiles : DefaultTask() {
     }
 
     private fun writeMappings(file: File, sortedLines: Map<String, List<String>>, comments: Map<String, String>) {
-        val lineSeparator = "\n" // Use Unix-style line endings explicitly
+        val lineSeparator = "\n"
         file.writeText(lineSeparator)
 
         for ((_, value) in sortedLines) {
