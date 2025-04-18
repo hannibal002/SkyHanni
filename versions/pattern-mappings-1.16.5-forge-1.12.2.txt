@@ -1,12 +1,12 @@
 
 at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer net.minecraft.client.gui.inventory.GuiContainer container inventorySlots at.hannibal2.skyhanni.utils.compat.container
 
-net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent unformattedTextForChatCompat() getUnformattedComponentText() at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
-net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent unformattedTextCompat() getUnformattedText() at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent formattedTextCompat() getFormattedText() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent unformattedTextCompat() getUnformattedText() at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent unformattedTextForChatCompat() getUnformattedComponentText() at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 
-net.minecraft.network.chat.Style net.minecraft.util.text.Style returnThis() createShallowCopy() at.hannibal2.skyhanni.utils.compat.returnThis
 net.minecraft.network.chat.Style net.minecraft.util.text.Style returnThis() createDeepCopy() at.hannibal2.skyhanni.utils.compat.returnThis
+net.minecraft.network.chat.Style net.minecraft.util.text.Style returnThis() createShallowCopy() at.hannibal2.skyhanni.utils.compat.returnThis
 
 net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.SPacketScoreboardObjective displayName.formattedTextCompat() getObjectiveValue() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 

@@ -13,8 +13,8 @@ net.minecraft.client.network.ClientPlayerEntity networkHandler.sendChatMessage()
 
 net.minecraft.client.util.math.MatrixStack at.hannibal2.skyhanni.utils.compat.MatrixStack
 
-net.minecraft.client.util.math.MatrixStack push() pushMatrix()
 net.minecraft.client.util.math.MatrixStack pop() popMatrix()
+net.minecraft.client.util.math.MatrixStack push() pushMatrix()
 
 net.minecraft.entity.Entity getEquippedItems() getItemsEquipped()
 net.minecraft.entity.Entity getId() getEntityId()
@@ -25,8 +25,8 @@ net.minecraft.entity.mob.CreeperEntity isCharged() shouldRenderOverlay()
 
 net.minecraft.entity.player.PlayerInventory mainStacks main
 
-net.minecraft.item.ItemStack getName() toHoverableText()
 net.minecraft.item.ItemStack getComponents() getTag()
+net.minecraft.item.ItemStack getName() toHoverableText()
 
 net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket$InteractType net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket$InteractionType
 

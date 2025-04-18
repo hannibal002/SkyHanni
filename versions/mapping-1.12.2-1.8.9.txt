@@ -55,9 +55,9 @@ net.minecraft.network.play.server.SPacketTitle net.minecraft.network.play.server
 net.minecraft.network.play.server.SPacketUpdateScore net.minecraft.network.play.server.S3CPacketUpdateScore
 net.minecraft.network.play.server.SPacketWorldBorder net.minecraft.network.play.server.S44PacketWorldBorder
 
-net.minecraft.network.play.server.SPacketScoreboardObjective getRenderType() func_179817_d()
 net.minecraft.network.play.server.SPacketScoreboardObjective getObjectiveName() func_149339_c()
 net.minecraft.network.play.server.SPacketScoreboardObjective getObjectiveValue() func_149337_d()
+net.minecraft.network.play.server.SPacketScoreboardObjective getRenderType() func_179817_d()
 
 net.minecraft.scoreboard.IScoreCriteria net.minecraft.scoreboard.IScoreObjectiveCriteria
 

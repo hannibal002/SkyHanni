@@ -39,7 +39,7 @@ abstract class CleanupMappingFiles : DefaultTask() {
         }
 
         val sortedLines: Map<String, List<String>> = lines.groupBy { it.first }
-            .mapValues { it.value.map { it.second } }
+            .mapValues { it.value.map { it.second }.sorted() }
             .toSortedMap()
 
         writeMappings(file, sortedLines)
