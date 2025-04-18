@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskWarningConfig.WarningType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress.updateSkillInfo
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -52,20 +52,20 @@ object FrogMaskFeatures {
      */
     private val currentAreaPattern by patternGroup.pattern(
         "scoreboard.current",
-        " §7⏣ (?<area>.+)"
+        " §7⏣ (?<area>.+)",
     )
 
     private val frogMask by lazy { "FROG_MASK".toInternalName().getItemStack() }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_PARK)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.THE_PARK)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
 
         config.displayPosition.renderRenderable(display, posLabel = "Frog Mask Display")
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_PARK)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_PARK)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         display = null
 
@@ -90,8 +90,8 @@ object FrogMaskFeatures {
             if (!needsToWarn) return lastWarning
 
             when (config.warning.warningType) {
-                WarningType.BEING -> LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
-                WarningType.FORAGING -> if (isForaging()) LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
+                WarningType.BEING -> TitleManager.sendTitle("§cWrong Region!")
+                WarningType.FORAGING -> if (isForaging()) TitleManager.sendTitle("§cWrong Region!")
                 else -> return lastWarning
             }
 

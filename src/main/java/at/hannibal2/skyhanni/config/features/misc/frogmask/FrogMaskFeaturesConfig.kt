@@ -22,5 +22,5 @@ class FrogMaskFeaturesConfig {
 
     @Expose
     @ConfigLink(owner = FrogMaskFeaturesConfig::class, field = "display")
-    var displayPosition: Position = Position(25, 25, false, true)
+    var displayPosition: Position = Position(25, 25)
 }
