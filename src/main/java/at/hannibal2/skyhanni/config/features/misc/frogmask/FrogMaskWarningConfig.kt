@@ -33,6 +33,6 @@ class FrogMaskWarningConfig {
         BEING("§eExisting"),
         FORAGING("§aForaging");
 
-        override fun toString() = displayname
+        override fun toString() = displayName
     }
 }
