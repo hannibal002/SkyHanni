@@ -16,7 +16,7 @@ object ColorUtils {
 
     fun ChromaColour.toColor(): Color = Color(toInt(), true)
 
-    // TODO: Replace this code with the call to moulconfig's function once its fixed
+    // TODO: Replace this code with the call to moulconfig's function once its fixed. revert #3821
     fun ChromaColour.toInt(): Int {
         val effectiveHue: Double
         if (timeForFullRotationInMillis > 0) {
