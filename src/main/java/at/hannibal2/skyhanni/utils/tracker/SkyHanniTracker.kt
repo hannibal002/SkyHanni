@@ -243,7 +243,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            TitleManager.sendTitle("§a+ $itemName", duration = 5.seconds, weight = price)
+            TitleManager.sendTitle("§a+ $itemName", weight = price)
         }
     }
 

@@ -6,16 +6,21 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.inPartialSeconds
 import kotlin.math.floor
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 enum class ItemAbility(
     val abilityName: String,
     private val cooldownInSeconds: Int,
     vararg val itemNames: String,
     val alternativePosition: Boolean = false,
-    var lastActivation: Long = 0L,
+    var lastActivation: SimpleTimeMark = SimpleTimeMark.farPast(),
     var specialColor: LorenzColor? = null,
-    var lastItemClick: Long = 0L,
+    var lastItemClick: SimpleTimeMark = SimpleTimeMark.farPast(),
     val actionBarDetection: Boolean = true,
     private val ignoreMageCooldownReduction: Boolean = false,
 ) {
@@ -88,38 +93,35 @@ enum class ItemAbility(
         internalNames.add(name.toInternalName())
     }
 
+    // TODO: change customCooldown to use Duration instead
     fun activate(color: LorenzColor? = null, customCooldown: Int = (cooldownInSeconds * 1000)) {
         specialColor = color
-        lastActivation = System.currentTimeMillis() - ((cooldownInSeconds * 1000) - customCooldown)
+        lastActivation = SimpleTimeMark.now() - ((cooldownInSeconds.seconds) - customCooldown.milliseconds)
     }
 
-    fun isOnCooldown(): Boolean = lastActivation + getCooldown() > System.currentTimeMillis()
+    fun isOnCooldown(): Boolean = lastActivation.passedSince() < getCooldown()
 
-    fun getCooldown(): Long {
+    fun getCooldown(): Duration {
         // Some items aren't really a cooldown but an effect over time, so don't apply cooldown multipliers
-        if (this == WAND_OF_ATONEMENT || this == RAGNAROCK_AXE) {
-            return 1000L * cooldownInSeconds
-        }
+        if (this == WAND_OF_ATONEMENT || this == RAGNAROCK_AXE) return cooldownInSeconds.seconds
 
-        return (1000L * cooldownInSeconds * getMultiplier()).toLong()
+        return cooldownInSeconds.seconds * getMultiplier()
     }
 
     fun getDurationText(): String {
-        var duration: Long = lastActivation + getCooldown() - System.currentTimeMillis()
-        return if (duration < 1600) {
-            duration /= 100
-            var d = duration.toDouble()
+        val duration = (lastActivation + getCooldown()).timeUntil()
+        return if (duration < 1.6.seconds) {
+            var d = duration.inWholeMilliseconds * 10.0
             d /= 10.0
             d.roundTo(1).addSeparators()
         } else {
-            duration /= 1000
-            duration++
-            duration.addSeparators()
+            val d = duration.inPartialSeconds + 1
+            d.addSeparators()
         }
     }
 
     fun setItemClick() {
-        lastItemClick = System.currentTimeMillis()
+        lastItemClick = SimpleTimeMark.now()
     }
 
     companion object {

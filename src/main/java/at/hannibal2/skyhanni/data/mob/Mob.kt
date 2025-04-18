@@ -259,7 +259,7 @@ class Mob(
     }
 
     // TODO add max distance
-    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean = { true }) =
+    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean) =
         LineToMobHandler.register(this, color, lineWidth, depth, condition)
 
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
