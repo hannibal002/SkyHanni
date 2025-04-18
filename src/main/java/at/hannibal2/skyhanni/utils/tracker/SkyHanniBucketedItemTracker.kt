@@ -42,8 +42,8 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                 return@modify
             }
             data.addItem(bucket, internalName, amount, command)
+            logCompletedAddEvent()
         }
-        logCompletedAddEvent()
     }
 
     @Deprecated(

@@ -62,8 +62,8 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         val command = source == ItemAddManager.Source.COMMAND
         modify { data ->
             data.addItem(internalName, amount, command)
+            logCompletedAddEvent()
         }
-        logCompletedAddEvent()
     }
 
     fun logCommandAdd(internalName: NeuInternalName, amount: Int) {
