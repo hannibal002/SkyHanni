@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -113,6 +115,13 @@ object DamageIndicatorManager {
     fun removeDamageIndicator(type: BossType) {
         data = data.editCopy {
             values.removeIf { it.bossType == type }
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onServerTick(event: ServerTickEvent) {
+        data.forEach {
+            it.value.serverTicksAlive++
         }
     }
 
@@ -546,7 +555,7 @@ object DamageIndicatorManager {
             entity.setHellionShield(null)
         }
 
-        if (!SkyHanniMod.feature.slayer.blazes.phaseDisplay) return ""
+        if (!SlayerApi.config.blazes.phaseDisplay) return ""
 
         var calcHealth = health
         val calcMaxHealth: Int
@@ -710,7 +719,7 @@ object DamageIndicatorManager {
             calcHealth.toLong(), calcMaxHealth.toLong(),
         ).getChatColor() + calcHealth.shortFormat()
 
-        if (!SkyHanniMod.feature.slayer.endermen.phaseDisplay) {
+        if (!SlayerApi.config.endermen.phaseDisplay) {
             result = ""
             entityData.namePrefix = ""
         }

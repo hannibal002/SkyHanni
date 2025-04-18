@@ -28,7 +28,7 @@ object FavoritePowerStone {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
 
-        highlightedSlots.forEach { event.container.inventorySlots[it].highlight(event.context, LorenzColor.AQUA) }
+        highlightedSlots.forEach { event.container.inventorySlots[it].highlight(LorenzColor.AQUA) }
     }
 
     @HandleEvent

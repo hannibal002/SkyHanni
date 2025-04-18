@@ -150,7 +150,7 @@ object StringUtils {
             split[1].removeColor()
         } else {
             split[0].removeColor()
-        }
+        }.removeSuffix("'s")
     }
 
     fun String.cleanPlayerName(displayName: Boolean = false): String {
@@ -201,9 +201,7 @@ object StringUtils {
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
 
-    fun String.pluralize(number: Int, plural: String? = null, withNumber: Boolean = false): String {
-        return pluralize(number, this, plural, withNumber)
-    }
+    fun String.pluralize(number: Int) = pluralize(number, this)
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
