@@ -85,29 +85,17 @@ object CurrentChatDisplay {
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
         changedChatPattern.matchMatcher(message) {
-            currentChat = ChatType.fromName(group("chat"))
-            privateMessagePlayer = null
-            update()
-            return
+            return updateChat(ChatType.fromName(group("chat")))
         }
         if (allChatPattern.matches(message)) {
-            currentChat = ChatType.ALL
-            privateMessagePlayer = null
-            update()
-            return
+            return updateChat(ChatType.ALL)
         }
         if (guildChatPattern.matches(message)) {
-            currentChat = ChatType.GUILD
-            privateMessagePlayer = null
-            update()
-            return
+            return updateChat(ChatType.GUILD)
         }
         openPrivateMessagePattern.matchMatcher(message) {
             privateMessageEnd = maxPrivateMessageTime.fromNow()
-            currentChat = ChatType.PRIVATE
-            privateMessagePlayer = group("player")
-            update()
-            return
+            return updateChat(ChatType.PRIVATE, group("player"))
         }
     }
 
@@ -144,6 +132,12 @@ object CurrentChatDisplay {
 
     private fun update() {
         display = drawDisplay()
+    }
+
+    private fun updateChat(currentChat: ChatType?, privateMessagePlayer: String? = null) {
+        this.currentChat = currentChat
+        this.privateMessagePlayer = privateMessagePlayer
+        update()
     }
 
     @HandleEvent(GuiRenderEvent::class)
