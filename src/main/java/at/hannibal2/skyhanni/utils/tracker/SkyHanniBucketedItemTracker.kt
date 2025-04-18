@@ -90,7 +90,6 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                     modifyEachMode {
                         it.selectedBucket = new
                     }
-                    update()
                 },
                 universe = data.selectableBuckets,
                 nullLabel = nullBucketLabel,
