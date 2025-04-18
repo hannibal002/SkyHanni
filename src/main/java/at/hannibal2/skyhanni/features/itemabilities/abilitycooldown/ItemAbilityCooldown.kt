@@ -318,7 +318,7 @@ object ItemAbilityCooldown {
         val specialColor = ability.specialColor
         val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration: Duration = ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
+            val duration = ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
             val color = specialColor ?: if (duration < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
@@ -447,7 +447,7 @@ object ItemAbilityCooldown {
     }
 
     private fun ItemAbility.sound() {
-        val ping = SimpleTimeMark.now() - lastItemClick
+        val ping = lastItemClick.passedSince()
         if (ping < 400.milliseconds) {
             activate()
         }

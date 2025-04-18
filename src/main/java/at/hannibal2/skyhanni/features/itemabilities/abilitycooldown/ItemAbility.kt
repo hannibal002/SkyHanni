@@ -109,7 +109,7 @@ enum class ItemAbility(
     }
 
     fun getDurationText(): String {
-        val duration: Duration = (lastActivation + getCooldown()).timeUntil()
+        val duration = (lastActivation + getCooldown()).timeUntil()
         return if (duration < 1.6.seconds) {
             var d = duration.inWholeMilliseconds * 10.0
             d /= 10.0

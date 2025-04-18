@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -38,7 +37,7 @@ object Year300RaffleEvent {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enableActiveTimer && SimpleTimeMark.now() < SkyBlockTime(301).asTimeMark()
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enableActiveTimer && SkyBlockTime(301).toTimeMark().isInPast()
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

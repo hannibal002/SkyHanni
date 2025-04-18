@@ -46,7 +46,7 @@ object PlayerDeathMessages {
         }
 
         val lastTime = lastTimePlayerSeen[name] ?: SimpleTimeMark.farPast()
-        val time = SimpleTimeMark.now() > lastTime + 30.seconds
+        val time = lastTime.passedSince() > 30.seconds
 
         if (isHideFarDeathsEnabled() && time) {
             event.chatEvent.blockedReason = "far_away_player_death"

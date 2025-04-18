@@ -511,8 +511,8 @@ class MobFinder {
             type = BossType.DUNGEON_F6_GIANT_1
         }
 
-        val extraDelay = 900L * pos
-        val pair = extraDelay.milliseconds to type
+        val extraDelay = 900.milliseconds * pos
+        val pair = extraDelay to type
         floor6GiantsSeparateDelay[uuid] = pair
 
         return pair

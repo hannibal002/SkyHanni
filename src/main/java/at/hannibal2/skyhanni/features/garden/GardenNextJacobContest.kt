@@ -225,11 +225,7 @@ object GardenNextJacobContest {
                 contests.clear()
             }
             // Contests are available now, make sure system knows this
-            if (nextContestsAvailableAt > SimpleTimeMark.now()) {
-                nextContestsAvailableAt = SimpleTimeMark.now() - 1.milliseconds
-                fetchContestsIfAble()
-            }
-            if (nextContestsAvailableAt.isFarPast()) {
+            if (nextContestsAvailableAt.isInFuture() || nextContestsAvailableAt.isFarPast()) {
                 nextContestsAvailableAt = SimpleTimeMark.now() - 1.milliseconds
                 fetchContestsIfAble()
             }

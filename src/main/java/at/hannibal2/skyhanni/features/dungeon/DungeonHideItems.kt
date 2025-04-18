@@ -109,7 +109,7 @@ object DungeonHideItems {
         if (isSkeletonSkull(entity)) {
             EntityMovementData.addToTrack(entity)
             if (config.hideSkeletonSkull) {
-                val lastMove = movingSkeletonSkulls.getOrElse(entity) { SimpleTimeMark.farPast() }
+                val lastMove = movingSkeletonSkulls[entity] ?: SimpleTimeMark.farPast()
                 if (lastMove.passedSince() < 100.milliseconds) return
                 event.cancel()
             }
