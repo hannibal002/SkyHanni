@@ -27,9 +27,17 @@ abstract class CleanupMappingFiles : DefaultTask() {
         val isPatternMapping = file.name.startsWith("pattern-")
 
         val lines = mutableSetOf<Pair<String, String>>()
+        val comments = mutableMapOf<String, String>()
+
+        var savedComment: String? = null
 
         file.forEachLine { line ->
             if (line.isNotBlank()) {
+                savedComment?.let {
+                    comments[line] = it
+                    savedComment = null
+                }
+                if (line.isComment()) savedComment = line
                 findSection(line, isPatternMapping)?.let { parts ->
                     lines.add(Pair(parts, line))
                 }
@@ -40,8 +48,10 @@ abstract class CleanupMappingFiles : DefaultTask() {
             .mapValues { it.value.map { it.second }.sorted() }
             .toSortedMap()
 
-        writeMappings(file, sortedLines)
+        writeMappings(file, sortedLines, comments)
     }
+
+    private fun String.isComment() = startsWith("#")
 
     private fun findSection(line: String, isPatternMapping: Boolean): String? {
         val parts = line.split(" ")
@@ -66,15 +76,18 @@ abstract class CleanupMappingFiles : DefaultTask() {
         }
     }
 
-    private fun writeMappings(file: File, sortedLines: Map<String, List<String>>) {
-        file.delete()
-        file.writeText("\n")
+    private fun writeMappings(file: File, sortedLines: Map<String, List<String>>, comments: Map<String, String>) {
+        val lineSeparator = "\n" // Use Unix-style line endings explicitly
+        file.writeText(lineSeparator)
 
         for ((_, value) in sortedLines) {
             for (line in value) {
-                file.appendText("$line\n")
+                comments[line]?.let {
+                    file.appendText("$it$lineSeparator")
+                }
+                file.appendText("$line$lineSeparator")
             }
-            file.appendText("\n")
+            file.appendText(lineSeparator)
         }
     }
 }
