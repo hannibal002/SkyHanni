@@ -45,7 +45,6 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -66,6 +65,7 @@ import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 // TODO cut class into smaller pieces
@@ -148,8 +148,8 @@ object DamageIndicatorManager {
 
         // TODO config to define between 100ms and 5 sec
         val filter = data.filter {
-            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
-            (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
+            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4.seconds else 100.milliseconds
+            (SimpleTimeMark.now() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
         }
         if (filter.isNotEmpty()) {
             data = data.editCopy {
@@ -332,22 +332,22 @@ object DamageIndicatorManager {
     }
 
     private fun tickDamage(damageCounter: DamageCounter) {
-        val now = System.currentTimeMillis()
+        val now = SimpleTimeMark.now()
         if (damageCounter.currentDamage != 0L || damageCounter.currentHealing != 0L) {
-            if (damageCounter.firstTick == 0L) {
+            if (damageCounter.firstTick.isFarPast()) {
                 damageCounter.firstTick = now
             }
 
-            if (now > damageCounter.firstTick + 1_000) {
+            if (damageCounter.firstTick.passedSince() > 1.seconds) {
                 damageCounter.oldDamages.add(
                     0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing),
                 )
-                damageCounter.firstTick = 0L
+                damageCounter.firstTick = SimpleTimeMark.farPast()
                 damageCounter.currentDamage = 0
                 damageCounter.currentHealing = 0
             }
         }
-        damageCounter.oldDamages.removeIf { now > it.time + 5_000 }
+        damageCounter.oldDamages.removeIf { it.time.passedSince() > 5.seconds }
     }
 
     private fun formatDelay(delay: Duration): String {
@@ -417,7 +417,7 @@ object DamageIndicatorManager {
                 val color = NumberUtil.percentageColor(health, maxHealth)
                 entityData.healthText = color.getChatColor() + health.shortFormat()
             }
-            entityData.timeLastTick = System.currentTimeMillis()
+            entityData.timeLastTick = SimpleTimeMark.now()
             return entity.uniqueID to entityData
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
@@ -896,7 +896,7 @@ object DamageIndicatorManager {
         val entityData = EntityData(
             entity,
             entityResult.ignoreBlocks,
-            entityResult.delayedStart?.asTimeMark(),
+            entityResult.delayedStart,
             entityResult.finalDungeonBoss,
             entityResult.bossType,
             foundTime = SimpleTimeMark.now(),
