@@ -51,7 +51,7 @@ abstract class CleanupMappingFiles : DefaultTask() {
         writeMappings(file, sortedLines, comments)
     }
 
-    private fun String.isComment() = startsWith("#")
+    private fun String.isComment() = trim().startsWith("#")
 
     private fun findSection(line: String, isPatternMapping: Boolean): String? {
         val parts = line.split(" ")
