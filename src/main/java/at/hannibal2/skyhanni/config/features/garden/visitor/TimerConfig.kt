@@ -33,6 +33,7 @@ class TimerConfig {
             "§eMay be inaccurate with co-op members farming simultaneously."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var sixthVisitorWarning: Boolean = true
 
     @Expose
