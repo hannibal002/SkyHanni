@@ -146,9 +146,9 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { true }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !isInvisible() && condition() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { true }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !isInvisible() && condition() }
             }
         }
     }
