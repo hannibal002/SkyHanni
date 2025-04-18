@@ -158,7 +158,7 @@ object PestProfitTracker {
 
             if (config.hideChat) blockedReason = "pest_drop"
 
-            tracker.addItem(pest, internalName, amount)
+            tracker.addItem(pest, internalName, amount, command = false)
 
             // Field Mice drop 6 separate items, but we only want to count the kill once
             if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
@@ -177,7 +177,7 @@ object PestProfitTracker {
 
             // Happens here so that the amount is fixed independently of tracker being enabled
 
-            tracker.addItem(pest, internalName, amount)
+            tracker.addItem(pest, internalName, amount, command = false)
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
@@ -286,7 +286,7 @@ object PestProfitTracker {
         // Get a list of all that have been killed in the last 2 seconds, it will
         // want to be the most recent one that was killed.
         val pest = lastPestKillTimes.minByOrNull { it.value }?.key ?: return
-        tracker.addCoins(pest, coins.roundToInt())
+        tracker.addCoins(pest, coins.roundToInt(), command = false)
     }
 
     @HandleEvent

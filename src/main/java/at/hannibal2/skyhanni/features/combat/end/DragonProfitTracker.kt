@@ -138,8 +138,8 @@ object DragonProfitTracker {
         ChatUtils.debug("Added $type to tracker, lastDragonKill: $lastDragonKill")
     }
 
-    fun addDragonLoot(type: DragonType, item: NeuInternalName, amount: Int) {
-        tracker.addItem(type, item, amount)
+    fun addDragonLoot(type: DragonType, item: NeuInternalName, amount: Int, command: Boolean = false) {
+        tracker.addItem(type, item, amount, command)
         ChatUtils.debug("Added $item to tracker (amount: $amount, type: $type)")
     }
 
