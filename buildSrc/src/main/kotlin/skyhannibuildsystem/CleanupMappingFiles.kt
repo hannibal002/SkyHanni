@@ -14,8 +14,6 @@ abstract class CleanupMappingFiles : DefaultTask() {
     @TaskAction
     fun cleanupMappingFiles() {
         val mappingsDir = mappingsDirectory.get().asFile
-        println("full path for mapping task: ${mappingsDir.absolutePath}")
-
         val mappingsFiles = mappingsDir.listFiles() ?: return
 
         for (file in mappingsFiles) {
