@@ -75,6 +75,8 @@
 
 + Added Outside Sack Value Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3778)
     + Show value of all items in Sacks as GUI while not in Sacks.
++ Added Trade Value Overlay. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
+    + Doesn't support coins.
 
 #### Chat
 
@@ -116,11 +118,14 @@
     + Updates both the Visitor Stats counter and the "prevent denying" feature.
 + Added Harvest Harbinger V potion to Visitor Rewards list. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3806)
     + Updated Visitor Stats counter and Prevent Denying features accordingly.
++ Improved 6th Visitor reminder to function when the visitor timer is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3820)
 
 #### Mining
 
 + Added Outline Mode to the Nucleus Barriers Highlighter. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3530)
 + Added cooldown to Base Camp warp hotkey. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3718)
++ Improved `/shblockstrength`. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3822)
+    + Added mining speed required for next lower tick.
 
 #### Fishing
 
@@ -161,6 +166,7 @@
 + Added legacy item warning to the "Others" chat filter. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3331)
 + Added Hypixel's Anniversary Video Ad to Spam Filter. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3739)
 + Added "Thunderstorm is ready to use!" message to Dungeon Chat Filter. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3756)
++ Added edge case for Guild Chat in Current Chat Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3826)
 
 #### Combat
 
@@ -203,6 +209,9 @@
 + Always show estimated Armor Value while in Custom Wardrobe edit mode. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3771)
 + Added option to format perfect enchantments on items as bold. - Goo (https://github.com/hannibal002/SkyHanni/pull/3681)
 + Improved performance of customizable colors in config. - Empa (https://github.com/hannibal002/SkyHanni/pull/3213)
++ Improved titles sent by SH features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3819)
+    + All titles now share size and position; no more dynamic scaling.
+    + Size and vertical position adjustable via the position editor; full opacity enforced.
 
 ### Bug Fixes
 
@@ -224,6 +233,7 @@
     + Takes effect after the second startup, once the data has been reloaded.
 + Fixed error message when clicking in Jacob Contest overview menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3764)
 + Fixed Garden Composter empty warnings not showing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3818)
++ Fixed Composter Empty Display not showing outside garden. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3827)
 
 #### The Rift
 
@@ -245,6 +255,7 @@
 + Fixed Corpse Tracker not displaying profit titles. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3451)
 + Fixed Bits Gained chat message appearing despite disabled setting. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3729)
 + Fixed Mineshaft Pity Display not appearing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3733)
++ Fixed Line to Golden Goblin tooltip occasionally not disappearing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3828)
 
 #### Events
 
@@ -332,6 +343,9 @@
 + Fixed titles getting stuck on screen. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3785)
 + Fixed SkyHanni warning incorrectly about invalid tablist. - nopo (https://github.com/hannibal002/SkyHanni/pull/3798)
 + Fixed errors with shortened party command. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3817)
++ Fixed Custom Scoreboard Background always having full opacity. - Empa (https://github.com/hannibal002/SkyHanni/pull/3821)
++ Fixed titles exceeding display size. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3819)
++ Fixed trackers not grammaring goodly. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3823)
 
 ### Technical Details
 
@@ -509,6 +523,19 @@
 + Formatted files in Features package. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3797)
 + Included Navigation Graph data in `/shdebug`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3813)
 + Updated Contributing guide with detailed events info. - rueblimaster & CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3808)
++ Added custom Gradle task to automatically sort mappings. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3824)
+    + Run `./gradlew cleanupMappingFiles` after editing the mappings files.
++ Added more mappings for modern versions. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/3824)
++ Added Server Ticks Alive to Entity Data. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3792)
++ Cleanup in `CurrentChatDiplay.kt`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3826)
++ Replaced `System.currentTimeMillis()` with `SimpleTimeMark`. - Empa (https://github.com/hannibal002/SkyHanni/pull/3412)
++ Reworked `Renderable.searchableTable`. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3557)
++ Updated `ChestValue`. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
+    + Replaced `MutableList<Renderable>.addList()` with `MutableList<Renderable>.addToList`.
+    + Added `values: Collection<Item>` parameter to `sortedList()`.
+    + Added `createItems` function to map `ItemStack`s to unique identifiers with values and metadata.
++ Updated `ItemUtils`. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
+    + Added coin handling to `grabInternalNameOrNull`.
 
 ### Removed Features
 

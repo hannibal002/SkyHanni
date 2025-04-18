@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.insert
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
@@ -36,6 +37,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import java.awt.Color
+import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -170,22 +172,7 @@ object BlockStrengthGuide {
                 this.insert(this.length - 1, '5')
             }
 
-            val (progressBar, percentLine) = when (ticks) {
-                1 -> Renderable.progressBar(1.0, InstantMineColor, InstantMineColor, width = 100) to "§6Instant Mine"
-                4 -> Renderable.progressBar(
-                    speed.fractionOf(ore.speedForInstantMine),
-                    SoftCapColor,
-                    InstantMineColor,
-                    width = 100,
-                ) to "§a${speed.fractionOf(ore.speedForInstantMine).times(100).roundTo(1)}% §fto Instant Mine"
-
-                else -> Renderable.progressBar(
-                    speed.fractionOf(ore.speedSoftCap),
-                    BaseColor,
-                    SoftCapColor,
-                    width = 100,
-                ) to "§a${speed.fractionOf(ore.speedSoftCap).times(100).roundTo(1)}% §fto Soft Cap"
-            }
+            val (progressBar, percentLine, untilNextLine) = processProgressData(ticks, speed, ore)
 
             return Renderable.hoverTips(
                 Renderable.horizontalContainer(
@@ -208,6 +195,11 @@ object BlockStrengthGuide {
                     addExtraInfo("You have §6${speed.toInt().addSeparators()} mining speed")
                     addExtraInfo("when breaking $blockName :)")
 
+                    untilNextLine?.let {
+                        addString(it)
+                        addExtraInfo("The mining speed you need more")
+                        addExtraInfo("to mine $blockName in §b${ticks - 1}")
+                    }
                     addString(percentLine)
                     add(Renderable.placeholder(0, 5))
 
@@ -236,6 +228,48 @@ object BlockStrengthGuide {
                 },
             )
         }
+    }
+
+    private fun processProgressData(ticks: Int, speed: Double, ore: OreBlock): Triple<Renderable, String, String?> {
+        val progressBar: Renderable
+        val percentLine: String
+        val untilNextLine: String?
+        when (ticks) {
+            1 -> {
+                progressBar = Renderable.progressBar(1.0, InstantMineColor, InstantMineColor, width = 100)
+                percentLine = "§6Instant Mine"
+                untilNextLine = null
+            }
+
+            4 -> {
+                progressBar = Renderable.progressBar(
+                    speed.fractionOf(ore.speedForInstantMine),
+                    SoftCapColor,
+                    InstantMineColor,
+                    width = 100,
+                )
+                percentLine = "§a${speed.fractionOf(ore.speedForInstantMine).times(100).roundTo(1)}% §fto Instant Mine"
+                untilNextLine = "§6${
+                    ceil(ore.speedForInstantMine - speed).toInt().addSeparators()
+                } ${SkyblockStat.MINING_SPEED.icon} §cmissing §fto §b1 §ftick"
+            }
+
+            else -> {
+                progressBar = Renderable.progressBar(
+                    speed.fractionOf(ore.speedSoftCap),
+                    BaseColor,
+                    SoftCapColor,
+                    width = 100,
+                )
+                percentLine = "§a${speed.fractionOf(ore.speedSoftCap).times(100).roundTo(1)}% §fto Soft Cap"
+                val next = ticks - 1
+                val nextTicksFormat = "tick".pluralize(next)
+                untilNextLine = "§6${
+                    ceil(ore.speedNeededForNextTick(speed)).toInt().addSeparators()
+                } ${SkyblockStat.MINING_SPEED.icon} §cmissing §fto §b$next §f$nextTicksFormat"
+            }
+        }
+        return Triple(progressBar, percentLine, untilNextLine)
     }
 
     private fun MutableList<Renderable>.addExtraInfo(info: String) {

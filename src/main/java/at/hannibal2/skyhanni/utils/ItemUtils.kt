@@ -277,6 +277,10 @@ object ItemUtils {
         if (displayName == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
+        // This is to prevent an error message whenever coins are traded.
+        if (getLore().getOrNull(0) == "§7Lump-sum amount") {
+            return NeuInternalName.SKYBLOCK_COIN
+        }
         val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
         return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
