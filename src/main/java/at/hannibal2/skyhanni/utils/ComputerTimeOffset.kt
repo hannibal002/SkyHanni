@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlinx.coroutines.launch
 import org.apache.commons.net.ntp.NTPUDPClient
@@ -55,16 +56,17 @@ object ComputerTimeOffset {
     }
 
     private fun checkOffset() {
+        // probably a problem when the response somehow took longer than 1s?
         if (currentlyChecking) {
-            // probably a problem when the response somehow took longer than 1s?
-            ErrorManager.logErrorStateWithData(
-                "Error when checking computer time offset",
-                "trying to check again even though the previous check is stil not done",
-            )
-            state = when (state) {
-                State.NORMAL -> State.SLOW
-                State.SLOW -> State.TOTALLY_OFF
-                else -> return
+            state = state.next() ?: error("state is already TOTALLY_OFF")
+            if (state == State.TOTALLY_OFF) {
+                ErrorManager.logErrorStateWithData(
+                    "Error when checking Computer Time Offset",
+                    "trying to check again even though the previous check is stil not done",
+                )
+            }
+            if (state == State.SLOW) {
+                ChatUtils.chat("Computer Time Offset calculation takes longer than normal. Checkign now less often.")
             }
             currentlyChecking = false
             return
