@@ -55,7 +55,8 @@ object FrogMaskFeatures {
         " §7⏣ (?<area>.+)",
     )
 
-    private val frogMask by lazy { "FROG_MASK".toInternalName().getItemStack() }
+    val FROG_MASK = "FROG_MASK".toInternalName()
+    private val frogMask by lazy { FROG_MASK.getItemStack() }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.THE_PARK)
     fun onRenderOverlay() {
@@ -70,7 +71,7 @@ object FrogMaskFeatures {
         display = null
 
         val helmet = InventoryUtils.getHelmet() ?: return
-        if (helmet.getInternalName() != "FROG_MASK".toInternalName()) return
+        if (helmet.getInternalName() != FROG_MASK) return
 
         activeRegionPattern.firstMatcher(helmet.getLore()) {
             val currentRegion = group("region")
