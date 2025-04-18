@@ -134,7 +134,7 @@ object CurrentChatDisplay {
         display = drawDisplay()
     }
 
-    private fun updateChat(currentChat: ChatType?, privateMessagePlayer: String? = null) {
+    private fun updateChat(currentChat: ChatType, privateMessagePlayer: String? = null) {
         this.currentChat = currentChat
         this.privateMessagePlayer = privateMessagePlayer
         update()
@@ -172,7 +172,7 @@ object CurrentChatDisplay {
         val displayName = color?.getChatColor().orEmpty() + (displayName ?: toFormattedName())
 
         companion object {
-            fun fromName(name: String) = entries.find { it.chatName.equals(name, true) }
+            fun fromName(name: String) = entries.find { it.chatName.equals(name, true) } ?: error("unknown chat type '$name'")
         }
     }
 
