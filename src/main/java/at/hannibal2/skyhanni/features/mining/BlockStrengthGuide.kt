@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.insert
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
@@ -261,9 +262,11 @@ object BlockStrengthGuide {
                     width = 100,
                 )
                 percentLine = "§a${speed.fractionOf(ore.speedSoftCap).times(100).roundTo(1)}% §fto Soft Cap"
+                val next = ticks - 1
+                val nextTicksFormat = "tick".pluralize(next)
                 untilNextLine = "§6${
                     ceil(ore.speedNeededForNextTick(speed)).toInt().addSeparators()
-                } ${SkyblockStat.MINING_SPEED.icon} §cmissing §fto §b${ticks - 1} §ftick"
+                } ${SkyblockStat.MINING_SPEED.icon} §cmissing §fto §b$next §f$nextTicksFormat"
             }
         }
         return Triple(progressBar, percentLine, untilNextLine)
