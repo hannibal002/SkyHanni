@@ -91,7 +91,8 @@ object SeaCreatureFeatures {
 
         if (mob !in damagedSeaCreatures) return
 
-        if (mob.centerCords.distanceToPlayer() > 15) return
+        val allowedDistance = if (mob.isRareSeaCreature()) 35 else 15
+        if (mob.centerCords.distanceToPlayer() > allowedDistance) return
 
         lastSeaCreatureKill = SimpleTimeMark.now()
     }
