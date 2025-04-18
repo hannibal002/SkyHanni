@@ -14,6 +14,9 @@ import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Items
 import kotlin.time.Duration.Companion.seconds
+//#if MC < 1.16
+//$$ import net.minecraft.item.SpawnEggItem
+//#endif
 
 @SkyHanniModule
 object SlayerItemsOnGround {
