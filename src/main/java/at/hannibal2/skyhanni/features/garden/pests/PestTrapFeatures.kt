@@ -97,13 +97,13 @@ object PestTrapFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         val applicableWarnings = allActiveWarnings.filter { it in userEnabledWarnings }
         if (applicableWarnings.isEmpty() || nextWarningMark.isInFuture()) return
         val activeWarnings = applicableWarnings.map { it.getDescriptiveWarning() }
 
         warningSound?.playSound()
-        if (titleWarnEnabled) TitleManager.sendTitle(activeWarnings.first(), height = 2.8, fontSize = 7f)
+        if (titleWarnEnabled) TitleManager.sendTitle(activeWarnings.first())
         if (chatWarnEnabled) activeWarnings.forEach { ChatUtils.chat(it, replaceSameMessage = true) }
 
         nextWarningMark = getNextWarningMark()
