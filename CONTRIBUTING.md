@@ -455,6 +455,8 @@ files, so you might be fixing issues in files you didn't even look at. It will e
 (consider using the method descriptor instead of just the method name for your mixin). However, if something aside from the name changed,
 this will not suffice.
 
+After adding new mappings to the mappings file don't forget to run `./gradlew cleanupMappingFiles` to automatically sort the mappings file.
+
 #### Custom mappings
 
 If you need to do a bit more advanced remapping that requires an import to be added to the file, you can add a custom mapping. This is
