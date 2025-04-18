@@ -436,7 +436,7 @@ object GardenNextJacobContest {
         lastWarningTime = SimpleTimeMark.now()
         val cropText = crops.joinToString("§7, ") { (if (it == boostedCrop) "§6" else "§a") + it.cropName }
         ChatUtils.chat("Next farming contest: $cropText")
-        TitleManager.sendTitle("§eFarming Contest!", duration = 5.seconds)
+        TitleManager.sendTitle("§eFarming Contest!")
         SoundUtils.playBeepSound()
 
         val cropTextNoColor = crops.joinToString(", ") {

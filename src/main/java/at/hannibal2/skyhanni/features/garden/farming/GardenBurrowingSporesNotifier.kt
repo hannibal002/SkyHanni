@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenBurrowingSporesNotifier {
@@ -16,7 +15,7 @@ object GardenBurrowingSporesNotifier {
         if (!GardenApi.config.burrowingSporesNotification) return
 
         if (event.message.endsWith("§6§lVERY RARE CROP! §r§f§r§9Burrowing Spores")) {
-            TitleManager.sendTitle("§9Burrowing Spores!", duration = 5.seconds)
+            TitleManager.sendTitle("§9Burrowing Spores!")
             // would be sent too often, nothing special then
 //            ItemBlink.setBlink(NEUItems.getItemStackOrNull("BURROWING_SPORES"), 5_000)
         }
