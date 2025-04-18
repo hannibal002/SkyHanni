@@ -56,14 +56,14 @@ object ExperimentationTableApi {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
-    private val currentData = ExperimentationDataSet()
+    private val currentExperimentData = ExperimentationDataSet()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
     val experimentationTableInventory = InventoryDetector { name -> inventoriesPattern.matches(name) }
     val inTable get() = experimentationTableInventory.isInside()
-    val isActive get() = currentData.tier != null
-    val currentExperimentTier get() = currentData.tier
-    val currentExperimentType get() = currentData.type
+    val isActive get() = currentExperimentData.tier != null
+    val currentExperimentTier get() = currentExperimentData.tier
+    val currentExperimentType get() = currentExperimentData.type
 
     private var lastExpOverHash: Int = 0
     private var currentExpOverHash: Int = 0
@@ -161,33 +161,6 @@ object ExperimentationTableApi {
     }
 
     // <editor-fold desc="Patterns">
-    /**
-     * REGEX-TEST: Click any button!
-     * REGEX-TEST: Next button is instantly rewarded!
-     * REGEX-TEST: Click a second button!
-     */
-    val waitingMessagesPattern by patternGroup.pattern(
-        "waiting.messages",
-        "Click any button!|Click a second button!|Next button is instantly rewarded!",
-    )
-
-    /**
-     * REGEX-TEST: Gained +3 Clicks
-     */
-    val powerUpPattern by patternGroup.pattern(
-        "powerups",
-        "Gained \\+\\d Clicks?|Instant Find|\\+\\S* XP",
-    )
-
-    /**
-     * REGEX-TEST: 123k Enchanting Exp
-     * REGEX-TEST: Titanic Experience Bottle
-     */
-    val rewardPattern by patternGroup.pattern(
-        "rewards",
-        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment the Fish",
-    )
-
     /**
      * REGEX-TEST: Superpairs (Metaphysical)
      * REGEX-TEST: Chronomatron (Metaphysical)
@@ -362,7 +335,7 @@ object ExperimentationTableApi {
             val queuedEvent = queuedCompleteEvent ?: return@runDelayed
             queuedEvent.post()
             queuedCompleteEvent = null
-            currentData.reset()
+            currentExperimentData.reset()
         }
     }
 
@@ -416,7 +389,7 @@ object ExperimentationTableApi {
             val absChange = currentInInv - lastInInv
             if (absChange < 0 && inDistanceToTable(10.0) && fireUsageEvent) {
                 TableXPBottleUsedEvent(internalName, abs(absChange)).post()
-            } else if (addToLoot) currentData.addReward(internalName, absChange)
+            } else if (addToLoot) currentExperimentData.addReward(internalName, absChange)
         }
     }
 
@@ -458,13 +431,12 @@ object ExperimentationTableApi {
 
     private fun InventoryOpenEvent.tryProcessExperimentOver() {
         if (!expOverInventoryPattern.matches(inventoryName) || currentExpOverHash != 0) return
-        tryUpdateCurrentActivity()
-        val slotIndex = when (currentData.type) {
+        val slotIndex = when (currentExperimentData.type) {
             null -> ErrorManager.skyHanniError(
                 "Found Experiment Over GUI without a set task type!",
                 "inventoryName" to inventoryName,
                 "inventoryItems" to inventoryItems,
-                "currentData" to currentData,
+                "currentData" to currentExperimentData,
                 "currentType" to currentExperimentType,
                 "currentTier" to currentExperimentTier,
             )
@@ -478,8 +450,8 @@ object ExperimentationTableApi {
             it != lastExpOverHash && it != currentExpOverHash && it != 0
         } ?: return
 
-        currentData.type = ExperimentationTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
-        currentData.tier = expOverStakesLorePattern.firstMatcher(lore) {
+        currentExperimentData.type = ExperimentationTaskType.fromStringOrNull(item.displayName.removeColor()) ?: return
+        currentExperimentData.tier = expOverStakesLorePattern.firstMatcher(lore) {
             ExperimentationTier.byNameOrNull(group("stakes"))
         } ?: return
 
@@ -491,7 +463,7 @@ object ExperimentationTableApi {
             .takeIfNotEmpty()?.toList().orEmpty()
             .forEach { it.processRewardOrNull() }
 
-        queuedCompleteEvent = currentData.toCompletedTaskEventOrNull()
+        queuedCompleteEvent = currentExperimentData.toCompletedTaskEventOrNull()
     }
 
     private fun String.processRewardOrNull() {
@@ -501,12 +473,12 @@ object ExperimentationTableApi {
             val color = group("color")[0].toLorenzColor() ?: return@matchMatcher
             val rarity = LorenzRarity.getByColor(color) ?: return@matchMatcher
             val internalName = "GUARDIAN;${rarity.id}".toInternalName()
-            currentData.addReward(internalName, 1)
+            currentExperimentData.addReward(internalName, 1)
             return
         }
         enchantingExpPattern.matchMatcher(this) {
             val amount = group("amount").formatLong().takeIf { it > 0 } ?: return@matchMatcher
-            currentData.enchantingXpGained += amount
+            currentExperimentData.enchantingXpGained += amount
             return
         }
         if (experienceBottleChatPattern.matches(this)) {
@@ -518,29 +490,31 @@ object ExperimentationTableApi {
             ChatUtils.debug("Could not read item name from $this")
             return
         }
-        currentData.addReward(internalName, 1)
+        currentExperimentData.addReward(internalName, 1)
     }
 
     private fun InventoryOpenEvent.tryFireRareBookUncovered() {
-        if (currentData.rareFoundFired) return
+        if (currentExperimentData.rareFoundFired) return
         for (lore in inventoryItems.map { it.value.getLore() }) {
             val firstLine = lore.firstOrNull() ?: continue
             if (!ultraRarePattern.matches(firstLine)) continue
             val bookNameLine = lore.getOrNull(2) ?: continue
             bookPattern.matchMatcher(bookNameLine) {
                 TableRareUncoverEvent(group("enchant")).post()
-                currentData.rareFoundFired = true
+                currentExperimentData.rareFoundFired = true
                 return
             }
         }
     }
 
     private fun InventoryOpenEvent.tryUpdateCurrentActivity() = currentTypeAndTierPattern.matchMatcher(inventoryName) {
+        if (inventoryName == "Experimentation Table") return@matchMatcher currentExperimentData.reset()
+
         val type = ExperimentationTaskType.fromStringOrNull(group("type")) ?: return@matchMatcher
         val tier = ExperimentationTier.byNameOrNull(group("tier")) ?: return@matchMatcher
         if (type == currentExperimentType && tier == currentExperimentTier) return@matchMatcher
 
-        currentData.apply {
+        currentExperimentData.apply {
             this.type = type
             this.tier = tier
         }

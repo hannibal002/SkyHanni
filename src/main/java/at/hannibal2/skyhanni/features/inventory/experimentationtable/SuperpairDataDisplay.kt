@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -42,6 +42,7 @@ object SuperpairDataDisplay {
         PAIR
     }
 
+    // <editor-fold desc="Patterns">
     private val instantFindNamePattern by ExperimentationTableApi.patternGroup.pattern(
         "powerups.instantfind.name",
         "Instant Find",
@@ -55,6 +56,44 @@ object SuperpairDataDisplay {
         "Remaining Clicks: (?<clicks>\\d+)",
     )
 
+    /**
+     * REGEX-TEST: GUARDIAN;4
+     */
+    private val guardianPetInternalNamePattern by ExperimentationTableApi.patternGroup.pattern(
+        "guardian.pet.internalname",
+        "GUARDIAN;\\d"
+    )
+
+    /**
+     * REGEX-TEST: 123k Enchanting Exp
+     * REGEX-TEST: Titanic Experience Bottle
+     * REGEX-TEST: [Lvl 1] Guardian
+     */
+    @Suppress("MaxLineLength")
+    private val rewardPattern by ExperimentationTableApi.patternGroup.pattern(
+        "rewards",
+        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment the Fish|\\[Lvl \\d+] Guardian",
+    )
+
+    /**
+     * REGEX-TEST: Gained +3 Clicks
+     */
+    private val powerUpPattern by ExperimentationTableApi.patternGroup.pattern(
+        "powerups",
+        "Gained \\+\\d Clicks?|Instant Find|\\+\\S* XP",
+    )
+
+    /**
+     * REGEX-TEST: Click any button!
+     * REGEX-TEST: Next button is instantly rewarded!
+     * REGEX-TEST: Click a second button!
+     */
+    private val waitingMessagesPattern by ExperimentationTableApi.patternGroup.pattern(
+        "waiting.messages",
+        "Click any button!|Click a second button!|Next button is instantly rewarded!",
+    )
+    // <editor-fold>
+
     private val emptySuperpairItem = SuperpairItem(-1, "", -1)
 
     private var display = emptyList<String>()
@@ -62,7 +101,7 @@ object SuperpairDataDisplay {
     private val found = mutableMapOf<FoundType, MutableList<FoundData>>()
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         display = emptyList()
         uncoveredItems = emptyMap()
         found.clear()
@@ -79,10 +118,10 @@ object SuperpairDataDisplay {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.superpairDisplay) return
-        val currentExperiment = ExperimentationTableApi.currentExperimentTier ?: return
+        val currentTier = ExperimentationTableApi.currentExperimentTier ?: return
 
         val item = event.item ?: return
-        if (isOutOfBounds(event.slotId, currentExperiment) || item.displayName.removeColor() == "?") return
+        if (isOutOfBounds(event.slotId, currentTier) || item.displayName.removeColor() == "?") return
 
         val items = uncoveredItems.toMutableMap()
         val itemExistsInData = items.any { it.value.slotId == event.slotId && it.key == items.keys.max() }
@@ -98,7 +137,7 @@ object SuperpairDataDisplay {
     private fun handleItem(items: MutableMap<Int, SuperpairItem>, slot: Int) = DelayedRun.runDelayed(200.milliseconds) {
         val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return@runDelayed
         val itemName = itemNow.displayName.removeColor()
-        val reward = convertToReward(itemNow)
+        val reward = itemNow.convertToReward()
         val itemData = SuperpairItem(slot, reward, itemNow.itemDamage)
         val uncovered = items.keys.maxOrNull() ?: -1
 
@@ -262,8 +301,11 @@ object SuperpairDataDisplay {
     private fun calculatePossiblePairs(currentExperiment: ExperimentationTableApi.ExperimentationTier) =
         ((currentExperiment.gridSize - 2) / 2) - found.filter { it.key != FoundType.POWERUP }.values.sumOf { it.size }
 
-    private fun convertToReward(item: ItemStack) = if (item.displayName.removeColor() == "Enchanted Book") item.getLore()[2].removeColor()
-    else item.displayName.removeColor()
+    private fun ItemStack.convertToReward() = when {
+        guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) -> displayName.split("] ")[1]
+        displayName.removeColor() == "Enchanted Book" -> getLore()[2].removeColor()
+        else -> displayName.removeColor()
+    }
 
     private fun determinePrefix(index: Int, lastIndex: Int) = if (index == lastIndex) "└" else "├"
 
@@ -288,11 +330,11 @@ object SuperpairDataDisplay {
     private fun hasFoundMatch(items: Map<Int, SuperpairItem>, firstItem: SuperpairItem): Boolean =
         existsMatchingItem(items, firstItem) && !isItemAlreadyFound(firstItem)
 
-    private fun isPowerUp(reward: String) = ExperimentationTableApi.powerUpPattern.matches(reward)
+    private fun isPowerUp(reward: String) = powerUpPattern.matches(reward)
 
-    private fun isReward(reward: String) = ExperimentationTableApi.rewardPattern.matches(reward) || isPowerUp(reward)
+    private fun isReward(reward: String) = rewardPattern.matches(reward) || isPowerUp(reward)
 
-    private fun isWaiting(itemName: String) = ExperimentationTableApi.waitingMessagesPattern.matches(itemName)
+    private fun isWaiting(itemName: String) = waitingMessagesPattern.matches(itemName)
 
     private fun clicksSinceSeparator(list: MutableMap<Int, SuperpairItem>): Int {
         val lastIndex = list.entries.indexOfLast { it.value == emptySuperpairItem }
