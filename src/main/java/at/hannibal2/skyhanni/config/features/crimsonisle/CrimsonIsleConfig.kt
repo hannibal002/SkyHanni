@@ -32,7 +32,7 @@ class CrimsonIsleConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var kuudraProfileViewer: Boolean = false
+    var disableProfileViewerInKuudra: Boolean = false
 
     @Expose
     @ConfigOption(name = "Miniboss Respawn Timer", desc = "Shows a timer for when minibosses will respawn.")

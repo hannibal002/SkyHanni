@@ -2,14 +2,12 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -94,12 +92,10 @@ object HighlightVisitorsOutsideOfGarden {
         if (MinecraftCompat.localPlayer.isSneaking) return
         val entity = event.clickedEntity ?: return
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
-            if (event.clickType == ClickType.RIGHT_CLICK) {
-                ChatUtils.chatAndOpenConfig(
-                    "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
-                    VisitorApi.config::blockInteracting,
-                )
-            }
+            ChatUtils.chatAndOpenConfig(
+                "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
+                VisitorApi.config::blockInteracting,
+            )
             event.cancel()
         }
     }
