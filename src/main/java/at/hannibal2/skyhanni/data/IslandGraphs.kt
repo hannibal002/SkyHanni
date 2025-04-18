@@ -231,6 +231,7 @@ object IslandGraphs {
             add("")
             if (important) {
                 add("wrong island!")
+            } else {
                 add("island is correct!")
             }
             add("")

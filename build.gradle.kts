@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
+import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import java.io.Serializable
 import java.nio.file.Path
@@ -120,6 +121,10 @@ val headlessLwjgl by configurations.creating {
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
     this.branch = "main"
+}
+
+val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
+    this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
 }
 
 tasks.runClient {

@@ -1,3 +1,4 @@
+
 net.minecraft.entity.Entity net.minecraft.entity.Entity deceased removed at.hannibal2.skyhanni.utils.compat.deceased
 
 # 1.21.5 made nbt functions return Optional<T> instead of just T :/
