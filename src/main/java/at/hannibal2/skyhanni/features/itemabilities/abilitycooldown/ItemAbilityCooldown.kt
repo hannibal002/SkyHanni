@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import kotlin.math.max
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
