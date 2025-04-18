@@ -15,4 +15,7 @@ object EnumUtils {
 
     inline fun <reified T : Enum<T>> T.isAnyOf(vararg array: T): Boolean = array.contains(this)
 
+    fun <T : Enum<T>> Enum<T>.toFormattedName(): String =
+        name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercase) }
+
 }

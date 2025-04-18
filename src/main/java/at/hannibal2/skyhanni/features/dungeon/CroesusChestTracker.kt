@@ -83,7 +83,7 @@ object CroesusChestTracker {
                 val state = run.openState ?: OpenedState.UNOPENED
 
                 if (state != OpenedState.KEY_USED) {
-                    slot.highlight(event.context, if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
+                    slot.highlight(if (state == OpenedState.OPENED) LorenzColor.DARK_AQUA else LorenzColor.DARK_PURPLE)
                 }
             }
         }

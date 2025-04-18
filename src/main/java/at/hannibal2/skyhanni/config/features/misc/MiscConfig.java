@@ -42,7 +42,7 @@ public class MiscConfig {
     public MinionsConfig minions = new MinionsConfig();
 
     @Expose
-    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
+    @Category(name = "Stranded", desc = "Features designed for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
     @Expose
@@ -135,6 +135,11 @@ public class MiscConfig {
     @Accordion
     @Expose
     public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
+
+    @ConfigOption(name = "Fruit Bowl", desc = "Features for Fruit Bowl")
+    @Accordion
+    @Expose
+    public FruitBowlConfig fruitBowl = new FruitBowlConfig();
 
     @Expose
     @ConfigOption(name = "Cake Counter Features", desc = "")

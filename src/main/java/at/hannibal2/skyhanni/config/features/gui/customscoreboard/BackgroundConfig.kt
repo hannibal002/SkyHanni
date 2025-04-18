@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import java.awt.Color
 
 class BackgroundConfig {
     @Expose
@@ -18,7 +21,7 @@ class BackgroundConfig {
     @Expose
     @ConfigOption(name = "Background Color", desc = "The color of the background.")
     @ConfigEditorColour
-    var color: String = "0:80:0:0:0"
+    var color: ChromaColour = Color.BLACK.toChromaColor(80)
 
     @Expose
     @ConfigOption(name = "Background Border Size", desc = "The size of the border around the background.")

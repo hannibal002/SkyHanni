@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.DisplayTypeEntry
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -108,10 +107,10 @@ object BestiaryData {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.stack.getLore()
             if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
-                slot.highlight(event.context, LorenzColor.GREEN)
+                slot.highlight(LorenzColor.GREEN)
             }
             if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
-                slot.highlight(event.context, LorenzColor.RED)
+                slot.highlight(LorenzColor.RED)
             }
         }
     }
@@ -451,8 +450,8 @@ object BestiaryData {
     }
 
     private fun Long.formatNumber(): String = when (config.numberFormat) {
-        BestiaryConfig.NumberFormatEntry.SHORT -> this.shortFormat()
-        BestiaryConfig.NumberFormatEntry.LONG -> this.addSeparators()
+        NumberFormatEntry.SHORT -> this.shortFormat()
+        NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }
 

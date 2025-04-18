@@ -19,8 +19,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
@@ -32,6 +34,14 @@ import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object FishingApi {
+    enum class RodPart {
+        HOOK,
+        LINE,
+        SINKER,
+        ;
+
+        val tagName get() = name.lowercase()
+    }
 
     /**
      * REGEX-TEST: BRONZE_HUNTER_HELMET
@@ -48,17 +58,27 @@ object FishingApi {
     private val waterBlocks = buildList { addWaters() }
 
     var lastCastTime = SimpleTimeMark.farPast()
+        private set
     var holdingRod = false
+        private set
     var holdingLavaRod = false
+        private set
     var holdingWaterRod = false
+        private set
+    var hasTreasureHook = false
+        private set
 
     private var lavaRods = listOf<NeuInternalName>()
     private var waterRods = listOf<NeuInternalName>()
+    private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
     var bobber: EntityFishHook? = null
+        private set
     var bobberHasTouchedLiquid = false
+        private set
 
     var wearingTrophyArmor = false
+        private set
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityFishHook>) {
@@ -111,6 +131,9 @@ object FishingApi {
 
     fun NeuInternalName.isWaterRod() = this in waterRods
 
+    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? =
+        getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")?.toInternalName()
+
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
     @HandleEvent
@@ -119,6 +142,11 @@ object FishingApi {
         holdingRod = event.newItem.isFishingRod()
         holdingLavaRod = event.newItem.isLavaRod()
         holdingWaterRod = event.newItem.isWaterRod()
+
+        if (holdingRod) {
+            // If the player is not holding a rod, we want to just save the last state
+            hasTreasureHook = InventoryUtils.getItemInHand()?.getFishingRodPart(RodPart.HOOK) == TREASURE_HOOK
+        }
     }
 
     @HandleEvent

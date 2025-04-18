@@ -34,7 +34,7 @@ fun EntityLivingBase.getAllEquipment() =
 //#if MC < 1.12
     this.inventory
 //#else
-//$$ this.equipmentAndArmor.toList()
+//$$ this.equipment.map.values.toTypedArray()
 //#endif
 
 fun Entity.getFirstPassenger(): Entity? =

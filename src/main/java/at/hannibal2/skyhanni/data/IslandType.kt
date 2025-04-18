@@ -36,6 +36,15 @@ enum class IslandType(private val nameFallback: String) {
     UNKNOWN("???"),
     ;
 
+    fun isValidIsland(): Boolean = when (this) {
+        NONE,
+        ANY,
+        UNKNOWN,
+        -> false
+
+        else -> true
+    }
+
     fun guestVariant(): IslandType = when (this) {
         PRIVATE_ISLAND -> PRIVATE_ISLAND_GUEST
         GARDEN -> GARDEN_GUEST
