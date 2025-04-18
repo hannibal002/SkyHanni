@@ -109,7 +109,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         },
         itemHider: (NeuInternalName, Boolean) -> Unit = { item, currentlyHidden ->
             modify {
-                it.items[item]?.hidden = !currentlyHidden
+                it.toggleItemHide(item, currentlyHidden)
             }
         },
         getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String> = { internalName, item ->

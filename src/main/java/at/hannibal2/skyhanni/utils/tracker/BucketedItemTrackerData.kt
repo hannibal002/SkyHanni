@@ -71,11 +71,18 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
         }
     }
 
-    fun toggleItemHide(bucket: E?, internalName: NeuInternalName) {
+    @Deprecated(
+        "Use toggleItemHide(bucket, internalName, currentlyHidden) instead",
+        ReplaceWith("toggleItemHide(bucket, internalName, currentlyHidden)")
+    )
+    override fun toggleItemHide(internalName: NeuInternalName, currentlyHidden: Boolean) =
+        throw UnsupportedOperationException("Use toggleItemHide(bucket, internalName, currentlyHidden) instead")
+
+    fun toggleItemHide(bucket: E?, internalName: NeuInternalName, currentlyHidden: Boolean) {
         bucket?.let {
-            bucketedItems[bucket]?.get(internalName)?.let { it.hidden = !it.hidden }
-        } ?: bucketedItems.forEach {
-            it.value[internalName]?.hidden = !it.value[internalName]?.hidden!!
+            bucketedItems[bucket]?.get(internalName)?.hidden = !currentlyHidden
+        } ?: bucketedItems.forEach { (_, items) ->
+            items[internalName]?.hidden = !currentlyHidden
         }
     }
 

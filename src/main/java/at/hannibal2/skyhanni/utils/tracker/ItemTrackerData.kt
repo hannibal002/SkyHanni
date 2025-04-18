@@ -31,6 +31,11 @@ abstract class ItemTrackerData : TrackerData() {
         items.remove(internalName)
     }
 
+    open fun toggleItemHide(internalName: NeuInternalName, currentlyHidden: Boolean) {
+        val item = items.getOrPut(internalName) { TrackedItem() }
+        item.hidden = !currentlyHidden
+    }
+
     fun TrackedItem.processAdd(
         internalName: NeuInternalName,
         amount: Int,

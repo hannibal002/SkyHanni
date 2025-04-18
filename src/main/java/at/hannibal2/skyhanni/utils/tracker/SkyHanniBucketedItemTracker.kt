@@ -115,9 +115,9 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             }
             ChatUtils.chat("Removed $cleanName §efrom $name.")
         },
-        itemHider = { internalName, _ ->
+        itemHider = { internalName, currentlyHidden ->
             modify {
-                it.toggleItemHide(data.selectedBucket, internalName)
+                it.toggleItemHide(data.selectedBucket, internalName, currentlyHidden)
             }
         },
         getLoreList = { internalName, item ->
