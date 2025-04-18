@@ -150,7 +150,7 @@ object CollectionTracker {
     }
 
     private fun setNewDungeonBossCollection(floor: DungeonFloor) {
-        val foundAmount = ProfileStorageData.profileSpecific?.dungeons?.bosses[floor]
+        val foundAmount = ProfileStorageData.profileSpecific?.dungeons?.bosses?.get(floor)
         if (foundAmount == null) {
             ChatUtils.userError("${floor.bossName} collection not found. Try to open the collection inventory!")
             return
@@ -232,8 +232,8 @@ object CollectionTracker {
 
     @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
-        if (isDungeonBoss) {
-            val foundAmount = ProfileStorageData.profileSpecific?.dungeons?.bosses[dungeonFloor]
+        if (isDungeonBoss && dungeonFloor != null) {
+            val foundAmount = ProfileStorageData.profileSpecific?.dungeons?.bosses?.get(dungeonFloor)
             if (foundAmount != null) {
                 itemAmount = foundAmount.toLong()
                 updateDisplay()
