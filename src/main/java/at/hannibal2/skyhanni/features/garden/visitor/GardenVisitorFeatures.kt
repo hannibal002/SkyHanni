@@ -528,9 +528,10 @@ object GardenVisitorFeatures {
         update()
 
         logger.log("New visitor detected: '$name'")
-        val recentWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince() < 2.seconds
+        // do not show titles and chat messages for visitors that spawned while the player was offline
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 
-        if (config.notificationTitle && !recentWorldSwitch) {
+        if (config.notificationTitle) {
             TitleManager.sendTitle("§eNew Visitor")
         }
         if (config.notificationChat) {
@@ -538,15 +539,13 @@ object GardenVisitorFeatures {
             ChatUtils.chat("$displayName §eis visiting your garden!")
         }
 
-        if (!recentWorldSwitch) {
-            if (name.removeColor().contains("Jerry")) {
-                logger.log("Jerry!")
-                ItemBlink.setBlink(NeuItems.getItemStackOrNull("JERRY;4"), 5_000)
-            }
-            if (name.removeColor().contains("Spaceman")) {
-                logger.log("Spaceman!")
-                ItemBlink.setBlink(NeuItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
-            }
+        if (name.removeColor().contains("Jerry")) {
+            logger.log("Jerry!")
+            ItemBlink.setBlink(NeuItems.getItemStackOrNull("JERRY;4"), 5_000)
+        }
+        if (name.removeColor().contains("Spaceman")) {
+            logger.log("Spaceman!")
+            ItemBlink.setBlink(NeuItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
         }
     }
 

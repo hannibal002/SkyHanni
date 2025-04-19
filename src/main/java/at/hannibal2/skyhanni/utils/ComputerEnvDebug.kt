@@ -69,7 +69,7 @@ object ComputerEnvDebug {
         if (firstStack.contains("org.multimc.EntryPoint.main")) {
             return Pair("MultiMC", false)
         }
-        if (firstStack.contains("net.digitalingot.vendor.")) {
+        if (firstStack.contains("net.digitalingot.vendor.") || firstStack.contains("net.digitalingot.rustextension.")) {
             return Pair("Feather Client", true)
         }
         return Pair(null, true)

@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -122,13 +121,6 @@ object ComposterDisplay {
             }
         }
 
-        for (type in DataType.entries) {
-            if (!newData.containsKey(type)) {
-                tabListData = emptyMap()
-                return
-            }
-        }
-
         tabListData = newData
     }
 
@@ -142,7 +134,7 @@ object ComposterDisplay {
             if (config.notifyLow.title) {
                 TitleManager.sendTitle("§cYour Organic Matter is low", duration = 4.seconds)
             }
-            ChatUtils.chat("§cYour Organic Matter is low!")
+            ChatUtils.chat("§cYour Organic Matter is low!", replaceSameMessage = true)
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
         }
 
@@ -150,7 +142,7 @@ object ComposterDisplay {
             if (config.notifyLow.title) {
                 TitleManager.sendTitle("§cYour Fuel is low", duration = 4.seconds)
             }
-            ChatUtils.chat("§cYour Fuel is low!")
+            ChatUtils.chat("§cYour Fuel is low!", replaceSameMessage = true)
             storage.informedAboutLowFuel = 5.0.minutes.fromNow()
         }
     }
@@ -163,14 +155,11 @@ object ComposterDisplay {
         if (GardenApi.inGarden() && config.displayEnabled) {
             config.displayPos.renderRenderable(display, posLabel = "Composter Display")
         }
+
+        checkWarningsAndOutsideGarden()
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!event.repeatSeconds(5)) return
-        @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
-
+    private fun checkWarningsAndOutsideGarden() {
         val format = GardenApi.storage?.let {
             if (!it.composterEmptyTime.isFarPast()) {
                 val duration = it.composterEmptyTime.timeUntil()
@@ -202,10 +191,11 @@ object ComposterDisplay {
         val storage = GardenApi.storage ?: return
 
         if (ReminderUtils.isBusy()) return
+
         if (storage.lastComposterEmptyWarningTime.passedSince() < 2.0.minutes) return
         storage.lastComposterEmptyWarningTime = SimpleTimeMark.now()
         if (IslandType.GARDEN.isInIsland()) {
-            ChatUtils.chat(warningMessage)
+            ChatUtils.chat(warningMessage, replaceSameMessage = true)
         } else {
             ChatUtils.clickToActionOrDisable(
                 warningMessage,
