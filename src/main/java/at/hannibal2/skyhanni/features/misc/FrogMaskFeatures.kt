@@ -70,7 +70,7 @@ object FrogMaskFeatures {
             val helmetRegion = group("region")
 
             if (config.warning.enabled) handleWarning(helmetRegion)
-            if (config.display) display = handleDisplay(helmetRegion)
+            if (config.display) handleDisplay(helmetRegion)
         }
     }
 
@@ -89,16 +89,16 @@ object FrogMaskFeatures {
         lastWarning = SimpleTimeMark.now()
     }
 
-    private fun handleDisplay(helmetRegion: String): Renderable {
+    private fun handleDisplay(helmetRegion: String) {
         val now = SkyBlockTime.now()
         val endOfDay = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).toTimeMark()
-        return updateDisplay(helmetRegion, endOfDay)
+        updateDisplay(helmetRegion, endOfDay)
     }
 
-    private fun updateDisplay(helmetRegion: String, endOfDay: SimpleTimeMark): Renderable {
+    private fun updateDisplay(helmetRegion: String, endOfDay: SimpleTimeMark) {
         val timeRemaining = endOfDay.timeUntil()
 
-        return Renderable.horizontalContainer(
+        display = Renderable.horizontalContainer(
             listOf(
                 frogMaskRenderable,
                 Renderable.string("§5Frog Mask§6 - $helmetRegion §6for §b${timeRemaining.format()}"),
