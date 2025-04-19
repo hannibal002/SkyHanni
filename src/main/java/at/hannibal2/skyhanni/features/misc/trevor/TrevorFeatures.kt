@@ -144,7 +144,7 @@ object TrevorFeatures {
         mobDiedPattern.matchMatcher(event.message) {
             TrevorSolver.resetLocation()
             if (config.trapperMobDiedMessage) {
-                TitleManager.sendTitle("§2Mob Died ", duration = 5.seconds)
+                TitleManager.sendTitle("§2Mob Died ")
                 SoundUtils.playBeepSound()
             }
             trapperReady = true

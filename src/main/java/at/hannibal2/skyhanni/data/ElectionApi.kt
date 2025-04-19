@@ -222,18 +222,20 @@ object ElectionApi {
             )
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launchIOCoroutine
+            val mayor = data.mayor ?: error("mayor is null")
+            val election = mayor.election ?: error("election is null")
             val map = mutableMapOf<Int, MayorCandidate>()
-            map put data.mayor.election.getPairs()
+            map put election.getPairs()
             data.current?.let {
                 map put data.current.getPairs()
             }
             candidates = map
 
-            val currentMayorName = data.mayor.name
+            val currentMayorName = mayor.name
             if (lastMayor?.name != currentMayorName) {
                 Perk.resetPerks()
-                currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
-                currentMinister = data.mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
+                currentMayor = setAssumeMayorJson(currentMayorName, mayor.perks)
+                currentMinister = mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
             }
         }
     }
