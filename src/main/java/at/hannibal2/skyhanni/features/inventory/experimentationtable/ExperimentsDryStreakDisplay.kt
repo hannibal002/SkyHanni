@@ -20,6 +20,7 @@ object ExperimentsDryStreakDisplay {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.dryStreak
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation?.dryStreak
     private var display = emptyList<String>()
+    private var ignoreNextFinish = false
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -45,10 +46,15 @@ object ExperimentsDryStreakDisplay {
         storage.attemptsSince = 0
         storage.xpSince = 0
         display = drawDisplay()
+        ignoreNextFinish = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTableTaskCompleted(event: TableTaskCompletedEvent) {
+        if (ignoreNextFinish) {
+            ignoreNextFinish = false
+            return
+        }
         val storage = storage ?: return
         storage.xpSince += (event.enchantingXpGained ?: 0L)
         if (event.type == ExperimentationTableApi.ExperimentationTaskType.SUPERPAIRS) {
