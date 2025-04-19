@@ -25,8 +25,8 @@ object OtherInventoryData {
         close()
     }
 
-    fun close(reopenSameName: Boolean = false) {
-        InventoryCloseEvent(InventoryUtils.openInventoryName(), reopenSameName).post()
+    fun close(title: String = InventoryUtils.openInventoryName(), reopenSameName: Boolean = false) {
+        InventoryCloseEvent(title, reopenSameName).post()
         currentInventory = null
     }
 
