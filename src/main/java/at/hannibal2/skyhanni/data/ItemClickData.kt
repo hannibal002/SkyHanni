@@ -47,7 +47,6 @@ object ItemClickData {
             }
 
             packet is C02PacketUseEntity -> {
-                ChatUtils.consoleLog(packet.action.toString())
                 val clickType = when (packet.action) {
                     C02PacketUseEntity.Action.INTERACT -> ClickType.RIGHT_CLICK
                     C02PacketUseEntity.Action.ATTACK -> ClickType.LEFT_CLICK
