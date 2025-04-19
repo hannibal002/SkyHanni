@@ -103,7 +103,8 @@ object FishingHotspotRadar {
             location,
             userFacingReason = "Found no path to fishing hotspot",
             additionalInternalInfo = "no node with tag 'fishing hotspot' found near the radar hotspot target",
-            ignoreCache = true
+            ignoreCache = true,
+            betaOnly = true,
         )
     }
 

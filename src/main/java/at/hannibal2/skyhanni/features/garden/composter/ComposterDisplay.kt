@@ -121,13 +121,6 @@ object ComposterDisplay {
             }
         }
 
-        for (type in DataType.entries) {
-            if (!newData.containsKey(type)) {
-                tabListData = emptyMap()
-                return
-            }
-        }
-
         tabListData = newData
     }
 
@@ -141,7 +134,7 @@ object ComposterDisplay {
             if (config.notifyLow.title) {
                 TitleManager.sendTitle("§cYour Organic Matter is low", duration = 4.seconds)
             }
-            ChatUtils.chat("§cYour Organic Matter is low!")
+            ChatUtils.chat("§cYour Organic Matter is low!", replaceSameMessage = true)
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
         }
 
@@ -149,13 +142,13 @@ object ComposterDisplay {
             if (config.notifyLow.title) {
                 TitleManager.sendTitle("§cYour Fuel is low", duration = 4.seconds)
             }
-            ChatUtils.chat("§cYour Fuel is low!")
+            ChatUtils.chat("§cYour Fuel is low!", replaceSameMessage = true)
             storage.informedAboutLowFuel = 5.0.minutes.fromNow()
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         @Suppress("InSkyBlockEarlyReturn")
         if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.COMPOSTER_TIME.isSelected()) return
 
@@ -199,10 +192,10 @@ object ComposterDisplay {
 
         if (ReminderUtils.isBusy()) return
 
-        if (storage.lastComposterEmptyWarningTime.passedSince() >= 2.0.minutes) return
+        if (storage.lastComposterEmptyWarningTime.passedSince() < 2.0.minutes) return
         storage.lastComposterEmptyWarningTime = SimpleTimeMark.now()
         if (IslandType.GARDEN.isInIsland()) {
-            ChatUtils.chat(warningMessage)
+            ChatUtils.chat(warningMessage, replaceSameMessage = true)
         } else {
             ChatUtils.clickToActionOrDisable(
                 warningMessage,
