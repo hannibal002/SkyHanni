@@ -107,7 +107,7 @@ object UserLuckBreakdown {
 
             10 -> event.replace(skillsItem)
             11 -> event.replace(limboItem)
-            12 -> jerryItem?.let { event.replace(it) }
+            12 -> jerryItem?.let { event.replace(it) } ?: event.remove()
 
             in validItemSlots -> event.remove()
 
@@ -161,6 +161,7 @@ object UserLuckBreakdown {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipEvent) {
         if (!config.userluckEnabled) return
+        if (event.slot.inventory !is ContainerLocalMenu) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
