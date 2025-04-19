@@ -81,12 +81,20 @@ object FrogMaskFeatures {
         if (!needsToWarn) return
 
         when (config.warning.warningType) {
-            WarningType.BEING -> TitleManager.sendTitle("§cWrong Region!")
-            WarningType.FORAGING -> if (isForaging()) TitleManager.sendTitle("§cWrong Region!")
+            WarningType.BEING -> {
+                TitleManager.sendTitle("§cWrong Region!")
+                lastWarning = SimpleTimeMark.now()
+            }
+
+            WarningType.FORAGING -> {
+                if (isForaging()) {
+                    TitleManager.sendTitle("§cWrong Region!")
+                    lastWarning = SimpleTimeMark.now()
+                }
+            }
+
             WarningType.NEVER -> return
         }
-
-        lastWarning = SimpleTimeMark.now()
     }
 
     private fun handleDisplay(helmetRegion: String) {
