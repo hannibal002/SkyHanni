@@ -118,7 +118,11 @@ object KeyboardManager {
             val isDown = if (keyCode < 0) {
                 Mouse.isButtonDown(keyCode + 100)
             } else {
-                Keyboard.isKeyDown(keyCode)
+                if (keyCode < Keyboard.KEYBOARD_SIZE) {
+                    Keyboard.isKeyDown(keyCode)
+                } else {
+                    false
+                }
             }
 
             if (isDown) {
