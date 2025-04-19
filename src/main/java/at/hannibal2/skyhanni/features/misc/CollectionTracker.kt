@@ -36,7 +36,7 @@ object CollectionTracker {
     private var display: Renderable? = null
 
     private var itemName = ""
-    private var isDungeonBoss = false
+    private val isDungeonBoss: Boolean get() = dungeonFloor != null
     private var dungeonFloor: DungeonFloor? = null
     private var internalName: NeuInternalName? = null
     private var itemAmount = -1L
@@ -88,14 +88,12 @@ object CollectionTracker {
 
         val foundInternalName = NeuInternalName.fromItemNameOrNull(rawName)
         if (foundInternalName == null) {
-
-            val possibleDungeonBossMatches = DungeonFloor.entries.filter { it.bossName.lowercase().contains(rawName) }
-
-            if (possibleDungeonBossMatches.isEmpty() || possibleDungeonBossMatches.size > 1) {
-                ChatUtils.userError("Item / Dungeon Boss '$rawName' does not exist!")
-                return
-            }
-            setNewDungeonBossCollection(possibleDungeonBossMatches.first())
+            val dungeonBoss = DungeonFloor.byBossName(rawName)
+                ?: run {
+                    ChatUtils.userError("Item / Dungeon Boss '$rawName' does not exist!")
+                    return
+                }
+            setNewDungeonBossCollection(dungeonBoss)
         } else {
             val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
@@ -155,7 +153,6 @@ object CollectionTracker {
         this.internalName = internalName
         itemName = name
         itemAmount = foundAmount
-        isDungeonBoss = false
         dungeonFloor = null
 
         lastAmountInInventory = countCurrentlyInInventory()
@@ -172,7 +169,6 @@ object CollectionTracker {
         this.internalName = floor.bossName.toInternalName()
         itemName = floor.bossName
         itemAmount = foundAmount.toLong()
-        isDungeonBoss = true
         dungeonFloor = floor
 
         ChatUtils.chat("Started tracking $itemName §ecollection.")
@@ -246,8 +242,8 @@ object CollectionTracker {
 
     @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
-        if (isDungeonBoss && dungeonFloor != null) {
-            val foundAmount = ProfileStorageData.profileSpecific?.dungeons?.bosses?.get(dungeonFloor)
+        if (isDungeonBoss) {
+            val foundAmount = dungeonFloor?.let { ProfileStorageData.profileSpecific?.dungeons?.bosses?.get(dungeonFloor) }
             if (foundAmount != null) {
                 itemAmount = foundAmount.toLong()
                 updateDisplay()
