@@ -53,12 +53,13 @@ public class RewardWarningConfig {
         VisitorReward.MUSIC_RUNE,
         VisitorReward.SPACE_HELMET,
         VisitorReward.CULTIVATING,
-        VisitorReward.REPLENISH
+        VisitorReward.REPLENISH,
+        VisitorReward.COPPER_DYE
     ));
 
     @Expose
     @ConfigOption(
-        name = "Coins Per Copper",
+        name = "Coins per Copper",
         desc = "The price to use for the options below.\n" +
             "Requires at least one of them to be on."
     )
@@ -100,7 +101,7 @@ public class RewardWarningConfig {
     public boolean preventAcceptingHighLoss = false;
 
     @Expose
-    @ConfigOption(name = "Block Refusing New Visitors", desc = "Prevents refusing a visitor you've never completed an offer with.")
+    @ConfigOption(name = "Block Refusing New Visitors", desc = "Prevents refusing a visitor you've never completed an offer with.\n§eDisabled while on bingo.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean preventRefusingNew = true;
@@ -118,7 +119,7 @@ public class RewardWarningConfig {
     public int opacity = 180;
 
     @Expose
-    @ConfigOption(name = "Outline", desc = "Adds a red/green line around the best offer buttons.")
+    @ConfigOption(name = "Outline", desc = "Add a red/green line around the best offer buttons.")
     @ConfigEditorBoolean
     public boolean optionOutline = true;
 }

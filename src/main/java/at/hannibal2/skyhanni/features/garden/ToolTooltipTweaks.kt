@@ -1,40 +1,48 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getAbilityFortune
-import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
-class ToolTooltipTweaks {
+@SkyHanniModule
+object ToolTooltipTweaks {
 
-    private val config get() = GardenAPI.config.tooltipTweak
-    private val tooltipFortunePattern =
-        "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
+    private val config get() = GardenApi.config.tooltipTweak
+
+    /**
+     * REGEX-TEST: §7Farming Fortune: §a+73 §9(+30) §d(+8)
+     */
+    private val farmingFortunePattern by RepoPattern.pattern(
+        "garden.tooltip.farmingfortune",
+        "§7Farming Fortune: §a",
+    )
+
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
     private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
-    private val abilityDescriptionStart = "§5§o§7These boots gain §a+2❈ Defense"
-    private val abilityDescriptionEnd = "§5§o§7Skill level."
+    private const val ABILITY_DESCRIPTION_START = "§5§o§7These boots gain §a+2❈ Defense"
+    private const val ABILITY_DESCRIPTION_END = "§5§o§7Skill level."
 
     private val statFormatter = DecimalFormat("0.##")
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onToolTip(event: ToolTipEvent) {
         val itemStack = event.itemStack
         val itemLore = itemStack.getLore()
         val internalName = itemStack.getInternalName()
@@ -63,8 +71,7 @@ class ToolTooltipTweaks {
         var removingAbilityDescription = false
 
         for (line in iterator) {
-            val match = tooltipFortunePattern.matchEntire(line)?.groups
-            if (match != null) {
+            if (farmingFortunePattern.find(line)) {
                 val enchantmentFortune = sunderFortune + harvestingFortune + cultivatingFortune
 
                 FarmingFortuneDisplay.loadFortuneLineData(itemStack, enchantmentFortune)
@@ -83,9 +90,14 @@ class ToolTooltipTweaks {
                 val cropString = if (hiddenFortune != 0.0) " §6[+${hiddenFortune.roundToInt()}]" else ""
 
                 val fortuneLine = when (config.cropTooltipFortune) {
-                    CropTooltipFortuneEntry.DEFAULT -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
-                    CropTooltipFortuneEntry.SHOW -> "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
-                    else -> "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
+                    CropTooltipFortuneEntry.DEFAULT ->
+                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString"
+
+                    CropTooltipFortuneEntry.SHOW ->
+                        "§7Farming Fortune: §a+${displayedFortune.formatStat()}$ffdString$reforgeString$cropString"
+
+                    else ->
+                        "§7Farming Fortune: §a+${totalFortune.formatStat()}$ffdString$reforgeString$cropString"
                 }
                 iterator.set(fortuneLine)
 
@@ -108,7 +120,7 @@ class ToolTooltipTweaks {
                 }
             }
             // Beware, dubious control flow beyond these lines
-            if (config.compactToolTooltips || FFGuideGUI.isInGui()) {
+            if (config.compactToolTooltips || FFGuideGui.isInGui()) {
                 if (line.startsWith("§5§o§7§8Bonus ")) removingFarmhandDescription = true
                 if (removingFarmhandDescription) {
                     iterator.remove()
@@ -127,17 +139,17 @@ class ToolTooltipTweaks {
                 }
                 if (line == "§5§o§9Bountiful Bonus") removingReforgeDescription = true
 
-                if (FFGuideGUI.isInGui()) {
+                if (FFGuideGui.isInGui()) {
                     if (line.contains("Click to ") || line.contains("§7§8This item can be reforged!") || line.contains("Dyed")) {
                         iterator.remove()
                     }
 
-                    if (line == abilityDescriptionStart) {
+                    if (line == ABILITY_DESCRIPTION_START) {
                         removingAbilityDescription = true
                     }
                     if (removingAbilityDescription) {
                         iterator.remove()
-                        if (line == abilityDescriptionEnd) {
+                        if (line == ABILITY_DESCRIPTION_END) {
                             removingAbilityDescription = false
                         }
                     }
@@ -154,7 +166,7 @@ class ToolTooltipTweaks {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.compactToolTooltips", "garden.tooltipTweak.compactToolTooltips")
         event.move(3, "garden.fortuneTooltipKeybind", "garden.tooltipTweak.fortuneTooltipKeybind")

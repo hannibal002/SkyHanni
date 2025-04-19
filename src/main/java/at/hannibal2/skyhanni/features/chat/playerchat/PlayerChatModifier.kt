@@ -1,17 +1,18 @@
 package at.hannibal2.skyhanni.features.chat.playerchat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PlayerChatModifier {
+@SkyHanniModule
+object PlayerChatModifier {
 
     private val config get() = SkyHanniMod.feature.chat.playerMessage
     private val patterns = mutableListOf<Regex>()
@@ -21,7 +22,7 @@ class PlayerChatModifier {
         patterns.add("§[7ab6](\\w{2,16})§r(?!§7x)(?!\$)".toRegex()) // all players without rank prefix in notification messages
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SystemMessageEvent) {
         event.applyIfPossible { cutMessage(it) }
     }
@@ -42,7 +43,11 @@ class PlayerChatModifier {
         }
         val hoverEvent = chatComponent.chatStyle.chatHoverEvent ?: return
         hoverEvent.action ?: return
+        //#if MC < 1.21
         if (hoverEvents.any { it.value == hoverEvent.value }) return
+        //#else
+        //$$ if (hoverEvents.any { it.getValue(HoverEvent.Action.SHOW_TEXT) == hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT) }) return
+        //#endif
         hoverEvents.add(hoverEvent)
     }
 
@@ -62,7 +67,7 @@ class PlayerChatModifier {
         return string
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.playerRankHider", "chat.playerMessage.playerRankHider")
         event.move(3, "chat.chatFilter", "chat.playerMessage.chatFilter")

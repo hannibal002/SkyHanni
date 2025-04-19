@@ -1,40 +1,72 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
-import kotlin.math.max
 
 object ColorUtils {
 
-    /** Transfer string colors from the config to java.awt.Color */
-    fun String.toChromaColor() = Color(toChromaColorInt(), true)
-    fun String.toChromaColorInt() = SpecialColour.specialToChromaRGB(this)
+    @JvmStatic
+    @JvmOverloads
+    fun Color.toChromaColor(alpha: Int = this.alpha, chroma: Int = 0): ChromaColour =
+        ChromaColour.fromRGB(red, green, blue, alpha, chroma)
 
-    fun String.getFirstColorCode() = this.takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
+    @JvmStatic
+    fun String.toChromaColor() = ChromaColour.forLegacyString(this)
 
-    fun getRed(colour: Int) = colour shr 16 and 0xFF
+    fun ChromaColour.toColor(): Color = Color(toInt(), true)
 
-    fun getGreen(colour: Int) = colour shr 8 and 0xFF
+    // TODO: Replace this code with the call to moulconfig's function once its fixed. revert #3821
+    fun ChromaColour.toInt(): Int {
+        val effectiveHue: Double
+        if (timeForFullRotationInMillis > 0) {
+            effectiveHue = System.currentTimeMillis() / timeForFullRotationInMillis.toDouble()
+        } else {
+            effectiveHue = hue.toDouble()
+        }
 
-    fun getBlue(colour: Int) = colour and 0xFF
+        val rgb = Color.HSBtoRGB((effectiveHue % 1.0).toFloat(), this.saturation, this.brightness)
+        return (alpha and 0xFF) shl 24 or (rgb and 0xFFFFFF)
+    }
 
-    fun getAlpha(colour: Int) = colour shr 24 and 0xFF
+    fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
+
+    fun getAlpha(color: Int) = color shr 24 and 0xFF
+
+    fun getRed(color: Int) = color shr 16 and 0xFF
+
+    fun getGreen(color: Int) = color shr 8 and 0xFF
+
+    fun getBlue(color: Int) = color and 0xFF
+
+    private val tooltipFixBool get() = SkyHanniMod.feature.misc.transparentTooltips
+
+    // I think you need to manually import these
+    operator fun Color.component1(): Float = if (!tooltipFixBool) this.alpha / 255f else this.red / 255f
+    operator fun Color.component2(): Float = if (!tooltipFixBool) this.red / 255f else this.green / 255f
+    operator fun Color.component3(): Float = if (!tooltipFixBool) this.green / 255f else this.blue / 255f
+    operator fun Color.component4(): Float = if (!tooltipFixBool) this.blue / 255f else this.alpha / 255f
+
 
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),
         (start.green * (1 - percent) + end.green * percent).toInt(),
-        (start.blue * (1 - percent) + end.blue * percent).toInt()
+        (start.blue * (1 - percent) + end.blue * percent).toInt(),
     )
 
-    fun Color.darker(factor: Double): Color {
-        return Color(
-            max((red * factor).toInt(), 0),
-            max((green * factor).toInt(), 0),
-            max((blue * factor).toInt(), 0),
-            alpha
-        )
-    }
+    fun Color.getExtendedColorCode(hasAlpha: Boolean = false): String = ExtendedChatColor(rgb, hasAlpha).toString()
 
-    fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
+    /** Darkens a color by a [factor]. The lower the [factor], the darker the color. */
+    fun Color.darker(factor: Double = 0.7) = Color(
+        (red * factor).toInt().coerceIn(0, 255),
+        (green * factor).toInt().coerceIn(0, 255),
+        (blue * factor).toInt().coerceIn(0, 255),
+        alpha,
+    )
+
+    val TRANSPARENT_COLOR = Color(0, 0, 0, 0)
 
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
+
+    fun getColorFromHex(hex: String): Int = runCatching { Color(Integer.decode(hex)) }.getOrNull()?.rgb ?: 0
 }

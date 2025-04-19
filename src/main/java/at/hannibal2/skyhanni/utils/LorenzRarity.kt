@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
 // TODO: replace id with ordinal
 enum class LorenzRarity(val color: LorenzColor, val id: Int) {
@@ -18,8 +20,9 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     ULTIMATE(LorenzColor.DARK_RED, 10),
     ;
 
-    val chatColorCode by lazy { color.getChatColor() }
+    val chatColorCode get() = color.getChatColor()
     val rawName = name.replace("_", " ")
+    val formattedName = rawName.firstLetterUppercase()
 
     fun oneBelow(logError: Boolean = true): LorenzRarity? {
         val rarityBelow = getById(ordinal - 1)
@@ -27,7 +30,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
             ErrorManager.logErrorStateWithData(
                 "Problem with item rarity detected.",
                 "Trying to get an item rarity below common",
-                "ordinal" to ordinal
+                "ordinal" to ordinal,
             )
         }
         return rarityBelow
@@ -39,7 +42,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
             ErrorManager.logErrorStateWithData(
                 "Problem with item rarity detected.",
                 "Trying to get an item rarity above special",
-                "ordinal" to ordinal
+                "ordinal" to ordinal,
             )
         }
         return rarityBelow
@@ -50,6 +53,16 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     companion object {
 
         fun getById(id: Int) = if (entries.size > id) entries[id] else null
-        fun getByName(name: String) = entries.firstOrNull { it.name == name }
+
+        fun getByName(name: String): LorenzRarity? = entries.find { it.name.equals(name, ignoreCase = true) }
+
+        private fun getByColor(color: LorenzColor?): LorenzRarity? = entries.find { it.color == color }
+
+        private fun getByColorCode(colorCode: Char): LorenzRarity? = getByColor(colorCode.toLorenzColor())
+
+        fun colorCodeToRarity(colorCode: Char): String {
+            val rarity = getByColorCode(colorCode) ?: SPECIAL
+            return rarity.formattedName
+        }
     }
 }

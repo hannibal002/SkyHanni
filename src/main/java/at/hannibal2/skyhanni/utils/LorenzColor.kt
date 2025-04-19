@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.EnumChatFormatting
 import java.awt.Color
@@ -50,7 +52,12 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     override fun toString(): String = coloredLabel
 
-    fun toConfigColour(): String = "0:255:${color.red}:${color.green}:${color.blue}"
+    @Suppress("AvoidBritishSpelling")
+    @Deprecated("Use ChromaColour instead", ReplaceWith("toChromaColor()"))
+    fun toConfigColor(): String = "0:255:${color.red}:${color.green}:${color.blue}"
+
+    @JvmOverloads
+    fun toChromaColor(alpha: Int = this.color.alpha, chroma: Int = 0): ChromaColour = color.toChromaColor(alpha, chroma)
 
     fun toDyeColor(): EnumDyeColor = when (this) {
         WHITE -> EnumDyeColor.WHITE
@@ -74,14 +81,14 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
         CHROMA -> EnumDyeColor.WHITE
     }
 
-    fun toChatFormatting(): EnumChatFormatting? =
-        EnumChatFormatting.entries.firstOrNull { it.toString() == getChatColor() }
+    fun toChatFormatting(): EnumChatFormatting =
+        EnumChatFormatting.entries.firstOrNull { it.toString() == getChatColor() } ?: EnumChatFormatting.WHITE
 
     companion object {
 
         fun EnumDyeColor.toLorenzColor() = when (this) {
             EnumDyeColor.WHITE -> WHITE
-            EnumDyeColor.MAGENTA -> AQUA
+            EnumDyeColor.MAGENTA -> LIGHT_PURPLE
             EnumDyeColor.PINK -> LIGHT_PURPLE
             EnumDyeColor.RED -> RED
             EnumDyeColor.SILVER -> GRAY

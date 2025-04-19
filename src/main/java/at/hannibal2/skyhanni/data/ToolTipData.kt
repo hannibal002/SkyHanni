@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
@@ -17,7 +16,7 @@ object ToolTipData {
         val slot = lastSlot ?: return
         val itemStack = slot.stack ?: return
         try {
-            if (LorenzToolTipEvent(slot, itemStack, toolTip).postAndCatch()) {
+            if (ToolTipEvent(slot, itemStack, toolTip).post()) {
                 toolTip.clear()
             }
         } catch (e: Throwable) {
@@ -28,7 +27,7 @@ object ToolTipData {
                 "slotNumber" to slot.slotNumber,
                 "slotIndex" to slot.slotIndex,
                 "itemStack" to itemStack,
-                "name" to itemStack.name,
+                "name" to itemStack.displayName,
                 "internal name" to itemStack.getInternalName(),
                 "lore" to itemStack.getLore(),
             )
@@ -37,7 +36,7 @@ object ToolTipData {
 
     @JvmStatic
     fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
-        ItemHoverEvent(stack, toolTip).postAndCatch()
+        ItemHoverEvent(stack, toolTip).post()
     }
 
     var lastSlot: Slot? = null

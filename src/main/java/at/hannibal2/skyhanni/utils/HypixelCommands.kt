@@ -1,5 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.GetFromSackApi
+import at.hannibal2.skyhanni.utils.ChatUtils.debug
+import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -9,8 +14,16 @@ object HypixelCommands {
         send("bz $searchTerm")
     }
 
+    fun auctionSearch(searchTerm: String) {
+        send("ahs $searchTerm")
+    }
+
     fun playtime() {
         send("playtime")
+    }
+
+    fun skyblockMenu() {
+        send("sbmenu")
     }
 
     fun skills() {
@@ -23,6 +36,15 @@ object HypixelCommands {
 
     fun recipe(itemName: String) {
         send("recipe $itemName")
+    }
+
+    // opens the crafting table
+    fun craft() {
+        send("craft")
+    }
+
+    fun npcOption(npc: String, answer: String) {
+        send("selectnpcoption $npc $answer")
     }
 
     fun warp(warp: String) {
@@ -38,7 +60,7 @@ object HypixelCommands {
     }
 
     fun teleportToPlot(plotName: String) {
-        send("tptoplot $plotName")
+        send("plottp $plotName")
     }
 
     fun gardenLevels() {
@@ -50,7 +72,7 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        send("gfs $itemName $amount")
+        GetFromSackApi.getFromSack(itemName.toInternalName(), amount)
     }
 
     fun widget() {
@@ -59,6 +81,10 @@ object HypixelCommands {
 
     fun chocolateFactory() {
         send("cf")
+    }
+
+    fun pet() {
+        send("pet")
     }
 
     fun openBaker() {
@@ -83,6 +109,18 @@ object HypixelCommands {
 
     fun wiki(text: String) {
         send("wiki $text")
+    }
+
+    fun backPack(position: Int) {
+        send("bp $position")
+    }
+
+    fun enderChest(position: Int) {
+        send("ec $position")
+    }
+
+    fun partyAccept(player: String) {
+        send("party accept $player")
     }
 
     fun partyWarp() {
@@ -117,12 +155,22 @@ object HypixelCommands {
         send("pc $message")
     }
 
+    fun partyInvite(player: String) {
+        send("party $player")
+    }
+
     fun allChat(message: String) {
         send("ac $message")
     }
 
     fun particleQuality(quality: String) {
         send("pq $quality")
+    }
+
+    // Changes the speed of Rancher's Boots
+    fun setMaxSpeed(speed: Int? = null) = when {
+        speed == null -> send("setmaxspeed")
+        else -> send("setmaxspeed $speed")
     }
 
     fun showRng(major: String? = null, minor: String? = null) = when {
@@ -134,9 +182,30 @@ object HypixelCommands {
         send("chatprompt $prompt")
     }
 
+    fun callback(uuid: String) {
+        send("cb $uuid")
+    }
+
+    fun bank() {
+        send("bank")
+    }
+
+    fun pickupStash() {
+        send("pickupstash")
+    }
+
+    fun viewStash(type: String) {
+        send("viewstash $type")
+    }
+
+    fun locraw() {
+        send("locraw")
+    }
+
     private fun send(command: String) {
-        @Suppress("DEPRECATION")
-        // TODO rename function
-        ChatUtils.sendCommandToServer(command)
+        if (command.startsWith("/")) {
+            debug("Sending wrong command to server? ($command)")
+        }
+        sendMessageToServer("/$command")
     }
 }

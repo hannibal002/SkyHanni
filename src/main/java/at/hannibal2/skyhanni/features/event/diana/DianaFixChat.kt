@@ -1,21 +1,23 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.BurrowGuessEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class DianaFixChat {
+@SkyHanniModule
+object DianaFixChat {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
@@ -31,7 +33,7 @@ class DianaFixChat {
     private var lastGuessPoint = SimpleTimeMark.farPast()
     private var foundGuess = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (lastSpadeUse.passedSince() > 1.minutes) return
@@ -55,7 +57,10 @@ class DianaFixChat {
         errorCounter++
         if (errorCounter == 1) {
             if (successfulCounter < 5) {
-                ChatUtils.chat("Could not find Diana Guess using sound and particles, please try again. (Was this a funny sound easter egg?)")
+                ChatUtils.chat(
+                    "Could not find Diana Guess using sound and particles, " +
+                        "please try again. (Was this a funny sound easter egg?)",
+                )
             }
             return
         }
@@ -71,7 +76,8 @@ class DianaFixChat {
                         HypixelCommands.particleQuality("high")
                         errorCounter = 0
                         ChatUtils.chat("Now try again!")
-                    })
+                    },
+                )
             }
         } else {
             if (!hasSetToggleMusic) {
@@ -85,7 +91,8 @@ class DianaFixChat {
                             HypixelCommands.toggleMusic()
                             errorCounter = 0
                             ChatUtils.chat("Now try again, please!")
-                        })
+                        },
+                    )
                 }
             } else {
                 ErrorManager.logErrorStateWithData(
@@ -98,7 +105,7 @@ class DianaFixChat {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -111,14 +118,14 @@ class DianaFixChat {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         foundGuess = true
 
         if (hasSetToggleMusic) {
             ChatUtils.chat("Toggling the hypixel music has worked, good job!")
         } else if (hasSetParticleQuality) {
-            ChatUtils.chat("Changing the particle qualilty has worked, good job!")
+            ChatUtils.chat("Changing the particle quality has worked, good job!")
         }
 
         hasSetParticleQuality = false
@@ -133,10 +140,10 @@ class DianaFixChat {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         successfulCounter = 0
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && config.burrowsSoopyGuess
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.guess
 }

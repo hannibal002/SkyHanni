@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -11,24 +12,23 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HoppityEggsShared {
 
-    private val config get() = HoppityEggsManager.config
+    private val waypointsConfig get() = HoppityEggsManager.config.waypoints
 
     /**
      * REGEX-TEST: CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453
      * REGEX-TEST: CalMWolfs: [SkyHanni] Breakfast Chocolate Egg located at x: 142, y: 71, z: -453 (hidden note)
      */
-    private val sharedEggPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val sharedEggPattern by CFApi.patternGroup.pattern(
         "egg.shared",
         ".*\\[SkyHanni] (?<meal>\\w+) Chocolate Egg located at x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?: \\((?<note>.*)\\))?"
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         sharedEggPattern.matchMatcher(event.message.removeColor()) {
@@ -49,7 +49,7 @@ object HoppityEggsShared {
 
     fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: HoppityEggType, note: String) {
         if (!isEnabled()) return
-        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
+        val islandEggsLocations = HoppityEggLocations.islandLocations
         val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return
 
         val x = closestEgg.x.toInt()
@@ -59,5 +59,5 @@ object HoppityEggsShared {
         HypixelCommands.allChat("[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z ($note)")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints && config.sharedWaypoints
+    fun isEnabled() = LorenzUtils.inSkyBlock && waypointsConfig.enabled && waypointsConfig.shared
 }

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
 import java.io.BufferedReader
@@ -28,8 +27,8 @@ object RepoUtils {
     /**
      * Modified from https://www.journaldev.com/960/java-unzip-file-example
      */
-    fun unzipIgnoreFirstFolder(zipFilePath: String, destDir: String) {
-        val dir = File(destDir)
+    fun unzipIgnoreFirstFolder(zipFilePath: String, destinationDirectory: String) {
+        val dir = File(destinationDirectory)
         // create output directory if it doesn't exist
         if (!dir.exists()) dir.mkdirs()
         val fis: FileInputStream
@@ -43,12 +42,13 @@ object RepoUtils {
                 if (!ze.isDirectory) {
                     var fileName = ze.name
                     fileName = fileName.substring(fileName.split("/").toTypedArray()[0].length + 1)
-                    val newFile = File(destDir + File.separator + fileName)
+                    val newFile = File(destinationDirectory + File.separator + fileName)
                     // create directories for sub directories in zip
                     File(newFile.parent).mkdirs()
                     if (!isInTree(dir, newFile)) {
                         throw RuntimeException(
-                            "SkyHanni detected an invalid zip file. This is a potential security risk, please report this on the SkyHanni discord."
+                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                                "please report this on the SkyHanni discord."
                         )
                     }
                     val fos = FileOutputStream(newFile)
@@ -71,7 +71,7 @@ object RepoUtils {
                 e,
                 "unzipIgnoreFirstFolder failed",
                 "zipFilePath" to zipFilePath,
-                "destDir" to destDir,
+                "destinationDirectory" to destinationDirectory,
             )
         }
     }
@@ -106,12 +106,7 @@ object RepoUtils {
     }
 
     @JvmStatic
-    fun updateRepo() {
-        SkyHanniMod.repo.updateRepo()
-    }
-
-    @JvmStatic
     fun resetRepoLocation() {
-        SkyHanniMod.repo.resetRepositoryLocation(manual = true)
+        RepoManager.resetRepositoryLocation(manual = true)
     }
 }

@@ -6,45 +6,54 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.audio.ISound
-import net.minecraft.client.audio.PositionedSound
 import net.minecraft.client.audio.SoundCategory
 import net.minecraft.util.ResourceLocation
+//#if MC < 1.21
+import net.minecraft.client.audio.PositionedSound
+//#else
+//$$ import net.minecraft.client.sound.PositionedSoundInstance
+//$$ import net.minecraft.sound.SoundEvent
+//#endif
 
 object SoundUtils {
 
-    private val beepSound by lazy { createSound("random.orb", 1f) }
+    private val beepSoundCache = mutableMapOf<Float, ISound>()
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
     private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
     val plingSound by lazy { createSound("note.pling", 1f) }
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun ISound.playSound() {
-        Minecraft.getMinecraft().addScheduledTask {
-            val gameSettings = Minecraft.getMinecraft().gameSettings
-            val oldLevel = gameSettings.getSoundLevel(SoundCategory.PLAYERS)
-            gameSettings.setSoundLevel(SoundCategory.PLAYERS, 1f)
+        DelayedRun.onThread.execute {
+            val oldLevel = Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.PLAYERS)
+            if (!SkyHanniMod.feature.misc.maintainGameVolume) {
+                Minecraft.getMinecraft().soundHandler.setSoundLevel(SoundCategory.PLAYERS, 1f)
+            }
             try {
                 Minecraft.getMinecraft().soundHandler.playSound(this)
-            } catch (e: Exception) {
-                if (e is IllegalArgumentException) {
-                    e.message?.let {
-                        if (it.startsWith("value already present:")) {
-                            println("SkyHanni Sound error: $it")
-                            return@addScheduledTask
-                        }
-                    }
-                }
+            } catch (e: IllegalArgumentException) {
+                if (e.message?.startsWith("value already present:") == true) return@execute
                 ErrorManager.logErrorWithData(
-                    e, "Failed to play a sound",
-                    "soundLocation" to this.soundLocation
+                    e,
+                    "Failed to play a sound",
+                    "soundLocation" to this.soundLocation,
+                )
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Failed to play a sound",
+                    "soundLocation" to this.soundLocation,
                 )
             } finally {
-                gameSettings.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
+                if (!SkyHanniMod.feature.misc.maintainGameVolume) {
+                    Minecraft.getMinecraft().soundHandler.setSoundLevel(SoundCategory.PLAYERS, oldLevel)
+                }
             }
         }
     }
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): ISound {
+        //#if MC < 1.21
         val sound: ISound = object : PositionedSound(ResourceLocation(name)) {
             init {
                 this.volume = volume
@@ -55,9 +64,13 @@ object SoundUtils {
             }
         }
         return sound
+        //#else
+        //$$ return PositionedSoundInstance.master(SoundEvent.of(Identifier.of(name)), pitch, volume)
+        //#endif
     }
 
-    fun playBeepSound() {
+    fun playBeepSound(pitch: Float = 1f) {
+        val beepSound = beepSoundCache.getOrPut(pitch) { createSound("random.orb", pitch) }
         beepSound.playSound()
     }
 
@@ -86,6 +99,7 @@ object SoundUtils {
         errorSound.playSound()
     }
 
+    // TODO use duration for delay
     fun repeatSound(delay: Long, repeat: Int, sound: ISound) {
         SkyHanniMod.coroutineScope.launch {
             repeat(repeat) {

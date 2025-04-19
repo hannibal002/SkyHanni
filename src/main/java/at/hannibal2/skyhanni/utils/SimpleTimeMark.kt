@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -31,11 +33,16 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isFarFuture() = millis == Long.MAX_VALUE
 
+    fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
+
+    fun absoluteDifference(other: SimpleTimeMark) = abs(millis - other.millis).milliseconds
+
     override fun compareTo(other: SimpleTimeMark): Int = millis.compareTo(other.millis)
 
-    override fun toString(): String {
-        if (millis == 0L) return "The Far Past"
-        return Instant.ofEpochMilli(millis).toString()
+    override fun toString(): String = when (this) {
+        farPast() -> "The Far Past"
+        farFuture() -> "The Far Future"
+        else -> Instant.ofEpochMilli(millis).toString()
     }
 
     fun formattedDate(pattern: String): String {
@@ -51,21 +58,28 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         return localDateTime.format(formatter)
     }
 
+    fun toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault())
+
     fun toMillis() = millis
 
-    fun toSkyBlockTime() = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
+    fun toSkyBlockTime(): SkyBlockTime = SkyBlockTime.fromTimeMark(this)
 
-    fun elapsedMinutes() = passedSince().inWholeMinutes
+    fun toLocalDate(): LocalDate = toLocalDateTime().toLocalDate()
 
     companion object {
 
         fun now() = SimpleTimeMark(System.currentTimeMillis())
+
+        @JvmStatic
+        @JvmName("farPast")
         fun farPast() = SimpleTimeMark(0)
         fun farFuture() = SimpleTimeMark(Long.MAX_VALUE)
 
         fun Duration.fromNow() = now() + this
 
         fun Long.asTimeMark() = SimpleTimeMark(this)
+
+        @Deprecated("Use toTimeMark() instead", ReplaceWith("this.toTimeMark()"))
         fun SkyBlockTime.asTimeMark() = SimpleTimeMark(toMillis())
     }
 }

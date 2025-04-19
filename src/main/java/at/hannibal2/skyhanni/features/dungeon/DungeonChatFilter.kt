@@ -1,28 +1,32 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 private typealias MessageTypes = ChatConfig.DungeonMessageTypes
 
-class DungeonChatFilter {
+@SkyHanniModule
+object DungeonChatFilter {
 
     private val config get() = SkyHanniMod.feature.chat
 
-    /// <editor-fold desc="Patterns, Messages, and Maps">
+    // <editor-fold desc="Patterns, Messages, and Maps">
     // TODO USE SH-REPO
     private val endPatterns = listOf(
         "(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!".toPattern(),
-        " {4}§r§d(.*) Essence §r§8x(.*)".toPattern()
+        " {4}§r§d(.*) Essence §r§8x(.*)".toPattern(),
     )
     private val endMessagesEndWith = listOf(
-        " Experience §r§b(Team Bonus)"
+        " Experience §r§b(Team Bonus)",
     )
+
+    @Suppress("MaxLineLength")
     private val abilityPatterns = listOf(
         "§7Your Guided Sheep hit §r§c(.*) §r§7enemy for §r§c(.*) §r§7damage.".toPattern(),
         "§a§lBUFF! §fYou were splashed by (.*) §fwith §r§cHealing VIII§r§f!".toPattern(),
@@ -42,7 +46,7 @@ class DungeonChatFilter {
         "(.*)§r§a granted you §r§c(.*) §r§astrength for §r§e20 §r§aseconds!".toPattern(),
         "§eYour fairy healed §r§ayourself §r§efor §r§a(.*) §r§ehealth!".toPattern(),
         "§eYour fairy healed §r(.*) §r§efor §r§a(.*) §r§ehealth!".toPattern(),
-        "(.*) fairy healed you for §r§a(.*) §r§ehealth!".toPattern()
+        "(.*) fairy healed you for §r§a(.*) §r§ehealth!".toPattern(),
     )
     private val abilityMessages = listOf(
         "§a§r§6Guided Sheep §r§ais now available!",
@@ -50,7 +54,8 @@ class DungeonChatFilter {
         "§dCreeper Veil §r§cDe-activated!",
         "§6Rapid Fire§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
         "§6Castle of Stone§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
-        "§6Ragnarok§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!"
+        "§6Ragnarok§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
+        "§bThunderstorm§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
     )
     private val damagePatterns = listOf(
         "(.*) §r§aused §r(.*) §r§aon you!".toPattern(),
@@ -67,7 +72,7 @@ class DungeonChatFilter {
         "§7Your (.*) hit §r§c(.*) §r§7(enemy|enemies) for §r§c(.*) §r§7damage.".toPattern(),
     )
     private val damageMessages = listOf(
-        "§cMute silenced you!"
+        "§cMute silenced you!",
     )
     private val notPossibleMessages = listOf(
         "§cYou cannot hit the silverfish while it's moving!",
@@ -79,7 +84,7 @@ class DungeonChatFilter {
         "§cYou do not have the key for this door!",
         "§cYou have already opened this dungeon chest!",
         "§cYou cannot use abilities in this room!",
-        "§cA mystical force in this room prevents you from using that ability!"
+        "§cA mystical force in this room prevents you from using that ability!",
     )
     private val buffPatterns = listOf(
         "§6§lDUNGEON BUFF! (.*) §r§ffound a §r§dBlessing of (.*)§r§f!(.*)".toPattern(),
@@ -92,16 +97,20 @@ class DungeonChatFilter {
         " {5}§r§7(Grants|Granted) you §r§a(.*) Defense §r§7and §r§a+(.*) Damage§r§7.".toPattern(),
         " {5}§r§7Granted you §r§a§r§a(.*)x HP §r§7and §r§a§r§a(.*)x §r§c❣ Health Regen§r§7.".toPattern(),
         " {5}§r§7(Grants|Granted) you §r§a(.*) Intelligence §r§7and §r§a+(.*)? Speed§r§7.".toPattern(),
-        " {5}§r§7Granted you §r§a+(.*) HP§r§7, §r§a(.*) Defense§r§7, §r§a(.*) Intelligence§r§7, and §r§a(.*) Strength§r§7.".toPattern()
+        " {5}§r§7Granted you §r§a+(.*) HP§r§7, §r§a(.*) Defense§r§7, §r§a(.*) Intelligence§r§7, and §r§a(.*) Strength§r§7.".toPattern(),
     )
     private val buffMessages = listOf(
-        "§a§lBUFF! §fYou have gained §r§cHealing V§r§f!"
+        "§a§lBUFF! §fYou have gained §r§cHealing V§r§f!",
     )
+
+    @Suppress("MaxLineLength")
     private val puzzlePatterns = listOf(
         "§a§lPUZZLE SOLVED! (.*) §r§ewasn't fooled by §r§c(.*)§r§e! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!".toPattern(),
         "§a§lPUZZLE SOLVED! (.*) §r§etied Tic Tac Toe! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!".toPattern(),
         "§4\\[STATUE] Oruo the Omniscient§r§f: §r(.*) §r§fthinks the answer is §r§6 . §r(.*)§r§f! §r§fLock in your party's answer in my Chamber!".toPattern(),
     )
+
+    @Suppress("MaxLineLength")
     private val puzzleMessages = listOf(
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fThough I sit stationary in this prison that is §r§cThe Catacombs§r§f, my knowledge knows no bounds.",
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fProve your knowledge by answering 3 questions and I shall reward you in ways that transcend time!",
@@ -111,15 +120,17 @@ class DungeonChatFilter {
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fI bestow upon you all the power of a hundred years!",
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fYou've already proven enough to me! No need to press more of my buttons!",
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fI've had enough of you and your party fiddling with my buttons. Scram!",
-        "§4[STATUE] Oruo the Omniscient§r§f: §r§fEnough! My buttons are not to be pressed with such lack of grace!"
+        "§4[STATUE] Oruo the Omniscient§r§f: §r§fEnough! My buttons are not to be pressed with such lack of grace!",
     )
     private val ambienceMessages = listOf(
-        "§5A shiver runs down your spine..."
+        "§5A shiver runs down your spine...",
     )
     private val reminderMessages = listOf(
         "§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it. This key can only be used to open §r§a1§r§7 door!",
-        "§e§lRIGHT CLICK §r§7on §r§7the §r§cBLOOD DOOR§r§7 to open it. This key can only be used to open §r§a1§r§7 door!"
+        "§e§lRIGHT CLICK §r§7on §r§7the §r§cBLOOD DOOR§r§7 to open it. This key can only be used to open §r§a1§r§7 door!",
     )
+
+    @Suppress("MaxLineLength")
     private val pickupPatterns = listOf(
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT§r§e!".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT §r§8x2§r§e!".toPattern(),
@@ -133,21 +144,24 @@ class DungeonChatFilter {
         "§c(.*) §r§eYou picked up a (.*) Orb from (.*) §r§ehealing you for §r§c(.*) §r§eand granting you +(.*)% §r§e(.*) for §r§b10 §r§eseconds.".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§9Premium Flesh§r§e!".toPattern(),
         "§6§lRARE DROP! §r§9Beating Heart §r§b(.*)".toPattern(),
-        "(.*) §r§ehas obtained §r§a§r§9Beating Heart§r§e!".toPattern()
+        "(.*) §r§ehas obtained §r§a§r§9Beating Heart§r§e!".toPattern(),
     )
     private val pickupMessages = listOf(
-        "§fYou found a §r§dWither Essence§r§f! Everyone gains an extra essence!"
+        "§fYou found a §r§dWither Essence§r§f! Everyone gains an extra essence!",
     )
+
+    /**
+     * REGEX-TEST: §a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
+     * REGEX-TEST: §a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
+     */
     private val startPatterns = listOf(
-        //§a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
-        //§a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
-        "§a(.*) §r§f(.*) §r§c(.*)§r§f -> §r§a(.*)".toPattern()
+        "§a(.*) §r§f(.*) §r§c(.*)§r§f -> §r§a(.*)".toPattern(),
     )
     private val startMessages = listOf(
         "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.",
         "§e[NPC] §bMort§f: §rYou should find it useful if you get lost.",
         "§e[NPC] §bMort§f: §rGood luck.",
-        "§e[NPC] §bMort§f: §rTalk to me to change your class and ready up."
+        "§e[NPC] §bMort§f: §rTalk to me to change your class and ready up.",
     )
     private val preparePatterns = listOf(
         "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.".toPattern(),
@@ -155,6 +169,8 @@ class DungeonChatFilter {
         "(.*)§a is now ready!".toPattern(),
         "§aDungeon starts in (.*) seconds.".toPattern(),
     )
+
+    @Suppress("MaxLineLength")
     private val prepareMessages = listOf(
         "§aYour active Potion Effects have been paused and stored. They will be restored when you leave Dungeons! You are not allowed to use existing Potion Effects while in Dungeons.",
         "§aDungeon starts in 1 second.",
@@ -186,14 +202,11 @@ class DungeonChatFilter {
     private val messagesEndsWithMap: Map<MessageTypes, List<String>> = mapOf(
         MessageTypes.END to endMessagesEndWith,
     )
-    /// </editor-fold>
+    // </editor-fold>
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.onHypixel || config.dungeonFilteredMessageTypes.isEmpty()) return
-
-        // Workaround since the potion message gets always sent at that moment when SkyBlock is set as false
-        if (!LorenzUtils.inSkyBlock && !event.message.startsWith("§aYour active Potion Effects")) return
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onChat(event: SkyHanniChatEvent) {
+        if (config.dungeonFilteredMessageTypes.isEmpty()) return
 
         val blockReason = block(event.message)
         if (blockReason != "") {
@@ -207,7 +220,7 @@ class DungeonChatFilter {
             message.isFiltered(MessageTypes.START) -> return "start"
         }
 
-        if (!DungeonAPI.inDungeon()) return ""
+        if (!DungeonApi.inDungeon()) return ""
 
         return when {
             message.isFiltered(MessageTypes.AMBIENCE) -> "ambience"
@@ -238,8 +251,8 @@ class DungeonChatFilter {
      * @see messagesEndsWithMap
      */
     private fun String.isPresent(key: MessageTypes): Boolean {
-        return this in (messagesMap[key] ?: emptyList()) ||
-            (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
-            (messagesEndsWithMap[key] ?: emptyList()).any { this.endsWith(it) }
+        return this in (messagesMap[key].orEmpty()) ||
+            (patternsMap[key].orEmpty()).any { it.matches(this) } ||
+            (messagesEndsWithMap[key].orEmpty()).any { this.endsWith(it) }
     }
 }

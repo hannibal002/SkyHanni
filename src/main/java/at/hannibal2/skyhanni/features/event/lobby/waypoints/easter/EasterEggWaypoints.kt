@@ -1,33 +1,39 @@
 package at.hannibal2.skyhanni.features.event.lobby.waypoints.easter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 
-class EasterEggWaypoints {
+@SkyHanniModule
+object EasterEggWaypoints {
 
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.easterEgg
     private var closest: EasterEgg? = null
     private var isEgg: Boolean = false
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isEgg) return
 
         if (!isEnabled()) return
 
         val message = event.message
-        if (message.startsWith("§a§lYou found an Easter Egg! §r") || message == "§aYou have received the §bsuper reward§a!" || message == "§cYou already found this egg!") {
+        if (message.startsWith("§a§lYou found an Easter Egg! §r") ||
+            message == "§aYou have received the §bsuper reward§a!" ||
+            message == "§cYou already found this egg!"
+        ) {
             val egg = EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
             egg.found = true
             if (closest == egg) {
@@ -36,26 +42,40 @@ class EasterEggWaypoints {
         }
     }
 
-    @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!config.allWaypoints && !config.allEntranceWaypoints) return
-        if (!isEnabled()) return
+    var active = false
 
-        isEgg = checkScoreboardEasterSpecific()
+    private fun isActive(): Boolean = isEnabled() && config.allWaypoints || config.allEntranceWaypoints
 
-        if (isEgg) {
-            if (config.onlyClosest) {
-                if (closest == null) {
-                    val notFoundEggs = EasterEgg.entries.filter { !it.found }
-                    if (notFoundEggs.isEmpty()) return
-                    closest = notFoundEggs.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
-                }
-            }
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
+        active = isActive()
+        if (!active) return
+
+        val isCurrentlyEgg = checkScoreboardEasterSpecific()
+        if (isCurrentlyEgg && !isEgg) {
+            IslandGraphs.loadLobby("MAIN_LOBBY")
         }
+        isEgg = isCurrentlyEgg
+
+
+        if (!isEgg) return
+        if (!config.onlyClosest) return
+        if (closest != null) return
+        val notFoundEggs = EasterEgg.entries.filter { !it.found }
+        if (notFoundEggs.isEmpty()) return
+        val nextEgg = notFoundEggs.minByOrNull { it.waypoint.distanceSqToPlayer() } ?: error("next easter egg is null")
+        closest = nextEgg
+
+        IslandGraphs.pathFind(
+            nextEgg.waypoint,
+            "§dNext Egg",
+            LorenzColor.LIGHT_PURPLE.toColor(),
+            condition = { active && isEgg },
+        )
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!isEgg) return
 
@@ -68,7 +88,7 @@ class EasterEggWaypoints {
         }
 
         if (config.allEntranceWaypoints) {
-            for (eggEntrance in EggEntrances.entries) {
+            for (eggEntrance in EggEntrance.entries) {
                 if (!eggEntrance.easterEgg.any { it.shouldShow() }) continue
                 event.drawWaypointFilled(eggEntrance.waypoint, LorenzColor.YELLOW.toColor())
                 event.drawDynamicText(eggEntrance.waypoint, "§e" + eggEntrance.eggEntranceName, 1.5)
@@ -89,7 +109,7 @@ class EasterEggWaypoints {
     /*
         Title:
         §e§lHYPIXEL
-        
+
         '§703/14/24  §8L30A'
         '  '
         'Rank: §bMVP§d+§b'
@@ -104,7 +124,7 @@ class EasterEggWaypoints {
         'Easter Eggs: §a0/§a30'
         '             '
         '§ewww.hypixel.net'
-    */
+     */
     private fun checkScoreboardEasterSpecific(): Boolean {
         val a = ScoreboardData.sidebarLinesFormatted.any { it.contains("Hypixel Level") }
         val b = ScoreboardData.sidebarLinesFormatted.any { it.contains("Easter") }

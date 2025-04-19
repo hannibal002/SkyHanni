@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.shader
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.resources.IReloadableResourceManager
@@ -9,7 +9,6 @@ import net.minecraft.client.shader.ShaderLinkHelper
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.OpenGLException
-import java.util.function.Supplier
 
 /**
  * Superclass for shader objects to compile and attach vertex and fragment shaders to the shader program
@@ -67,7 +66,7 @@ abstract class Shader(val vertex: String, val fragment: String) {
 
         ShaderHelper.glLinkProgram(shaderProgram)
 
-        if (ShaderHelper.glGetProgrami(shaderProgram, ShaderHelper.GL_LINK_STATUS) == GL11.GL_FALSE) {
+        if (ShaderHelper.glGetProgramInt(shaderProgram, ShaderHelper.GL_LINK_STATUS) == GL11.GL_FALSE) {
             val errorMessage = "Failed to link vertex shader $vertex and fragment shader $fragment. Features that " +
                 "utilise this shader will not work correctly, if at all"
             val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderProgram, 1024))
@@ -79,7 +78,7 @@ abstract class Shader(val vertex: String, val fragment: String) {
                     "Link Error:\n" to errorLog
                 )
             } else {
-                LorenzUtils.consoleLog("$errorMessage $errorLog")
+                ChatUtils.consoleLog("$errorMessage $errorLog")
             }
             return
         }
@@ -106,7 +105,7 @@ abstract class Shader(val vertex: String, val fragment: String) {
      * to the uniform in the shader file.
      * @param uniformValuesSupplier The supplier that changes / sets the uniform's value
      */
-    fun <T> registerUniform(uniformType: Uniform.UniformType<T>, name: String, uniformValuesSupplier: Supplier<T>) {
+    fun <T> registerUniform(uniformType: Uniform.UniformType<T>, name: String, uniformValuesSupplier: () -> T) {
         uniforms.add(Uniform(this, uniformType, name, uniformValuesSupplier))
     }
 }
