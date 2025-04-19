@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -165,7 +166,7 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.hasKey("attributes", 10) }
+        ?.takeIf { it.containsCompound("attributes") }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
@@ -250,7 +251,7 @@ object SkyBlockItemModifierUtils {
     }
     //#else
     //$$ fun isVanillaItem(itemId: String): Boolean {
-    //$$     Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
+    //$$     return Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
     //$$ }
     //#endif
 
