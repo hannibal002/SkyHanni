@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -51,7 +51,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object VampireSlayerFeatures {
 
-    private val config get() = SkyHanniMod.feature.slayer.vampire
+    private val config get() = SlayerApi.config.vampire
     private val configOwnBoss get() = config.ownBoss
     private val configOtherBoss get() = config.othersBoss
     private val configCoopBoss get() = config.coopBoss
@@ -143,7 +143,6 @@ object VampireSlayerFeatures {
                         TitleManager.sendTitle(
                             "§6§lTWINCLAWS",
                             duration = (1750 - config.twinclawsDelay).milliseconds,
-                            height = 2.6,
                         )
                         nextClawSend = System.currentTimeMillis() + 5_000
                     }
@@ -179,7 +178,7 @@ object VampireSlayerFeatures {
                 else canUseSteak && configCoopBoss.steakAlert && containCoop
 
             if (shouldSendSteakTitle) {
-                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds, height = 2.6)
+                TitleManager.sendTitle("§c§lSTEAK!", duration = 300.milliseconds)
             }
 
             if (shouldRender) {

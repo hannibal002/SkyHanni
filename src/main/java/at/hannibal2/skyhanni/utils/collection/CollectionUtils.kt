@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.collection
 
+import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import java.util.Collections
 import java.util.EnumMap
@@ -62,6 +63,10 @@ object CollectionUtils {
 
     fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
         this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
+
+    @Suppress("UnsafeCallOnNullableType")
+    fun <K> MutableMap<K, MinMaxNumber>.addOrPut(key: K, number: MinMaxNumber): MinMaxNumber =
+        this.merge(key, number, MinMaxNumber::plus)!! // Never returns null since "plus" can't return null
 
     fun <K, N : Number> Map<K, N>.sumAllValues(): Double {
         if (values.isEmpty()) return 0.0
@@ -130,8 +135,24 @@ object CollectionUtils {
      * @return A list containing up to `amount` elements starting `skip` elements after the first occurrence of `after`,
      *         or an empty list if `after` is not found.
      */
-    fun List<String>.sublistAfter(after: String, skip: Int = 1, amount: Int = 1): List<String> {
+    fun <T> List<T>.sublistAfter(after: T, skip: Int = 1, amount: Int = 1): List<T> {
         val startIndex = indexOf(after)
+        if (startIndex == -1) return emptyList()
+
+        return this.drop(startIndex + skip).take(amount)
+    }
+
+    /**
+     * Returns a sublist of this list, starting after the first occurrence that matches the condition.
+     *
+     * @param conditionAfter The element's condition after which the sublist should start.
+     * @param skip The number of elements to skip after the occurrence of `after` (default is 1).
+     * @param amount The number of elements to include in the returned sublist (default is 1).
+     * @return A list containing up to `amount` elements starting `skip` elements after the first occurrence of `after`,
+     *         or an empty list if `after` is not found.
+     */
+    fun <T> List<T>.sublistAfter(conditionAfter: (T) -> Boolean, skip: Int = 1, amount: Int = 1): List<T> {
+        val startIndex = indexOfFirst { conditionAfter(it) }
         if (startIndex == -1) return emptyList()
 
         return this.drop(startIndex + skip).take(amount)
@@ -257,7 +278,7 @@ object CollectionUtils {
 
     inline fun <T, C : Number, D : Number, R : Number> Iterable<T>.sumOfPair(
         crossinline selector: (T) -> Pair<C, D>,
-        crossinline resultConverter: (Double) -> R
+        crossinline resultConverter: (Double) -> R,
     ): Pair<R, R> {
         var sumFirst = 0.0
         var sumSecond = 0.0
@@ -388,6 +409,7 @@ object CollectionUtils {
             }
             return newQueue
         }
+
         fun pollOrNull(): T? = poll()?.item
         fun getWaitingWeightOrNull(): Double? = peek()?.weight
     }

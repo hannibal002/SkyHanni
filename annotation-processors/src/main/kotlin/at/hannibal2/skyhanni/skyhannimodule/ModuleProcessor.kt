@@ -33,7 +33,7 @@ class ModuleProcessor(
     private val warnings = mutableListOf<String>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        if (!processedVersions.add(mcVersion)) {
+        if (!processedVersions.add(mcVersion) || modVersion == "0.0.0") {
             return emptyList()
         }
         generateVersionConstants()
