@@ -16,22 +16,22 @@ class FrogMaskWarningConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    var enabled = false
 
     @Expose
     @ConfigOption(name = "Cooldown", desc = "Change how much time needs to pass before you get warned again.")
     @ConfigEditorSlider(minValue = 5f, maxValue = 60f, minStep = 1f)
-    var cooldown: Int = 30
+    var cooldown = 30
 
     @Expose
     @ConfigOption(name = "Warning Type", desc = "Change when you want to be warned.")
     @ConfigEditorDropdown
-    var warningType: WarningType = WarningType.FORAGING
+    var warningType = WarningType.FORAGING
 
     enum class WarningType(private val displayName: String) {
         NEVER("§cNever"),
-        BEING("§eExisting"),
-        FORAGING("§aForaging");
+        BEING("§eWhile in Park"),
+        FORAGING("§aWhile actively foraging");
 
         override fun toString() = displayName
     }
