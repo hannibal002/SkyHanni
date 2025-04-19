@@ -188,8 +188,7 @@ object FarmingWeightDisplay {
 
                 isLoadingWeight = true
                 if (display.isEmpty()) {
-                    val lbType = if (isMonthlyLb()) " Monthly" else ""
-                    display = Renderable.singeltonString("§6Farming Weight$lbType§7: §eLoading..")
+                    display = Renderable.singeltonString("§6Farming Weight§7: §eLoading..")
                 }
                 SkyHanniMod.coroutineScope.launch {
                     loadWeight(localProfile)
@@ -203,12 +202,11 @@ object FarmingWeightDisplay {
 
         if (rankGoal == -1) rankGoal = getRankGoal()
         val leaderboard = getLeaderboard()
-        val lbType = if (isMonthlyLb()) " Monthly" else ""
 
         val list = mutableListOf<Renderable>()
         list.add(
             Renderable.clickable(
-                "§6Farming Weight$lbType§7: $weight$leaderboard",
+                "§6Farming Weight§7: $weight$leaderboard",
                 tips = listOf("§eClick to open your Farming Profile."),
                 onLeftClick = { openWebsite(LorenzUtils.getPlayerName()) },
             ),
@@ -390,7 +388,6 @@ object FarmingWeightDisplay {
     private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenApi.inGarden()) || config.showOutsideGarden
 
     private fun isEtaEnabled() = config.overtakeETA
-    private fun isMonthlyLb() = config.eliteLbType == EliteFarmingWeightConfig.EliteFarmingWeightLbType.MONTHLY
 
     fun addCrop(crop: CropType, addedCounter: Int) {
         // Prevent div-by-0 errors
@@ -466,9 +463,8 @@ object FarmingWeightDisplay {
         val includeUpcoming = if (isEtaEnabled()) "?upcoming=10" else ""
         val goalRank = getRankGoal() + 1 // API returns upcoming players as if you were at this rank already
         val atRank = if (isEtaEnabled() && config.useEtaGoalRank.get()) "&atRank=$goalRank" else ""
-        val lbType = if (isMonthlyLb()) "-monthly" else ""
 
-        val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/" +
+        val url = "https://api.elitebot.dev/leaderboard/farmingweight/" +
             "$uuid/$profileId$includeUpcoming$atRank"
         val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Leaderboard")
 
