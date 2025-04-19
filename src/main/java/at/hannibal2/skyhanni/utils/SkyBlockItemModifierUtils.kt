@@ -165,7 +165,7 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { NbtCompat.containsCompound(it,"attributes") }
+        ?.takeIf { NbtCompat.containsCompound(it, "attributes") }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
