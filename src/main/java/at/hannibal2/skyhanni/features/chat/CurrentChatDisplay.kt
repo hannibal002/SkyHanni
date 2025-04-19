@@ -64,6 +64,15 @@ object CurrentChatDisplay {
     )
 
     /**
+     * REGEX-TEST: §cYou cannot send guild chat with your guild chat disabled! Use /g toggle to enable it!
+     */
+    @Suppress("MaxLineLength")
+    private val guildChatPattern by patternGroup.pattern(
+        "guild",
+        "§cYou cannot send guild chat with your guild chat disabled! Use \\/g toggle to enable it!",
+    )
+
+    /**
      * REGEX-TEST: §aOpened a chat conversation with §r§b[MVP§r§5+§r§b] martimavocado§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave
      */
     @Suppress("MaxLineLength")
@@ -76,23 +85,17 @@ object CurrentChatDisplay {
     fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
         changedChatPattern.matchMatcher(message) {
-            currentChat = ChatType.fromName(group("chat"))
-            privateMessagePlayer = null
-            update()
-            return
+            return updateChat(ChatType.fromName(group("chat")))
         }
         if (allChatPattern.matches(message)) {
-            currentChat = ChatType.ALL
-            privateMessagePlayer = null
-            update()
-            return
+            return updateChat(ChatType.ALL)
+        }
+        if (guildChatPattern.matches(message)) {
+            return updateChat(ChatType.GUILD)
         }
         openPrivateMessagePattern.matchMatcher(message) {
             privateMessageEnd = maxPrivateMessageTime.fromNow()
-            currentChat = ChatType.PRIVATE
-            privateMessagePlayer = group("player")
-            update()
-            return
+            return updateChat(ChatType.PRIVATE, group("player"))
         }
     }
 
@@ -131,6 +134,12 @@ object CurrentChatDisplay {
         display = drawDisplay()
     }
 
+    private fun updateChat(currentChat: ChatType, privateMessagePlayer: String? = null) {
+        this.currentChat = currentChat
+        this.privateMessagePlayer = privateMessagePlayer
+        update()
+    }
+
     @HandleEvent(GuiRenderEvent::class)
     fun onRenderOverlay() {
         if (!isEnabled()) return
@@ -163,7 +172,7 @@ object CurrentChatDisplay {
         val displayName = color?.getChatColor().orEmpty() + (displayName ?: toFormattedName())
 
         companion object {
-            fun fromName(name: String) = entries.find { it.chatName.equals(name, true) }
+            fun fromName(name: String) = entries.find { it.chatName.equals(name, true) } ?: error("unknown chat type '$name'")
         }
     }
 
