@@ -7,8 +7,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity {
@@ -21,15 +23,8 @@ public abstract class MixinEntity {
         return EntityData.getDisplayName((Entity) (Object) this, value);
     }
 
-    @Redirect(
-        method = "isInvisibleToPlayer",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isInvisible()Z")
-    )
-    private boolean redirectIsInvisible(Entity instance, EntityPlayer player) {
-        // Replace this condition with your desired logic
-        if (SeaCreatureFeatures.INSTANCE.isSeaCreature(instance)) {
-            return false;
-        }
-        return !player.isSpectator() && instance.isInvisible();
+    @Inject(method = "isInvisibleToPlayer", at = @At("HEAD"), cancellable = true)
+    public void isInvisibleToPlayer(EntityPlayer player, CallbackInfoReturnable<Boolean> cir) {
+        if (SeaCreatureFeatures.isSeaCreature((Entity) (Object) this)) cir.setReturnValue(false);
     }
 }
