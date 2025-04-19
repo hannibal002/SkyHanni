@@ -282,6 +282,8 @@ object NumberUtil {
 
     private fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
+
+    fun Double.oneDecimal() = "%.1f".format(this)
 }
 
 class MinMaxNumber(val min: Double, val max: Double) {

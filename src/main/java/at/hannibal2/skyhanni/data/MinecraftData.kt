@@ -43,6 +43,8 @@ object MinecraftData {
             }
 
             is S32PacketConfirmTransaction -> {
+                if (packet.actionNumber > 0) return
+
                 totalServerTicks++
                 ServerTickEvent.post()
             }
@@ -58,11 +60,7 @@ object MinecraftData {
         val newItem = hand?.getInternalName() ?: NeuInternalName.NONE
         val oldItem = InventoryUtils.itemInHandId
         if (newItem != oldItem) {
-
-            InventoryUtils.recentItemsInHand.keys.removeIf { it + 30_000 > System.currentTimeMillis() }
-            if (newItem != NeuInternalName.NONE) {
-                InventoryUtils.recentItemsInHand[System.currentTimeMillis()] = newItem
-            }
+            if (newItem != NeuInternalName.NONE) InventoryUtils.recentItemsInHand.add(newItem)
             InventoryUtils.itemInHandId = newItem
             InventoryUtils.latestItemInHand = hand
             ItemInHandChangeEvent(newItem, oldItem).post()
