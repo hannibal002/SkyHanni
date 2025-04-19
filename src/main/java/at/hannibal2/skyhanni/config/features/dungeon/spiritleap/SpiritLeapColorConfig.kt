@@ -1,30 +1,13 @@
-package at.hannibal2.skyhanni.config.features.dungeon
+package at.hannibal2.skyhanni.config.features.dungeon.spiritleap
 
-import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class SpiritLeapConfig {
+class SpiritLeapColorConfig {
     val defaultColor: String = "0:200:0:0:0"
     private val deadColor: String = "0:200:120:0:0"
-
-    @Expose
-    @ConfigOption(name = "Enable Spirit Leap Overlay", desc = "Enable Spirit Leap Overlay inside Dungeons.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var enabled: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Show Player Class Level",
-        desc = "Display the player's Class level in the Spirit Leap overlay.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var showDungeonClassLevel: Boolean = false
 
     @Expose
     @ConfigOption(
