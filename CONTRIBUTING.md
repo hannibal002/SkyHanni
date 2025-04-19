@@ -227,6 +227,9 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
+- Always combine title messages with chat message.
+  - This way users know what feature and what mod sends the title, if they want to disable it.
+  - Also we can include more informations why the title just showed up, as the title should not be too long.
 
 ### Compatibility with modern versions
 As SkyHanni gets closer to supporting multiple Minecraft versions, there are a few additional coding conventions to follow. Below are some
@@ -454,6 +457,8 @@ Adding a mapping like this is the easiest way to fix a broken method call, field
 files, so you might be fixing issues in files you didn't even look at. It will even work in mixin targets, as long as they are unambiguous
 (consider using the method descriptor instead of just the method name for your mixin). However, if something aside from the name changed,
 this will not suffice.
+
+After adding new mappings to the mappings file don't forget to run `./gradlew cleanupMappingFiles` to automatically sort the mappings file.
 
 #### Custom mappings
 
