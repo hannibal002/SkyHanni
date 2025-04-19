@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -54,9 +53,8 @@ object HighlightVisitorsOutsideOfGarden {
     }
 
     private fun isVisitor(entity: Entity): Boolean {
-        // todo migrate to Skyhanni IslandType
-        val mode = HypixelData.mode
-        val possibleJsons = visitorJson[mode] ?: return false
+        val island = LorenzUtils.skyBlockIsland.islandData?.apiName ?: return false
+        val possibleJsons = visitorJson[island] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
             (it.position == null || it.position.distance(entity.position.toLorenzVec()) < 1) &&
@@ -91,6 +89,7 @@ object HighlightVisitorsOutsideOfGarden {
         if (!shouldBlock) return
         if (MinecraftCompat.localPlayer.isSneaking) return
         val entity = event.clickedEntity ?: return
+        ChatUtils.consoleLog("triggered")
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             ChatUtils.chatAndOpenConfig(
                 "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",

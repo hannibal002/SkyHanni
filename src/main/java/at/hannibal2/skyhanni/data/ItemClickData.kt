@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getUsedItem
@@ -46,11 +47,14 @@ object ItemClickData {
             }
 
             packet is C02PacketUseEntity -> {
+                ChatUtils.consoleLog(packet.action.toString())
                 val clickType = when (packet.action) {
                     C02PacketUseEntity.Action.INTERACT -> ClickType.RIGHT_CLICK
                     C02PacketUseEntity.Action.ATTACK -> ClickType.LEFT_CLICK
-                    C02PacketUseEntity.Action.INTERACT_AT -> ClickType.RIGHT_CLICK
-                    else -> return
+                    else -> {
+                        event.cancel()
+                        return
+                    }
                 }
                 val clickedEntity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
                 EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).post()
