@@ -105,43 +105,49 @@ object CollectionTracker {
     }
 
     // TODO repo
-    private fun fixTypo(rawName: String) = when (rawName) {
-        "carrots" -> "carrot"
-        "melons" -> "melon"
-        "seed" -> "seeds"
-        "iron" -> "iron ingot"
-        "gold" -> "gold ingot"
-        "sugar" -> "sugar cane"
-        "cocoa bean", "cocoa" -> "cocoa beans"
-        "lapis" -> "lapis lazuli"
-        "cacti" -> "cactus"
-        "pumpkins" -> "pumpkin"
-        "potatoes" -> "potato"
-        "nether warts", "wart", "warts" -> "nether wart"
-        "stone" -> "cobblestone"
-        "red mushroom", "brown mushroom", "mushrooms" -> "mushroom"
-        "gemstones" -> "gemstone"
-        "caducous" -> "caducous stem"
-        "agaricus" -> "agaricus cap"
-        "quartz" -> "nether quartz"
-        "glowstone" -> "glowstone dust"
-        "floor 1" -> "bonzo"
-        "f1" -> "bonzo"
-        "floor 2" -> "scarf"
-        "f2" -> "scarf"
-        "Professor" -> "the professor"
-        "floor 3" -> "the professor"
-        "f3" -> "the professor"
-        "floor 4" -> "thorn"
-        "f4" -> "thorn"
-        "floor 5" -> "livid"
-        "f5" -> "livid"
-        "floor 6" -> "sadan"
-        "f6" -> "sadan"
-        "floor 7" -> "necron"
-        "f7" -> "necron"
+    private fun fixTypo(rawName: String): String {
+        val typos = mapOf(
+            "carrot" to "carrots",
+            "melon" to "melons",
+            "seeds" to "seed",
+            "iron ingot" to "iron",
+            "gold ingot" to "gold",
+            "sugar cane" to "sugar",
+            "cocoa beans" to "cocoa bean",
+            "lapis lazuli" to "lapis",
+            "cactus" to "cacti",
+            "pumpkin" to "pumpkins",
+            "potato" to "potatoes",
+            "nether wart" to listOf("nether warts", "wart", "warts"),
+            "cobblestone" to "stone",
+            "mushroom" to listOf("red mushroom", "brown mushroom", "mushrooms"),
+            "gemstone" to "gemstones",
+            "caducous stem" to listOf("caducous"),
+            "agaricus cap" to listOf("agaricus"),
+            "nether quartz" to listOf("quartz"),
+            "glowstone dust" to listOf("glowstone"),
+            "bonzo" to listOf("floor 1", "f1"),
+            "scarf" to listOf("floor 2", "f2"),
+            "the professor" to listOf("floor 3", "f3", "Professor"),
+            "thorn" to listOf("floor 4", "f4"),
+            "livid" to listOf("floor 5", "f5"),
+            "sadan" to listOf("floor 6", "f6"),
+            "necron" to listOf("floor 7", "f7"),
+        )
 
-        else -> rawName
+        for ((correct, incorrect) in typos) {
+            if (incorrect is List<*>) {
+                if (incorrect.any { it == rawName }) {
+                    return correct
+                }
+            } else {
+                if (incorrect == rawName) {
+                    return correct
+                }
+            }
+        }
+
+        return rawName
     }
 
     private fun setNewCollection(internalName: NeuInternalName, name: String) {
