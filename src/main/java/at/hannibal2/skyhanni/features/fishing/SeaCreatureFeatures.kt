@@ -121,7 +121,7 @@ object SeaCreatureFeatures {
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
         (entity as? EntityLivingBase)?.mob?.let { mob ->
-            if (mob in rareSeaCreatures && entity.distanceToPlayer() < 30) {
+            if ((mob in rareSeaCreatures || mob.baseEntity.mob in rareSeaCreatures) && entity.distanceToPlayer() < 30) {
                 LorenzColor.GREEN.toColor().rgb
             } else null
         }
