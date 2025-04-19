@@ -43,6 +43,10 @@ object EquipmentApi {
     private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) = equipment?.set(slot.ordinal, itemStack)
 
     private val repoGroup = RepoPattern.group("data.equipment")
+
+    /**
+     * REGEX-TEST: §aYou equipped a §r§dSnowy Gillsplash Cloak§r§a!
+     */
     private val chatEquipRegex by repoGroup.pattern(
         "chat.equip",
         "§aYou equipped a (?<item>.+)§r§a!",
