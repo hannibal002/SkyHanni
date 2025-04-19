@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -10,7 +9,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -25,6 +23,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -69,19 +68,19 @@ object ComposterOverlay {
     private var fuelExtraDisplay: Renderable? = null
 
     private var currentTimeType = TimeType.HOUR
-    private var inComposter = false
-    private var inComposterUpgrades = false
+    private val composterInventory = InventoryDetector { name -> name == "Composter" }
+    private val composterUpgradesInventory = InventoryDetector { name -> name == "Composter Upgrades" }
     private var extraComposterUpgrade: ComposterUpgrade? = null
         set(value) {
             field = value
-            lastHovered = SimpleTimeMark.farPast()
+            lastHovered = SimpleTimeMark.now()
         }
 
     private var maxLevel = false
     private var lastHovered = SimpleTimeMark.farPast()
     private var lastAttemptTime = SimpleTimeMark.farPast()
 
-    var inInventory = false
+    val inInventory get() = composterInventory.isInside() || composterUpgradesInventory.isInside()
 
     private var testOffset = 0
 
@@ -111,41 +110,32 @@ object ComposterOverlay {
     private val VOLTA = "VOLTA".toInternalName()
     private val OIL_BARREL = "OIL_BARREL".toInternalName()
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        inInventory = false
-    }
-
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        if (!inInventory) return
-
-        update()
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick() {
-        if (inComposterUpgrades && extraComposterUpgrade != null && lastHovered.passedSince() > 200.milliseconds) {
-            extraComposterUpgrade = null
+    @HandleEvent(TabListUpdateEvent::class, priority = HandleEvent.LOW)
+    fun onTabListUpdate() {
+        if (inInventory) {
             update()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!config.overlay) return
-        inComposter = event.inventoryName == "Composter"
-        inComposterUpgrades = event.inventoryName == "Composter Upgrades"
-        if (!inComposter && !inComposterUpgrades) return
-
-        inInventory = true
-        update()
+    fun onTick() {
+        if (composterUpgradesInventory.isInside() && extraComposterUpgrade != null && lastHovered.passedSince() > 200.milliseconds) {
+            extraComposterUpgrade = null
+            update()
+        }
     }
 
-    @HandleEvent
+    @HandleEvent(InventoryFullyOpenedEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onInventoryFullyOpened() {
+        if (!config.overlay) return
+        if (inInventory) {
+            update()
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onToolTip(event: ToolTipEvent) {
-        if (!inComposterUpgrades) return
-        update()
+        if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
             val name = event.itemStack.displayName
             if (name.contains(upgrade.displayName)) {
@@ -160,8 +150,8 @@ object ComposterOverlay {
         if (extraComposterUpgrade != null) {
             extraComposterUpgrade = null
             maxLevel = false
-            update()
         }
+        update()
     }
 
     private fun update() {
@@ -193,10 +183,10 @@ object ComposterOverlay {
         }
         if (currentFuelItem.let { it !in fuelFactors.keys && it != NONE }) currentFuelItem = NONE
 
-        if (inComposter) {
+        if (composterInventory.isInside()) {
             organicMatterDisplay = drawOrganicMatterDisplay()
             fuelExtraDisplay = drawFuelExtraDisplay()
-        } else if (inComposterUpgrades) {
+        } else if (this.composterUpgradesInventory.isInside()) {
             organicMatterDisplay = drawUpgradeStats()
             fuelExtraDisplay = null
         }
@@ -211,7 +201,6 @@ object ComposterOverlay {
             val displayName = upgrade.displayName
             Renderable.string("§7Preview §a$displayName§7: §a$level $nextLevel")
         }
-
 
     private fun drawUpgradeStats(): Renderable {
         val upgrade = if (!maxLevel) extraComposterUpgrade else null
@@ -276,19 +265,18 @@ object ComposterOverlay {
 
     private fun drawFuelExtraDisplay() = Renderable.vertical {
         addNotNull(profitDisplay())
-        if (inComposter) {
-            addString("§7Items needed to fill §2Fuel")
-            val maxFuel = ComposterApi.maxFuel(null)
-            val currentFuel = ComposterApi.getFuel()
-            val missingFuel = (maxFuel - currentFuel).toDouble()
-            val fillList = fillList(fuelFactors, missingFuel) {
-                currentFuelItem = it
-                update()
-            }
-            if (currentFuelItem == NONE) {
-                currentFuelItem = fillList
-                update()
-            }
+        if (!composterInventory.isInside()) return@vertical
+        addString("§7Items needed to fill §2Fuel")
+        val maxFuel = ComposterApi.maxFuel(null)
+        val currentFuel = ComposterApi.getFuel()
+        val missingFuel = (maxFuel - currentFuel).toDouble()
+        val fillList = fillList(fuelFactors, missingFuel) {
+            currentFuelItem = it
+            update()
+        }
+        if (currentFuelItem == NONE) {
+            currentFuelItem = fillList
+            update()
         }
     }
 
@@ -469,7 +457,7 @@ object ComposterOverlay {
 
     private fun retrieveMaterials(internalName: NeuInternalName, itemName: String, itemsNeeded: Int) {
         if (itemsNeeded == 0) return
-        if (config.retrieveFrom == ComposterConfig.RetrieveFromEntry.BAZAAR &&
+        if (config.retrieveFrom == RetrieveFromEntry.BAZAAR &&
             !LorenzUtils.noTradeMode && internalName != BIOFUEL
         ) {
             BazaarApi.searchForBazaarItem(itemName, itemsNeeded)
@@ -529,8 +517,8 @@ object ComposterOverlay {
         return price
     }
 
-    @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    @HandleEvent(NeuRepositoryReloadEvent::class)
+    fun onNeuRepoReload() {
         updateOrganicMatterFactors()
     }
 
@@ -585,20 +573,19 @@ object ComposterOverlay {
         return map
     }
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onBackgroundDraw() {
         if (EstimatedItemValue.isCurrentlyShowing()) return
 
-        if (inInventory) {
-            config.overlayOrganicMatterPos.renderRenderable(
-                organicMatterDisplay,
-                posLabel = "Composter Overlay Organic Matter",
-            )
-            config.overlayFuelExtrasPos.renderRenderable(
-                fuelExtraDisplay,
-                posLabel = "Composter Overlay Fuel Extras",
-            )
-        }
+        if (!inInventory) return
+        config.overlayOrganicMatterPos.renderRenderable(
+            organicMatterDisplay,
+            posLabel = "Composter Overlay Organic Matter",
+        )
+        config.overlayFuelExtrasPos.renderRenderable(
+            fuelExtraDisplay,
+            posLabel = "Composter Overlay Fuel Extras",
+        )
     }
 
     enum class TimeType(val display: String, val multiplier: Int) {

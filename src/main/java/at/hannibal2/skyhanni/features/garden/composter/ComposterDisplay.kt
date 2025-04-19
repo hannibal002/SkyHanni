@@ -121,13 +121,6 @@ object ComposterDisplay {
             }
         }
 
-        for (type in DataType.entries) {
-            if (!newData.containsKey(type)) {
-                tabListData = emptyMap()
-                return
-            }
-        }
-
         tabListData = newData
     }
 

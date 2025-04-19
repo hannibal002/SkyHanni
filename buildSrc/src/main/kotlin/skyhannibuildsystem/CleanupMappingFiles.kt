@@ -30,8 +30,9 @@ abstract class CleanupMappingFiles : DefaultTask() {
         val comments = mutableMapOf<String, String>()
 
         var savedComment: String? = null
+        val oldText = file.readText()
 
-        file.forEachLine { line ->
+        oldText.lines().forEach { line ->
             if (line.isNotBlank()) {
                 savedComment?.let {
                     comments[line] = it
@@ -48,7 +49,10 @@ abstract class CleanupMappingFiles : DefaultTask() {
             .mapValues { it.value.map { it.second }.sorted() }
             .toSortedMap()
 
-        writeMappings(file, sortedLines, comments)
+        val newText = writeMappings(sortedLines, comments)
+        if (oldText.lines() != newText.lines()) {
+            file.writeText(newText)
+        }
     }
 
     private fun String.isComment() = trim().startsWith("#")
@@ -76,18 +80,20 @@ abstract class CleanupMappingFiles : DefaultTask() {
         }
     }
 
-    private fun writeMappings(file: File, sortedLines: Map<String, List<String>>, comments: Map<String, String>) {
+    private fun writeMappings(sortedLines: Map<String, List<String>>, comments: Map<String, String>): String {
         val lineSeparator = "\n"
-        file.writeText(lineSeparator)
+        val newText = StringBuilder()
+        newText.append(lineSeparator)
 
         for ((_, value) in sortedLines) {
             for (line in value) {
                 comments[line]?.let {
-                    file.appendText("$it$lineSeparator")
+                    newText.append("$it$lineSeparator")
                 }
-                file.appendText("$line$lineSeparator")
+                newText.append("$line$lineSeparator")
             }
-            file.appendText(lineSeparator)
+            newText.append(lineSeparator)
         }
+        return newText.toString()
     }
 }
