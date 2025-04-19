@@ -267,13 +267,14 @@ object HoppityEggsManager {
         if (warningActive && allEggsRemaining) warn()
     }
 
-    private val warpClickAction: Pair<() -> Unit, String> get() =
-        if (LorenzUtils.inSkyBlock) {
-            { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) } to
-                "warp to ${unclaimedEggsConfig.warpClickDestination}".trim()
-        } else {
-            { HypixelCommands.skyblock() } to "join /skyblock!"
-        }
+    private val warpClickAction: Pair<() -> Unit, String>
+        get() =
+            if (LorenzUtils.inSkyBlock) {
+                { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) } to
+                    "warp to ${unclaimedEggsConfig.warpClickDestination}".trim()
+            } else {
+                { HypixelCommands.skyblock() } to "join /skyblock!"
+            }
 
     private fun warn() {
         if (!unclaimedEggsConfig.warningsEnabled) return
@@ -292,7 +293,7 @@ object HoppityEggsManager {
                 action = action,
             )
         } else ChatUtils.chat(message, replaceSameMessage = true)
-        TitleManager.sendTitle("§e$amount Hoppity Eggs!", duration = 5.seconds)
+        TitleManager.sendTitle("§e$amount Hoppity Eggs!")
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 

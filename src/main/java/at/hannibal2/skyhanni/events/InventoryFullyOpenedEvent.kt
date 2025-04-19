@@ -37,6 +37,8 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
  *
  * Since this logic only works via packets, and the player inventory (pressing E) is client side,
  * this event does not get fired when opening the inventory via pressing E.
+ *
+ * TODO does not work for inventories with empty slots. e.g. dungeon when death ghost tp menu "Teleport to Player".
  */
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 

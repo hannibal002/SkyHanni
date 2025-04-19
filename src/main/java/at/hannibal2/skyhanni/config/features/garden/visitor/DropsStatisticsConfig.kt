@@ -78,6 +78,7 @@ class DropsStatisticsConfig {
         COPPER_DYE("§b1 §8Copper Dye"),
         JUNGLE_KEY("§b1 §5Jungle Key"),
         FRUIT_BOWL("§b1 §9Fruit Bowl"),
+        HARVEST_HARBINGER("§b1 §9Harvest Harbinger V"),
         ;
 
         override fun getLegacyId() = legacyId
