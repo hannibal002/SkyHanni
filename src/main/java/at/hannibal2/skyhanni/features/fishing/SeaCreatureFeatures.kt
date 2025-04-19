@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -128,5 +127,12 @@ object SeaCreatureFeatures {
                 LorenzColor.GREEN.toColor().rgb
             } else null
         }
+    }
+
+    fun isSeaCreature(entity: Entity): Boolean {
+        (entity as? EntityLivingBase)?.mob?.let { mob ->
+            return mob in rareSeaCreatures
+        }
+        return false
     }
 }
