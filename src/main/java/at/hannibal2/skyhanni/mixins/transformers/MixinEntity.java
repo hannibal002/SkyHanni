@@ -24,6 +24,6 @@ public abstract class MixinEntity {
 
     @Inject(method = "isInvisibleToPlayer", at = @At("HEAD"), cancellable = true)
     public void isInvisibleToPlayer(EntityPlayer player, CallbackInfoReturnable<Boolean> cir) {
-        if (SeaCreatureFeatures.isSeaCreature((Entity) (Object) this)) cir.setReturnValue(false);
+        if (SeaCreatureFeatures.isRareSeaCreatureBody((Entity) (Object) this)) cir.setReturnValue(false);
     }
 }

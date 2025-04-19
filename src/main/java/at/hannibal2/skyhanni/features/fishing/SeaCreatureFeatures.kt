@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntitySlime
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -130,9 +131,17 @@ object SeaCreatureFeatures {
     }
 
     @JvmStatic
-    fun isSeaCreature(entity: Entity): Boolean {
+    fun isRareSeaCreature(entity: Entity): Boolean {
         (entity as? EntityLivingBase)?.mob?.let { mob ->
             return mob in rareSeaCreatures
+        }
+        return false
+    }
+
+    @JvmStatic
+    fun isRareSeaCreatureBody(entity: Entity): Boolean {
+        if (entity is EntitySlime && isRareSeaCreature(entity)) {
+            return true
         }
         return false
     }
