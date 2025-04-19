@@ -85,7 +85,7 @@ object DungeonSpiritLeapOverlay {
     }
 
     private val spiritLeapKeybinds
-        get() = arrayOf(
+        get() = intArrayOf(
             config.spiritLeapKeybindConfig.keybindOption1,
             config.spiritLeapKeybindConfig.keybindOption2,
             config.spiritLeapKeybindConfig.keybindOption3,
