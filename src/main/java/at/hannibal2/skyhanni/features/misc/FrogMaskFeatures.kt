@@ -100,7 +100,7 @@ object FrogMaskFeatures {
 
     private fun remindWrongRegion(helmetRegion: String) {
         TitleManager.sendTitle("§cWrong Region!")
-        ChatUtils.chat("Your Frog Mask currently boosts $helmetRegion §e!")
+        ChatUtils.chat("Your Frog Mask currently boosts $helmetRegion§e!")
     }
 
     private fun handleDisplay(helmetRegion: String) {
