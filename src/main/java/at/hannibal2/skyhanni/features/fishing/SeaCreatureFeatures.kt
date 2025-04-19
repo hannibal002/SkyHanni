@@ -50,6 +50,9 @@ object SeaCreatureFeatures {
 
         if (!config.highlight) return
 
+        // mob.baseEntity.isInvisible = false
+        mob.extraEntities.forEach { it.isInvisible = false }
+
         mob.highlight(LorenzColor.GREEN.toColor())
     }
 
@@ -107,7 +110,7 @@ object SeaCreatureFeatures {
 
     @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
-        if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.NO_XRAY) {
+        if (isEnabled() && config.highlight && event.type === RenderEntityOutlineEvent.Type.XRAY) {
             event.queueEntitiesToOutline(getEntityOutlineColor)
         }
     }
@@ -121,7 +124,7 @@ object SeaCreatureFeatures {
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
         (entity as? EntityLivingBase)?.mob?.let { mob ->
-            if ((mob in rareSeaCreatures || mob.baseEntity.mob in rareSeaCreatures) && entity.distanceToPlayer() < 30) {
+            if (mob in rareSeaCreatures && entity.distanceToPlayer() < 30) {
                 LorenzColor.GREEN.toColor().rgb
             } else null
         }
