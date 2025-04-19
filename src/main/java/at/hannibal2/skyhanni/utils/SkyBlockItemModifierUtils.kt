@@ -205,7 +205,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
-    fun ItemStack.getSecondsHeld() = when (getItemId()) {
+    fun ItemStack.getSecondsHeld() = when (getItemId()) { // TODO move item IDs and attribute tags to repo
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
         "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")

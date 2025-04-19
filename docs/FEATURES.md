@@ -268,6 +268,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show value of all items in Sacks as GUI while not in Sacks.
 + Added Trade Value Overlay. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
     + Doesn't suppport coins.
++ Added Evolving Item time remaining in lore (Bottle of Jyrre, Dark Cacao Truffle, etc.). - Obsidian (https://github.com/hannibal002/SkyHanni/pull/3614)
 
 </details>
 <details open><summary>
@@ -1588,6 +1589,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Requires Cake Counter placed on Private Island.
     + Prompts you to enable this feature when placing Cake Counter.
 + Added Fruit Bowl Player Highlighter and Stats Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3394)
++ Added Frog Mask Warning. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3449)
+    + Displays a warning when foraging in an incorrect park region while wearing a Frog Mask.
 
 </details>
 <details open><summary>
