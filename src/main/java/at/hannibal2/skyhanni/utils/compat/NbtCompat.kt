@@ -30,36 +30,36 @@ object NbtCompat {
     const val TAG_INT_ARRAY: Int = 11
     const val TAG_ANY_NUMERIC = 99
 
-    fun NBTTagCompound.containsList(key: String): Boolean {
+    fun containsList(list: NBTTagCompound, key: String): Boolean {
         //#if MC < 1.21
-        return this.hasKey(key, TAG_LIST)
+        return list.hasKey(key, TAG_LIST)
         //#else
-        //$$ return this.contains(key) && this.get(key) is NbtList
+        //$$ return list.contains(key) && list.get(key) is NbtList
         //#endif
     }
 
-    fun NBTTagCompound.containsCompound(key: String): Boolean {
+    fun containsCompound(compound: NBTTagCompound, key: String): Boolean {
         //#if MC < 1.21
-        return this.hasKey(key, TAG_COMPOUND)
+        return compound.hasKey(key, TAG_COMPOUND)
         //#else
-        //$$ return this.contains(key) && this.get(key) is NbtCompound
+        //$$ return compound.contains(key) && compound.get(key) is NbtCompound
         //#endif
     }
 
-    fun NBTTagCompound.getStringTagList(key: String): NBTTagList {
+    fun getStringTagList(list: NBTTagCompound, key: String): NBTTagList {
         //#if MC < 1.21
-        return this.getTagList(key, TAG_STRING)
+        return list.getTagList(key, TAG_STRING)
         //#else
-        //$$ val nbtList = this.getList(key).getOrNull() ?: NbtList()
+        //$$ val nbtList = list.getList(key).getOrNull() ?: NbtList()
         //$$ return getList(nbtList, TAG_STRING)
         //#endif
     }
 
-    fun NBTTagCompound.getCompoundTagList(key: String): NBTTagList {
+    fun getCompoundTagList(list: NBTTagCompound, key: String): NBTTagList {
         //#if MC < 1.21
-        return this.getTagList(key, TAG_COMPOUND)
+        return list.getTagList(key, TAG_COMPOUND)
         //#else
-        //$$ val nbtList = this.getList(key).getOrNull() ?: NbtList()
+        //$$ val nbtList = list.getList(key).getOrNull() ?: NbtList()
         //$$ return getList(nbtList, TAG_COMPOUND)
         //#endif
     }

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.NbtCompat.containsCompound
+import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import com.google.gson.JsonObject
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -165,7 +165,7 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.containsCompound("attributes") }
+        ?.takeIf { NbtCompat.containsCompound(it,"attributes") }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
