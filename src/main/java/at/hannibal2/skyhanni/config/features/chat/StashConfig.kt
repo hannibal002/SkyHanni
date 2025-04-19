@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
@@ -23,17 +24,33 @@ class StashConfig {
     var notice: String = ""
 
     @Expose
+    @ConfigOption(name = "Hide Dupe Warnings", desc = "")
+    @Accordion
+    var hideDuplicateWarning: HideDuplicateWarningConfig = HideDuplicateWarningConfig()
+
+    class HideDuplicateWarningConfig {
+        @Expose
+        @ConfigOption(
+            name = "Hide Dupe Warnings",
+            desc = "Hide duplicate warnings for previously reported stash counts."
+        )
+        @ConfigEditorBoolean
+        var enabled: Boolean = true
+
+        @Expose
+        @ConfigOption(
+            name = "World Change Reset",
+            desc = "Show duplicate warnings once per world change. If this is off, " +
+                "the warning will be shown once per count change."
+        )
+        @ConfigEditorBoolean
+        var worldChangeReset: Boolean = true
+    }
+
+    @Expose
     @ConfigOption(name = "Hide Added Messages", desc = "Hide the messages when something is added to your stash.")
     @ConfigEditorBoolean
     var hideAddedMessages: Boolean = true
-
-    @Expose
-    @ConfigOption(
-        name = "Hide Duplicate Warnings",
-        desc = "Hide duplicate warnings for previously reported stash counts."
-    )
-    @ConfigEditorBoolean
-    var hideDuplicateCounts: Boolean = true
 
     @Expose
     @ConfigOption(name = "Hide Low Warnings", desc = "Hide warnings with a total count below this number.")
