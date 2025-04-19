@@ -204,7 +204,7 @@ object UserLuckBreakdown {
             totalLuck *= 1.1f
         }
         val luckString = tryTruncateFloat(totalLuck)
-        event.toolTip.add("§5§o §a✴ SkyHanni User Luck §f$luckString")
+        event.toolTip.add("$LUCK_TOOLTIP$luckString")
     }
 
     private fun skyblockMenuTooltip(event: ToolTipEvent, limboLuck: Float) {
