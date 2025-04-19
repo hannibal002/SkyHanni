@@ -44,7 +44,7 @@ object MobHighlight {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!config.runicMobHighlight) return
 
         toHighlightRunicMobs.forEach {
