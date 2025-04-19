@@ -46,7 +46,7 @@ fun List<Searchable>.buildSearchableScrollable(
     )
 }
 
-fun Map<List<Renderable>, String?>.buildSearchableTable(textInput: SearchTextInput): Renderable {
+fun Map<List<Renderable>, String>.buildSearchableTable(textInput: SearchTextInput): Renderable {
     val key = 0
     return Renderable.searchBox(
         Renderable.searchableTable(toMap(), textInput = textInput, key = key + 1),

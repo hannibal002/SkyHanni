@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
@@ -30,6 +31,12 @@ object LineToMobHandler {
     @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn) {
         lines.remove(event.mob)
+    }
+
+    // TODO remove workaround once we can confirm why lines show up after world switch
+    @HandleEvent(WorldChangeEvent::class)
+    fun onWorldChange() {
+        lines.clear()
     }
 
     @HandleEvent(onlyOnSkyblock = true)

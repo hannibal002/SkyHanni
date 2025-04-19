@@ -19,6 +19,7 @@ import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
 import java.util.NavigableMap
+import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
 //#if FORGE
@@ -135,6 +136,12 @@ object StringUtils {
         return map.subMap(prefix, true, lastKey, false)
     }
 
+    fun subMapOfStringsStartingWith(prefix: String, map: NavigableSet<String>): NavigableSet<String> {
+        if ("" == prefix) return map
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
+        return map.subSet(prefix, true, lastKey, false)
+    }
+
     fun nextLexicographicallyStringWithSameLength(input: String): String {
         val lastCharPosition = input.length - 1
         val inputWithoutLastChar = input.substring(0, lastCharPosition)
@@ -201,6 +208,8 @@ object StringUtils {
         val allButLast = this.subList(0, lastIndex).joinToString("$delimiterColor, ")
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
+
+    fun String.pluralize(number: Int) = pluralize(number, this)
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"

@@ -651,6 +651,7 @@ object IslandGraphs {
             reasonForReport = "Manual reported graph location error",
             userReason = args.joinToString(" "),
             ignoreCache = true,
+            betaOnly = false,
         )
     }
 
@@ -659,12 +660,14 @@ object IslandGraphs {
         userFacingReason: String,
         additionalInternalInfo: String? = null,
         ignoreCache: Boolean = false,
+        betaOnly: Boolean = false,
     ) {
         sendReportLocation(
             location,
             reasonForReport = "Automatic graph location error: $userFacingReason",
             additionalInternalInfo = additionalInternalInfo,
             ignoreCache = ignoreCache,
+            betaOnly = betaOnly,
         )
     }
 
@@ -674,6 +677,7 @@ object IslandGraphs {
         userReason: String? = null,
         additionalInternalInfo: String? = null,
         ignoreCache: Boolean,
+        betaOnly: Boolean,
     ) {
         val graphArea = IslandAreas.currentAreaName
         val scoreboardArea = LorenzUtils.skyBlockArea ?: "unknown"
@@ -706,6 +710,7 @@ object IslandGraphs {
             noStackTrace = true,
             extraData = extraData.map { it.key to it.value }.normalizeAsArray(),
             ignoreErrorCache = ignoreCache,
+            betaOnly = betaOnly,
         )
     }
 
