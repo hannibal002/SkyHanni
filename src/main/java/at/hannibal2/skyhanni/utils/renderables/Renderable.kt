@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGui
@@ -558,50 +559,63 @@ interface Renderable {
         }
 
         fun searchableTable(
-            map: Map<List<Renderable?>, String?>,
+            content: Map<List<Renderable>, String>,
             textInput: TextInput,
             key: Int,
             xPadding: Int = 1,
             yPadding: Int = 0,
+            header: List<Renderable> = emptyList(),
             useEmptySpace: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            var content = filter()
-            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
+            var list = filterListMap(content, textInput.textBox)
+            private val fullContent = if (header.isNotEmpty()) listOf(header) + content.keys else content.keys
+            val xOffsets = RenderableUtils.calculateTableX(fullContent, xPadding)
+            val yOffsets = RenderableUtils.calculateTableY(fullContent, yPadding)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override val width = xOffsets.last() - xPadding
-            override val height = yOffsets.last() - yPadding
+            override val width = xOffsets.sum()
+            override val height = yOffsets.sumAllValues().toInt()
 
             val emptySpaceX = if (useEmptySpace) 0 else xPadding
             val emptySpaceY = if (useEmptySpace) 0 else yPadding
 
             init {
                 textInput.registerToEvent(key) {
-                    content = filter()
+                    list = filterListMap(content, textInput.textBox)
                 }
             }
 
-            // null = ignored, never filtered
-            private fun filter() = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
+            @Suppress("NOTHING_TO_INLINE")
+            inline fun renderRow(posX: Int, posY: Int, row: List<Renderable>, renderY: Int): Int {
+                var renderX = 0
+                val yShift = yOffsets[row] ?: row.firstOrNull()?.height ?: 0
+                for ((index, renderable) in row.withIndex()) {
+                    val xShift = xOffsets[index]
+                    renderable.renderXYAligned(
+                        posX + renderX,
+                        posY + renderY,
+                        xShift - emptySpaceX,
+                        yShift - emptySpaceY,
+                    )
+                    GlStateManager.translate(xShift.toFloat(), 0f, 0f)
+                    renderX += xShift
+                }
+                GlStateManager.translate(-renderX.toFloat(), yShift.toFloat(), 0f)
+                return renderY + yShift
+            }
 
             override fun render(posX: Int, posY: Int) {
-                for ((rowIndex, row) in content.withIndex()) {
-                    for ((index, renderable) in row.withIndex()) {
-                        GlStateManager.pushMatrix()
-                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.renderXYAligned(
-                            posX + xOffsets[index],
-                            posY + yOffsets[rowIndex],
-                            xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
-                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
-                        )
-                        GlStateManager.popMatrix()
-                    }
+                var renderY = 0
+                if (header.isNotEmpty()) {
+                    renderY = renderRow(posX, posY, header, renderY)
                 }
+                for (row in list) {
+                    renderY = renderRow(posX, posY, row, renderY)
+                }
+                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 
