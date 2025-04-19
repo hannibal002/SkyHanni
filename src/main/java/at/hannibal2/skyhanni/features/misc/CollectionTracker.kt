@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.isFormatNumber
 import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -79,11 +80,9 @@ object CollectionTracker {
         }
 
         val rawName = fixTypo(nameArgs.joinToString(" ").lowercase().replace("_", " "))
-        if (rawName == "gemstone") {
-            ChatUtils.userError("Gemstone collection is not supported!")
-            return
-        } else if (rawName == "mushroom") {
-            ChatUtils.userError("Mushroom collection is not supported!")
+        val unsupportedCollections = listOf("gemstone", "mushroom", "kuurda")
+        if (unsupportedCollections.contains(rawName)) {
+            ChatUtils.userError("${rawName.firstLetterUppercase()} collection is not supported!")
             return
         }
 
@@ -128,6 +127,21 @@ object CollectionTracker {
         "agaricus" -> "agaricus cap"
         "quartz" -> "nether quartz"
         "glowstone" -> "glowstone dust"
+        "floor 1" -> "bonzo"
+        "f1" -> "bonzo"
+        "floor 2" -> "scarf"
+        "f2" -> "scarf"
+        "Professor" -> "the professor"
+        "floor 3" -> "the professor"
+        "f3" -> "the professor"
+        "floor 4" -> "thorn"
+        "f4" -> "thorn"
+        "floor 5" -> "livid"
+        "f5" -> "livid"
+        "floor 6" -> "sadan"
+        "f6" -> "sadan"
+        "floor 7" -> "necron"
+        "f7" -> "necron"
 
         else -> rawName
     }
