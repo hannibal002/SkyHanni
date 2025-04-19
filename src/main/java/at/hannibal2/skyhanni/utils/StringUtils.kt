@@ -201,6 +201,8 @@ object StringUtils {
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
 
+    fun String.pluralize(number: Int) = pluralize(number, this)
+
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
         var str = if (number == 1 || number == -1) singular else pluralForm

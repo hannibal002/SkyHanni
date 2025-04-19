@@ -29,7 +29,9 @@ import kotlin.time.Duration.Companion.seconds
 object InventoryUtils {
 
     var itemInHandId = NeuInternalName.NONE
-    var recentItemsInHand = mutableMapOf<Long, NeuInternalName>()
+    fun NeuInternalName.recentlyHeld(): Boolean = this in recentItemsInHand
+
+    val recentItemsInHand = TimeLimitedSet<NeuInternalName>(30.seconds)
     var latestItemInHand: ItemStack? = null
     private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
 
