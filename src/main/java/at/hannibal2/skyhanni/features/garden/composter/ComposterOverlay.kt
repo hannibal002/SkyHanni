@@ -74,11 +74,11 @@ object ComposterOverlay {
     private var extraComposterUpgrade: ComposterUpgrade? = null
         set(value) {
             field = value
-            lastHovered = System.currentTimeMillis()
+            lastHovered = SimpleTimeMark.farPast()
         }
 
     private var maxLevel = false
-    private var lastHovered = 0L
+    private var lastHovered = SimpleTimeMark.farPast()
     private var lastAttemptTime = SimpleTimeMark.farPast()
 
     var inInventory = false
@@ -125,7 +125,7 @@ object ComposterOverlay {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
-        if (inComposterUpgrades && extraComposterUpgrade != null && System.currentTimeMillis() > lastHovered + 200) {
+        if (inComposterUpgrades && extraComposterUpgrade != null && lastHovered.passedSince() > 200.milliseconds) {
             extraComposterUpgrade = null
             update()
         }
