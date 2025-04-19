@@ -125,7 +125,9 @@ object EntityOutlineRenderer {
 
                 try {
                     if (key !is EntityLivingBase) outlineColor(value)
+                    key.isInvisible = false
                     renderManager.renderEntityStatic(key, partialTicks, true)
+                    key.isInvisible = true
                 } catch (ignored: Exception) {
                 }
             }
@@ -167,7 +169,9 @@ object EntityOutlineRenderer {
 
                 try {
                     if (key !is EntityLivingBase) outlineColor(value)
+                    key.isInvisible = false
                     renderManager.renderEntityStatic(key, partialTicks, true)
+                    key.isInvisible = true
                 } catch (ignored: Exception) {
                 }
             }
@@ -301,7 +305,8 @@ object EntityOutlineRenderer {
                 vector.x,
                 vector.y,
                 vector.z
-            ) || entity.getFirstPassenger() === MinecraftCompat.localPlayerOrNull
+            ) || entity.getFirstPassenger() === MinecraftCompat.localPlayerOrNull ||
+            entity.isInvisible
             )
     // Only render if renderManager would render and the world is loaded at the entity
 

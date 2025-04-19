@@ -51,7 +51,7 @@ object SeaCreatureFeatures {
         if (!config.highlight) return
 
         // mob.baseEntity.isInvisible = false
-        mob.extraEntities.forEach { it.isInvisible = false }
+        // mob.extraEntities.forEach { it.isInvisible = false }
 
         mob.highlight(LorenzColor.GREEN.toColor())
     }
