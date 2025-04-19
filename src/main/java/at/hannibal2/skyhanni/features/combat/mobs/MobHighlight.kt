@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -29,14 +31,28 @@ object MobHighlight {
 
     private val config get() = SkyHanniMod.feature.combat.mobs
     private var arachne: EntityLivingBase? = null
+    private val toHighlightRunicMobs: HashSet<Mob> = hashSetOf()
+
+    @HandleEvent
+    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+        val mob = event.mob
+        if (mob.isRunic) toHighlightRunicMobs.add(mob)
+    }
+
+    @HandleEvent
+    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
+        val mob = event.mob
+        if (mob.isRunic) toHighlightRunicMobs.remove(mob)
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!config.runicMobHighlight) return
 
-        val mob = event.mob
-        if (config.runicMobHighlight && mob.isRunic) {
-            mob.highlight(LorenzColor.LIGHT_PURPLE.toColor()) { config.runicMobHighlight }
+        toHighlightRunicMobs.forEach {
+            it.highlight(LorenzColor.LIGHT_PURPLE.toColor()) { config.runicMobHighlight }
         }
+        toHighlightRunicMobs.clear()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -128,6 +144,7 @@ object MobHighlight {
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         arachne = null
+        toHighlightRunicMobs.clear()
     }
 
     private fun checkArachne(entity: EntitySpider) {
