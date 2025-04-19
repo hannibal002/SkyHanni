@@ -1,3 +1,16 @@
 
 net.minecraft.entity.Entity net.minecraft.entity.Entity deceased removed at.hannibal2.skyhanni.utils.compat.deceased
 
+# 1.21.5 made nbt functions return Optional<T> instead of just T :/
+net.minecraft.nbt.NbtCompound net.minecraft.nbt.NbtCompound getBooleanOrDefault() getBoolean() at.hannibal2.skyhanni.utils.compat.getBooleanOrDefault
+net.minecraft.nbt.NbtCompound net.minecraft.nbt.NbtCompound getByteOrDefault() getByte() at.hannibal2.skyhanni.utils.compat.getByteOrDefault
+net.minecraft.nbt.NbtCompound net.minecraft.nbt.NbtCompound getCompoundOrDefault() getCompound() at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+net.minecraft.nbt.NbtCompound net.minecraft.nbt.NbtCompound getDoubleOrDefault() getDouble() at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
+net.minecraft.nbt.NbtCompound net.minecraft.nbt.NbtCompound getFloatOrDefault() getFloat() at.hannibal2.skyhanni.utils.compat.getFloatOrDefault
+net.minecraft.nbt.NbtCompound net.minecraft.nbt.NbtCompound getIntOrDefault() getInt() at.hannibal2.skyhanni.utils.compat.getIntOrDefault
+net.minecraft.nbt.NbtCompound net.minecraft.nbt.NbtCompound getLongOrDefault() getLong() at.hannibal2.skyhanni.utils.compat.getLongOrDefault
+net.minecraft.nbt.NbtCompound net.minecraft.nbt.NbtCompound getStringOrDefault() getString() at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+
+net.minecraft.nbt.NbtList net.minecraft.nbt.NbtList getCompoundOrDefault() getCompound() at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
+net.minecraft.nbt.NbtList net.minecraft.nbt.NbtList getStringOrDefault() getString() at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+

@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -833,17 +834,21 @@ object ItemUtils {
     }
 
     fun NBTTagCompound.getStringList(key: String): List<String> {
-        if (!hasKey(key, 9)) return emptyList()
+        if (!NbtCompat.containsList(this, key)) return emptyList()
 
-        return getTagList(key, 8).let { loreList ->
+        return NbtCompat.getStringTagList(this, key).let { loreList ->
             List(loreList.tagCount()) { loreList.getStringTagAt(it) }
         }
     }
 
     fun NBTTagCompound.getCompoundList(key: String): List<NBTTagCompound> =
-        getTagList(key, 10).let { loreList ->
+        NbtCompat.getCompoundTagList(this, key).let { loreList ->
             List(loreList.tagCount()) { loreList.getCompoundTagAt(it) }
         }
+
+    fun NBTTagCompound.containsCompound(key: String): Boolean {
+        return NbtCompat.containsCompound(this, key)
+    }
 
     fun NeuInternalName.getNumberedName(amount: Number): String {
         val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "

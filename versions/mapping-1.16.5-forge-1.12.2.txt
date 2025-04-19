@@ -405,6 +405,7 @@ net.minecraft.world.item.DyeColor LIGHT_GRAY SILVER
 
 net.minecraft.world.item.Item byBlock() getItemFromBlock()
 
+net.minecraft.world.item.ItemStack count stackSize
 net.minecraft.world.item.ItemStack getTag() getTagCompound()
 net.minecraft.world.item.ItemStack isEnchanted() isItemEnchanted()
 
