@@ -33,7 +33,6 @@ object EquipmentApi {
 
     val inventory = InventoryDetector { it == "Your Equipment and Stats" }
 
-    private const val SLOTS = 4
     val stained_glass_pane = Item.getItemFromBlock(Blocks.stained_glass_pane)
 
     private val storage get() = ProfileStorageData.profileSpecific?.equipment
@@ -105,10 +104,6 @@ object EquipmentApi {
         setEquipment(slot, item)
     }
 
-    fun getEmptyEquipment(): MutableList<ItemStack?> {
-        val list = mutableListOf<ItemStack?>()
-        for (i in 0 until SLOTS) list.add(null)
-        return list
-    }
+    fun getEmptyEquipment(): MutableList<ItemStack?> = EquipmentSlot.entries.mapTo(mutableListOf()) { null }
 
 }
