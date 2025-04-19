@@ -33,7 +33,7 @@ object EquipmentApi {
 
     val inventory = InventoryDetector { it == "Your Equipment and Stats" }
 
-    val stained_glass_pane = Item.getItemFromBlock(Blocks.stained_glass_pane)
+    private val stained_glass_pane = Item.getItemFromBlock(Blocks.stained_glass_pane)
 
     private val storage get() = ProfileStorageData.profileSpecific?.equipment
 
