@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -82,19 +83,24 @@ object FrogMaskFeatures {
 
         when (config.warning.warningType) {
             WarningType.BEING -> {
-                TitleManager.sendTitle("§cWrong Region!")
+                remindWrongRegion(helmetRegion)
                 lastWarning = SimpleTimeMark.now()
             }
 
             WarningType.FORAGING -> {
                 if (isForaging()) {
-                    TitleManager.sendTitle("§cWrong Region!")
+                    remindWrongRegion(helmetRegion)
                     lastWarning = SimpleTimeMark.now()
                 }
             }
 
             WarningType.NEVER -> return
         }
+    }
+
+    private fun remindWrongRegion(helmetRegion: String) {
+        TitleManager.sendTitle("§cWrong Region!")
+        ChatUtils.chat("Your Frog Mask currently boosts $helmetRegion §e!")
     }
 
     private fun handleDisplay(helmetRegion: String) {
