@@ -51,8 +51,6 @@ abstract class CleanupMappingFiles : DefaultTask() {
 
         val newText = writeMappings(sortedLines, comments)
         if (oldText.lines() != newText.lines()) {
-            println("writing to ${file.name}")
-
             file.writeText(newText)
         }
     }
