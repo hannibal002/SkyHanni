@@ -9,8 +9,6 @@ import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.EnumChatFormatting.GREEN
-import net.minecraft.util.EnumChatFormatting.RED
 import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
@@ -18,7 +16,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
     val button = GuiElementButton("", -1) {}
     val changelog = GuiElementButton("Show Changelog", -1) { }
 
-    val currentVersion = SkyHanniMod.version
+    val currentVersion = SkyHanniMod.VERSION
 
     override fun render(context: RenderContext?, x: Int, y: Int, width: Int) {
         val fr = Minecraft.getMinecraft().fontRendererObj
@@ -55,7 +53,6 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         }
 
         GlStateManager.scale(2F, 2F, 1F)
-        val currentVersion = SkyHanniMod.VERSION
         val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +

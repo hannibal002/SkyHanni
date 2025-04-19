@@ -147,8 +147,8 @@ object GuiRenderUtils {
         endColor: Int = -0xfeffff0,
         zLevel: Double = 0.0,
     ) {
-        val (startAlpha, startRed, startGreen, startBlue) = Color(startColor)
-        val (endAlpha, endRed, endGreen, endBlue) = Color(endColor)
+        val (startAlpha, startRed, startGreen, startBlue) = Color(startColor, true)
+        val (endAlpha, endRed, endGreen, endBlue) = Color(endColor, true)
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()

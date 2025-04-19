@@ -1,19 +1,21 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.containsKeys
-import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,6 +24,7 @@ import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
 
+@SkyHanniModule
 object ChangelogViewer {
 
     private var dispatcher = Dispatchers.IO
@@ -35,11 +38,11 @@ object ChangelogViewer {
 
     internal var shouldMakeNewList = false
 
-    internal var shouldShowBeta = LorenzUtils.isBetaVersion()
+    internal var shouldShowBeta = SkyHanniMod.isBetaVersion
     internal var showTechnicalDetails = false
 
     internal val primaryColor = LorenzColor.DARK_GRAY.toColor().addAlpha(218)
-    internal val primary2Color = LorenzColor.DARK_GRAY.toColor().darker().withAlpha(220)
+    internal val primary2Color = LorenzColor.DARK_GRAY.toColor().darker().addAlpha(220)
 
     fun showChangelog(currentVersion: String, targetVersion: String) =
         showChangelog(currentVersion.toVersionTag(), targetVersion.toVersionTag())
@@ -50,7 +53,7 @@ object ChangelogViewer {
                 "Invalid versions for changelog",
                 "current version is larger than target version",
                 "current" to currentVersion,
-                "target" to targetVersion
+                "target" to targetVersion,
             )
             return
         }
@@ -72,7 +75,7 @@ object ChangelogViewer {
     ) : Comparable<VersionTag> {
 
         constructor(l: List<Int>, beta: Boolean) : this(
-            l.getOrNull(0) ?: -1, l.getOrNull(1) ?: -1, l.getOrNull(2) ?: -1, l.getOrNull(3) ?: -1, beta
+            l.getOrNull(0) ?: -1, l.getOrNull(1) ?: -1, l.getOrNull(2) ?: -1, l.getOrNull(3) ?: -1, beta,
         )
 
         override operator fun compareTo(other: VersionTag): Int {
@@ -129,8 +132,8 @@ object ChangelogViewer {
                 var pageNumber = 1
                 while (data.isEmpty() || data.last().tagName.toVersionTag() > startVersion) {
                     val jsonObject = withContext(dispatcher) {
-                        APIUtil.getJSONResponseAsElement(
-                            url + pageNumber, apiName = "github"
+                        ApiUtils.getJSONResponseAsElement(
+                            url + pageNumber, apiName = "github",
                         )
                     }
                     val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
@@ -144,7 +147,7 @@ object ChangelogViewer {
                 neededData.forEach {
                     var headline = 0
                     cache[it.tagName.toVersionTag()] = it.body.replace(
-                        "[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), ""
+                        "[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), "",
                     ) // Remove GitHub link
                         .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
                         .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
@@ -183,12 +186,23 @@ object ChangelogViewer {
         }
     }
 
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register(
+            "shchangelog",
+        ) {
+            description = "Shows the specified changelog."
+            category = CommandCategory.USERS_ACTIVE
+            callback(::handelCommand)
+        }
+    }
+
     fun handelCommand(args: Array<String>) {
         when (args.size) {
-            0 -> UpdateManager.getNextVersion()?.let { showChangelog(SkyHanniMod.version, it) }
+            0 -> UpdateManager.getNextVersion()?.let { showChangelog(SkyHanniMod.VERSION, it) }
                 ?: ChatUtils.userError(
                     "You are up to date, if you want to look at past change logs use the command " +
-                        "with arguments. Usage: [version you want to look at] [your version]"
+                        "with arguments. Usage: [version you want to look at] [your version]",
                 )
 
             1 -> {
@@ -197,7 +211,7 @@ object ChangelogViewer {
                     ChatUtils.userError("Version shape requirement failed")
                     return
                 }
-                val current = SkyHanniMod.version.toVersionTag()
+                val current = SkyHanniMod.VERSION.toVersionTag()
                 if (tag <= current) {
                     showChangelog(tag, tag)
                 } else {
@@ -221,7 +235,7 @@ object ChangelogViewer {
 
             else -> ChatUtils.userError(
                 "Invalid amount of arguments. Usage: [version you want to look at] " +
-                    "[your version]"
+                    "[your version]",
             )
         }
 

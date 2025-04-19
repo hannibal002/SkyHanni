@@ -41,23 +41,22 @@ object DefaultConfigFeatures {
                 "Looks like this is the first time you are using SkyHanni. " +
                     "Click here to configure default options, or run /shdefaultoptions.",
                 onClick = { onCommand("null", "null") },
-                "§eClick to run /shdefaultoptions!"
+                "§eClick to run /shdefaultoptions!",
             )
         } else if (updated) {
             val lastVersion = knownToggles.keys.last { it != SkyHanniMod.VERSION }
             val command = "/shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}"
             ChatUtils.chat("Looks like you updated SkyHanni.")
             ChatUtils.clickableChat(
-                "Looks like you updated SkyHanni. " +
-                    "Click here to configure the newly introduced options, or run $command.",
+                "Click here to configure the newly introduced options, or run $command.",
                 onClick = { onCommand(lastVersion, SkyHanniMod.VERSION) },
-                "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!"
+                "§eClick to run /shdefaultoptions $lastVersion ${SkyHanniMod.VERSION}!",
             )
             ChatUtils.clickableChat(
                 "Click here to see the changelog.",
                 onClick = {
                     ChangelogViewer.showChangelog(lastVersion, SkyHanniMod.VERSION)
-                }
+                },
             )
         }
     }

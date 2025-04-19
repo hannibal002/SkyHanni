@@ -14,9 +14,11 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.GuiRenderUtils.drawGradientRect
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.skyhanni.utils.RenderUtils.drawRoundRect
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -1602,7 +1604,7 @@ object RenderUtils {
         RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
         GlStateManager.pushMatrix()
-        ShaderManager.enableShader("rounded_rect")
+        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
 
         drawGradientRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
 
