@@ -125,9 +125,7 @@ object EntityOutlineRenderer {
 
                 try {
                     if (key !is EntityLivingBase) outlineColor(value)
-                    key.isInvisible = false
                     renderManager.renderEntityStatic(key, partialTicks, true)
-                    key.isInvisible = true
                 } catch (ignored: Exception) {
                 }
             }
@@ -169,9 +167,7 @@ object EntityOutlineRenderer {
 
                 try {
                     if (key !is EntityLivingBase) outlineColor(value)
-                    key.isInvisible = false
                     renderManager.renderEntityStatic(key, partialTicks, true)
-                    key.isInvisible = true
                 } catch (ignored: Exception) {
                 }
             }
