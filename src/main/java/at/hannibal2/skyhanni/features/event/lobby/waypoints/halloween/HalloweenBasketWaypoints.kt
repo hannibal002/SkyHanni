@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object BasketWaypoints {
+object HalloweenBasketWaypoints {
 
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.halloweenBasket
     private var isActive: Boolean = false
@@ -40,25 +40,25 @@ object BasketWaypoints {
     // TODO add regex tests
     private val scoreboardTitlePattern by patternGroup.pattern(
         "main.scoreboard.title",
-        "^HYPIXEL$"
+        "^HYPIXEL$",
     )
     private val halloweenEventPattern by patternGroup.pattern(
         "main.scoreboard.halloween",
-        "^§6Halloween \\d+$"
+        "^§6Halloween \\d+$",
     )
     private val scoreboardBasketPattern by patternGroup.pattern(
         "main.scoreboard.basket",
-        "^Baskets Found: §a\\d+§f/§a\\d+\$"
+        "^Baskets Found: §a\\d+§f/§a\\d+\$",
     )
 
     @Suppress("MaxLineLength")
     private val basketPattern by patternGroup.pattern(
         "basket",
-        "^(?:(?:§.)+You found a Candy Basket! (?:(?:§.)+\\((?:§.)+(?<current>\\d+)(?:§.)+/(?:§.)+(?<max>\\d+)(?:§.)+\\))?|(?:§.)+You already found this Candy Basket!)\$"
+        "^(?:(?:§.)+You found a Candy Basket! (?:(?:§.)+\\((?:§.)+(?<current>\\d+)(?:§.)+/(?:§.)+(?<max>\\d+)(?:§.)+\\))?|(?:§.)+You already found this Candy Basket!)\$",
     )
     private val basketAllFoundPattern by patternGroup.pattern(
         "basket.allfound",
-        "^§a§lCongratulations! You found all Candy Baskets!$"
+        "^§a§lCongratulations! You found all Candy Baskets!$",
     )
 
     @HandleEvent
@@ -120,12 +120,12 @@ object BasketWaypoints {
             isActive = false
             return
         }
-        var titleMatches = false
+        var inHub = false
         var halloweenMatches = false
         var basketMatches = false
 
         if (scoreboardTitlePattern.matches(ScoreboardData.objectiveTitle.removeColor())) {
-            titleMatches = true
+            inHub = true
         }
         event.full.forEach {
             if (halloweenEventPattern.matches(it)) {
@@ -135,7 +135,7 @@ object BasketWaypoints {
             }
         }
 
-        val newIsActive = titleMatches && halloweenMatches && basketMatches
+        val newIsActive = inHub && halloweenMatches && basketMatches
         if (isActive != newIsActive && newIsActive) {
             IslandGraphs.loadLobby("MAIN_LOBBY")
 
@@ -164,7 +164,7 @@ object BasketWaypoints {
             basket.position,
             "§dNext Basket",
             LorenzColor.LIGHT_PURPLE.toColor(),
-            condition = { config.pathfind.get() && closestBasket != null && config.allWaypoints }
+            condition = { config.pathfind.get() && closestBasket != null && config.allWaypoints },
         )
     }
 

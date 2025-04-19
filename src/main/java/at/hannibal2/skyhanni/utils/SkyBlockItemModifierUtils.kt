@@ -23,6 +23,7 @@ import java.util.Locale
 //$$ import net.minecraft.item.Items
 //#endif
 
+@Suppress("TooManyFunctions")
 object SkyBlockItemModifierUtils {
 
     fun ItemStack.getCoinsOfAvarice() = getAttributeLong("collected_coins")
