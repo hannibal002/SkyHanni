@@ -70,5 +70,7 @@ enum class ItemCategory {
         val miningTools = listOf(PICKAXE, DRILL, GAUNTLET)
 
         val armor = setOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
+
+        val equipment = setOf(NECKLACE, BELT, CLOAK, GLOVES, BRACELET)
     }
 }

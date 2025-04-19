@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -641,6 +642,14 @@ class ProfileSpecificStorage {
 
         @Expose
         var currentSlot: Int? = null
+    }
+
+    @Expose
+    var equipment: EquipmentStorage = EquipmentStorage()
+
+    class EquipmentStorage {
+        @Expose
+        var slots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
     }
 
     // - mining
