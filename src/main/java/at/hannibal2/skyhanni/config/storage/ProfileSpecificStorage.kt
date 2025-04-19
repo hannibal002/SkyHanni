@@ -650,6 +650,9 @@ class ProfileSpecificStorage {
     class EquipmentStorage {
         @Expose
         var slots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+
+        @Expose
+        var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
     }
 
     // - mining

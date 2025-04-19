@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -37,7 +38,7 @@ object EquipmentApi {
 
     private val storage get() = ProfileStorageData.profileSpecific?.equipment
 
-    private val equipment get() = storage?.slots
+    private val equipment get() = if (RiftApi.inRift()) storage?.riftSlots else storage?.slots
 
     fun getEquipment(slot: EquipmentSlot): ItemStack? = equipment?.get(slot.ordinal)
     private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) = equipment?.set(slot.ordinal, itemStack)
@@ -85,7 +86,14 @@ object EquipmentApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Equipment")
         event.addIrrelevant {
-            equipment?.forEach { item ->
+            val storage = storage ?: return@addIrrelevant
+            add("§aEquipment:")
+            storage.slots.forEach { item ->
+                val name = item?.displayName.toString()
+                add(name)
+            }
+            add("§aRift Equipment:")
+            storage.riftSlots.forEach { item ->
                 val name = item?.displayName.toString()
                 add(name)
             }
