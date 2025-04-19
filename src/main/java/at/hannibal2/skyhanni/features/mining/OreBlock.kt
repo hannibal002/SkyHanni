@@ -136,6 +136,12 @@ enum class OreBlock(
         else -> round((strength * 30.0) / speed).toInt()
     }
 
+    /**
+     * Assume below softcap
+     */
+    fun speedNeededForNextTick(currentSpeed: Double): Double =
+        (strength * 30) / (miningTicks(currentSpeed) - 0.5) - currentSpeed
+
     constructor(block: Block, checkArea: () -> Boolean, category: OreCategory, hasInitSound: Boolean = true) :
         this({ it.block == block }, checkArea, category, hasInitSound)
 
