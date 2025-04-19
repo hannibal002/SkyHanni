@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.utils.ItemPriceSource;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -71,12 +70,12 @@ public class EliteFarmingWeightConfig {
     @ConfigOption(name = "Use ETA Goal", desc = "Use the ETA Goal number instead of the next upcoming rank. Useful when your rank is in the" +
         "ten thousands and you don't want to see small ETAs.")
     @ConfigEditorBoolean
-    public boolean useEtaGoalRank = true;
+    public Property<Boolean> useEtaGoalRank = Property.of(true);
 
     @Expose
     @ConfigOption(name = "ETA Goal", desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")")
     @ConfigEditorText
-    public String etaGoalRank = "10000";
+    public Property<String> etaGoalRank = Property.of("10000");
 
     @Expose
     @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")

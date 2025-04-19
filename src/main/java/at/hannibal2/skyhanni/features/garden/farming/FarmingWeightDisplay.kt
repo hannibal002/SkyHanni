@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -111,6 +113,23 @@ object FarmingWeightDisplay {
         event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
     }
 
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        if (!isEtaEnabled()) return
+        if (lastupdate.passedSince() < 30.seconds) return
+
+        ConditionalUtils.onToggle(config.useEtaGoalRank) {
+            getRankGoal()
+            loadLeaderboardIfAble()
+            var lastupdate = SimpleTimeMark.now()
+        }
+        ConditionalUtils.onToggle(config.etaGoalRank) {
+            getRankGoal()
+            loadLeaderboardIfAble()
+            var lastupdate = SimpleTimeMark.now()
+        }
+    }
+
     private val config get() = GardenApi.config.eliteFarmingWeights
     private val localCounter = mutableMapOf<CropType, Long>()
 
@@ -127,6 +146,7 @@ object FarmingWeightDisplay {
     private var isLoadingLeaderboard = false
     private var rankGoal = -1
     private var minAmount = 0
+    private var lastupdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private val nextPlayers = mutableListOf<UpcomingLeaderboardPlayer>()
     private val nextPlayer get() = nextPlayers.firstOrNull()
@@ -236,14 +256,14 @@ object FarmingWeightDisplay {
         var goal = 10000
 
         // Check that the provided string is valid
-        val parsed = value.toIntOrNull() ?: 0
+        val parsed = value.get().toIntOrNull() ?: 0
         if (parsed < 1 || parsed > goal) {
             ChatUtils.chatAndOpenConfig(
                 "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
                     "to a valid number [1-10000] to use this feature!",
                 GardenApi.config.eliteFarmingWeights::etaGoalRank,
             )
-            config.etaGoalRank = goal.toString()
+            config.etaGoalRank.set(goal.toString())
         } else {
             goal = parsed
         }
@@ -270,7 +290,7 @@ object FarmingWeightDisplay {
         val nextWeight = nextPlayer?.weight ?: minAmount.toDouble()
         var nextName = nextPlayer?.name ?: "$nextWeight Weight"
 
-        val showRankGoal = (leaderboardPosition == -1 || leaderboardPosition > rankGoal) && config.useEtaGoalRank
+        val showRankGoal = (leaderboardPosition == -1 || leaderboardPosition > rankGoal) && config.useEtaGoalRank.get()
         nextName = if (showRankGoal) "#$rankGoal" else nextName
 
         val totalWeight = (localWeight + weight)
@@ -445,7 +465,7 @@ object FarmingWeightDisplay {
 
         val includeUpcoming = if (isEtaEnabled()) "?upcoming=10" else ""
         val goalRank = getRankGoal() + 1 // API returns upcoming players as if you were at this rank already
-        val atRank = if (isEtaEnabled() && config.useEtaGoalRank) "&atRank=$goalRank" else ""
+        val atRank = if (isEtaEnabled() && config.useEtaGoalRank.get()) "&atRank=$goalRank" else ""
         val lbType = if (isMonthlyLb()) "-monthly" else ""
 
         val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/" +
