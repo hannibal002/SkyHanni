@@ -121,12 +121,12 @@ object FarmingWeightDisplay {
         ConditionalUtils.onToggle(config.useEtaGoalRank) {
             getRankGoal()
             loadLeaderboardIfAble()
-            var lastupdate = SimpleTimeMark.now()
+            lastupdate = SimpleTimeMark.now()
         }
         ConditionalUtils.onToggle(config.etaGoalRank) {
             getRankGoal()
             loadLeaderboardIfAble()
-            var lastupdate = SimpleTimeMark.now()
+            lastupdate = SimpleTimeMark.now()
         }
     }
 
