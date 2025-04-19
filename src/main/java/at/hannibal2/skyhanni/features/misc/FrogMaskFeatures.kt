@@ -91,12 +91,12 @@ object FrogMaskFeatures {
 
     private fun handleDisplay(helmetRegion: String) {
         val now = SkyBlockTime.now()
-        val endOfDay = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).toTimeMark()
-        updateDisplay(helmetRegion, endOfDay)
+        val nextDay = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).toTimeMark()
+        updateDisplay(helmetRegion, nextDay)
     }
 
-    private fun updateDisplay(helmetRegion: String, endOfDay: SimpleTimeMark) {
-        val timeRemaining = endOfDay.timeUntil()
+    private fun updateDisplay(helmetRegion: String, nextDay: SimpleTimeMark) {
+        val timeRemaining = nextDay.timeUntil()
 
         display = Renderable.horizontalContainer(
             listOf(
