@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.inPartialSeconds
@@ -111,12 +111,10 @@ enum class ItemAbility(
     fun getDurationText(): String {
         val duration = (lastActivation + getCooldown()).timeUntil()
         return if (duration < 1.6.seconds) {
-            var d = duration.inWholeMilliseconds * 10.0
-            d /= 10.0
-            d.roundTo(1).addSeparators()
+            val d = (duration.inPartialSeconds)
+            d.roundTo(1).oneDecimal()
         } else {
-            val d = duration.inPartialSeconds + 1
-            d.addSeparators()
+            "" + (duration.inWholeSeconds + 1)
         }
     }
 

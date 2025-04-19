@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import net.minecraft.client.Minecraft
@@ -74,22 +75,22 @@ object RenderableTooltips {
         GlStateManager.enableDepth()
 
         val zLevel = 400f
-        GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
+        DrawContextUtils.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
         drawTooltipBackground(tooltipTextWidth, tooltipHeight, borderColorStart)
 
-        GlStateManager.translate(-1f, -1f, 0f)
+        DrawContextUtils.translate(-1f, -1f, 0f)
 
         var yTranslateSum = 0
         tips.forEachIndexed { index, line ->
             line.renderXAligned(tooltipX, tooltipY, tooltipTextWidth)
             var yShift = line.height
             if (index == 0 && isSpacedTitle) yShift += 2
-            GlStateManager.translate(0f, yShift.toFloat(), 0f)
+            DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
             yTranslateSum += yShift
         }
 
-        GlStateManager.translate(-tooltipX.toFloat() + 1, -tooltipY.toFloat() + 1 + yTranslateSum.toFloat(), -zLevel)
+        DrawContextUtils.translate(-tooltipX.toFloat() + 1, -tooltipY.toFloat() + 1 + yTranslateSum.toFloat(), -zLevel)
         GlStateManager.enableLighting()
         RenderHelper.enableStandardItemLighting()
         GlStateManager.enableRescaleNormal()
