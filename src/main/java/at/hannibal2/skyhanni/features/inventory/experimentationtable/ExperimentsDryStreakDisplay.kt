@@ -62,7 +62,7 @@ object ExperimentsDryStreakDisplay {
                 ChatUtils.chat(
                     "§a§lDRY-STREAK ENDED! §eYou have (finally) " +
                         "found a §5ULTRA-RARE §eafter §3${storage.xpSince.shortFormat()} Enchanting Exp " +
-                        "§e and §2${storage.attemptsSince} attempts§e!",
+                        "§eand §2${storage.attemptsSince} attempts§e!",
                 )
                 storage.attemptsSince = 0
                 storage.xpSince = 0

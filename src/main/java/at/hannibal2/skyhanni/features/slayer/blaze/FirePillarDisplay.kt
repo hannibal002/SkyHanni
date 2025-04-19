@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -15,7 +15,7 @@ import net.minecraft.entity.item.EntityArmorStand
 @SkyHanniModule
 object FirePillarDisplay {
 
-    private val config get() = SkyHanniMod.feature.slayer.blazes
+    private val config get() = SlayerApi.config.blazes
 
     /**
      * REGEX-TEST: §6§l2s §c§l8 hits

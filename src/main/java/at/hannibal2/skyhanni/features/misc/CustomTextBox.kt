@@ -30,7 +30,7 @@ object CustomTextBox {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!config.onlyInGUI) return
+        if (!config.onlyInGui) return
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")
@@ -38,7 +38,7 @@ object CustomTextBox {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (config.onlyInGUI) return
+        if (config.onlyInGui) return
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "Custom Text Box")
@@ -50,5 +50,6 @@ object CustomTextBox {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.textBox", "gui.customTextBox")
+        event.move(81, "gui.customTextBox.onlyInGUI", "gui.customTextBox.onlyInGui")
     }
 }

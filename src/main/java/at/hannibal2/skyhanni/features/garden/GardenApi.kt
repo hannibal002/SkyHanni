@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
@@ -22,13 +22,13 @@ import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateShopPrice
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -57,10 +58,11 @@ object GardenApi {
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
+    var pestCooldownEndTime = SimpleTimeMark.farPast()
+    var lastCropBrokenTime = SimpleTimeMark.farPast()
     val mushroomCowPet
         get() = PetApi.isCurrentPet("Mooshroom Cow") &&
-            storage?.fortune?.farmingItems?.get(FarmingItems.MOOSHROOM_COW)
-                ?.let { it.getItemRarityOrNull()?.isAtLeast(LorenzRarity.RARE) } ?: false
+            FarmingItemType.MOOSHROOM_COW.getItemOrNull()?.let { it.getItemRarityOrNull()?.isAtLeast(LorenzRarity.RARE) } ?: false
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val storage get() = ProfileStorageData.profileSpecific?.garden
@@ -190,10 +192,10 @@ object GardenApi {
         SkyMartCopperPrice.inInventory ||
         FarmingContestApi.inInventory ||
         VisitorApi.inInventory ||
-        FFGuideGUI.isInGui() ||
-        ChocolateShopPrice.inInventory ||
-        ChocolateFactoryApi.inChocolateFactory ||
-        ChocolateFactoryApi.chocolateFactoryPaused ||
+        FFGuideGui.isInGui() ||
+        CFShopPrice.inInventory ||
+        CFApi.inChocolateFactory ||
+        CFApi.chocolateFactoryPaused ||
         HoppityCollectionStats.inInventory ||
         PesthunterProfit.isInInventory()
 

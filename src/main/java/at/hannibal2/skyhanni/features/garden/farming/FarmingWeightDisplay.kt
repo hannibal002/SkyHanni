@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -48,19 +48,15 @@ object FarmingWeightDisplay {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { shouldShowDisplay() },
+            condition = { shouldShowDisplay() && isEnabled() },
             onRender = {
-                val shouldShow = apiError || (config.ignoreLow || weight >= 200)
-                if (isEnabled() && shouldShow) {
-                    config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
-                }
+                config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
             },
         )
     }
 
-    private fun shouldShowDisplay(): Boolean {
-        return !GardenApi.hideExtraGuis()
-    }
+    private fun shouldShowDisplay(): Boolean =
+        !GardenApi.hideExtraGuis() && (apiError || (config.ignoreLow || weight >= 200))
 
     @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {

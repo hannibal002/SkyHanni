@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
@@ -24,8 +25,8 @@ object OtherInventoryData {
         close()
     }
 
-    fun close(reopenSameName: Boolean = false) {
-        InventoryCloseEvent(reopenSameName).post()
+    fun close(title: String = InventoryUtils.openInventoryName(), reopenSameName: Boolean = false) {
+        InventoryCloseEvent(title, reopenSameName).post()
         currentInventory = null
     }
 
