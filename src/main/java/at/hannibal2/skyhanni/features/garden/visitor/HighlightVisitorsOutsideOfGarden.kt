@@ -89,7 +89,6 @@ object HighlightVisitorsOutsideOfGarden {
         if (!shouldBlock) return
         if (MinecraftCompat.localPlayer.isSneaking) return
         val entity = event.clickedEntity ?: return
-        ChatUtils.consoleLog("triggered")
         if (isVisitor(entity) || (entity is EntityArmorStand && isVisitorNearby(entity.getLorenzVec()))) {
             ChatUtils.chatAndOpenConfig(
                 "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
