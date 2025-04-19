@@ -55,7 +55,7 @@ object FrogMaskFeatures {
     fun onRenderOverlay() {
         if (!isEnabled()) return
 
-        config.displayPosition.renderRenderable(display, posLabel = "Frog Mask Display")
+        config.position.renderRenderable(display, posLabel = "Frog Mask Display")
     }
 
     @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_PARK)
@@ -75,8 +75,6 @@ object FrogMaskFeatures {
     }
 
     private fun handleWarning(helmetRegion: String) {
-        if (config.warning.warningType == WarningType.NEVER) return
-
         val needsToWarn =
             IslandAreas.currentAreaName != helmetRegion.removeColor() && lastWarning.passedSince() > config.warning.cooldown.seconds
 
@@ -85,7 +83,7 @@ object FrogMaskFeatures {
         when (config.warning.warningType) {
             WarningType.BEING -> TitleManager.sendTitle("§cWrong Region!")
             WarningType.FORAGING -> if (isForaging()) TitleManager.sendTitle("§cWrong Region!")
-            else -> return
+            WarningType.NEVER -> return
         }
 
         lastWarning = SimpleTimeMark.now()
@@ -114,14 +112,16 @@ object FrogMaskFeatures {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(86, "misc.frogMaskDisplay", "misc.frogMaskFeatures.display")
-        event.move(86, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.displayPosition")
+        event.move(86, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.position")
     }
+
+    // TODO nopo you should have fun with a wood compat class now
+    private val logTypes = setOf(Blocks.log, Blocks.log2)
 
     @HandleEvent(onlyOnIsland = IslandType.THE_PARK)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        val logTypes = setOf(Blocks.log, Blocks.log2)
         if (event.position.getBlockAt() !in logTypes) return
 
         lastLogClick = SimpleTimeMark.now()
