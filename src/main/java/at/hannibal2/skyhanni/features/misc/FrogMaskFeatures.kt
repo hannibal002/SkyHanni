@@ -75,10 +75,10 @@ object FrogMaskFeatures {
     }
 
     private fun handleWarning(helmetRegion: String) {
-        val needsToWarn =
-            IslandAreas.currentAreaName != helmetRegion.removeColor() && lastWarning.passedSince() > config.warning.cooldown.seconds
+        val inWrongArea = IslandAreas.currentAreaName != helmetRegion.removeColor()
+        val timeToWarn = lastWarning.passedSince() > config.warning.cooldown.seconds
 
-        if (!needsToWarn) return
+        if (!inWrongArea || !timeToWarn) return
 
         when (config.warning.warningType) {
             WarningType.BEING -> {
