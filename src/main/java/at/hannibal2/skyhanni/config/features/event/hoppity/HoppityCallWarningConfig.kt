@@ -6,12 +6,10 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import org.lwjgl.input.Keyboard
 
 class HoppityCallWarningConfig {
     @Expose
@@ -19,11 +17,6 @@ class HoppityCallWarningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Accept Call Hotkey", desc = "Accept the call from hoppity by pressing this keybind.")
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    var acceptHotkey: Int = Keyboard.KEY_NONE
 
     @Expose
     @ConfigOption(

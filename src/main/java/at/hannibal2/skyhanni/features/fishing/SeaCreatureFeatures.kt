@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -72,7 +71,7 @@ object SeaCreatureFeatures {
         if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
             else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
-            TitleManager.sendTitle(text, duration = 1.5.seconds, height = 3.6, fontSize = 7f)
+            TitleManager.sendTitle(text, duration = 1.5.seconds)
             if (config.playSound) SoundUtils.playBeepSound()
         }
     }
@@ -88,7 +87,7 @@ object SeaCreatureFeatures {
         if (config.alertOwnCatches) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
-            TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
+            TitleManager.sendTitle(text)
             if (config.playSound) SoundUtils.playBeepSound()
             lastRareCatch = SimpleTimeMark.now()
         }
@@ -103,7 +102,7 @@ object SeaCreatureFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         rareSeaCreatures.clear()
         entityIds.clear()
     }

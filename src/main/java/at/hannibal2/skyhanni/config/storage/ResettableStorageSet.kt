@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.config.storage
+
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.createInstance

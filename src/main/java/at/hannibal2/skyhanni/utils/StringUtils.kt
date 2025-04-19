@@ -18,6 +18,7 @@ import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
 import java.util.NavigableMap
+import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
 //#if FORGE
@@ -134,6 +135,12 @@ object StringUtils {
         return map.subMap(prefix, true, lastKey, false)
     }
 
+    fun subMapOfStringsStartingWith(prefix: String, map: NavigableSet<String>): NavigableSet<String> {
+        if ("" == prefix) return map
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
+        return map.subSet(prefix, true, lastKey, false)
+    }
+
     fun nextLexicographicallyStringWithSameLength(input: String): String {
         val lastCharPosition = input.length - 1
         val inputWithoutLastChar = input.substring(0, lastCharPosition)
@@ -150,7 +157,7 @@ object StringUtils {
             split[1].removeColor()
         } else {
             split[0].removeColor()
-        }
+        }.removeSuffix("'s")
     }
 
     fun String.cleanPlayerName(displayName: Boolean = false): String {
@@ -200,6 +207,8 @@ object StringUtils {
         val allButLast = this.subList(0, lastIndex).joinToString("$delimiterColor, ")
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
+
+    fun String.pluralize(number: Int) = pluralize(number, this)
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
@@ -491,5 +500,39 @@ object StringUtils {
         val firstColor = getFirstColorCode()
         val clean = removeColor()
         return "§$firstColor§m$clean"
+    }
+
+    fun getListOfStringsMatchingLastWord(words: Array<String>, args: Collection<String>): List<String> {
+        val lastWord = words.lastOrNull() ?: return emptyList()
+        val matches = args.filter { it.startsWith(lastWord, ignoreCase = true) }
+        return matches
+    }
+
+    // Just fully yoinked this one from the font renderer thx dinner bone
+    fun getFormatFromString(text: String): String {
+        val length = text.length
+        var string = ""
+        var i = -1
+
+        while ((text.indexOf(167.toChar(), i + 1).also { i = it }) != -1) {
+            if (i < length - 1) {
+                val c0 = text[i + 1]
+                if (isFormatColor(c0)) {
+                    string = "§$c0"
+                } else if (isFormatSpecial(c0)) {
+                    string = "$string§$c0"
+                }
+            }
+        }
+
+        return string
+    }
+
+    private fun isFormatColor(colorChar: Char): Boolean {
+        return colorChar in '0'..'9' || colorChar in 'a'..'f' || colorChar in 'A'..'F'
+    }
+
+    private fun isFormatSpecial(formatChar: Char): Boolean {
+        return formatChar in 'k'..'o' || formatChar in 'K'..'O' || formatChar in "rR"
     }
 }

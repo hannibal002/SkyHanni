@@ -1,0 +1,19 @@
+{
+    "schemaVersion": 1,
+    "version": "${version}",
+    "id": "skyhanni",
+    "name": "SkyHanni",
+    "description": "SkyHanni is a Minecraft Mod for Hypixel SkyBlock.",
+    "icon": "assets/skyhanni/logo.png",
+    "authors": [],
+    "environment": "client",
+    "accessWidener": "skyhanni.accesswidener",
+    "mixins": [
+        "mixins.skyhanni.json"
+    ],
+    "entrypoints": {
+        "main": [
+            "at.hannibal2.skyhanni.SkyHanniModLoader"
+        ]
+    }
+}

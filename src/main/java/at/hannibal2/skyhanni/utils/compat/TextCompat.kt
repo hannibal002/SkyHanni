@@ -14,6 +14,9 @@ import net.minecraft.util.ResourceLocation
 //#if MC > 1.21
 //$$ import net.minecraft.text.PlainTextContent
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
+//$$ import net.minecraft.network.message.MessageSignatureData
+//$$ import java.net.URI
+//$$ import kotlin.math.abs
 //#endif
 
 fun IChatComponent.unformattedTextForChatCompat(): String =
@@ -88,43 +91,55 @@ var IChatComponent.hover: IChatComponent?
     //#if MC < 1.16
     get() = this.chatStyle.chatHoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) it.value else null }
     //#else
-    //$$ get() = this.style.hoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) it.getValue(HoverEvent.Action.SHOW_TEXT) else null }
+    //$$ get() = this.style.hoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) (it as HoverEvent.ShowText).value else null }
     //#endif
     set(value) {
         //#if MC < 1.16
         this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
         //#else
-        //$$ this.style.withHoverEvent(value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) })
+        //$$ this.style.withHoverEvent(value?.let {  HoverEvent.ShowText(it) })
         //#endif
     }
 
 var IChatComponent.command: String?
+    //#if MC < 1.21
     get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) it.value else null }
+    //#else
+    //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) (it as ClickEvent.RunCommand).command else null }
+    //#endif
     set(value) {
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) }
         //#else
-        //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) })
+        //$$ this.style.withClickEvent(value?.let { ClickEvent.RunCommand(it) })
         //#endif
     }
 
 var IChatComponent.suggest: String?
+    //#if MC < 1.21
     get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) it.value else null }
+    //#else
+    //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) (it as ClickEvent.SuggestCommand).command else null }
+    //#endif
     set(value) {
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) }
         //#else
-        //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) })
+        //$$ this.style.withClickEvent(value?.let { ClickEvent.SuggestCommand(it) })
         //#endif
     }
 
 var IChatComponent.url: String?
+    //#if MC < 1.21
     get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) it.value else null }
+    //#else
+    //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) (it as ClickEvent.OpenUrl).uri.toString() else null }
+    //#endif
     set(value) {
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
         //#else
-        //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) })
+        //$$ this.style.withClickEvent(value?.let { ClickEvent.OpenUrl(URI.create(it)) })
         //#endif
     }
 
@@ -154,10 +169,26 @@ fun addDeletableMessageToChat(component: IChatComponent, id: Int) {
     //#if MC < 1.16
     Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(component, id)
     //#else
-    //$$ // todo convert the id int to the middle variable of MessageSignatureData
-    //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, null, MessageIndicator.system())
+    //$$ MinecraftClient.getInstance().inGameHud.chatHud.addMessage(component, idToMessageSignature(id), MessageIndicator.system())
     //#endif
 }
+
+//#if MC > 1.21
+//$$ val map = mutableMapOf<Int, MessageSignatureData>()
+//$$
+//$$ fun idToMessageSignature(id: Int): MessageSignatureData {
+//$$     val newId = abs(id % (255*128))
+//$$     if (map.contains(newId)) return map[newId]!!
+//$$     val bytes = ByteArray(256)
+//$$     val div = newId / 128
+//$$     val mod = newId % 128
+//$$     for (i in 0 until div) {
+//$$         bytes[i] = 127
+//$$     }
+//$$     bytes[div] = mod.toByte()
+//$$     return MessageSignatureData(bytes)
+//$$ }
+//#endif
 
 val defaultStyleConstructor: ChatStyle get() =
     //#if MC < 1.16

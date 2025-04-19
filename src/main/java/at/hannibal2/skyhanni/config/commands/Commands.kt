@@ -27,11 +27,10 @@ import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
-import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
 import at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
@@ -86,7 +85,7 @@ object Commands {
         }
         event.register("ff") {
             description = "Opens the Farming Fortune Guide"
-            callback { FFGuideGUI.onCommand() }
+            callback { FFGuideGui.onCommand() }
         }
         event.register("shwords") {
             description = "Opens the config list for modifying visual words"
@@ -337,11 +336,6 @@ object Commands {
             description = "Test the inquisitor waypoint share"
             category = CommandCategory.DEVELOPER_DEBUG
             callback { InquisitorWaypointShare.test() }
-        }
-        event.register("shshowcropmoneycalculation") {
-            description = "Show the calculation of the crop money"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CropMoneyDisplay.toggleShowCalculation() }
         }
         event.register("shcropspeedmeter") {
             description = "Debugs how many crops you collect over time"
