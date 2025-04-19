@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -107,7 +108,7 @@ object UserLuckBreakdown {
 
             10 -> event.replace(skillsItem)
             11 -> event.replace(limboItem)
-            12 -> jerryItem?.let { event.replace(it) }
+            12 -> jerryItem?.let { event.replace(it) } ?: event.remove()
 
             in validItemSlots -> event.remove()
 
@@ -161,6 +162,7 @@ object UserLuckBreakdown {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipEvent) {
         if (!config.userluckEnabled) return
+        if (!event.slot.isTopInventory()) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
@@ -203,7 +205,7 @@ object UserLuckBreakdown {
             totalLuck *= 1.1f
         }
         val luckString = tryTruncateFloat(totalLuck)
-        event.toolTip.add("§5§o §a✴ SkyHanni User Luck §f$luckString")
+        event.toolTip.add("$LUCK_TOOLTIP$luckString")
     }
 
     private fun skyblockMenuTooltip(event: ToolTipEvent, limboLuck: Float) {

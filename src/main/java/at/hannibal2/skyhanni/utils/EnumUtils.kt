@@ -18,4 +18,14 @@ object EnumUtils {
     fun <T : Enum<T>> Enum<T>.toFormattedName(): String =
         name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercase) }
 
+    inline fun <reified T : Enum<T>> T.next(wrap: Boolean = false): T? {
+        val values = enumValues<T>()
+        val nextIndex = ordinal + 1
+        return when {
+            nextIndex < values.size -> values[nextIndex]
+            wrap -> values[0]
+            else -> null
+        }
+    }
+
 }
