@@ -98,17 +98,6 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    private val bannedItemsPattern by patternGroup.list(
-        "banneditems",
-        "SKYBLOCK_MENU",
-        "CANCEL_PARKOUR_ITEM",
-        "CANCEL_RACE_ITEM",
-        "MAXOR_ENERGY_CRYSTAL",
-        "ELLE_SUPPLIES",
-        "ELLE_FUEL_CELL",
-    )
-    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().toInternalName() }
-
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
@@ -152,7 +141,8 @@ object ItemPickupLog {
         if (!InventoryUtils.inInventory()) {
             itemList.clear()
 
-            val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
+            val inventoryItems = InventoryUtils.getItemsInOwnInventoryWithNull()?.filterIndexed { i, item -> i != 8 }
+                ?.filterNotNull()?.toMutableList().orEmpty()
             val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
 
             if (cursorItem != null) {
@@ -190,8 +180,6 @@ object ItemPickupLog {
 
     // TODO merge with ItemAddInInventoryEvent
     private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
-        if (isBannedItem(item)) return
-
         val targetInventory = if (removed) itemsRemovedFromInventory else itemsAddedToInventory
         val oppositeInventory = if (removed) itemsAddedToInventory else itemsRemovedFromInventory
 
@@ -233,17 +221,6 @@ object ItemPickupLog {
                 updateItem(key, item, stack, add)
             }
         }
-    }
-
-    private fun isBannedItem(item: ItemStack): Boolean {
-        val internalName = item.getInternalNameOrNull() ?: return true
-        if (internalName.startsWith("MAP") == true) return true
-        if (internalName in bannedItemsConverted) return true
-
-        if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
-            return true
-        }
-        return false
     }
 
     private fun ItemStack.dynamicName(): String {
