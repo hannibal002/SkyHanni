@@ -34,11 +34,12 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
-import at.hannibal2.skyhanni.utils.SkyblockSeason.Companion.currentSeason
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -68,6 +69,7 @@ object HoppityEventSummary {
     private var lastSentCfUpdateMessage: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentEventEndMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSnapshotServer: String? = null
+    private var yearSpawnCache: TimeLimitedCache<Int, Map<HoppityEggType, Int>> = TimeLimitedCache(30.seconds)
     var statYear: Int = currentSbYear
 
     private fun MutableList<StatString>.chromafyHoppityStats(): MutableList<StatString> = map {
@@ -312,14 +314,14 @@ object HoppityEventSummary {
     private fun HoppityEventStats.getBoughtCount(): Int =
         (mealsFound[HoppityEggType.BOUGHT] ?: 0) + (mealsFound[HoppityEggType.BOUGHT_ABIPHONE] ?: 0)
 
-    fun HoppityEventStats.getMealEggCount(): Int =
-        mealsFound.filterKeys { it in HoppityEggType.resettingEntries }.sumAllValues().toInt()
+    fun HoppityEventStats.getMealEggCounts(): Map<HoppityEggType, Int> =
+        mealsFound.filterKeys { it in HoppityEggType.resettingEntries }
 
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
             put(HoppityStat.MEAL_EGGS_FOUND) { statList, stats, year ->
-                stats.getMealEggCount().takeIf { it > 0 }?.let {
-                    val spawnedMealEggs = getSpawnedEggCount(year)
+                stats.getMealEggCounts().sumAllValues().toInt().takeIf { it > 0 }?.let {
+                    val spawnedMealEggs = stats.getSpawnedEggCounts(year).sumAllValues()
                     val eggFormat = StringUtils.pluralize(it, "Egg")
                     val amount = "${it.addSeparators()}§7/§a${spawnedMealEggs.addSeparators()}"
                     statList.addStr("§7You found §b$amount §6Chocolate Meal $eggFormat§7.")
@@ -327,18 +329,10 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.HITMAN_EGGS) { statList, stats, year ->
-                val spawnedMealEggs = getSpawnedEggCount(year)
-                val trueMissed = spawnedMealEggs - stats.getMealEggCount()
                 // We only want to show events after hitman was added (Hunt #41)
-                val missedMealEggs = if (year < 41) return@put
-                else if (year == Int.MAX_VALUE) {
-                    stats.containingYears.mapNotNull { containingYear ->
-                        if (containingYear < 41) return@mapNotNull null
-                        val yearMealEggs = getYearStats(containingYear)?.getMealEggCount() ?: 0
-
-                        getSpawnedEggCount(containingYear) - yearMealEggs
-                    }.sum()
-                } else trueMissed
+                getHoppityEventNumber(year).takeIf { it > 41 } ?: return@put
+                val spawnedMealEggs = stats.getSpawnedEggCounts(year)
+                val missedMealEggs = (spawnedMealEggs - stats.getMealEggCounts()).sumAllValues()
 
                 stats.mealsFound[HoppityEggType.HITMAN]?.let {
                     val eggFormat = StringUtils.pluralize(it, "Egg")
@@ -523,28 +517,51 @@ object HoppityEventSummary {
         ChatUtils.chat(summary, prefix = false)
     }
 
-    private fun getAllTimeSpawnedEggCount(): Int {
-        val negativeOffset = if (HoppityApi.isHoppityEvent()) 1 else 0
-        val completedEvents = storage?.hoppityEventStats?.size?.minus(negativeOffset) ?: 0
-        val spawnedThisEvent = if (HoppityApi.isHoppityEvent()) getSpawnedEggCount(currentSbYear) else 0
-        return completedEvents * 279 + spawnedThisEvent
-    }
+    fun HoppityEventStats.getSpawnedEggCounts(year: Int): Map<HoppityEggType, Int> {
+        val cachedValue = yearSpawnCache[year]
+        if (cachedValue != null) return cachedValue
 
-    fun getSpawnedEggCount(year: Int): Int {
-        if (year == Int.MAX_VALUE) return getAllTimeSpawnedEggCount()
+        if (year == Int.MAX_VALUE) return containingYears.mapNotNull { containingYear ->
+            if (containingYear == year) return@mapNotNull null
+            getSpawnedEggCounts(containingYear)
+        }.sumByKey().map {
+            it.key to it.value.toInt()
+        }.toMap().also {
+            yearSpawnCache[year] = it
+        }
+
+        if (year > SkyBlockTime.now().year) return mapOf<HoppityEggType, Int>().also {
+            yearSpawnCache[year] = emptyMap()
+        }
+
+        // Hunt #41 is when we got hitman and the alt day eggs
+        if (getHoppityEventNumber(year) < 41) return mapOf(
+            HoppityEggType.BREAKFAST to 93,
+            HoppityEggType.LUNCH to 93,
+            HoppityEggType.DINNER to 93,
+        ).also { yearSpawnCache[year] = it }
+
         val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSBYear(year).toMillis()
         val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
-        // Calculate total eggs from complete days and incomplete day periods
-        val previousEggs = if (pastEvent) 279 else (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() * 3
-        val currentEggs = when {
-            pastEvent -> 0
-            // Add eggs for the current day based on time of day
-            milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 21 -> 3 // Dinner egg, 9 PM
-            milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 14 -> 2 // Lunch egg, 2 PM
-            milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 7 -> 1 // Breakfast egg, 7 AM
-            else -> 0
-        }
-        return previousEggs + currentEggs
+        if (pastEvent) return mapOf(
+            HoppityEggType.BREAKFAST to 47,
+            HoppityEggType.LUNCH to 47,
+            HoppityEggType.DINNER to 47,
+
+            HoppityEggType.BRUNCH to 46,
+            HoppityEggType.DEJEUNER to 46,
+            HoppityEggType.SUPPER to 46,
+        ).also { yearSpawnCache[year] = it }
+
+        // Div by 2 to account for alt days
+        val currentCompleteCycles = (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() / 2
+        val hourNow = SkyBlockTime.now().hour
+
+        return HoppityEggType.resettingEntries.map { eggType ->
+            val spawnedCount = if (hourNow > eggType.resetsAt) currentCompleteCycles + 1
+            else currentCompleteCycles
+            eggType to spawnedCount
+        }.toMap().also { yearSpawnCache[year] = it }
     }
 
     private fun HoppityEventStats.getPairTriple(

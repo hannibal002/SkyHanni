@@ -21,8 +21,8 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.StatString
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getMealEggCount
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getSpawnedEggCount
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getMealEggCounts
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getSpawnedEggCounts
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getYearStats
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
@@ -39,6 +39,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
@@ -46,7 +48,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import org.lwjgl.input.Keyboard
-import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -200,25 +201,18 @@ object HoppityLiveDisplay {
     }
 
     private fun HoppityEventStats.buildMealEggHover(statYear: Int): List<String> = buildList {
-        val spawnedEggs = getSpawnedEggCount(statYear)
-        val eggTypes = HoppityEggType.resettingEntries.size
-        val completedSpawnCycles = floor(spawnedEggs / eggTypes.toDouble()).toInt()
-        val remainder = spawnedEggs % eggTypes
-        val typeSpawnMap = HoppityEggType.resettingEntries.mapIndexed { index, type ->
-            val extra = if (index < remainder) 1 else 0
-            type to (completedSpawnCycles + extra)
-        }
+        val spawnedEggs: Map<HoppityEggType, Int> = getSpawnedEggCounts(statYear).takeIfNotEmpty() ?: return@buildList
+        val totalSpawnedEggs = spawnedEggs.values.sum()
 
-        if (typeSpawnMap.isEmpty()) return@buildList
-        val totalMealsFound = getMealEggCount()
-        val (totalPercentFormat, totalColor) = getFoundPercentFormat(totalMealsFound, spawnedEggs)
+        val totalMealsFound = getMealEggCounts().sumAllValues().toInt()
+        val (totalPercentFormat, totalColor) = getFoundPercentFormat(totalMealsFound, totalSpawnedEggs)
         val totalColorFormat = totalColor.getChatColor()
-        val totalCountFormat = "$totalColorFormat$totalMealsFound§7/§a$spawnedEggs"
+        val totalCountFormat = "$totalColorFormat$totalMealsFound§7/§a$totalSpawnedEggs"
         val totalFinalPercentFormat = "§8(§7$totalPercentFormat§8)"
         add("§7Total: $totalCountFormat $totalFinalPercentFormat")
         add("§8${"▬".repeat(16)}")
 
-        typeSpawnMap.filter { it.second > 0 }.forEach { (type, spawnCount) ->
+        spawnedEggs.filter { it.value > 0 }.forEach { (type, spawnCount) ->
             val amountCollected = mealsFound[type] ?: 0
             val (percentFormat, color) = getFoundPercentFormat(amountCollected, spawnCount)
             val colorFormat = color.getChatColor()
