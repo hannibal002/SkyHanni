@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.client.shader.Framebuffer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.MinecraftForgeClient
 import org.lwjgl.opengl.GL11
@@ -167,7 +168,12 @@ object EntityOutlineRenderer {
 
                 try {
                     if (key !is EntityLivingBase) outlineColor(value)
-                    renderManager.renderEntityStatic(key, partialTicks, true)
+                    if (key is EntitySlime && key.isInvisible) {
+                        key.isInvisible = false
+                        renderManager.renderEntityStatic(key, partialTicks, true)
+                        key.isInvisible = true
+                    }
+                    else renderManager.renderEntityStatic(key, partialTicks, true)
                 } catch (ignored: Exception) {
                 }
             }
