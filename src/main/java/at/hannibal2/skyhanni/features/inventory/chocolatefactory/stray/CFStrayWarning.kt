@@ -3,10 +3,12 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFStrayRabbitWarningConfig.StrayTypeEntry
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
@@ -46,6 +48,7 @@ object CFStrayWarning {
 
     private var flashScreen = false
     private var activeStraySlots: Set<Int> = setOf()
+    private var destructiveSlots: Set<Int> = setOf()
 
     private fun reset() {
         flashScreen = false
@@ -169,18 +172,35 @@ object CFStrayWarning {
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        destructiveSlots = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").destructiveSlots
+    }
+
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!CFApi.inChocolateFactory || !warningConfig.blockClosing) return
+        if (event.slot?.slotNumber in destructiveSlots) {
+            event.cancel()
+            preventCloseTitle()
+        }
+    }
+
+    private fun preventCloseTitle() {
+        TitleManager.sendTitle(
+            "§cStray Rabbit Prevented Close",
+            subtitleText = "§7Hold §eShift §7to bypass",
+            duration = 5.seconds,
+            location = TitleManager.TitleLocation.INVENTORY
+        )
+        SoundUtils.playErrorSound()
+    }
+
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        val shouldContinue = !isInventoryClosure(keycode) || !warningConfig.blockClosing || activeStraySlots.isEmpty()
-        if (!shouldContinue) {
-            TitleManager.sendTitle(
-                "§cStray Rabbit Prevented Close",
-                subtitleText = "§7Hold §eShift §7to bypass",
-                duration = 5.seconds,
-                location = TitleManager.TitleLocation.INVENTORY
-            )
-            SoundUtils.playErrorSound()
-        }
+        if (!config.rabbitWarning.blockClosing) return true
+        val shouldContinue = !isInventoryClosure(keycode) || activeStraySlots.isEmpty()
+        if (!shouldContinue) preventCloseTitle()
         return shouldContinue
     }
 }

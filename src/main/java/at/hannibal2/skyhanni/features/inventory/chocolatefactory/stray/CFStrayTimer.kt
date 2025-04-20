@@ -3,10 +3,13 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
@@ -29,6 +32,7 @@ object CFStrayTimer {
     private var timer: Duration = Duration.ZERO
     private var lastTimerSubtraction: SimpleTimeMark? = SimpleTimeMark.farPast()
     private var lastPingTime = SimpleTimeMark.farPast()
+    private var destructiveSlots: Set<Int> = setOf()
 
     @HandleEvent
     fun onEggFound(event: EggFoundEvent) {
@@ -86,6 +90,20 @@ object CFStrayTimer {
         eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }
 
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        destructiveSlots = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations").destructiveSlots
+    }
+
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!isEnabled() || !eventConfig.blockClosing) return
+        if (event.slotId in destructiveSlots) {
+            event.cancel()
+            preventCloseTitle()
+        }
+    }
+
     private fun getTimerRenderable(): Renderable = Renderable.verticalContainer(
         listOf(
             "§eStray Timer",
@@ -93,18 +111,21 @@ object CFStrayTimer {
         ).map { Renderable.string(it) }
     )
 
+    private fun preventCloseTitle() {
+        TitleManager.sendTitle(
+            "§cStray Timer Prevented Close",
+            subtitleText = "§7Hold §eShift §7to bypass",
+            duration = 5.seconds,
+            location = TitleManager.TitleLocation.INVENTORY
+        )
+        SoundUtils.playErrorSound()
+    }
+
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
+        if (!eventConfig.blockClosing) return true
         val shouldContinue = !isInventoryClosure(keycode) || !isEnabled() || !CFApi.inChocolateFactory
-        if (!shouldContinue) {
-            TitleManager.sendTitle(
-                "§cStray Timer Prevented Close",
-                subtitleText = "§7Hold §eShift §7to bypass",
-                duration = 5.seconds,
-                location = TitleManager.TitleLocation.INVENTORY
-            )
-            SoundUtils.playErrorSound()
-        }
+        if (!shouldContinue) preventCloseTitle()
         return shouldContinue
     }
 
