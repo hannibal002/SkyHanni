@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventEndMark
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getHoppityEventNumber
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.StatString
@@ -557,11 +558,19 @@ object HoppityEventSummary {
             else -> {
                 // Div by 2 to account for alt days
                 val currentCompleteCycles = (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() / 2
-                val hourNow = SkyBlockTime.now().hour
+                val (hourNow, isAltDay) = SkyBlockTime.now().let {
+                    it.hour to it.isAlternateDay()
+                }
 
                 HoppityEggType.resettingEntries.map { eggType ->
-                    val spawnedCount = if (hourNow > eggType.resetsAt) currentCompleteCycles + 1
-                    else currentCompleteCycles
+                    val spawnedCount = when {
+                        isAltDay == eggType.altDay -> {
+                            if (hourNow >= eggType.resetsAt) {
+                                currentCompleteCycles + 1
+                            } else currentCompleteCycles
+                        }
+                        else -> currentCompleteCycles
+                    }
                     eggType to spawnedCount
                 }.toMap()
             }
