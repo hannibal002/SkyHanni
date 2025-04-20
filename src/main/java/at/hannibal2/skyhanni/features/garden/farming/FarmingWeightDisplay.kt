@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
@@ -118,12 +117,7 @@ object FarmingWeightDisplay {
         if (!isEtaEnabled()) return
         if (lastupdate.passedSince() < 30.seconds) return
 
-        ConditionalUtils.onToggle(config.useEtaGoalRank) {
-            getRankGoal()
-            loadLeaderboardIfAble()
-            lastupdate = SimpleTimeMark.now()
-        }
-        ConditionalUtils.onToggle(config.etaGoalRank) {
+        ConditionalUtils.onToggle(config.useEtaGoalRank, config.etaGoalRank) {
             getRankGoal()
             loadLeaderboardIfAble()
             lastupdate = SimpleTimeMark.now()
