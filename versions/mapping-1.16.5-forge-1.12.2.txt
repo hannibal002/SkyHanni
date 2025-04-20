@@ -537,3 +537,5 @@ org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
 
+net.minecraft.client.gui.screens.PauseScreen net.minecraft.client.gui.GuiIngameMenu
+net.minecraft.client.gui.components.Widget net.minecraft.client.gui.GuiButton

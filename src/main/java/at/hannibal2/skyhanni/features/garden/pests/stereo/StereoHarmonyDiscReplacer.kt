@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
@@ -27,7 +28,7 @@ object StereoHarmonyDiscReplacer {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.replaceMenuIcons) return
-        if (!inventoryPattern.matches(event.inventory.name)) return
+        if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
         if (event.slot !in 11..15 && event.slot !in 20..24) return
 
         val internalName = event.originalItem.getInternalNameOrNull() ?: return

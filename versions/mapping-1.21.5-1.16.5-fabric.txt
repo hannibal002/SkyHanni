@@ -38,3 +38,4 @@ net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket getEntityId() getId()
 
 net.minecraft.text.Text net.minecraft.text.LiteralText
 
+net.minecraft.client.gui.widget.Widget net.minecraft.client.gui.Drawable
