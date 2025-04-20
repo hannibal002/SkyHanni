@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
-import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -518,50 +517,45 @@ object HoppityEventSummary {
     }
 
     fun HoppityEventStats.getSpawnedEggCounts(year: Int): Map<HoppityEggType, Int> {
-        val cachedValue = yearSpawnCache[year]
-        if (cachedValue != null) return cachedValue
-
-        if (year == Int.MAX_VALUE) return containingYears.mapNotNull { containingYear ->
-            if (containingYear == year) return@mapNotNull null
-            getSpawnedEggCounts(containingYear)
-        }.sumByKey().map {
-            it.key to it.value.toInt()
-        }.toMap().also {
-            yearSpawnCache[year] = it
-        }
-
-        if (year > SkyBlockTime.now().year) return mapOf<HoppityEggType, Int>().also {
-            yearSpawnCache[year] = emptyMap()
-        }
-
-        // Hunt #41 is when we got hitman and the alt day eggs
-        if (getHoppityEventNumber(year) < 41) return mapOf(
-            HoppityEggType.BREAKFAST to 93,
-            HoppityEggType.LUNCH to 93,
-            HoppityEggType.DINNER to 93,
-        ).also { yearSpawnCache[year] = it }
-
         val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSBYear(year).toMillis()
         val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
-        if (pastEvent) return mapOf(
-            HoppityEggType.BREAKFAST to 47,
-            HoppityEggType.LUNCH to 47,
-            HoppityEggType.DINNER to 47,
+        return when {
+            year in yearSpawnCache.keys -> yearSpawnCache[year].orEmpty()
+            year == Int.MAX_VALUE -> {
+                containingYears.mapNotNull { containingYear ->
+                    if (containingYear == year) return@mapNotNull null
+                    getSpawnedEggCounts(containingYear)
+                }.sumByKey().map {
+                    it.key to it.value.toInt()
+                }.toMap()
+            }
+            year > SkyBlockTime.now().year -> mapOf<HoppityEggType, Int>()
+            getHoppityEventNumber(year) < 41 -> mapOf(
+                HoppityEggType.BREAKFAST to 93,
+                HoppityEggType.LUNCH to 93,
+                HoppityEggType.DINNER to 93,
+            )
+            pastEvent -> mapOf(
+                HoppityEggType.BREAKFAST to 47,
+                HoppityEggType.LUNCH to 47,
+                HoppityEggType.DINNER to 47,
 
-            HoppityEggType.BRUNCH to 46,
-            HoppityEggType.DEJEUNER to 46,
-            HoppityEggType.SUPPER to 46,
-        ).also { yearSpawnCache[year] = it }
+                HoppityEggType.BRUNCH to 46,
+                HoppityEggType.DEJEUNER to 46,
+                HoppityEggType.SUPPER to 46,
+            )
+            else -> {
+                // Div by 2 to account for alt days
+                val currentCompleteCycles = (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() / 2
+                val hourNow = SkyBlockTime.now().hour
 
-        // Div by 2 to account for alt days
-        val currentCompleteCycles = (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() / 2
-        val hourNow = SkyBlockTime.now().hour
-
-        return HoppityEggType.resettingEntries.map { eggType ->
-            val spawnedCount = if (hourNow > eggType.resetsAt) currentCompleteCycles + 1
-            else currentCompleteCycles
-            eggType to spawnedCount
-        }.toMap().also { yearSpawnCache[year] = it }
+                HoppityEggType.resettingEntries.map { eggType ->
+                    val spawnedCount = if (hourNow > eggType.resetsAt) currentCompleteCycles + 1
+                    else currentCompleteCycles
+                    eggType to spawnedCount
+                }.toMap()
+            }
+        }.also { yearSpawnCache[year] = it }
     }
 
     private fun HoppityEventStats.getPairTriple(
