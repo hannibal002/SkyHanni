@@ -374,8 +374,8 @@ object HoppityLiveDisplay {
         statYear: Int,
     ): MutableList<Renderable> = map { (stat, statStrings) ->
         val customRenderableFactory = renderableOverridesOperationList[stat]
-        val baseRenderable = statStrings.dropConsecutiveEmpties().takeIfNotEmpty()?.getContainer() ?:
-            return@map Renderable.vertical {
+        val baseRenderable = statStrings.dropConsecutiveEmpties().takeIfNotEmpty()?.getContainer()
+            ?: return@map Renderable.vertical {
                 buildEmptyFallback(statYear == currentSbYear).map {
                     Renderable.string(it.string)
                 }
