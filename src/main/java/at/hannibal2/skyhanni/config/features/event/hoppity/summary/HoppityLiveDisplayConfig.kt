@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
-class HoppityEventSummaryLiveDisplayConfig {
+class HoppityLiveDisplayConfig {
     @Expose
     @ConfigOption(name = "Show Display", desc = "Show a hoppity stats card in a GUI element.")
     @ConfigEditorBoolean

@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.event.hoppity.summary
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryConfig.HoppityStat
-import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryLiveDisplayConfig
-import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeFormat.RELATIVE
-import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityEventSummaryLiveDisplayConfig.HoppityLiveDisplayInventoryType
+import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig
+import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig.HoppityDateTimeFormat.RELATIVE
+import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig.HoppityLiveDisplayInventoryType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -47,9 +47,10 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import org.lwjgl.input.Keyboard
 import kotlin.math.floor
+import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
-private typealias DTType = HoppityEventSummaryLiveDisplayConfig.HoppityDateTimeDisplayType
+private typealias DTType = HoppityLiveDisplayConfig.HoppityDateTimeDisplayType
 
 @SkyHanniModule
 object HoppityLiveDisplay {
@@ -200,13 +201,12 @@ object HoppityLiveDisplay {
 
     private fun HoppityEventStats.buildMealEggHover(statYear: Int): List<String> = buildList {
         val spawnedEggs = getSpawnedEggCount(statYear)
-        val completedSpawnCycles = floor(spawnedEggs / 6.0).toInt()
-        val remainder = spawnedEggs % 6
-
-        if (completedSpawnCycles == 0 && remainder == 0) return@buildList
+        val eggTypes = HoppityEggType.resettingEntries.size
+        val completedSpawnCycles = floor(spawnedEggs / eggTypes.toDouble()).toInt()
+        val remainder = spawnedEggs % eggTypes
         val typeSpawnMap = HoppityEggType.resettingEntries.mapIndexed { index, type ->
-            val possibleExtraSpawn: Int = if (remainder > index) 1 else 0
-            type to completedSpawnCycles + possibleExtraSpawn
+            val extra = if (index < remainder) 1 else 0
+            type to (completedSpawnCycles + extra)
         }
 
         if (typeSpawnMap.isEmpty()) return@buildList
@@ -216,7 +216,7 @@ object HoppityLiveDisplay {
         val totalCountFormat = "$totalColorFormat$totalMealsFound§7/§a$spawnedEggs"
         val totalFinalPercentFormat = "§8(§7$totalPercentFormat§8)"
         add("§7Total: $totalCountFormat $totalFinalPercentFormat")
-        add("§8${"▬".repeat(10)}")
+        add("§8${"▬".repeat(16)}")
 
         typeSpawnMap.filter { it.second > 0 }.forEach { (type, spawnCount) ->
             val amountCollected = mealsFound[type] ?: 0
@@ -230,15 +230,19 @@ object HoppityLiveDisplay {
 
     private fun getFoundPercentFormat(
         amountFound: Int,
-        amountTotal: Int,
+        amountTotal: Int
     ): Pair<String, LorenzColor> {
-        val percentage = if (amountTotal == 0) 0 else amountFound / amountTotal
+        if (amountTotal == 0) return "0%" to LorenzColor.RED
+
+        val rawPercent = amountFound.toDouble() * 100.0 / amountTotal
+        val percentText = "${rawPercent.roundToInt()}%".partyModeReplace()
+
         val percentageColor = when {
-            percentage > 0.9 -> LorenzColor.GREEN
-            percentage > 0.5 -> LorenzColor.YELLOW
+            rawPercent > 90  -> LorenzColor.GREEN
+            rawPercent > 50  -> LorenzColor.YELLOW
             else -> LorenzColor.RED
         }
-        return Pair("${percentage.toString().partyModeReplace()}%", percentageColor)
+        return percentText to percentageColor
     }
 
     private fun buildTitle(statYear: Int) = Renderable.verticalContainer(

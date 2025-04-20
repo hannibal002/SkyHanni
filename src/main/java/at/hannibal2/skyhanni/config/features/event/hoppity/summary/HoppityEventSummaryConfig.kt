@@ -20,7 +20,7 @@ class HoppityEventSummaryConfig {
     @Expose
     @Accordion
     @ConfigOption(name = "Live Display", desc = "")
-    var liveDisplay: HoppityEventSummaryLiveDisplayConfig = HoppityEventSummaryLiveDisplayConfig()
+    var liveDisplay: HoppityLiveDisplayConfig = HoppityLiveDisplayConfig()
 
     @Expose
     @Accordion

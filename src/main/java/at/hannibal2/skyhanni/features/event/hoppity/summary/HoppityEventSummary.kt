@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.SkyblockSeason.Companion.currentSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -248,11 +249,10 @@ object HoppityEventSummary {
 
     private fun checkEnded() {
         if (!config.eventSummary.enabled) return
-        if (SkyBlockTime.now().isSeasonBorder()) return
+        val currentSeason = SkyblockSeason.currentSeason ?: return
 
         getUnsummarizedYearStats().filter {
-            it.key < currentSbYear || (it.key == currentSbYear && !SkyblockSeason.SPRING.isSeason()) &&
-                (it.key != currentSbYear || !HoppityApi.isHoppityEvent()) // Secondary sanity check
+            it.key < currentSbYear || (it.key == currentSbYear && currentSeason > SkyblockSeason.SPRING)
         }.forEach { (year, stats) ->
             storage?.hoppityEventStats?.get(year)?.let {
                 // Only send the message if we're going to be able to set the stats as summarized
