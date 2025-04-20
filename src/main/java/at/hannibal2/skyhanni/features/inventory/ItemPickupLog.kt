@@ -142,7 +142,7 @@ object ItemPickupLog {
             itemList.clear()
 
             val inventoryItems = InventoryUtils.getItemsInOwnInventoryWithNull()?.filterIndexed { i, item -> i != 8 }
-                ?.filterNotNull()?.toMutableList().orEmpty()
+                ?.filterNotNull().orEmpty().toMutableList()
             val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
 
             if (cursorItem != null) {
