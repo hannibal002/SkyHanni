@@ -238,8 +238,8 @@ object HoppityLiveDisplay {
         val percentText = "${rawPercent.roundToInt()}%".partyModeReplace()
 
         val percentageColor = when {
-            rawPercent > 90  -> LorenzColor.GREEN
-            rawPercent > 50  -> LorenzColor.YELLOW
+            rawPercent > 90 -> LorenzColor.GREEN
+            rawPercent > 50 -> LorenzColor.YELLOW
             else -> LorenzColor.RED
         }
         return percentText to percentageColor
