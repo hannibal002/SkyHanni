@@ -33,11 +33,9 @@ import kotlin.time.Duration.Companion.seconds
 object SeaCreatureFeatures {
 
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
-    private val damageIndicatorConfig get() = SkyHanniMod.feature.combat.damageIndicator
     private var lastRareCatch = SimpleTimeMark.farPast()
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
-    private val seaCreaturesBosses = BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
