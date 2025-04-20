@@ -63,12 +63,12 @@ object HoppityEventSummary {
     private val storage get() = ProfileStorageData.profileSpecific
     private val updateCfConfig get() = config.eventSummary.cfReminder
     private val currentSbYear get() = SkyBlockTime.now().year
+    private val yearSpawnCache: TimeLimitedCache<Int, Map<HoppityEggType, Int>> = TimeLimitedCache(30.seconds)
 
     private var lastAddedCfMillis: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSentCfUpdateMessage: SimpleTimeMark = SimpleTimeMark.farPast()
     private var currentEventEndMark: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSnapshotServer: String? = null
-    private var yearSpawnCache: TimeLimitedCache<Int, Map<HoppityEggType, Int>> = TimeLimitedCache(30.seconds)
     var statYear: Int = currentSbYear
 
     private fun MutableList<StatString>.chromafyHoppityStats(): MutableList<StatString> = map {
@@ -80,7 +80,7 @@ object HoppityEventSummary {
 
     private fun MutableList<StatString>.addStr(string: String, headed: Boolean = true) = this.add(StatString(string, headed))
 
-    private fun MutableList<StatString>.addEmptyLine() = this.add(StatString("", false))
+    private fun MutableList<StatString>.addEmptyLine() = this.addStr("", false)
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -92,7 +92,13 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
+    fun onEggSpawned() {
+        yearSpawnCache.remove(currentSbYear)
+    }
+
+    @HandleEvent
     fun onRabbitFound(event: RabbitFoundEvent) {
+        yearSpawnCache.remove(currentSbYear)
         val stats = getYearStats() ?: return
         if (!HoppityApi.isHoppityEvent()) {
             DelayedRun.runDelayed(5.seconds) {
