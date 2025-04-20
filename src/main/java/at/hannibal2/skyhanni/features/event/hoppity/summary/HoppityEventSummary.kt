@@ -473,31 +473,33 @@ object HoppityEventSummary {
         stat to operatedList
     }.toMap()
 
+    fun List<StatString>.dropConsecutiveEmpties(): MutableList<StatString> = fold(mutableListOf()) { acc, s ->
+        if (s.string.isEmpty() && acc.lastOrNull()?.string?.isEmpty() == true) {
+            acc
+        } else acc.apply { add(s) }
+    }
+
+    fun buildEmptyFallback(isCurrentEvent: Boolean): List<StatString> {
+        val timeFmt = if (isCurrentEvent) "§c§l§oRIGHT NOW§c§o" else "in the future"
+        return listOf(
+            StatString("", false),
+            StatString("§c§lNothing to show!"),
+            StatString("§c§oFind some eggs $timeFmt!")
+        )
+    }
+
     private fun getStatsStrings(stats: HoppityEventStats, eventYear: Int?): MutableList<StatString> {
         if (eventYear == null) return mutableListOf()
         val statList = getMappedStatStrings(stats, eventYear).values.flatten().toMutableList()
+        val collapsedStatList = statList.dropConsecutiveEmpties().toMutableList()
 
-        // Remove any consecutive empty lines
-        val iterator = statList.iterator()
-        while (iterator.hasNext()) {
-            val next = iterator.next()
-            if (next.string.isEmpty() && iterator.hasNext()) {
-                val nextNext = iterator.next()
-                if (nextNext.string.isEmpty()) iterator.remove()
-            }
-        }
+        val finalStatList = if (collapsedStatList.isEmpty() || collapsedStatList.all { it.string.isBlank() }) {
+            buildEmptyFallback(
+                isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == currentSbYear
+            ).toMutableList()
+        } else collapsedStatList
 
-        // If no stats are found, or the stats are only newlines, display a message
-        if (statList.all { it.string.isBlank() } || statList.isEmpty()) {
-            statList.clear()
-            statList.addEmptyLine()
-            statList.addStr("§c§lNothing to show!")
-            val isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == currentSbYear
-            val timeFormat = if (isCurrentEvent) "§c§l§oRIGHT NOW§c§o" else "in the future"
-            statList.addStr("§c§oFind some eggs $timeFormat!")
-        }
-
-        return statList.chromafyHoppityStats()
+        return finalStatList.chromafyHoppityStats()
     }
 
     private fun sendStatsMessage(stats: HoppityEventStats, eventYear: Int?) {

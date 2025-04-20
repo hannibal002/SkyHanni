@@ -21,6 +21,8 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitTheFishChecker.mealEggInventoryPattern
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.StatString
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.buildEmptyFallback
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.dropConsecutiveEmpties
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getMealEggCounts
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getSpawnedEggCounts
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getYearStats
@@ -370,9 +372,14 @@ object HoppityLiveDisplay {
     private fun MappedStatStrings.getRenderables(
         stats: HoppityEventStats,
         statYear: Int,
-    ): List<Renderable> = map { (stat, statStrings) ->
+    ): MutableList<Renderable> = map { (stat, statStrings) ->
         val customRenderableFactory = renderableOverridesOperationList[stat]
-        val baseRenderable = statStrings.getContainer()
+        val baseRenderable = statStrings.dropConsecutiveEmpties().takeIfNotEmpty()?.getContainer() ?:
+            return@map Renderable.vertical {
+                buildEmptyFallback(statYear == currentSbYear).map {
+                    Renderable.string(it.string)
+                }
+            }
         val intendedOperation = RenderableOverrideOperation(
             statStrings = statStrings,
             baseRenderable = baseRenderable,
@@ -380,7 +387,7 @@ object HoppityLiveDisplay {
             year = statYear,
         )
         customRenderableFactory?.invoke(intendedOperation) ?: baseRenderable
-    }
+    }.toMutableList()
 
     private fun MutableList<Renderable>.tryAddYearSwitchers(statYear: Int) {
         if (!isInInventory()) return
