@@ -4,6 +4,8 @@ net.fabricmc.api.Environment net.minecraftforge.api.distmarker.OnlyIn
 
 net.fabricmc.loader.api.ModContainer net.minecraftforge.fml.ModContainer
 
+net.minecraft.client.gui.screen.GameMenuScreen net.minecraft.client.gui.screens.PauseScreen
+
 net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.player.LocalPlayer
 
 net.minecraft.client.network.ClientPlayerEntity networkHandler connection
@@ -71,4 +73,3 @@ net.minecraft.util.math.Vec3d squaredDistanceTo() distanceToSqr()
 
 net.minecraft.world.phys.HitResult getPos() getLocation()
 
-net.minecraft.client.gui.screen.GameMenuScreen net.minecraft.client.gui.screens.PauseScreen
