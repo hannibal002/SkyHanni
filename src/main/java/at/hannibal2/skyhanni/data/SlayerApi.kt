@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
@@ -22,6 +23,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -78,6 +81,13 @@ object SlayerApi {
         event.addData {
             add("activeSlayer: $activeSlayer")
             add("isInCorrectArea: $isInCorrectArea")
+            if (!isInCorrectArea) {
+                add("currentAreaType: $currentAreaType")
+                add(" graph area: ${IslandAreas.currentAreaName}")
+                with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
+                    add(" /shtestwaypoint $x $y $z pathfind")
+                }
+            }
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: ${latestSlayerProgress.removeColor()}")
         }
@@ -139,10 +149,8 @@ object SlayerApi {
 
     // TODO USE SH-REPO
     private fun checkSlayerTypeForCurrentArea() = when (IslandAreas.currentAreaName) {
-        "Graveyard",
-        "Coal Mine",
-        "Revenant Cave",
-        -> SlayerType.REVENANT
+        "Graveyard" -> if (trackerConfig.revenantInGraveyard && IslandType.HUB.isInIsland()) SlayerType.REVENANT else null
+        "Revenant Cave" -> SlayerType.REVENANT
 
         "Spider Mound",
         "Arachne's Burrow",
@@ -154,14 +162,12 @@ object SlayerApi {
         "Howling Cave",
         -> SlayerType.SVEN
 
-        in listOf(
-            "The End",
-            "Void Sepulture",
-            "Zealot Bruiser Hideout",
-        ).let {
-            if (trackerConfig.voidgloomInNest) it + "Dragon's Nest" else it
-        },
+        "Void Sepulture",
+        "Zealot Bruiser Hideout",
         -> SlayerType.VOID
+
+        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest && IslandType.THE_END.isInIsland()) SlayerType.VOID else null
+        "no_area" -> if (trackerConfig.voidgloomInNoArea && IslandType.THE_END.isInIsland()) SlayerType.VOID else null
 
         "Stronghold",
         "The Wasteland",

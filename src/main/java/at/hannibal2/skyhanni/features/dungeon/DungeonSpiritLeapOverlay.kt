@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.gui.inventory.GuiChest
@@ -29,6 +30,7 @@ object DungeonSpiritLeapOverlay {
     private var overlayPosition: Position? = null
     private var containerWidth = 0
     private var containerHeight = 0
+    private val validInventoryNames = setOf("Spirit Leap", "Teleport to Player")
 
     data class PlayerStackInfo(val playerInfo: DungeonApi.TeamMember?, val stack: ItemStack, val slotNumber: Int)
 
@@ -37,7 +39,8 @@ object DungeonSpiritLeapOverlay {
         if (!isEnabled()) return
 
         val gui = event.gui
-        if (gui !is GuiChest || InventoryUtils.openInventoryName().removeColor() != "Spirit Leap") return
+        // TODO find a way to make InventoryDetector usable here.
+        if (gui !is GuiChest || InventoryUtils.openInventoryName().removeColor() !in validInventoryNames) return
         containerWidth = gui.width
         containerHeight = gui.height
         scaleFactor = min(containerWidth, containerHeight).toDouble() / max(containerWidth, containerHeight).toDouble()
@@ -48,7 +51,7 @@ object DungeonSpiritLeapOverlay {
             for ((slot, stack) in chest.getUpperItems()) {
                 val lore = stack.getLore()
                 if (lore.isNotEmpty()) {
-                    val playerInfo = DungeonApi.getPlayerInfo(stack.displayName)
+                    val playerInfo = DungeonApi.getPlayerInfo(stack.displayName.cleanPlayerName())
                     add(PlayerStackInfo(playerInfo, stack, slot.slotNumber))
                 }
             }
