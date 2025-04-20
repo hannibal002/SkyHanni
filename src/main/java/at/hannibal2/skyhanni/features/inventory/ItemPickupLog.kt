@@ -119,7 +119,7 @@ object ItemPickupLog {
             val itemStack = (it.internalName.getItemStack())
             val item = PickupEntry(itemStack.dynamicName(), it.delta.absoluteValue.toLong(), it.internalName)
 
-            updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
+            updateItem(itemStack.hash(), item, it.delta < 0)
         }
     }
 
@@ -127,7 +127,7 @@ object ItemPickupLog {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 
-        updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
+        updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), event.coins < 0)
     }
 
     @HandleEvent
@@ -178,7 +178,7 @@ object ItemPickupLog {
     }
 
     // TODO merge with ItemAddInInventoryEvent
-    private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
+    private fun updateItem(hash: Int, itemInfo: PickupEntry, removed: Boolean) {
         val targetInventory = if (removed) itemsRemovedFromInventory else itemsAddedToInventory
         val oppositeInventory = if (removed) itemsAddedToInventory else itemsRemovedFromInventory
 
@@ -213,11 +213,11 @@ object ItemPickupLog {
 
             if (!listToCheckAgainst.containsKey(key)) {
                 val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, add)
+                updateItem(key, item, add)
             } else if (oldAmount > listToCheckAgainst[key]!!.second) {
                 val amount = (oldAmount - listToCheckAgainst[key]?.second!!)
                 val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, add)
+                updateItem(key, item, add)
             }
         }
     }
