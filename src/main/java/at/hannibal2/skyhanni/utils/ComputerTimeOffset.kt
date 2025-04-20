@@ -66,7 +66,7 @@ object ComputerTimeOffset {
                 )
             }
             if (state == State.SLOW) {
-                ChatUtils.chat("Computer Time Offset calculation takes longer than normal. Checkign now less often.")
+                ChatUtils.chat("Computer Time Offset calculation takes longer than normal. Checking now less often.")
             }
             currentlyChecking = false
             return
