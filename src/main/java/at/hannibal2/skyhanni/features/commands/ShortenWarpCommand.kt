@@ -6,6 +6,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
+import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -13,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 @SkyHanniModule
 object ShortenWarpCommand {
 
+    private val config get() = SkyHanniMod.feature.misc.commands
     private var warps = emptyList<String>()
 
     @HandleEvent
@@ -23,7 +27,7 @@ object ShortenWarpCommand {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
-        if (!SkyHanniMod.feature.misc.commands.shortenWarp) return
+        if (!config.shortenWarp) return
 
         val message = event.message.lowercase()
         if (!message.startsWith("/")) return
@@ -36,5 +40,12 @@ object ShortenWarpCommand {
             event.cancel()
             HypixelCommands.warp(command)
         }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTabComplete(event: TabCompletionEvent) {
+        if (!config.shortenWarp) return
+
+        event.addSuggestions(warps)
     }
 }
