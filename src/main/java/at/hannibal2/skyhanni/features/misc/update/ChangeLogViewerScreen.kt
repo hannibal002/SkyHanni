@@ -6,12 +6,12 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
-import net.minecraft.client.renderer.GlStateManager
 import java.util.NavigableMap
 import kotlin.time.Duration.Companion.minutes
 
@@ -42,13 +42,11 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
                     ChangelogViewer.shouldMakeNewList = true
                 },
             ),
-
-            ),
+        ),
         10, horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
     )
 
     override fun guiClosed() {
-        super.guiClosed()
         DelayedRun.runDelayed(30.0.minutes) {
             if (ChangelogViewer.openTime.passedSince() > 20.0.minutes) {
                 ChangelogViewer.cache.clear()
@@ -58,7 +56,6 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
 
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
         ChangelogViewer.openTime = SimpleTimeMark.now()
-        super.onDrawScreen(mouseX, mouseY, partialTicks)
         val width = 4 * this.width / 5
         val height = 4 * this.height / 5
         val xTranslate = this.width / 10
@@ -71,7 +68,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
             ChangelogViewer.primary2Color.rgb,
             ChangelogViewer.primaryColor.rgb,
         )
-        GlStateManager.translate(xTranslate.toFloat(), yTranslate.toFloat(), 0f)
+        DrawContextUtils.translate(xTranslate.toFloat(), yTranslate.toFloat(), 0f)
         Renderable.withMousePosition(mouseX - xTranslate, mouseY - yTranslate) {
             if (!ChangelogViewer.cache.containsKeys(ChangelogViewer.startVersion, ChangelogViewer.endVersion)) {
                 ChangelogViewer.shouldMakeNewList = true
@@ -89,31 +86,30 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
                         false,
                         ChangelogViewer.endVersion,
                         true,
-                    )
-                        .takeIf { it.isNotEmpty() }
-                        ?: ChangelogViewer.cache.subMap(
-                            ChangelogViewer.startVersion,
-                            true,
-                            ChangelogViewer.endVersion,
-                            true,
-                        ) // If startVersion == endVersion
+                    ).takeIf { it.isNotEmpty() } ?: ChangelogViewer.cache.subMap(
+                        ChangelogViewer.startVersion,
+                        true,
+                        ChangelogViewer.endVersion,
+                        true,
+                    ) // If startVersion == endVersion
                         ).descendingMap()
                     scrollList = makeScrollList(changelogList, width, height)
                 }
                 scrollList
             }.renderXYAligned(0, 0, width, height)
-            GlStateManager.translate(0f, -buttonPanel.height - 5f, 0f)
-            buttonPanel.renderXAligned(0, -buttonPanel.height - 5, width)
+            val topOfGui = -buttonPanel.height - 5
+            DrawContextUtils.translate(0f, topOfGui.toFloat(), 0f)
+            buttonPanel.renderXAligned(0, topOfGui, width)
             Renderable.drawInsideRoundedRect(
                 Renderable.string(
                     "§9${ChangelogViewer.startVersion} §e➜ §9${ChangelogViewer.endVersion}",
                 ),
                 ChangelogViewer.primaryColor,
                 horizontalAlign = RenderUtils.HorizontalAlignment.LEFT,
-            ).renderXAligned(0, -buttonPanel.height - 5, width)
-            GlStateManager.translate(0f, buttonPanel.height + 5f, 0f)
+            ).renderXAligned(0, topOfGui, width)
+            DrawContextUtils.translate(0f, -topOfGui.toFloat(), 0f)
         }
-        GlStateManager.translate(-xTranslate.toFloat(), -yTranslate.toFloat(), 0f)
+        DrawContextUtils.translate(-xTranslate.toFloat(), -yTranslate.toFloat(), 0f)
     }
 
     private fun makeScrollList(

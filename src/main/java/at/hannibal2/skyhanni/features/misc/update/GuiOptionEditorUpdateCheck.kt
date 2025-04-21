@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
@@ -56,7 +57,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +
-                if (nextVersion != null && !sameVersion) "➜ §a${nextVersion}" else "",
+                if (nextVersion != null && !sameVersion) "➜ §a$nextVersion" else "",
             fr,
             widthRemaining / 4F,
             10F,
@@ -93,7 +94,11 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             (mouseY - 30 - y) in (0..changelog.height)
         ) {
             if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
-                ChangelogViewer.showChangelog(currentVersion, UpdateManager.getNextVersion()!!)
+                val version = UpdateManager.getNextVersion() ?: run {
+                    ErrorManager.skyHanniError("Can't get Changelog because of internal error", "state" to UpdateManager.updateState)
+                    return true
+                }
+                ChangelogViewer.showChangelog(currentVersion, version)
             }
             return true
         }

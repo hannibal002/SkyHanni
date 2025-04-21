@@ -27,7 +27,7 @@ import java.util.TreeMap
 @SkyHanniModule
 object ChangelogViewer {
 
-    private var dispatcher = Dispatchers.IO
+    private val dispatcher = Dispatchers.IO
 
     internal val cache: NavigableMap<VersionTag, Map<String, List<String>>> = TreeMap()
 
@@ -144,23 +144,23 @@ object ChangelogViewer {
                     val sub = it.tagName.toVersionTag()
                     sub.isInBetween(startVersion, endVersion)
                 }
-                neededData.forEach {
+                neededData.forEach { entry ->
                     var headline = 0
-                    cache[it.tagName.toVersionTag()] = it.body.replace(
+                    cache[entry.tagName.toVersionTag()] = entry.body.replace(
                         "[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), "",
                     ) // Remove GitHub link
                         .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
                         .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
                         .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
-                        .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b$1") // Color contributors
+                        .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b§l$1") // Color contributors
                         .replace("\\[(.+)\\]\\(.+\\)".toRegex(), "$1") // Random Links
                         .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
-                        .replace("(?<rest>(?<format>§[kmolnrKMOLNR])?.*?(?<colour>§[0-9a-fA-F])?.*)\\*\\*(?<content>.*)\\*\\*".toRegex()) {
-                            val rest = it.groups["rest"]?.value ?: ""
-                            val foramt = it.groups["format"]?.value ?: ""
-                            val colour = it.groups["colour"]?.value ?: ""
-                            val content = it.groups["content"]?.value ?: ""
-                            "$rest§l$content§r$foramt$colour"
+                        .replace("(?<rest>(?<format>§[kmolnrKMOLNR])?.*?(?<color>§[0-9a-fA-F])?.*)\\*\\*(?<content>.*)\\*\\*".toRegex()) {
+                            val rest = it.groups["rest"]?.value.orEmpty()
+                            val format = it.groups["format"]?.value.orEmpty()
+                            val color = it.groups["color"]?.value.orEmpty()
+                            val content = it.groups["content"]?.value.orEmpty()
+                            "$rest§l$content§r$format$color"
                         } // Bolding markdown
                         .replace("\\s*\r\n$".toRegex(), "") // Remove trailing empty Lines
                         .split("\r\n") // Split at newlines
@@ -172,10 +172,10 @@ object ChangelogViewer {
                             headline
                         }
                         // Change §a to §c if in removed
-                        .mapKeys { it.value.firstOrNull() ?: "" }.toMutableMap().also {
+                        .mapKeys { it.value.firstOrNull().orEmpty() }.toMutableMap().also { map ->
                             val key = "§l§9Removed Features"
-                            val subgroup = it[key] ?: return@also
-                            it[key] = subgroup.map {
+                            val subgroup = map[key] ?: return@also
+                            map[key] = subgroup.map {
                                 it.replace("§a", "§c")
                             }
                         }.toMap()
