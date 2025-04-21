@@ -97,9 +97,9 @@ object ChangelogViewer {
                         .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
                         .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
                         .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b§l$1") // Color contributors
-                        .replace("\\[(.+)\\]\\(.+\\)".toRegex(), "$1") // Random Links
+                        .replace("\\[(.+?)\\]\\(.+?\\)".toRegex(), "$1") // Random Links
                         .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
-                        .replace("(?<rest>(?<format>§[kmolnrKMOLNR])?.*?(?<color>§[0-9a-fA-F])?.*)\\*\\*(?<content>.*)\\*\\*".toRegex()) {
+                        .replace("(?<rest>(?<format>§[kmolnrKMOLNR])?.*?(?<color>§[0-9a-fA-F])?.*)\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
                             val rest = it.groups["rest"]?.value.orEmpty()
                             val format = it.groups["format"]?.value.orEmpty()
                             val color = it.groups["color"]?.value.orEmpty()
