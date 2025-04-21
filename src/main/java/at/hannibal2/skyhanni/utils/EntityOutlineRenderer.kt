@@ -172,8 +172,7 @@ object EntityOutlineRenderer {
                         key.isInvisible = false
                         renderManager.renderEntityStatic(key, partialTicks, true)
                         key.isInvisible = true
-                    }
-                    else renderManager.renderEntityStatic(key, partialTicks, true)
+                    } else renderManager.renderEntityStatic(key, partialTicks, true)
                 } catch (ignored: Exception) {
                 }
             }
