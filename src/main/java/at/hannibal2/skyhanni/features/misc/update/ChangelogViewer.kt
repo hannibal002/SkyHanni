@@ -12,11 +12,10 @@ import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,12 +28,12 @@ object ChangelogViewer {
 
     private val dispatcher = Dispatchers.IO
 
-    internal val cache: NavigableMap<VersionTag, Map<String, List<String>>> = TreeMap()
+    internal val cache: NavigableMap<ModVersion, Map<String, List<String>>> = TreeMap()
 
     internal var openTime = SimpleTimeMark.farPast()
 
-    internal lateinit var startVersion: VersionTag
-    internal lateinit var endVersion: VersionTag
+    internal lateinit var startVersion: ModVersion
+    internal lateinit var endVersion: ModVersion
 
     internal var shouldMakeNewList = false
 
@@ -45,9 +44,9 @@ object ChangelogViewer {
     internal val primary2Color = LorenzColor.DARK_GRAY.toColor().darker().addAlpha(220)
 
     fun showChangelog(currentVersion: String, targetVersion: String) =
-        showChangelog(currentVersion.toVersionTag(), targetVersion.toVersionTag())
+        showChangelog(ModVersion.fromString(currentVersion), ModVersion.fromString(targetVersion))
 
-    private fun showChangelog(currentVersion: VersionTag, targetVersion: VersionTag) {
+    private fun showChangelog(currentVersion: ModVersion, targetVersion: ModVersion) {
         if (currentVersion > targetVersion) {
             ErrorManager.logErrorStateWithData(
                 "Invalid versions for changelog",
@@ -66,62 +65,7 @@ object ChangelogViewer {
             ChangeLogViewerScreen()
     }
 
-    internal data class VersionTag(
-        val first: Int,
-        val second: Int,
-        val third: Int,
-        val fourth: Int,
-        val isBeta: Boolean,
-    ) : Comparable<VersionTag> {
-
-        constructor(l: List<Int>, beta: Boolean) : this(
-            l.getOrNull(0) ?: -1, l.getOrNull(1) ?: -1, l.getOrNull(2) ?: -1, l.getOrNull(3) ?: -1, beta,
-        )
-
-        override operator fun compareTo(other: VersionTag): Int {
-            val first = first.compareTo(other.first)
-            if (first != 0) return first
-            val second = second.compareTo(other.second)
-            if (second != 0) return second
-            val beta = -isBeta.compareTo(other.isBeta)
-            if (beta != 0) return beta
-            val third = third.compareTo(other.third)
-            if (third != 0) return third
-            return fourth.compareTo(other.fourth)
-        }
-
-        override fun toString(): String {
-            return if (isBeta) {
-                "$first" +
-                    if (second == -1) " Beta" else ".$second" +
-                        if (third == -1) " Beta" else " Beta $third" +
-                            if (fourth == -1) "" else ".$fourth"
-            } else {
-                "$first" +
-                    if (second == -1) "" else ".$second" +
-                        if (third == -1) "" else ".$third" +
-                            if (fourth == -1) "" else ".$fourth"
-            }
-        }
-
-        fun isValid() = first != -1
-    }
-
-    /** Inclusive for both borders */
-    private fun VersionTag.isInBetween(current: VersionTag, target: VersionTag): Boolean {
-        if (this > target) return false
-        if (this < current) return false
-        if (this == current) return true
-        return true
-    }
-
-    private fun String.toVersionTag(): VersionTag {
-        val split = this.split('.')
-        val ints = split.filter { it.isInt() }.map { it.toInt() }
-        return VersionTag(ints, split.contains("Beta"))
-    }
-
-    private fun getChangelog(currentVersion: VersionTag, targetVersion: VersionTag) {
+    private fun getChangelog(currentVersion: ModVersion, targetVersion: ModVersion) {
         startVersion = currentVersion
         endVersion = targetVersion
         if (cache.containsKeys(startVersion, endVersion)) return
@@ -130,7 +74,7 @@ object ChangelogViewer {
                 val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
                 val data = mutableListOf<ChangelogJson>()
                 var pageNumber = 1
-                while (data.isEmpty() || data.last().tagName.toVersionTag() > startVersion) {
+                while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
                     val jsonObject = withContext(dispatcher) {
                         ApiUtils.getJSONResponseAsElement(
                             url + pageNumber, apiName = "github",
@@ -141,15 +85,15 @@ object ChangelogViewer {
                     pageNumber++
                 }
                 val neededData = data.filter {
-                    val sub = it.tagName.toVersionTag()
+                    val sub = ModVersion.fromString(it.tagName)
                     sub.isInBetween(startVersion, endVersion)
                 }
                 neededData.forEach { entry ->
                     var headline = 0
-                    cache[entry.tagName.toVersionTag()] = entry.body.replace(
+                    cache[ModVersion.fromString(entry.tagName)] = entry.body.replace(
                         "[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), "",
                     ) // Remove GitHub link
-                        .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
+                        .replace("#+\\s*".toRegex(), "§l§9§r") // Formatting for headings
                         .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
                         .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
                         .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b§l$1") // Color contributors
@@ -206,12 +150,12 @@ object ChangelogViewer {
                 )
 
             1 -> {
-                val tag = args[0].toVersionTag()
+                val tag = ModVersion.fromString(args[0])
                 if (!tag.isValid()) {
                     ChatUtils.userError("Version shape requirement failed")
                     return
                 }
-                val current = SkyHanniMod.VERSION.toVersionTag()
+                val current = ModVersion.fromString(SkyHanniMod.VERSION)
                 if (tag <= current) {
                     showChangelog(tag, tag)
                 } else {
@@ -220,12 +164,12 @@ object ChangelogViewer {
             }
 
             2 -> {
-                val target = args[0].toVersionTag()
+                val target = ModVersion.fromString(args[0])
                 if (!target.isValid()) {
                     ChatUtils.userError("Version shape requirement failed, first argument")
                     return
                 }
-                val current = args[1].toVersionTag()
+                val current = ModVersion.fromString(args[1])
                 if (!current.isValid()) {
                     ChatUtils.userError("Version shape requirement failed, second argument")
                     return

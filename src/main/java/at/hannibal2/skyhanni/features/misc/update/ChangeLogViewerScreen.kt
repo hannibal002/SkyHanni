@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import java.util.NavigableMap
 import kotlin.time.Duration.Companion.minutes
 
@@ -81,17 +82,18 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
                 if (ChangelogViewer.shouldMakeNewList || lastWidth != width || lastHeight != height) {
                     lastWidth = width
                     lastHeight = height
-                    val changelogList = (ChangelogViewer.cache.subMap(
-                        ChangelogViewer.startVersion,
-                        false,
-                        ChangelogViewer.endVersion,
-                        true,
-                    ).takeIf { it.isNotEmpty() } ?: ChangelogViewer.cache.subMap(
-                        ChangelogViewer.startVersion,
-                        true,
-                        ChangelogViewer.endVersion,
-                        true,
-                    ) // If startVersion == endVersion
+                    val changelogList = (
+                        ChangelogViewer.cache.subMap(
+                            ChangelogViewer.startVersion,
+                            false,
+                            ChangelogViewer.endVersion,
+                            true,
+                        ).takeIf { it.isNotEmpty() } ?: ChangelogViewer.cache.subMap(
+                            ChangelogViewer.startVersion,
+                            true,
+                            ChangelogViewer.endVersion,
+                            true,
+                        ) // If startVersion == endVersion
                         ).descendingMap()
                     scrollList = makeScrollList(changelogList, width, height)
                 }
@@ -113,7 +115,7 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
     }
 
     private fun makeScrollList(
-        changelogList: NavigableMap<ChangelogViewer.VersionTag, Map<String, List<String>>>,
+        changelogList: NavigableMap<ModVersion, Map<String, List<String>>>,
         width: Int,
         height: Int,
     ): Renderable = Renderable.scrollList(
