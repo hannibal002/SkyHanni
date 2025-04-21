@@ -90,21 +90,23 @@ object ChangelogViewer {
                 }
                 neededData.forEach { entry ->
                     var headline = 0
-                    cache[ModVersion.fromString(entry.tagName)] = entry.body.replace(
-                        "[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), "",
-                    ) // Remove GitHub link
-                        .replace("#+\\s*".toRegex(), "§l§9§r") // Formatting for headings
+                    val basic = entry.body.replace("[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), "") // Remove GitHub link
+                        .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
                         .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
                         .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
                         .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b§l$1") // Color contributors
                         .replace("\\[(.+?)\\]\\(.+?\\)".toRegex(), "$1") // Random Links
+                        .replace("`", "\"") // Fix Code Blocks to look better
                         .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
-                        .replace("(?<rest>(?<format>§[kmolnrKMOLNR])?.*?(?<color>§[0-9a-fA-F])?.*)\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
-                            val rest = it.groups["rest"]?.value.orEmpty()
-                            val format = it.groups["format"]?.value.orEmpty()
-                            val color = it.groups["color"]?.value.orEmpty()
+                    println(basic)
+                    cache[ModVersion.fromString(entry.tagName)] = basic
+                        .replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
+                            val format = "\n|(?<format>[kmolnrKMOLNR]§)".toRegex()
+                                .find(basic.subSequence(0, it.range.start).reversed())?.groups["format"]?.value?.reversed().orEmpty()
+                            val color = "\n|(?<color>[0-9a-fA-F]§)".toRegex()
+                                .find(basic.subSequence(0, it.range.start).reversed())?.groups["color"]?.value?.reversed().orEmpty()
                             val content = it.groups["content"]?.value.orEmpty()
-                            "$rest§l$content§r$format$color"
+                            "§l$content§r$format$color"
                         } // Bolding markdown
                         .replace("\\s*\r\n$".toRegex(), "") // Remove trailing empty Lines
                         .split("\r\n") // Split at newlines
