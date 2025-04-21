@@ -7,10 +7,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
-import at.hannibal2.skyhanni.features.commands.tabcomplete.WarpTabComplete
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 
 @SkyHanniModule
@@ -29,10 +28,10 @@ object ShortenWarpCommand {
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.shortenWarp) return
 
-        val message = event.message.lowercase()
+        val message = event.message
         if (!message.startsWith("/")) return
 
-        val command = message.removePrefix("/")
+        val command = message.lowercase().removePrefix("/").trimEnd()
         // doing /barn in garden should not warp to the farming islands
         if (command == "barn" && IslandType.GARDEN.isInIsland() && SkyHanniMod.feature.garden.gardenCommands.warpCommands) return
 
@@ -46,6 +45,11 @@ object ShortenWarpCommand {
     fun onTabComplete(event: TabCompletionEvent) {
         if (!config.shortenWarp) return
 
-        event.addSuggestions(warps)
+        if (' ' in event.leftOfCursor) return
+
+        val lastWord = event.lastWord.lowercase().removePrefix("/")
+        val matchingWarps = warps.filter { it.startsWith(lastWord) }.map { "/$it" }
+
+        event.addSuggestions(matchingWarps)
     }
 }
