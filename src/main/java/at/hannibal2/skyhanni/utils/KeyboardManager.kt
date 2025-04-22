@@ -95,9 +95,9 @@ object KeyboardManager {
     private fun getSyntheticKeyboardKeyCode(key: Int, char: Char): Int = if (key == 0) char.code + 256 else key
     //#endif
 
+    //#if MC < 1.16
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick() {
-        //#if MC < 1.16
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
         if (isConfigScreen || currentScreen is GuiChat) return
@@ -130,11 +130,9 @@ object KeyboardManager {
                 }
             }
         }
-
-        //#else
-        //$$ // todo use fabric event or whatnot
-        //#endif
     }
+    //#endif
+    // on 1.21 we use MixinKeyboard, it provides all of this
 
     private fun postKeyPressEvent(keyCode: Int) {
         // This cooldown is here to make sure the Text input features in graph editor

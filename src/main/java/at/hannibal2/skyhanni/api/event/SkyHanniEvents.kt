@@ -170,10 +170,12 @@ object SkyHanniEvents {
         classes.add(clazz)
 
         var current = clazz
+        @Suppress("LoopWithTooManyJumpStatements")
         while (current.superclass != null) {
             val superClass = current.superclass
             if (superClass == SkyHanniEvent::class.java) break
             if (superClass == GenericSkyHanniEvent::class.java) break
+            if (superClass == RenderingSkyHanniEvent::class.java) break
             if (superClass == CancellableSkyHanniEvent::class.java) break
             classes.add(superClass)
             current = superClass
