@@ -868,16 +868,8 @@ object EstimatedItemValueCalculator {
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName().removeKuudraTier()
 
-        if (internalName == NeuInternalName.NONE) {
-            ErrorManager.logErrorStateWithData(
-                "failed to read item data for estimated item value calculation",
-                "internal name is none!",
-                "name" to stack.displayName,
-                "lore" to stack.getLore(),
-                betaOnly = true,
-            )
-            return 0.0
-        }
+        // ignore cases where players put bugged items in ah/trade/chest to break mods
+        if (internalName == NeuInternalName.NONE) return 0.0
 
         stack.getAttributeFromShard()?.let {
             val price = it.getAttributePrice()

@@ -11,10 +11,8 @@ import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -46,8 +44,6 @@ object AuctionHousePriceComparison {
 
         for ((slot, stack) in event.inventoryItems) {
             for (line in stack.getLore()) {
-                // ignore cases where items put intentionally bugged items in ah to break mods
-                if (stack.getInternalName() == NeuInternalName.NONE) continue
                 AuctionsHighlighter.buyItNowPattern.matchMatcher(line) {
                     map.add(stack, group("coins").formatLong(), slot)
                 }

@@ -9,9 +9,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -67,7 +65,6 @@ object TradeValue {
         // Gets total value of trade
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val stack = slot.stack
-            if (stack.getInternalNameOrNull() == NeuInternalName.NONE) continue
             // Gets value of their trade
             if (slot.slotIndex in otherList) {
                 otherMap[slot.slotIndex] = slot.stack
