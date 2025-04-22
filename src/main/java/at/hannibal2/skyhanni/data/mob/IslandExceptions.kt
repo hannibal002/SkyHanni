@@ -83,7 +83,7 @@ object IslandExceptions {
             baseEntity.isNpc() &&
             (nextEntity is EntityGiantZombie || nextEntity == null) &&
             baseEntity.name.contains("Livid") -> MobUtils.getArmorStand(baseEntity, 10)
-            ?.takeIf { getNextEntity(it, -1)?.takeIf { it.name.contains("Livid") } == null }
+            ?.takeIf { getNextEntity(it, -1)?.takeIf { entity -> entity.name.contains("Livid") } == null }
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
         baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.orEmpty()) ->

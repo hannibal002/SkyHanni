@@ -23,5 +23,5 @@ class LividFinderConfig {
     @Expose
     @ConfigOption(name = "Color Override", desc = "Forces the livid highlight to be a specific color.")
     @ConfigEditorDropdown
-    var colorOverride: LividColorHighlight = LividColorHighlight.DEFAULT;
+    var colorOverride: LividColorHighlight = LividColorHighlight.DEFAULT
 }

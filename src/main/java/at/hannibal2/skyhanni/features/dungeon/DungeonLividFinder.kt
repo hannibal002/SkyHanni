@@ -71,10 +71,17 @@ object DungeonLividFinder {
         "Frog" to LorenzColor.DARK_GREEN,
     )
 
+    /**
+     * REGEX-TEST: Doctor Livid
+     */
     private val lividNamePattern by RepoPattern.pattern(
         "dungeon.f5.livid.name",
         "^(?<type>\\w+) Livid$",
     )
+    /**
+     * REGEX-TEST: §2﴾ §2§lLivid§r§r §a7M§c❤ §2﴿
+     * REGEX-TEST: §5﴾ §5§lLivid§r§r §a7M§c❤ §5﴿
+     */
     private val lividArmorStandNamePattern by RepoPattern.pattern(
         "dungeon.f5.livid.armorstand",
         "^§(?<colorCode>.)﴾ §.§lLivid.*$",
