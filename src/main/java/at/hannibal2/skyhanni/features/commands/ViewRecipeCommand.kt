@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -40,7 +41,13 @@ object ViewRecipeCommand {
         val endsWithPageNumber = args.last().isInt()
 
         val (item, page) = if (endsWithPageNumber) {
-            args.dropLast(1).joinToString("_") to args.last().toInt()
+
+            val testItem = args.joinToString(" ").toInternalName().getItemStackOrNull()
+            if (testItem == null) {
+                args.dropLast(1).joinToString("_") to args.last().toInt()
+            } else {
+                input.replace(" ", "_") to 1
+            }
         } else {
             input.replace(" ", "_") to 1
         }
