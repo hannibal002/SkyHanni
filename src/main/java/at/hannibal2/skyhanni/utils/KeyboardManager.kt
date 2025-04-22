@@ -130,10 +130,8 @@ object KeyboardManager {
                 }
             }
         }
-
-        //#else
-        //$$ // todo use fabric event or whatnot
         //#endif
+        // on 1.21 we use MixinKeyboard, it provides all of this
     }
 
     private fun postKeyPressEvent(keyCode: Int) {
