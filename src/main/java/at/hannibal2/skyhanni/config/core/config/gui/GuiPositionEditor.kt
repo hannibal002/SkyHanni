@@ -103,21 +103,6 @@ class GuiPositionEditor(
 
     private fun renderHover(text: List<String>) {
         RenderableTooltips.setTooltipForRender(text.map { Renderable.string(it) })
-
-//         DrawContextUtils.pushMatrix()
-//         val (mouseX, mouseY) = GuiScreenUtils.mousePos
-//         val x = mouseX.toFloat()
-//         val y = mouseY.toFloat()
-//         val z = 250f
-//         DrawContextUtils.translate(x, y, z)
-//         Renderable.drawInsideRoundedRect(
-//             Renderable.verticalContainer(
-//                 text.map { Renderable.string(it) },
-//             ),
-//             color = Color.LIGHT_GRAY,
-//         ).render(0, 0)
-//         DrawContextUtils.translate(-x, -y, -z)
-//         DrawContextUtils.popMatrix()
     }
 
     private fun renderRectangles(): Int {
@@ -156,7 +141,7 @@ class GuiPositionEditor(
                 y - border,
                 x + elementWidth + border * 2,
                 y + elementHeight + border * 2,
-                if (isHovering) Color.red.rgb else gray,
+                if (isHovering) Color.yellow.rgb else gray,
             )
 
             if (isHovering) {
