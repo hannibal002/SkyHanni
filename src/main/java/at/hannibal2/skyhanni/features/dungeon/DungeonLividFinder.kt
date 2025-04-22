@@ -73,11 +73,11 @@ object DungeonLividFinder {
 
     private val lividNamePattern by RepoPattern.pattern(
         "dungeon.f5.livid.name",
-        "^(?<type>\\w+) Livid$"
+        "^(?<type>\\w+) Livid$",
     )
     private val lividArmorStandNamePattern by RepoPattern.pattern(
         "dungeon.f5.livid.armorstand",
-        "^§(?<colorCode>.)﴾ §.§lLivid.*$"
+        "^§(?<colorCode>.)﴾ §.§lLivid.*$",
     )
 
     @HandleEvent
@@ -91,14 +91,14 @@ object DungeonLividFinder {
                 ErrorManager.logErrorStateWithData(
                     "Unknown Livid found",
                     "No color matches for name",
-                    "Livid Name" to entity.name
+                    "Livid Name" to entity.name,
                 )
                 continue
             }
             if (lividColor == color) {
                 livid = entity
                 entity.highlight(color)
-            } else  {
+            } else {
                 if (entity !in fakeLivids) fakeLivids += entity
             }
         }
@@ -192,7 +192,8 @@ object DungeonLividFinder {
         if (isBlind) return
 
         val entity = livid ?: return
-        val lorenzColor = color ?: return
+        val lorenzColor =
+            if (config.colorOverride != LividColorHighlight.DEFAULT) config.colorOverride.color as LorenzColor else color ?: return
 
         val location = event.exactLocation(entity)
         val boundingBox = event.exactBoundingBox(entity)
@@ -221,7 +222,7 @@ object DungeonLividFinder {
         RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             entity = this,
             color = newColor.toColor(),
-            condition = { this.isLividColor(newColor) }
+            condition = { this.isLividColor(newColor) },
         )
     }
 
@@ -242,7 +243,7 @@ object DungeonLividFinder {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity = newLivid,
                 color = newColor.toColor(),
-                condition = { newLivid.isLividColor(newColor) }
+                condition = { newLivid.isLividColor(newColor) },
             )
         } else {
             RenderLivingEntityHelper.removeEntityColor(livid ?: return)
@@ -269,6 +270,7 @@ object DungeonLividFinder {
         YELLOW(LorenzColor.YELLOW),
         WHITE(LorenzColor.WHITE),
         ;
+
         override fun toString() = prettyName
 
     }
