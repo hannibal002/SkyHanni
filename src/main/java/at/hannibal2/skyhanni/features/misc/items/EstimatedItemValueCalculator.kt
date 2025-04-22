@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.removePrefix
@@ -551,7 +550,7 @@ object EstimatedItemValueCalculator {
         }
 
         price.coinPrice.takeIf { it != 0L }?.let {
-            items[SKYBLOCK_COIN] = it
+            items[NeuInternalName.SKYBLOCK_COIN] = it
         }
 
         for ((materialInternalName, amount) in price.itemPrice) {
@@ -868,6 +867,17 @@ object EstimatedItemValueCalculator {
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName().removeKuudraTier()
+
+        if (internalName == NeuInternalName.NONE) {
+            ErrorManager.logErrorStateWithData(
+                "failed to read item data for estimated item value calculation",
+                "internal name is none!",
+                "name" to stack.displayName,
+                "lore" to stack.getLore(),
+                betaOnly = true,
+            )
+            return 0.0
+        }
 
         stack.getAttributeFromShard()?.let {
             val price = it.getAttributePrice()
