@@ -11,14 +11,15 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Blocks
@@ -107,7 +108,7 @@ object UserLuckBreakdown {
 
             10 -> event.replace(skillsItem)
             11 -> event.replace(limboItem)
-            12 -> jerryItem?.let { event.replace(it) }
+            12 -> jerryItem?.let { event.replace(it) } ?: event.remove()
 
             in validItemSlots -> event.remove()
 
@@ -121,11 +122,11 @@ object UserLuckBreakdown {
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (event.inventoryName != "Your Stats Breakdown") {
+        if (InventoryUtils.openInventoryName() != "Your Stats Breakdown") {
             inMiscStats = false
             return
         }
-        val inventoryName = event.inventoryItems[4]?.name.orEmpty()
+        val inventoryName = event.inventoryItems[4]?.displayName.orEmpty()
         if (inventoryName != "§dMisc Stats") return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItems)
@@ -151,7 +152,7 @@ object UserLuckBreakdown {
         for (slot in input.keys) {
             if (slot !in validItemSlots && slot < 44) continue
             val itemStack = input[slot]
-            if (itemStack?.name == " ") {
+            if (itemStack?.displayName == " ") {
                 return slot
             }
         }
@@ -161,12 +162,13 @@ object UserLuckBreakdown {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipEvent) {
         if (!config.userluckEnabled) return
+        if (!event.slot.isTopInventory()) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
         }
         val limboLuck = storage?.limbo?.userLuck?.roundTo(1) ?: 0.0f
-        when (event.slot.inventory.name) {
+        when (InventoryUtils.openInventoryName()) {
             "Your Equipment and Stats" -> equipmentMenuTooltip(event, limboLuck)
             "Your Stats Breakdown" -> statsBreakdownLoreTooltip(event, limboLuck)
             "SkyBlock Menu" -> skyblockMenuTooltip(event, limboLuck)
@@ -203,7 +205,7 @@ object UserLuckBreakdown {
             totalLuck *= 1.1f
         }
         val luckString = tryTruncateFloat(totalLuck)
-        event.toolTip.add("§5§o §a✴ SkyHanni User Luck §f$luckString")
+        event.toolTip.add("$LUCK_TOOLTIP$luckString")
     }
 
     private fun skyblockMenuTooltip(event: ToolTipEvent, limboLuck: Float) {

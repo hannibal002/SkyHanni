@@ -3,17 +3,24 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
+
+    // TODO move this away. split json data from logic
     @Expose
     var nbtName = ""
 
@@ -48,7 +55,11 @@ open class Enchant : Comparable<Enchant> {
 
         // TODO when chroma is disabled maybe use the neu chroma style instead of gold
         if (color.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
-        return color.get().getChatColor()
+
+        val chatColor = color.get().getChatColor()
+        return if ((level >= maxLevel || color == config.perfectEnchantColor) && config.boldPerfectEnchant.get()) {
+            "$chatColor§l"
+        } else chatColor
     }
 
     /**
@@ -67,7 +78,7 @@ open class Enchant : Comparable<Enchant> {
 
         val itemCategory = itemStack?.getItemCategoryOrNull()
         val internalName = itemStack?.getInternalNameOrNull()
-        val itemName = internalName?.itemName?.removeColor()
+        val itemName = internalName?.repoItemName?.removeColor()
 
         if (this.nbtName == "efficiency") {
             // If the item is a Stonk, or a non-mining tool with Efficiency 5 (whilst not being a Promising Shovel),
@@ -112,6 +123,17 @@ open class Enchant : Comparable<Enchant> {
         private val stackLevel: TreeSet<Int>? = null
 
         override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
+
+        fun progressString(item: ItemStack): String {
+            val nbtKey = nbtNum ?: return ""
+            val levels = stackLevel ?: return ""
+            val label = statLabel?.splitCamelCase()?.replaceFirstChar { it.uppercase() }?.replace("Xp", "XP") ?: return ""
+            val progress = item.extraAttributes.getDouble(nbtKey).roundTo(0).toInt()
+            if (progress == 0) return ""
+            val nextLevel = levels.higher(progress)
+            val tail = nextLevel?.shortFormat()?.insert(0, "/ ") ?: "(Maxed)"
+            return "§7$label: §c${progress.shortFormat()} §7$tail"
+        }
     }
 
     class Dummy(name: String) : Enchant() {

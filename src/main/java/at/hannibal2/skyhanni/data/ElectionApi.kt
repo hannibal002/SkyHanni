@@ -18,8 +18,6 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -31,6 +29,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -95,7 +95,8 @@ object ElectionApi {
 
     private var lastUpdate = SimpleTimeMark.farPast()
 
-    private var rawMayorData: MayorJson? = null
+    var rawMayorData: MayorJson? = null
+        private set
     private var candidates = mapOf<Int, MayorCandidate>()
 
     var nextMayorTimestamp = SimpleTimeMark.farPast()
@@ -221,18 +222,20 @@ object ElectionApi {
             )
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launchIOCoroutine
+            val mayor = data.mayor ?: error("mayor is null")
+            val election = mayor.election ?: error("election is null")
             val map = mutableMapOf<Int, MayorCandidate>()
-            map put data.mayor.election.getPairs()
+            map put election.getPairs()
             data.current?.let {
                 map put data.current.getPairs()
             }
             candidates = map
 
-            val currentMayorName = data.mayor.name
+            val currentMayorName = mayor.name
             if (lastMayor?.name != currentMayorName) {
                 Perk.resetPerks()
-                currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
-                currentMinister = data.mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
+                currentMayor = setAssumeMayorJson(currentMayorName, mayor.perks)
+                currentMinister = mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
             }
         }
     }
@@ -282,4 +285,10 @@ object ElectionApi {
         }
 
     }
+
+    val isDerpy get() = Perk.DOUBLE_MOBS_HP.isActive
+
+    fun Int.derpy() = if (isDerpy) this / 2 else this
+
+    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
 }

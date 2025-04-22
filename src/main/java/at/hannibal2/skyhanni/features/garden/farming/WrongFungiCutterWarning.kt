@@ -2,23 +2,25 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFungiCutterMode
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object WrongFungiCutterWarning {
 
     private var mode = FungiMode.UNKNOWN
-    private var lastPlaySoundTime = 0L
+    private var lastPlaySoundTime = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
@@ -48,9 +50,9 @@ object WrongFungiCutterWarning {
     private fun notifyWrong() {
         if (!GardenApi.config.fungiCutterWarn) return
 
-        LorenzUtils.sendTitle("§cWrong Fungi Cutter Mode!", 2.seconds)
-        if (System.currentTimeMillis() > lastPlaySoundTime + 3_00) {
-            lastPlaySoundTime = System.currentTimeMillis()
+        TitleManager.sendTitle("§cWrong Fungi Cutter Mode!", duration = 2.seconds)
+        if (lastPlaySoundTime.passedSince() > 300.milliseconds) {
+            lastPlaySoundTime = SimpleTimeMark.now()
             SoundUtils.playBeepSound()
         }
     }

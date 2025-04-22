@@ -29,15 +29,12 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.T
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -47,7 +44,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
@@ -57,8 +57,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object DailyQuestHelper {
 
-    private val townBoardMage = LorenzVec(-138, 92, -755)
-    private val townBoardBarbarian = LorenzVec(-572, 100, -687)
+    private val questBoardMage = LorenzVec(-138, 92, -755)
+    private val questBoardBarbarian = LorenzVec(-572, 100, -687)
 
     val quests = mutableListOf<Quest>()
     var greatSpook = false
@@ -128,8 +128,8 @@ object DailyQuestHelper {
         if (!isEnabled()) return
 
         if (event.gui !is GuiChest) return
-        val chest = event.gui.inventorySlots as ContainerChest
-        val chestName = chest.getInventoryName()
+        val chest = event.container as ContainerChest
+        val chestName = InventoryUtils.openInventoryName()
 
         if (chestName == "Challenges") {
             if (LorenzUtils.skyBlockArea != "Dojo") return
@@ -137,8 +137,8 @@ object DailyQuestHelper {
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
             for ((slot, stack) in chest.getUpperItems()) {
-                if (stack.name.contains(dojoQuest.dojoName)) {
-                    slot highlight LorenzColor.AQUA
+                if (stack.displayName.contains(dojoQuest.dojoName)) {
+                    slot.highlight(LorenzColor.AQUA)
                 }
             }
         }
@@ -179,7 +179,7 @@ object DailyQuestHelper {
 
         val itemName = fetchQuest.itemName
 
-        val count = InventoryUtils.countItemsInLowerInventory { it.name.contains(itemName) }
+        val count = InventoryUtils.countItemsInLowerInventory { it.displayName.removeColor() == itemName }
         updateProcessQuest(fetchQuest, count)
     }
 
@@ -214,12 +214,20 @@ object DailyQuestHelper {
         renderTownBoard(event)
     }
 
+    fun getQuestBoardLocation(): LorenzVec {
+        val factionType = CrimsonIsleReputationHelper.factionType ?: ErrorManager.skyHanniError("faction type is unknown")
+        return when (factionType) {
+            FactionType.BARBARIAN -> questBoardBarbarian
+            FactionType.MAGE -> questBoardMage
+        }
+    }
+
     private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
-        val location = when (CrimsonIsleReputationHelper.factionType ?: return) {
-            FactionType.BARBARIAN -> townBoardBarbarian
-            FactionType.MAGE -> townBoardMage
-        }
+
+        // we do not call getQuestBoardLocation in the first few seconds when faction type is null, since this will show an error
+        if (CrimsonIsleReputationHelper.factionType == null && LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
+        val location = getQuestBoardLocation()
         event.drawWaypointFilled(location, LorenzColor.WHITE.toColor())
         event.drawDynamicText(location, "Town Board", 1.5)
     }
@@ -279,7 +287,7 @@ object DailyQuestHelper {
         val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
-            val name = item.name
+            val name = item.displayName
             if (category == QuestCategory.FISHING) {
                 name.removeWordsAtEnd(1)
             } else name

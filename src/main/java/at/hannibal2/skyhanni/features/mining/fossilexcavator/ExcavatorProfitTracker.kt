@@ -11,15 +11,16 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -49,7 +50,7 @@ object ExcavatorProfitTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / timesExcavated
-            val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$dropRate.",
@@ -145,7 +146,7 @@ object ExcavatorProfitTracker {
         if (timesExcavated <= 0) return profit
         // TODO use same price source as profit tracker
         val scrapPrice = timesExcavated * scrapItem.getPrice()
-        val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.itemName)
+        val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
         add(
             Renderable.hoverTips(
                 "$name §7price: §c-${scrapPrice.shortFormat()}",
@@ -161,6 +162,7 @@ object ExcavatorProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
+        if (!config.enabled) return
         if (!isEnabled()) return
 
         val internalName = event.internalName
@@ -216,6 +218,7 @@ object ExcavatorProfitTracker {
     }
 
     private fun shouldShowDisplay(): Boolean {
+        if (!config.enabled) return false
         if (!isEnabled()) return false
         val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
         // Only show in excavation menu
@@ -231,8 +234,7 @@ object ExcavatorProfitTracker {
         }
     }
 
-    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled &&
-        LorenzUtils.skyBlockArea == "Fossil Research Center"
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "Fossil Research Center"
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

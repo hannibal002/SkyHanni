@@ -16,19 +16,24 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -44,7 +49,7 @@ object ChestValue {
 
     private val config get() = SkyHanniMod.feature.inventory.chestValueConfig
     private var display = emptyList<Renderable>()
-    private var chestItems = mapOf<String, Item>()
+    private var chestItems = mapOf<String, ChestItem>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
     private val scrollValue = ScrollValue()
@@ -102,28 +107,27 @@ object ChestValue {
 
         if (chestItems.isEmpty()) return@buildList
 
-        addList()
+        val values = chestItems.values
+        addToList(values, featureName())
         addButton()
     }
 
-    private fun MutableList<Renderable>.addList() {
-        val sortedList = sortedList()
+    fun MutableList<Renderable>.addToList(values: Collection<ChestItem>, featureName: String) {
+        val sortedList = sortedList(values)
         var totalPrice = 0.0
         var rendered = 0
-
         val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
-        addString("§7${featureName()}: §o(Showing $amountShowing of ${sortedList.size} items)")
-
+        addString("§7$featureName: §o(Showing $amountShowing of ${sortedList.size} items)")
         for ((index, amount, stack, total, tips) in sortedList) {
             totalPrice += total
             if (rendered >= config.itemToShow) continue
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
-            val name = "${stack.itemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+            val name = "${stack.repoItemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay) "$name $price"
-            else "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
+            else "${stack.repoItemName} §7x$amount: §6${total.formatPrice()}"
 
             addLine {
                 val renderable = Renderable.hoverTips(
@@ -141,10 +145,10 @@ object ChestValue {
         addString("§aTotal value: §6${totalPrice.formatPrice()} coins")
     }
 
-    private fun sortedList() = when (config.sortingType) {
-        SortingTypeEntry.DESCENDING -> chestItems.values.sortedByDescending { it.total }
-        SortingTypeEntry.ASCENDING -> chestItems.values.sortedBy { it.total }
-        else -> chestItems.values.sortedByDescending { it.total }
+    private fun sortedList(values: Collection<ChestItem>): List<ChestItem> = when (config.sortingType) {
+        SortingTypeEntry.DESCENDING -> values.sortedByDescending { it.total }
+        SortingTypeEntry.ASCENDING -> values.sortedBy { it.total }
+        else -> values.sortedByDescending { it.total }
     }
 
     private fun MutableList<Renderable>.addButton() {
@@ -187,7 +191,7 @@ object ChestValue {
         } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
             InventoryUtils.getItemsInOpenChest().filter {
-                it.hasStack && it.inventory != Minecraft.getMinecraft().thePlayer.inventory && (!isMinion || it.slotNumber % 9 != 1)
+                it.hasStack && it.inventory != MinecraftCompat.localPlayer.inventory && (!isMinion || it.slotNumber % 9 != 1)
             }
         }
         val stacks = buildMap {
@@ -195,25 +199,32 @@ object ChestValue {
                 put(it.slotIndex, it.stack)
             }
         }
-        val items = mutableMapOf<String, Item>()
+        chestItems = createItems(stacks)
+    }
+
+    fun createItems(stacks: Map<Int, ItemStack>) = buildMap<String, ChestItem> {
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
             val list = mutableListOf<String>()
-            var total = EstimatedItemValueCalculator.calculate(stack, list).first
+            var total = if (internalName == NeuInternalName.SKYBLOCK_COIN) {
+                "§8(?<value>.*)".toPattern().matchMatcher(stack.getLore().last()) {
+                    group("value").formatDouble()
+                } ?: error("Could not read coin value from trade item")
+            } else EstimatedItemValueCalculator.calculate(stack, list).first
+
             val key = "$internalName+$total"
             if (stack.item == Items.enchanted_book)
                 total /= 2
             list.add("§aTotal: §6§l${total.formatPrice()} coins")
             if (total == 0.0) continue
-            val item = items.getOrPut(key) {
-                Item(mutableListOf(), 0, stack, 0.0, list)
+            val item = getOrPut(key) {
+                ChestItem(mutableListOf(), 0, stack, 0.0, list)
             }
             item.index.add(i)
             item.amount += stack.stackSize
             item.total += total * stack.stackSize
         }
-        chestItems = items
     }
 
     private fun Double.formatPrice(): String {
@@ -269,7 +280,7 @@ object ChestValue {
         return currentString
     }
 
-    data class Item(
+    data class ChestItem(
         val index: MutableList<Int>,
         var amount: Int,
         val stack: ItemStack,

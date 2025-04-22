@@ -8,12 +8,17 @@ import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.appendComponent
+import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
-import net.minecraft.util.IChatComponent
 import java.util.Stack
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+//#if MC < 1.21
+import net.minecraft.util.IChatComponent
+//#endif
 
 object ComponentMatcherUtils {
 
@@ -247,10 +252,10 @@ class ComponentSpan internal constructor(
      * only use [ChatComponentText], converting any other [IChatComponent] in the process.
      */
     fun intoComponent(): IChatComponent {
-        val parent = ChatComponentText("")
-        parent.chatStyle = ChatStyle()
+        val parent = "".asComponent()
+        parent.chatStyle = defaultStyleConstructor
         for ((component, start, end) in sampleSlicedComponents()) {
-            val copy = ChatComponentText(component.unformattedTextForChat.substring(start, end))
+            val copy = component.unformattedTextForChat.substring(start, end).asComponent()
             copy.chatStyle = component.chatStyle.createDeepCopy()
             parent.appendSibling(copy)
         }
@@ -305,13 +310,13 @@ class ComponentSpan internal constructor(
     operator fun plus(other: ComponentSpan): ComponentSpan {
         val left = this.intoComponent()
         val right = other.intoComponent()
-        left.appendSibling(right)
+        left.appendComponent(right)
         return left.intoSpan()
     }
 
     companion object {
         fun empty(): ComponentSpan {
-            return ComponentSpan(ChatComponentText(""), "", 0, 0)
+            return ComponentSpan("".asComponent(), "", 0, 0)
         }
     }
 

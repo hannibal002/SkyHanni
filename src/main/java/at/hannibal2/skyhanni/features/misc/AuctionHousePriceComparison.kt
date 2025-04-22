@@ -61,9 +61,8 @@ object AuctionHousePriceComparison {
     }
 
     private fun MutableMap<Int, Long>.add(stack: ItemStack, binPrice: Long, slot: Int) {
-        val (totalPrice, basePrice) = EstimatedItemValueCalculator.calculate(stack, mutableListOf())
-        if (totalPrice == basePrice) return
-        val estimatedPrice = totalPrice.toLong()
+        val price = EstimatedItemValueCalculator.getTotalPrice(stack, ignoreBasePrice = true) ?: return
+        val estimatedPrice = price.toLong()
 
         val diff = estimatedPrice - binPrice
         this[slot] = diff
@@ -92,7 +91,7 @@ object AuctionHousePriceComparison {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val diff = slotPriceMap[slot.slotIndex] ?: continue
             if (diff == 0L) {
-                slot highlight good
+                slot.highlight(good)
                 continue
             }
             val isGood = diff >= 0
@@ -106,7 +105,7 @@ object AuctionHousePriceComparison {
             } else {
                 getColorInBetween(bad, veryBad, percentage)
             }
-            slot highlight color
+            slot.highlight(color)
         }
     }
 
