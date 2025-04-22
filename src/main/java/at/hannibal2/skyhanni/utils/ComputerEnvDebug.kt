@@ -31,7 +31,7 @@ object ComputerEnvDebug {
         ram(event)
         uptime(event)
         //#if MC == 1.8.9
-        optifine(event)
+        performanceMods(event)
         //#endif
     }
 
@@ -224,7 +224,7 @@ object ComputerEnvDebug {
     private fun getUptime() = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
 
     //#if MC == 1.8.9
-    private fun optifine(event: DebugDataCollectEvent) {
+    private fun performanceMods(event: DebugDataCollectEvent) {
         if (PlatformUtils.isDevEnvironment) return
         val hasOptifine = FMLClientHandler.instance().hasOptifine()
         val hasPatcher = Loader.isModLoaded("patcher")
