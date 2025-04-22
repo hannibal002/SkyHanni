@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -41,6 +42,7 @@ import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
+import net.minecraft.entity.item.EntityArmorStand
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -72,6 +74,10 @@ object DungeonLividFinder {
     private val lividNamePattern by RepoPattern.pattern(
         "dungeon.f5.livid.name",
         "^(?<type>\\w+) Livid$"
+    )
+    private val lividArmorStandNamePattern by RepoPattern.pattern(
+        "dungeon.f5.livid.armorstand",
+        "^§(?<colorCode>.)﴾ §.§lLivid.*$"
     )
 
     @HandleEvent
@@ -155,6 +161,13 @@ object DungeonLividFinder {
         if (!inLividBossRoom() || !config.hideWrong) return
         if (livid == null) return // in case livid detection fails, don't hide anything
         if (event.entity is EntityOtherPlayerMP && event.entity in fakeLivids) event.cancel()
+        if (event.entity is EntityArmorStand) {
+            lividArmorStandNamePattern.matchMatcher(event.entity.name) {
+                val colorChar = group("colorCode")[0]
+
+                if (colorChar.toLorenzColor() != color) event.cancel()
+            }
+        }
     }
 
     private fun isCurrentlyBlind() = (MinecraftCompat.localPlayerOrNull?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
