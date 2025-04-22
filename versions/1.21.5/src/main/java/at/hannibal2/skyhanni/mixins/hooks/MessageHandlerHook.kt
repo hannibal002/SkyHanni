@@ -14,10 +14,12 @@ fun onGameMessage(message: Text, actionBar: Boolean, original: Operation<Void>) 
         ActionBarData.onChatReceive(message)?.let { result ->
             original.call(result, actionBar)
         }
+        return
     }
     val (result, cancel) = ChatManager.onChatReceive(message)
     result?.let {
         original.call(it, actionBar)
+        return
     }
     if (cancel) {
         // We want to still log the message even if we cancel it
