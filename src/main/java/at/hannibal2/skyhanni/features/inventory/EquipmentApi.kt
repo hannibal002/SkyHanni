@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -33,7 +34,7 @@ object EquipmentApi {
 
     val inventory = InventoryDetector { it == "Your Equipment and Stats" }
 
-    private val stained_glass_pane = Item.getItemFromBlock(Blocks.stained_glass_pane)
+    private val stainedGlassPane = Item.getItemFromBlock(Blocks.stained_glass_pane)
 
     private val storage get() = ProfileStorageData.profileSpecific?.equipment
 
@@ -65,6 +66,7 @@ object EquipmentApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRightClick(event: ItemClickEvent) {
+        if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         val category = item.getItemCategoryOrNull() ?: return
         if (category !in ItemCategory.equipment) return
@@ -90,21 +92,21 @@ object EquipmentApi {
         event.title("Equipment")
         event.addIrrelevant {
             val storage = storage ?: return@addIrrelevant
-            add("§aEquipment:")
+            add("Equipment:")
             storage.slots.forEach { item ->
                 val name = item?.displayName.toString()
-                add(name)
+                add(" - $name")
             }
-            add("§aRift Equipment:")
+            add("Rift Equipment:")
             storage.riftSlots.forEach { item ->
                 val name = item?.displayName.toString()
-                add(name)
+                add(" - $name")
             }
         }
     }
 
     private fun handleInventoryItem(slot: EquipmentSlot, itemStack: ItemStack?) {
-        val item = if (itemStack?.item == stained_glass_pane) null else itemStack
+        val item = if (itemStack?.item == stainedGlassPane) null else itemStack
         setEquipment(slot, item)
     }
 
