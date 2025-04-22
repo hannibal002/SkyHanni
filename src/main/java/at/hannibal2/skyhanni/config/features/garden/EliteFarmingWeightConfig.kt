@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class EliteFarmingWeightConfig {
     @Expose
@@ -28,7 +29,7 @@ class EliteFarmingWeightConfig {
     @ConfigOption(
         name = "Leaderboard Ranking",
         desc = "Show your position in the farming weight leaderboard. " +
-            "Only if your farming weight is high enough! Updates every 10 minutes."
+            "Only if your farming weight is high enough! Updates periodically."
     )
     @ConfigEditorBoolean
     var leaderboard: Boolean = true
@@ -37,7 +38,7 @@ class EliteFarmingWeightConfig {
     @ConfigOption(
         name = "Overtake ETA",
         desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
-            "Will show an ETA to rank #10,000 if you're not on the leaderboard yet."
+            "Will show an ETA to placement weight required if you're not on the leaderboard yet."
     )
     @ConfigEditorBoolean
     var overtakeETA: Boolean = false
@@ -57,11 +58,20 @@ class EliteFarmingWeightConfig {
 
     @Expose
     @ConfigOption(
+        name = "Use ETA Goal",
+        desc = "Use the ETA Goal number instead of the next upcoming rank. Useful when your rank is in the " +
+            "ten thousands and you don't want to see small ETAs."
+    )
+    @ConfigEditorBoolean
+    var useEtaGoalRank: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
         name = "ETA Goal",
         desc = "Override the Overtake ETA to show when you'll reach the specified rank (if not there yet). (Default: \"10,000\")"
     )
     @ConfigEditorText
-    var etaGoalRank: String = "10000"
+    var etaGoalRank: Property<String> = Property.of("10000")
 
     @Expose
     @ConfigOption(name = "Show below 200", desc = "Show the farming weight data even if you are below 200 weight.")
