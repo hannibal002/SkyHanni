@@ -87,17 +87,13 @@ class NeuInternalName private constructor(private val internalName: String) {
      * This is because skyblock has special ids in commands such as /viewrecipe for items like enchanted books and pets
      */
     val skyblockCommandId: String
-        get() = run {
-            println("doing for item $internalName")
-            when {
-                isPet -> internalName.split(";").first()
-                isEnchantedBook -> {
-                    val (name, level) = internalName.split(";", limit = 2)
-                    "ENCHANTED_BOOK_${name}_$level"
-                }
-
-                else -> internalName
+        get() = when {
+            isPet -> internalName.split(";").first()
+            isEnchantedBook -> {
+                val (name, level) = internalName.split(";", limit = 2)
+                "ENCHANTED_BOOK_${name}_$level"
             }
+            else -> internalName
         }
 
     private val isPet: Boolean
