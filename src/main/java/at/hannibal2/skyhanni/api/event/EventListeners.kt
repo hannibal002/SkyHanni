@@ -70,14 +70,17 @@ class EventListeners private constructor(val name: String, private val isGeneric
             }
         }
 
-        return { _: Any -> method.invoke(instance) }
+        val runnable = ReflectionUtils.createRunnableFromMethod(instance, method)
+        return { _: Any -> runnable.run() }
     }
 
     private fun createSingleParameterConsumer(method: Method, instance: Any): (Any) -> Unit {
         require(SkyHanniEvent::class.java.isAssignableFrom(method.parameterTypes[0])) {
             "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
         }
-        return { event -> method.invoke(instance, event) }
+
+        val consumer = ReflectionUtils.createConsumerFromMethod(instance, method)
+        return { event -> consumer.accept(event) }
     }
 
     private fun resolveGenericType(method: Method): Class<*> =

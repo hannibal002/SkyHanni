@@ -7,7 +7,7 @@ at/hannibal2/skyhanni/utils/ConditionalUtils.kt
 at/hannibal2/skyhanni/utils/Quad.kt
 at/hannibal2/skyhanni/utils/TimeLimitedSet.kt
 at/hannibal2/skyhanni/utils/TimeLimitedCache.kt
-at/hannibal2/skyhanni/api/minecraftevents/ClientEvents.kt
+#at/hannibal2/skyhanni/api/minecraftevents/ClientEvents.kt
 at/hannibal2/skyhanni/utils/ReflectionUtils.kt
 at/hannibal2/skyhanni/config/HasLegacyId.java
 
