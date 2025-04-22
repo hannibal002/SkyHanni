@@ -129,9 +129,7 @@ object KeyboardManager {
                 postKeyPressEvent(keyCode)
             } else {
                 postKeyUpEvent(keyCode)
-                if (pressedKeys.contains(keyCode)) {
-                    pressedKeys.remove(keyCode)
-                }
+                pressedKeys.remove(keyCode)
             }
         }
 
