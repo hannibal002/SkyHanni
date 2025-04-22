@@ -125,7 +125,7 @@ object SeaCreatureFeatures {
 
     @JvmStatic
     fun isRareSeaCreature(entity: Entity): Boolean {
-        return (entity as? EntityLivingBase)?.mob?.let { mob -> 
+        return (entity as? EntityLivingBase)?.mob?.let { mob ->
             mob in rareSeaCreatures
         } ?: false
     }
