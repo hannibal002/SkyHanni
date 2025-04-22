@@ -231,20 +231,19 @@ object ComputerEnvDebug {
         event.title("Performance Mods")
         if (!hasOptifine || !hasPatcher) {
             event.addData {
+                add("Optifine is ${if (hasOptifine) "" else "not"} installed")
+                add("Patcher is ${if (hasPatcher) "" else "not"} installed")
+                add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
                 if (!hasOptifine) {
-                    add("Optifine is not installed")
+                    add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
                 }
                 if (!hasPatcher) {
-                    add("Patcher is not installed")
+                    add("https://modrinth.com/mod/patcher")
                 }
-                add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
-                add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
-                add("https://modrinth.com/mod/patcher")
             }
         } else {
             event.addIrrelevant {
-                add("Optifine is installed")
-                add("Patcher is installed")
+                add("Optifine and Patcher are installed")
             }
         }
     }
