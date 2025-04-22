@@ -228,22 +228,24 @@ object ComputerEnvDebug {
         if (PlatformUtils.isDevEnvironment) return
         val hasOptifine = FMLClientHandler.instance().hasOptifine()
         val hasPatcher = Loader.isModLoaded("patcher")
-        event.title("Optifine")
-        if (hasOptifine) {
-            event.addIrrelevant("Optifine is installed")
-        } else {
-            event.addData("Optifine is not installed")
-        }
-        if (hasPatcher) {
-            event.addIrrelevant("Patcher is installed")
-        } else {
-            event.addData("Patcher is not installed")
-        }
+        event.title("Performance Mods")
         if (!hasOptifine || !hasPatcher) {
-            event.addData("Optifine or Patcher are not installed")
-            event.addData("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
-            event.addData("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
-            event.addData("https://modrinth.com/mod/patcher")
+            event.addData {
+                if (!hasOptifine) {
+                    add("Optifine is not installed")
+                }
+                if (!hasPatcher) {
+                    add("Patcher is not installed")
+                }
+                add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
+                add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
+                add("https://modrinth.com/mod/patcher")
+            }
+        } else {
+            event.addIrrelevant {
+                add("Optifine is installed")
+                add("Patcher is installed")
+            }
         }
     }
     //#endif
