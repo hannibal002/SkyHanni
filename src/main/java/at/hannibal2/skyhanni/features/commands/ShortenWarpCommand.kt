@@ -29,7 +29,9 @@ object ShortenWarpCommand {
         if (!message.startsWith("/")) return
 
         val command = message.removePrefix("/")
-        // doing /barn in garden should not warp to the farming islands
+
+        // Avoid overriding commands on islands where they have a different use
+        if (command == "jerry" && IslandType.PRIVATE_ISLAND.isInIsland()) return
         if (command == "barn" && IslandType.GARDEN.isInIsland() && SkyHanniMod.feature.garden.gardenCommands.warpCommands) return
 
         if (command in warps) {
