@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
@@ -125,6 +124,7 @@ object FarmingWeightDisplay {
     }
 
     private val config get() = GardenApi.config.eliteFarmingWeights
+    private val storage get() = GardenApi.storage?.farmingWeight
     private val localCounter = mutableMapOf<CropType, Long>()
 
     private var display = emptyList<Renderable>()
@@ -253,7 +253,7 @@ object FarmingWeightDisplay {
             ChatUtils.chatAndOpenConfig(
                 "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
                     "to a valid number [1-10000] to use this feature!",
-                GardenApi.config.eliteFarmingWeights::etaGoalRank,
+                config::etaGoalRank,
             )
             config.etaGoalRank.set(goal.toString())
         } else {
@@ -299,8 +299,7 @@ object FarmingWeightDisplay {
             } else {
                 leaderboardPosition--
             }
-            GardenApi.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
-                leaderboardPosition
+            storage?.lastFarmingWeightLeaderboard = leaderboardPosition
 
             // Remove passed player to present the next one
             nextPlayers.removeFirst()
@@ -419,16 +418,14 @@ object FarmingWeightDisplay {
             if (wasNotLoaded && config.showLbChange) {
                 checkOffScreenLeaderboardChanges()
             }
-            GardenApi.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
-                leaderboardPosition
+            storage?.lastFarmingWeightLeaderboard = leaderboardPosition
             lastLeaderboardUpdate = SimpleTimeMark.now()
             isLoadingLeaderboard = false
         }
     }
 
     private fun checkOffScreenLeaderboardChanges() {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
-        val oldPosition = profileSpecific.garden.farmingWeight.lastFarmingWeightLeaderboard
+        val oldPosition = storage?.lastFarmingWeightLeaderboard ?: return
 
         if (oldPosition <= 0) return
         if (leaderboardPosition <= 0) return
