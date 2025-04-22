@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(value = MessageHandler.class, priority = 500)
 public class MixinMessageHandler {
 
-	@WrapMethod(method = "onGameMessage")
-	private void onGameMessage(Text message, boolean actionBar, Operation<Void> original) {
+    @WrapMethod(method = "onGameMessage")
+    private void onGameMessage(Text message, boolean actionBar, Operation<Void> original) {
         MessageHandlerHookKt.onGameMessage(message, actionBar, original);
-	}
+    }
 }
