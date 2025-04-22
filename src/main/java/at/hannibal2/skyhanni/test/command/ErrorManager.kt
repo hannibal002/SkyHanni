@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -79,8 +81,13 @@ object ErrorManager {
 //         ),
 //     )
 
-    fun resetCache() {
-        cache.clear()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestreseterrorcache") {
+            description = "Resets the cache of errors."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { cache.clear() }
+        }
     }
 
     // Extra data from last thrown error
