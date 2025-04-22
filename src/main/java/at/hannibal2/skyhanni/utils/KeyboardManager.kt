@@ -140,10 +140,12 @@ object KeyboardManager {
         //#endif
     }
 
+    /*
+    The delay below is here to make sure the Text input features in graph editor
+    and in renderable calls have time to react first, and lock this key press event properly
+     */
+
     private fun postKeyPressEvent(keyCode: Int) {
-        // This cooldown is here to make sure the Text input features in graph editor
-        // and in renderable calls have time to react first,
-        // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyPressEvent(keyCode).post()
@@ -151,9 +153,6 @@ object KeyboardManager {
     }
 
     private fun postKeyDownEvent(keyCode: Int) {
-        // This cooldown is here to make sure the Text input features in graph editor
-        // and in renderable calls have time to react first,
-        // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyDownEvent(keyCode).post()
@@ -161,9 +160,6 @@ object KeyboardManager {
     }
 
     private fun postKeyUpEvent(keyCode: Int) {
-        // This cooldown is here to make sure the Text input features in graph editor
-        // and in renderable calls have time to react first,
-        // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyUpEvent(keyCode).post()
