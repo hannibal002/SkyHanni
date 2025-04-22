@@ -162,8 +162,8 @@ object DailyQuestHelper {
 
         val message = event.message
         chatCompletedPattern.matchMatcher(message) {
-            val type = group("type")
-            when (type.lowercase()) {
+            val type = group("type").lowercase()
+            when (type) {
                 "dojo" -> {
                     val dojoQuest = getQuest<DojoQuest>() ?: return
                     dojoQuest.state = QuestState.READY_TO_COLLECT
