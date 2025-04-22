@@ -58,6 +58,9 @@ object DungeonLividFinder {
     private val lividEntities
         get() = EntityUtils.getEntities<EntityOtherPlayerMP>().filter { it.isNpc() && lividNamePattern.matches(it.name) }.toList()
 
+    // avoid rendering the line while closer than 7 blocks or further than 90 blocks
+    private val lineRenderRange = 50.0..900.0
+
     private var color: LorenzColor? = null
     private val lividNameColor = mapOf(
         "Vendetta" to LorenzColor.WHITE,
@@ -211,7 +214,7 @@ object DungeonLividFinder {
         val color = lorenzColor.toColor()
         event.drawFilledBoundingBox(boundingBox, color, 0.5f)
 
-        if (location.distanceSqToPlayer() > 50) {
+        if (location.distanceSqToPlayer() in lineRenderRange) {
             event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)
         }
     }
