@@ -175,7 +175,6 @@ object DungeonLividFinder {
             return
         }
 
-        // TODO either hide if setting is disabled, or include the info if setting is enabled
         event.addData {
             add("isEnabled: ${config.enabled}")
             add("inBoss: ${inLividBossRoom()}")
