@@ -78,6 +78,7 @@ object DungeonLividFinder {
         "dungeon.f5.livid.name",
         "^(?<type>\\w+) Livid$",
     )
+
     /**
      * REGEX-TEST: §2﴾ §2§lLivid§r§r §a7M§c❤ §2﴿
      * REGEX-TEST: §5﴾ §5§lLivid§r§r §a7M§c❤ §5﴿
@@ -87,8 +88,8 @@ object DungeonLividFinder {
         "^§(?<colorCode>.)﴾ §.§lLivid.*$",
     )
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!config.enabled.get()) return
         if (!inLividBossRoom()) return
         if (color == null) return
@@ -144,14 +145,14 @@ object DungeonLividFinder {
         }
     }
 
-    @HandleEvent
-    fun onBossStart(event: DungeonBossRoomEnterEvent) {
+    @HandleEvent(DungeonBossRoomEnterEvent::class)
+    fun onBossStart() {
         if (DungeonApi.getCurrentBoss() != DungeonFloor.F5) return
         color = LorenzColor.RED
     }
 
-    @HandleEvent
-    fun onBossEnd(event: DungeonCompleteEvent) {
+    @HandleEvent(DungeonCompleteEvent::class)
+    fun onBossEnd() {
         color = null
         livid = null
         fakeLivids.clear()
@@ -233,8 +234,8 @@ object DungeonLividFinder {
         )
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         config.enabled.onToggle {
             reloadHighlight()
         }
@@ -258,7 +259,7 @@ object DungeonLividFinder {
         }
     }
 
-    enum class LividColorHighlight(val color: LorenzColor?, val prettyName: String = color?.toString() ?: "Disabled") {
+    enum class LividColorHighlight(val color: LorenzColor?, private val prettyName: String = color?.toString() ?: "Disabled") {
         DEFAULT(null),
         BLACK(LorenzColor.BLACK),
         DARK_BLUE(LorenzColor.DARK_BLUE),
