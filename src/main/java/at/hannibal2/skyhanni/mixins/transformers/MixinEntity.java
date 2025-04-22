@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class MixinEntity {
-
     @ModifyVariable(
         method = "getDisplayName",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ChatStyle;setInsertion(Ljava/lang/String;)Lnet/minecraft/util/ChatStyle;", shift = At.Shift.AFTER)
@@ -21,9 +20,4 @@ public abstract class MixinEntity {
     public ChatComponentText getDisplayName(ChatComponentText value) {
         return EntityData.getDisplayName((Entity) (Object) this, value);
     }
-
-    // @Inject(method = "isInvisibleToPlayer", at = @At("HEAD"), cancellable = true)
-    // public void isInvisibleToPlayer(EntityPlayer player, CallbackInfoReturnable<Boolean> cir) {
-    //     if (SeaCreatureFeatures.isRareSeaCreatureBody((Entity) (Object) this)) cir.setReturnValue(false);
-    // }
 }
