@@ -160,8 +160,7 @@ object DailyQuestHelper {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
-        val message = event.message
-        chatCompletedPattern.matchMatcher(message) {
+        chatCompletedPattern.matchMatcher(event.message) {
             val type = group("type").lowercase()
             when (type) {
                 "dojo" -> {
