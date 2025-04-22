@@ -526,7 +526,7 @@ interface Renderable {
                         break
                     }
                     iteration++
-                    localWidth = (width - iteration * width * 0.01).toInt();
+                    localWidth = (width - iteration * width * 0.01).toInt()
                 }
                 pre
             }

@@ -1591,25 +1591,25 @@ object RenderUtils {
         radius: Int = 10,
         smoothness: Int = 1,
     ) {
-        val scaledRes = ScaledResolution(Minecraft.getMinecraft())
-        val widthIn = width * scaledRes.scaleFactor
-        val heightIn = height * scaledRes.scaleFactor
-        val xIn = x * scaledRes.scaleFactor
-        val yIn = y * scaledRes.scaleFactor
+        val scaledRes = GuiScreenUtils.scaleFactor
+        val widthIn = width * scaledRes
+        val heightIn = height * scaledRes
+        val xIn = x * scaledRes
+        val yIn = y * scaledRes
 
-        RoundedRectangleShader.scaleFactor = scaledRes.scaleFactor.toFloat()
+        RoundedRectangleShader.scaleFactor = scaledRes.toFloat()
         RoundedRectangleShader.radius = radius.toFloat()
         RoundedRectangleShader.smoothness = smoothness.toFloat()
         RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
 
         drawGradientRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
 
         ShaderManager.disableShader()
-        GlStateManager.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     /**
