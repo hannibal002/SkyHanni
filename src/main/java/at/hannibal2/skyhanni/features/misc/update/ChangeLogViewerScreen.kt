@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import java.util.NavigableMap
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class ChangeLogViewerScreen : SkyhanniBaseScreen() {
     private val changelogScroll = ScrollValue()
@@ -74,7 +75,9 @@ class ChangeLogViewerScreen : SkyhanniBaseScreen() {
             if (!ChangelogViewer.cache.containsKeys(ChangelogViewer.startVersion, ChangelogViewer.endVersion)) {
                 ChangelogViewer.shouldMakeNewList = true
                 Renderable.string(
-                    "§aStill Loading",
+                    if (ChangelogViewer.openTime.passedSince() >= 5.0.seconds)
+                        "§aStill Loading. §cThe Version you are looking for may not exist"
+                    else "§aStill Loading",
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                     verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 )

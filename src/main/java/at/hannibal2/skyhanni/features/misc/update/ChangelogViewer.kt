@@ -9,8 +9,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.CommandArgument
+import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
@@ -61,8 +62,7 @@ object ChangelogViewer {
     }
 
     private fun openChangelog() {
-        if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen =
-            ChangeLogViewerScreen()
+        if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
     }
 
     private fun getChangelog(currentVersion: ModVersion, targetVersion: ModVersion) {
@@ -98,16 +98,14 @@ object ChangelogViewer {
                         .replace("\\[(.+?)\\]\\(.+?\\)".toRegex(), "$1") // Random Links
                         .replace("`", "\"") // Fix Code Blocks to look better
                         .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
-                    println(basic)
-                    cache[ModVersion.fromString(entry.tagName)] = basic
-                        .replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
-                            val format = "\n|(?<format>[kmolnrKMOLNR]§)".toRegex()
-                                .find(basic.subSequence(0, it.range.start).reversed())?.groups["format"]?.value?.reversed().orEmpty()
-                            val color = "\n|(?<color>[0-9a-fA-F]§)".toRegex()
-                                .find(basic.subSequence(0, it.range.start).reversed())?.groups["color"]?.value?.reversed().orEmpty()
-                            val content = it.groups["content"]?.value.orEmpty()
-                            "§l$content§r$format$color"
-                        } // Bolding markdown
+                    cache[ModVersion.fromString(entry.tagName)] = basic.replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
+                        val format = "\n|(?<format>[kmolnrKMOLNR]§)".toRegex()
+                            .find(basic.subSequence(0, it.range.start).reversed())?.groups["format"]?.value?.reversed().orEmpty()
+                        val color = "\n|(?<color>[0-9a-fA-F]§)".toRegex()
+                            .find(basic.subSequence(0, it.range.start).reversed())?.groups["color"]?.value?.reversed().orEmpty()
+                        val content = it.groups["content"]?.value.orEmpty()
+                        "§l$content§r$format$color"
+                    } // Bolding markdown
                         .replace("\\s*\r\n$".toRegex(), "") // Remove trailing empty Lines
                         .split("\r\n") // Split at newlines
                         .map { it.trimEnd() } // Remove trailing empty stuff
@@ -134,55 +132,75 @@ object ChangelogViewer {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register(
-            "shchangelog",
-        ) {
-            description = "Shows the specified changelog."
+        event.registerComplex<CommandContext>("shchangelog") {
+            description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
-            callback(::handelCommand)
+            context = { CommandContext() }
+            specifiers = listOf<CommandArgument<CommandContext>>(
+                CommandArgument(
+                    documentation = "<version> - Shows the changelog of the versions until this, " +
+                        "or only that version if no since is specified.",
+                    prefix = "until",
+                    defaultPosition = 1,
+                    handler = { argument, context ->
+                        context.until = context.getModVersion(argument)
+                        1
+                    },
+                ),
+                CommandArgument(
+                    documentation = "<version> - Shows the changelog of the versions since this. (Exclusive)",
+                    prefix = "since",
+                    defaultPosition = 0,
+                    handler = { argument, context ->
+                        context.since = context.getModVersion(argument)
+                        1
+                    },
+                ),
+                CommandArgument(
+                    documentation = "<version> - Shows the changelog of this specific versions",
+                    prefix = "show",
+                    defaultPosition = -1,
+                    handler = { argument, context ->
+                        context.since = context.getModVersion(argument)
+                        context.until = context.since
+                        1
+                    },
+                ),
+            )
+
         }
     }
 
-    fun handelCommand(args: Array<String>) {
-        when (args.size) {
-            0 -> UpdateManager.getNextVersion()?.let { showChangelog(SkyHanniMod.VERSION, it) }
-                ?: ChatUtils.userError(
-                    "You are up to date, if you want to look at past change logs use the command " +
-                        "with arguments. Usage: [version you want to look at] [your version]",
-                )
+    private fun CommandContext.getModVersion(argument: Iterable<String>): ModVersion? {
+        val input = argument.first()
+        val version = ModVersion.fromString(input)
+        return if (!version.isValid()) {
+            errorMessage =
+                "'$input' is not a valid mod version. Version Syntax is: 'Major.Beta.Patch' " +
+                    "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
+            null
+        } else {
+            version
+        }
+    }
 
-            1 -> {
-                val tag = ModVersion.fromString(args[0])
-                if (!tag.isValid()) {
-                    ChatUtils.userError("Version shape requirement failed")
-                    return
-                }
-                val current = ModVersion.fromString(SkyHanniMod.VERSION)
-                if (tag <= current) {
-                    showChangelog(tag, tag)
-                } else {
-                    showChangelog(current, tag)
-                }
+    private class CommandContext : CommandContextAwareObject {
+
+        override var errorMessage: String? = null
+
+        var until: ModVersion? = null
+        var since: ModVersion? = null
+
+        override fun post() {
+            val since = since ?: ModVersion.fromString(SkyHanniMod.VERSION)
+            val until =
+                until ?: UpdateManager.getNextVersion()?.let { ModVersion.fromString(it) } ?: ModVersion.fromString(SkyHanniMod.VERSION)
+
+            if (until < since) {
+                errorMessage = "until:'$until' is less than since:'$since', where it is expected to be greater"
+                return
             }
-
-            2 -> {
-                val target = ModVersion.fromString(args[0])
-                if (!target.isValid()) {
-                    ChatUtils.userError("Version shape requirement failed, first argument")
-                    return
-                }
-                val current = ModVersion.fromString(args[1])
-                if (!current.isValid()) {
-                    ChatUtils.userError("Version shape requirement failed, second argument")
-                    return
-                }
-                showChangelog(current, target)
-            }
-
-            else -> ChatUtils.userError(
-                "Invalid amount of arguments. Usage: [version you want to look at] " +
-                    "[your version]",
-            )
+            showChangelog(since, until)
         }
 
     }
