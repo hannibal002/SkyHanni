@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import net.minecraftforge.fml.client.FMLClientHandler
 import java.lang.management.ManagementFactory
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
@@ -26,6 +27,7 @@ object ComputerEnvDebug {
         launcher(event)
         ram(event)
         uptime(event)
+        optifine(event)
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -215,6 +217,17 @@ object ComputerEnvDebug {
     }
 
     private fun getUptime() = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
+
+    private fun optifine(event: DebugDataCollectEvent) {
+        if (PlatformUtils.isDevEnvironment) return
+        val hasOptifine = FMLClientHandler.instance().hasOptifine()
+        event.title("Optifine")
+        if (hasOptifine) {
+            event.addIrrelevant("Optifine is installed")
+        } else {
+            event.addData("Optifine is not installed")
+        }
+    }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
