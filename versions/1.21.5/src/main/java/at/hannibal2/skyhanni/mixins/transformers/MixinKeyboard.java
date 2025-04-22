@@ -28,6 +28,10 @@ public class MixinKeyboard {
             * modifiers = 2: Control
             * modifiers = 4: Alt
          */
+        // todo on 1.8 it first checks TextInput.isActive() before posting, however im not sure if this is needed
+        // and as of now that file would need to be recoded to work with 1.21 so i havent put that here as of now
+        // the extension functions such as isActive() and isKeyHeld() still work from keyboard manager
+        // this only replaces the posting of events
         if (action == 0) new KeyUpEvent(key).post();
         if (action == 1) new KeyDownEvent(key).post();
         if (action == 1) new KeyPressEvent(key).post();
