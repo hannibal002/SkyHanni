@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
@@ -31,6 +32,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -44,7 +46,7 @@ object BazaarApi {
 
     private var loadedNpcPriceData = false
 
-    val holder = HypixelItemApi()
+    private val holder = HypixelItemApi()
     var inBazaarInventory = false
     private var currentSearchedItem = ""
 
@@ -129,9 +131,38 @@ object BazaarApi {
         }
     }
 
+    //     @HandleEvent(onlyOnSkyblock = true)
+//     fun onClickEntity(event: PacketSentEvent) {
+//         val packet = event.packet
+//
+//         if (packet !is C0EPacketClickWindow) return
+//         val slotId = packet.slotId
+//         val slot = InventoryUtils.getSlotAtIndex(slotId) ?: return
+//         val item = slot.stack
+//
+// //     }
+//
+    @HandleEvent
+    fun onPastSlotClick(event: GuiContainerHook.PastSlotClickEvent) {
+        val duration = lastNormalClick.passedSince()
+        println("PastSlotClickEvent duration: $duration")
+        val slot = InventoryUtils.getSlotAtIndex(event.slotId)
+
+        val item = slot?.stack ?: return
+
+        abc(item)
+    }
+
+    private var lastNormalClick = SimpleTimeMark.farPast()
+
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        lastNormalClick = SimpleTimeMark.now()
         val item = event.item ?: return
+        abc(item)
+    }
+
+    private fun abc(item: ItemStack) {
         val itemName = item.displayName
         if (isBazaarOrderInventory(InventoryUtils.openInventoryName())) {
             val internalName = item.getInternalNameOrNull() ?: return
@@ -144,6 +175,7 @@ object BazaarApi {
                 orderOptionProduct = internalName
             }
         }
+
         if (InventoryUtils.openInventoryName() == "Order options" && itemName == "§cCancel Order") {
             // pickup items from own bazaar order
             OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
@@ -167,8 +199,8 @@ object BazaarApi {
         return NeuInternalName.fromItemName(bazaarItem.displayName)
     }
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(SkyHanniTickEvent::class)
+    fun onTick() {
         if (ApiUtils.isHypixelItemsDisabled()) return
 
         if (!loadedNpcPriceData) {
@@ -232,8 +264,8 @@ object BazaarApi {
         event.move(25, "bazaar", "inventory.bazaar")
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         inBazaarInventory = false
         currentlyOpenedProduct = null
     }
