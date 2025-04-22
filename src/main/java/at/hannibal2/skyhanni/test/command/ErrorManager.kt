@@ -86,7 +86,10 @@ object ErrorManager {
         event.register("shtestreseterrorcache") {
             description = "Resets the cache of errors."
             category = CommandCategory.DEVELOPER_TEST
-            callback { cache.clear() }
+            callback {
+                cache.clear()
+                ChatUtils.chat("Error cache reset.")
+            }
         }
     }
 
