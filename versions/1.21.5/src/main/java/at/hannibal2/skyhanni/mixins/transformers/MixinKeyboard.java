@@ -35,6 +35,6 @@ public class MixinKeyboard {
         // this only replaces the posting of events
         if (action == 0) new KeyUpEvent(key).post();
         if (action == 1) new KeyDownEvent(key).post();
-        if (action == 1) new KeyPressEvent(key).post();
+        if (action == 2) new KeyPressEvent(key).post();
     }
 }
