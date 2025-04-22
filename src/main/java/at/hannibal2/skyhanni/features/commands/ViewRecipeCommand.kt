@@ -41,7 +41,6 @@ object ViewRecipeCommand {
         val endsWithPageNumber = args.last().isInt()
 
         val (item, page) = if (endsWithPageNumber) {
-
             val testItem = args.joinToString(" ").toInternalName().getItemStackOrNull()
             if (testItem == null) {
                 args.dropLast(1).joinToString("_") to args.last().toInt()
