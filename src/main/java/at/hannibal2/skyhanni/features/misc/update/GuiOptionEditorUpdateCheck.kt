@@ -56,8 +56,8 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         GlStateManager.scale(2F, 2F, 1F)
         val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
-            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion"
-                + if (nextVersion != null && !sameVersion) "➜ §a$nextVersion" else "",
+            "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +
+            if (nextVersion != null && !sameVersion) "➜ §a$nextVersion" else "",
             fr,
             widthRemaining / 4F,
             10F,

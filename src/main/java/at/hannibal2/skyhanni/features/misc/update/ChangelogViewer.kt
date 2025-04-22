@@ -139,7 +139,7 @@ object ChangelogViewer {
             specifiers = listOf<CommandArgument<CommandContext>>(
                 CommandArgument(
                     documentation = "<version> - Shows the changelog of the versions until this, " +
-                        "or only that version if no since is specified.",
+                                    "or only that version if no since is specified.",
                     prefix = "until",
                     defaultPosition = 1,
                     handler = { argument, context ->
@@ -167,7 +167,6 @@ object ChangelogViewer {
                     },
                 ),
             )
-
         }
     }
 
@@ -177,7 +176,7 @@ object ChangelogViewer {
         return if (!version.isValid()) {
             errorMessage =
                 "'$input' is not a valid mod version. Version Syntax is: 'Major.Beta.Patch' " +
-                    "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
+                "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
             null
         } else {
             version

@@ -30,7 +30,6 @@ data class ComplexCommand<O : CommandContextAwareObject>(
     }
 
     fun constructHelp(description: String): String = buildString {
-        //appendLine(name)
         appendLine(description)
         appendLine()
         appendLine("Arguments:")
