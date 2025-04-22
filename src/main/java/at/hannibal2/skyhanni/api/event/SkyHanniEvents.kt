@@ -51,6 +51,7 @@ object SkyHanniEvents {
         GeneratedEventPrimaryFunctionNames.map
 
     private fun registerNoEventType(options: HandleEvent, method: Method, instance: Any) {
+        if (method.parameterTypes.any()) return
         val eventType = eventPrimaryFunctionNames[method.name] ?: return
         if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
         listeners.getOrPut(eventType) { EventListeners(eventType) }
