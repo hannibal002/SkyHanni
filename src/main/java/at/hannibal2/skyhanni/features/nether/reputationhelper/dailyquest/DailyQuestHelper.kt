@@ -160,23 +160,23 @@ object DailyQuestHelper {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
-        chatCompletedPattern.matchMatcher(event.message) {
-            val type = group("type").lowercase()
-            when (type) {
-                "dojo" -> {
-                    val dojoQuest = getQuest<DojoQuest>() ?: return
-                    dojoQuest.state = QuestState.READY_TO_COLLECT
-                    update()
-                }
-                "rescue" -> {
-                    val rescueMissionQuest = getQuest<RescueMissionQuest>() ?: return
-                    rescueMissionQuest.state = QuestState.READY_TO_COLLECT
-                    update()
-                }
-                else -> {
-                    ChatUtils.debug("Unhandled quest completion type: $type")
-                }
+        val type = chatCompletedPattern.matchMatcher(event.message) {
+            group("type").lowercase()
+        } ?: return
+        when (type) {
+            "dojo" -> {
+                val dojoQuest = getQuest<DojoQuest>() ?: return
+                dojoQuest.state = QuestState.READY_TO_COLLECT
+                update()
             }
+
+            "rescue" -> {
+                val rescueMissionQuest = getQuest<RescueMissionQuest>() ?: return
+                rescueMissionQuest.state = QuestState.READY_TO_COLLECT
+                update()
+            }
+
+            else -> ChatUtils.debug("Unhandled quest completion type: $type")
         }
     }
 
