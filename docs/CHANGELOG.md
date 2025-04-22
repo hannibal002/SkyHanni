@@ -77,6 +77,7 @@
     + Show value of all items in Sacks as GUI while not in Sacks.
 + Added Trade Value Overlay. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
     + Doesn't support coins.
++ Added Evolving Item time remaining in lore (Bottle of Jyrre, Dark Cacao Truffle, etc.). - Obsidian (https://github.com/hannibal002/SkyHanni/pull/3614)
 
 #### Chat
 
@@ -106,6 +107,8 @@
 + Added Fruit Bowl Player Highlighter and Stats Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3394)
 + Added Shorten /warp option. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3524)
     + `/gold` warps to Gold Mines, `/crimson` to Crimson Isles, etc.
++ Added Frog Mask Warning. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3449)
+    + Displays a warning when foraging in an incorrect park region while wearing a Frog Mask.
 
 ### Improvements
 
@@ -119,6 +122,8 @@
 + Added Harvest Harbinger V potion to Visitor Rewards list. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3806)
     + Updated Visitor Stats counter and Prevent Denying features accordingly.
 + Improved 6th Visitor reminder to function when the visitor timer is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3820)
++ Fixed Composter display not updating when a Composter Tab List widget item is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3832)
++ Fixed Composter Upgrade Overlay flickering on upgrade-item hover. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3831)
 
 #### Mining
 
@@ -126,6 +131,7 @@
 + Added cooldown to Base Camp warp hotkey. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3718)
 + Improved `/shblockstrength`. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3822)
     + Added mining speed required for next lower tick.
++ Fixed Flowstate helper not working with Pure Quartz Ore. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/3838)
 
 #### Fishing
 
@@ -155,6 +161,9 @@
     + Uses the Magma Rod attribute price for Inferno and Hellfire Rods.
     + Displays the actual combo price instead of the lowest bin piece with the attributes.
     + Changes Level 1 attributes to have 0 cost.
++ Evolving Items time held now shows days, hours and minutes. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/3614)
++ Fixed Pet Luck appearing in SkyHanni User Luck breakdown when Jerry isn't mayor. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/3837)
++ Fixed SkyHanni User Luck appearing on inventory items. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/3837)
 
 #### Hoppity
 
@@ -212,6 +221,9 @@
 + Improved titles sent by SH features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3819)
     + All titles now share size and position; no more dynamic scaling.
     + Size and vertical position adjustable via the position editor; full opacity enforced.
++ Fixed Ability Cooldown Number Format. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3834)
++ Fixed Computer Time Offset lag on poor internet connections. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3829)
++ Fixed Mod-wide Keybinds V3. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3802)
 
 ### Bug Fixes
 
@@ -536,6 +548,14 @@
     + Added `createItems` function to map `ItemStack`s to unique identifiers with values and metadata.
 + Updated `ItemUtils`. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
     + Added coin handling to `grabInternalNameOrNull`.
++ Added argument-definition-driven command-handling system. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3409)
++ Added KeyUpEvent. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3802)
++ Added NbtCompat. - nopo (https://github.com/hannibal002/SkyHanni/pull/3776)
++ Changed `CleanupMappingFiles` to only edit mapping files requiring changes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3835)
++ Changed closed-inventory name retrieval to use `InventoryCompat`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3810)
++ Changed KeyboardManager to allow multiple simultaneous keys and buttons. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3802)
++ Cleaned up Matrix class. - Empa (https://github.com/hannibal002/SkyHanni/pull/3468)
++ Ported `event` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3657)
 
 ### Removed Features
 
