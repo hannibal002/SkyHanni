@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -14,9 +13,7 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
-import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 class GuiContainerHook(guiAny: Any) {
 
@@ -81,29 +78,6 @@ class GuiContainerHook(guiAny: Any) {
         ci: CallbackInfo,
     ) {
         if (DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel()
-    }
-
-    data class PastSlotClickEvent(
-        val windowId: Int,
-        val slotId: Int,
-        val mouseButtonClicked: Int,
-        val mode: Int,
-    ) : CancellableSkyHanniEvent()
-
-    companion object {
-
-        @JvmStatic
-        fun windowClick(
-            windowId: Int,
-            slotId: Int,
-            mouseButtonClicked: Int,
-            mode: Int,
-            cir: CallbackInfoReturnable<ItemStack>,
-        ) {
-            if (PastSlotClickEvent(windowId, slotId, mouseButtonClicked, mode).post()) {
-                cir.cancel()
-            }
-        }
     }
 
 }
