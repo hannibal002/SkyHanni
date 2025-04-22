@@ -170,6 +170,7 @@ object SkyHanniEvents {
         classes.add(clazz)
 
         var current = clazz
+        @Suppress("LoopWithTooManyJumpStatements")
         while (current.superclass != null) {
             val superClass = current.superclass
             if (superClass == SkyHanniEvent::class.java) break
