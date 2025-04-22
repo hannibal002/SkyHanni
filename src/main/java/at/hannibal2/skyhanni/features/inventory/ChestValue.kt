@@ -205,6 +205,7 @@ object ChestValue {
     fun createItems(stacks: Map<Int, ItemStack>) = buildMap<String, ChestItem> {
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
+            if (internalName == NeuInternalName.NONE) continue
             if (internalName.getItemStackOrNull() == null) continue
             val list = mutableListOf<String>()
             var total = if (internalName == NeuInternalName.SKYBLOCK_COIN) {
