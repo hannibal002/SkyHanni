@@ -11,7 +11,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+//#if MC == 1.8.9
 import net.minecraftforge.fml.client.FMLClientHandler
+import net.minecraftforge.fml.common.Loader
+//#endif
 import java.lang.management.ManagementFactory
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
@@ -27,7 +30,9 @@ object ComputerEnvDebug {
         launcher(event)
         ram(event)
         uptime(event)
+        //#if MC == 1.8.9
         optifine(event)
+        //#endif
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -218,16 +223,30 @@ object ComputerEnvDebug {
 
     private fun getUptime() = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
 
+    //#if MC == 1.8.9
     private fun optifine(event: DebugDataCollectEvent) {
         if (PlatformUtils.isDevEnvironment) return
         val hasOptifine = FMLClientHandler.instance().hasOptifine()
+        val hasPatcher = Loader.isModLoaded("patcher")
         event.title("Optifine")
         if (hasOptifine) {
             event.addIrrelevant("Optifine is installed")
         } else {
             event.addData("Optifine is not installed")
         }
+        if (hasPatcher) {
+            event.addIrrelevant("Patcher is installed")
+        } else {
+            event.addData("Patcher is not installed")
+        }
+        if (!hasOptifine || !hasPatcher) {
+            event.addData("Optifine or Patcher are not installed")
+            event.addData("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
+            event.addData("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
+            event.addData("https://modrinth.com/mod/patcher")
+        }
     }
+    //#endif
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
