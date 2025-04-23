@@ -89,7 +89,7 @@ object ItemNameResolver {
         if (rarityLocation !in expectedRarityLocations) return null
         val petName = splits.filterIndexed { index, _ -> index != rarityLocation }.joinToString("_").uppercase()
         val petRarity = LorenzRarity.getByName(splits[rarityLocation]) ?: return null
-        val structuralInternalName = "${petName};${petRarity.ordinal}"
+        val structuralInternalName = "$petName;${petRarity.id}"
         val internalName = structuralInternalName.toInternalName()
         internalName.getItemStackOrNull()?.let {
             return internalName
