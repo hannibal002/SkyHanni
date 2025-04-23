@@ -14,9 +14,9 @@ object GoblinRaidFeatures {
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if(!config.superProtectronHighlight) return
+        if (!config.superProtectronHighlight) return
 
-        if(event.mob.name != "Superprotectron") return
+        if (event.mob.name != "Superprotectron") return
 
         event.mob.highlight(config.superprotectronHighlightColor.toChromaColor().toColor())
     }
