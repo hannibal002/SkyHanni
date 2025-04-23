@@ -27,8 +27,8 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
-import java.lang.reflect.Field
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import java.lang.reflect.Field
 
 class Position @JvmOverloads constructor(
     x: Int,
