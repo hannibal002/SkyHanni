@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.garden.LockMouseConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -26,7 +25,7 @@ object LockMouseLook {
         "§aTeleported you to .*",
     )
 
-    private val config get() = LockMouseConfig()
+    private val config get() = SkyHanniMod.feature.garden.lockMouseConfig
     private val storage get() = SkyHanniMod.feature.storage
     var lockedMouse = false
     private const val lockedPosition = -1F / 3F
