@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.webhooks
 
+import com.google.gson.annotations.SerializedName
+
 data class DiscordEmbed(
     val title: String? = null,
     val type: String? = null, // usually "rich"
@@ -16,10 +18,17 @@ data class DiscordEmbed(
     val fields: List<EmbedField>? = null
 )
 
-data class EmbedFooter(val text: String, val iconUrl: String? = null)
+data class EmbedFooter(
+    val text: String,
+    @SerializedName("icon_url") val iconUrl: String? = null
+)
 data class EmbedImage(val url: String)
 data class EmbedThumbnail(val url: String)
 data class EmbedVideo(val url: String)
 data class EmbedProvider(val name: String? = null, val url: String? = null)
-data class EmbedAuthor(val name: String, val url: String? = null, val iconUrl: String? = null)
+data class EmbedAuthor(
+    val name: String,
+    val url: String? = null,
+    @SerializedName("icon_url") val iconUrl: String? = null
+)
 data class EmbedField(val name: String, val value: String, val inline: Boolean = false)
