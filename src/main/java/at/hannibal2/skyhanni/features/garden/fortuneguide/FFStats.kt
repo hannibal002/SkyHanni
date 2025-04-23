@@ -5,28 +5,24 @@ import at.hannibal2.skyhanni.data.GardenCropUpgrades.getUpgradeLevel
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
 
 object FFStats {
 
-    private val mathCrops by lazy {
-        listOf(CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART)
-    }
-    private val dicerCrops by lazy { listOf(CropType.PUMPKIN, CropType.MELON) }
-
-    private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "FARMER_BOOTS")
+    private val farmingBoots = setOf("RANCHERS_BOOTS", "FARMER_BOOTS")
 
     var cakeExpireTime
-        get() = GardenAPI.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
+        get() = GardenApi.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
         set(value) {
-            GardenAPI.storage?.fortune?.cakeExpiring = value
+            GardenApi.storage?.fortune?.cakeExpiring = value
         }
 
     var equipmentTotalFF = mapOf<FFTypes, Double>()
@@ -41,10 +37,10 @@ object FFStats {
     var totalBaseFF = mapOf<FFTypes, Double>()
 
     fun loadFFData() {
-        equipmentTotalFF = FarmingItems.equip.getFFData()
+        equipmentTotalFF = FarmingItemType.equip.getFFData()
 
-        armorTotalFF = FarmingItems.armor.getFFData()
-        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName().asString() in farmingBoots
+        armorTotalFF = FarmingItemType.armor.getFFData()
+        usingSpeedBoots = FarmingItemType.BOOTS.getItem().getInternalName().asString() in farmingBoots
 
         baseFF = getGenericFF()
 
@@ -65,7 +61,7 @@ object FFStats {
         FarmingFortuneDisplay.loadFortuneLineData(tool, 0.0)
 
         when (crop) {
-            in mathCrops -> {
+            CropType.WHEAT, CropType.CARROT, CropType.POTATO, CropType.SUGAR_CANE, CropType.NETHER_WART -> {
                 FortuneStats.BASE_TOOL.set(FarmingFortuneDisplay.getToolFortune(tool), 50.0)
                 FortuneStats.COUNTER.set(FarmingFortuneDisplay.getCounterFortune(tool), 96.0)
                 FortuneStats.HARVESTING.set(FarmingFortuneDisplay.getHarvestingFortune(tool), 75.0)
@@ -74,10 +70,10 @@ object FFStats {
                 FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 30.0)
             }
 
-            in dicerCrops -> {
+            CropType.PUMPKIN, CropType.MELON -> {
                 FortuneStats.SUNDER.set(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
-                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 20.0)
+                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 30.0)
             }
 
             CropType.MUSHROOM -> {
@@ -130,7 +126,7 @@ object FFStats {
     }
 
     fun getPetFFData(item: ItemStack?): Map<FFTypes, Double> = buildMap {
-        val gardenLvl = GardenAPI.getGardenLevel(overflow = false)
+        val gardenLvl = GardenApi.getGardenLevel(overflow = false)
         this[FFTypes.BASE] = getPetFF(item)
         this[FFTypes.PET_ITEM] = when (item?.getPetItem()) {
             "GREEN_BANDANA" -> 4.0 * gardenLvl
@@ -142,7 +138,7 @@ object FFStats {
     }
 
     private fun getGenericFF(): Map<FFTypes, Double> = buildMap {
-        val storage = GardenAPI.storage?.fortune ?: return emptyMap()
+        val storage = GardenApi.storage?.fortune ?: return emptyMap()
         this[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
         this[FFTypes.BESTIARY] = storage.bestiary
         this[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
@@ -157,26 +153,26 @@ object FFStats {
     }
 
     fun getTotalFF() {
-        currentPetItem = FarmingItems.currentPet.getItem().getPetItem().toString()
+        currentPetItem = FarmingItemType.currentPet.getItem().getPetItem().toString()
 
         totalBaseFF = combineFFData(
-            baseFF, armorTotalFF, equipmentTotalFF, FarmingItems.currentPet.getFFData(),
+            baseFF, armorTotalFF, equipmentTotalFF, FarmingItemType.currentPet.getFFData(),
         )
 
-        FFGuideGUI.updateDisplay()
+        FFGuideGui.updateDisplay()
     }
 
-    fun List<FarmingItems>.getFFData(): Map<FFTypes, Double> = combineFFData(this.map { it.getFFData() })
+    private fun List<FarmingItemType>.getFFData(): Map<FFTypes, Double> = combineFFData(this.map { it.getFFData() })
 
-    fun combineFFData(vararg value: Map<FFTypes, Double>) = combineFFData(value.toList())
-    fun combineFFData(value: List<Map<FFTypes, Double>>) =
+    private fun combineFFData(vararg value: Map<FFTypes, Double>) = combineFFData(value.toList())
+    private fun combineFFData(value: List<Map<FFTypes, Double>>) =
         value.map { it.toList() }.flatten().groupBy({ it.first }, { it.second })
             .mapValues { (_, values) -> values.sum() }
 
     private fun getPetFF(pet: ItemStack?): Double {
         if (pet == null) return 0.0
         val petLevel = pet.getPetLevel()
-        val strength = (GardenAPI.storage?.fortune?.farmingStrength)
+        val strength = (GardenApi.storage?.fortune?.farmingStrength)
         if (strength != null) {
             val rawInternalName = pet.getInternalName()
             return when {
@@ -189,6 +185,7 @@ object FFStats {
                 rawInternalName.contains("BEE;2") -> 0.2 * petLevel
                 rawInternalName.contains("BEE;3") || rawInternalName.contains("BEE;4") -> 0.3 * petLevel
                 rawInternalName.contains("SLUG;4") -> 1.0 * petLevel
+                rawInternalName.contains("HEDGEHOG;4") -> 0.45 * petLevel * if (SkyBlockTime.isDay()) 1.0 else 3.0
                 else -> 0.0
             }
         }

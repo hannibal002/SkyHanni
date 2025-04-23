@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
 import java.io.BufferedReader
@@ -48,7 +47,8 @@ object RepoUtils {
                     File(newFile.parent).mkdirs()
                     if (!isInTree(dir, newFile)) {
                         throw RuntimeException(
-                            "SkyHanni detected an invalid zip file. This is a potential security risk, please report this on the SkyHanni discord."
+                            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+                                "please report this on the SkyHanni discord."
                         )
                     }
                     val fos = FileOutputStream(newFile)
@@ -106,12 +106,7 @@ object RepoUtils {
     }
 
     @JvmStatic
-    fun updateRepo() {
-        SkyHanniMod.repo.updateRepo()
-    }
-
-    @JvmStatic
     fun resetRepoLocation() {
-        SkyHanniMod.repo.resetRepositoryLocation(manual = true)
+        RepoManager.resetRepositoryLocation(manual = true)
     }
 }

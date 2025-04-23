@@ -44,7 +44,7 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
         String string = classUrl.toString();
         if (classUrl.getProtocol().equals("jar")) {
             try {
-                return new URL(string.substring(4).split("!")[0]);
+                return new URL(string.substring(4, string.lastIndexOf('!')));
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
@@ -77,7 +77,8 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
     public void walkDir(Path file) {
         System.out.println("Trying to find mixins from directory");
         try (Stream<Path> classes = Files.walk(file.resolve(mixinBaseDir))) {
-            classes.map(it -> file.relativize(it).toString())
+            classes.filter(Files::isRegularFile)
+                .map(it -> file.relativize(it).toString())
                 .forEach(this::tryAddMixinClass);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -121,13 +122,15 @@ public class SkyhanniMixinPlugin implements IMixinConfigPlugin {
         }
     }
 
+    //#if MC < 1.21
     @Override
-    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
-    }
-
+    public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
     @Override
-    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
-    }
+    public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
+    //#else
+    //$$ @Override
+    //$$ public void preApply(String targetClassName, org.objectweb.asm.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
+    //$$ @Override
+    //$$ public void postApply(String targetClassName, org.objectweb.asm.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
+    //#endif
 }

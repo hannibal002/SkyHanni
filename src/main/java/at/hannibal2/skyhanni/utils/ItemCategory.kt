@@ -11,6 +11,7 @@ enum class ItemCategory {
     WAND,
     FISHING_WEAPON,
     FISHING_ROD,
+    ROD_PART,
     AXE,
     GAUNTLET,
     HOE,
@@ -53,6 +54,10 @@ enum class ItemCategory {
     SACK,
     CHISEL,
     DYE,
+    ORE,
+    BLOCK,
+    DWARVEN_METAL,
+    GEMSTONE,
 
     NONE,
     ;
@@ -63,5 +68,7 @@ enum class ItemCategory {
             stack?.getItemCategoryOrNull()?.let { this.contains(it) } ?: false
 
         val miningTools = listOf(PICKAXE, DRILL, GAUNTLET)
+
+        val armor = setOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
     }
 }

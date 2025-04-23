@@ -7,6 +7,25 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class BitsConfig {
+
+    @Expose
+    @ConfigOption(name = "Bulk Buy Cookie Time", desc = "Corrects the time for cookies if bought in bulk on the buy item.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean bulkBuyCookieTime = true;
+
+    @Expose
+    @ConfigOption(name = "Bits on Cookie", desc = "Show the bits you would gain on a cookies.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showBitsOnCookie = true;
+
+    @Expose
+    @ConfigOption(name = "Bits on Cookie Change", desc = "Show the change in available bits on cookies.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showBitsChangeOnCookie = false;
+
     @Expose
     @ConfigOption(name = "Enable No Bits Warning", desc = "Alerts you when you have no bits available.")
     @ConfigEditorBoolean
@@ -25,7 +44,8 @@ public class BitsConfig {
     public boolean bitsGainChatMessage = true;
 
     @Expose
-    @ConfigOption(name = "Threshold", desc = "The amount of bits you need to have to not get a warning.")
+    @ConfigOption(name = "Message Threshhold", desc = "The amount of bits you need to get to show the message.")
     @ConfigEditorSlider(minValue = 0, maxValue = 1000, minStep = 1)
+    // TODO rename
     public int threshold = 400;
 }

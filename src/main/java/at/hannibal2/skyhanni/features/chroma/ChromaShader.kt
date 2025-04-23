@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.chroma
 
+import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig.Direction
-import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMinecraft
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
 import net.minecraft.client.Minecraft
@@ -17,11 +18,11 @@ abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, f
 
     override fun registerUniforms() {
         registerUniform(Uniform.UniformType.FLOAT, "chromaSize") {
-            ChromaManager.config.chromaSize * (Minecraft.getMinecraft().displayWidth / 100f)
+            ChromaManager.config.chromaSize * (GuiScreenUtils.displayWidth / 100f)
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
             var ticks =
-                (MinecraftData.totalTicks) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+                (ClientEvents.totalTicks) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
 
             ticks = when (ChromaManager.config.chromaDirection) {
                 Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks

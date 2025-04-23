@@ -1,37 +1,37 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.data.SlayerApi
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.features.event.diana.DianaAPI
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SlayerQuestWarning {
 
-    private val config get() = SkyHanniMod.feature.slayer
+    private val config get() = SlayerApi.config
 
     private var lastWeaponUse = SimpleTimeMark.farPast()
-    private val voidItem = "ASPECT_OF_THE_VOID".asInternalName()
-    private val endItem = "ASPECT_OF_THE_END".asInternalName()
+    private val voidItem = "ASPECT_OF_THE_VOID".toInternalName()
+    private val endItem = "ASPECT_OF_THE_END".toInternalName()
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
@@ -41,10 +41,10 @@ object SlayerQuestWarning {
         var lastSlayerType: SlayerType? = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        val slayerType = event.scoreboard.nextAfter("Slayer Quest")
-        val slayerProgress = event.scoreboard.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+        val slayerType = event.full.nextAfter("Slayer Quest")
+        val slayerProgress = event.full.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
         val new = slayerProgress.removeColor()
         val slayerData = getSlayerData()
 
@@ -59,7 +59,7 @@ object SlayerQuestWarning {
         }
     }
 
-    private fun getSlayerData() = if (RiftAPI.inRift()) outsideRiftData else insideRiftData
+    private fun getSlayerData() = if (RiftApi.inRift()) outsideRiftData else insideRiftData
 
     private fun String.inCombat() = contains("Combat") || contains("Kills")
     private fun String.inBoss() = this == "Slay the boss!"
@@ -100,7 +100,7 @@ object SlayerQuestWarning {
         if (!config.questWarning) return
         if (lastWarning.passedSince() < 10.seconds) return
 
-        if (DianaAPI.isDoingDiana()) return
+        if (DianaApi.isDoingDiana()) return
         // prevent warnings when mobs are hit by other players
         if (lastWeaponUse.passedSince() > 500.milliseconds) return
 
@@ -108,13 +108,12 @@ object SlayerQuestWarning {
         ChatUtils.chat(chatMessage)
 
         if (config.questWarningTitle) {
-            LorenzUtils.sendTitle("§e$titleMessage", 2.seconds)
+            TitleManager.sendTitle("§e$titleMessage", duration = 2.seconds)
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         val entity = event.entity
         if (entity.getLorenzVec().distanceToPlayer() < 6 && isSlayerMob(entity)) {
@@ -123,20 +122,21 @@ object SlayerQuestWarning {
     }
 
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
-        val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
+        val slayerType = SlayerApi.currentAreaType ?: return false
 
         // workaround for rift mob that is unrelated to slayer
         if (entity.name == "Oubliette Guard") return false
         // workaround for Bladesoul in  Crimson Isle
         if (LorenzUtils.skyBlockArea == "Stronghold" && entity.name == "Skeleton") return false
 
-        val activeSlayer = SlayerAPI.activeSlayer
+        val isSlayer = slayerType.clazz.isInstance(entity)
+        if (!isSlayer) return false
 
-        if (activeSlayer != null) {
-            if (slayerType != activeSlayer) {
-                val activeSlayerName = activeSlayer.displayName
+        SlayerApi.activeSlayer?.let {
+            if (slayerType != it) {
+                val activeSlayerName = it.displayName
                 val slayerName = slayerType.displayName
-                SlayerAPI.latestWrongAreaWarning = SimpleTimeMark.now()
+                SlayerApi.latestWrongAreaWarning = SimpleTimeMark.now()
                 warn(
                     "Wrong Slayer!",
                     "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!",
@@ -144,11 +144,10 @@ object SlayerQuestWarning {
             }
         }
 
-        val isSlayer = slayerType.clazz.isInstance(entity)
-        return (getSlayerData().lastSlayerType == slayerType) && isSlayer
+        return getSlayerData().lastSlayerType == slayerType
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
         val internalName = event.itemInHand?.getInternalNameOrNull()
 

@@ -15,10 +15,16 @@ import org.lwjgl.input.Keyboard;
 
 public class EstimatedItemValueConfig {
     @Expose
-    @ConfigOption(name = "Enable Estimated Price", desc = "Display an Estimated Item Value for the item you hover over.")
+    @ConfigOption(name = "Enabled", desc = "Display an Estimated Item Value for the item you hover over.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigOption(name = "Show on Tooltip", desc = "Puts the estimated item value in the tooltip.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showTooltip = false;
 
     @Expose
     @ConfigOption(name = "Hotkey", desc = "Press this key to show the Estimated Item Value.")
@@ -38,6 +44,15 @@ public class EstimatedItemValueConfig {
         minStep = 1
     )
     public Property<Integer> enchantmentsCap = Property.of(7);
+
+    @Expose
+    @ConfigOption(name = "Star Material Cap", desc = "Only show the top # most expensive parts of star prices.")
+    @ConfigEditorSlider(
+        minValue = 1,
+        maxValue = 15,
+        minStep = 1
+    )
+    public Property<Integer> starMaterialCap = Property.of(3);
 
     @Expose
     @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
@@ -74,15 +89,15 @@ public class EstimatedItemValueConfig {
         INSTANT_BUY("Instant Buy"),
         BUY_ORDER("Buy Order"),
         ;
-        private final String str;
+        private final String displayName;
 
-        BazaarPriceSource(String str) {
-            this.str = str;
+        BazaarPriceSource(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -97,5 +112,6 @@ public class EstimatedItemValueConfig {
 
     @Expose
     @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
+    // TODO rename "position"
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 }

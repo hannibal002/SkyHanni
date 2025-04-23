@@ -26,15 +26,15 @@ public class EnchantParsingConfig {
         COMPRESSED("Compressed"),
         STACKED("Stacked");
 
-        public final String str;
+        public final String displayName;
 
-        EnchantFormat(String str) {
-            this.str = str;
+        EnchantFormat(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -43,6 +43,11 @@ public class EnchantParsingConfig {
         "§eIf SkyHanni chroma is disabled this will default to §6Gold.")
     @ConfigEditorDropdown
     public Property<LorenzColor> perfectEnchantColor = Property.of(LorenzColor.CHROMA);
+
+    @Expose
+    @ConfigOption(name = "Perfect Enchantment Bold", desc = "Enchantments at max level will be bold.")
+    @ConfigEditorBoolean
+    public Property<Boolean> boldPerfectEnchant = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Great Enchantment Color", desc = "The color an enchantment will be at a great level.")
@@ -68,15 +73,15 @@ public class EnchantParsingConfig {
         COPY_ENCHANT("Copy enchant format"),
         DEFAULT("Default (Blue)");
 
-        public final String str;
+        public final String displayName;
 
-        CommaFormat(String str) {
-            this.str = str;
+        CommaFormat(String displayName) {
+            this.displayName = displayName;
         }
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -91,4 +96,13 @@ public class EnchantParsingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideEnchantDescriptions = Property.of(false);
+
+    @Expose
+    @ConfigOption(
+        name = "Stacking Enchant Progress",
+        desc = "Shows the stacking enchant progress at the bottom of the lore. " +
+            "§eRequires Enchant Parsing to be enabled."
+    )
+    @ConfigEditorBoolean
+    public boolean stackingEnchantProgress = true;
 }
