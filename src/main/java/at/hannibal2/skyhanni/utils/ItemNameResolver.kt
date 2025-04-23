@@ -37,6 +37,10 @@ object ItemNameResolver {
             return itemNameCache.getOrPut(lowercase) { it }
         }
 
+        resolvePetWithRarity(itemName)?.let {
+            return itemNameCache.getOrPut(lowercase) { it }
+        }
+
         if (itemName.endsWith("gemstone", ignoreCase = true)) {
             val split = lowercase.split(" ")
             if (split.size == 3) {
@@ -76,6 +80,21 @@ object ItemNameResolver {
 
         itemNameCache[lowercase] = internalName
         return internalName
+    }
+
+    private fun resolvePetWithRarity(itemName: String): NeuInternalName? {
+        val splits = itemName.split(" ").takeIf { it.size > 1 } ?: return null
+        val rarityLocation = splits.indexOfFirst { LorenzRarity.getByName(it) != null }
+        val expectedRarityLocations = listOf(0, splits.size - 1)
+        if (rarityLocation !in expectedRarityLocations) return null
+        val petName = splits.filterIndexed { index, _ -> index != rarityLocation }.joinToString("_").uppercase()
+        val petRarity = LorenzRarity.getByName(splits[rarityLocation]) ?: return null
+        val structuralInternalName = "${petName};${petRarity.ordinal}"
+        val internalName = structuralInternalName.toInternalName()
+        internalName.getItemStackOrNull()?.let {
+            return internalName
+        }
+        return null
     }
 
     private fun resolveEnchantmentByCleanName(itemName: String): NeuInternalName? {
