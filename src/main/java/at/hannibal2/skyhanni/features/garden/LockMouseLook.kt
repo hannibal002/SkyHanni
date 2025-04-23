@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -12,6 +14,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import at.hannibal2.skyhanni.config.features.garden.LockMouseConfig
+import at.hannibal2.skyhanni.data.IslandType
 
 @SkyHanniModule
 object LockMouseLook {
@@ -43,6 +46,15 @@ object LockMouseLook {
     fun onChat(event: SkyHanniChatEvent) {
         if (!gardenTeleportPattern.matches(event.message)) return
         if (lockedMouse) toggleLock()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onCommandRegister(event: CommandRegistrationEvent) {
+        event.register("shmouselock") {
+            description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
+            aliases = listOf("shlockmouse")
+            callback { toggleLock() }
+        }
     }
 
     private fun toggleLock() {
