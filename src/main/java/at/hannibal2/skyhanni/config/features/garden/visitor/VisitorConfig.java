@@ -24,7 +24,7 @@ public class VisitorConfig {
     @Expose
     @ConfigOption(name = "Visitor Inventory", desc = "")
     @Accordion
-    public InventoryConfig inventory = new InventoryConfig();
+    public VisitorInventoryConfig inventory = new VisitorInventoryConfig();
 
     @Expose
     @ConfigOption(name = "Visitor Reward Warning", desc = "")

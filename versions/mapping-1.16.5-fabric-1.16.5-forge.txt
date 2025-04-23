@@ -6,41 +6,67 @@ net.fabricmc.loader.api.ModContainer net.minecraftforge.fml.ModContainer
 
 net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.player.LocalPlayer
 
-net.minecraft.client.network.ClientPlayerEntity sendChatMessage() chat()
 net.minecraft.client.network.ClientPlayerEntity networkHandler connection
+net.minecraft.client.network.ClientPlayerEntity sendChatMessage() chat()
 net.minecraft.client.network.ClientPlayerEntity setExperience() setExperienceValues()
 
+net.minecraft.client.option.KeyBinding net.minecraft.client.KeyMapping
 net.minecraft.client.option.Perspective net.minecraft.client.CameraType
+
+net.minecraft.client.option.KeyBinding isPressed() isDown()
+net.minecraft.client.option.KeyBinding unpressAll() releaseAll()
+
 net.minecraft.client.option.Perspective isFrontView() isMirrored()
 
 net.minecraft.client.render.WorldRenderer reload() allChanged()
 
 net.minecraft.client.util.Window getHandle() getWindow()
 
-net.minecraft.item.ItemStack net.minecraft.world.item.ItemsStack
-net.minecraft.item.ItemStack getName() getDisplayName()
+net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.decoration.ArmorStand
+
+net.minecraft.entity.decoration.ArmorStandEntity shouldHideBasePlate() isNoBasePlate()
+net.minecraft.entity.decoration.ArmorStandEntity shouldShowArms() isShowArms()
 
 net.minecraft.entity.passive.VillagerEntity net.minecraft.world.entity.npc.Villager
-net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.decoration.ArmorStand
-net.minecraft.entity.decoration.ArmorStandEntity shouldShowArms() isShowArms()
-net.minecraft.entity.decoration.ArmorStandEntity shouldHideBasePlate() isNoBasePlate()
 
-net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.ServerPlayer
+net.minecraft.item.ItemStack net.minecraft.world.item.ItemsStack
+
+net.minecraft.item.ItemStack getName() getDisplayName()
+
+net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket net.minecraft.network.protocol.game.ClientboundAddPlayerPacket
+
+net.minecraft.screen.ScreenHandler net.minecraft.world.inventory.AbstractContainerMenu
+
+net.minecraft.screen.ScreenHandler getSlot() getSlot()
+net.minecraft.screen.ScreenHandler syncId containerId
 
 net.minecraft.screen.slot.Slot net.minecraft.world.inventory.Slot
+
 net.minecraft.screen.slot.Slot getIndex() getSlotIndex()
 net.minecraft.screen.slot.Slot getStack() getItem()
 net.minecraft.screen.slot.Slot hasStack() hasItem()
 
-net.minecraft.screen.ScreenHandler net.minecraft.world.inventory.AbstractContainerMenu
-net.minecraft.screen.ScreenHandler getSlot() getSlot()
-net.minecraft.screen.ScreenHandler syncId containerId
-net.minecraft.text.Style net.minecraft.network.chat.Style
-
-net.minecraft.text.Style withStrikethrough() setStrikethrough()
-net.minecraft.text.Style withUnderline() setUnderlined()
-net.minecraft.text.Style withObfuscated() setObfuscated()
-net.minecraft.text.Style withParent() applyTo()
+net.minecraft.server.network.ServerPlayerEntity net.minecraft.server.level.ServerPlayer
 
 net.minecraft.text.MutableText net.minecraft.network.chat.MutableComponent
+net.minecraft.text.Style net.minecraft.network.chat.Style
+
 net.minecraft.text.MutableText setStyle() setStyle()
+
+net.minecraft.text.Style withObfuscated() setObfuscated()
+net.minecraft.text.Style withParent() applyTo()
+net.minecraft.text.Style withStrikethrough() setStrikethrough()
+net.minecraft.text.Style withUnderline() setUnderlined()
+
+net.minecraft.util.hit.HitResult net.minecraft.world.phys.HitResult
+
+net.minecraft.util.math.Box net.minecraft.world.phys.AABB
+net.minecraft.util.math.Vec3d net.minecraft.world.phys.Vec3
+
+net.minecraft.util.math.Box contains() contains()
+net.minecraft.util.math.Box offset() move()
+
+net.minecraft.util.math.Vec3d squaredDistanceTo() distanceToSqr()
+
+net.minecraft.world.phys.HitResult getPos() getLocation()
+

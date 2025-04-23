@@ -40,7 +40,7 @@ object AnvilCombineHelper {
         if (leftStack == null && rightStack == null) return emptySet()
 
         return InventoryUtils.getSlotsInOwnInventory().filter { slot ->
-            val name = slot.stack?.getInternalName()
+            val name = slot.stack.getInternalName()
             name == leftStack || name == rightStack
         }.map { it.slotNumber }.toSet()
 

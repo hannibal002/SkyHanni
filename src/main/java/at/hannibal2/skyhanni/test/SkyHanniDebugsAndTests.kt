@@ -329,7 +329,7 @@ object SkyHanniDebugsAndTests {
         GardenNextJacobContest.isFetchingContests = true
         SkyHanniMod.coroutineScope.launch {
             GardenNextJacobContest.fetchUpcomingContests()
-            GardenNextJacobContest.lastFetchAttempted = System.currentTimeMillis()
+            GardenNextJacobContest.lastFetchAttempted = SimpleTimeMark.now()
             GardenNextJacobContest.isFetchingContests = false
         }
     }

@@ -87,7 +87,7 @@ object ProfileStorageData {
             if (it.multipleProfiles && !hypixelDataLoaded) return
         }
 
-        if (noTabListTime.passedSince() < 2.seconds) return
+        if (noTabListTime.passedSince() < 3.seconds) return
         noTabListTime = SimpleTimeMark.now()
         val foundSkyBlockTabList = TabListData.getTabList().any { it.contains("§b§lArea:") }
         if (foundSkyBlockTabList) {

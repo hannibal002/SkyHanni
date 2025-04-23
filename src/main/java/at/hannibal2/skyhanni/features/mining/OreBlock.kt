@@ -97,6 +97,7 @@ enum class OreBlock(
     PURE_REDSTONE(Blocks.redstone_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
     PURE_EMERALD(Blocks.emerald_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
     PURE_DIAMOND(Blocks.diamond_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE, hasInitSound = false),
+    PURE_QUARTZ(Blocks.quartz_block, { inDwarvenMines || inCrystalHollows }, OreCategory.ORE),
 
     // GEMSTONES
     RUBY(EnumDyeColor.RED, { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE),
@@ -135,6 +136,12 @@ enum class OreBlock(
         speed >= speedSoftCap -> 4
         else -> round((strength * 30.0) / speed).toInt()
     }
+
+    /**
+     * Assume below softcap
+     */
+    fun speedNeededForNextTick(currentSpeed: Double): Double =
+        (strength * 30) / (miningTicks(currentSpeed) - 0.5) - currentSpeed
 
     constructor(block: Block, checkArea: () -> Boolean, category: OreCategory, hasInitSound: Boolean = true) :
         this({ it.block == block }, checkArea, category, hasInitSound)

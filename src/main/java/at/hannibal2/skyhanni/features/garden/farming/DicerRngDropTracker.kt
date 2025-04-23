@@ -103,8 +103,6 @@ object DicerRngDropTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.hideChat && !config.display) return
-
         val message = event.message
         for (drop in itemDrops) {
             drop.pattern.matchMatcher(message) {
@@ -181,7 +179,7 @@ object DicerRngDropTracker {
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Pattern)
 
-    fun isEnabled() = GardenApi.inGarden() && config.display
+    private fun isEnabled() = GardenApi.inGarden() && config.display
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

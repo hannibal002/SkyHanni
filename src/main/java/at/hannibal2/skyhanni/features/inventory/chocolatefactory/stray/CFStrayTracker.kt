@@ -306,7 +306,7 @@ object CFStrayTracker {
         tracker.initRenderer(
             { config.strayRabbitTrackerPosition },
             CFApi.mainInventory,
-        ) { isEnabled() }
+        ) { config.strayRabbitTracker && isEnabled() }
     }
 
     @HandleEvent
@@ -363,5 +363,5 @@ object CFStrayTracker {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.strayRabbitTracker && CFApi.inChocolateFactory
+    private fun isEnabled() = LorenzUtils.inSkyBlock && CFApi.inChocolateFactory
 }

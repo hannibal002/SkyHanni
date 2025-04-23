@@ -163,4 +163,7 @@ class GuiConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var configButtonOnPause: Boolean = true
+
+    @Expose
+    var titlePosition: Position = Position(0, 160)
 }
