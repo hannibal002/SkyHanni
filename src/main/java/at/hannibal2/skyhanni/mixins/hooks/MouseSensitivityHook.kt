@@ -38,8 +38,11 @@ object MouseSensitivityHook {
     ) {
         DEFAULT({ it }),
         LOCKED({_ -> -1f/3f}),
-        REDUCED({
-            ((it + 1f/3f) * config.reducingFactor.get()) - 1f/3f
+        AUTO_REDUCED({
+            ((it + 1f/3f) / config.reducingFactor.get()) - 1f/3f
+        }),
+        MANUAL_REDUCED({
+            ((it + 1f/3f) / config.reducingFactor.get()) - 1f/3f
         }),
         ;
 
