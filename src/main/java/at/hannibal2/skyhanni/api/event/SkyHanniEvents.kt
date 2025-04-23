@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import java.lang.reflect.Method
 
 @SkyHanniModule
