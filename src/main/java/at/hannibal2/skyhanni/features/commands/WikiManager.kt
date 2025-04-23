@@ -11,8 +11,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import net.minecraft.item.ItemStack
 import java.net.URLEncoder
 
@@ -58,8 +59,8 @@ object WikiManager {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeybind(event: GuiKeyPressEvent) {
-        if (NEUItems.neuHasFocus()) return
-        val stack = event.guiContainer.slotUnderMouse?.stack ?: return
+        if (NeuItems.neuHasFocus()) return
+        val stack = slotUnderCursor()?.stack ?: return
 
         if (!config.wikiKeybind.isKeyHeld()) return
         wikiTheItem(stack, config.menuOpenWiki)

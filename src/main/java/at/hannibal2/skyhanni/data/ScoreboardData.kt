@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
@@ -11,15 +10,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.getPlayerNames
+import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
-import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ScoreboardData {
@@ -29,7 +27,7 @@ object ScoreboardData {
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
     val objectiveTitle: String get() =
-        Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName.orEmpty()
+        MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -71,8 +69,7 @@ object ScoreboardData {
 
     @HandleEvent(receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
-        val packet = event.packet
-        when (packet) {
+        when (val packet = event.packet) {
             is S3CPacketUpdateScore -> {
                 if (packet.objectiveName == "update") {
                     dirty = true
@@ -113,8 +110,8 @@ object ScoreboardData {
         println(" ")
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onTick() {
         if (!dirty) return
         dirty = false
         monitor()
@@ -148,12 +145,11 @@ object ScoreboardData {
     }.joinToString(separator = "")
 
     private fun fetchScoreboardLines(): List<String> {
-        val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
-        val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
+        val scoreboard = MinecraftCompat.localWorldOrNull?.scoreboard ?: return emptyList()
+        val objective = scoreboard.getSidebarObjective() ?: return emptyList()
         var scores = scoreboard.getSortedScores(objective)
-        val list = scores.filter { input: Score? ->
-            input != null && input.playerName != null && !input.playerName.startsWith("#")
-        }
+        val list = scores.getPlayerNames(scoreboard)
+        //#if MC < 1.21
         scores = if (list.size > 15) {
             list.drop(15)
         } else {
@@ -162,6 +158,9 @@ object ScoreboardData {
         return scores.map {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
+        //#else
+        //$$ return list.map { it.formattedTextCompat() }
+        //#endif
     }
 
     // TODO USE SH-REPO

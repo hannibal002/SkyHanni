@@ -9,20 +9,20 @@ import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.indexOfFirst
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirst
 
 @SkyHanniModule
 object GardenCropMilestoneInventory {
 
     private var average = -1.0
-    private val config get() = GardenAPI.config
+    private val config get() = GardenApi.config
 
     @HandleEvent
     fun onCropMilestoneUpdate(event: CropMilestoneUpdateEvent) {
@@ -72,7 +72,7 @@ object GardenCropMilestoneInventory {
 
         val counter = crop.getCounter().toDouble()
         val percentage = counter / maxCounter
-        val percentageFormat = LorenzUtils.formatPercentage(percentage)
+        val percentageFormat = percentage.formatPercentage()
 
         event.toolTip.add(index, " ")
         val progressBar = StringUtils.progressBar(percentage, 19)

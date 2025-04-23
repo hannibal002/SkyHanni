@@ -4,17 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.dev.DebugMobConfig.HowToShow
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
 import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.MobUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.entity.EntityPlayerSP
 
 @SkyHanniModule
@@ -32,13 +32,13 @@ object MobDebug {
 
     private fun Mob.isNotInvisible() = !this.isInvisible() || (config.showInvisible && this == lastRayHit)
 
-    private fun MobData.MobSet.highlight(event: RenderWorldEvent, color: (Mob) -> (LorenzColor)) {
+    private fun MobData.MobSet.highlight(event: SkyHanniRenderWorldEvent, color: (Mob) -> (LorenzColor)) {
         for (mob in filter { it.isNotInvisible() }) {
-            event.drawFilledBoundingBoxNea(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
+            event.drawFilledBoundingBox(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
         }
     }
 
-    private fun MobData.MobSet.showName(event: RenderWorldEvent) {
+    private fun MobData.MobSet.showName(event: SkyHanniRenderWorldEvent) {
         val map = filter { it.canBeSeen() && it.isNotInvisible() }
             .map { it.boundingBox.getTopCenter() to it.name }
         for ((location, text) in map) {
@@ -47,9 +47,9 @@ object MobDebug {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (config.showRayHit || config.showInvisible) {
-            lastRayHit = MobUtils.rayTraceForMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)
+            lastRayHit = MobUtils.rayTraceForMobs(MinecraftCompat.localPlayer, event.partialTicks)
                 ?.firstOrNull { it.canBeSeen() && (!config.showInvisible || !it.isInvisible()) }
         }
 
@@ -57,7 +57,7 @@ object MobDebug {
             MobData.skyblockMobs.highlight(event) { if (it.mobType == Mob.Type.BOSS) LorenzColor.DARK_GREEN else LorenzColor.GREEN }
         }
         if (config.displayNPC.isHighlight()) {
-            MobData.displayNPCs.highlight(event) { LorenzColor.RED }
+            MobData.displayNpcs.highlight(event) { LorenzColor.RED }
         }
         if (config.realPlayerHighlight) {
             MobData.players.highlight(event) { if (it.baseEntity is EntityPlayerSP) LorenzColor.CHROMA else LorenzColor.BLUE }
@@ -72,7 +72,7 @@ object MobDebug {
             MobData.skyblockMobs.showName(event)
         }
         if (config.displayNPC.isName()) {
-            MobData.displayNPCs.showName(event)
+            MobData.displayNpcs.showName(event)
         }
         if (config.summon.isName()) {
             MobData.summoningMobs.showName(event)
@@ -82,7 +82,7 @@ object MobDebug {
         }
         if (config.showRayHit) {
             lastRayHit?.let {
-                event.drawFilledBoundingBoxNea(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
+                event.drawFilledBoundingBox(it.boundingBox.expandBlock(), LorenzColor.GOLD.toColor(), 0.5f)
             }
         }
     }

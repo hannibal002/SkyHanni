@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarDataOr
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.item.ItemStack
@@ -45,7 +45,7 @@ object BazaarBestSellMethod {
         display = updateDisplay(event.openedProduct)
     }
 
-    private fun updateDisplay(internalName: NEUInternalName?): String {
+    private fun updateDisplay(internalName: NeuInternalName?): String {
         if (internalName == null) {
             return "§cUnknown Bazaar item!"
         }
@@ -61,7 +61,7 @@ object BazaarBestSellMethod {
         val totalDiff = (data.sellOfferPrice - data.instantBuyPrice) * having
         val result = totalDiff.toInt().shortFormat()
 
-        val name = internalName.itemName
+        val name = internalName.repoItemName
         return "$name§7 sell difference: §6$result coins"
     }
 

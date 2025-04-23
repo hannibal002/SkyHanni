@@ -255,7 +255,7 @@ object SkyHanniConfigSearchResetCommand {
         val line = term.split(".").drop(1)
         var field: Field? = null
         for (entry in line) {
-            field = obj.javaClass.getField(entry).makeAccessible()
+            field = obj.javaClass.getDeclaredField(entry).makeAccessible()
             parentObject = obj
             obj = field.get(obj)
         }
@@ -265,6 +265,7 @@ object SkyHanniConfigSearchResetCommand {
         return Triple(field, obj, parentObject)
     }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun loadAllFields(parentName: String, obj: Any, depth: Int = 0): Map<String, Any?> {
         val map = mutableMapOf<String, Any?>()
         if (depth == 8) { // this is only a backup for safety, needs increasing someday maybe
@@ -288,6 +289,7 @@ object SkyHanniConfigSearchResetCommand {
                 newObj !is Long &&
                 newObj !is Int &&
                 newObj !is Double &&
+                newObj !is Float &&
                 newObj !is Position &&
                 newObj !is Map<*, *> &&
                 newObj !is List<*> &&

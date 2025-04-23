@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
+import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
@@ -12,13 +13,19 @@ class PlayerSpecificStorage {
     var profiles: MutableMap<String, ProfileSpecificStorage> = mutableMapOf() // profile name
 
     @Expose
-    var useRomanNumerals: Boolean = true
-
-    @Expose
     var multipleProfiles: Boolean = false
 
     @Expose
+    var useRomanNumerals: Boolean = true
+
+    @Expose
     var gardenCommunityUpgrade: Int = -1
+
+    @Expose
+    var fameRank: String = "New Player"
+
+    @Expose
+    var currentChat: CurrentChatDisplay.ChatType? = null
 
     @Expose
     var nextCityProjectParticipationTime: SimpleTimeMark = farPast()
@@ -48,7 +55,7 @@ class PlayerSpecificStorage {
 
     class BingoSession {
         @Expose
-        var tierOneMinionsDone: MutableSet<NEUInternalName> = mutableSetOf()
+        var tierOneMinionsDone: MutableSet<NeuInternalName> = mutableSetOf()
 
         @Expose
         var goals: MutableMap<Int, BingoGoal> = mutableMapOf()

@@ -6,17 +6,20 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
+import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.compat.getVanillaItem
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -27,17 +30,22 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.JsonToNBT
-import net.minecraft.nbt.NBTException
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
-import net.minecraft.nbt.NBTTagString
-import net.minecraftforge.common.util.Constants
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.TreeMap
 import kotlin.math.floor
+//#if MC > 1.21
+//$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.util.Identifier
+//$$ import net.minecraft.nbt.NbtString
+//#else
+import net.minecraft.nbt.NBTTagString
+import net.minecraft.nbt.NBTException
+//#endif
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -50,7 +58,7 @@ object EnoughUpdatesManager {
     private val itemStackCache = mutableMapOf<String, ItemStack>()
     private val displayNameCache = mutableMapOf<String, String>()
     private val recipes = mutableSetOf<PrimitiveRecipe>()
-    private val recipesMap = mutableMapOf<NEUInternalName, MutableSet<PrimitiveRecipe>>()
+    private val recipesMap = mutableMapOf<NeuInternalName, MutableSet<PrimitiveRecipe>>()
 
     private var neuPetsJson: NeuPetsJson? = null
     private var neuPetNums: JsonObject? = null
@@ -85,7 +93,7 @@ object EnoughUpdatesManager {
         }
     }
 
-    fun getRecipesFor(internalName: NEUInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
+    fun getRecipesFor(internalName: NeuInternalName): Set<PrimitiveRecipe> = recipesMap.getOrDefault(internalName, emptySet())
 
     private fun loadItemMap(tempItemMap: TreeMap<String, JsonObject>) {
         val itemDir = File(repoLocation, "items")
@@ -107,9 +115,9 @@ object EnoughUpdatesManager {
     private fun parseItem(internalName: String, json: JsonObject): JsonObject? {
         if (json.get("itemid") == null) return null
         var itemId = json["itemid"].asString
-        val mcItem = Item.getByNameOrId(itemId)
+        val mcItem = itemId.getVanillaItem()
         if (mcItem != null) {
-            itemId = mcItem.registryName
+            itemId = mcItem.getIdentifierString()
         }
         json.addProperty("itemid", itemId)
 
@@ -149,15 +157,16 @@ object EnoughUpdatesManager {
     fun stackToJson(stack: ItemStack): JsonObject {
         val tag = stack.tagCompound ?: NBTTagCompound()
 
-        val lore = if (tag.hasKey("display", Constants.NBT.TAG_COMPOUND)) {
-            tag.getCompoundTag("display").getStringList("Lore")
-        } else emptyList()
+        val lore = stack.getLore()
 
         val json = JsonObject()
-        json.addProperty("itemid", stack.item.registryName.toString())
+        json.addProperty("itemid", stack.item.getIdentifierString())
         json.addProperty("displayname", stack.displayName)
+        //#if MC < 1.21
+        // todo nbt tag doesnt exist on modern
         json.addProperty("nbttag", tag.toString())
         json.addProperty("damage", stack.itemDamage)
+        //#endif
 
         val jsonLore = JsonArray()
         for (line in lore) {
@@ -168,6 +177,7 @@ object EnoughUpdatesManager {
     }
 
     fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {
+        //#if MC < 1.21
         json ?: return ItemStack(Items.painting)
         var usingCache = useCache && !useReplacements
         val internalName = json["internalname"].asString
@@ -178,7 +188,8 @@ object EnoughUpdatesManager {
             if (cachedStack != null) return cachedStack.copy()
         }
 
-        val stack = ItemStack(Item.getByNameOrId(json["itemid"].asString))
+        // todo modern doesnt have the "meta" number
+        val stack = ItemStack(json["itemid"].asString.getVanillaItem() ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255))
         stack.item ?: return ItemStack(Item.getItemFromBlock(Blocks.stone), 0, 255)
 
         json["count"]?.asInt?.let { stack.stackSize = it }
@@ -193,13 +204,13 @@ object EnoughUpdatesManager {
 
         var replacements = mapOf<String, String>()
         if (useReplacements) {
-            replacements = getPetLoreReplacements(stack.tagCompound, -1)
+            replacements = getPetLoreReplacements(stack, -1)
             json["displayname"]?.asString?.let {
                 var name = it
                 for ((key, value) in replacements) {
                     name = name.replace("{$key}", value)
                 }
-                stack.setStackDisplayName(name)
+                stack.setCustomItemName(name)
             }
         }
 
@@ -214,14 +225,18 @@ object EnoughUpdatesManager {
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
+        //#else
+        //$$ // todo clearly this isnt correct but this is lot that has to change and this works for now
+        //$$ return ItemStack(Items.PAINTING)
+        //#endif
     }
 
-    private fun getPetLoreReplacements(tag: NBTTagCompound?, level: Int): Map<String, String> {
-        tag ?: return emptyMap()
+    private fun getPetLoreReplacements(stack: ItemStack?, level: Int): Map<String, String> {
+        stack?.tagCompound ?: return emptyMap()
         var petName: String? = null
         var tier: String? = null
 
-        val extraAttributes = tag.extraAttributes
+        val extraAttributes = stack.extraAttributes
         if (extraAttributes.hasKey("petInfo")) {
             val petInfoStr = extraAttributes.getString("petInfo")
             val petInfo = ConfigManager.gson.fromJson(petInfoStr, JsonObject::class.java)
@@ -345,7 +360,11 @@ object EnoughUpdatesManager {
             for ((key, value) in replacements) {
                 loreLine.replace("{$key}", value)
             }
+            //#if MC < 1.21
             loreList.appendTag(NBTTagString(loreLine))
+            //#else
+            //$$ loreList.add(NbtString.of(loreLine))
+            //#endif
         }
         return loreList
     }

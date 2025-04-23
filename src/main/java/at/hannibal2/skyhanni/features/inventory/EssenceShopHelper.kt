@@ -14,13 +14,14 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -58,7 +59,7 @@ object EssenceShopHelper {
     private var essenceShops = mutableListOf<EssenceShop>()
     private var currentProgress: EssenceShopProgress? = null
     private var currentEssenceType: String = ""
-    private var currentEssenceItem: NEUInternalName? = null
+    private var currentEssenceItem: NeuInternalName? = null
     private var essenceOwned: Int = 0
     private var essenceNeeded: Int = 0
     private var lastClick = SimpleTimeMark.farPast()
@@ -129,7 +130,7 @@ object EssenceShopHelper {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled() || essenceShops.isEmpty() || currentProgress == null || event.slot != CUSTOM_STACK_LOCATION) return
-        if (!essenceShopPattern.matches(event.inventory.name)) return
+        if (!essenceShopPattern.matches(InventoryUtils.openInventoryName())) return
         infoItemStack?.let { event.replace(it) }
     }
 
@@ -245,7 +246,7 @@ object EssenceShopHelper {
                 extraData = listOf(
                     "inventoryName" to event.inventoryName,
                     "essenceHeaderStack" to essenceHeaderStack?.displayName.orEmpty(),
-                    "populatedInventorySize" to event.inventoryItems.filter { it.value.hasDisplayName() }.size,
+                    "populatedInventorySize" to event.inventoryItems.filter { it.value.displayName.isNotEmpty() }.size,
                     "eventType" to event.javaClass.simpleName,
                 ).toTypedArray(),
             )

@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -102,9 +101,9 @@ class SkyblockGuideHighlightFeature private constructor(
             if (!isEnabled()) return
             if (activeObject == null) return
 
-            event.gui.inventorySlots.inventorySlots
+            event.container.inventorySlots
                 .filter { missing.contains(it.slotNumber) }
-                .forEach { it highlight LorenzColor.RED }
+                .forEach { it.highlight(LorenzColor.RED) }
         }
 
         @HandleEvent
@@ -127,7 +126,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             for ((slot, item) in event.inventoryItems) {
                 if (slot == 4) continue // Overview Item
-                val loreAndName = listOf(item.name) + item.getLore()
+                val loreAndName = listOf(item.displayName) + item.getLore()
                 if (!current.conditionPattern.anyMatches(loreAndName)) continue
                 missing.add(slot)
             }
@@ -259,6 +258,12 @@ class SkyblockGuideHighlightFeature private constructor(
                 "collections",
                 "\\w+ Collections|Collections",
                 "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7(?:Boss )?Collections (?:Unlocked|Maxed Out): §e.*",
+            )
+            SkyblockGuideHighlightFeature(
+                { SkyHanniMod.feature.event.anniversaryCelebration400.highlightDailyTasks },
+                "century",
+                "Daily Tasks",
+                "§c§lINCOMPLETE",
             )
         }
     }

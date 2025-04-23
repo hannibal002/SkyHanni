@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementProfile
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementPurse
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementQuiver
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSkyBlockXp
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSkyBlockXP
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSlayer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSoulflow
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementTime
@@ -65,7 +65,7 @@ enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     SLAYER(ScoreboardElementSlayer),
     QUIVER(ScoreboardElementQuiver),
     POWDER(ScoreboardElementPowder),
-    SKYBLOCK_XP(ScoreboardElementSkyBlockXp),
+    SKYBLOCK_XP(ScoreboardElementSkyBlockXP),
     EVENTS(ScoreboardElementEvents),
     MAYOR(ScoreboardElementMayor),
     PARTY(ScoreboardElementParty),
@@ -81,6 +81,11 @@ enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     EMPTY_LINE8(ScoreboardElementEmptyLine),
     EMPTY_LINE9(ScoreboardElementEmptyLine),
     EMPTY_LINE10(ScoreboardElementEmptyLine),
+    EMPTY_LINE11(ScoreboardElementEmptyLine),
+    EMPTY_LINE12(ScoreboardElementEmptyLine),
+    EMPTY_LINE13(ScoreboardElementEmptyLine),
+    EMPTY_LINE14(ScoreboardElementEmptyLine),
+    EMPTY_LINE15(ScoreboardElementEmptyLine),
     ;
 
     override fun toString() = element.configLine

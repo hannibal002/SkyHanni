@@ -2,22 +2,23 @@ package at.hannibal2.skyhanni.features.rift.area.westvillage.kloon
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -27,11 +28,14 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object KloonHacking {
 
-    private val config get() = RiftAPI.config.area.westVillage.hacking
+    private val config get() = RiftApi.config.area.westVillage.hacking
 
+    /**
+     * REGEX-TEST: You've set the color of this terminal to RED!
+     */
     private val colorPattern by RepoPattern.pattern(
         "rift.area.westvillage.kloon.color",
-        "You've set the color of this terminal to (?<color>.*)!"
+        "You've set the color of this terminal to (?<color>.*)!",
     )
 
     private var wearingHelmet = false
@@ -42,9 +46,8 @@ object KloonHacking {
 
     private val RETRO_ENCABULATING_VISOR = "RETRO_ENCABULATING_VISOR".toInternalName()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!RiftAPI.inRift()) return
         checkHelmet()
     }
 
@@ -52,12 +55,11 @@ object KloonHacking {
         wearingHelmet = InventoryUtils.getHelmet()?.getInternalName() == RETRO_ENCABULATING_VISOR
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inTerminalInventory = false
         inColorInventory = false
         nearestTerminal = null
-        if (!RiftAPI.inRift()) return
         if (!config.solver) return
         if (event.inventoryName == "Hacking" || event.inventoryName == "Hacking (As seen on CSI)") {
             inTerminalInventory = true
@@ -79,22 +81,21 @@ object KloonHacking {
         inColorInventory = false
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!RiftAPI.inRift()) return
         if (inTerminalInventory) {
             if (!config.solver) return
             var i = 0
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.slotIndex == 11 + 10 * i) {
-                    val correctButton = slot.stack!!.displayName.removeColor() == correctButtons[i]
-                    slot highlight if (correctButton) LorenzColor.GREEN else LorenzColor.RED
+                    val correctButton = slot.stack.displayName.removeColor() == correctButtons[i]
+                    slot.highlight(if (correctButton) LorenzColor.GREEN else LorenzColor.RED)
                     continue
                 }
                 if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 &&
-                    slot.stack!!.displayName.removeColor() == correctButtons[i]
+                    slot.stack.displayName.removeColor() == correctButtons[i]
                 ) {
-                    slot highlight LorenzColor.YELLOW
+                    slot.highlight(LorenzColor.YELLOW)
                 }
                 if (slot.slotIndex == i * 9 + 17) {
                     i += 1
@@ -102,25 +103,24 @@ object KloonHacking {
             }
         }
         if (inColorInventory) {
-            if (!config.colour) return
+            if (!config.color) return
             val targetColor = nearestTerminal ?: getNearestTerminal()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.stack.getLore().any { it.contains(targetColor?.name.orEmpty()) }) {
-                    slot highlight LorenzColor.GREEN
+                    slot.highlight(LorenzColor.GREEN)
                 }
             }
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.THE_RIFT)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!inTerminalInventory || !RiftAPI.inRift()) return
+        if (!inTerminalInventory) return
         event.makePickblock()
     }
 
-    @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
-        if (!RiftAPI.inRift()) return
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.waypoints) return
         if (!wearingHelmet) return
         val storage = ProfileStorageData.profileSpecific?.rift ?: return
@@ -131,9 +131,8 @@ object KloonHacking {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!RiftAPI.inRift()) return
         if (!wearingHelmet) return
         colorPattern.matchMatcher(event.message.removeColor()) {
             val storage = ProfileStorageData.profileSpecific?.rift ?: return
@@ -144,9 +143,8 @@ object KloonHacking {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onToolTip(event: ToolTipEvent) {
-        if (!RiftAPI.inRift()) return
         if (!inTerminalInventory) return
         if (!config.solver) return
 
@@ -172,7 +170,11 @@ object KloonHacking {
     }
 
     @HandleEvent
+    @Suppress("AvoidBritishSpelling")
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.westVillageConfig", "rift.area.westVillage")
+
+        val basePath = "rift.area.westVillage"
+        event.move(82, "$basePath.hacking.colour", "$basePath.hacking.color")
     }
 }

@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.data.DateFormat
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 
@@ -14,9 +14,9 @@ object ScoreboardElementLobbyCode : ScoreboardElement() {
         if (CustomScoreboard.displayConfig.dateInLobbyCode) append("§7${CustomScoreboard.displayConfig.dateFormat}")
         listOfNotNull(
             HypixelData.serverId,
-            DungeonAPI.roomId,
-            MiningAPI.mineshaftRoomId,
-        ).forEach { append(" §8$it") }
+            DungeonApi.roomId,
+            MiningApi.mineshaftRoomId,
+        ).distinct().forEach { append(" §8$it") }
     }.trim()
 
     override val configLine = "§7${DateFormat.US_SLASH_MMDDYYYY} §8mega77CK"

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CarryTrackerJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -11,10 +12,8 @@ import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
@@ -23,9 +22,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * TODO more carry features
@@ -81,7 +80,7 @@ object CarryTracker {
         carry.done++
         if (carry.done == carry.requested) {
             ChatUtils.chat("Carry done for ${customer.name}!")
-            LorenzUtils.sendTitle("§eCarry done!", 3.seconds)
+            TitleManager.sendTitle("§eCarry done!")
         }
         update()
     }
@@ -223,8 +222,8 @@ object CarryTracker {
         }
         val cost = formatCost(type.pricePer?.let { it * requested })
         val text = "$color$done§8/$color$requested $cost"
-        return Renderable.clickAndHover(
-            Renderable.string("  $type $text"),
+        return Renderable.clickable(
+            "  $type $text",
             tips = buildList<String> {
                 add("§b${customer.name}' $type §cCarry")
                 add("")
@@ -244,7 +243,7 @@ object CarryTracker {
                 add("§eClick to send current progress in the party chat!")
                 add("§eControl-click to remove this carry!")
             },
-            onClick = {
+            onLeftClick = {
                 if (KeyboardManager.isModifierKeyDown()) {
                     carries.remove(carry)
                     update()
@@ -283,8 +282,8 @@ object CarryTracker {
         val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
         val missingFormat = formatCost(totalCost - customer.alreadyPaid)
         add(
-            Renderable.clickAndHover(
-                Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
+            Renderable.clickable(
+                "§b$customerName $paidFormat§8/$totalCostFormat",
                 tips = listOf(
                     "§7Carries for §b$customerName",
                     "",
@@ -294,7 +293,7 @@ object CarryTracker {
                     "",
                     "§eClick to send missing coins in party chat!",
                 ),
-                onClick = {
+                onLeftClick = {
                     HypixelCommands.partyChat(
                         "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
                     )

@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -93,7 +92,7 @@ object DungeonCopilot {
         if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
 
         if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
-            if (DungeonAPI.getCurrentBoss() == DungeonFloor.E) {
+            if (DungeonApi.getCurrentBoss() == DungeonFloor.E) {
                 changeNextStep("")
             } else {
                 changeNextStep("Enter Boss Room")
@@ -141,11 +140,11 @@ object DungeonCopilot {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         changeNextStep("")
     }
 
-    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.enabled
+    private fun isEnabled(): Boolean = DungeonApi.inDungeon() && config.enabled
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

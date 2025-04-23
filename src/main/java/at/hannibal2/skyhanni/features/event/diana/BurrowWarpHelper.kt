@@ -6,15 +6,14 @@ import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,19 +29,19 @@ object BurrowWarpHelper {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (!DianaAPI.isDoingDiana()) return
+        if (!DianaApi.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
 
         if (event.keyCode != config.keyBindWarp) return
         if (Minecraft.getMinecraft().currentScreen != null) return
 
         currentWarp?.let {
-            if (lastWarpTime.passedSince() > 5.seconds) {
+            if (lastWarpTime.passedSince() > 1.seconds) {
                 lastWarpTime = SimpleTimeMark.now()
                 HypixelCommands.warp(it.name)
                 lastWarp = currentWarp
                 GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
-                TitleManager.optionalResetTitle { currentTitle ->
+                TitleManager.conditionallyStopTitle { currentTitle ->
                     currentTitle.startsWith("§bWarp to ")
                 }
             }
@@ -65,7 +64,7 @@ object BurrowWarpHelper {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastWarp = null
         currentWarp = null
     }
@@ -74,7 +73,7 @@ object BurrowWarpHelper {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Diana Burrow Nearest Warp")
 
-        if (!DianaAPI.isDoingDiana()) {
+        if (!DianaApi.isDoingDiana()) {
             event.addIrrelevant("not doing diana")
             return
         }

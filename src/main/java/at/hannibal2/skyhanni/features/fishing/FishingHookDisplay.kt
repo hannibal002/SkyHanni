@@ -2,17 +2,16 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FishingHookDisplay {
@@ -23,7 +22,7 @@ object FishingHookDisplay {
     private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         reset()
     }
 
@@ -32,8 +31,8 @@ object FishingHookDisplay {
         reset()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick() {
         if (!isEnabled()) return
 
         if (armorStand == null) {
@@ -80,6 +79,11 @@ object FishingHookDisplay {
         config.position.renderString(alertText, posLabel = "Fishing Hook Display")
     }
 
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(72, "fishing.fishingHookDisplay.position", Position::migrate)
+    }
+
     private fun EntityArmorStand.hasCorrectName(): Boolean {
         if (name == "§c§l!!!") {
             return true
@@ -87,5 +91,5 @@ object FishingHookDisplay {
         return pattern.matcher(name).matches()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingAPI.holdingRod
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && FishingApi.holdingRod
 }

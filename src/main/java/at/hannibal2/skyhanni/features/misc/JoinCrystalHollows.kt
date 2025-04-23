@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -30,18 +30,19 @@ object JoinCrystalHollows {
             if (!IslandType.DWARVEN_MINES.isInIsland()) {
                 ChatUtils.clickableChat(
                     "Click here to warp to Dwarven Mines!",
-                    onClick = {
-                        HypixelCommands.warp("mines")
-                    }, "§eClick to run /warp mines!"
+                    onClick = { HypixelCommands.warp("mines") },
+                    hover = "§eClick to run /warp mines!",
                 )
             } else {
                 ChatUtils.chat("Buy a §2Crystal Hollows Pass §efrom §5Gwendolyn")
             }
         }
         if (message == "§e[NPC] §5Gwendolyn§f: §rGreat! Now hop on into the Minecart and I'll get you on your way!" && inTime()) {
-            ChatUtils.clickableChat("Click here to warp to Crystal Hollows!", onClick = {
-                HypixelCommands.warp("ch")
-            }, "§eClick to run /warp ch!")
+            ChatUtils.clickableChat(
+                "Click here to warp to Crystal Hollows!",
+                onClick = { HypixelCommands.warp("ch") },
+                hover = "§eClick to run /warp ch!",
+            )
         }
     }
 
@@ -57,9 +58,8 @@ object JoinCrystalHollows {
         }
     }
 
-    @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
-        if (!IslandType.DWARVEN_MINES.isInIsland()) return
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (inTime()) {

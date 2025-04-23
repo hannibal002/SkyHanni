@@ -20,12 +20,11 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -47,8 +46,9 @@ object EstimatedItemValue {
     private var display = emptyList<Renderable>()
     private val cache = mutableMapOf<ItemStack, List<Renderable>>()
     private var lastToolTipTime = 0L
-    var gemstoneUnlockCosts = HashMap<NEUInternalName, HashMap<String, List<String>>>()
+    var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
     var bookBundleAmount = mapOf<String, Int>()
+    var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
     private var currentlyShowing = false
 
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
@@ -59,7 +59,7 @@ object EstimatedItemValue {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
-            event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+            event.readConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
     @HandleEvent
@@ -67,12 +67,22 @@ object EstimatedItemValue {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
+        crimsonPrestigeCosts = data.crimsonPrestigeCosts
     }
 
     private fun isInNeuOverlay(): Boolean {
         val inPv = Minecraft.getMinecraft().currentScreen is GuiProfileViewer
         val inTrade = InventoryUtils.openInventoryName().startsWith("You  ")
-        val inNeuTrade = inTrade && NotEnoughUpdates.INSTANCE.config.tradeMenu.enableCustomTrade
+
+        // Use reflection to make sure tradeMenu exists
+        val neuConfig = NotEnoughUpdates.INSTANCE.config
+        val tradeField = neuConfig.javaClass.getDeclaredField("tradeMenu")
+        val trade = tradeField[neuConfig]
+
+        val booleanField = trade.javaClass.getDeclaredField("enableCustomTrade")
+        val customTradeEnabled = booleanField[trade] as Boolean
+
+        val inNeuTrade = inTrade && customTradeEnabled
         val inStorage = InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled
 
         return inPv || inNeuTrade || inStorage
@@ -217,7 +227,7 @@ object EstimatedItemValue {
                 e, "Error in Estimated Item Value renderer",
                 "openInventoryName" to openInventoryName,
                 "item" to item,
-                "item name" to item.itemName,
+                "item name" to item.repoItemName,
                 "internal name" to item.getInternalNameOrNull(),
                 "lore" to item.getLore(),
             )
@@ -231,7 +241,7 @@ object EstimatedItemValue {
 
     private fun ItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
-            val name = this.name
+            val name = this.displayName
             return (
                 this.item == Items.enchanted_book ||
                     name.contains("Salesperson") ||

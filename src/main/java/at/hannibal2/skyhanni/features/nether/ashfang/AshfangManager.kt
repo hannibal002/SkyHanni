@@ -8,12 +8,10 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.item.EntityArmorStand
@@ -32,9 +30,8 @@ object AshfangManager {
 
     val active get() = ashfang != null
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         val mob = event.mob
         val color = when (mob.name) {
             "Ashfang Follower" -> LorenzColor.DARK_GRAY
@@ -51,9 +48,8 @@ object AshfangManager {
         if (config.highlightBlazes) mob.highlight(color.toColor().addAlpha(40))
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         if (!event.mob.name.contains("Ashfang ")) return
         if (lastSpawnTime.passedSince() < 10.seconds) return
         lastSpawnTime = SimpleTimeMark.now()
@@ -78,7 +74,7 @@ object AshfangManager {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastSpawnTime = SimpleTimeMark.farPast()
     }
 

@@ -3,13 +3,12 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.MaxwellAPI
+import at.hannibal2.skyhanni.data.MaxwellApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -37,7 +36,7 @@ object StatsTuning {
         val stack = event.stack
 
         if (config.templateStats && inventoryName == "Stats Tuning") if (templateStats(stack, event)) return
-        if (config.selectedStats && MaxwellAPI.isThaumaturgyInventory(inventoryName) && renderTunings(
+        if (config.selectedStats && MaxwellApi.isThaumaturgyInventory(inventoryName) && renderTunings(
                 stack,
                 event,
             )
@@ -46,7 +45,7 @@ object StatsTuning {
     }
 
     private fun templateStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        if (stack.name != "§aLoad") return false
+        if (stack.displayName != "§aLoad") return false
 
         var grab = false
         val list = mutableListOf<String>()
@@ -74,8 +73,8 @@ object StatsTuning {
     }
 
     private fun renderTunings(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
-        if (stack.name != "§aStats Tuning") return false
-        val tunings = MaxwellAPI.tunings ?: return false
+        if (stack.displayName != "§aStats Tuning") return false
+        val tunings = MaxwellApi.tunings ?: return false
 
         event.stackTip = tunings
             .map { tuning ->
@@ -106,7 +105,7 @@ object StatsTuning {
             val lore = stack.getLore()
 
             if (lore.any { it == "§aCurrently selected!" }) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }

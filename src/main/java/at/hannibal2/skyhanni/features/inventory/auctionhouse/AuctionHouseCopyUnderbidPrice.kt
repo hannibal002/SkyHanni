@@ -12,12 +12,13 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -55,7 +56,7 @@ object AuctionHouseCopyUnderbidPrice {
         val item = event.inventoryItems[13] ?: return
 
         val internalName = item.getInternalName()
-        if (internalName == NEUInternalName.NONE) return
+        if (internalName == NeuInternalName.NONE) return
 
         val price = internalName.getPrice().toLong()
         if (price <= 0) {
@@ -71,7 +72,7 @@ object AuctionHouseCopyUnderbidPrice {
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!config.copyUnderbidKeybind.isKeyHeld()) return
         if (!allowedInventoriesPattern.matches(InventoryUtils.openInventoryName())) return
-        val stack = event.guiContainer.slotUnderMouse?.stack ?: return
+        val stack = slotUnderCursor()?.stack ?: return
 
         auctionPricePattern.firstMatcher(stack.getLore()) {
             val underbid = group("coins").formatLong() - 1

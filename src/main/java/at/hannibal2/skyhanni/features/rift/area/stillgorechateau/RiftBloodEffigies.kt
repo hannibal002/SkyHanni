@@ -7,9 +7,8 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -48,7 +47,7 @@ object RiftBloodEffigies {
         }
     }
 
-    private val config get() = RiftAPI.config.area.stillgoreChateau.bloodEffigies
+    private val config get() = RiftApi.config.area.stillgoreChateau.bloodEffigies
 
     private var locations: List<LorenzVec> = emptyList()
     private val effigies = (0..5).associateWith { Effigy() }
@@ -85,7 +84,7 @@ object RiftBloodEffigies {
         locations.minByOrNull { it.distanceSq(entity.getLorenzVec()) }?.let { locations.indexOf(it) }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         effigies.values.forEach { it.reset() }
     }
 
@@ -168,7 +167,7 @@ object RiftBloodEffigies {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for ((index, location) in locations.withIndex()) {
@@ -183,7 +182,7 @@ object RiftBloodEffigies {
                             event.drawDynamicText(location, "§7Unknown Time ($name)", 1.5)
                             continue
                         }
-                    } else if (config.respawningSoon && effigy.respawnTime.timeUntil() < config.respwningSoonTime.minutes) {
+                    } else if (config.respawningSoon && effigy.respawnTime.timeUntil() < config.respawningSoonTime.minutes) {
                         event.drawWaypointFilled(location, LorenzColor.YELLOW.toColor(), seeThroughBlocks = true)
                         val time = effigy.respawnTime.timeUntil().format()
                         event.drawDynamicText(location, "§e$name respawning in §b$time", 1.5)
@@ -212,10 +211,13 @@ object RiftBloodEffigies {
         }
     }
 
-    fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inStillgoreChateau()
+    fun isEnabled() = RiftApi.inRift() && config.enabled && RiftApi.inStillgoreChateau()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
+
+        val basePath = "rift.area.stillgoreChateau.bloodEffigies"
+        event.move(82, "$basePath.respwningSoonTime", "$basePath.respawningSoonTime")
     }
 }

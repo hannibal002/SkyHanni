@@ -3,12 +3,11 @@ package at.hannibal2.skyhanni.features.combat.mobs
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -17,8 +16,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -54,7 +51,7 @@ object ArachneSpawnTimer {
     private var searchTime = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         searchTime = SimpleTimeMark.farPast()
         lastTickTime = SimpleTimeMark.farPast()
         particleCounter = 0
@@ -63,7 +60,7 @@ object ArachneSpawnTimer {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (arachneSpawnTime.isInPast()) return
         val countDown = arachneSpawnTime.timeUntil()
@@ -88,7 +85,7 @@ object ArachneSpawnTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN, priority = HandleEvent.LOW, receiveCancelled = true)
-    fun onPacketReceive(event: PacketReceivedEvent) {
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!saveNextTickParticles) return
         if (searchTime.passedSince() < 3.seconds) return
 
@@ -104,16 +101,13 @@ object ArachneSpawnTimer {
             return
         }
 
-        val packet = event.packet
-        if (packet is S2APacketParticles) {
-            val location = packet.toLorenzVec().roundTo(2)
-            if (arachneAltarLocation.distance(location) > 30) return
-            if (packet.particleType == EnumParticleTypes.REDSTONE && packet.particleSpeed == 1.0f) {
-                particleCounter += 1
-            }
+        val location = event.location.roundTo(2)
+        if (arachneAltarLocation.distance(location) > 30) return
+        if (event.type == EnumParticleTypes.REDSTONE && event.speed == 1.0f) {
+            particleCounter += 1
         }
     }
 
     fun isEnabled() =
-        IslandType.SPIDER_DEN.isInIsland() && LorenzUtils.skyBlockArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
+        IslandType.SPIDER_DEN.isInIsland() && IslandAreas.currentAreaName == "Arachne's Sanctuary" && config.showArachneSpawnTimer
 }

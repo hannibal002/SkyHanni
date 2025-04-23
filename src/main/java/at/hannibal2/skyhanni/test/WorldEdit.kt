@@ -4,14 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.minecraft.RenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import net.minecraft.util.AxisAlignedBB
@@ -65,35 +65,31 @@ object WorldEdit {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         leftPos = null
         rightPos = null
     }
 
     @HandleEvent
-    fun onRenderWorld(event: RenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         leftPos?.let { l ->
-            RenderUtils.drawWireframeBoundingBoxNea(
+            event.drawWireframeBoundingBox(
                 funAABB(l, l).expandBlock(),
                 Color.RED,
-                event.partialTicks,
             )
         }
         rightPos?.let { r ->
-            RenderUtils.drawWireframeBoundingBoxNea(
+            event.drawWireframeBoundingBox(
                 funAABB(r, r).expandBlock(),
                 Color.BLUE,
-                event.partialTicks,
             )
         }
         aabb?.let {
-            RenderUtils.drawFilledBoundingBoxNea(
+            event.drawFilledBoundingBox(
                 it.expandBlock(),
                 Color.CYAN.addAlpha(60),
-                partialTicks = event.partialTicks,
-                renderRelativeToCamera = false,
             )
         }
     }

@@ -4,13 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import com.google.gson.JsonObject
 import net.minecraft.util.IChatComponent
 import org.apache.commons.io.FileUtils
@@ -26,214 +28,268 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.time.Duration.Companion.minutes
+import java.time.Instant
 
-class RepoManager(private val configLocation: File) {
+@SkyHanniModule
+object RepoManager {
 
     private val gson get() = ConfigManager.gson
+    private val configLocation = ConfigManager.configDirectory
     val repoLocation: File = File(configLocation, "repo")
     private var error = false
     private var lastRepoUpdate = SimpleTimeMark.now()
     private var repoDownloadFailed = false
 
-    companion object {
+    private val config get() = SkyHanniMod.feature.dev.repo
 
-        private val config get() = SkyHanniMod.feature.dev.repo
+    val successfulConstants = mutableListOf<String>()
+    val unsuccessfulConstants = mutableListOf<String>()
+    var usingBackupRepo = false
 
-        val successfulConstants = mutableListOf<String>()
-        val unsuccessfulConstants = mutableListOf<String>()
-        var usingBackupRepo = false
+    private var lastConstant: String? = null
 
-        private var lastConstant: String? = null
-
-        fun setLastConstant(constant: String) {
-            lastConstant?.let {
-                successfulConstants.add(it)
-            }
-            lastConstant = constant
+    fun setLastConstant(constant: String) {
+        lastConstant?.let {
+            successfulConstants.add(it)
         }
-
-        fun getRepoLocation(): String {
-            return "${config.location.user}/${config.location.name}/${config.location.branch}"
-        }
-
-        private const val DEFAULT_USER = "hannibal002"
-        private const val DEFAULT_NAME = "SkyHanni-REPO"
-        private const val DEFAULT_BRANCH = "main"
-
-        fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
-            user.lowercase() == DEFAULT_USER.lowercase() &&
-                name.lowercase() == DEFAULT_NAME.lowercase() &&
-                branch.lowercase() == DEFAULT_BRANCH.lowercase()
+        lastConstant = constant
     }
 
-    fun loadRepoInformation() {
-        atomicShouldManuallyReload.set(true)
-        if (config.repoAutoUpdate) {
-            fetchRepository(false).thenRun {
+    fun getRepoLocation(): String {
+        return "${config.location.user}/${config.location.name}/${config.location.branch}"
+    }
+
+    private const val DEFAULT_USER = "hannibal002"
+    private const val DEFAULT_NAME = "SkyHanni-REPO"
+    private const val DEFAULT_BRANCH = "main"
+
+    fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() =
+        user.lowercase() == DEFAULT_USER.lowercase() &&
+            name.lowercase() == DEFAULT_NAME.lowercase() &&
+            branch.lowercase() == DEFAULT_BRANCH.lowercase()
+
+    fun initRepo() {
+        shouldManuallyReload = true
+        SkyHanniMod.launchIOCoroutine {
+            if (config.repoAutoUpdate) {
+                fetchRepository(command = false)
                 if (repoDownloadFailed) {
                     switchToBackupRepo()
                 }
-            }.thenRun { reloadRepository() }
-        } else {
+            }
             reloadRepository()
         }
     }
 
-    private val atomicShouldManuallyReload = AtomicBoolean(false)// TODO remove the workaround
+    private var shouldManuallyReload = false
 
+    private var currentlyFetching = false
+    var commitTime: SimpleTimeMark? = null
+        private set
+
+    @JvmStatic
     fun updateRepo() {
-        atomicShouldManuallyReload.set(true)
+        shouldManuallyReload = true
         checkRepoLocation()
-        fetchRepository(true).thenRun {
-            if (unsuccessfulConstants.isNotEmpty() || usingBackupRepo) return@thenRun
-            this.reloadRepository("Repo updated successfully.")
+        SkyHanniMod.launchIOCoroutine {
+            fetchRepository(command = true)
+            reloadRepository("Repo updated successfully.")
+            if (unsuccessfulConstants.isNotEmpty() || usingBackupRepo) {
+                if (!ErrorManager.logErrorStateWithData(
+                        "Error updating reading Sh Repo",
+                        "no success",
+                        "usingBackupRepo" to usingBackupRepo,
+                        "unsuccessfulConstants" to unsuccessfulConstants,
+                    )
+                ) {
+                    ChatUtils.chat("§cFailed to load the repo! See above for more infos.")
+                }
+                return@launchIOCoroutine
+            }
         }
     }
 
     fun reloadLocalRepo() {
-        atomicShouldManuallyReload.set(true)
-        reloadRepository("Repo loaded from local files successfully.")
+        shouldManuallyReload = true
+        SkyHanniMod.launchIOCoroutine {
+            reloadRepository("Repo loaded from local files successfully.")
+        }
     }
 
-    private fun fetchRepository(command: Boolean): CompletableFuture<Boolean> {
-        return CompletableFuture.supplyAsync {
+    private fun fetchRepository(command: Boolean) {
+        if (currentlyFetching) return
+        currentlyFetching = true
+        doTheFetching(command)
+        currentlyFetching = false
+    }
+
+    private fun doTheFetching(command: Boolean) {
+        try {
+            val (currentDownloadedCommit, currentDownloadedCommitTime) = readCurrentCommit() ?: (null to null)
+            commitTime = currentDownloadedCommitTime
+            var latestRepoCommit: String? = null
+            var latestRepoCommitTime: SimpleTimeMark? = null
             try {
-                val currentDownloadedCommit = readCurrentCommit()
-                var latestRepoCommit: String?
-                try {
-                    InputStreamReader(URL(getCommitApiUrl()).openStream())
-                        .use { inReader ->
-                            val commits: JsonObject = gson.fromJson(inReader, JsonObject::class.java)
-                            latestRepoCommit = commits["sha"].asString
-                        }
-                } catch (e: Exception) {
-                    ErrorManager.logErrorWithData(
-                        e,
-                        "Error while loading data from repo",
-                        "command" to command,
-                        "currentDownloadedCommit" to currentDownloadedCommit,
-                    )
-                    repoDownloadFailed = true
-                    return@supplyAsync false
-                }
-
-                val file = File(configLocation, "repo")
-                if (file.exists() &&
-                    currentDownloadedCommit == latestRepoCommit &&
-                    unsuccessfulConstants.isEmpty() &&
-                    lastRepoUpdate.passedSince() < 1.minutes
-                ) {
-                    if (command) {
-                        ChatUtils.chat("§7The repo is already up to date!")
-                        atomicShouldManuallyReload.set(false)
+                InputStreamReader(URL(getCommitApiUrl()).openStream())
+                    .use { inReader ->
+                        val commits: JsonObject = gson.fromJson(inReader, JsonObject::class.java)
+                        latestRepoCommit = commits["sha"].asString
+                        val formattedDate = commits["commit"].asJsonObject["committer"].asJsonObject["date"].asString
+                        latestRepoCommitTime = Instant.parse(formattedDate).toEpochMilli().asTimeMark()
                     }
-                    return@supplyAsync false
-                }
-                lastRepoUpdate = SimpleTimeMark.now()
-
-                repoLocation.mkdirs()
-                val itemsZip = File(repoLocation, "sh-repo-main.zip")
-                itemsZip.createNewFile()
-
-                val url = URL(getDownloadUrl(latestRepoCommit))
-                val urlConnection = url.openConnection()
-                urlConnection.connectTimeout = 15000
-                urlConnection.readTimeout = 30000
-
-                RepoUtils.recursiveDelete(repoLocation)
-                repoLocation.mkdirs()
-
-                try {
-                    urlConnection.getInputStream().use { `is` ->
-                        FileUtils.copyInputStreamToFile(
-                            `is`,
-                            itemsZip,
-                        )
-                    }
-                } catch (e: IOException) {
-                    ErrorManager.logErrorWithData(
-                        e,
-                        "Failed to download SkyHanni Repo",
-                        "url" to url,
-                        "command" to command,
-                    )
-                    repoDownloadFailed = true
-                    return@supplyAsync false
-                }
-                RepoUtils.unzipIgnoreFirstFolder(
-                    itemsZip.absolutePath,
-                    repoLocation.absolutePath,
-                )
-                if (currentDownloadedCommit == null || currentDownloadedCommit != latestRepoCommit) {
-                    writeCurrentCommit(latestRepoCommit)
-                }
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(
                     e,
-                    "Failed to download SkyHanni Repo",
+                    "Error while loading data from repo",
                     "command" to command,
+                    "currentDownloadedCommit" to currentDownloadedCommit,
                 )
                 repoDownloadFailed = true
             }
-            repoDownloadFailed = false
-            usingBackupRepo = false
-            true
-        }
-    }
 
-    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Unit?> {
-        val comp = CompletableFuture<Unit?>()
-        if (!atomicShouldManuallyReload.get()) return comp
-        ErrorManager.resetCache()
-        DelayedRun.onThread.execute {
-            error = false
-            successfulConstants.clear()
-            unsuccessfulConstants.clear()
-            lastConstant = null
-
-            RepositoryReloadEvent(repoLocation, gson).post {
-                error = true
-                lastConstant?.let {
-                    unsuccessfulConstants.add(it)
+            if (repoLocation.exists() &&
+                currentDownloadedCommit == latestRepoCommit &&
+                unsuccessfulConstants.isEmpty()
+            ) {
+                if (command) {
+                    ChatUtils.clickToClipboard(
+                        "§7The repo is already up to date!",
+                        lines = buildList {
+                            add("latest commit sha: §e$currentDownloadedCommit")
+                            latestRepoCommitTime?.let { latestTime ->
+                                add("latest commit time: §b$latestTime")
+                                add("  (§b${latestTime.passedSince().format()} ago§7)")
+                            }
+                        },
+                    )
+                    shouldManuallyReload = false
                 }
-                lastConstant = null
+                return
             }
-            comp.complete(null)
-            if (answerMessage.isNotEmpty() && !error) {
-                ChatUtils.chat("§a$answerMessage")
-            }
-            if (error) {
-                ChatUtils.clickableChat(
-                    "Error with the repo detected, try /shupdaterepo to fix it!",
-                    onClick = {
-                        SkyHanniMod.repo.updateRepo()
+            if (command) {
+                ChatUtils.clickToClipboard(
+                    "Repo is outdated, updating..",
+                    lines = buildList {
+                        add("local commit sha: §e$latestRepoCommit")
+                        currentDownloadedCommitTime?.let { localTime ->
+                            add("local commit time: §b$localTime")
+                            add("  (§b${localTime.passedSince().format()} ago§7)")
+                        }
+                        add("")
+                        add("latest commit sha: §e$currentDownloadedCommit")
+                        latestRepoCommitTime?.let<SimpleTimeMark, Unit> { latestTime ->
+                            add("latest commit time: §b$latestTime")
+                            add("  (§b${latestTime.passedSince().format()} ago§7)")
+                            currentDownloadedCommitTime?.let<SimpleTimeMark, Unit> { localTime ->
+                                val outdatedDuration = latestTime - localTime
+                                add("")
+                                add("outdated by: §b${outdatedDuration.format()}")
+                            }
+                        }
                     },
-                    "§eClick to update the repo!",
-                    prefixColor = "§c",
                 )
-                if (unsuccessfulConstants.isEmpty()) {
-                    unsuccessfulConstants.add("All Constants")
-                }
             }
+            lastRepoUpdate = SimpleTimeMark.now()
+
+            repoLocation.mkdirs()
+            val itemsZip = File(repoLocation, "sh-repo-main.zip")
+            itemsZip.createNewFile()
+
+            val url = URL(getDownloadUrl(latestRepoCommit))
+            val urlConnection = url.openConnection()
+            urlConnection.connectTimeout = 15000
+            urlConnection.readTimeout = 30000
+
+            RepoUtils.recursiveDelete(repoLocation)
+            repoLocation.mkdirs()
+
+            try {
+                urlConnection.getInputStream().use { stream ->
+                    FileUtils.copyInputStreamToFile(
+                        stream,
+                        itemsZip,
+                    )
+                }
+            } catch (e: IOException) {
+                ErrorManager.logErrorWithData(
+                    e,
+                    "Failed to download SkyHanni Repo",
+                    "url" to url,
+                    "command" to command,
+                )
+                repoDownloadFailed = true
+                return
+            }
+            RepoUtils.unzipIgnoreFirstFolder(
+                itemsZip.absolutePath,
+                repoLocation.absolutePath,
+            )
+            if (currentDownloadedCommit == null || currentDownloadedCommit != latestRepoCommit) {
+                writeCurrentCommit(latestRepoCommit, latestRepoCommitTime)
+            }
+            commitTime = latestRepoCommitTime
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Failed to download SkyHanni Repo",
+                "command" to command,
+            )
+            repoDownloadFailed = true
+            return
         }
-        return comp
+        repoDownloadFailed = false
+        usingBackupRepo = false
     }
 
-    private fun writeCurrentCommit(commit: String?) {
+    private fun reloadRepository(answerMessage: String = "") {
+        if (!shouldManuallyReload) return
+        error = false
+        successfulConstants.clear()
+        unsuccessfulConstants.clear()
+        lastConstant = null
+
+        RepositoryReloadEvent(repoLocation, gson).post {
+            error = true
+            lastConstant?.let {
+                unsuccessfulConstants.add(it)
+            }
+            lastConstant = null
+        }
+        if (answerMessage.isNotEmpty() && !error) {
+            ChatUtils.chat("§a$answerMessage")
+        }
+        if (error) {
+            ChatUtils.clickableChat(
+                "Error with the repo detected, try /shupdaterepo to fix it!",
+                onClick = {
+                    updateRepo()
+                },
+                "§eClick to update the repo!",
+                prefixColor = "§c",
+            )
+            if (unsuccessfulConstants.isEmpty()) {
+                unsuccessfulConstants.add("All Constants")
+            }
+        }
+    }
+
+    private fun writeCurrentCommit(commit: String?, time: SimpleTimeMark?) {
         val newCurrentCommitJSON = JsonObject()
         newCurrentCommitJSON.addProperty("sha", commit)
+        time?.let {
+            newCurrentCommitJSON.addProperty("time", it.toMillis())
+        }
         try {
             writeJson(newCurrentCommitJSON, File(configLocation, "currentCommit.json"))
         } catch (ignored: IOException) {
         }
     }
 
-    private fun readCurrentCommit(): String? {
+    private fun readCurrentCommit(): Pair<String, SimpleTimeMark?>? {
         val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
-        return currentCommitJSON?.get("sha")?.asString
+        val sha = currentCommitJSON?.get("sha")?.asString
+        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark()
+        return sha?.let { it to time }
     }
 
     fun displayRepoStatus(joinEvent: Boolean) {
@@ -254,16 +310,16 @@ class RepoManager(private val configLocation: File) {
                 for (constant in unsuccessfulConstants) {
                     text.add("   §e- §7$constant".asComponent())
                 }
-                Text.multiline(text).send()
+                TextHelper.multiline(text).send()
             }
             return
         }
-        val currentCommit = readCurrentCommit()
+        val (currentDownloadedCommit, _) = readCurrentCommit() ?: (null to null)
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $currentCommit", prefixColor = "§a")
+            ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             return
         }
-        ChatUtils.chat("Repo has errors! Commit hash: $currentCommit", prefixColor = "§c")
+        ChatUtils.chat("Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",
@@ -367,7 +423,7 @@ class RepoManager(private val configLocation: File) {
 
             Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING)
             RepoUtils.unzipIgnoreFirstFolder(destinationPath.toAbsolutePath().toString(), repoLocation.absolutePath)
-            writeCurrentCommit("backup-repo")
+            writeCurrentCommit("backup-repo", time = null)
 
             println("Successfully switched to backup repo")
         } catch (e: Exception) {

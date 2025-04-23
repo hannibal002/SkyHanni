@@ -80,7 +80,7 @@ object SummoningMobManager {
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.Summon) {
-        if (event.mob.owner?.ownerName != LorenzUtils.getPlayerName()) return
+        if (!event.mob.belongsToPlayer()) return
 
         mobs += event.mob
         if (config.summoningMobColored) event.mob.highlight(LorenzColor.GREEN.toColor())
