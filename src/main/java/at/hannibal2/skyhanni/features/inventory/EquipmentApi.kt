@@ -65,7 +65,7 @@ object EquipmentApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRightClick(event: ItemClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         val category = item.getItemCategoryOrNull() ?: return
