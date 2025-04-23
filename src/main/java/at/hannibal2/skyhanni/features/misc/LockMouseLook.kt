@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook
+import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook.MouseSensitivityState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -14,8 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object MouseSensitivityManager {
-
+object LockMouseLook {
     /**
      * REGEX-TEST: §aTeleported you to §r§aPlot
      */
@@ -25,9 +25,7 @@ object MouseSensitivityManager {
     )
 
     private val config get() = SkyHanniMod.feature.misc
-    private val isActive get() = mouseSensitivityState == MouseSensitivityState.LOCKED
-
-    var mouseSensitivityState = MouseSensitivityState.DEFAULT
+    private val isActive get() = MouseSensitivityHook.state == MouseSensitivityState.LOCKED
 
     @HandleEvent
     fun onWorldChange() {
@@ -43,7 +41,7 @@ object MouseSensitivityManager {
     fun unlockMouse() {
         if (!isActive) return
 
-        mouseSensitivityState = MouseSensitivityState.DEFAULT
+        MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityState.DEFAULT)
         if (config.lockMouseLookChatMessage) {
             ChatUtils.chat("§bMouse rotation is now unlocked.")
         }
@@ -52,7 +50,7 @@ object MouseSensitivityManager {
     private fun lockMouse() {
         if (isActive) return
 
-        mouseSensitivityState = MouseSensitivityState.LOCKED
+        MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityState.LOCKED)
         if (config.lockMouseLookChatMessage) {
             ChatUtils.chat("§bMouse rotation is now locked.")
         }
@@ -73,20 +71,6 @@ object MouseSensitivityManager {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Mouse Sensitivity")
-
-        if (mouseSensitivityState == MouseSensitivityState.DEFAULT) {
-            event.addIrrelevant("not enabled")
-            return
-        }
-
-        event.addData {
-            add("current state: $mouseSensitivityState")
-        }
-    }
-
-    @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
@@ -94,16 +78,5 @@ object MouseSensitivityManager {
             aliases = listOf("shlockmouse")
             callback { toggleLock() }
         }
-    }
-
-    enum class MouseSensitivityState(
-        private val transform: ((Float) -> Float)
-    ) {
-        DEFAULT({ it }),
-        LOCKED({_ -> -1f/3f}),
-        REDUCED({ it }),
-        ;
-
-        fun apply(original: Float): Float = transform(original)
     }
 }

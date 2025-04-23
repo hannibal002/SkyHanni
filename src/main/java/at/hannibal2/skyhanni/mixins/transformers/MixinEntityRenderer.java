@@ -29,6 +29,6 @@ public class MixinEntityRenderer {
         )
     )
     private float redirectMouseSensitivity(GameSettings settings) {
-        return MouseSensitivityHook.INSTANCE.mouseSensitivityOverride(settings.mouseSensitivity);
+        return MouseSensitivityHook.INSTANCE.getMouseSensitivity(settings.mouseSensitivity);
     }
 }
