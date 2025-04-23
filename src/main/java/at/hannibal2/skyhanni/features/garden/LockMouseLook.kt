@@ -64,7 +64,10 @@ object LockMouseLook {
         event.register("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             aliases = listOf("shlockmouse")
-            callback { toggleLock() }
+            callback {
+                commandUsed = true
+                toggleLock()
+            }
         }
     }
 
@@ -98,11 +101,6 @@ object LockMouseLook {
                 commandUsed = false
             }
         }
-    }
-
-    fun mouseLockCommand() {
-        commandUsed = true
-        toggleLock()
     }
 
     fun toggleLock() {
