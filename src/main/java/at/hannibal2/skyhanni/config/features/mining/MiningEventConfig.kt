@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -68,8 +69,17 @@ class MiningEventConfig {
     @Expose
     @ConfigOption(
         name = "Sharing Event Data",
-        desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings. Thanks for your help!"
+        desc = "Sending Mining Event data to a server. This allows everyone to see more precise mining event timings." +
+            " Thanks for your help!"
     )
     @ConfigEditorBoolean
     var allowDataSharing: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Goblin Raid Features",
+        desc = "",
+    )
+    @Accordion
+    val goblinRaidConfig: GoblinRaidConfig = GoblinRaidConfig()
 }
