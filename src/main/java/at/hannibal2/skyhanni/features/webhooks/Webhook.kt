@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.webhooks
 
+import at.hannibal2.skyhanni.utils.ApiUtils
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import java.io.OutputStreamWriter
@@ -10,7 +11,7 @@ data class Webhook(
     val content: String? = null,
     val username: String? = null,
     @SerializedName("avatar_url") val avatarUrl: String? = null,
-    val tts: Boolean = false,
+    val tts: Boolean? = null,
     val embeds: List<DiscordEmbed>? = null,
     @SerializedName("allowed_mentions") val allowedMentions: AllowedMentions? = null,
     val components: List<Any>? = null,
@@ -18,18 +19,8 @@ data class Webhook(
 ) {
     fun sendTo(webhookUrl: String) {
         val jsonPayload = Gson().toJson(this)
-        val url = URL(webhookUrl)
+        println("Sending JSON: $jsonPayload")
 
-        with(url.openConnection() as HttpURLConnection) {
-            requestMethod = "POST"
-            setRequestProperty("Content-Type", "application/json")
-            doOutput = true
-
-            OutputStreamWriter(outputStream).use { it.write(jsonPayload) }
-
-            if (responseCode !in 200..299) {
-                System.err.println("Discord webhook failed: $responseCode $responseMessage")
-            }
-        }
+        ApiUtils.postJSON(webhookUrl, jsonPayload, "Discord Webhook")
     }
 }

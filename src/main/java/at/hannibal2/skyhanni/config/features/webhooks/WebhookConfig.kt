@@ -46,7 +46,7 @@ class WebhookConfig {
         Webhook(
             content = "This is a test message from SkyHanni!",
             username = webhookUsername,
-            avatarUrl = webhookAvatarUrl,
+            avatarUrl = webhookAvatarUrl.takeIf { it.isNotEmpty() },
             embeds = listOf(
                 DiscordEmbed(
                     title = "Test Embed",
