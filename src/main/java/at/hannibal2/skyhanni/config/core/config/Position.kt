@@ -28,9 +28,7 @@ import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import java.lang.reflect.Field
-//#if MC < 1.21
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-//#endif
 
 class Position @JvmOverloads constructor(
     x: Int,
@@ -207,9 +205,7 @@ class Position @JvmOverloads constructor(
         val option = editor.getOptionFromField(field) ?: return
         editor.search("")
         if (!editor.goToOption(option)) return
-        //#if MC < 1.21
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
-        //#endif
     }
 
     fun setLink(configLink: ConfigLink) {
