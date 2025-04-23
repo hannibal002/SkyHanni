@@ -55,7 +55,7 @@ public class LockMouseConfig {
         name = "Disable in Barn",
         desc = "Disable automatic mouse lock in barn plot.")
     @ConfigEditorBoolean
-    public Boolean onlyPlot = true;
+    public boolean onlyPlot = true;
 
     @Expose
     @ConfigLink(owner = GardenConfig.class, field = "lockMouseConfig")
