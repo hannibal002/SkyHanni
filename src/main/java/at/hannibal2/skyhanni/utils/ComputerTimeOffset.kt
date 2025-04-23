@@ -62,11 +62,11 @@ object ComputerTimeOffset {
             if (state == State.TOTALLY_OFF) {
                 ErrorManager.logErrorStateWithData(
                     "Error when checking Computer Time Offset",
-                    "trying to check again even though the previous check is stil not done",
+                    "trying to check again even though the previous check is still not done",
                 )
             }
             if (state == State.SLOW) {
-                ChatUtils.chat("Computer Time Offset calculation takes longer than normal. Checkign now less often.")
+                ChatUtils.chat("Computer Time Offset calculation took longer than normal. Checking less often now.")
             }
             currentlyChecking = false
             return

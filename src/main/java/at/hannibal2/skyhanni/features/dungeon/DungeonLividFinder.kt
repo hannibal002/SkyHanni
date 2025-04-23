@@ -3,26 +3,31 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
@@ -34,8 +39,10 @@ import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.getWoolColor
 import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.isWool
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
+import net.minecraft.entity.item.EntityArmorStand
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -44,57 +51,67 @@ object DungeonLividFinder {
 
     private val isBlind by RecalculatingValue(2.ticks, ::isCurrentlyBlind)
 
-    var livid: Mob? = null
+    var livid: EntityOtherPlayerMP? = null
         private set
-    private var lividArmorStandId: Int? = null
 
-    val lividEntityOrArmorstand: Entity?
-        get() = livid?.baseEntity ?: lividArmorStandId?.let { EntityUtils.getEntityByID(it) }
+    private var fakeLivids = mutableSetOf<EntityOtherPlayerMP>()
+    private val lividEntities
+        get() = EntityUtils.getEntities<EntityOtherPlayerMP>().filter { it.isNpc() && lividNamePattern.matches(it.name) }.toList()
 
-    private var fakeLivids = mutableSetOf<Mob>()
+    // avoid rendering the line while closer than 7 blocks or further than 90 blocks
+    private val lineRenderRange = 50.0..900.0
 
     private var color: LorenzColor? = null
+    private val lividNameColor = mapOf(
+        "Vendetta" to LorenzColor.WHITE,
+        "Doctor" to LorenzColor.GRAY,
+        "Crossed" to LorenzColor.LIGHT_PURPLE,
+        "Purple" to LorenzColor.DARK_PURPLE,
+        "Scream" to LorenzColor.BLUE,
+        "Hockey" to LorenzColor.RED,
+        "Arcade" to LorenzColor.YELLOW,
+        "Smile" to LorenzColor.GREEN,
+        "Frog" to LorenzColor.DARK_GREEN,
+    )
 
-    @HandleEvent
-    fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
+    /**
+     * REGEX-TEST: Doctor Livid
+     */
+    private val lividNamePattern by RepoPattern.pattern(
+        "dungeon.f5.livid.name",
+        "^(?<type>\\w+) Livid$",
+    )
+
+    /**
+     * REGEX-TEST: §2﴾ §2§lLivid§r§r §a7M§c❤ §2﴿
+     * REGEX-TEST: §5﴾ §5§lLivid§r§r §a7M§c❤ §5﴿
+     */
+    private val lividArmorStandNamePattern by RepoPattern.pattern(
+        "dungeon.f5.livid.armorstand",
+        "^§(?<colorCode>.)﴾ §.§lLivid.*$",
+    )
+
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
+        if (!config.enabled.get()) return
         if (!inLividBossRoom()) return
-        val mob = event.mob
-        if (mob.name != "Livid" && mob.name != "Real Livid") return
-        if (mob.baseEntity !is EntityOtherPlayerMP) return
+        if (color == null) return
 
-        val lividColor = color
-        val isCorrectLivid = if (lividColor == null) false else mob.isLividColor(lividColor)
-
-        if (lividColor == null) {
-            fakeLivids += mob
-            return
-        }
-
-        if (isCorrectLivid) {
-            livid = mob
-            lividArmorStandId = mob.armorStand?.entityId
-            // When the real livid dies at the same time as a fake livid, Hypixel despawns the player entity,
-            // and makes it impossible to get the mob of the real livid again.
-
-            ChatUtils.debug("Livid found: $lividColor§7 | $lividArmorStandId")
-            if (config.enabled.get()) mob.highlight(lividColor.toColor())
-        } else fakeLivids += mob
-    }
-
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        config.enabled.onToggle {
-            reloadHighlight()
-        }
-    }
-
-    private fun reloadHighlight() {
-        val enabled = config.enabled.get()
-
-        if (enabled) {
-            livid?.highlight(color?.toColor())
-        } else {
-            livid?.highlight(null)
+        for (entity in lividEntities) {
+            val lividColor = entity.getLividColor() ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Unknown Livid found",
+                    "No color matches for name",
+                    "Livid Name" to entity.name,
+                )
+                continue
+            }
+            if (lividColor == color) {
+                livid = entity
+                entity.highlight(color)
+            } else {
+                if (entity !in fakeLivids) fakeLivids += entity
+            }
         }
     }
 
@@ -108,14 +125,13 @@ object DungeonLividFinder {
         color = newColor
         ChatUtils.debug("newColor! $newColor")
 
-        val lividSet = fakeLivids + livid
+        livid = null
+        fakeLivids.clear()
 
-        for (mob in lividSet) {
-            if (mob == null) continue
+        for (mob in lividEntities) {
             if (mob.isLividColor(LorenzColor.RED) && newColor != LorenzColor.RED) {
                 if (mob == livid) {
                     livid = null
-                    lividArmorStandId = null
                 }
                 mob.highlight(null)
                 fakeLivids += mob
@@ -124,55 +140,61 @@ object DungeonLividFinder {
 
             if (mob.isLividColor(newColor)) {
                 livid = mob
-                lividArmorStandId = mob.armorStand?.entityId
-                ChatUtils.debug("Livid found: $newColor§7 | $lividArmorStandId")
-                if (config.enabled.get()) mob.highlight(newColor.toColor())
+                ChatUtils.debug("Livid found: $newColor§7")
+                if (config.enabled.get()) mob.highlight(newColor)
                 fakeLivids -= mob
                 continue
             }
         }
     }
 
-    @HandleEvent
-    fun onBossStart(event: DungeonBossRoomEnterEvent) {
+    @HandleEvent(DungeonBossRoomEnterEvent::class)
+    fun onBossStart() {
         if (DungeonApi.getCurrentBoss() != DungeonFloor.F5) return
         color = LorenzColor.RED
     }
 
-    @HandleEvent
-    fun onBossEnd(event: DungeonCompleteEvent) {
+    @HandleEvent(DungeonCompleteEvent::class)
+    fun onBossEnd() {
         color = null
         livid = null
-        lividArmorStandId = null
         fakeLivids.clear()
-    }
-
-    @HandleEvent
-    fun onMobDespawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        when (event.mob) {
-            livid -> livid = null
-            in fakeLivids -> fakeLivids -= event.mob
-        }
     }
 
     @HandleEvent
     fun onWorldChange() {
         color = null
-        lividArmorStandId = null
+        livid = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!inLividBossRoom() || !config.hideWrong) return
-        if (livid == null && lividArmorStandId == null) return // in case livid detection fails, don't hide anything
-        if (event.entity.mob in fakeLivids) event.cancel()
+        if (livid == null) return // in case livid detection fails, don't hide anything
+        if (event.entity is EntityOtherPlayerMP && event.entity in fakeLivids) event.cancel()
+        if (event.entity is EntityArmorStand) {
+            lividArmorStandNamePattern.matchMatcher(event.entity.name) {
+                val colorChar = group("colorCode")[0]
+
+                if (colorChar.toLorenzColor() != color) event.cancel()
+            }
+        }
     }
 
     private fun isCurrentlyBlind() = (MinecraftCompat.localPlayerOrNull?.activePotionEffect(EffectsCompat.BLINDNESS)?.duration ?: 0) > 10
 
-    private fun Mob.isLividColor(color: LorenzColor): Boolean {
+    private fun EntityOtherPlayerMP.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()
-        return armorStand?.name?.startsWith("$chatColor﴾ $chatColor§lLivid") == true
+        return name.startsWith("$chatColor﴾ $chatColor§lLivid")
+    }
+
+    private fun EntityOtherPlayerMP.getLividColor(): LorenzColor? {
+        lividNamePattern.matchMatcher(this.name) {
+            val type = groupOrNull("type") ?: return null
+
+            return lividNameColor.getOrElse(type) { null }
+        }
+        return null
     }
 
     @HandleEvent
@@ -180,8 +202,9 @@ object DungeonLividFinder {
         if (!inLividBossRoom() || !config.enabled.get()) return
         if (isBlind) return
 
-        val entity = lividEntityOrArmorstand ?: return
-        val lorenzColor = color ?: return
+        val entity = livid ?: return
+        val lorenzColor =
+            if (config.colorOverride != LividColorHighlight.DEFAULT) config.colorOverride.color as LorenzColor else color ?: return
 
         val location = event.exactLocation(entity)
         val boundingBox = event.exactBoundingBox(entity)
@@ -191,12 +214,77 @@ object DungeonLividFinder {
         val color = lorenzColor.toColor()
         event.drawFilledBoundingBox(boundingBox, color, 0.5f)
 
-        if (location.distanceSqToPlayer() > 50) {
+        if (location.distanceSqToPlayer() in lineRenderRange) {
             event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)
         }
     }
 
     private fun inLividBossRoom() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonFloor.F5
+
+    private fun EntityOtherPlayerMP.highlight(color: LorenzColor?) {
+        if (color == null) {
+            RenderLivingEntityHelper.removeEntityColor(this)
+            RenderLivingEntityHelper.removeNoHurtTime(this)
+            return
+        }
+
+        val newColor = if (config.colorOverride != LividColorHighlight.DEFAULT) config.colorOverride.color as LorenzColor else color
+
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            entity = this,
+            color = newColor.toColor(),
+            condition = { this.isLividColor(newColor) },
+        )
+    }
+
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        config.enabled.onToggle {
+            reloadHighlight()
+        }
+    }
+
+    private fun reloadHighlight() {
+        val enabled = config.enabled.get()
+
+        if (enabled) {
+            val newLivid = livid ?: return
+            val newColor = color ?: return
+
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                entity = newLivid,
+                color = newColor.toColor(),
+                condition = { newLivid.isLividColor(newColor) },
+            )
+        } else {
+            RenderLivingEntityHelper.removeEntityColor(livid ?: return)
+            RenderLivingEntityHelper.removeNoHurtTime(livid ?: return)
+        }
+    }
+
+    enum class LividColorHighlight(val color: LorenzColor?, private val prettyName: String = color?.toString() ?: "Disabled") {
+        DEFAULT(null),
+        BLACK(LorenzColor.BLACK),
+        DARK_BLUE(LorenzColor.DARK_BLUE),
+        DARK_GREEN(LorenzColor.DARK_GREEN),
+        DARK_AQUA(LorenzColor.DARK_AQUA),
+        DARK_RED(LorenzColor.DARK_RED),
+        DARK_PURPLE(LorenzColor.DARK_PURPLE),
+        GOLD(LorenzColor.GOLD),
+        GRAY(LorenzColor.GRAY),
+        DARK_GRAY(LorenzColor.DARK_GRAY),
+        BLUE(LorenzColor.BLUE),
+        GREEN(LorenzColor.GREEN),
+        AQUA(LorenzColor.AQUA),
+        RED(LorenzColor.RED),
+        LIGHT_PURPLE(LorenzColor.LIGHT_PURPLE),
+        YELLOW(LorenzColor.YELLOW),
+        WHITE(LorenzColor.WHITE),
+        ;
+
+        override fun toString() = prettyName
+
+    }
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -211,13 +299,12 @@ object DungeonLividFinder {
             return
         }
 
-        // TODO either hide if setting is disabled, or include the info if setting is enabled
         event.addData {
+            add("isEnabled: ${config.enabled.get()}")
             add("inBoss: ${inLividBossRoom()}")
             add("isBlind: $isBlind")
             add("blockColor: ${blockLocation.getBlockStateAt()}")
-            add("livid: '${livid?.armorStand?.name}'")
-            add("lividArmorStandID: $lividArmorStandId")
+            add("livid: '${livid?.name}'")
             add("color: ${color?.name}")
         }
     }

@@ -32,9 +32,12 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
+import java.awt.Color
 
 class GuiPositionEditor(
     private val positions: List<Position>,
@@ -69,8 +72,6 @@ class GuiPositionEditor(
     }
 
     private fun renderLabels(hoveredPos: Int) {
-        GuiRenderUtils.drawStringCentered("§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
-
         var displayPos = -1
         if (clickedPos != -1 && positions[clickedPos].clicked) {
             displayPos = clickedPos
@@ -81,17 +82,27 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         if (displayPos == -1) {
-            GuiRenderUtils.drawStringCentered("§eTo edit hidden GUI elements set a key in /sh edit", getScaledWidth() / 2, 20)
-            GuiRenderUtils.drawStringCentered("§ethen click that key while the GUI element is visible", getScaledWidth() / 2, 32)
+            renderHover(
+                listOf(
+                    "§cSkyHanni Position Editor",
+                    "§eTo edit hidden GUI elements set a key in /sh edit",
+                    "§ethen click that key while the GUI element is visible",
+                ),
+            )
             return
         }
+        renderHover(getTextForPos(positions[displayPos]))
+    }
 
-        val pos = positions[displayPos]
-        val location = "§7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}"
-        GuiRenderUtils.drawStringCentered("§b ${pos.internalName}", getScaledWidth() / 2, 18)
-        GuiRenderUtils.drawStringCentered(location, getScaledWidth() / 2, 28)
-        if (pos.canJumpToConfigOptions())
-            GuiRenderUtils.drawStringCentered("§aRight-Click to open associated config options", getScaledWidth() / 2, 38)
+    private fun getTextForPos(pos: Position) = listOf(
+        "§cSkyHanni Position Editor",
+        "§b ${pos.internalName}",
+        "§7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}",
+        "§aRight-Click to open associated config options",
+    )
+
+    private fun renderHover(text: List<String>) {
+        RenderableTooltips.setTooltipForRender(text.map { Renderable.string(it) })
     }
 
     private fun renderRectangles(): Int {
@@ -114,23 +125,26 @@ class GuiPositionEditor(
 
             elementWidth = position.getDummySize().x
             elementHeight = position.getDummySize().y
+
+            val isHovering = GuiRenderUtils.isPointInRect(
+                mouseX,
+                mouseY,
+                x - border,
+                y - border,
+                elementWidth + border * 2,
+                elementHeight + border * 2,
+            )
+
+            val gray = -0x7fbfbfc0
             GuiRenderUtils.drawRect(
                 x - border,
                 y - border,
                 x + elementWidth + border * 2,
                 y + elementHeight + border * 2,
-                -0x7fbfbfc0,
+                if (isHovering) Color.yellow.rgb else gray,
             )
 
-            if (GuiRenderUtils.isPointInRect(
-                    mouseX,
-                    mouseY,
-                    x - border,
-                    y - border,
-                    elementWidth + border * 2,
-                    elementHeight + border * 2,
-                )
-            ) {
+            if (isHovering) {
                 hoveredPos = index
             }
         }
