@@ -170,7 +170,7 @@ object GardenApi {
     }
 
     fun isHoldingTool(): Boolean {
-        return GardenAPI.toolInHand != null
+        return toolInHand != null
     }
 
     fun inGarden() = IslandType.GARDEN.isInIsland()
