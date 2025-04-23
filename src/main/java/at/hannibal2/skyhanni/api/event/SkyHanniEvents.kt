@@ -71,14 +71,15 @@ object SkyHanniEvents {
 
     @Suppress("UNCHECKED_CAST")
     private fun registerMultipleEventTypes(options: HandleEvent, method: Method, instance: Any): Boolean {
-        var anyAdded = false
+        val addedTypes: MutableSet<Class<out SkyHanniEvent>> = mutableSetOf()
         options.eventTypes.map { it.java }.forEach { eventType ->
             if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return@forEach
+            if (eventType in addedTypes) return@forEach
             listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
                 .addListener(method, instance, options)
-            anyAdded = true
+            addedTypes.add(eventType)
         }
-        return anyAdded
+        return addedTypes.isNotEmpty()
     }
 
 
