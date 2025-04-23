@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import java.lang.reflect.Method
 
 @SkyHanniModule
@@ -71,15 +72,14 @@ object SkyHanniEvents {
 
     @Suppress("UNCHECKED_CAST")
     private fun registerMultipleEventTypes(options: HandleEvent, method: Method, instance: Any): Boolean {
-        val addedTypes: MutableSet<Class<out SkyHanniEvent>> = mutableSetOf()
-        options.eventTypes.map { it.java }.forEach { eventType ->
+        var registered = false
+        options.eventTypes.mapTo(mutableSetOf()) { it.java }.forEach { eventType ->
             if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return@forEach
-            if (eventType in addedTypes) return@forEach
+            registered = true
             listeners.getOrPut(eventType as Class<SkyHanniEvent>) { EventListeners(eventType) }
                 .addListener(method, instance, options)
-            addedTypes.add(eventType)
         }
-        return addedTypes.isNotEmpty()
+        return registered
     }
 
 
