@@ -155,8 +155,12 @@ object ApiUtils {
                 val entity = response.entity
 
                 if (status.statusCode in 200..299) {
-                    val data = readResponse(entity)
-                    return ApiResponse(true, "Request successful", data)
+                    if (entity != null) {
+                        val data = readResponse(entity)
+                        return ApiResponse(true, "Request successful", data)
+                    } else {
+                        return ApiResponse(true, "No response body", JsonObject())
+                    }
                 }
 
                 val message = "POST request to '$url' returned status ${status.statusCode}"

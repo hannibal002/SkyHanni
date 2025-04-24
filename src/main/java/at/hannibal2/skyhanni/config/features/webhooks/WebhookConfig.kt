@@ -4,9 +4,13 @@ import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
 import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
+import net.minecraft.client.Minecraft
 
 class WebhookConfig {
     @Expose
@@ -37,6 +41,22 @@ class WebhookConfig {
     @ConfigEditorText
     var webhookAvatarUrl: String = ""
 
+    @Expose
+    @ConfigOption(
+        name = "Embed Thumbnail",
+        desc = "What thumbnail to use for embeds."
+    )
+    @ConfigEditorDropdown
+    var embedThumbnail: Property<EmbedThumbnailType> = Property.of(EmbedThumbnailType.SKIN)
+
+    @Expose
+    @ConfigOption(
+        name = "Username in Embeds",
+        desc = "Sends your username in the embed author field."
+    )
+    @ConfigEditorBoolean
+    var usernameInEmbeds: Boolean = true
+
     @ConfigOption(
         name = "Send Test Message",
         desc = "Send a test message to the Webhook."
@@ -56,6 +76,27 @@ class WebhookConfig {
                 )
             )
         ).sendTo(webhookUrl)
+    }
+
+    enum class EmbedThumbnailType(
+        private val displayName: String,
+        private val urlProvider: () -> String?,
+    ) {
+        SKIN("Skin", {
+            Minecraft.getMinecraft().thePlayer?.name?.let { "https://mineskin.eu/helm/$it" }
+        }),
+        SKYHANNI(
+            "SkyHanni",
+            { "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png?raw=true" }
+        ),
+        NONE("None", { null })
+        ;
+
+        override fun toString(): String = displayName
+
+        fun getUrl(): String? {
+            return urlProvider()
+        }
     }
 
 }

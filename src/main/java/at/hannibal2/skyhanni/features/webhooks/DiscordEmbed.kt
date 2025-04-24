@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.features.webhooks
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import com.google.gson.annotations.SerializedName
+import net.minecraft.client.Minecraft
+
+val config get() = SkyHanniMod.feature.webhook
 
 data class DiscordEmbed(
     val title: String? = null,
@@ -10,11 +14,17 @@ data class DiscordEmbed(
     val timestamp: String? = null,
     val color: Int? = null,
     val footer: EmbedFooter? = null,
-    val image: String? = null,
-    val thumbnail: String? = "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png?raw=true",
-    val video: String? = null,
+    val image: EmbedImage? = null,
+    val thumbnail: EmbedThumbnail? = EmbedThumbnail(config.embedThumbnail.get().getUrl() ?: ""),
+    val video: EmbedVideo? = null,
     val provider: EmbedProvider? = null,
-    val author: EmbedAuthor? = null,
+    val author: EmbedAuthor? = EmbedAuthor(
+        name = if (config.usernameInEmbeds) {
+            Minecraft.getMinecraft().thePlayer.name
+        } else {
+            ""
+        },
+    ),
     val fields: List<EmbedField>? = null
 )
 
@@ -23,6 +33,9 @@ data class EmbedFooter(
     @SerializedName("icon_url") val iconUrl: String? = null
 )
 data class EmbedProvider(val name: String? = null, val url: String? = null)
+data class EmbedImage(val url: String)
+data class EmbedThumbnail(val url: String)
+data class EmbedVideo(val url: String)
 data class EmbedAuthor(
     val name: String,
     val url: String? = null,
