@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import com.google.gson.annotations.SerializedName
 import net.minecraft.client.Minecraft
 
-val config get() = SkyHanniMod.feature.webhook
+private val config get() = SkyHanniMod.feature.webhook
 
 data class DiscordEmbed(
     val title: String? = null,

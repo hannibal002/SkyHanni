@@ -28,6 +28,16 @@ public class TimerConfig {
     public boolean sixthVisitorWarning = true;
 
     @Expose
+    @ConfigOption(
+        name = "Sixth Visitor Webhook Notification",
+        desc = "Send a webhook notification when the sixth visitor arrives.\n" +
+            "§eMay be inaccurate with co-op members farming simultaneously.\n" +
+            "§eRequires a webhook set in the Webhook config."
+    )
+    @ConfigEditorBoolean
+    public boolean sixthVisitorWebhook = false;
+
+    @Expose
     @ConfigOption(name = "New Visitor Ping", desc = "Ping you when you are less than 10 seconds away from getting a new visitor.\n" +
         "§eUseful for getting Ephemeral Gratitudes during the 2023 Halloween event.")
     @ConfigEditorBoolean

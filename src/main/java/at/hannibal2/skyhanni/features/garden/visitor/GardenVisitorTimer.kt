@@ -182,6 +182,10 @@ object GardenVisitorTimer {
         lastSixthVisitorWarning = SimpleTimeMark.now()
         TitleManager.sendTitle("§a6th Visitor Ready")
         SoundUtils.playBeepSound()
+
+        if (config.sixthVisitorWebhook) {
+            if ()
+        }
     }
 
     private fun createDisplayText(text: String) = Renderable.clickable(
