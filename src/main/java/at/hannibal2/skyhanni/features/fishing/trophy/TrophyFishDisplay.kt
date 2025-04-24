@@ -297,7 +297,7 @@ object TrophyFishDisplay {
             "fishing.trophyFishing.display.requireHunterArmor",
             "fishing.trophyFishing.display.armorRequirement",
         ) { jsonElement ->
-            val newEnum = when(jsonElement.asBoolean) {
+            val newEnum = when (jsonElement.asBoolean) {
                 true -> TrophyFishDisplayConfig.ArmorReq.HUNTER_ARMOR
                 false -> TrophyFishDisplayConfig.ArmorReq.NO_REQ
             }
