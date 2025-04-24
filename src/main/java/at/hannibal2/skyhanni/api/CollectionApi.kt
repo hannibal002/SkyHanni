@@ -35,10 +35,11 @@ object CollectionApi {
     /**
      * REGEX-TEST: §7Total collected: §e261,390
      * REGEX-TEST: §7Total Collected: §e2,012,418
+     * REGEX-TEST: §7Total Collection: §c4,120
      */
     private val singleCounterPattern by patternGroup.pattern(
         "singlecounter",
-        "§7Total [c|C]ollected: §e(?<amount>.*)",
+        "§7Total [cC]ollect(ed|ion): §[ec](?<amount>.*)",
     )
 
     /**
@@ -54,6 +55,13 @@ object CollectionApi {
     // TODO repo
     private val incorrectCollectionNames = mapOf(
         "Mushroom" to "RED_MUSHROOM".toInternalName(),
+        "Bonzo" to "BONZO_BOSS".toInternalName(),
+        "Scarf" to "SCARF_BOSS".toInternalName(),
+        "The Professor" to "PROFESSOR_BOSS".toInternalName(),
+        "Thorns" to "THORNS".toInternalName(),
+        "Livid" to "LIVID_BOSS".toInternalName(),
+        "Sadan" to "SADAN_BOSS".toInternalName(),
+        "Necron" to "NECRON_BOSS".toInternalName(),
     )
 
     @HandleEvent
@@ -76,8 +84,6 @@ object CollectionApi {
         }
 
         if (inventoryName.endsWith(" Collections")) {
-            if (inventoryName == "Boss Collections") return
-
             for ((_, stack) in event.inventoryItems) {
                 var name = stack.displayName.removeColor()
                 if (name.contains("Collections")) continue
@@ -88,6 +94,8 @@ object CollectionApi {
                 if (!isCollectionTier0(lore)) {
                     name = name.split(" ").dropLast(1).joinToString(" ")
                 }
+
+                if (name.contains("Kuudra")) continue
 
                 val internalName = incorrectCollectionNames[name] ?: NeuInternalName.fromItemName(name)
                 counterPattern.firstMatcher(lore) {
