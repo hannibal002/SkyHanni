@@ -133,7 +133,11 @@ class Features : Config() {
     var misc: MiscConfig = MiscConfig()
 
     @Expose
-    @Category(name = "Webhook", desc = "Webhook settings.")
+    @Category(
+        name = "Webhook", desc = "Webhook settings.\n" +
+            "This is only for general settings.\n" +
+            "Specific webhook notifications are found throughout the config."
+    )
     var webhook: WebhookConfig = WebhookConfig()
 
     // Bottom
