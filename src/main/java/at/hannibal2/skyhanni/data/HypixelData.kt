@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
@@ -43,13 +44,12 @@ import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
+import net.minecraft.network.login.server.S00PacketDisconnect
+import net.minecraft.network.play.server.S40PacketDisconnect
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HypixelData {
-
-    private val notificationConfig get() = SkyHanniMod.feature.webhook.miscNotificationsConfig
-
     private val patternGroup = RepoPattern.group("data.hypixeldata")
 
     // TODO add regex tests
@@ -358,15 +358,20 @@ object HypixelData {
         skyBlockArea = null
         skyBlockAreaWithSymbol = null
         hasScoreboardUpdated = false
+    }
 
-        if (notificationConfig.disconnectNotification) {
-            Webhook().addEmbed(
-                DiscordEmbed(
-                    title = "You have been disconnected!",
-                    color = 0xFF0000,
-                    timestamp = SimpleTimeMark.now().toString(),
-                )
-            ).sendTo()
+    @HandleEvent
+    fun onServerDisconnect(event: PacketReceivedEvent) {
+        if (event.packet is S40PacketDisconnect) {
+            val packet = event.packet
+            val kickReason = packet.reason
+
+            println("Kick reason: $kickReason")
+        } else if (event.packet is S00PacketDisconnect) {
+            val packet = event.packet
+            val kickReason = packet.func_149603_c()
+
+            println("Kick reason: $kickReason")
         }
     }
 

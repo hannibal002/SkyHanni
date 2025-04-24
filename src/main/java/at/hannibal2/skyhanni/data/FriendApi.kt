@@ -15,11 +15,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
 import java.util.UUID
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object FriendApi {
@@ -135,10 +137,12 @@ object FriendApi {
         incomingFriendRequest.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
             if (notificationConfig.friendRequestNotification) {
+                val format = "<t:${SimpleTimeMark.now().plus(5.minutes).toMillis() / 1000}:R>"
                 Webhook().addEmbed(
                     DiscordEmbed(
                         title = "Incoming Friend Request",
-                        description = "You have received a friend request from $name",
+                        description = "You have received a friend request from **${name.removeColor()}**\n" +
+                            "Expires in: $format",
                         color = 0x00FF00,
                         timestamp = SimpleTimeMark.now().toString(),
                     )

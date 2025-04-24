@@ -71,6 +71,8 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.network.play.server.S40PacketDisconnect
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.common.MinecraftForge
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
@@ -581,6 +583,11 @@ object SkyHanniDebugsAndTests {
             ),
             posLabel = "Item Debug",
         )
+    }
+
+    fun simulateServerDisconnect(reason: String) {
+        val component: IChatComponent = IChatComponent.Serializer.jsonToComponent(reason)
+        S40PacketDisconnect(component).processPacket(Minecraft.getMinecraft().netHandler)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

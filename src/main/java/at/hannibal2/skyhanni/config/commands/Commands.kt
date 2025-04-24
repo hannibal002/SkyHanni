@@ -469,6 +469,11 @@ object Commands {
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
         }
+        event.register("shtestserverdisconnect") {
+            description = "Simulates a server disconnect"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { SkyHanniDebugsAndTests.simulateServerDisconnect(it.joinToString(" ")) }
+        }
     }
 
     private fun internalCommands(event: CommandRegistrationEvent) {
