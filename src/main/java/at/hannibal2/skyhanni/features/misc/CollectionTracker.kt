@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.commonItemAliases
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -79,7 +80,7 @@ object CollectionTracker {
             args
         }
 
-        val rawName = fixTypo(nameArgs.joinToString(" ").lowercase().replace("_", " "))
+        val rawName = nameArgs.joinToString(" ").lowercase().replace("_", " ")
         val unsupportedCollections = listOf("gemstone", "mushroom", "kuurda")
         if (unsupportedCollections.contains(rawName)) {
             ChatUtils.userError("${rawName.firstLetterUppercase()} collection is not supported!")
@@ -102,46 +103,6 @@ object CollectionTracker {
             }
             setNewCollection(foundInternalName, stack.displayName.removeColor())
         }
-    }
-
-    // TODO repo
-    private fun fixTypo(rawName: String) = when (rawName) {
-        "carrots" -> "carrot"
-        "melons" -> "melon"
-        "seed" -> "seeds"
-        "iron" -> "iron ingot"
-        "gold" -> "gold ingot"
-        "sugar" -> "sugar cane"
-        "cocoa bean", "cocoa" -> "cocoa beans"
-        "lapis" -> "lapis lazuli"
-        "cacti" -> "cactus"
-        "pumpkins" -> "pumpkin"
-        "potatoes" -> "potato"
-        "nether warts", "wart", "warts" -> "nether wart"
-        "stone" -> "cobblestone"
-        "red mushroom", "brown mushroom", "mushrooms" -> "mushroom"
-        "gemstones" -> "gemstone"
-        "caducous" -> "caducous stem"
-        "agaricus" -> "agaricus cap"
-        "quartz" -> "nether quartz"
-        "glowstone" -> "glowstone dust"
-        "floor 1" -> "bonzo"
-        "f1" -> "bonzo"
-        "floor 2" -> "scarf"
-        "f2" -> "scarf"
-        "Professor" -> "the professor"
-        "floor 3" -> "the professor"
-        "f3" -> "the professor"
-        "floor 4" -> "thorn"
-        "f4" -> "thorn"
-        "floor 5" -> "livid"
-        "f5" -> "livid"
-        "floor 6" -> "sadan"
-        "f6" -> "sadan"
-        "floor 7" -> "necron"
-        "f7" -> "necron"
-
-        else -> rawName
     }
 
     private fun setNewCollection(internalName: NeuInternalName, name: String) {
