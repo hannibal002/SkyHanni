@@ -14,13 +14,19 @@ object MouseSensitivityHook {
     private var lastIn: Float = Float.NaN
     private var lastOut: Float = Float.NaN
 
-    fun getMouseSensitivity(original: Float): Float {
+    private fun getMouseSensitivity(original: Float): Float {
         if (original != lastIn) {
             lastIn = original
             lastOut = state.apply(original)
         }
 
         return lastOut
+    }
+
+    fun getMouseSensitivityWithWeirdMath(original: Float): Float {
+        val actualSensitivity = (original - 0.2f) / 0.6f
+
+        return getMouseSensitivity(actualSensitivity) * 0.6f + 0.2f
     }
 
     fun setState(newState: MouseSensitivityState) {

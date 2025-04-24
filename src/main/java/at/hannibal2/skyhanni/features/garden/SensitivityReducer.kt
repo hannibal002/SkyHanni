@@ -22,7 +22,7 @@ object SensitivityReducer {
     private var inBarn: Boolean = false
     private var onGround: Boolean = false
 
-    private var shouldBeActive = false //like isActive, but doesn't get skipped by ground or barn checks
+    private var shouldBeActive = false
     private val isActive get() = isAutoActive || isManualActive
     private val isAutoActive get() = MouseSensitivityHook.state == MouseSensitivityHook.MouseSensitivityState.AUTO_REDUCED
     private val isManualActive get() = MouseSensitivityHook.state == MouseSensitivityHook.MouseSensitivityState.MANUAL_REDUCED
@@ -43,21 +43,21 @@ object SensitivityReducer {
     private fun updatePlayerStatus() {
         if (GardenApi.onBarnPlot && !inBarn) {
             inBarn = true
-            tryAutoToggle(false)
+            tryAutoToggle()
         } else if (!GardenApi.onBarnPlot && inBarn) {
             inBarn = false
-            tryAutoToggle(true)
+            tryAutoToggle()
         }
         if (MinecraftCompat.localPlayer.onGround && !onGround) {
             onGround = true
-            tryAutoToggle(true)
+            tryAutoToggle()
         } else if (!MinecraftCompat.localPlayer.onGround && onGround) {
             onGround = false
-            tryAutoToggle(false)
+            tryAutoToggle()
         }
     }
 
-    private fun tryAutoToggle(enable: Boolean) {
+    private fun tryAutoToggle() {
         if (!isAutoActive) return
 
         if (!isActive) {
@@ -72,7 +72,7 @@ object SensitivityReducer {
     private fun autoToggleIfNeeded() {
         when (config.mode) {
             SensitivityReducerConfig.Mode.OFF -> toggleIfCondition { false }
-            SensitivityReducerConfig.Mode.TOOL ->  toggleIfCondition(::isHoldingTool)
+            SensitivityReducerConfig.Mode.TOOL -> toggleIfCondition(::isHoldingTool)
             SensitivityReducerConfig.Mode.KEYBIND -> toggleIfCondition(::isHoldingKey)
         }
     }
