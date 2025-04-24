@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -39,7 +40,7 @@ object StereoHarmonyDiscReplacer {
 
         val replacementStack = iconCache.getOrPut(iconId) {
             cropType.getItemStackCopy(iconId).apply {
-                if (isActiveVinyl) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+                if (isActiveVinyl) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
                 setLore(event.originalItem.getLore())
                 setStackDisplayName(event.originalItem.displayName)
             }

@@ -66,7 +66,7 @@ at/hannibal2/skyhanni/utils/OtherModsSettings.kt
 at/hannibal2/skyhanni/utils/RegexUtils.kt
 at/hannibal2/skyhanni/utils/compat/ArrayNormalization.kt
 at/hannibal2/skyhanni/utils/compat/EffectsCompat.kt
-at/hannibal2/skyhanni/utils/compat/EnchantmentsCompat.kt
+#at/hannibal2/skyhanni/utils/compat/EnchantmentsCompat.kt
 at/hannibal2/skyhanni/utils/compat/EntityCompat.kt
 at/hannibal2/skyhanni/utils/compat/GuiScreenUtils.kt
 at/hannibal2/skyhanni/utils/compat/ItemCompat.kt
