@@ -41,14 +41,18 @@ class TrophyFishDisplayConfig {
     var keybind: Int = Keyboard.KEY_NONE
 
     @Expose
-    @ConfigOption(name = "Armor Requirement", desc = "Only show when this requirment is met in regards to armor.")
+    @ConfigOption(
+        name = "Armor Requirement",
+        desc = "Only show when this requirement is met in regards to " +
+        "Treasure Hunter & Ember Armor."
+    )
     @ConfigEditorDropdown
     var armorRequirement: Property<ArmorReq> = Property.of(ArmorReq.NO_REQ)
 
     enum class ArmorReq(private val displayName: String) {
         NO_REQ("No Requirement"),
-        HUNTER_ARMOR("Trophy Hunter Armor"),
-        HUNTER_OR_EMBER("Trophy Hunter Armor or Ember Armor"),
+        HUNTER_ARMOR("TH Armor"),
+        HUNTER_OR_EMBER("TH/Ember Armor"),
         ;
 
         override fun toString() = displayName
