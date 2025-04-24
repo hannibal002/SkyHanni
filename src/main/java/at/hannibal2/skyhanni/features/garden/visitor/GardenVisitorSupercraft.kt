@@ -26,7 +26,7 @@ object GardenVisitorSupercraft {
 
     private var hasIngredients = false
     private var lastClick = SimpleTimeMark.farPast()
-    private var lastSuperCraftMaterial = ""
+    private var lastSuperCraftMaterial = NeuInternalName.NONE
 
     private val superCraftItem by lazy {
         ItemUtils.createItemStack(
@@ -84,7 +84,7 @@ object GardenVisitorSupercraft {
         hasIngredients = true
         for ((key, value) in requiredIngredients) {
             val sackItem = key.getAmountInSacks()
-            lastSuperCraftMaterial = internalName.asString()
+            lastSuperCraftMaterial = internalName
             if (sackItem < value * (amount - amountInSacks)) {
                 hasIngredients = false
                 break

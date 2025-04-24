@@ -261,15 +261,16 @@ object ScoreboardPattern {
      */
     val lockedPattern by farmingSB.pattern(
         "locked",
-        "\\s*§cLocked",
+        "\\s*§cLocked.*",
     )
 
     /**
      * REGEX-TEST:    §fCleanup§7: §e0.3%
+     * REGEX-TEST:    §fCleanup§7: §b2 §4§lൠ§7 x1
      */
     val cleanUpPattern by farmingSB.pattern(
         "cleanup",
-        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*[\\d,.]*%?",
+        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*.*",
     )
 
     /**

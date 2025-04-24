@@ -150,17 +150,17 @@ object ChatManager {
             return null to true
         }
 
-        val eventComponent = chatEvent.chatComponent
+        val modifiedComponent = chatEvent.chatComponent
         var modified = false
         loggerAllowed.log("[allowed] $message")
         loggerAll.log("[allowed] $message")
-        if (eventComponent.formattedText != component.formattedText) {
+        if (modifiedComponent.formattedText != component.formattedText) {
             modified = true
-            component = chatEvent.chatComponent
             loggerModified.log(" ")
             loggerModified.log("[original] " + component.formattedText)
-            loggerModified.log("[modified] " + eventComponent.formattedText)
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, eventComponent)
+            loggerModified.log("[modified] " + modifiedComponent.formattedText)
+            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent)
+            component = modifiedComponent
         } else {
             messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null)
         }
