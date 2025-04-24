@@ -41,7 +41,7 @@ object LockMouseLook {
     fun unlockMouse() {
         if (!isActive) return
 
-        MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityState.DEFAULT)
+        MouseSensitivityHook.setState(MouseSensitivityState.DEFAULT)
         if (config.lockMouseLookChatMessage) {
             ChatUtils.chat("§bMouse rotation is now unlocked.")
         }
@@ -50,7 +50,7 @@ object LockMouseLook {
     private fun lockMouse() {
         if (isActive) return
 
-        MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityState.LOCKED)
+        MouseSensitivityHook.setState(MouseSensitivityState.LOCKED)
         if (config.lockMouseLookChatMessage) {
             ChatUtils.chat("§bMouse rotation is now locked.")
         }

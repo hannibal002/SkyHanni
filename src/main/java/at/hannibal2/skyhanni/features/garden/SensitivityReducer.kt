@@ -62,10 +62,10 @@ object SensitivityReducer {
 
         if (!isActive) {
             shouldBeActive = true
-            MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityHook.MouseSensitivityState.AUTO_REDUCED)
+            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.AUTO_REDUCED)
         } else {
             shouldBeActive = false
-            MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityHook.MouseSensitivityState.DEFAULT)
+            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.DEFAULT)
         }
     }
 
@@ -89,21 +89,21 @@ object SensitivityReducer {
         if (config.onGround.get() && !onGround) return
         if (!isActive) {
             shouldBeActive = true
-            MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityHook.MouseSensitivityState.AUTO_REDUCED)
+            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.AUTO_REDUCED)
         } else {
             shouldBeActive = false
-            MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityHook.MouseSensitivityState.DEFAULT)
+            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.DEFAULT)
         }
     }
 
     private fun manualToggle() {
         if (!isActive) {
             shouldBeActive = true
-            MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityHook.MouseSensitivityState.MANUAL_REDUCED)
+            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.MANUAL_REDUCED)
             ChatUtils.chat("§bMouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
         } else {
             shouldBeActive = false
-            MouseSensitivityHook.setMouseSensitivityState(MouseSensitivityHook.MouseSensitivityState.DEFAULT)
+            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.DEFAULT)
             ChatUtils.chat("§bMouse sensitivity is now restored.")
         }
     }

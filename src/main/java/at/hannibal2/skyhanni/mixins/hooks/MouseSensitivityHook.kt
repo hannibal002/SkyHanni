@@ -11,12 +11,23 @@ object MouseSensitivityHook {
     var state: MouseSensitivityState = MouseSensitivityState.DEFAULT
         private set
 
+    private var lastIn: Float = Float.NaN
+    private var lastOut: Float = Float.NaN
+
     fun getMouseSensitivity(original: Float): Float {
-        return state.apply(original)
+        if (original != lastIn) {
+            lastIn = original
+            lastOut = state.apply(original)
+        }
+
+        return lastOut
     }
 
-    fun setMouseSensitivityState(newState: MouseSensitivityState) {
+    fun setState(newState: MouseSensitivityState) {
         state = newState
+
+        lastIn = Float.NaN
+        lastOut = Float.NaN
     }
 
     @HandleEvent
@@ -34,16 +45,20 @@ object MouseSensitivityHook {
     }
 
     enum class MouseSensitivityState(
-        private val transform: ((Float) -> Float)
+        private val transform: ((Float) -> Float),
     ) {
         DEFAULT({ it }),
-        LOCKED({_ -> -1f/3f}),
-        AUTO_REDUCED({
-            ((it + 1f/3f) / config.reducingFactor.get()) - 1f/3f
-        }),
-        MANUAL_REDUCED({
-            ((it + 1f/3f) / config.reducingFactor.get()) - 1f/3f
-        }),
+        LOCKED({ _ -> -1f / 3f }),
+        AUTO_REDUCED(
+            {
+                ((it + 1f / 3f) / config.reducingFactor.get()) - 1f / 3f
+            },
+        ),
+        MANUAL_REDUCED(
+            {
+                ((it + 1f / 3f) / config.reducingFactor.get()) - 1f / 3f
+            },
+        ),
         ;
 
         fun apply(original: Float): Float = transform(original)
