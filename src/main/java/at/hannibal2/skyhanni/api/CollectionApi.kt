@@ -89,6 +89,7 @@ object CollectionApi {
                 if (name.contains("Kuudra")) continue
 
                 val internalName = specialCollectionItems.global[name] ?: NeuInternalName.fromItemName(name)
+                // TODO: Co-op Contributions and specific collection inventory
                 counterPattern.firstMatcher(lore) {
                     val counter = group("amount").formatLong()
                     collectionValue[internalName] = counter
