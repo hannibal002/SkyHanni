@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
+import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -17,6 +19,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.util.AxisAlignedBB
@@ -50,6 +54,18 @@ object LimboTimeTracker {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
             onFire = MinecraftCompat.localPlayer.isBurning
+
+            if (config.limboWebhookAlert) {
+                Webhook().addEmbed(
+                    DiscordEmbed(
+                        title = "Limboed!",
+                        description = "You have been limboed.\n" +
+                            "You were limboed for: ${event.message.removeColor()}",
+                        color = 0xFF0000,
+                        timestamp = SimpleTimeMark.now().toString(),
+                    )
+                )
+            }
         }
     }
 

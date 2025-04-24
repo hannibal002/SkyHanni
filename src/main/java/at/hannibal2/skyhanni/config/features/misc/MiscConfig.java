@@ -323,6 +323,14 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Limbo Webhook Alert",
+        desc = "Send a webhook alert when you enter limbo."
+    )
+    @ConfigEditorBoolean
+    public boolean limboWebhookAlert = false;
+
+    @Expose
+    @ConfigOption(
         name = "Lesser Orb of Healing Hider",
         desc = "Hide the Lesser Orb of Healing.")
     @ConfigEditorBoolean

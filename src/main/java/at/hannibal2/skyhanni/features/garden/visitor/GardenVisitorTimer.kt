@@ -191,6 +191,7 @@ object GardenVisitorTimer {
                     title = "6th Visitor Ready",
                     description = "Your visitor queue is full.",
                     color = 0xFF3333,
+                    timestamp = SimpleTimeMark.now().toString(),
                 )
             ).sendTo()
         }
