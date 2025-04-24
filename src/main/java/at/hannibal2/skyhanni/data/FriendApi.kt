@@ -7,10 +7,13 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
+import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -20,6 +23,8 @@ import java.util.UUID
 
 @SkyHanniModule
 object FriendApi {
+    private val notificationConfig get() = SkyHanniMod.feature.webhook.miscNotificationsConfig
+
     private val patternGroup = RepoPattern.group("data.friends")
 
     /**
@@ -36,6 +41,34 @@ object FriendApi {
     private val addedFriendPattern by patternGroup.pattern(
         "add",
         "§aYou are now friends with (?<name>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §9§m-----------------------------------------------------§r§9
+     * §r§eFriend request from §r§a[VIP] BestGringo§r§9
+     * §r§a§l[ACCEPT]§r§8 - §r§c§l[DENY]§r§8 - §r§7§l[BLOCK]§r§9
+     * §r§9§m-----------------------------------------------------
+     */
+    private val incomingFriendRequest by patternGroup.pattern(
+        "incoming",
+        "§9§m-----------------------------------------------------§r§9\n" +
+                "§r§eFriend request from §r(?<name>.*)§r§9\n" +
+                "§r§a§l\\[ACCEPT]§r§8 - §r§c§l\\[DENY]§r§8 - §r§7§l\\[BLOCK]§r§9\n" +
+                "§r§9§m-----------------------------------------------------",
+    )
+
+    /**
+     * REGEX-TEST: §9§m-----------------------------------------------------
+     * §r§9§aYou have 1 pending friend requests.
+     * §eUse §b/f requests §eto see them!§r§9§m
+     * -----------------------------------------------------
+     */
+    private val offlineRequests by patternGroup.pattern(
+        "offline",
+        "§9§m-----------------------------------------------------\n" +
+                "§r§9§aYou have (?<amount>\\d+) pending friend requests.\n" +
+                "§eUse §b/f requests §eto see them!§r§9§m\n" +
+                "-----------------------------------------------------",
     )
 
     /**
@@ -98,6 +131,20 @@ object FriendApi {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         readFriendsList(event)
+
+        incomingFriendRequest.matchMatcher(event.message) {
+            val name = group("name").cleanPlayerName()
+            if (notificationConfig.friendRequestNotification) {
+                Webhook().addEmbed(
+                    DiscordEmbed(
+                        title = "Incoming Friend Request",
+                        description = "You have received a friend request from $name",
+                        color = 0x00FF00,
+                        timestamp = SimpleTimeMark.now().toString(),
+                    )
+                ).sendTo()
+            }
+        }
 
         removedFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()

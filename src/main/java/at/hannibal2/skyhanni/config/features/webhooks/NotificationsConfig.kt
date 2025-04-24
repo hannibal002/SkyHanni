@@ -20,4 +20,12 @@ class NotificationsConfig {
     )
     @ConfigEditorBoolean
     var disconnectNotification: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Friend Request Notification",
+        desc = "Send a notification when you receive a friend request."
+    )
+    @ConfigEditorBoolean
+    var friendRequestNotification: Boolean = false
 }
