@@ -43,8 +43,7 @@ class TrophyFishDisplayConfig {
     @Expose
     @ConfigOption(
         name = "Armor Requirement",
-        desc = "Only show when this requirement is met in regards to " +
-        "Treasure Hunter & Ember Armor."
+        desc = "Only show when wearing the required armor set(s).",
     )
     @ConfigEditorDropdown
     var armorRequirement: Property<ArmorReq> = Property.of(ArmorReq.NO_REQ)
