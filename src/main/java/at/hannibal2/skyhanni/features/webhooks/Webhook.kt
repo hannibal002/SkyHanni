@@ -10,8 +10,8 @@ private val config get() = SkyHanniMod.feature.webhook
 data class Webhook(
     val url: String = config.webhookUrl,
     val content: String? = null,
-    val username: String? = null,
-    @SerializedName("avatar_url") val avatarUrl: String? = null,
+    val username: String = config.webhookUsername.takeIf { it.isNotEmpty() } ?: "SkyHanni",
+    @SerializedName("avatar_url") val avatarUrl: String? = config.webhookAvatarUrl.takeIf { it.isNotEmpty() },
     val tts: Boolean? = null,
     var embeds: List<DiscordEmbed>? = null,
     @SerializedName("allowed_mentions") val allowedMentions: AllowedMentions? = null,
@@ -25,7 +25,8 @@ data class Webhook(
         ApiUtils.postJSON(webhookUrl, jsonPayload, "Discord Webhook")
     }
 
-    fun addEmbed(embed: DiscordEmbed) {
+    fun addEmbed(embed: DiscordEmbed): Webhook {
         embeds = embeds?.plus(embed) ?: listOf(embed)
+        return this
     }
 }

@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
+import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
+import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -184,7 +186,13 @@ object GardenVisitorTimer {
         SoundUtils.playBeepSound()
 
         if (config.sixthVisitorWebhook) {
-            if ()
+            Webhook().addEmbed(
+                DiscordEmbed(
+                    title = "6th Visitor Ready",
+                    description = "Your visitor queue is full.",
+                    color = 0xFF3333,
+                )
+            ).sendTo()
         }
     }
 
