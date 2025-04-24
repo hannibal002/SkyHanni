@@ -65,8 +65,6 @@ class WebhookConfig {
     var sendTestMessage: Runnable = Runnable {
         Webhook(
             content = "This is a test message from SkyHanni!",
-            username = webhookUsername,
-            avatarUrl = webhookAvatarUrl.takeIf { it.isNotEmpty() },
             embeds = listOf(
                 DiscordEmbed(
                     title = "Test Embed",
@@ -98,5 +96,4 @@ class WebhookConfig {
             return urlProvider()
         }
     }
-
 }
