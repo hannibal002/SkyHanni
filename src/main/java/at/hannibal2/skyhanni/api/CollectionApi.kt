@@ -40,7 +40,7 @@ object CollectionApi {
      */
     private val singleCounterPattern by patternGroup.pattern(
         "singlecounter",
-        "§7Total [cC]ollect(ed|ion): §[ec](?<amount>.*)",
+        "§7Total [cC]ollect(?:ed|ion): §[ec](?<amount>.*)",
     )
 
     /**
