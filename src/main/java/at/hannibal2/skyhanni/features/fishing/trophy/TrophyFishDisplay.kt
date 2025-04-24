@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.HideCaught
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TextPart
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TrophySorting
@@ -35,6 +37,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.milliseconds
@@ -43,6 +46,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
+    private val armorReqType get() = config.armorRequirement.get()
 
     private val recentlyDroppedTrophies = TimeLimitedCache<NeuInternalName, TrophyRarity>(5.seconds)
     private val itemNameCache = mutableMapOf<String, NeuInternalName>()
@@ -258,12 +262,9 @@ object TrophyFishDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        if (!canRender()) return
+        if (!isEnabled() || !canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
-
-        if (FishingApi.hasTreasureHook) return
-        if (config.requireHunterArmor.get() && !FishingApi.wearingTrophyArmor) return
+        if (FishingApi.hasTreasureHook || !matchesArmorRequirement()) return
 
         config.position.renderRenderables(
             display,
@@ -272,7 +273,15 @@ object TrophyFishDisplay {
         )
     }
 
-    fun canRender(): Boolean = when (config.whenToShow.get()!!) {
+    private fun matchesArmorRequirement() = when (armorReqType) {
+        TrophyFishDisplayConfig.ArmorReq.NO_REQ -> true
+        TrophyFishDisplayConfig.ArmorReq.HUNTER_ARMOR -> FishingApi.wearingTrophyArmor
+        TrophyFishDisplayConfig.ArmorReq.HUNTER_OR_EMBER ->
+            FishingApi.wearingTrophyArmor || FishingApi.wearingEmberArmor
+        else -> false
+    }
+
+    private fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
         WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getMinecraft().currentScreen is GuiInventory
         WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingApi.holdingLavaRod
@@ -280,4 +289,19 @@ object TrophyFishDisplay {
     }
 
     fun isEnabled() = (IslandType.CRIMSON_ISLE.isInIsland() || LorenzUtils.isStrandedProfile) && config.enabled.get()
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(
+            87,
+            "fishing.trophyFishing.display.requireHunterArmor",
+            "fishing.trophyFishing.display.armorRequirement",
+        ) { jsonElement ->
+            val newEnum = when(jsonElement.asBoolean) {
+                true -> TrophyFishDisplayConfig.ArmorReq.HUNTER_ARMOR
+                false -> TrophyFishDisplayConfig.ArmorReq.NO_REQ
+            }
+            JsonPrimitive(newEnum.name)
+        }
+    }
 }

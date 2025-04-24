@@ -54,6 +54,17 @@ object FishingApi {
         "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
+    /**
+     * REGEX-TEST: EMBER_HELMET
+     * REGEX-TEST: EMBER_CHESTPLATE
+     * REGEX-TEST: EMBER_LEGGINGS
+     * REGEX-TEST: EMBER_BOOTS
+     */
+    private val emberArmorNames by RepoPattern.pattern(
+        "fishing.trophyfishing.emberarmor",
+        "EMBER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+    )
+
     val lavaBlocks = buildList { addLavas() }
     private val waterBlocks = buildList { addWaters() }
 
@@ -78,6 +89,9 @@ object FishingApi {
         private set
 
     var wearingTrophyArmor = false
+        private set
+
+    var wearingEmberArmor = false
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -105,6 +119,7 @@ object FishingApi {
     fun onTick(event: SkyHanniTickEvent) {
         if (event.isMod(5)) {
             wearingTrophyArmor = isWearingTrophyArmor()
+            wearingEmberArmor = isWearingEmberArmor()
         }
 
         val bobber = bobber ?: return
@@ -198,5 +213,9 @@ object FishingApi {
 
     private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
         trophyArmorNames.matches(it?.getInternalName()?.asString())
+    }
+
+    fun isWearingEmberArmor(): Boolean = InventoryUtils.getArmor().all {
+        emberArmorNames.matches(it?.getInternalName()?.asString())
     }
 }
