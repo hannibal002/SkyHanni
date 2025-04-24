@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.webhooks
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ApiUtils
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
+
+private val config get() = SkyHanniMod.feature.webhook
 
 data class Webhook(
+    val url: String = config.webhookUrl,
     val content: String? = null,
     val username: String? = null,
     @SerializedName("avatar_url") val avatarUrl: String? = null,
@@ -17,7 +18,7 @@ data class Webhook(
     val components: List<Any>? = null,
     @SerializedName("thread_name") val threadName: String? = null
 ) {
-    fun sendTo(webhookUrl: String) {
+    fun sendTo(webhookUrl: String = config.webhookUrl) {
         val jsonPayload = Gson().toJson(this)
         println("Sending JSON: $jsonPayload")
 
