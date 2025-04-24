@@ -50,6 +50,7 @@ object LimboTimeTracker {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
+        val limboReason = handleLimboReason(event.message)
         if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
             limboJoinTime = SimpleTimeMark.now()
             inLimbo = true
@@ -59,14 +60,20 @@ object LimboTimeTracker {
                 Webhook().addEmbed(
                     DiscordEmbed(
                         title = "Limboed!",
-                        description = "You have been limboed.\n" +
-                            "You were limboed for: ${event.message.removeColor()}",
+                        description = "You have been limboed for: **$limboReason**",
                         color = 0xFF0000,
                         timestamp = SimpleTimeMark.now().toString(),
-                    )
-                )
+                    ),
+                ).sendTo()
             }
         }
+    }
+
+    private fun handleLimboReason(message: String) = when (message) {
+        "§cYou are AFK. Move around to return from AFK." -> "AFK"
+        "§cYour connection timed out to the server, so you have been routed to limbo!" -> "Connection Timeout"
+        "§cOut of sync, check your internet connection!" -> "Out of Sync"
+        else -> null
     }
 
     @HandleEvent
