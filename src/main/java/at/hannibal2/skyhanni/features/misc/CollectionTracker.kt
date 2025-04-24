@@ -12,8 +12,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -79,14 +81,15 @@ object CollectionTracker {
             args
         }
 
-        val rawName = fixTypo(nameArgs.joinToString(" ").lowercase().replace("_", " "))
-        val unsupportedCollections = listOf("gemstone", "mushroom", "kuurda")
+        val rawName = nameArgs.joinToString(" ").lowercase().replace("_", " ")
+
+        val unsupportedCollections = listOf("gemstone", "mushroom", "kuudra")
         if (unsupportedCollections.contains(rawName)) {
             ChatUtils.userError("${rawName.firstLetterUppercase()} collection is not supported!")
             return
         }
 
-        val foundInternalName = NeuInternalName.fromItemNameOrNull(rawName)
+        val foundInternalName = findInternalName(rawName)
         if (foundInternalName == null) {
             val dungeonBoss = DungeonFloor.byBossName(rawName)
                 ?: run {
@@ -95,6 +98,11 @@ object CollectionTracker {
                 }
             setNewDungeonBossCollection(dungeonBoss)
         } else {
+            if (unsupportedCollections.contains(foundInternalName.asString())) {
+                ChatUtils.userError("${foundInternalName.readableInternalName} collection is not supported!")
+                return
+            }
+
             val stack = foundInternalName.getItemStackOrNull()
             if (stack == null) {
                 ChatUtils.userError("Item / Dungeon Boss '$rawName' does not exist!")
@@ -104,44 +112,12 @@ object CollectionTracker {
         }
     }
 
-    // TODO repo
-    private fun fixTypo(rawName: String) = when (rawName) {
-        "carrots" -> "carrot"
-        "melons" -> "melon"
-        "seed" -> "seeds"
-        "iron" -> "iron ingot"
-        "gold" -> "gold ingot"
-        "sugar" -> "sugar cane"
-        "cocoa bean", "cocoa" -> "cocoa beans"
-        "lapis" -> "lapis lazuli"
-        "cacti" -> "cactus"
-        "pumpkins" -> "pumpkin"
-        "potatoes" -> "potato"
-        "nether warts", "wart", "warts" -> "nether wart"
-        "stone" -> "cobblestone"
-        "red mushroom", "brown mushroom", "mushrooms" -> "mushroom"
-        "gemstones" -> "gemstone"
-        "caducous" -> "caducous stem"
-        "agaricus" -> "agaricus cap"
-        "quartz" -> "nether quartz"
-        "glowstone" -> "glowstone dust"
-        "floor 1" -> "bonzo"
-        "f1" -> "bonzo"
-        "floor 2" -> "scarf"
-        "f2" -> "scarf"
-        "Professor" -> "the professor"
-        "floor 3" -> "the professor"
-        "f3" -> "the professor"
-        "floor 4" -> "thorn"
-        "f4" -> "thorn"
-        "floor 5" -> "livid"
-        "f5" -> "livid"
-        "floor 6" -> "sadan"
-        "f6" -> "sadan"
-        "floor 7" -> "necron"
-        "f7" -> "necron"
-
-        else -> rawName
+    private fun findInternalName(rawName: String): NeuInternalName? {
+        val aliases: Map<String, NeuInternalName> = NeuItems.commonItemAliases.global
+        if (aliases.containsKey(rawName)) {
+            return aliases[rawName]
+        }
+        return NeuInternalName.fromItemNameOrNull(rawName)
     }
 
     private fun setNewCollection(internalName: NeuInternalName, name: String) {
