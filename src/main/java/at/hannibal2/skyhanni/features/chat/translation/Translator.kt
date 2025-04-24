@@ -87,8 +87,13 @@ object Translator {
 
     private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
         val text = messageContentRegex.find(message)!!.groupValues[1].removeColor()
+        //#if MC < 1.21
         style.setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shtranslate $text"))
         style.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, "§bClick to translate!".asComponent()))
+        //#else
+        //$$ style.withClickEvent(ClickEvent.RunCommand("/shtranslate $text"))
+        //$$ style.withHoverEvent(HoverEvent.ShowText("§bClick to translate!".asComponent()))
+        //#endif
         return style
     }
 
