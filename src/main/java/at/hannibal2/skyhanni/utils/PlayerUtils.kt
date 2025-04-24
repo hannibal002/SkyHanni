@@ -9,7 +9,7 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object PlayerUtils {
 
-    private var lastAction: SimpleTimeMark = SimpleTimeMark.farPast()
+    var lastAction: SimpleTimeMark = SimpleTimeMark.farPast()
 
     // thirdPersonView on 1.8.9
     // 0 == normal

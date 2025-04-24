@@ -256,13 +256,6 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-    // Events that change things in DiscordStatus
-    @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
-        if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
-        beenAfkFor = SimpleTimeMark.now()
-    }
-
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(11, "misc.discordRPC.firstLine") { element ->

@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -53,7 +54,6 @@ private fun getVisitingName(): String {
     return "Someone"
 }
 
-var beenAfkFor = SimpleTimeMark.now()
 
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()
@@ -338,8 +338,8 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     AFK(
         {
-            if (beenAfkFor.passedSince() > 5.minutes) {
-                val format = beenAfkFor.passedSince().format(maxUnits = 1, longName = true)
+            if (PlayerUtils.isAFK) {
+                val format = PlayerUtils.lastAction.passedSince().format(maxUnits = 1, longName = true)
                 "AFK for $format"
             } else AutoStatus.AFK.placeholderText
         },
