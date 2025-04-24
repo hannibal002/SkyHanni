@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder.LividColorHighlight
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
@@ -17,4 +19,9 @@ class LividFinderConfig {
     @ConfigOption(name = "Hide Wrong Livids", desc = "Hide wrong livids entirely.")
     @ConfigEditorBoolean
     var hideWrong: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Color Override", desc = "Forces the livid highlight to be a specific color.")
+    @ConfigEditorDropdown
+    var colorOverride: LividColorHighlight = LividColorHighlight.DEFAULT
 }
