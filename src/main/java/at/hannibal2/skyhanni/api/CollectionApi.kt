@@ -2,15 +2,16 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.SpecialCollectionItems
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -52,17 +53,7 @@ object CollectionApi {
 
     val collectionValue = mutableMapOf<NeuInternalName, Long>()
 
-    // TODO repo
-    private val incorrectCollectionNames = mapOf(
-        "Mushroom" to "RED_MUSHROOM".toInternalName(),
-        "Bonzo" to "BONZO_BOSS".toInternalName(),
-        "Scarf" to "SCARF_BOSS".toInternalName(),
-        "The Professor" to "PROFESSOR_BOSS".toInternalName(),
-        "Thorns" to "THORNS".toInternalName(),
-        "Livid" to "LIVID_BOSS".toInternalName(),
-        "Sadan" to "SADAN_BOSS".toInternalName(),
-        "Necron" to "NECRON_BOSS".toInternalName(),
-    )
+    var specialCollectionItems: SpecialCollectionItems = SpecialCollectionItems()
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -77,7 +68,7 @@ object CollectionApi {
             singleCounterPattern.firstMatcher(stack.getLore()) {
                 val counter = group("amount").formatLong()
                 val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                val internalName = incorrectCollectionNames[name] ?: NeuInternalName.fromItemName(name)
+                val internalName = specialCollectionItems.global[name] ?: NeuInternalName.fromItemName(name)
                 collectionValue[internalName] = counter
             }
             CollectionUpdateEvent.post()
@@ -97,7 +88,7 @@ object CollectionApi {
 
                 if (name.contains("Kuudra")) continue
 
-                val internalName = incorrectCollectionNames[name] ?: NeuInternalName.fromItemName(name)
+                val internalName = specialCollectionItems.global[name] ?: NeuInternalName.fromItemName(name)
                 counterPattern.firstMatcher(lore) {
                     val counter = group("amount").formatLong()
                     collectionValue[internalName] = counter
@@ -124,4 +115,9 @@ object CollectionApi {
 
     fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
     fun getCollectionCounter(internalName: NeuInternalName): Long? = collectionValue[internalName]
+
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val collectionItems = event.getConstant<SpecialCollectionItems>("SpecialCollectionItems")
+        specialCollectionItems = collectionItems
+    }
 }
