@@ -42,7 +42,7 @@ object StereoHarmonyDiscReplacer {
             cropType.getItemStackCopy(iconId).apply {
                 if (isActiveVinyl) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
                 setLore(event.originalItem.getLore())
-                setStackDisplayName(event.originalItem.displayName)
+                setCustomItemName(event.originalItem.displayName)
             }
         }
 
