@@ -53,6 +53,7 @@ import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
+@Suppress("TooManyFunctions")
 interface Renderable {
 
     val width: Int

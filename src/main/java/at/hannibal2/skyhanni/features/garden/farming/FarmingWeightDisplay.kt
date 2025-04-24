@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -110,7 +111,20 @@ object FarmingWeightDisplay {
         event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
     }
 
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        if (!isEtaEnabled()) return
+        if (lastupdate.passedSince() < 30.seconds) return
+
+        ConditionalUtils.onToggle(config.useEtaGoalRank, config.etaGoalRank) {
+            getRankGoal()
+            loadLeaderboardIfAble()
+            lastupdate = SimpleTimeMark.now()
+        }
+    }
+
     private val config get() = GardenApi.config.eliteFarmingWeights
+    private val storage get() = GardenApi.storage?.farmingWeight
     private val localCounter = mutableMapOf<CropType, Long>()
 
     private var display = emptyList<Renderable>()
@@ -125,6 +139,8 @@ object FarmingWeightDisplay {
     private var isLoadingWeight = false
     private var isLoadingLeaderboard = false
     private var rankGoal = -1
+    private var minAmount = 0
+    private var lastupdate: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private val nextPlayers = mutableListOf<UpcomingLeaderboardPlayer>()
     private val nextPlayer get() = nextPlayers.firstOrNull()
@@ -232,14 +248,14 @@ object FarmingWeightDisplay {
         var goal = 10000
 
         // Check that the provided string is valid
-        val parsed = value.toIntOrNull() ?: 0
+        val parsed = value.get().toIntOrNull() ?: 0
         if (parsed < 1 || parsed > goal) {
             ChatUtils.chatAndOpenConfig(
                 "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
                     "to a valid number [1-10000] to use this feature!",
-                GardenApi.config.eliteFarmingWeights::etaGoalRank,
+                config::etaGoalRank,
             )
-            config.etaGoalRank = goal.toString()
+            config.etaGoalRank.set(goal.toString())
         } else {
             goal = parsed
         }
@@ -254,18 +270,23 @@ object FarmingWeightDisplay {
 
     private fun getETA(): Renderable? {
         if (weight < 0) return null
+        val nextPlayer = nextPlayer
 
-        val nextPlayer = nextPlayer ?: return Renderable.clickable(
-            "§cWaiting for leaderboard update...",
-            tips = listOf("§eClick here to load new data right now!"),
-            onLeftClick = ::resetData,
-        )
-        val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
-        var nextName =
-            if (showRankGoal) "#$rankGoal" else nextPlayer.name
+        if (nextPlayer == null && weight > minAmount) {
+            return Renderable.clickable(
+                "§cWaiting for leaderboard update...",
+                tips = listOf("§eClick here to load new data right now!"),
+                onLeftClick = ::resetData,
+            )
+        }
+        val nextWeight = nextPlayer?.weight ?: minAmount.toDouble()
+        var nextName = nextPlayer?.name ?: "$nextWeight Weight"
+
+        val showRankGoal = (leaderboardPosition == -1 || leaderboardPosition > rankGoal) && config.useEtaGoalRank.get()
+        nextName = if (showRankGoal) "#$rankGoal" else nextName
 
         val totalWeight = (localWeight + weight)
-        var weightUntilOvertake = nextPlayer.weight - totalWeight
+        var weightUntilOvertake = nextWeight - totalWeight
 
         if (weightUntilOvertake < 0) {
             if (weightPerSecond > 0) {
@@ -278,19 +299,18 @@ object FarmingWeightDisplay {
             } else {
                 leaderboardPosition--
             }
-            GardenApi.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
-                leaderboardPosition
+            storage?.lastFarmingWeightLeaderboard = leaderboardPosition
 
             // Remove passed player to present the next one
             nextPlayers.removeFirst()
 
             // Display waiting message if nextPlayers list is empty
             // Update values to next player
-            nextName = nextPlayer.name
-            weightUntilOvertake = nextPlayer.weight - totalWeight
+            nextName = nextPlayer?.name ?: "Loading..."
+            weightUntilOvertake = nextWeight - totalWeight
         }
 
-        if (nextPlayer.weight == 0.0) {
+        if (nextWeight == 0.0) {
             return Renderable.clickable(
                 "§cRejoin the garden to show ETA!",
                 tips = listOf("Click here to calculate the data right now!"),
@@ -308,7 +328,7 @@ object FarmingWeightDisplay {
                     "weightPerSecond" to weightPerSecond,
                     "weightUntilOvertake" to weightUntilOvertake,
                     "totalWeight" to totalWeight,
-                    "nextPlayer.weight" to nextPlayer.weight,
+                    "nextWeight" to nextWeight,
                 )
                 return null
             }
@@ -398,16 +418,14 @@ object FarmingWeightDisplay {
             if (wasNotLoaded && config.showLbChange) {
                 checkOffScreenLeaderboardChanges()
             }
-            GardenApi.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
-                leaderboardPosition
+            storage?.lastFarmingWeightLeaderboard = leaderboardPosition
             lastLeaderboardUpdate = SimpleTimeMark.now()
             isLoadingLeaderboard = false
         }
     }
 
     private fun checkOffScreenLeaderboardChanges() {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
-        val oldPosition = profileSpecific.garden.farmingWeight.lastFarmingWeightLeaderboard
+        val oldPosition = storage?.lastFarmingWeightLeaderboard ?: return
 
         if (oldPosition <= 0) return
         if (leaderboardPosition <= 0) return
@@ -433,11 +451,12 @@ object FarmingWeightDisplay {
     private fun loadLeaderboardPosition(): Int {
         val uuid = LorenzUtils.getPlayerUuid()
 
-        val includeUpcoming = if (isEtaEnabled()) "?includeUpcoming=true" else ""
+        val includeUpcoming = if (isEtaEnabled()) "?upcoming=10" else ""
         val goalRank = getRankGoal() + 1 // API returns upcoming players as if you were at this rank already
-        val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
+        val atRank = if (isEtaEnabled() && config.useEtaGoalRank.get()) "&atRank=$goalRank" else ""
 
-        val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
+        val url = "https://api.elitebot.dev/leaderboard/farmingweight/" +
+            "$uuid/$profileId$includeUpcoming$atRank"
         val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Leaderboard")
 
         try {
@@ -447,6 +466,7 @@ object FarmingWeightDisplay {
                 nextPlayers.clear()
                 apiData.upcomingPlayers.forEach { nextPlayers.add(it) }
             }
+            minAmount = apiData.minAmount
 
             return apiData.rank
         } catch (e: Exception) {
