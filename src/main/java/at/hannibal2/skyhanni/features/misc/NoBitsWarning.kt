@@ -5,10 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
+import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
+import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 
@@ -29,6 +32,17 @@ object NoBitsWarning {
             // TODO use reminder utils
             TitleManager.sendTitle("§bNo Bits Available")
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))
+
+            if (config.noBitsNotification) {
+                Webhook().addEmbed(
+                    DiscordEmbed(
+                        title = "No Bits Available",
+                        description = "You have no bits available!",
+                        color = 0x3300FF,
+                        timestamp = SimpleTimeMark.now().toString(),
+                    )
+                ).sendTo()
+            }
         }
 
         if (config.bitsGainChatMessage) {

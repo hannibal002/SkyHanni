@@ -33,6 +33,14 @@ public class BitsConfig {
     public boolean enableWarning = true;
 
     @Expose
+    @ConfigOption(
+        name = "Send No Bits Webhook",
+        desc = "Send a webhook when you have no bits available."
+    )
+    @ConfigEditorBoolean
+    public boolean noBitsNotification = true;
+
+    @Expose
     @ConfigOption(name = "Notification Sound", desc = "Play a notification sound when you get a warning.")
     @ConfigEditorBoolean
     public boolean notificationSound = true;

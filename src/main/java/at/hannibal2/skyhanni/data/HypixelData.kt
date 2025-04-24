@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
@@ -20,6 +21,8 @@ import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
+import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
+import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -44,6 +47,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HypixelData {
+
+    private val notificationConfig get() = SkyHanniMod.feature.webhook.miscNotificationsConfig
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
 
@@ -353,6 +358,16 @@ object HypixelData {
         skyBlockArea = null
         skyBlockAreaWithSymbol = null
         hasScoreboardUpdated = false
+
+        if (notificationConfig.disconnectNotification) {
+            Webhook().addEmbed(
+                DiscordEmbed(
+                    title = "You have been disconnected!",
+                    color = 0xFF0000,
+                    timestamp = SimpleTimeMark.now().toString(),
+                )
+            ).sendTo()
+        }
     }
 
     @HandleEvent

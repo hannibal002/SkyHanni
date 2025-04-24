@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
 import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -13,6 +14,13 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 
 class WebhookConfig {
+    @Expose
+    @Category(
+        name = "Misc Notifications",
+        desc = "Miscellaneous Webhook notifications."
+    )
+    val miscNotificationsConfig: NotificationsConfig = NotificationsConfig()
+
     @Expose
     @ConfigOption(
         name = "Webhook URL",

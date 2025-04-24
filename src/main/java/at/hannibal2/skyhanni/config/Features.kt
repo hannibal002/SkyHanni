@@ -134,9 +134,7 @@ class Features : Config() {
 
     @Expose
     @Category(
-        name = "Webhook", desc = "Webhook settings.\n" +
-            "This is only for general settings.\n" +
-            "Specific webhook notifications are found throughout the config."
+        name = "Webhook", desc = "General Webhook settings."
     )
     var webhook: WebhookConfig = WebhookConfig()
 

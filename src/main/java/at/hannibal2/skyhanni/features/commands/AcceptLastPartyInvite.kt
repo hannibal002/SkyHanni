@@ -4,18 +4,23 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
+import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object AcceptLastPartyInvite {
 
     private val config get() = SkyHanniMod.feature.misc.commands
+    private val notificationConfig get() = SkyHanniMod.feature.webhook.miscNotificationsConfig
 
     private val patternGroup = RepoPattern.group("party.invite")
 
@@ -48,6 +53,20 @@ object AcceptLastPartyInvite {
         inviteReceivedPattern.findMatcher(event.message) {
             lastInviter = group("player")
             ChatUtils.debug("Party invite received from $lastInviter")
+
+            val format = "<t:${SimpleTimeMark.now().plus(1.minutes).toMillis() / 1000}:R>"
+
+            if (notificationConfig.partyInviteNotification) {
+                Webhook().addEmbed(
+                    DiscordEmbed(
+                        title = "Party Invite Received",
+                        description = "You have received a party invite from $lastInviter\n" +
+                            "Expires in $format",
+                        color = 0x3333FF,
+                        timestamp = SimpleTimeMark.now().toString(),
+                    )
+                ).sendTo()
+            }
             return
         }
         inviteExpiredPattern.matchMatcher(event.message) {
