@@ -12,7 +12,7 @@ data class Webhook(
     val username: String? = null,
     @SerializedName("avatar_url") val avatarUrl: String? = null,
     val tts: Boolean? = null,
-    val embeds: List<DiscordEmbed>? = null,
+    var embeds: List<DiscordEmbed>? = null,
     @SerializedName("allowed_mentions") val allowedMentions: AllowedMentions? = null,
     val components: List<Any>? = null,
     @SerializedName("thread_name") val threadName: String? = null
@@ -22,5 +22,9 @@ data class Webhook(
         println("Sending JSON: $jsonPayload")
 
         ApiUtils.postJSON(webhookUrl, jsonPayload, "Discord Webhook")
+    }
+
+    fun addEmbed(embed: DiscordEmbed) {
+        embeds = embeds?.plus(embed) ?: listOf(embed)
     }
 }

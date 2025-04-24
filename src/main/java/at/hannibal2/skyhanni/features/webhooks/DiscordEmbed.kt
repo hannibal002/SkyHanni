@@ -10,9 +10,9 @@ data class DiscordEmbed(
     val timestamp: String? = null,
     val color: Int? = null,
     val footer: EmbedFooter? = null,
-    val image: EmbedImage? = null,
-    val thumbnail: EmbedThumbnail? = null,
-    val video: EmbedVideo? = null,
+    val image: String? = null,
+    val thumbnail: String? = "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png?raw=true",
+    val video: String? = null,
     val provider: EmbedProvider? = null,
     val author: EmbedAuthor? = null,
     val fields: List<EmbedField>? = null
@@ -22,9 +22,6 @@ data class EmbedFooter(
     val text: String,
     @SerializedName("icon_url") val iconUrl: String? = null
 )
-data class EmbedImage(val url: String)
-data class EmbedThumbnail(val url: String)
-data class EmbedVideo(val url: String)
 data class EmbedProvider(val name: String? = null, val url: String? = null)
 data class EmbedAuthor(
     val name: String,

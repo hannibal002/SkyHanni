@@ -52,7 +52,7 @@ class WebhookConfig {
                     title = "Test Embed",
                     description = "This is a test embed from SkyHanni!",
                     color = 0x00FF00,
-                    timestamp = SimpleTimeMark.now().toString()
+                    timestamp = SimpleTimeMark.now().toString(),
                 )
             )
         ).sendTo(webhookUrl)
