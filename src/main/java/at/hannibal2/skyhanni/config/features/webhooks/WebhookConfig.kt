@@ -43,6 +43,14 @@ class WebhookConfig {
 
     @Expose
     @ConfigOption(
+        name = "Only when AFK",
+        desc = "Only send messages when you are AFK."
+    )
+    @ConfigEditorBoolean
+    var onlyWhenAFK: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Embed Thumbnail",
         desc = "What thumbnail to use for embeds."
     )

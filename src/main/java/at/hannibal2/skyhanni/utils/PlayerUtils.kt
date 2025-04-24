@@ -1,8 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.client.Minecraft
+import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object PlayerUtils {
+
+    private var lastAction: SimpleTimeMark = SimpleTimeMark.farPast()
 
     // thirdPersonView on 1.8.9
     // 0 == normal
@@ -33,4 +40,11 @@ object PlayerUtils {
         //$$ return MinecraftClient.getInstance().options.perspective.isFrontView
         //#endif
     }
+
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
+        lastAction = SimpleTimeMark.now()
+    }
+
+    val isAFK = lastAction.passedSince() > 5.minutes
 }

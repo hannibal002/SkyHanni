@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.webhooks
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.ApiUtils
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
@@ -19,6 +21,11 @@ data class Webhook(
     @SerializedName("thread_name") val threadName: String? = null
 ) {
     fun sendTo(webhookUrl: String = config.webhookUrl) {
+        if (config.onlyWhenAFK && !PlayerUtils.isAFK) {
+            ChatUtils.debug("Not sending webhook because not AFK")
+            return
+        }
+
         val jsonPayload = Gson().toJson(this)
         println("Sending JSON: $jsonPayload")
 
