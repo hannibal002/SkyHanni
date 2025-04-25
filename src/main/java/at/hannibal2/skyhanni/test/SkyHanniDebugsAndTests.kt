@@ -72,6 +72,7 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.play.server.S40PacketDisconnect
+import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.common.MinecraftForge
 import java.io.File
@@ -586,8 +587,62 @@ object SkyHanniDebugsAndTests {
     }
 
     fun simulateServerDisconnect(reason: String) {
-        val component: IChatComponent = IChatComponent.Serializer.jsonToComponent(reason)
-        S40PacketDisconnect(component).processPacket(Minecraft.getMinecraft().netHandler)
+        val component: IChatComponent
+        when (reason) {
+            "-permaban" -> {
+                component = ChatComponentText("\u00a7cYou are permanently banned from this server!");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Reason: \u00a7rSuspicious account activity/Other");
+                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
+                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
+            }
+            "-30d" -> {
+                component = ChatComponentText("\u00a7cYou are temporarily banned for §r29d 23h 59m 59s §r§cfor from this server!");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Reason: \u00a7rCheating through the use of unfair game advantages.");
+                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
+                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
+            }
+            "-90d" -> {
+                component = ChatComponentText("\u00a7cYou are temporarily banned for §r89d 23h 59m 59s §r§cfor from this server!");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Reason: \u00a7rBoosting detected on one or multiple SkyBlock profiles.");
+                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
+                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
+            }
+            "-360d" -> {
+                component = ChatComponentText("\u00a7cYou are temporarily banned for §r359d 23h 59m 59s §r§cfor from this server!");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Reason: \u00a7rCheating through the use of unfair game advantages.");
+                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
+                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
+            }
+            "-30dR" -> {
+                component = ChatComponentText("\u00a7cYou are temporarily banned for §r29d 23h 59m 59s §r§cfor from this server!");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Reason: \u00a7r${reason.substring(5)}");
+                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
+                component.appendText("\n");
+                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
+                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
+            }
+            else -> {
+                component = ChatComponentText(reason)
+            }
+        }
+        try {
+            Minecraft.getMinecraft().netHandler.networkManager.channelRead(null, S40PacketDisconnect(component))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)

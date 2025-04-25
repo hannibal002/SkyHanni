@@ -365,10 +365,10 @@ object HypixelData {
         val kickReason: String
         if (event.packet is S40PacketDisconnect) {
             val packet = event.packet
-            kickReason = packet.reason.toString()
+            kickReason = packet.reason.formattedText.removeColor()
         } else if (event.packet is S00PacketDisconnect) {
             val packet = event.packet
-            kickReason = packet.func_149603_c().toString()
+            kickReason = packet.func_149603_c().formattedText.removeColor()
         } else {
             return
         }
