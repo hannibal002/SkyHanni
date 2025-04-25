@@ -589,27 +589,22 @@ object SkyHanniDebugsAndTests {
     fun simulateServerDisconnect(args: Array<String>) {
         val mutArgs = args.toMutableList()
 
+        val tag = mutArgs.getOrNull(0)
+        when (tag) {
+            "-permaban", "-30d", "-90d", "-360d" -> mutArgs.removeAt(0)
+        }
+
         val reason = if (mutArgs.isNotEmpty()) mutArgs.joinToString(" ")
         else "Cheating through the use of unfair game advantages"
-        val component = when (mutArgs.getOrNull(0)) {
-            "-permaban" -> {
-                mutArgs.removeAt(0)
-                createBanScreen("permanent", reason)
-            }
-            "-30d" -> {
-                mutArgs.removeAt(0)
-                createBanScreen("30d", reason)
-            }
-            "-90d" -> {
-                mutArgs.removeAt(0)
-                createBanScreen("90d", reason)
-            }
-            "-360d" -> {
-                mutArgs.removeAt(0)
-                createBanScreen("360d", reason)
-            }
+
+        val component = when (tag) {
+            "-permaban" -> createBanScreen("permanent", reason)
+            "-30d" -> createBanScreen("29d 23h 59m 59s", reason)
+            "-90d" -> createBanScreen("89d 23h 59m 59s", reason)
+            "-360d" -> createBanScreen("359d 23h 59m 59s", reason)
             else -> ChatComponentText(reason)
         }
+
         try {
             Minecraft.getMinecraft().netHandler.networkManager.channelRead(null, S40PacketDisconnect(component))
         } catch (e: Exception) {
