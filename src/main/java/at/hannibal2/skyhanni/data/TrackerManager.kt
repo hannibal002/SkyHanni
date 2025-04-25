@@ -5,11 +5,16 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
+import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 @SkyHanniModule
 object TrackerManager {
@@ -17,6 +22,8 @@ object TrackerManager {
     private var hasChanged = false
     var dirty = false
     var commandEditTrackerSuccess = false
+
+    private var rareDrops: List<String> = emptyList()
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
@@ -75,5 +82,30 @@ object TrackerManager {
         if (!commandEditTrackerSuccess) {
             ChatUtils.userError("Could not edit the Item Tracker! Does this item belong to this tracker? Is the tracker active right now?")
         }
+    }
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (event.repeatSeconds(5)) {
+            if (rareDrops.isEmpty()) return
+            val embedDescription = StringBuilder()
+            rareDrops.forEach {
+                embedDescription.append("You dropped: **$it**\n")
+            }
+            rareDrops = emptyList()
+
+            Webhook().addEmbed(
+                DiscordEmbed(
+                    title = "**Tracker Drop!**",
+                    description = embedDescription.toString().removeColor(),
+                    color = 0x33FF33,
+                    timestamp = SimpleTimeMark.now().toString(),
+                )
+            ).sendTo()
+        }
+    }
+
+    fun addRareDrop(item: String) {
+        rareDrops = rareDrops + item
     }
 }
