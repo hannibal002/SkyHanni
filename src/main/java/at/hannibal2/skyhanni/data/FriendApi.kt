@@ -54,9 +54,9 @@ object FriendApi {
     private val incomingFriendRequest by patternGroup.pattern(
         "incoming",
         "§9§m-----------------------------------------------------§r§9\n" +
-                "§r§eFriend request from §r(?<name>.*)§r§9\n" +
-                "§r§a§l\\[ACCEPT]§r§8 - §r§c§l\\[DENY]§r§8 - §r§7§l\\[BLOCK]§r§9\n" +
-                "§r§9§m-----------------------------------------------------",
+            "§r§eFriend request from §r(?<name>.*)§r§9\n" +
+            "§r§a§l\\[ACCEPT]§r§8 - §r§c§l\\[DENY]§r§8 - §r§7§l\\[BLOCK]§r§9\n" +
+            "§r§9§m-----------------------------------------------------",
     )
 
     /**
@@ -68,9 +68,9 @@ object FriendApi {
     private val offlineRequests by patternGroup.pattern(
         "offline",
         "§9§m-----------------------------------------------------\n" +
-                "§r§9§aYou have (?<amount>\\d+) pending friend requests.\n" +
-                "§eUse §b/f requests §eto see them!§r§9§m\n" +
-                "-----------------------------------------------------",
+            "§r§9§aYou have (?<amount>\\d+) pending friend requests.\n" +
+            "§eUse §b/f requests §eto see them!§r§9§m\n" +
+            "-----------------------------------------------------",
     )
 
     /**

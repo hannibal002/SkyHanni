@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -608,7 +609,12 @@ object SkyHanniDebugsAndTests {
         try {
             Minecraft.getMinecraft().netHandler.networkManager.channelRead(null, S40PacketDisconnect(component))
         } catch (e: Exception) {
-            e.printStackTrace()
+            ErrorManager.logErrorStateWithData(
+                "Error while disconnecting from server.",
+                "Error while disconnecting",
+                "tag" to tag,
+                "reason" to reason,
+            )
         }
     }
 
