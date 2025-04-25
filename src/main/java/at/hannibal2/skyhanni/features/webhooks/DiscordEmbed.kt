@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.webhooks
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.annotations.SerializedName
-import net.minecraft.client.Minecraft
 
 private val config get() = SkyHanniMod.feature.webhook
 
