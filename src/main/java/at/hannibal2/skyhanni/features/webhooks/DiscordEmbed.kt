@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.webhooks
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.annotations.SerializedName
-import net.minecraft.client.Minecraft
 
 private val config get() = SkyHanniMod.feature.webhook
 
@@ -15,12 +15,12 @@ data class DiscordEmbed(
     val color: Int? = null,
     val footer: EmbedFooter? = null,
     val image: EmbedImage? = null,
-    val thumbnail: EmbedThumbnail? = EmbedThumbnail(config.embedThumbnail.get().getUrl() ?: ""),
+    val thumbnail: EmbedThumbnail? = EmbedThumbnail(config.embedThumbnail.get().getUrl().orEmpty()),
     val video: EmbedVideo? = null,
     val provider: EmbedProvider? = null,
     val author: EmbedAuthor? = EmbedAuthor(
         name = if (config.usernameInEmbeds) {
-            Minecraft.getMinecraft().thePlayer.name
+            MinecraftCompat.localPlayer.name
         } else {
             ""
         },
