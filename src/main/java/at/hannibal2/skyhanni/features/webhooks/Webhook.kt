@@ -42,7 +42,9 @@ data class Webhook(
         val jsonPayload = Gson().toJson(this)
         println("Sending JSON: $jsonPayload")
 
-        ApiUtils.postJSON(webhookUrl, jsonPayload, "Discord Webhook")
+        Thread {
+            ApiUtils.postJSON(webhookUrl, jsonPayload, "Discord Webhook")
+        }.start()
     }
 
     fun addEmbed(embed: DiscordEmbed): Webhook {
