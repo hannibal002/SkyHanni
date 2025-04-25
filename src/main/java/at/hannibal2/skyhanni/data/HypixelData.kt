@@ -362,31 +362,24 @@ object HypixelData {
 
     @HandleEvent
     fun onServerDisconnect(event: PacketReceivedEvent) {
+        val kickReason: String
         if (event.packet is S40PacketDisconnect) {
             val packet = event.packet
-            val kickReason = packet.reason
-
-            Webhook().addEmbed(
-                DiscordEmbed(
-                    title = "Disconnected!",
-                    description = "Kick reason: **$kickReason**",
-                    color = 0xFF0000,
-                    timestamp = SimpleTimeMark.now().toString(),
-                )
-            ).sendTo()
+            kickReason = packet.reason.toString()
         } else if (event.packet is S00PacketDisconnect) {
             val packet = event.packet
-            val kickReason = packet.func_149603_c()
-
-            Webhook().addEmbed(
-                DiscordEmbed(
-                    title = "Disconnected!",
-                    description = "Kick reason: **$kickReason**",
-                    color = 0xFF0000,
-                    timestamp = SimpleTimeMark.now().toString(),
-                )
-            ).sendTo()
+            kickReason = packet.func_149603_c().toString()
+        } else {
+            return
         }
+        Webhook().addEmbed(
+            DiscordEmbed(
+                title = "Disconnected!",
+                description = "Kick reason: **$kickReason**",
+                color = 0xFF0000,
+                timestamp = SimpleTimeMark.now().toString(),
+            )
+        ).sendTo()
     }
 
     @HandleEvent
