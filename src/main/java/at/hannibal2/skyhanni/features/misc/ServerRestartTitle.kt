@@ -5,8 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
+import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -33,6 +38,34 @@ object ServerRestartTitle {
         "greedy",
         "§cServer closing.*",
     )
+
+    /**
+     * REGEX-TEST: §c[Important] §r§eThis server will restart soon: §r§bGame Update
+     */
+    private val restartingChatPattern by patternGroup.pattern(
+        "chat",
+        "§c\\[Important] §r§eThis server will restart soon: §r(?<reason>.*)",
+    )
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!config.serverRestartNotification) return
+        val message = event.message
+
+        restartingChatPattern.matchMatcher(message) {
+            val reason = group("reason")
+            if (reason.isNotEmpty()) {
+                Webhook().addEmbed(
+                    DiscordEmbed(
+                        title = "Server Restart",
+                        description = "Reason: $reason",
+                        color = 0xFF0000,
+                        timestamp = SimpleTimeMark.now().toString(),
+                    )
+                ).sendTo()
+            }
+        }
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {

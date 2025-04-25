@@ -274,6 +274,14 @@ public class MiscConfig {
     public boolean serverRestartTitle = true;
 
     @Expose
+    @ConfigOption(
+        name = "Server Restart Notification",
+        desc = "Sends a webhook when a server is about to restart."
+    )
+    @ConfigEditorBoolean
+    public boolean serverRestartNotification = false;
+
+    @Expose
     @ConfigOption(name = "Piece Of Wizard Portal", desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.")
     @ConfigEditorBoolean
     @FeatureToggle
