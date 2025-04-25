@@ -22,6 +22,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.multiplayer.WorldClient
+import net.minecraft.client.renderer.culling.Frustum
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -181,7 +182,14 @@ object EntityUtils {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
 
-    fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
+    private val frustum = Frustum()
+
+    fun Entity.canBeSeen(viewDistance: Number = 150.0): Boolean {
+        if (isDead) return false
+        // TODO add cache that only updates e.g. 10 times a second
+        if (!frustum.isBoundingBoxInFrustum(entityBoundingBox)) return false
+        return getLorenzVec().up(0.5).canBeSeen(viewDistance)
+    }
 
     fun getEntityByID(entityId: Int) = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
 
