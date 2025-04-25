@@ -586,63 +586,50 @@ object SkyHanniDebugsAndTests {
         )
     }
 
-    fun simulateServerDisconnect(reason: String) {
-        val component: IChatComponent
-        when (reason) {
+    fun simulateServerDisconnect(args: Array<String>) {
+        val mutArgs = args.toMutableList()
+
+        val reason = if (mutArgs.isNotEmpty()) mutArgs.joinToString(" ")
+        else "Cheating through the use of unfair game advantages"
+        val component = when (mutArgs.getOrNull(0)) {
             "-permaban" -> {
-                component = ChatComponentText("\u00a7cYou are permanently banned from this server!");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Reason: \u00a7rSuspicious account activity/Other");
-                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
-                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
+                mutArgs.removeAt(0)
+                createBanScreen("permanent", reason)
             }
             "-30d" -> {
-                component = ChatComponentText("\u00a7cYou are temporarily banned for §r29d 23h 59m 59s §r§cfor from this server!");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Reason: \u00a7rCheating through the use of unfair game advantages.");
-                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
-                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
+                mutArgs.removeAt(0)
+                createBanScreen("30d", reason)
             }
             "-90d" -> {
-                component = ChatComponentText("\u00a7cYou are temporarily banned for §r89d 23h 59m 59s §r§cfor from this server!");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Reason: \u00a7rBoosting detected on one or multiple SkyBlock profiles.");
-                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
-                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
+                mutArgs.removeAt(0)
+                createBanScreen("90d", reason)
             }
             "-360d" -> {
-                component = ChatComponentText("\u00a7cYou are temporarily banned for §r359d 23h 59m 59s §r§cfor from this server!");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Reason: \u00a7rCheating through the use of unfair game advantages.");
-                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
-                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
+                mutArgs.removeAt(0)
+                createBanScreen("360d", reason)
             }
-            "-30dR" -> {
-                component = ChatComponentText("\u00a7cYou are temporarily banned for §r29d 23h 59m 59s §r§cfor from this server!");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Reason: \u00a7r${reason.substring(5)}");
-                component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal");
-                component.appendText("\n");
-                component.appendText("\n\u00a77Ban ID: \u00a7r#49871982");
-                component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!");
-            }
-            else -> {
-                component = ChatComponentText(reason)
-            }
+            else -> ChatComponentText(reason)
         }
         try {
             Minecraft.getMinecraft().netHandler.networkManager.channelRead(null, S40PacketDisconnect(component))
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun createBanScreen(
+        duration: String = "29d 23h 59m 59s",
+        reason: String,
+    ): IChatComponent {
+        val component = if (duration == "permanent") ChatComponentText("\u00a7cYou are permanently banned from this server!")
+        else ChatComponentText("\u00a7cYou are temporarily banned for §r$duration §r§cfor from this server!")
+        component.appendText("\n")
+        component.appendText("\n\u00a77Reason: \u00a7r$reason")
+        component.appendText("\n\u00a77Find out more: \u00a7b\u00a7nhttps://www.hypixel.net/appeal")
+        component.appendText("\n")
+        component.appendText("\n\u00a77Ban ID: \u00a7r#49871982")
+        component.appendText("\n\u00a77Sharing your Ban ID may affect the processing of your appeal!")
+        return component
     }
 
     @HandleEvent(onlyOnSkyblock = true)
