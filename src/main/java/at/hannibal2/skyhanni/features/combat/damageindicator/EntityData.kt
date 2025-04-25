@@ -17,7 +17,7 @@ class EntityData(
 
     var lastHealth: Long = 0L,
     var healthText: String = "",
-    var timeLastTick: Long = 0,
+    var timeLastTick: SimpleTimeMark = SimpleTimeMark.now(),
     var namePrefix: String = "",
     var nameSuffix: String = "",
     var nameAbove: String = "",
