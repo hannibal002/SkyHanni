@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.webhooks
 import at.hannibal2.skyhanni.features.webhooks.DiscordEmbed
 import at.hannibal2.skyhanni.features.webhooks.Webhook
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
@@ -80,9 +81,7 @@ class WebhookConfig {
         private val displayName: String,
         private val urlProvider: () -> String?,
     ) {
-        SKIN("Skin", {
-            Minecraft.getMinecraft().thePlayer?.name?.let { "https://mineskin.eu/helm/$it" }
-        }),
+        SKIN("Skin", { "https://mineskin.eu/helm/${MinecraftCompat.localPlayer.name}" }),
         SKYHANNI(
             "SkyHanni",
             { "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png?raw=true" }
