@@ -18,11 +18,11 @@ import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.multiplayer.WorldClient
-import net.minecraft.client.renderer.culling.Frustum
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -182,12 +182,10 @@ object EntityUtils {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
 
-    private val frustum = Frustum()
-
     fun Entity.canBeSeen(viewDistance: Number = 150.0): Boolean {
         if (isDead) return false
         // TODO add cache that only updates e.g. 10 times a second
-        if (!frustum.isBoundingBoxInFrustum(entityBoundingBox)) return false
+        if (!FrustumUtils.isVisible(entityBoundingBox)) return false
         return getLorenzVec().up(0.5).canBeSeen(viewDistance)
     }
 
