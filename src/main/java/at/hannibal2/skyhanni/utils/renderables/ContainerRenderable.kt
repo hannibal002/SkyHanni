@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.filterList
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import net.minecraft.client.renderer.GlStateManager
@@ -19,7 +21,7 @@ open class RenderableContainer(
     override fun render(posX: Int, posY: Int) = onRender.invoke(posX, posY, width, height, renderables)
 }
 
-class VerticalContainerRenderable(
+open class VerticalContainerRenderable(
     containerContent: Collection<Renderable>,
     spacing: Int = 0,
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -60,3 +62,24 @@ class HorizontalRenderableContainer(
         GlStateManager.translate(-width.toFloat() - spacing.toFloat(), 0f, 0f)
     }
 )
+
+class SearchableVerticalContainer(
+    private val content: Map<Renderable, String?>,
+    spacing: Int = 0,
+    private val textInput: TextInput,
+    private val key: Int,
+    horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+    verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+) : Renderable, VerticalContainerRenderable(
+    content.map { it.key },
+    spacing,
+    horizontalAlign,
+    verticalAlign,
+) {
+    init {
+        textInput.registerToEvent(key) {
+            // null = ignored, never filtered
+            renderables = filterList(content, textInput.textBox)
+        }
+    }
+}

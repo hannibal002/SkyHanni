@@ -913,25 +913,6 @@ interface Renderable {
             verticalAlign,
         )
 
-        fun verticalSearchableContainer(
-            content: Map<Renderable, String?>,
-            spacing: Int = 0,
-            textInput: TextInput,
-            key: Int,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = VerticalContainerRenderable(
-            filterList(content, textInput.textBox),
-            spacing,
-            horizontalAlign,
-            verticalAlign,
-        ).apply {
-            textInput.registerToEvent(key) {
-                // null = ignored, never filtered
-                renderables = filterList(content, textInput.textBox)
-            }
-        }
-
         fun scrollList(
             list: List<Renderable>,
             height: Int,
@@ -1102,7 +1083,7 @@ interface Renderable {
             GlStateManager.translate(0f, -renderY.toFloat(), 0f)
         }
 
-        private fun filterList(content: Map<Renderable, String?>, textBox: String) =
+        fun filterList(content: Map<Renderable, String?>, textBox: String) =
             filterListBase(content, textBox, RenderableString("§cNo search results!"))
 
         private fun filterListMap(content: Map<List<Renderable>, String?>, textBox: String) =
