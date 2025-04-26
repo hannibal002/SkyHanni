@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice.menuNamePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -46,6 +47,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.HorizontalRenderableContainer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableContainer
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
 import at.hannibal2.skyhanni.utils.renderables.VerticalContainerRenderable
@@ -387,13 +389,16 @@ object HoppityLiveDisplay {
             renderableOverridesOperationList[stat]?.invoke(intendedOperation) ?: baseRenderable
         }.toMutableList().let { renderableList ->
             val isCurrentEvent = HoppityApi.isHoppityEvent() && statYear == currentSbYear
-            val isEmpty = renderableList.isEmpty() || renderableList.all { it is RenderableString && it.text.isEmpty() }
+            val isEmpty = renderableList.isEmpty() || renderableList.all { it.isEmpty() }
 
             if (isEmpty) buildEmptyFallback(isCurrentEvent).map {
                 RenderableString(it.string)
             } else renderableList
         }
     )
+
+    private fun Renderable.isEmpty(): Boolean = this is RenderableString && text.trim().isEmpty() ||
+        this is RenderableContainer && renderables.all { it.isEmpty() }
 
     private fun MutableList<Renderable>.tryAddYearSwitchers(statYear: Int) {
         if (!isInInventory()) return
