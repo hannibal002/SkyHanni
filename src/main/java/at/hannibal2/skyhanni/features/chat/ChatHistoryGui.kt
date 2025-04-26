@@ -51,7 +51,9 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
 
         for (msg in history) {
             GuiRenderUtils.drawString(msg.actionKind.renderedString, 0, 0, -1)
-            msg.actionReason?.let { GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1) }
+            (msg.actionReason ?: msg.modifiedReason)?.let {
+                GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1)
+            }
             var size = drawMultiLineText(msg.message, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             msg.modified?.let {
                 GuiRenderUtils.drawString("§e§lNEW TEXT", 0, 0, -1)

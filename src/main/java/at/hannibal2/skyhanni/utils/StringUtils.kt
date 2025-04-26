@@ -18,7 +18,6 @@ import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
 import java.util.NavigableMap
-import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
 //#if FORGE
@@ -35,7 +34,7 @@ object StringUtils {
     private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
     private val minecraftColorCodesPattern = "(?i)(§[0-9a-fklmnor])+".toPattern()
     private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
-    fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
+    private fun String.removeAllNonLettersAndNumbers(): String = lettersAndNumbersPattern.matcher(this).replaceAll("")
     fun String.cleanString(): String = removeAllNonLettersAndNumbers().trimWhiteSpaceAndResets().lowercase()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
@@ -135,13 +134,7 @@ object StringUtils {
         return map.subMap(prefix, true, lastKey, false)
     }
 
-    fun subMapOfStringsStartingWith(prefix: String, map: NavigableSet<String>): NavigableSet<String> {
-        if ("" == prefix) return map
-        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
-        return map.subSet(prefix, true, lastKey, false)
-    }
-
-    fun nextLexicographicallyStringWithSameLength(input: String): String {
+    private fun nextLexicographicallyStringWithSameLength(input: String): String {
         val lastCharPosition = input.length - 1
         val inputWithoutLastChar = input.substring(0, lastCharPosition)
         val lastChar = input[lastCharPosition]
@@ -195,7 +188,7 @@ object StringUtils {
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
-     * @param list - the list of strings to join into a string, containing 0 or more elements.
+     * @this the list of strings to join into a string, containing 0 or more elements.
      * @param delimiterColor - the color code of the delimiter, inserted before each delimiter (commas and "and").
      * @return a string representing the list joined with the Oxford comma and the word "and".
      */
@@ -254,8 +247,6 @@ object StringUtils {
 
     fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
 
-    fun String.getPlayerNameAndRankFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("rankedName")
-
     private fun matchPlayerChatMessage(string: String): Matcher? {
         var username = ""
         var matcher = UtilsPatterns.playerChatPattern.matcher(string)
@@ -295,19 +286,12 @@ object StringUtils {
 
     fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
 
-    fun replaceIfNeeded(
-        original: IChatComponent,
-        newText: String,
-    ): IChatComponent? {
-        return replaceIfNeeded(original, newText.asComponent())
-    }
-
     private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
     fun enumChatFormattingByCode(char: Char): EnumChatFormatting? {
         return colorMap[char]
     }
 
-    fun doLookTheSame(left: IChatComponent, right: IChatComponent): Boolean {
+    private fun doLookTheSame(left: IChatComponent, right: IChatComponent): Boolean {
         class ChatIterator(var component: IChatComponent) {
             var queue = mutableListOf<IChatComponent>()
             var idx = 0
@@ -373,20 +357,13 @@ object StringUtils {
         return newText
     }
 
-    private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
-        val clickEvent = message.command
-        if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].command == clickEvent) {
-                return
-            }
-            foundCommands.add(message)
-        }
-    }
-
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
-    fun SystemMessageEvent.applyIfPossible(transform: (String) -> String) {
+    fun SystemMessageEvent.applyIfPossible(
+        transformationReason: String? = null,
+        transform: (String) -> String,
+    ) {
         val original = chatComponent.formattedText
         val new = transform(original)
         if (new == original) return
@@ -397,14 +374,17 @@ object StringUtils {
 
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
-        chatComponent = new.asComponent()
-        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value
-        if (hoverEvents.size == 1) chatComponent.hover =
-            //#if MC < 1.21
-            hoverEvents.first().value
-        //#else
-        //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
-        //#endif
+        val newComponent = new.asComponent().apply {
+            if (clickEvents.size == 1) command = clickEvents.first().value
+            if (hoverEvents.size == 1) hover =
+                //#if MC < 1.21
+                hoverEvents.first().value
+            //#else
+            //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
+            //#endif
+        }
+
+        replaceComponent(newComponent, transformationReason.orEmpty())
     }
 
     private fun IChatComponent.findAllEvents(
@@ -460,10 +440,6 @@ object StringUtils {
 
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
         return asComponent { chatStyle = original.sampleStyleAtStart() }
-    }
-
-    fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
-        return asComponent { chatStyle = original.chatStyle }
     }
 
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
