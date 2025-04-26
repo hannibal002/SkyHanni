@@ -134,8 +134,8 @@ object HoppityLiveDisplay {
         lastToggleMark = SimpleTimeMark.now()
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    @HandleEvent(GuiRenderEvent::class)
+    fun onRenderOverlay() {
         if (!liveDisplayEnabled()) return
 
         val stats = getYearStats(HoppityEventSummary.statYear) ?: return
@@ -359,35 +359,38 @@ object HoppityLiveDisplay {
 
         add(buildTitle(statYear))
         tryAddYearSwitchers(statYear)
-
-        val statMappedStatStrings: MappedStatStrings = HoppityEventSummary.getMappedStatStrings(stats, statYear)
-        val statRenderables = statMappedStatStrings.getRenderables(stats, statYear)
-        add(Renderable.verticalContainer(statRenderables))
+        add(stats.getRenderableContainer(statYear))
     }
 
     private fun MutableList<StatString>.getContainer(): Renderable = Renderable.verticalContainer(
         this.map { Renderable.string(it.string) }
     )
 
-    private fun MappedStatStrings.getRenderables(
-        stats: HoppityEventStats,
+    private fun HoppityEventStats.getRenderableContainer(
         statYear: Int,
-    ): MutableList<Renderable> = map { (stat, statStrings) ->
-        val customRenderableFactory = renderableOverridesOperationList[stat]
-        val baseRenderable = statStrings.dropConsecutiveEmpties().takeIfNotEmpty()?.getContainer()
-            ?: return@map Renderable.vertical {
-                buildEmptyFallback(statYear == currentSbYear).map {
-                    Renderable.string(it.string)
-                }
-            }
-        val intendedOperation = RenderableOverrideOperation(
-            statStrings = statStrings,
-            baseRenderable = baseRenderable,
-            stats = stats,
-            year = statYear,
-        )
-        customRenderableFactory?.invoke(intendedOperation) ?: baseRenderable
-    }.toMutableList()
+    ): Renderable = Renderable.verticalContainer(
+        HoppityEventSummary.getMappedStatStrings(
+            this,
+            statYear
+        ).mapNotNull { (stat, statStrings) ->
+            val baseRenderable = statStrings.dropConsecutiveEmpties().takeIfNotEmpty()?.getContainer()
+                ?: return@mapNotNull null
+            val intendedOperation = RenderableOverrideOperation(
+                statStrings = statStrings,
+                baseRenderable = baseRenderable,
+                stats = this,
+                year = statYear,
+            )
+            renderableOverridesOperationList[stat]?.invoke(intendedOperation) ?: baseRenderable
+        }.toMutableList().let { renderableList ->
+            val isCurrentEvent = HoppityApi.isHoppityEvent() && statYear == currentSbYear
+            val isEmpty = renderableList.isEmpty() || renderableList.all { it.toString().isEmpty() }
+
+            if (renderableList.isEmpty()) buildEmptyFallback(isCurrentEvent).map {
+                Renderable.string(it.string)
+            } else renderableList
+        }
+    )
 
     private fun MutableList<Renderable>.tryAddYearSwitchers(statYear: Int) {
         if (!isInInventory()) return

@@ -479,9 +479,9 @@ object HoppityEventSummary {
         } else acc.apply { add(s) }
     }
 
-    fun buildEmptyFallback(isCurrentEvent: Boolean): List<StatString> {
+    fun buildEmptyFallback(isCurrentEvent: Boolean): MutableList<StatString> {
         val timeFmt = if (isCurrentEvent) "§c§l§oRIGHT NOW§c§o" else "in the future"
-        return listOf(
+        return mutableListOf(
             StatString("", false),
             StatString("§c§lNothing to show!"),
             StatString("§c§oFind some eggs $timeFmt!")
