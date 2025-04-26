@@ -2,8 +2,9 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -34,10 +35,9 @@ object ComposterInventoryNumbers {
         "§7§7Compost Available: §a(?<amount>.*)",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
-        if (!GardenAPI.inGarden()) return
-        if (!GardenAPI.config.composters.inventoryNumbers) return
+        if (!GardenApi.config.composters.inventoryNumbers) return
 
         if (event.inventoryName != "Composter") return
 

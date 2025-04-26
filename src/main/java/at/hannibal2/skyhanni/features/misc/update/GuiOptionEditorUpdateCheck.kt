@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
@@ -9,13 +11,12 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.EnumChatFormatting.GREEN
 import net.minecraft.util.EnumChatFormatting.RED
-import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
-    val button = GuiElementButton("", -1) { }
+    val button = GuiElementButton("", -1) {}
 
-    override fun render(x: Int, y: Int, width: Int) {
+    override fun render(context: RenderContext?, x: Int, y: Int, width: Int) {
         val fr = Minecraft.getMinecraft().fontRendererObj
 
         GlStateManager.pushMatrix()
@@ -45,7 +46,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val widthRemaining = adjustedWidth - button.width - 10
 
         GlStateManager.scale(2F, 2F, 1F)
-        val currentVersion = SkyHanniMod.version
+        val currentVersion = SkyHanniMod.VERSION
         val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
         TextRenderUtils.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" +
@@ -55,7 +56,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             10F,
             true,
             widthRemaining / 2,
-            -1
+            -1,
         )
 
         GlStateManager.popMatrix()
@@ -68,7 +69,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
         val adjustedWidth = width - 20
-        if (Mouse.getEventButtonState() &&
+        if (MouseCompat.getEventButtonState() &&
             (mouseX - getButtonPosition(adjustedWidth) - x) in (0..button.width) &&
             (mouseY - 10 - y) in (0..button.height)
         ) {

@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
@@ -19,9 +19,6 @@ import moe.nea.libautoupdate.PotentialUpdate
 import moe.nea.libautoupdate.UpdateContext
 import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
-import net.minecraft.client.Minecraft
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 
@@ -51,10 +48,13 @@ object UpdateManager {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        Minecraft.getMinecraft().thePlayer ?: return
-        MinecraftForge.EVENT_BUS.unregister(this)
+    private var hasCheckedForUpdate = false
+
+    @HandleEvent
+    fun onTick() {
+        if (hasCheckedForUpdate) return
+        hasCheckedForUpdate = true
+
         if (config.autoUpdates || config.fullAutoUpdates)
             checkUpdate()
     }
@@ -63,10 +63,6 @@ object UpdateManager {
         processor.registerConfigEditor(ConfigVersionDisplay::class.java) { option, _ ->
             GuiOptionEditorUpdateCheck(option)
         }
-    }
-
-    fun isCurrentlyBeta(): Boolean {
-        return SkyHanniMod.version.contains("beta", ignoreCase = true)
     }
 
     private val config get() = SkyHanniMod.feature.about
@@ -86,12 +82,12 @@ object UpdateManager {
         }
         logger.log("Starting update check")
         val currentStream = config.updateStream.get()
-        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || isCurrentlyBeta())) {
+        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || SkyHanniMod.isBetaVersion)) {
             config.updateStream = Property.of(UpdateStream.BETA)
             updateStream = UpdateStream.BETA
         }
-        activePromise = context.checkUpdate(updateStream.stream)
-            .thenAcceptAsync({
+        activePromise = context.checkUpdate(updateStream.stream).thenAcceptAsync(
+            {
                 logger.log("Update check completed")
                 if (updateState != UpdateState.NONE) {
                     logger.log("This appears to be the second update check. Ignoring this one")
@@ -107,13 +103,15 @@ object UpdateManager {
                         ChatUtils.chatAndOpenConfig(
                             "§aSkyHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
-                            config::autoUpdates
+                            config::autoUpdates,
                         )
                     }
                 } else if (forceDownload) {
                     ChatUtils.chat("§aSkyHanni didn't find a new update.")
                 }
-            }, DelayedRun.onThread)
+            },
+            DelayedRun.onThread,
+        )
     }
 
     fun queueUpdate() {
@@ -124,34 +122,30 @@ object UpdateManager {
         activePromise = CompletableFuture.supplyAsync {
             logger.log("Update download started")
             potentialUpdate!!.prepareUpdate()
-        }.thenAcceptAsync({
-            logger.log("Update download completed, setting exit hook")
-            updateState = UpdateState.DOWNLOADED
-            potentialUpdate!!.executePreparedUpdate()
-            ChatUtils.chat("Download of update complete. ")
-            ChatUtils.chat("§aThe update will be installed after your next restart.")
-        }, DelayedRun.onThread)
+        }.thenAcceptAsync(
+            {
+                logger.log("Update download completed, setting exit hook")
+                updateState = UpdateState.DOWNLOADED
+                potentialUpdate!!.executePreparedUpdate()
+                ChatUtils.chat("Download of update complete. ")
+                ChatUtils.chat("§aThe update will be installed after your next restart.")
+            },
+            DelayedRun.onThread,
+        )
     }
 
     private val context = UpdateContext(
         CustomGithubReleaseUpdateSource("hannibal002", "SkyHanni"),
         UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager::class.java),
         object : CurrentVersion {
-            val normalDelegate = CurrentVersion.ofTag(SkyHanniMod.version)
-            override fun display(): String {
-                if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
-                    return "Force Outdated"
-                return normalDelegate.display()
-            }
+            private val debug get() = SkyHanniMod.feature.dev.debug.alwaysOutdated
+            override fun display(): String = if (debug) "Force Outdated" else SkyHanniMod.VERSION
 
-            override fun isOlderThan(element: JsonElement): Boolean {
-                if (SkyHanniMod.feature.dev.debug.alwaysOutdated)
-                    return true
-                return normalDelegate.isOlderThan(element)
-            }
-
-            override fun toString(): String {
-                return "ForceOutdateDelegate($normalDelegate)"
+            override fun isOlderThan(element: JsonElement?): Boolean {
+                if (debug) return true
+                val asString = element?.asString ?: return true
+                val otherVersion = ModVersion.fromString(asString)
+                return SkyHanniMod.modVersion < otherVersion
             }
         },
         SkyHanniMod.MODID,
@@ -161,7 +155,7 @@ object UpdateManager {
         context.cleanup()
         UpdateUtils.patchConnection {
             if (it is HttpsURLConnection) {
-                APIUtils.patchHttpsRequest(it)
+                ApiUtils.patchHttpsRequest(it)
             }
         }
     }
@@ -184,18 +178,20 @@ object UpdateManager {
             else -> currentStream
         }
 
-        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !SkyHanniMod.isBetaVersion)
         if (switchingToBeta) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
                 onClick = {
-                    UpdateManager.checkUpdate(true, updateStream)
+                    val newUpdateStream = SkyHanniMod.feature.about.updateStream
+                    newUpdateStream.set(UpdateStream.BETA)
+                    checkUpdate(true, newUpdateStream.get())
                 },
                 "§eClick to confirm!",
                 oneTimeClick = true,
             )
         } else {
-            UpdateManager.checkUpdate(true, updateStream)
+            checkUpdate(true, updateStream)
         }
     }
 }

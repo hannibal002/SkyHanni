@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -15,8 +14,8 @@ object RenderLivingEntityHelper {
 
     private val entityNoHurtTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         entityColorMap.clear()
         entityColorCondition.clear()
 

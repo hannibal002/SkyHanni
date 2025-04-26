@@ -6,24 +6,22 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.milliseconds
@@ -54,25 +52,25 @@ object GuiEditManager {
         if (isInNeuPv) return
         guiScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
-            if (it is GuiEditSign && !it.isRancherSign()) return
+            if (it is GuiEditSign && !it.isGardenSign()) return
         }
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
-        if (NEUItems.neuHasFocus()) return
+        if (NeuItems.neuHasFocus()) return
         lastHotkeyPressed = SimpleTimeMark.now()
 
         openGuiPositionEditor(hotkeyReminder = false)
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick() {
         lastMovedGui?.let {
             GuiPositionMovedEvent(it).post()
             lastMovedGui = null
@@ -81,10 +79,8 @@ object GuiEditManager {
 
     @JvmStatic
     fun add(position: Position, posLabel: String, width: Int, height: Int) {
-        var name = position.internalName
-        if (name == null) {
-            name = if (posLabel == "none") "none " + StringUtils.generateRandomId() else posLabel
-            position.internalName = name
+        val name = position.getOrSetInternalName {
+            if (posLabel == "none") "none ${StringUtils.generateRandomId()}" else posLabel
         }
         currentPositions[name] = position
         currentBorderSize[posLabel] = Pair(width, height)
@@ -110,20 +106,20 @@ object GuiEditManager {
     }
 
     @JvmStatic
-    fun renderLast() {
+    fun renderLast(context: DrawContext) {
         if (!isInGui()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
 
-        GlStateManager.translate(0f, 0f, 200f)
+        context.matrices.translate(0f, 0f, 200f)
 
-        GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
+        RenderData.renderOverlay(context)
 
-        GlStateManager.pushMatrix()
+        context.matrices.pushMatrix()
         GlStateManager.enableDepth()
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
-        GlStateManager.popMatrix()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent(context).post()
+        context.matrices.popMatrix()
 
-        GlStateManager.translate(0f, 0f, -200f)
+        context.matrices.translate(0f, 0f, -200f)
     }
 
     fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor

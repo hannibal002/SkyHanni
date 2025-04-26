@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -49,19 +48,19 @@ object SnakeGame {
             if (key?.isKeyHeld() == false) continue
             event.cancel()
 
-            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, 2, 3)
+            InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, mouseButton = 2, mode = 3)
 
             lastClick = SimpleTimeMark.now()
             break
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inInventory = pattern.matches(event.inventoryName)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }

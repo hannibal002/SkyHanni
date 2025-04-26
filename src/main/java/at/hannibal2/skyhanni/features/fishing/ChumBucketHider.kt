@@ -4,17 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.compat.getWholeInventory
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -24,8 +21,8 @@ object ChumBucketHider {
     private val titleEntity = TimeLimitedSet<Entity>(5.seconds)
     private val hiddenEntities = TimeLimitedSet<Entity>(5.seconds)
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         reset()
     }
 
@@ -65,8 +62,8 @@ object ChumBucketHider {
 
         // Chum Bucket
         if (config.hideBucket.get() &&
-            entity.getWholeInventory().any {
-                it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket")
+            entity.getAllEquipment().any {
+                it != null && (it.displayName == "§fEmpty Chum Bucket" || it.displayName == "§aEmpty Chumcap Bucket")
             }
         ) {
             val entityLocation = entity.getLorenzVec()

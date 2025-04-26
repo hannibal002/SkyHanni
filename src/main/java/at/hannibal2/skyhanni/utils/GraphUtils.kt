@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.DijkstraTree
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
@@ -89,6 +90,10 @@ object GraphUtils {
 
         while (queue.isNotEmpty()) {
             val current = queue.poll()
+            if (!current.enabled) {
+                visited.add(current)
+                continue
+            }
             lastVisitedNode = current
             if (bailout(current)) break
 
@@ -114,8 +119,21 @@ object GraphUtils {
         )
     }
 
-    fun findAllShortestDistances(start: GraphNode): DijkstraTree {
-        return findDijkstraDistances(start) { false }
+    fun findAllShortestDistancesOnCurrentIsland(
+        start: LorenzVec,
+        bailout: (GraphNode) -> Boolean = { false },
+    ): DijkstraTree = findDijkstraDistances(nearestNodeOnCurrentIsland(start), bailout)
+
+    fun nearestNodeOnCurrentIsland(location: LorenzVec): GraphNode {
+        val graph = IslandGraphs.currentIslandGraph ?: error("no island found")
+        return graph.nodes.minBy { it.position.distanceSq(location) }
+    }
+
+    fun findAllShortestDistances(
+        start: GraphNode,
+        bailout: (GraphNode) -> Boolean = { false },
+    ): DijkstraTree {
+        return findDijkstraDistances(start, bailout)
     }
 
     fun findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode): Pair<Graph, Double> {
@@ -126,4 +144,10 @@ object GraphUtils {
     fun findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> = findShortestPathAsGraph(start, end).toPositionsList()
 
     fun findShortestDistance(start: GraphNode, end: GraphNode): Double = findShortestPathAsGraphWithDistance(start, end).second
+
+    fun calculatePathLength(path: List<LorenzVec>): Double {
+        if (path.size < 2) return 0.0
+        val mappedNodes = path.map { nearestNodeOnCurrentIsland(it) }
+        return mappedNodes.zipWithNext { a, b -> findShortestDistance(a, b) }.sum()
+    }
 }

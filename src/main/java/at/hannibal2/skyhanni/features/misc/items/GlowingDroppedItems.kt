@@ -1,19 +1,19 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -41,7 +41,7 @@ object GlowingDroppedItems {
         IslandType.CRIMSON_ISLE
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
         if (isEnabled() && event.type === RenderEntityOutlineEvent.Type.XRAY) {
             event.queueEntitiesToOutline { getEntityOutlineColor(it) }
@@ -55,12 +55,12 @@ object GlowingDroppedItems {
         if (shouldHideShowcaseItem(entity)) return null
 
         val entityItem = item.entityItem
-        if (!config.highlightFishingBait && entityItem.name.endsWith(" Bait")) {
+        if (!config.highlightFishingBait && entityItem.displayName.endsWith(" Bait")) {
             return null
         }
 
         val internalName = entityItem.getInternalNameOrNull() ?: return null
-        val isSprayItem = LorenzUtils.enumValueOfOrNull<SprayType>(internalName.asString()) != null
+        val isSprayItem = EnumUtils.enumValueOfOrNull<SprayType>(internalName.asString()) != null
         if (isSprayItem) return null
         val rarity = entityItem.getItemRarityOrNull()
         return rarity?.color?.toColor()?.rgb

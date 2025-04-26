@@ -8,21 +8,19 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.inventory.ContainerChest
 
 @SkyHanniModule
 object ItemTipHelper {
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
-        val stack = event.stack ?: return
-        if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
+        val stack = event.stack?.takeIf { it.stackSize == 1 } ?: return
 
         val itemTipEvent = RenderItemTipEvent(stack, mutableListOf())
         itemTipEvent.post()
@@ -38,15 +36,13 @@ object ItemTipHelper {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniDebugsAndTests.globalRender) return
 
         val gui = Minecraft.getMinecraft().currentScreen
         if (gui !is GuiChest) return
-        val chest = gui.inventorySlots as ContainerChest
-        val inventoryName = chest.getInventoryName()
+        val inventoryName = InventoryUtils.openInventoryName()
 
         val guiLeft = (gui as AccessorGuiContainer).guiLeft
         val guiTop = (gui as AccessorGuiContainer).guiTop
@@ -71,7 +67,7 @@ object ItemTipHelper {
             } else 0
             val y = guiTop + yDisplayPosition + 9 + itemTipEvent.offsetY
 
-            fontRenderer.drawStringWithShadow(stackTip, x.toFloat(), y.toFloat(), 16777215)
+            GuiRenderUtils.drawString(stackTip, x, y, 16777215)
         }
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()

@@ -8,10 +8,8 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object TrackerManager {
@@ -22,20 +20,25 @@ object TrackerManager {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val config = SkyHanniMod.feature.misc.tracker.hideCheapItems
-        ConditionalUtils.onToggle(config.alwaysShowBest, config.minPrice, config.enabled) {
-            hasChanged = true
+        with(SkyHanniMod.feature.misc.tracker) {
+            ConditionalUtils.onToggle(
+                textOrder,
+                showTable,
+                itemsShown,
+            ) {
+                hasChanged = true
+            }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderOverlayFirst(event: GuiRenderEvent) {
         if (hasChanged) {
             dirty = true
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlayLast(event: GuiRenderEvent) {
         if (hasChanged) {
             dirty = false
@@ -56,7 +59,7 @@ object TrackerManager {
         }
 
         val rawName = args.dropLast(1).joinToString(" ")
-        val internalName = NEUInternalName.fromItemNameOrInternalName(rawName)
+        val internalName = NeuInternalName.fromItemNameOrInternalName(rawName)
         if (!internalName.isKnownItem()) {
             ChatUtils.chat("No item found for '$rawName'!")
             return
@@ -64,6 +67,11 @@ object TrackerManager {
 
         commandEditTrackerSuccess = false
         ItemAddEvent(internalName, amount, ItemAddManager.Source.COMMAND).post()
+    }
+
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onItemAdd(event: ItemAddEvent) {
+        if (event.source != ItemAddManager.Source.COMMAND || event.isCancelled) return
         if (!commandEditTrackerSuccess) {
             ChatUtils.userError("Could not edit the Item Tracker! Does this item belong to this tracker? Is the tracker active right now?")
         }

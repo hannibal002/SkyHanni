@@ -6,37 +6,38 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -44,7 +45,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -61,7 +61,7 @@ object GhostTracker {
         }
 
     private val isMaxBestiary get() = currentBestiaryKills >= MAX_BESTIARY_KILLS
-    private var allowedDrops = setOf<NEUInternalName>()
+    private var allowedDrops = setOf<NeuInternalName>()
 
     // TODO: in the future get from neu bestiary data
     private const val MAX_BESTIARY_KILLS = 100_000
@@ -96,6 +96,7 @@ object GhostTracker {
         @Expose
         var maxKillCombo = 0L
 
+        // TODO rename to combatXPGained
         @Expose
         var combatXpGained = 0L
 
@@ -107,7 +108,7 @@ object GhostTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / kills
-            val perKill = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val perKill = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
@@ -138,10 +139,11 @@ object GhostTracker {
 
     /**
      * REGEX-TEST: §cYour Kill Combo has expired! You reached a 32 Kill Combo!
+     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 1,187 Kill Combo!
      */
     private val killComboEndPattern by patternGroup.pattern(
         "killcombo.end",
-        "§cYour Kill Combo has expired! You reached a (?<kill>\\d+) Kill Combo!",
+        "§cYour Kill Combo has expired! You reached a (?<kill>[\\d,.]+) Kill Combo!",
     )
     private val bagOfCashPattern by patternGroup.pattern(
         "bagofcash",
@@ -178,20 +180,20 @@ object GhostTracker {
 
     @HandleEvent
     fun onSkillExp(event: SkillExpGainEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         if (event.gained > 10_000) return
         tracker.modify {
             it.combatXpGained += event.gained.toLong()
         }
     }
 
-    @SubscribeEvent
-    fun onSecond(event: SecondPassedEvent) {
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoWidgetWarningTime = SimpleTimeMark.now()
             ChatUtils.clickableChat(
-                "§cYou do not have the Bestiary Tab Widget enabled! Ghost Tracker will not work properly without it.",
+                "§cYou do not have the Bestiary Tab Widget enabled! Ghost Tracker needs this information to work properly.",
                 onClick = HypixelCommands::widget,
                 "§eClick to run /widget!",
                 replaceSameMessage = true,
@@ -200,7 +202,7 @@ object GhostTracker {
         if (TabWidget.BESTIARY.isActive && !foundGhostBestiary && lastNoGhostBestiaryWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoGhostBestiaryWidgetWarningTime = SimpleTimeMark.now()
             ChatUtils.clickableChat(
-                "§cGhost bestiary not found in Bestiary Tab Widget! Ghost Tracker will not work properly without it.",
+                "§cGhost Bestiary not found in Bestiary Tab Widget! Ghost Tracker needs this information to work properly.",
                 onClick = HypixelCommands::widget,
                 "§eClick to run /widget!",
                 replaceSameMessage = true,
@@ -209,18 +211,25 @@ object GhostTracker {
     }
 
     @HandleEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
+
+        tracker.addItem(event.internalName, event.amount, command = true)
+    }
+
+    @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
-        if (!isEnabled()) return
+        if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         if (event.coins !in 200.0..2_000.0) return
         tracker.addCoins(event.coins.toInt(), false)
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        if (!inArea) return
         itemDropPattern.matchMatcher(event.message) {
-            val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
+            val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val mf = group("mf").formatInt()
             if (!isAllowedItem(internalName)) return
 
@@ -279,18 +288,15 @@ object GhostTracker {
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BESTIARY)) return
-        if (isMaxBestiary || !isEnabled()) return
+        if (isMaxBestiary || !inArea) return
         parseBestiaryWidget(event.lines)
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer({ config.position }) { isEnabled() }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<GhostDropsJson>("GhostDrops").ghostDrops
     }
@@ -308,18 +314,17 @@ object GhostTracker {
         }
     }
 
-    private fun isAllowedItem(internalName: NEUInternalName): Boolean = internalName in allowedDrops
+    private fun isAllowedItem(internalName: NeuInternalName): Boolean = internalName in allowedDrops
 
     private fun getAverageMagicFind(mf: Long, kills: Long) =
         if (mf == 0L || kills == 0L) 0.0 else mf / (kills).toDouble()
-
 
     private fun isEnabled() = inArea && config.enabled
 
     enum class GhostTrackerLines(private val display: String, val line: Data.() -> String) {
         KILLS(
             "§7Kills: §e7,813",
-            { "§7Kills: §e${kills.addSeparators()}" }
+            { "§7Kills: §e${kills.addSeparators()}" },
         ),
         GHOSTS_SINCE_SORROW(
             "§7Ghosts Since Sorrow: §e71",

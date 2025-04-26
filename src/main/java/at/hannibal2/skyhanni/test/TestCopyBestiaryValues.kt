@@ -5,22 +5,19 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object TestCopyBestiaryValues {
@@ -51,7 +48,7 @@ object TestCopyBestiaryValues {
         "\\[Lv(?<lvl>.*)] (?<text>.*)"
     )
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!SkyHanniMod.feature.dev.debug.copyBestiaryData) return
         SkyHanniDebugsAndTests.displayLine = ""
@@ -71,7 +68,7 @@ object TestCopyBestiaryValues {
     }
 
     private fun copy(titleItem: ItemStack, inventoryItems: Map<Int, ItemStack>) {
-        val titleName = titleItem.name.removeWordsAtEnd(1)
+        val titleName = titleItem.displayName.removeWordsAtEnd(1)
 
         val obj = BestiaryObject()
         obj.name = titleName
@@ -91,7 +88,7 @@ object TestCopyBestiaryValues {
         val mobs = mutableListOf<String>()
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
-            bestiaryTypePattern.matchMatcher(stack.name.removeColor()) {
+            bestiaryTypePattern.matchMatcher(stack.displayName.removeColor()) {
                 val lvl = group("lvl").toInt()
                 var text = group("text").lowercase().replace(" ", "_")
 

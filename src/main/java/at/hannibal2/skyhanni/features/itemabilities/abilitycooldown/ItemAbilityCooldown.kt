@@ -5,37 +5,37 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
-import at.hannibal2.skyhanni.utils.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.recentlyHeld
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ItemAbilityCooldown {
@@ -52,10 +52,17 @@ object ItemAbilityCooldown {
         "§aYou buffed yourself for §r§c\\+\\d+❁ Strength",
     )
 
+    /**
+     * REGEX-TEST: §63,848/3,473❤     §b-24 Mana (§6Instant Transmission§b)     §b2,507/2,507✎ Mana
+     */
+    private val abilityUsePattern by patternGroup.pattern(
+        "abilityuse",
+        ".*§b-\\d+ Mana \\(§6(?<type>.*)§b\\).*",
+    )
+
     private var lastAbility = ""
     private var items = mapOf<String, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
-    private val recentItemsInHand = InventoryUtils.recentItemsInHand.values
     private val WEIRD_TUBA = "WEIRD_TUBA".toInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".toInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".toInternalName()
@@ -127,8 +134,7 @@ object ItemAbilityCooldown {
             }
             // Jinxed Voodoo Doll Miss
             event.soundName == "mob.ghast.scream" && event.volume == 1.0f && event.pitch >= 1.6 && event.pitch <= 1.7 -> {
-                val recentItems = InventoryUtils.recentItemsInHand.values
-                if (VOODOO_DOLL_WILTED in recentItems) {
+                if (VOODOO_DOLL_WILTED.recentlyHeld()) {
                     ItemAbility.VOODOO_DOLL_WILTED.sound()
                 }
             }
@@ -138,11 +144,10 @@ object ItemAbilityCooldown {
             }
             // Weird Tuba & Weirder Tuba
             event.soundName == "mob.wolf.howl" && event.volume == 0.5f -> {
-                val recentItems = InventoryUtils.recentItemsInHand.values
-                if (WEIRD_TUBA in recentItems) {
+                if (WEIRD_TUBA.recentlyHeld()) {
                     ItemAbility.WEIRD_TUBA.sound()
                 }
-                if (WEIRDER_TUBA in recentItems) {
+                if (WEIRDER_TUBA.recentlyHeld()) {
                     ItemAbility.WEIRDER_TUBA.sound()
                 }
             }
@@ -196,7 +201,7 @@ object ItemAbilityCooldown {
             }
             // Totem of Corruption
             event.soundName == "random.wood_click" && event.pitch == 0.84126985f && event.volume == 0.5f -> {
-                if (TOTEM_OF_CORRUPTION in recentItemsInHand) {
+                if (TOTEM_OF_CORRUPTION.recentlyHeld()) {
                     ItemAbility.TOTEM_OF_CORRUPTION.sound()
                 }
             }
@@ -207,10 +212,10 @@ object ItemAbilityCooldown {
 
             // Blaze Slayer Flares
             event.soundName == "fireworks.launch" && event.pitch == 1.0f && event.volume == 3.0f -> {
-                if (WARNING_FLARE in recentItemsInHand || ALERT_FLARE in recentItemsInHand) {
+                if (WARNING_FLARE.recentlyHeld() || ALERT_FLARE.recentlyHeld()) {
                     ItemAbility.ALERT_FLARE.sound()
                 }
-                if (SOS_FLARE in recentItemsInHand) {
+                if (SOS_FLARE.recentlyHeld()) {
                     ItemAbility.SOS_FLARE.sound()
                 }
             }
@@ -230,10 +235,10 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
-    fun onIslandChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         for (ability in ItemAbility.entries) {
-            ability.lastActivation = 0L
+            ability.lastActivation = SimpleTimeMark.farPast()
             ability.specialColor = null
         }
     }
@@ -265,9 +270,8 @@ object ItemAbilityCooldown {
     }
 
     private fun handleOldAbilities(message: String) {
-        // TODO use regex
-        if (message.contains(" (§6") && message.contains("§b) ")) {
-            val name: String = message.between(" (§6", "§b) ")
+        abilityUsePattern.matchMatcher(message) {
+            val name = group("type")
             if (name == lastAbility) return
             lastAbility = name
             for (ability in ItemAbility.entries) {
@@ -289,8 +293,8 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
         checkHotBar(event.isMod(10))
@@ -313,8 +317,8 @@ object ItemAbilityCooldown {
         val specialColor = ability.specialColor
         val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
-            val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+            val duration = ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
+            val color = specialColor ?: if (duration < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -378,14 +382,14 @@ object ItemAbilityCooldown {
                 opacity = 80
                 if (!config.itemAbilityShowWhenReady) return
             }
-            event highlight color.addOpacity(opacity)
+            event.highlight(color.addOpacity(opacity))
         }
     }
 
     private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -442,8 +446,8 @@ object ItemAbilityCooldown {
     }
 
     private fun ItemAbility.sound() {
-        val ping = System.currentTimeMillis() - lastItemClick
-        if (ping < 400) {
+        val ping = lastItemClick.passedSince()
+        if (ping < 400.milliseconds) {
             activate()
         }
     }

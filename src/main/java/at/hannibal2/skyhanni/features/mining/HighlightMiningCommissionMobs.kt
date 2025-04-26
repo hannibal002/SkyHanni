@@ -20,7 +20,6 @@ import net.minecraft.entity.monster.EntityEndermite
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntitySlime
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HighlightMiningCommissionMobs {
@@ -41,22 +40,18 @@ object HighlightMiningCommissionMobs {
         TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name == "Treasuer Hunter" }), // typo is intentional
 
         // Crystal Hollows
-        AUTOMATON("Automaton Slayer", {
-            it is EntityIronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000))
-        }),
+        AUTOMATON("Automaton Slayer", { it is EntityIronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000)) }),
         TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name == "Team Treasurite" }),
         YOG("Yog Slayer", { it is EntityMagmaCube && it.hasMaxHealth(35_000) }),
         THYST("Thyst Slayer", { it is EntityEndermite && it.hasMaxHealth(5_000) }),
         CORLEONE("Corleone Slayer", { it.hasMaxHealth(1_000_000) && it.name == "Team Treasurite" }),
-        SLUDGE("Sludge Slayer", {
-            it is EntitySlime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000))
-        }),
+        SLUDGE("Sludge Slayer", { it is EntitySlime && (it.hasMaxHealth(5_000) || it.hasMaxHealth(10_000) || it.hasMaxHealth(25_000)) }),
         CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
 
         // new commissions
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!event.repeatSeconds(2)) return
