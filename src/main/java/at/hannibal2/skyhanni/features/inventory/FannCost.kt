@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.insertLineAfter
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.insertLineAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 import kotlin.time.DurationUnit
 
@@ -119,8 +119,8 @@ object FannCost {
         "Type: (?<type>.*)",
     )
 
-    @SubscribeEvent
-    fun onFannAnvilTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onFannAnvilTooltip(event: ToolTipEvent) {
         if (!trainingSlotInventoryPattern.matches(InventoryUtils.openInventoryName())) return
         if (!anvilPattern.matches(event.itemStack.displayName)) return
         val tooltip = event.toolTip
@@ -135,8 +135,8 @@ object FannCost {
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
 
-                tooltip.insertLineAfter(coinsPattern, "§6 ➜ Coins/XP: ${coinPerExp.roundTo(2)}")
-                tooltip.insertLineAfter(bitsPattern, "§b ➜ XP/Bit: ${xpPerBit.roundTo(2)}")
+                tooltip.insertLineAfter(coinsPattern, "§6 = Coins/XP: ${coinPerExp.roundTo(2)}")
+                tooltip.insertLineAfter(bitsPattern, "§b = XP/Bit: ${xpPerBit.roundTo(2)}")
             }
 
             TrainingMode.UNTIL_LEVEL -> {
@@ -145,14 +145,14 @@ object FannCost {
                 val totalExp = dailyExp * duration
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
-                tooltip.insertLineAfter(coinsPattern, "§6 ➜ Coins/XP: ${coinPerExp.roundTo(2)}")
-                tooltip.insertLineAfter(bitsPattern, "§b ➜ XP/Bit: ${xpPerBit.roundTo(2)}")
 
+                tooltip.insertLineAfter(coinsPattern, "§6 = Coins/XP: ${coinPerExp.roundTo(2)}")
+                tooltip.insertLineAfter(bitsPattern, "§b = XP/Bit: ${xpPerBit.roundTo(2)}")
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!trainingSlotInventoryPattern.matches(event.inventoryName.removeColor())) return
         val slot24 = event.inventoryItems[24] ?: return
@@ -163,7 +163,6 @@ object FannCost {
         } else {
             trainingMode = TrainingMode.UNTIL_LEVEL
         }
-
     }
 
 
