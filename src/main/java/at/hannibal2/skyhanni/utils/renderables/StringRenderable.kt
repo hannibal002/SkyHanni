@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
 
 open class RenderableString(
@@ -56,18 +57,17 @@ class WrappedRenderableString(
     override val height by lazy { map.size * ((9 * scale).toInt() + 1) }
 
     override fun render(posX: Int, posY: Int) {
-        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
-        GlStateManager.translate(1.0, 1.0, 0.0)
-        GlStateManager.scale(scale, scale, 1.0)
+        DrawContextUtils.translate(1.0, 1.0, 0.0)
+        DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1.0f)
         map.entries.forEachIndexed { index, (text, size) ->
-            fontRenderer.drawStringWithShadow(
+            GuiRenderUtils.drawString(
                 text,
                 RenderableUtils.calculateAlignmentXOffset(size, rawWidth, internalAlign).toFloat(),
                 index * 10.0f,
                 color.rgb,
             )
         }
-        GlStateManager.scale(inverseScale, inverseScale, 1.0)
-        GlStateManager.translate(-1.0, -1.0, 0.0)
+        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1.0f)
+        DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
 }
