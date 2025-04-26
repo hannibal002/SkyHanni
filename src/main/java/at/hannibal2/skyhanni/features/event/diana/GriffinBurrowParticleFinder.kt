@@ -65,7 +65,8 @@ object GriffinBurrowParticleFinder {
 
         val type = ParticleType.entries.firstOrNull { it.check(event) } ?: return
 
-        val location = event.location.toBlockPos().down().toLorenzVec()
+        // TODO remove the workaround once we know what is going on exactly and can fix this properly
+        val location = workaround(event.location)
         val burrow = burrows.getOrPut(location) { Burrow(location) }
         val oldBurrowType = burrow.type
 
@@ -87,6 +88,8 @@ object GriffinBurrowParticleFinder {
         }
     }
 
+    private fun workaround(location: LorenzVec) = location.toBlockPos().down().toLorenzVec()
+
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
@@ -102,6 +105,7 @@ object GriffinBurrowParticleFinder {
         }
     }
 
+    // TODO remove the roundTo calls as they are only workarounds
     private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(
             { type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
