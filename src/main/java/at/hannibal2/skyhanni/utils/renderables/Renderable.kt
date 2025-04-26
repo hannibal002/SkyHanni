@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGui
@@ -279,8 +280,8 @@ interface Renderable {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
-                            GlStateManager.pushMatrix()
-                            GlStateManager.translate(0F, 0F, 400F)
+                            DrawContextUtils.pushMatrix()
+                            DrawContextUtils.translate(0F, 0F, 400F)
 
                             RenderableTooltips.setTooltipForRender(
                                 tips = tipsRender,
@@ -289,7 +290,7 @@ interface Renderable {
                                 snapsToTopIfToLong = snapsToTopIfToLong,
                                 spacedTitle = spacedTitle,
                             )
-                            GlStateManager.popMatrix()
+                            DrawContextUtils.popMatrix()
                         }
                     } else {
                         HighlightOnHoverSlot.currentSlots.remove(pair)
@@ -565,10 +566,10 @@ interface Renderable {
                         xShift - emptySpaceX,
                         yShift - emptySpaceY,
                     )
-                    GlStateManager.translate(xShift.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(xShift.toFloat(), 0f, 0f)
                     renderX += xShift
                 }
-                GlStateManager.translate(-renderX.toFloat(), yShift.toFloat(), 0f)
+                DrawContextUtils.translate(-renderX.toFloat(), yShift.toFloat(), 0f)
                 return renderY + yShift
             }
 
@@ -580,7 +581,7 @@ interface Renderable {
                 for (row in list) {
                     renderY = renderRow(posX, posY, row, renderY)
                 }
-                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+                DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 
@@ -609,15 +610,15 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 for ((rowIndex, row) in content.withIndex()) {
                     for ((index, renderable) in row.withIndex()) {
-                        GlStateManager.pushMatrix()
-                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+                        DrawContextUtils.pushMatrix()
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
                         renderable.renderXYAligned(
                             posX + xOffsets[index],
                             posY + yOffsets[rowIndex],
                             xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
                         )
-                        GlStateManager.popMatrix()
+                        DrawContextUtils.popMatrix()
                     }
                 }
             }
@@ -703,7 +704,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 if (shouldRenderTopElseBottom && !(hideIfNoText && isTextBoxEmpty)) {
                     RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
-                    GlStateManager.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
                 }
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
@@ -720,14 +721,14 @@ interface Renderable {
                     content.render(posX, posY)
                 } else if (!shouldRenderTopElseBottom) {
                     content.render(posX, posY)
-                    GlStateManager.translate(0f, (ySpacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, (ySpacing).toFloat(), 0f)
                     if (!(hideIfNoText && textInput.textBox.isEmpty())) {
                         RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     }
-                    GlStateManager.translate(0f, -(ySpacing).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, -(ySpacing).toFloat(), 0f)
                 } else {
                     content.render(posX, posY + textBoxHeight + ySpacing)
-                    GlStateManager.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
+                    DrawContextUtils.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
                 }
             }
 
@@ -856,9 +857,9 @@ interface Renderable {
                     val x = it.width + spacing
                     it.renderXYAligned(xOffset, posY, x, height)
                     xOffset += x
-                    GlStateManager.translate(x.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(x.toFloat(), 0f, 0f)
                 }
-                GlStateManager.translate(-(xOffset - posX).toFloat(), 0f, 0f)
+                DrawContextUtils.translate(-(xOffset - posX).toFloat(), 0f, 0f)
             }
         }
 
@@ -1045,7 +1046,7 @@ interface Renderable {
             // there are more items above
             if (showScrollableTipsInList && !scroll.atMinimum()) {
                 scrollUpTip.renderXAligned(posX, posY, width)
-                GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                DrawContextUtils.translate(0f, scrollUpTip.height.toFloat(), 0f)
                 renderY += scrollUpTip.height
                 negativeSpace1 -= scrollUpTip.height
             }
@@ -1060,13 +1061,13 @@ interface Renderable {
             for (renderable in list) {
                 if ((virtualY..virtualY + renderable.height) in window) {
                     renderable.renderXAligned(posX, posY + renderY, width)
-                    GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
                     renderY += renderable.height
                     found = true
                 } else if (found) {
                     if (renderY + renderable.height <= height + negativeSpace2) {
                         renderable.renderXAligned(posX, posY + renderY, width)
-                        GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
+                        DrawContextUtils.translate(0f, renderable.height.toFloat(), 0f)
                         renderY += renderable.height
                     }
                     break
@@ -1080,7 +1081,7 @@ interface Renderable {
                 scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
             }
 
-            GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+            DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
         }
 
         fun filterList(content: Map<Renderable, String?>, textBox: String) =
@@ -1207,12 +1208,12 @@ interface Renderable {
                             xOffsets[index],
                             yOffsets[header] ?: 0,
                         )
-                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         offset += xOffsets[index]
                     }
-                    GlStateManager.translate(-offset.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(-offset.toFloat(), 0f, 0f)
                     val yShift = yOffsets[header] ?: 0
-                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
 
@@ -1248,7 +1249,7 @@ interface Renderable {
                     scrollUpTip.render(posX, posY)
                     val yShift = scrollUpTip.height
                     renderY += yShift
-                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                 }
 
                 for (rowIndex in range) {
@@ -1262,11 +1263,11 @@ interface Renderable {
                             xOffsets[index],
                             yShift,
                         )
-                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         offset += xOffsets[index]
                     }
-                    GlStateManager.translate(-offset.toFloat(), 0f, 0f)
-                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(-offset.toFloat(), 0f, 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
 
@@ -1274,7 +1275,7 @@ interface Renderable {
                     scrollDownTip.render(posX, posY)
                 }
 
-                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+                DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 
@@ -1320,17 +1321,17 @@ interface Renderable {
                 var renderY = 0
                 if (hasHeader) {
                     for ((index, renderable) in content[0].withIndex()) {
-                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
                             posX + xOffsets[index],
                             posY,
                             xOffsets[index + 1] - xOffsets[index],
                             yOffsets[1],
                         )
-                        GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
                     val yShift = yOffsets[1] - yOffsets[0]
-                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
                 val range =
@@ -1347,20 +1348,20 @@ interface Renderable {
 
                 for (rowIndex in range2) {
                     for ((index, renderable) in content[rowIndex].withIndex()) {
-                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
                             posX + xOffsets[index],
                             posY + renderY,
                             xOffsets[index + 1] - xOffsets[index],
                             yOffsets[rowIndex + 1] - yOffsets[rowIndex],
                         )
-                        GlStateManager.translate(-xOffsets[index].toFloat(), 0f, 0f)
+                        DrawContextUtils.translate(-xOffsets[index].toFloat(), 0f, 0f)
                     }
                     val yShift = yOffsets[rowIndex + 1] - yOffsets[rowIndex]
-                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    DrawContextUtils.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+                DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 
@@ -1380,9 +1381,9 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1403,9 +1404,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
 
                 RenderUtils.drawRoundRectOutline(
                     0,
@@ -1441,9 +1442,9 @@ interface Renderable {
                 RenderUtils.drawRoundTexturedRect(0, 0, width, height, GL11.GL_NEAREST, radius)
                 GlStateManager.color(1f, 1f, 1f, 1f)
 
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1473,9 +1474,9 @@ interface Renderable {
                 GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
                 GlStateManager.color(1f, 1f, 1f, 1f)
 
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1511,9 +1512,9 @@ interface Renderable {
                     blur,
                 )
 
-                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
-                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+                DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
@@ -1543,7 +1544,7 @@ interface Renderable {
                 val mouse = currentRenderPassMousePosition ?: return
                 val mouseXRelativeToPlayer = if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
                 val mouseYRelativeToPlayer = if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
-                GlStateManager.translate(0f, 0f, 100f)
+                DrawContextUtils.translate(0f, 0f, 100f)
                 drawEntityOnScreen(
                     playerX,
                     playerY,
@@ -1552,7 +1553,7 @@ interface Renderable {
                     mouseYRelativeToPlayer,
                     player,
                 )
-                GlStateManager.translate(0f, 0f, -100f)
+                DrawContextUtils.translate(0f, 0f, -100f)
             }
         }
     }
