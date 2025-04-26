@@ -44,8 +44,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.renderables.HorizontalRenderableContainer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
+import at.hannibal2.skyhanni.utils.renderables.VerticalContainerRenderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -241,7 +244,7 @@ object HoppityLiveDisplay {
         return percentText to percentageColor
     }
 
-    private fun buildTitle(statYear: Int) = Renderable.verticalContainer(
+    private fun buildTitle(statYear: Int) = VerticalContainerRenderable(
         buildList {
             addString(
                 when (statYear) {
@@ -362,13 +365,13 @@ object HoppityLiveDisplay {
         add(stats.getRenderableContainer(statYear))
     }
 
-    private fun MutableList<StatString>.getContainer(): Renderable = Renderable.verticalContainer(
-        this.map { Renderable.string(it.string) }
+    private fun MutableList<StatString>.getContainer(): Renderable = VerticalContainerRenderable(
+        this.map { RenderableString(it.string) }
     )
 
     private fun HoppityEventStats.getRenderableContainer(
         statYear: Int,
-    ): Renderable = Renderable.verticalContainer(
+    ): Renderable = VerticalContainerRenderable(
         HoppityEventSummary.getMappedStatStrings(
             this,
             statYear
@@ -384,10 +387,10 @@ object HoppityLiveDisplay {
             renderableOverridesOperationList[stat]?.invoke(intendedOperation) ?: baseRenderable
         }.toMutableList().let { renderableList ->
             val isCurrentEvent = HoppityApi.isHoppityEvent() && statYear == currentSbYear
-            val isEmpty = renderableList.isEmpty() || renderableList.all { it.toString().isEmpty() }
+            val isEmpty = renderableList.isEmpty() || renderableList.all { it is RenderableString && it.text.isEmpty() }
 
-            if (renderableList.isEmpty()) buildEmptyFallback(isCurrentEvent).map {
-                Renderable.string(it.string)
+            if (isEmpty) buildEmptyFallback(isCurrentEvent).map {
+                RenderableString(it.string)
             } else renderableList
         }
     )
@@ -395,7 +398,7 @@ object HoppityLiveDisplay {
     private fun MutableList<Renderable>.tryAddYearSwitchers(statYear: Int) {
         if (!isInInventory()) return
         val renderable = buildYearSwitcherRenderables(statYear) ?: return
-        val container = Renderable.horizontalContainer(
+        val container = HorizontalRenderableContainer(
             renderable,
             spacing = 5,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
