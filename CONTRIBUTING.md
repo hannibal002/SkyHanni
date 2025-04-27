@@ -179,8 +179,10 @@ Make sure such pull requests have a good explanation in the **What** section.
         - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
         - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
-    - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
+- Config files should be made in **Kotlin**.
+    - There may be legacy config files left as Java files, however they will all be ported eventually.
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to register Forge/Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature classs it with `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
@@ -188,9 +190,6 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
-- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
-- Config files should be made in **Kotlin**.
-    - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - To expand the event systems you can create a new event that is called from a Mixin
     - Or you can subscribe to a Forge event and then post a SkyHanni event from that. See the `api/minecraftevents` package for examples.
@@ -213,11 +212,11 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
 - Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
+- Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
     - All repo patterns must be accompanied by a regex test. Look at other patterns for examples, more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
-- Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
   the main thread.
 - When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
