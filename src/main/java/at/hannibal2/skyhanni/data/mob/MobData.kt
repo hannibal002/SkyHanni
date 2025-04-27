@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -20,7 +20,7 @@ object MobData {
     }
 
     val players = MobSet()
-    val displayNPCs = MobSet()
+    val displayNpcs = MobSet()
     val skyblockMobs = MobSet()
     val summoningMobs = MobSet()
     val special = MobSet()
@@ -134,13 +134,13 @@ object MobData {
     }
 
     @HandleEvent
-    fun onDisplayNPCSpawnEvent(event: MobEvent.Spawn.DisplayNPC) {
-        displayNPCs.add(event.mob)
+    fun onDisplayNpcSpawnEvent(event: MobEvent.Spawn.DisplayNpc) {
+        displayNpcs.add(event.mob)
     }
 
     @HandleEvent
-    fun onDisplayNPCDeSpawnEvent(event: MobEvent.DeSpawn.DisplayNPC) {
-        displayNPCs.remove(event.mob)
+    fun onDisplayNpcDeSpawnEvent(event: MobEvent.DeSpawn.DisplayNpc) {
+        displayNpcs.remove(event.mob)
     }
 
     @HandleEvent

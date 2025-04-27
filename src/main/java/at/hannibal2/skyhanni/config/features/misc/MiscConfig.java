@@ -2,10 +2,11 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature;
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
+import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
@@ -13,10 +14,12 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +43,7 @@ public class MiscConfig {
     public MinionsConfig minions = new MinionsConfig();
 
     @Expose
-    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
+    @Category(name = "Stranded", desc = "Features designed for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
     @Expose
@@ -129,6 +132,26 @@ public class MiscConfig {
     @Accordion
     public EnchantedClockConfig enchantedClock = new EnchantedClockConfig();
 
+    @ConfigOption(name = "Century Party Invitation", desc = "Features for the Century Party Invitation")
+    @Accordion
+    @Expose
+    public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
+
+    @ConfigOption(name = "Fruit Bowl", desc = "Features for Fruit Bowl")
+    @Accordion
+    @Expose
+    public FruitBowlConfig fruitBowl = new FruitBowlConfig();
+
+    @Expose
+    @ConfigOption(name = "Cake Counter Features", desc = "")
+    @Accordion
+    public CakeCounterConfig cakeCounter = new CakeCounterConfig();
+  
+    @Expose
+    @ConfigOption(name = "Frog Mask Features", desc = "")
+    @Accordion
+    public FrogMaskFeaturesConfig frogMaskFeatures = new FrogMaskFeaturesConfig();
+
     @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
@@ -137,7 +160,13 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
-    public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
+    public Property<List<OutsideSBFeature>> showOutsideSB = Property.of(new ArrayList<>());
+
+    @Expose
+    @ConfigOption(name = "Auto Join Skyblock", desc = "Automatically join Skyblock when you join Hypixel.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean autoJoinSkyblock = false;
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hide all the experience orbs lying on the ground.")
@@ -168,6 +197,22 @@ public class MiscConfig {
     @ConfigOption(name = "Crash On Death", desc = "Crashes your game every time you die in Skyblock")
     @ConfigEditorBoolean
     public boolean crashOnDeath = false;
+
+    @Expose
+    @ConfigOption(name = "SkyBlock XP Bar", desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\n" +
+        "Except in Catacombs & Rift.\nBest used with the option below.")
+    @SearchTag("skyblockxp skyblocklevel level lvl")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    // TODO rename to skyblockXPBar
+    public boolean skyblockXpBar = false;
+
+    @Expose
+    @ConfigOption(name = "XP in Inventory", desc = "Show your current XP in inventory lore that would use your XP.\n" +
+        "E.g. when hovering over the anvil combine button.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean xpInInventory = true;
 
     // TODO move into scoreboard accordion
     @Expose
@@ -313,10 +358,10 @@ public class MiscConfig {
     public Property<Boolean> replaceRomanNumerals = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
+    @ConfigOption(name = "Charge Bottle Notification", desc = "Send a message when your charge bottle (thunder in a bottle, storm in a bottle, hurricane in a bottle) is fully charged.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean thunderBottleNotification = true;
+    public boolean chargeBottleNotification = true;
 
     @Expose
     @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
@@ -330,19 +375,26 @@ public class MiscConfig {
     public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
 
     @Expose
-    @ConfigOption(
-        name = "Open Last Storage",
-        desc = "Allows running §e/shlastopened §7as a command to open the last storage you opened. " +
-            "Also allows §e/ec - §7and §e/bp - §7to open the last Ender Chest and Backpack you opened.")
-    @FeatureToggle
-    @ConfigEditorBoolean
-    public boolean openLastStorage = true;
+    @ConfigOption(name = "Last Storage", desc = "")
+    @Accordion
+    public LastStorageConfig lastStorage = new LastStorageConfig();
 
     @Expose
     @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "NEU Soul Path Find", desc = "When showing §e/neusouls on§7, show a pathfind to the faily souls missing and a percentage of souls done in chat.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean neuSoulsPathFind = true;
+
+    @Expose
+    @ConfigOption(name = "Fast Fairy Souls", desc = "Uses a fast pathfinder route to get to all Fairy Souls on the current island. §eDoes not require NEU. ")
+    @ConfigEditorBoolean
+    public boolean fastFairySouls = false;
 
     @Expose
     @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")
@@ -354,6 +406,7 @@ public class MiscConfig {
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to userLuck
     public boolean userluckEnabled = true;
 
     @Expose
@@ -364,4 +417,17 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnAboutPcTimeOffset = true;
+
+    @Expose
+    @ConfigOption(name = "Transparent Tooltips", desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!")
+    @ConfigEditorBoolean
+    public boolean transparentTooltips = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Abiphone Hotkey",
+        desc = "Answer incoming abiphone calls with a hotkey."
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int abiphoneAcceptKey = Keyboard.KEY_NONE;
 }

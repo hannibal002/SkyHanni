@@ -5,16 +5,14 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -25,9 +23,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -47,7 +46,7 @@ object KingTalismanHelper {
      */
     private val kingPattern by patternGroup.pattern(
         "king",
-        "§6§lKing (?<name>.*)"
+        "§6§lKing (?<name>.*)",
     )
 
     /**
@@ -55,7 +54,7 @@ object KingTalismanHelper {
      */
     private val talismanPattern by patternGroup.pattern(
         "talisman",
-        "§7You have received a §r§fKing Talisman§r§7!"
+        "§7You have received a §r§fKing Talisman§r§7!",
     )
 
     private var currentOffset: Int? = null
@@ -203,8 +202,8 @@ object KingTalismanHelper {
 
     private fun getKingTimes(): MutableMap<String, Long> {
         val currentOffset = getCurrentOffset() ?: 0
-        val oneSbDay = 1000 * 60 * 20
-        val oneCircleTime = oneSbDay * kingCircles.size
+        val oneSBDay = 1000 * 60 * 20
+        val oneCircleTime = oneSBDay * kingCircles.size
         val kingTime = mutableMapOf<String, Long>()
         for ((index, king) in kingCircles.withIndex()) {
 //             val startTime = SkyBlockTime(day = index + 2 - kingCircles.size)
@@ -222,17 +221,17 @@ object KingTalismanHelper {
 
     private fun getCurrentKing() = getKingTimes().sortedDesc().firstNotNullOf { it.key }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.position.renderStrings(display, posLabel = "King Talisman Helper")
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (!MiningAPI.inDwarvenMines) return
+        if (!MiningApi.inDwarvenMines) return
 
         if (talismanPattern.matches(event.message)) {
             storage?.kingsTalkedTo = kingCircles.toMutableList()

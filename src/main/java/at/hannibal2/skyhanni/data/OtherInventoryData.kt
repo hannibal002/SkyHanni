@@ -5,14 +5,13 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object OtherInventoryData {
@@ -21,18 +20,18 @@ object OtherInventoryData {
     private var acceptItems = false
     private var lateEvent: InventoryUpdatedEvent? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
         close()
     }
 
-    fun close(reopenSameName: Boolean = false) {
-        InventoryCloseEvent(reopenSameName).post()
+    fun close(title: String = InventoryUtils.openInventoryName(), reopenSameName: Boolean = false) {
+        InventoryCloseEvent(title, reopenSameName).post()
         currentInventory = null
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick() {
         lateEvent?.let {
             it.post()
             lateEvent = null

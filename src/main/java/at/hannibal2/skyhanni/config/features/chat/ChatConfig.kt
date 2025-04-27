@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
@@ -29,10 +31,19 @@ class ChatConfig {
     var playerMessage: PlayerMessagesConfig = PlayerMessagesConfig()
 
     @Expose
+    @ConfigOption(name = "Sound Responses", desc = "")
+    @Accordion
+    var soundResponse: ChatSoundResponseConfig = ChatSoundResponseConfig()
+
+    @Expose
+    @ConfigOption(name = "Rare Drop Messages", desc = "")
+    @Accordion
+    var rareDropMessages: RareDropMessagesConfig = RareDropMessagesConfig()
+
+    @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
-    var dungeonFilteredMessageTypes: List<DungeonMessageTypes> = ArrayList()
-
+    var dungeonFilteredMessageTypes: MutableList<DungeonMessageTypes> = mutableListOf()
 
     enum class DungeonMessageTypes(private val displayName: String) {
         PREPARE("§bPreparation"),
@@ -52,6 +63,17 @@ class ChatConfig {
     }
 
     @Expose
+    @ConfigOption(
+        name = "Copy Chat",
+        desc = "Right click a chat message to copy it. Holding Shift will copy the message with " +
+            "Shwords applied, and holding Ctrl will copy only one line.\n" +
+            "§cNote: Will not work correctly with the Chatting mod.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var copyChat: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -60,11 +82,24 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Hide Far Deaths",
-        desc = "Hide other players' death messages when they're not nearby (except during Dungeons/Kuudra fights)"
+        desc = "Hide other players' death messages when they're not nearby (except during Dungeons/Kuudra fights)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var hideFarDeathMessages: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Current Chat Display",
+        desc = "Displays a GUI element that indicates what chat you are in (e.g. Party, Guild, Coop, All).",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var currentChatDisplay: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = ChatConfig::class, field = "currentChatDisplay")
+    var currentChatDisplayPos: Position = Position(3, -21)
 
     // TODO jawbus + thunder
     @Expose
@@ -75,7 +110,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Compact Bestiary Messages",
-        desc = "Compact the Bestiary level up message, only showing additional information when hovering."
+        desc = "Compact the Bestiary level up message, only showing additional information when hovering.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -85,7 +120,7 @@ class ChatConfig {
     @ConfigOption(
         name = "Compact Enchanting Rewards",
         desc = "Compact the rewards gained from Add-ons and Experiments in Experimentation Table,\n" +
-            "only showing additional information when hovering."
+            "only showing additional information when hovering.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -93,8 +128,17 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
+        name = "Compact Jacob Claim",
+        desc = "Compact the Jacob Claim message, only showing full information when hovering."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var compactJacobClaim: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Arachne Hider",
-        desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7."
+        desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -104,11 +148,19 @@ class ChatConfig {
     @ConfigOption(
         name = "Sack Change Hider",
         desc = "Hide the sack change message while allowing mods to continue accessing sack data.\n" +
-            "§eUse this instead of the toggle in Hypixel Settings."
+            "§eUse this instead of the toggle in Hypixel Settings.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var hideSacksChange: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Only Hide on Garden",
+        desc = "Only hide the sack change message in the Garden.",
+    )
+    @ConfigEditorBoolean
+    var onlyHideSacksChangeOnGarden: Boolean = false
 
     @Category(name = "Translator", desc = "Chat translator settings.")
     @Expose
@@ -123,7 +175,7 @@ class ChatConfig {
     @Expose
     @ConfigOption(
         name = "Anita's Accessories",
-        desc = "Hide Anita's Accessories' fortune bonus messages outside the Garden."
+        desc = "Hide Anita's Accessories' fortune bonus messages outside the Garden.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -137,11 +189,11 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
-        name = "Pet Drop Rarity",
-        desc = "Show the rarity of the Pet Drop in the message.\n" +
-            "§6§lPET DROP! §5§lEPIC §5Slug §6(§6+1300☘)"
+        name = "Shorten Coin Amounts",
+        desc = "Replace coin amounts in chat messages with their shortened version.\n" +
+            "e.g. §65,100,000 Coins §7-> §65.1M Coins",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var petRarityDropMessage: Boolean = true
+    var shortenCoinAmounts: Boolean = false
 }

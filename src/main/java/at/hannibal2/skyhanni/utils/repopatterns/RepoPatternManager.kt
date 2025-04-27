@@ -1,13 +1,11 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,14 +15,16 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.launchwrapper.Launch
-import net.minecraftforge.fml.common.FMLCommonHandler
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
 import java.util.TreeMap
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
+//#if FORGE
+import net.minecraft.launchwrapper.Launch
+import net.minecraftforge.fml.common.FMLCommonHandler
+//#endif
 
 /**
  * Manages [RepoPattern]s.
@@ -45,7 +45,7 @@ object RepoPatternManager {
     private val remotePattern: NavigableMap<String, String>
         get() = TreeMap(
             if (localLoading) mapOf()
-            else regexes?.regexes.orEmpty()
+            else regexes?.regexes.orEmpty(),
         )
 
     /**
@@ -61,7 +61,12 @@ object RepoPatternManager {
 
     private var wasPreInitialized = false
 
-    private val insideTest = Launch.blackboard == null
+    private val insideTest =
+        //#if FORGE
+        Launch.blackboard == null
+    //#else
+    //$$ false
+    //#endif
 
     var inTestDuplicateUsage = true
 
@@ -80,12 +85,10 @@ object RepoPatternManager {
     private val logger = LogManager.getLogger("SkyHanni")
 
     /**
-     * Crash if in a development environment, or if inside a guarded event handler.
+     * Crash if in a development environment.
      */
-    fun crash(reason: String) {
-        if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) {
-            throw RuntimeException(reason)
-        }
+    private fun crash(reason: String) {
+        if (PlatformUtils.isDevEnvironment) throw RuntimeException(reason)
     }
 
     /**
@@ -102,7 +105,7 @@ object RepoPatternManager {
                         crash(
                             "Non unique access to regex at \"$key\". " +
                                 "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
-                                "tried to use at ${owner.ownerClass} / ${owner.property}"
+                                "tried to use at ${owner.ownerClass} / ${owner.property}",
                         )
                 } else {
                     exclusivity[key] = owner

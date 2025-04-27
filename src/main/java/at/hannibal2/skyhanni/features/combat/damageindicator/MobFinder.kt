@@ -1,22 +1,24 @@
 package at.hannibal2.skyhanni.features.combat.damageindicator
 
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
+import at.hannibal2.skyhanni.data.ElectionApi.ignoreDerpy
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasBossHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.hasNameTagWith
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
-import at.hannibal2.skyhanni.utils.LorenzUtils.ignoreDerpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -41,49 +43,52 @@ import net.minecraft.entity.passive.EntityBat
 import net.minecraft.entity.passive.EntityHorse
 import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class MobFinder {
 
     // F1
     private var floor1bonzo1 = false
-    private var floor1bonzo1SpawnTime = 0L
+    private var floor1bonzo1SpawnTime = SimpleTimeMark.farPast()
     private var floor1bonzo2 = false
-    private var floor1bonzo2SpawnTime = 0L
+    private var floor1bonzo2SpawnTime = SimpleTimeMark.farPast()
 
     // F2
     private var floor2summons1 = false
-    private var floor2summons1SpawnTime = 0L
+    private var floor2summons1SpawnTime = SimpleTimeMark.farPast()
     private val floor2summonsDiedOnce = mutableListOf<EntityOtherPlayerMP>()
     private var floor2secondPhase = false
-    private var floor2secondPhaseSpawnTime = 0L
+    private var floor2secondPhaseSpawnTime = SimpleTimeMark.farPast()
 
     // F3
     private var floor3GuardianShield = false
-    private var floor3GuardianShieldSpawnTime = 0L
+    private var floor3GuardianShieldSpawnTime = SimpleTimeMark.farPast()
     private val guardians = mutableListOf<EntityGuardian>()
     private var floor3Professor = false
-    private var floor3ProfessorSpawnTime = 0L
+    private var floor3ProfessorSpawnTime = SimpleTimeMark.farPast()
     private var floor3ProfessorGuardianPrepare = false
-    private var floor3ProfessorGuardianPrepareSpawnTime = 0L
+    private var floor3ProfessorGuardianPrepareSpawnTime = SimpleTimeMark.farPast()
     private var floor3ProfessorGuardian = false
     private var floor3ProfessorGuardianEntity: EntityGuardian? = null
 
     // F5
     private var floor5lividEntity: EntityOtherPlayerMP? = null
-    private var floor5lividEntitySpawnTime = 0L
+    private var floor5lividEntitySpawnTime = SimpleTimeMark.farPast()
     private val correctLividPattern = "§c\\[BOSS] (.*) Livid§r§f: Impossible! How did you figure out which one I was\\?!".toPattern()
 
     // F6
     private var floor6Giants = false
-    private var floor6GiantsSpawnTime = 0L
-    private val floor6GiantsSeparateDelay = mutableMapOf<UUID, Pair<Long, BossType>>()
+    private var floor6GiantsSpawnTime = SimpleTimeMark.farPast()
+    private val floor6GiantsSeparateDelay = mutableMapOf<UUID, Pair<Duration, BossType>>()
     private var floor6Sadan = false
-    private var floor6SadanSpawnTime = 0L
+    private var floor6SadanSpawnTime = SimpleTimeMark.farPast()
 
     internal fun tryAdd(entity: EntityLivingBase) = when {
-        DungeonAPI.inDungeon() -> tryAddDungeon(entity)
-        RiftAPI.inRift() -> tryAddRift(entity)
-        GardenAPI.inGarden() -> tryAddGarden(entity)
+        DungeonApi.inDungeon() -> tryAddDungeon(entity)
+        RiftApi.inRift() -> tryAddRift(entity)
+        GardenApi.inGarden() -> tryAddGarden(entity)
         else -> {
             if (entity is EntityLiving && entity.hasNameTagWith(2, "Dummy §a10M§c❤")) {
                 EntityResult(bossType = BossType.DUMMY)
@@ -124,19 +129,19 @@ class MobFinder {
     }
 
     private fun tryAddGardenPest(entity: EntityLivingBase): EntityResult? {
-        if (!GardenAPI.inGarden()) return null
+        if (!GardenApi.inGarden()) return null
 
-        return PestType.entries.firstOrNull { entity.hasNameTagWith(3, it.displayName) }
+        return PestType.filterableEntries.firstOrNull { entity.hasNameTagWith(3, it.displayName) }
             ?.let { EntityResult(bossType = it.damageIndicatorBoss) }
     }
 
     private fun tryAddDungeon(entity: EntityLivingBase) = when {
-        DungeonAPI.isOneOf("F1", "M1") -> tryAddDungeonF1(entity)
-        DungeonAPI.isOneOf("F2", "M2") -> tryAddDungeonF2(entity)
-        DungeonAPI.isOneOf("F3", "M3") -> tryAddDungeonF3(entity)
-        DungeonAPI.isOneOf("F4", "M4") -> tryAddDungeonF4(entity)
-        DungeonAPI.isOneOf("F5", "M5") -> tryAddDungeonF5(entity)
-        DungeonAPI.isOneOf("F6", "M6") -> tryAddDungeonF6(entity)
+        DungeonApi.isOneOf("F1", "M1") -> tryAddDungeonF1(entity)
+        DungeonApi.isOneOf("F2", "M2") -> tryAddDungeonF2(entity)
+        DungeonApi.isOneOf("F3", "M3") -> tryAddDungeonF3(entity)
+        DungeonApi.isOneOf("F4", "M4") -> tryAddDungeonF4(entity)
+        DungeonApi.isOneOf("F5", "M5") -> tryAddDungeonF5(entity)
+        DungeonApi.isOneOf("F6", "M6") -> tryAddDungeonF6(entity)
         else -> null
     }
 
@@ -193,7 +198,7 @@ class MobFinder {
         if (floor3Professor && entity is EntityOtherPlayerMP && entity.name == "The Professor") {
             return EntityResult(
                 floor3ProfessorSpawnTime,
-                floor3ProfessorSpawnTime + 1_000 > System.currentTimeMillis(),
+                floor3ProfessorSpawnTime.passedSince() > 1.seconds,
                 bossType = BossType.DUNGEON_F3_PROFESSOR_1,
             )
         }
@@ -223,7 +228,7 @@ class MobFinder {
     }
 
     private fun tryAddDungeonF5(entity: EntityLivingBase): EntityResult? {
-        if (entity is EntityOtherPlayerMP && entity == DungeonLividFinder.livid?.baseEntity) {
+        if (entity is EntityOtherPlayerMP && entity == DungeonLividFinder.livid) {
             return EntityResult(
                 bossType = BossType.DUNGEON_F5,
                 ignoreBlocks = true,
@@ -238,14 +243,14 @@ class MobFinder {
         if (floor6Giants && entity.posY > 68) {
             val (extraDelay, bossType) = checkExtraF6GiantsDelay(entity)
             return EntityResult(
-                floor6GiantsSpawnTime + extraDelay,
-                floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis(),
+                floor6GiantsSpawnTime + extraDelay + 5.seconds,
+                floor6GiantsSpawnTime.passedSince() > extraDelay,
                 bossType = bossType,
             )
         }
 
         if (floor6Sadan) {
-            return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true, bossType = BossType.DUNGEON_F6_SADAN)
+            return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true, bossType = BossType.DUNGEON_F6_SADAN, ignoreBlocks = true)
         }
         return null
     }
@@ -270,6 +275,10 @@ class MobFinder {
         }
         if (entity is EntitySlime && entity.baseMaxHealth == 1_000) {
             return EntityResult(bossType = BossType.BACTE)
+        }
+        if (entity is EntityOtherPlayerMP && entity.baseMaxHealth == 250 && entity.name == "Sun Gecko") {
+            return EntityResult(bossType = BossType.SUN_GECKO)
+
         }
         return null
     }
@@ -324,6 +333,7 @@ class MobFinder {
         entity.name == "Minos Inquisitor" -> EntityResult(bossType = BossType.MINOS_INQUISITOR)
         entity.name == "Minos Champion" -> EntityResult(bossType = BossType.MINOS_CHAMPION)
         entity.name == "Minotaur " -> EntityResult(bossType = BossType.MINOTAUR)
+        entity.name == "Ragnarok" -> EntityResult(bossType = BossType.RAGNAROK)
 
         else -> null
     }
@@ -466,18 +476,18 @@ class MobFinder {
         EntityResult(bossType = BossType.THUNDER)
     } else null
 
-    private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Pair<Long, BossType> {
+    private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Pair<Duration, BossType> {
         val uuid = entity.uniqueID
 
-        if (floor6GiantsSeparateDelay.contains(uuid)) {
-            return floor6GiantsSeparateDelay[uuid]!!
+        floor6GiantsSeparateDelay[uuid]?.let {
+            return it
         }
 
         val middle = LorenzVec(-8, 0, 56)
 
         val loc = entity.getLorenzVec()
 
-        var pos = 0
+        val pos: Int
 
         val type: BossType
         if (loc.x > middle.x && loc.z > middle.z) {
@@ -501,20 +511,20 @@ class MobFinder {
             type = BossType.DUNGEON_F6_GIANT_1
         }
 
-        val extraDelay = 900L * pos
-        val pair = Pair(extraDelay, type)
+        val extraDelay = 900.milliseconds * pos
+        val pair = extraDelay to type
         floor6GiantsSeparateDelay[uuid] = pair
 
         return pair
     }
 
     fun handleChat(message: String) {
-        if (!DungeonAPI.inDungeon()) return
+        if (!DungeonApi.inDungeon()) return
         when (message) {
             // F1
             "§c[BOSS] Bonzo§r§f: Gratz for making it this far, but I'm basically unbeatable." -> {
                 floor1bonzo1 = true
-                floor1bonzo1SpawnTime = System.currentTimeMillis() + 11_250
+                floor1bonzo1SpawnTime = 11.25.seconds.fromNow()
             }
 
             "§c[BOSS] Bonzo§r§f: Oh noes, you got me.. what ever will I do?!" -> {
@@ -523,7 +533,7 @@ class MobFinder {
 
             "§c[BOSS] Bonzo§r§f: Oh I'm dead!" -> {
                 floor1bonzo2 = true
-                floor1bonzo2SpawnTime = System.currentTimeMillis() + 4_200
+                floor1bonzo2SpawnTime = 4.2.seconds.fromNow()
             }
 
             "§c[BOSS] Bonzo§r§f: Alright, maybe I'm just weak after all.." -> {
@@ -533,7 +543,7 @@ class MobFinder {
             // F2
             "§c[BOSS] Scarf§r§f: ARISE, MY CREATIONS!" -> {
                 floor2summons1 = true
-                floor2summons1SpawnTime = System.currentTimeMillis() + 3_500
+                floor2summons1SpawnTime = 3.5.seconds.fromNow()
             }
 
             "§c[BOSS] Scarf§r§f: Those toys are not strong enough I see." -> {
@@ -542,7 +552,7 @@ class MobFinder {
 
             "§c[BOSS] Scarf§r§f: Don't get too excited though." -> {
                 floor2secondPhase = true
-                floor2secondPhaseSpawnTime = System.currentTimeMillis() + 6_300
+                floor2secondPhaseSpawnTime = 6.3.seconds.fromNow()
             }
 
             "§c[BOSS] Scarf§r§f: Whatever..." -> {
@@ -552,21 +562,21 @@ class MobFinder {
             // F3
             "§c[BOSS] The Professor§r§f: I was burdened with terrible news recently..." -> {
                 floor3GuardianShield = true
-                floor3GuardianShieldSpawnTime = System.currentTimeMillis() + 15_400
+                floor3GuardianShieldSpawnTime = 15.4.seconds.fromNow()
             }
 
             "§c[BOSS] The Professor§r§f: Oh? You found my Guardians' one weakness?" -> {
                 floor3GuardianShield = false
                 DamageIndicatorManager.removeDamageIndicator(BossType.DUNGEON_F3_GUARDIAN)
                 floor3Professor = true
-                floor3ProfessorSpawnTime = System.currentTimeMillis() + 10_300
+                floor3ProfessorSpawnTime = 10.3.seconds.fromNow()
             }
 
             "§c[BOSS] The Professor§r§f: I see. You have forced me to use my ultimate technique." -> {
                 floor3Professor = false
 
                 floor3ProfessorGuardianPrepare = true
-                floor3ProfessorGuardianPrepareSpawnTime = System.currentTimeMillis() + 10_500
+                floor3ProfessorGuardianPrepareSpawnTime = 10.5.seconds.fromNow()
             }
 
             "§c[BOSS] The Professor§r§f: The process is irreversible, but I'll be stronger than a Wither now!" -> {
@@ -579,20 +589,20 @@ class MobFinder {
 
             // F5
             "§c[BOSS] Livid§r§f: This Orb you see, is Thorn, or what is left of him." -> {
-                floor5lividEntity = DungeonLividFinder.livid?.baseEntity as? EntityOtherPlayerMP?
-                floor5lividEntitySpawnTime = System.currentTimeMillis() + 13_000
+                floor5lividEntity = DungeonLividFinder.livid
+                floor5lividEntitySpawnTime = 13.seconds.fromNow()
             }
 
             // F6
             "§c[BOSS] Sadan§r§f: ENOUGH!" -> {
                 floor6Giants = true
-                floor6GiantsSpawnTime = System.currentTimeMillis() + 7_400
+                floor6GiantsSpawnTime = 2.8.seconds.fromNow()
             }
 
             "§c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect." -> {
                 floor6Giants = false
                 floor6Sadan = true
-                floor6SadanSpawnTime = System.currentTimeMillis() + 32_500
+                floor6SadanSpawnTime = 11.5.seconds.fromNow()
             }
 
             "§c[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!" -> {
@@ -606,7 +616,7 @@ class MobFinder {
     }
 
     fun handleNewEntity(entity: Entity) {
-        if (DungeonAPI.inDungeon() && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
+        if (DungeonApi.inDungeon() && floor3ProfessorGuardian && entity is EntityGuardian && floor3ProfessorGuardianEntity == null) {
             floor3ProfessorGuardianEntity = entity
             floor3ProfessorGuardianPrepare = false
         }

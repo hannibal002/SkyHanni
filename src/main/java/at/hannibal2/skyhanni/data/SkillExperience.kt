@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -31,9 +29,8 @@ object SkillExperience {
         skillExp.clear()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         actionBarPattern.matchMatcher(event.actionBar) {
             val skill = group("skill").lowercase()
@@ -51,7 +48,7 @@ object SkillExperience {
         if (event.inventoryName != "Your Skills") return
 
         for ((_, stack) in event.inventoryItems) {
-            val name = stack.name.removeColor()
+            val name = stack.displayName.removeColor()
             if (!name.contains(" ")) continue
 
             val lore = stack.getLore()
@@ -84,8 +81,8 @@ object SkillExperience {
 
     private fun getLevelForExpExactly(experience: Long): Int {
         var level = 1
-        for (levelXp in levelingExp) {
-            if (levelXp.toLong() == experience) {
+        for (levelXP in levelingExp) {
+            if (levelXP.toLong() == experience) {
                 return level
             }
             level++
@@ -99,8 +96,8 @@ object SkillExperience {
     fun getExpForLevel(requestedLevel: Int): Long {
         var total = 0L
         var level = 0
-        for (levelXp in levelingExp) {
-            total += levelXp
+        for (levelXP in levelingExp) {
+            total += levelXP
             level++
             if (level == requestedLevel) {
                 return total

@@ -1,23 +1,24 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
-import at.hannibal2.skyhanni.utils.compat.getNameAsString
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
-import at.hannibal2.skyhanni.utils.compat.getWholeInventory
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -29,10 +30,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.fml.common.eventhandler.Event
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object EntityUtils {
@@ -48,8 +45,8 @@ object EntityUtils {
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
-        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers().orEmpty()) {
-            if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
+        for (entity in MinecraftCompat.localWorldOrNull?.getLoadedPlayers().orEmpty()) {
+            if (!entity.isNpc() && entity is EntityOtherPlayerMP) {
                 list.add(entity)
             }
         }
@@ -61,7 +58,7 @@ object EntityUtils {
         contains: String,
         radius: Double = 3.0,
     ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
-        it.getNameAsString().contains(contains)
+        it.name.contains(contains)
     }
 
     @Deprecated("Use Mob Detection Instead")
@@ -83,26 +80,30 @@ object EntityUtils {
     ): List<EntityArmorStand> {
         val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
-            val result = it.getNameAsString().contains(contains)
+            val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
-                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
+                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
             if (debugRightEntity && result) {
-                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
+                ChatUtils.consoleLog("mob: " + center.printWithAccuracy(2))
+                ChatUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
+                ChatUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
             }
             result
         }
     }
 
     private fun getArmorStandsInRadius(center: LorenzVec, radius: Double): List<EntityArmorStand> {
-        val a = center.add(-radius, -radius - 3, -radius).toBlockPos()
-        val b = center.add(radius, radius + 3, radius).toBlockPos()
-        val alignedBB = AxisAlignedBB(a, b)
+        val a = center.add(-radius, -radius - 3, -radius)
+        val b = center.add(radius, radius + 3, radius)
+        val alignedBB = a.axisAlignedTo(b)
         val clazz = EntityArmorStand::class.java
-        val worldObj = Minecraft.getMinecraft().theWorld ?: return emptyList()
-        return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
+        val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
+        //#if MC < 1.21
+        return world.getEntitiesWithinAABB(clazz, alignedBB)
+        //#else
+        //$$ return world.getEntitiesByClass(clazz, alignedBB, net.minecraft.predicate.entity.EntityPredicates.EXCEPT_SPECTATOR)
+        //#endif
     }
 
     @Deprecated("Old. Instead use entity detection feature instead.")
@@ -110,10 +111,10 @@ object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
-        val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
+        val derpyMultiplier = if (ElectionApi.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
-        if (!boss && !DungeonAPI.inDungeon()) {
+        if (!boss && !DungeonApi.inDungeon()) {
             // Corrupted
             if (maxHealth == health * 3 * derpyMultiplier) return true
             // Runic
@@ -147,14 +148,14 @@ object EntityUtils {
 
     @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
-        val inventory = this.getWholeInventory() ?: return false
+        val inventory = this.getAllEquipment() ?: return false
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
     fun EntityArmorStand.wearingSkullTexture(skin: String) = getStandHelmet()?.getSkullTexture() == skin
     fun EntityArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
 
-    fun EntityPlayer.isNPC() = !isRealPlayer()
+    fun EntityPlayer.isNpc() = !isRealPlayer()
 
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
@@ -170,78 +171,29 @@ object EntityUtils {
     //$$ entitiesForRendering()
     //#endif
 
-    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft().theWorld?.getAllEntities()?.let {
+    fun getAllEntities(): Sequence<Entity> = MinecraftCompat.localWorldOrNull?.getAllEntities()?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it
         // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
         //  but *does* make crashes because of it rarer.
         else it.toMutableList()
     }?.asSequence().orEmpty()
 
-    fun getAllTileEntities(): Sequence<TileEntity> = Minecraft.getMinecraft().theWorld?.loadedTileEntityList?.let {
+    fun getAllTileEntities(): Sequence<TileEntity> = MinecraftCompat.localWorldOrNull?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
 
-    fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
-
-    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft().thePlayer?.getEntityLevel()?.getEntityByID(entityId)
-
-    @SubscribeEvent
-    fun onEntityRenderPre(
-        event:
-        //#if MC < 1.14
-        RenderLivingEvent.Pre<*>,
-        //#else
-        //$$ RenderLivingEvent.Pre<*, *>
-        //#endif
-
-    ) {
-        val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.post()) {
-            event.cancel()
-        }
+    fun Entity.canBeSeen(viewDistance: Number = 150.0): Boolean {
+        if (isDead) return false
+        // TODO add cache that only updates e.g. 10 times a second
+        if (!FrustumUtils.isVisible(entityBoundingBox)) return false
+        return getLorenzVec().up(0.5).canBeSeen(viewDistance)
     }
 
-    @SubscribeEvent
-    fun onEntityRenderPost(
-        event:
-        //#if MC < 11400
-        RenderLivingEvent.Post<*>,
-        //#else
-        //$$ RenderLivingEvent.Post<*, *>
-        //#endif
-
-    ) {
-        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
-    }
-
-    //#if MC < 11400
-    @SubscribeEvent
-    fun onEntityRenderSpecialsPre(
-        event: RenderLivingEvent.Specials.Pre<*>,
-    ) {
-        val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
-        if (shEvent.post()) {
-            event.cancel()
-        }
-    }
-
-    @SubscribeEvent
-    fun onEntityRenderSpecialsPost(
-        event: RenderLivingEvent.Specials.Post<*>,
-    ) {
-        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).post()
-    }
-    //#endif
+    fun getEntityByID(entityId: Int) = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.getNameAsString().removeColor()
+    fun Entity.cleanName() = this.name.removeColor()
 }
-
-//#if FORGE
-private fun Event.cancel() {
-    isCanceled = true
-}
-//#endif

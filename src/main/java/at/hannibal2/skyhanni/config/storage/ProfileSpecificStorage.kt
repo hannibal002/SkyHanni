@@ -1,14 +1,16 @@
 package at.hannibal2.skyhanni.config.storage
 
-import at.hannibal2.skyhanni.api.HotmAPI.PowderType
-import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.HotmApi.PowderType
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MaxwellAPI.ThaumaturgyPowerTuning
+import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
+import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
+import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
+import at.hannibal2.skyhanni.features.commands.OpenLastStorage
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.generateMaxChestAsList
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
@@ -24,70 +26,166 @@ import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.PlotData
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
-import at.hannibal2.skyhanni.features.garden.pests.VinylType
+import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
+import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.WardrobeData
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker.BucketData
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
-import java.util.*
 import kotlin.time.Duration
 
+// put everything under its respective feature, the order of the features is the same as in the folder structure
 class ProfileSpecificStorage {
+    // api
     @Expose
-    var currentPet: String = ""
+    var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
 
     @Expose
-    var experimentation: ExperimentationStorage = ExperimentationStorage()
+    var totalSkyBlockXP: Int? = null
 
-    class ExperimentationStorage {
+    // features
+    // - combat
+    @Expose
+    var ghostStorage: GhostStorage = GhostStorage()
+
+    class GhostStorage {
         @Expose
-        var tablePos: LorenzVec = LorenzVec()
+        var ghostTracker: GhostTracker.Data = GhostTracker.Data()
 
         @Expose
-        var dryStreak: ExperimentsDryStreakStorage = ExperimentsDryStreakStorage()
+        var bestiaryKills: Long = 0L
 
-        class ExperimentsDryStreakStorage {
-            @Expose
-            var attemptsSince: Int = 0
+        @Expose
+        var migratedTotalKills: Boolean = false
+    }
+
+    // - commands
+    @Expose
+    var lastStorage: LastStorage = LastStorage()
+
+    class LastStorage {
+        @Expose
+        var type: OpenLastStorage.StorageType = OpenLastStorage.StorageType.ENDER_CHEST
+
+        @Expose
+        var page: Int? = null
+    }
+
+    // - dungeon
+    @Expose
+    var dungeons: DungeonStorage = DungeonStorage()
+
+    class DungeonStorage {
+        @Expose
+        var bosses: MutableMap<DungeonFloor, Int> = enumMapOf()
+
+        @Expose
+        var runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
+
+        class DungeonRunInfo {
+            constructor()
+
+            constructor(floor: String?) {
+                this.floor = floor
+                this.openState = OpenedState.UNOPENED
+            }
 
             @Expose
-            var xpSince: Int = 0
+            var floor: String? = null
+
+            @Expose
+            var openState: OpenedState? = null
+
+            @Expose
+            var kismetUsed: Boolean? = null
         }
-
-        @Expose
-        var experimentsProfitTracker: ExperimentsProfitTracker.Data = ExperimentsProfitTracker.Data()
     }
 
     @Expose
-    var chocolateFactory: ChocolateFactoryStorage = ChocolateFactoryStorage()
+    var enderNodeTracker: EnderNodeTracker.Data = EnderNodeTracker.Data()
 
-    class ChocolateFactoryStorage {
+    @Expose
+    var dragonProfitTracker: DragonProfitTracker.BucketData = DragonProfitTracker.BucketData()
+
+    // - event
+    // -- carnival
+    @Expose
+    var carnival: CarnivalStorage = CarnivalStorage()
+
+    class CarnivalStorage {
+        @Expose
+        var lastClaimedDay: LocalDate? = null
+
+        @Expose
+        var carnivalYear: Int = 0
+
+        @Expose
+        var goals: MutableMap<CarnivalGoal, Boolean> = enumMapOf()
+
+        // - shop name -> (item name, tier)
+        @Expose
+        var carnivalShopProgress: MutableMap<String, Map<String, Int>> = mutableMapOf()
+    }
+
+    // -- diana
+    @Expose
+    var diana: DianaStorage = DianaStorage()
+
+    class DianaStorage {
+        @Expose
+        var profitTracker: DianaProfitTracker.Data = DianaProfitTracker.Data()
+
+        @Expose
+        var profitTrackerPerElection: MutableMap<Int, DianaProfitTracker.Data> = mutableMapOf()
+
+        @Expose
+        var mythologicalMobTracker: MythologicalCreatureTracker.Data = MythologicalCreatureTracker.Data()
+
+        @Expose
+        var mythologicalMobTrackerPerElection: MutableMap<Int, MythologicalCreatureTracker.Data> = mutableMapOf()
+    }
+
+    // -- winter
+    @Expose
+    var frozenTreasureTracker: FrozenTreasureTracker.Data = FrozenTreasureTracker.Data()
+
+    @Expose
+    var giftProfitTracker: GiftProfitTracker.Data = GiftProfitTracker.Data()
+
+    // -- hoppity
+    @Expose
+    var chocolateFactory: CFStorage = CFStorage()
+
+    class CFStorage {
         @Expose
         var currentRabbits: Int = 0
 
@@ -163,20 +261,20 @@ class ProfileSpecificStorage {
         var targetName: String? = null
 
         @Expose
-        var rabbitCounts: MutableMap<String, Int> = HashMap()
+        var rabbitCounts: MutableMap<String, Int> = mutableMapOf()
 
         @Expose
-        var locationRabbitRequirements: MutableMap<String, LocationRabbit> = HashMap()
+        var locationRabbitRequirements: MutableMap<String, LocationRabbit> = mutableMapOf()
 
         @Expose
-        var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>> = EnumMap(IslandType::class.java)
+        var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>> = enumMapOf()
 
         @Expose
-        var residentRabbits: MutableMap<IslandType, MutableMap<String, Boolean?>> = EnumMap(IslandType::class.java)
+        var residentRabbits: MutableMap<IslandType, MutableMap<String, Boolean?>> = enumMapOf()
 
-        class HotspotRabbitStorage(@field:Expose var skyblockYear: Int?) {
+        class HotspotRabbitStorage(@Expose var skyblockYear: Int?) {
             @Expose
-            var hotspotRabbits: MutableMap<IslandType, MutableMap<String, Boolean?>> = EnumMap(IslandType::class.java)
+            var hotspotRabbits: MutableMap<IslandType, MutableMap<String, Boolean?>> = enumMapOf()
         }
 
         @Expose
@@ -186,10 +284,16 @@ class ProfileSpecificStorage {
         var hoppityShopYearOpened: Int? = null
 
         @Expose
-        var strayTracker: ChocolateFactoryStrayTracker.Data = ChocolateFactoryStrayTracker.Data()
+        var strayTracker: CFStrayTracker.Data = CFStrayTracker.Data()
 
         @Expose
-        var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = EnumMap(HoppityEggType::class.java)
+        var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+
+        @Expose
+        var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+
+        @Expose
+        var hotChocolateMixinExpiry = farPast()
 
         class HitmanStatsStorage {
             @Expose
@@ -210,114 +314,96 @@ class ProfileSpecificStorage {
     }
 
     @Expose
-    var carnival: CarnivalStorage = CarnivalStorage()
-
-    class CarnivalStorage {
-        @Expose
-        var lastClaimedDay: LocalDate? = null
-
-        @Expose
-        var carnivalYear: Int = 0
-
-        @Expose
-        var goals: MutableMap<CarnivalGoal, Boolean> = EnumMap(CarnivalGoal::class.java)
-
-        // shop name -> (item name, tier)
-        @Expose
-        var carnivalShopProgress: MutableMap<String, Map<String, Int>> = HashMap()
-    }
+    var hoppityEventStats: MutableMap<Int, HoppityEventStats> = mutableMapOf()
 
     @Expose
-    var stats: MutableMap<SkyblockStat, Double?> = HashMap<SkyblockStat, Double?>(SkyblockStat.entries.size)
+    var hoppityStatLiveDisplayToggledOff: Boolean = false
 
-    @Expose
-    var maxwell: MaxwellPowerStorage = MaxwellPowerStorage()
+    data class HoppityEventStats(
+        @Expose var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
+        @Expose var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
+        @Expose var dupeChocolateGained: Long = 0,
+        @Expose var strayChocolateGained: Long = 0,
+        @Expose var rabbitTheFishFinds: Int = 0,
 
-    class MaxwellPowerStorage {
-        @Expose
-        var currentPower: String? = null
+        @Expose var millisInCf: Duration = Duration.ZERO,
+        @Expose var initialLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
+        @Expose var finalLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
+        @Expose var lastLbUpdate: SimpleTimeMark = farPast(),
+        @Expose var summarized: Boolean = false,
 
-        @Expose
-        var magicalPower: Int = -1
+        @Expose var typeCountSnapshot: RabbitData? = RabbitData(),
+        @Expose var typeCountsSince: RabbitData? = RabbitData(),
+    ) {
+        @Transient
+        var containingYears: MutableSet<Int> = mutableSetOf()
 
-        @Expose
-        var tunings: List<ThaumaturgyPowerTuning> = ArrayList()
+        constructor(year: Int) : this() {
+            containingYears.add(year)
+        }
 
-        @Expose
-        var favoritePowers: List<String> = ArrayList()
-    }
+        constructor(years: Set<Int>) : this() {
+            containingYears = years.toMutableSet()
+        }
 
-    @Expose
-    var arrows: ArrowsStorage = ArrowsStorage()
+        operator fun plusAssign(it: HoppityEventStats) {
+            it.mealsFound.forEach { (key, value) ->
+                mealsFound.merge(key, value, Int::plus)
+            }
+            it.rabbitsFound.forEach { (key, rabbitData) ->
+                rabbitsFound.merge(key, rabbitData) { existing, new ->
+                    RabbitData(
+                        uniques = existing.uniques + new.uniques,
+                        dupes = existing.dupes + new.dupes,
+                        strays = existing.strays + new.strays,
+                    )
+                }
+            }
+            dupeChocolateGained += it.dupeChocolateGained
+            strayChocolateGained += it.strayChocolateGained
+            rabbitTheFishFinds += it.rabbitTheFishFinds
+            millisInCf += it.millisInCf
+        }
 
-    class ArrowsStorage {
-        @Expose
-        var currentArrow: String? = null
+        companion object {
+            data class RabbitData(
+                @Expose var uniques: Int = 0,
+                @Expose var dupes: Int = 0,
+                @Expose var strays: Int = 0,
+            ) {
+                fun getByIndex(index: Int): Int = when (index) {
+                    0 -> uniques
+                    1 -> dupes
+                    2 -> strays
+                    else -> throw IllegalArgumentException("Invalid index: $index")
+                }
 
-        @Expose
-        var arrowAmount: MutableMap<NEUInternalName, Int> = HashMap()
-    }
+                companion object {
+                    val EMPTY get() = RabbitData(0, 0, 0)
+                }
+            }
 
-    @Expose
-    var bits: BitsStorage = BitsStorage()
-
-    class BitsStorage {
-        @Expose
-        var bits: Int = -1
-
-        @Expose
-        var bitsAvailable: Int = -1
-
-        @Expose
-        var boosterCookieExpiryTime: SimpleTimeMark? = null
-    }
-
-    @Expose
-    var minions: Map<LorenzVec, MinionConfig>? = HashMap()
-
-    class MinionConfig {
-        @Expose
-        var displayName: String = ""
-
-        @Expose
-        var lastClicked: SimpleTimeMark = farPast()
-
-        override fun toString(): String {
-            return "MinionConfig{" +
-                "displayName='$displayName'" +
-                ", lastClicked=$lastClicked" +
-                "}"
+            data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
     }
 
+    // - fame
     @Expose
-    var beaconPower: BeaconPowerStorage = BeaconPowerStorage()
+    var communityShopProfileUpgrade: CommunityShopUpgrade? = null
 
-    class BeaconPowerStorage {
+    // - fishing
+    @Expose
+    var fishing: FishingStorage = FishingStorage()
+
+    class FishingStorage {
         @Expose
-        var beaconPowerExpiryTime: SimpleTimeMark? = null
+        var fishingProfitTracker: FishingProfitTracker.Data = FishingProfitTracker.Data()
 
         @Expose
-        var boostedStat: String? = null
+        var seaCreatureTracker: SeaCreatureTracker.Data = SeaCreatureTracker.Data()
     }
 
-    @Expose
-    var crimsonIsle: CrimsonIsleStorage = CrimsonIsleStorage()
-
-    class CrimsonIsleStorage {
-        @Expose
-        var quests: MutableList<String> = ArrayList()
-
-        @Expose
-        var miniBossesDoneToday: MutableList<String> = ArrayList()
-
-        @Expose
-        var kuudraTiersDone: MutableList<String> = ArrayList()
-
-        @Expose
-        var trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>> = HashMap()
-    }
-
+    // - garden
     @Expose
     var garden: GardenStorage = GardenStorage()
 
@@ -326,23 +412,23 @@ class ProfileSpecificStorage {
         var experience: Long? = null
 
         @Expose
-        var cropCounter: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
+        var cropCounter: MutableMap<CropType, Long> = enumMapOf()
 
         @Expose
-        var cropUpgrades: MutableMap<CropType, Int> = EnumMap(CropType::class.java)
+        var cropUpgrades: MutableMap<CropType, Int> = enumMapOf()
 
         @Expose
-        var cropsPerSecond: MutableMap<CropType, Int> = EnumMap(CropType::class.java)
+        var cropsPerSecond: MutableMap<CropType, Int> = enumMapOf()
 
         @Expose
-        var latestBlocksPerSecond: MutableMap<CropType, Double> = EnumMap(CropType::class.java)
+        var latestBlocksPerSecond: MutableMap<CropType, Double> = enumMapOf()
 
         @Expose
-        var latestTrueFarmingFortune: MutableMap<CropType, Double> = EnumMap(CropType::class.java)
+        var latestTrueFarmingFortune: MutableMap<CropType, Double> = enumMapOf()
 
         // TODO use in /ff guide
         @Expose
-        var personalBestFF: MutableMap<CropType, Double> = EnumMap(CropType::class.java)
+        var personalBestFF: MutableMap<CropType, Double> = enumMapOf()
 
         @Expose
         var savedCropAccessory: CropAccessory? = CropAccessory.NONE
@@ -366,16 +452,16 @@ class ProfileSpecificStorage {
         var armorDropTracker: ArmorDropTracker.Data = ArmorDropTracker.Data()
 
         @Expose
-        var composterUpgrades: MutableMap<ComposterUpgrade, Int> = EnumMap(ComposterUpgrade::class.java)
+        var composterUpgrades: MutableMap<ComposterUpgrade, Int> = enumMapOf()
 
         @Expose
-        var toolWithBountiful: MutableMap<CropType, Boolean> = EnumMap(CropType::class.java)
+        var toolWithBountiful: MutableMap<CropType, Boolean> = enumMapOf()
 
         @Expose
-        var composterCurrentOrganicMatterItem: NEUInternalName? = NONE
+        var composterCurrentOrganicMatterItem: NeuInternalName? = NONE
 
         @Expose
-        var composterCurrentFuelItem: NEUInternalName? = NONE
+        var composterCurrentFuelItem: NeuInternalName? = NONE
 
         @Expose
         var uniqueVisitors: Int = 0
@@ -383,6 +469,7 @@ class ProfileSpecificStorage {
         @Expose
         var visitorDrops: VisitorDrops = VisitorDrops()
 
+        // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
         class VisitorDrops {
             @Expose
             var acceptedVisitors: Int = 0
@@ -390,8 +477,10 @@ class ProfileSpecificStorage {
             @Expose
             var deniedVisitors: Int = 0
 
+            fun getTotalVisitors() = acceptedVisitors + deniedVisitors
+
             @Expose
-            var visitorRarities: MutableList<Long> = ArrayList()
+            var acceptedRarities: MutableMap<LorenzRarity, Long> = enumMapOf()
 
             @Expose
             var copper: Int = 0
@@ -415,7 +504,7 @@ class ProfileSpecificStorage {
             var gemstonePowder: Long = 0
 
             @Expose
-            var rewardsCount: Map<VisitorReward, Int> = EnumMap(VisitorReward::class.java)
+            var rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
         }
 
         @Expose
@@ -423,30 +512,30 @@ class ProfileSpecificStorage {
 
         class PlotIcon {
             @Expose
-            var plotList: MutableMap<Int, NEUInternalName> = HashMap()
+            var plotList: MutableMap<Int, NeuInternalName> = mutableMapOf()
         }
 
         @Expose
-        var plotData: MutableMap<Int, PlotData> = HashMap()
+        var plotData: MutableMap<Int, PlotData> = mutableMapOf()
 
         @Expose
         var scoreboardPests: Int = 0
 
         @Expose
-        var cropStartLocations: MutableMap<CropType, LorenzVec> = EnumMap(CropType::class.java)
+        var cropStartLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
 
         @Expose
-        var cropLastFarmedLocations: MutableMap<CropType, LorenzVec> = EnumMap(CropType::class.java)
+        var cropLastFarmedLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
 
         @Expose
-        var farmingLanes: MutableMap<CropType, FarmingLane> = EnumMap(CropType::class.java)
+        var farmingLanes: MutableMap<CropType, FarmingLane> = enumMapOf()
 
         @Expose
         var fortune: Fortune = Fortune()
 
         class Fortune {
             @Expose
-            var outdatedItems: MutableMap<FarmingItems, Boolean> = EnumMap(FarmingItems::class.java)
+            var outdatedItems: MutableMap<FarmingItemType, Boolean> = enumMapOf()
 
             @Expose
             var farmingLevel: Int = -1
@@ -467,10 +556,10 @@ class ProfileSpecificStorage {
             var cakeExpiring: SimpleTimeMark? = null
 
             @Expose
-            var carrolyn: MutableMap<CropType, Boolean> = EnumMap(CropType::class.java)
+            var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
 
             @Expose
-            var farmingItems: MutableMap<FarmingItems, ItemStack> = EnumMap(FarmingItems::class.java)
+            var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
         }
 
         @Expose
@@ -483,119 +572,85 @@ class ProfileSpecificStorage {
         var farmingWeight: FarmingWeightConfig = FarmingWeightConfig()
 
         class FarmingWeightConfig {
+            // TODO rename to lastLeaderboard
             @Expose
             var lastFarmingWeightLeaderboard: Int = -1
         }
 
         @Expose
-        var npcVisitorLocations: MutableMap<String, LorenzVec> = HashMap()
+        var npcVisitorLocations: MutableMap<String, LorenzVec> = mutableMapOf()
 
         @Expose
-        var customGoalMilestone: MutableMap<CropType, Int> = EnumMap(CropType::class.java)
+        var customGoalMilestone: MutableMap<CropType, Int> = enumMapOf()
 
         @Expose
-        var pestProfitTracker: PestProfitTracker.Data = PestProfitTracker.Data()
+        var pestProfitTracker: PestProfitTracker.BucketData = PestProfitTracker.BucketData()
 
         @Expose
         var activeVinyl: VinylType? = null
     }
 
+    // - gui
     @Expose
-    var ghostStorage: GhostStorage = GhostStorage()
+    var beaconPower: BeaconPowerStorage = BeaconPowerStorage()
 
-    class GhostStorage {
+    class BeaconPowerStorage {
         @Expose
-        var ghostTracker: GhostTracker.Data = GhostTracker.Data()
-
-        @Expose
-        var bestiaryKills: Long = 0L
+        var beaconPowerExpiryTime: SimpleTimeMark? = null
 
         @Expose
-        var migratedTotalKills: Boolean = false
+        var boostedStat: String? = null
     }
 
-    class CakeData {
+    // - inventory
+    @Expose
+    var experimentation: ExperimentationStorage = ExperimentationStorage()
+
+    class ExperimentationStorage {
         @Expose
-        var ownedCakes: MutableSet<Int> = HashSet()
+        var tablePos: LorenzVec = LorenzVec()
 
         @Expose
-        var missingCakes: MutableSet<Int> = HashSet()
+        var dryStreak: ExperimentsDryStreakStorage = ExperimentsDryStreakStorage()
 
-        override fun hashCode(): Int {
-            val prime = 31
-            var result = 1
-            result = prime * result + ownedCakes.hashCode()
-            result = prime * result + missingCakes.hashCode()
-            return result
+        class ExperimentsDryStreakStorage {
+            @Expose
+            var attemptsSince: Int = 0
+
+            @Expose
+            var xpSince: Int = 0
         }
 
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null) return false
-            if (javaClass != other.javaClass) return false
-            val otherProp = other as CakeData
-            return otherProp.hashCode() == hashCode()
-        }
+        @Expose
+        var experimentsProfitTracker: ExperimentsProfitTracker.Data = ExperimentsProfitTracker.Data()
     }
 
     @Expose
     var cakeData: CakeData = CakeData()
 
-    @Expose
-    var powderTracker: PowderTracker.Data = PowderTracker.Data()
+    data class CakeData(
+        @Expose var ownedCakes: MutableSet<Int> = mutableSetOf(),
+        @Expose var missingCakes: MutableSet<Int> = mutableSetOf(),
+    )
 
     @Expose
-    var frozenTreasureTracker: FrozenTreasureTracker.Data = FrozenTreasureTracker.Data()
+    var wardrobe: WardrobeStorage = WardrobeStorage()
 
-    @Expose
-    var enderNodeTracker: EnderNodeTracker.Data = EnderNodeTracker.Data()
-
-    @Expose
-    var rift: RiftStorage = RiftStorage()
-
-    class RiftStorage {
+    class WardrobeStorage {
         @Expose
-        var completedKloonTerminals: MutableList<KloonTerminal> = ArrayList()
+        var data: MutableMap<Int, WardrobeData> = mutableMapOf()
 
         @Expose
-        var verminTracker: VerminTracker.Data = VerminTracker.Data()
+        var currentSlot: Int? = null
     }
 
-    @Expose
-    var slayerProfitData: MutableMap<String, SlayerProfitTracker.Data> = HashMap()
-
-    @Expose
-    var slayerRngMeter: MutableMap<String, SlayerRngMeterStorage> = HashMap()
-
-    class SlayerRngMeterStorage {
-        @Expose
-        var currentMeter: Long = -1
-
-        @Expose
-        var gainPerBoss: Long = -1
-
-        @Expose
-        var goalNeeded: Long = -1
-
-        @Expose
-        var itemGoal: String = "?"
-
-        override fun toString(): String {
-            return "SlayerRngMeterStorage{" +
-                "currentMeter=$currentMeter" +
-                ", gainPerBoss=$gainPerBoss" +
-                ", goalNeeded=$goalNeeded" +
-                ", itemGoal='$itemGoal'" +
-                "}"
-        }
-    }
-
+    // - mining
     @Expose
     var mining: MiningConfig = MiningConfig()
 
     class MiningConfig {
         @Expose
-        var kingsTalkedTo: MutableList<String> = ArrayList()
+        var kingsTalkedTo: MutableList<String> = mutableListOf()
 
         @Expose
         var fossilExcavatorProfitTracker: ExcavatorProfitTracker.Data = ExcavatorProfitTracker.Data()
@@ -604,7 +659,7 @@ class ProfileSpecificStorage {
         var hotmTree: HotmTree = HotmTree()
 
         @Expose
-        var powder: MutableMap<PowderType, PowderStorage> = EnumMap(PowderType::class.java)
+        var powder: MutableMap<PowderType, PowderStorage> = enumMapOf()
 
         class PowderStorage {
             @Expose
@@ -631,13 +686,39 @@ class ProfileSpecificStorage {
             var mineshaftTotalCount: Int = 0
 
             @Expose
-            var blocksBroken: MutableList<PityData> = ArrayList()
+            var blocksBroken: MutableList<PityData> = mutableListOf()
 
             @Expose
-            var corpseProfitTracker: BucketData = BucketData()
+            var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
+        }
+
+        @Expose
+        var crystalNucleusTracker: CrystalNucleusTracker.Data = CrystalNucleusTracker.Data()
+    }
+
+    @Expose
+    var powderTracker: PowderTracker.Data = PowderTracker.Data()
+
+    // - minion
+    @Expose
+    var minions: Map<LorenzVec, MinionConfig>? = mutableMapOf()
+
+    class MinionConfig {
+        @Expose
+        var displayName: String = ""
+
+        @Expose
+        var lastClicked: SimpleTimeMark = farPast()
+
+        override fun toString(): String {
+            return "MinionConfig{" +
+                "displayName='$displayName'" +
+                ", lastClicked=$lastClicked" +
+                "}"
         }
     }
 
+    // - misc
     @Expose
     var trapperData: TrapperData = TrapperData()
 
@@ -656,187 +737,136 @@ class ProfileSpecificStorage {
 
         // TODO change to sh tracker
         @Expose
-        var animalRarities: Map<TrapperMobRarity, Int> = EnumMap(TrapperMobRarity::class.java)
-    }
-
-    @Expose
-    var dungeons: DungeonStorage = DungeonStorage()
-
-    class DungeonStorage {
-        @Expose
-        var bosses: MutableMap<DungeonFloor, Int> = EnumMap(DungeonFloor::class.java)
-
-        @Expose
-        var runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
-
-        class DungeonRunInfo {
-            constructor()
-
-            constructor(floor: String?) {
-                this.floor = floor
-                this.openState = OpenedState.UNOPENED
-            }
-
-            @Expose
-            var floor: String? = null
-
-            @Expose
-            var openState: OpenedState? = null
-
-            @Expose
-            var kismetUsed: Boolean? = null
-        }
-    }
-
-    @Expose
-    var fishing: FishingStorage = FishingStorage()
-
-    class FishingStorage {
-        @Expose
-        var fishingProfitTracker: FishingProfitTracker.Data = FishingProfitTracker.Data()
-
-        @Expose
-        var seaCreatureTracker: SeaCreatureTracker.Data = SeaCreatureTracker.Data()
-    }
-
-    @Expose
-    var diana: DianaStorage = DianaStorage()
-
-    class DianaStorage {
-        @Expose
-        var profitTracker: DianaProfitTracker.Data = DianaProfitTracker.Data()
-
-        @Expose
-        var profitTrackerPerElection: MutableMap<Int, DianaProfitTracker.Data> = HashMap()
-
-        @Expose
-        var mythologicalMobTracker: MythologicalCreatureTracker.Data = MythologicalCreatureTracker.Data()
-
-        @Expose
-        var mythologicalMobTrackerPerElection: MutableMap<Int, MythologicalCreatureTracker.Data> = HashMap()
-    }
-
-    @Expose
-    var skillData: MutableMap<SkillType, SkillAPI.SkillInfo> = EnumMap(SkillType::class.java)
-
-    @Expose
-    var wardrobe: WardrobeStorage = WardrobeStorage()
-
-    class WardrobeStorage {
-        @Expose
-        var data: MutableMap<Int, WardrobeData> = HashMap()
-
-        @Expose
-        var currentSlot: Int? = null
+        var animalRarities: Map<TrapperMobRarity, Int> = enumMapOf()
     }
 
     @Expose
     var draconicSacrificeTracker: DraconicSacrificeTracker.Data = DraconicSacrificeTracker.Data()
 
     @Expose
-    var communityShopProfileUpgrade: CommunityShopUpgrade? = null
-
-    @Expose
     var abiphoneContactAmount: Int? = null
 
     @Expose
-    var hoppityEventStats: MutableMap<Int, HoppityEventStats> = HashMap()
+    var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
+
+    // - nether
+    @Expose
+    var crimsonIsle: CrimsonIsleStorage = CrimsonIsleStorage()
+
+    class CrimsonIsleStorage {
+        @Expose
+        var quests: MutableList<String> = mutableListOf()
+
+        @Expose
+        var miniBossesDoneToday: MutableList<String> = mutableListOf()
+
+        @Expose
+        var kuudraTiersDone: MutableList<String> = mutableListOf()
+
+        @Expose
+        var trophyFishes: MutableMap<String, MutableMap<TrophyRarity, Int>> = mutableMapOf()
+    }
+
+    // - rift
+    @Expose
+    var rift: RiftStorage = RiftStorage()
+
+    class RiftStorage {
+        @Expose
+        var completedKloonTerminals: MutableList<KloonTerminal> = mutableListOf()
+
+        @Expose
+        var verminTracker: VerminTracker.Data = VerminTracker.Data()
+
+        @Expose
+        var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
+    }
+
+    // - slayer
+    @Expose
+    var slayerProfitData: MutableMap<String, SlayerProfitTracker.Data> = mutableMapOf()
 
     @Expose
-    var hoppityStatLiveDisplayToggledOff: Boolean = false
+    var slayerRngMeter: MutableMap<String, SlayerRngMeterStorage> = mutableMapOf()
 
-    class HoppityEventStats {
+    data class SlayerRngMeterStorage(
+        @Expose var currentMeter: Long = -1,
+        @Expose var gainPerBoss: Long = -1,
+        @Expose var goalNeeded: Long = -1,
+        @Expose var itemGoal: String = "?",
+    )
+
+    // data
+    @Expose
+    var currentPet: String = ""
+
+    @Expose
+    var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()
+
+    @Expose
+    var maxwell: MaxwellPowerStorage = MaxwellPowerStorage()
+
+    class MaxwellPowerStorage {
         @Expose
-        var mealsFound: MutableMap<HoppityEggType, Int> = EnumMap(HoppityEggType::class.java)
-
-        @Expose
-        var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = EnumMap(LorenzRarity::class.java)
-
-        class RabbitData {
-            @Expose
-            var uniques: Int = 0
-
-            @Expose
-            var dupes: Int = 0
-
-            @Expose
-            var strays: Int = 0
-
-            override fun hashCode(): Int {
-                return Objects.hash(uniques, dupes, strays)
-            }
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other == null) return false
-                if (javaClass != other.javaClass) return false
-                val otherProp = other as RabbitData
-                return otherProp.hashCode() == hashCode()
-            }
-        }
+        var currentPower: String? = null
 
         @Expose
-        var dupeChocolateGained: Long = 0
+        var magicalPower: Int = -1
 
         @Expose
-        var strayChocolateGained: Long = 0
+        var tunings: List<ThaumaturgyPowerTuning> = listOf()
 
         @Expose
-        var millisInCf: Duration = Duration.ZERO
-
-        @Expose
-        var rabbitTheFishFinds: Int = 0
-
-        class LeaderboardPosition(@field:Expose var position: Int, @field:Expose var percentile: Double) {
-            override fun hashCode(): Int {
-                return Objects.hash(position, percentile)
-            }
-
-            override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (other == null) return false
-                if (javaClass != other.javaClass) return false
-                val otherProp = other as LeaderboardPosition
-                return otherProp.hashCode() == hashCode()
-            }
-        }
-
-        @Expose
-        var initialLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0)
-
-        @Expose
-        var finalLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0)
-
-        @Expose
-        var lastLbUpdate: SimpleTimeMark = farPast()
-
-        @Expose
-        var summarized: Boolean = false
-
-        override fun hashCode(): Int {
-            return Objects.hash(
-                mealsFound,
-                rabbitsFound,
-                dupeChocolateGained,
-                strayChocolateGained,
-                millisInCf,
-                rabbitTheFishFinds,
-                initialLeaderboardPosition,
-                finalLeaderboardPosition,
-                summarized
-            )
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other == null) return false
-            if (javaClass != other.javaClass) return false
-            val otherProp = other as HoppityEventStats
-            return otherProp.hashCode() == hashCode()
-        }
+        var favoritePowers: List<String> = listOf()
     }
 
     @Expose
-    var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> =
-        EnumMap(EnchantedClockHelper.SimpleBoostType::class.java)
+    var arrows: ArrowsStorage = ArrowsStorage()
+
+    class ArrowsStorage {
+        @Expose
+        var currentArrow: String? = null
+
+        @Expose
+        var arrowAmount: MutableMap<NeuInternalName, Int> = mutableMapOf()
+    }
+
+    @Expose
+    var bits: BitsStorage = BitsStorage()
+
+    class BitsStorage {
+        @Expose
+        var bits: Int = -1
+
+        @Expose
+        var bitsAvailable: Int = -1
+
+        @Expose
+        var boosterCookieExpiryTime: SimpleTimeMark? = null
+
+        @Expose
+        var museumMilestone: Int? = null
+    }
+
+    @Expose
+    var godPotExpiry: SimpleTimeMark = farPast()
+
+    @Expose
+    var fairySouls: FairySoulsStorage = FairySoulsStorage()
+
+    class FairySoulsStorage {
+        @Expose
+        var totalFound: MutableMap<IslandType, Int> = mutableMapOf()
+
+        @Expose
+        var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
+    }
+
+    @Expose
+    var cakeCounterData: CakeCounterData = CakeCounterData()
+
+    class CakeCounterData(
+        @Expose var cakesEaten: Int? = -1,
+        @Expose var soulsFound: Int = 0,
+    )
 }

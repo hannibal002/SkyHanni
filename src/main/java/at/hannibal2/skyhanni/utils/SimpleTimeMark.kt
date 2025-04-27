@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -61,7 +62,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun toMillis() = millis
 
-    fun toSkyBlockTime() = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
+    fun toSkyBlockTime(): SkyBlockTime = SkyBlockTime.fromTimeMark(this)
+
+    fun toLocalDate(): LocalDate = toLocalDateTime().toLocalDate()
 
     companion object {
 
@@ -75,6 +78,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         fun Duration.fromNow() = now() + this
 
         fun Long.asTimeMark() = SimpleTimeMark(this)
+
+        @Deprecated("Use toTimeMark() instead", ReplaceWith("this.toTimeMark()"))
         fun SkyBlockTime.asTimeMark() = SimpleTimeMark(toMillis())
     }
 }

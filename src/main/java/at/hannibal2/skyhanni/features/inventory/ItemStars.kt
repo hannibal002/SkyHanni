@@ -3,22 +3,19 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.CRIMSON_ARMOR
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSelected
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.getKuudraTier
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.isKuudraArmor
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ItemStars {
@@ -36,21 +33,20 @@ object ItemStars {
         "^(?<name>.+) (?<stars>(?:(?:§.)?✪)+)",
     )
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
         val stack = event.itemStack
         if (stack.stackSize != 1) return
         val stars = stack.grabStarCount() ?: return
-        starPattern.findMatcher(stack.name) {
+        starPattern.findMatcher(stack.displayName) {
             val name = group("name")
             event.toolTip[0] = "$name §c$stars✪"
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemTip(event: RenderItemTipEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!CRIMSON_ARMOR.isSelected()) return
         val stack = event.stack
         if (stack.getInternalNameOrNull()?.isKuudraArmor() != true) return

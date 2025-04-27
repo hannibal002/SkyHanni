@@ -10,7 +10,12 @@ class FilterTypesConfig {
     @Expose
     @ConfigOption(name = "Powder Mining", desc = "")
     @Accordion
-    var powderMiningFilter: PowderMiningFilterConfig = PowderMiningFilterConfig()
+    var powderMining: PowderMiningConfig = PowderMiningConfig()
+
+    @Expose
+    @ConfigOption(name = "Crystal Nucleus", desc = "")
+    @Accordion
+    var crystalNucleus: CrystalNucleusConfig = CrystalNucleusConfig()
 
     @Expose
     @ConfigOption(name = "Stash Messages", desc = "")
@@ -126,6 +131,12 @@ class FilterTypesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var gardenNoPest: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Legacy Items Warning", desc = "Hide the legacy items in sacks/storage warning.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var legacyItemsWarning: Boolean = false
 
     @Expose
     @ConfigOption(name = "Block Alpha Achievements", desc = "Hide achievement messages while on the Alpha network.")

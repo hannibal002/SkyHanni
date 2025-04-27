@@ -2,23 +2,25 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -27,7 +29,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ExcavatorProfitTracker {
@@ -49,7 +50,7 @@ object ExcavatorProfitTracker {
 
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / timesExcavated
-            val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$dropRate.",
@@ -74,7 +75,7 @@ object ExcavatorProfitTracker {
         var fossilDustGained = 0L
     }
 
-    private val scrapItem get() = FossilExcavatorAPI.scrapItem
+    private val scrapItem get() = FossilExcavatorApi.scrapItem
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lFossil Excavation Profit Tracker")
@@ -145,7 +146,7 @@ object ExcavatorProfitTracker {
         if (timesExcavated <= 0) return profit
         // TODO use same price source as profit tracker
         val scrapPrice = timesExcavated * scrapItem.getPrice()
-        val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.itemName)
+        val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
         add(
             Renderable.hoverTips(
                 "$name §7price: §c-${scrapPrice.shortFormat()}",
@@ -161,6 +162,7 @@ object ExcavatorProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
+        if (!config.enabled) return
         if (!isEnabled()) return
 
         val internalName = event.internalName
@@ -169,7 +171,7 @@ object ExcavatorProfitTracker {
         }
     }
 
-    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+    private fun tryAddItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
         tracker.addItem(internalName, amount, command)
     }
 
@@ -202,7 +204,7 @@ object ExcavatorProfitTracker {
             return
         }
 
-        val internalName = NEUInternalName.fromItemNameOrNull(name)
+        val internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
             ChatUtils.debug("no price for excavator profit: '$name'")
             return
@@ -211,18 +213,18 @@ object ExcavatorProfitTracker {
         tryAddItem(internalName, amount, command = false)
     }
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
-        if (inChest) {
-            // Only show in excavation menu
-            if (!FossilExcavatorAPI.inExcavatorMenu) {
-                return
-            }
-        }
+    init {
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
+    }
 
-        tracker.renderDisplay(config.position)
+    private fun shouldShowDisplay(): Boolean {
+        if (!config.enabled) return false
+        if (!isEnabled()) return false
+        val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
+        // Only show in excavation menu
+        if (inChest && !FossilExcavatorApi.inExcavatorMenu) return false
+
+        return true
     }
 
     @HandleEvent
@@ -232,11 +234,14 @@ object ExcavatorProfitTracker {
         }
     }
 
-    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled &&
-        LorenzUtils.skyBlockArea == "Fossil Research Center"
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "Fossil Research Center"
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetexcavatortracker") {
+            description = "Resets the Fossil Excavator Profit Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
-
 }

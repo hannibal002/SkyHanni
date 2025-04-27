@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI;
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -23,7 +23,7 @@ public class AttributeOverlayConfig {
     @Expose
     @ConfigOption(name = "Attributes Shown", desc = "List of attributes shown.")
     @ConfigEditorDraggableList
-    public List<AttributeAPI.AttributeType> attributesList = new ArrayList<>(AttributeAPI.AttributeType.getEntries());
+    public List<AttributeApi.AttributeType> attributesList = new ArrayList<>(AttributeApi.AttributeType.getEntries());
 
     @Expose
     @ConfigOption(
@@ -45,11 +45,28 @@ public class AttributeOverlayConfig {
 
     @Expose
     @ConfigOption(
+        name = "Highlight Good Attribute",
+        desc = "Highlights attributes that are in one of the Good Rolls\n" +
+            "combinations for that item."
+    )
+    @ConfigEditorBoolean
+    public boolean highlightGoodAttributes = false;
+
+    @Expose
+    @ConfigOption(
         name = "Good Rolls Override Level",
         desc = "Makes it so that Good Rolls are always shown no matter the attribute level."
     )
     @ConfigEditorBoolean
     public boolean goodRollsOverrideLevel = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Good Rolls ignore list",
+        desc = "Highlights attributes in good rolls even if they aren't in the attributes list."
+    )
+    @ConfigEditorBoolean
+    public boolean ignoreList = false;
 
     @Expose
     @ConfigOption(name = "Hide non Good Rolls", desc = "Hides attributes that are not considered good rolls.")

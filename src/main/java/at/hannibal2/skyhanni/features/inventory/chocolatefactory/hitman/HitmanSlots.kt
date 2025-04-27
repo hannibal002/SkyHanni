@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI.hitmanInventoryPattern
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.hitmanInventoryPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HitmanSlots {
@@ -23,12 +22,12 @@ object HitmanSlots {
     /**
      * REGEX-TEST: §7Hitman can store more eggs you miss! §7Cost §620,000,000 Coins §eClick to purchase!
      */
-    private val slotCostPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    private val slotCostPattern by CFApi.patternGroup.pattern(
         "hitman.slotcost",
         ".*§7Cost §6(?<cost>[\\d,]+) Coins.*",
     )
 
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = CFApi.config
     private var slotPricesPaid: List<Long> = emptyList()
     private var slotPricesLeft: List<Long> = emptyList()
     private var inInventory = false
@@ -45,7 +44,7 @@ object HitmanSlots {
         handleSlotStorageUpdate(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.hitmanCosts || slotPricesLeft.isEmpty()) return
         if (!inInventory) return
@@ -58,13 +57,13 @@ object HitmanSlots {
     private fun handleSlotStorageUpdate(event: InventoryOpenEvent) {
         if (!config.hitmanCosts) return
         val leftToPurchase = event.inventoryItems.filterNotBorderSlots().count { (_, item) ->
-            item.hasDisplayName() && item.getLore().isNotEmpty() &&
+            item.displayName.isNotEmpty() && item.getLore().isNotEmpty() &&
                 slotCostPattern.matches(item.getSingleLineLore())
         }
-        val ownedSlots = ChocolateFactoryAPI.hitmanCosts.size - leftToPurchase
+        val ownedSlots = CFApi.hitmanCosts.size - leftToPurchase
 
-        slotPricesPaid = ChocolateFactoryAPI.hitmanCosts.take(ownedSlots)
-        slotPricesLeft = ChocolateFactoryAPI.hitmanCosts.drop(ownedSlots)
+        slotPricesPaid = CFApi.hitmanCosts.take(ownedSlots)
+        slotPricesLeft = CFApi.hitmanCosts.drop(ownedSlots)
     }
 
     private fun Map<Int, ItemStack>.filterNotBorderSlots() = filterKeys {
