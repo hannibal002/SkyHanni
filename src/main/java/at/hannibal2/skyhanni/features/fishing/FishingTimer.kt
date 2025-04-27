@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.Keybinding
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -162,18 +162,14 @@ object FishingTimer {
         updateInfo()
     }
 
-    init {
-        Keybinding(
-            keyCodeProvider = { config.manualResetTimer },
-            functionToExecute = {
-                mobDespawnTime.replaceAll { _, _ ->
-                    SimpleTimeMark.now()
-                }
-            },
-            cooldown = 0.seconds,
-            condition = { isEnabled() },
-            name = "Fishing Timer Manual Reset",
-        )
+    @HandleEvent
+    fun onKeyDown(event: KeyPressEvent) {
+        if (!isEnabled()) return
+        if (event.keyCode != config.manualResetTimer) return
+
+        mobDespawnTime.replaceAll { _, _ ->
+            SimpleTimeMark.now()
+        }
     }
 
     private fun updateInfo() {
