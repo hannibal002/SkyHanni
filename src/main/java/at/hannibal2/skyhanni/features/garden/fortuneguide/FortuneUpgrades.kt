@@ -89,7 +89,7 @@ object FortuneUpgrades {
 
     private fun getEquipmentUpgrades() {
         val visitors = GardenApi.storage?.uniqueVisitors?.toDouble() ?: 0.0
-        for (piece in FarmingItems.equip) {
+        for (piece in FarmingItemType.equip) {
             val item = piece.getItem()
             // todo tell them to buy the missing item
             if (!item.getInternalName().contains("LOTUS")) return
@@ -119,7 +119,7 @@ object FortuneUpgrades {
     // todo adding armor tier upgrades later
 
     private fun getArmorUpgrades() {
-        for (piece in FarmingItems.armor) {
+        for (piece in FarmingItemType.armor) {
             val item = piece.getItemOrNull() ?: return // todo tell them to buy it later
 
             recombobulateItem(item, genericUpgrades)
@@ -138,7 +138,7 @@ object FortuneUpgrades {
 
     // todo needs to be called when switching pets
     private fun getPetUpgrades() {
-        if (FarmingItems.currentPet.getItemOrNull()?.getInternalName()?.contains(";") == true) {
+        if (FarmingItemType.currentPet.getItemOrNull()?.getInternalName()?.contains(";") == true) {
             when (FFStats.currentPetItem) {
                 "GREEN_BANDANA" -> {}
                 "YELLOW_BANDANA" -> {

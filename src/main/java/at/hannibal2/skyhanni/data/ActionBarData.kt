@@ -6,13 +6,12 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import kotlinx.coroutines.launch
-import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraft.util.IChatComponent
 
 @SkyHanniModule
 object ActionBarData {
@@ -57,18 +56,23 @@ object ActionBarData {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         actionBar = ""
     }
 
-    fun onChatReceive(event: ClientChatReceivedEvent) {
-        val original = event.message
-        val message = debugActionBar ?: original.formattedText.stripHypixelMessage()
+    /**
+     * If the action bar is modified return the new one, otherwise return null.
+     */
+    fun onChatReceive(component: IChatComponent): IChatComponent? {
+        val message = debugActionBar ?: component.formattedText.stripHypixelMessage()
+
         actionBar = message
-        val actionBarEvent = ActionBarUpdateEvent(actionBar, event.message)
+        val actionBarEvent = ActionBarUpdateEvent(actionBar, component)
         actionBarEvent.post()
-        if (event.message.formattedText != actionBarEvent.chatComponent.formattedText) {
-            event.message = actionBarEvent.chatComponent
+
+        if (component.formattedText != actionBarEvent.chatComponent.formattedText) {
+            return actionBarEvent.chatComponent
         }
+        return null
     }
 }

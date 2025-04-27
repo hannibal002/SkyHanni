@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.client.shader.Framebuffer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.MinecraftForgeClient
 import org.lwjgl.opengl.GL11
@@ -93,7 +94,7 @@ object EntityOutlineRenderer {
 
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
         val renderManager = mc.renderManager
-        mc.theWorld.theProfiler.endStartSection("entityOutlines")
+        MinecraftCompat.localWorld.theProfiler.endStartSection("entityOutlines")
         updateFrameBufferSize()
 
         // Clear and bind the outline framebuffer
@@ -167,7 +168,11 @@ object EntityOutlineRenderer {
 
                 try {
                     if (key !is EntityLivingBase) outlineColor(value)
-                    renderManager.renderEntityStatic(key, partialTicks, true)
+                    if (key is EntitySlime && key.isInvisible) {
+                        key.isInvisible = false
+                        renderManager.renderEntityStatic(key, partialTicks, true)
+                        key.isInvisible = true
+                    } else renderManager.renderEntityStatic(key, partialTicks, true)
                 } catch (ignored: Exception) {
                 }
             }
@@ -230,7 +235,7 @@ object EntityOutlineRenderer {
 
         // Vanilla Conditions
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
-        if (renderGlobal.frameBuffer == null || renderGlobal.shader == null || mc.thePlayer == null) return false
+        if (renderGlobal.frameBuffer == null || renderGlobal.shader == null || !MinecraftCompat.localPlayerExists) return false
 
         // OptiFine Conditions
         if (!stopLookingForOptiFine && isFastRender == null) {
@@ -290,18 +295,18 @@ object EntityOutlineRenderer {
         if (entity === mc.renderViewEntity &&
             !(
                 mc.renderViewEntity is EntityLivingBase && (mc.renderViewEntity as EntityLivingBase).isPlayerSleeping ||
-                    mc.gameSettings.thirdPersonView != 0
+                    !PlayerUtils.isFirstPersonView()
                 )
         ) {
             false
-        } else mc.theWorld.isBlockLoaded(BlockPos(entity)) && (
+        } else MinecraftCompat.localWorld.isBlockLoaded(BlockPos(entity)) && (
             mc.renderManager.shouldRender(
                 entity,
                 camera,
                 vector.x,
                 vector.y,
-                vector.z
-            ) || entity.getFirstPassenger() === mc.thePlayer
+                vector.z,
+            ) || entity.getFirstPassenger() === MinecraftCompat.localPlayerOrNull
             )
     // Only render if renderManager would render and the world is loaded at the entity
 
@@ -334,7 +339,7 @@ object EntityOutlineRenderer {
             GL30.glBlitFramebuffer(
                 0, 0, frameToCopy.framebufferWidth, frameToCopy.framebufferHeight,
                 0, 0, frameToPaste.framebufferWidth, frameToPaste.framebufferHeight,
-                buffersToCopy, GL11.GL_NEAREST
+                buffersToCopy, GL11.GL_NEAREST,
             )
         }
     }
@@ -356,11 +361,9 @@ object EntityOutlineRenderer {
      *
      * This works since entities are only updated once per tick, so the inclusion or exclusion of an entity
      * to be outlined can be cached each tick with no loss of data
-     *
-     * @param event the client tick event
      */
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         val renderGlobal = try {
@@ -371,7 +374,7 @@ object EntityOutlineRenderer {
             return
         }
 
-        if (mc.theWorld != null && shouldRenderEntityOutlines()) {
+        if (MinecraftCompat.localWorldExists && shouldRenderEntityOutlines()) {
             // These events need to be called in this specific order for the xray to have priority over the no xray
             // Get all entities to render xray outlines
             val xrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null)
@@ -379,7 +382,7 @@ object EntityOutlineRenderer {
             // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
             val noXrayOutlineEvent = RenderEntityOutlineEvent(
                 RenderEntityOutlineEvent.Type.NO_XRAY,
-                xrayOutlineEvent.entitiesToChooseFrom
+                xrayOutlineEvent.entitiesToChooseFrom,
             )
             noXrayOutlineEvent.post()
             // Cache the entities for future use

@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
+import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import java.io.Serializable
 import java.nio.file.Path
@@ -35,7 +36,6 @@ plugins {
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
     id("io.gitlab.arturbosch.detekt")
-    id("net.kyori.blossom")
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
@@ -62,6 +62,9 @@ loom {
             )
             mixinConfig("mixins.skyhanni.json")
         }
+    }
+    if (target == ProjectTarget.MODERN) {
+        accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
     }
     mixin {
         useLegacyMixinAp.set(true)
@@ -118,6 +121,10 @@ val headlessLwjgl by configurations.creating {
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
     this.branch = "main"
+}
+
+val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
+    this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
 }
 
 tasks.runClient {
@@ -182,8 +189,8 @@ dependencies {
         modImplementation("net.fabricmc:fabric-loader:0.16.7")
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
-        modImplementation("net.fabricmc:fabric-loader:0.16.10")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
+        modImplementation("net.fabricmc:fabric-loader:0.16.13")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
 
         modLocalRuntime(libs.modmenu)
     }
@@ -207,7 +214,12 @@ dependencies {
         isTransitive = false
     }
 
-    shadowModImpl(libs.moulconfig)
+    if (target == ProjectTarget.MAIN) {
+        shadowModImpl(libs.moulconfig)
+    } else if (target == ProjectTarget.MODERN) {
+        shadowModImpl(libs.moulconfigModern)
+    }
+
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
@@ -239,7 +251,8 @@ afterEvaluate {
         programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
-        this.options.add(SubpluginOption("apoption", "skyhanni.sourceset=${target.minecraftVersion.versionName}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
         this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
     }
 }
@@ -297,7 +310,7 @@ fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
     if (buildPathsFile.exists()) {
         sourceSet.get().apply {
             val buildPaths = buildPathsFile.readText().lineSequence()
-                .map { it.substringBefore("#").trim() }
+                .map { it.substringBefore("#").trim().replace(Regex("\\.(?!kt|java|\\()"), "/") }
                 .filter { it.isNotBlank() }
                 .toSet()
             kotlin.include(buildPaths)
@@ -397,11 +410,6 @@ preprocess {
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
-}
-
-blossom {
-    replaceToken("@MOD_VERSION@", version)
-    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {

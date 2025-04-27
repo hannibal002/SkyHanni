@@ -11,25 +11,27 @@ import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.CollectionUtils.contains
-import at.hannibal2.skyhanni.utils.CollectionUtils.firstTwiceOf
-import at.hannibal2.skyhanni.utils.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
-import at.hannibal2.skyhanni.utils.NeuItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstTwiceOf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
-import at.hannibal2.skyhanni.utils.guide.GuideGUI
+import at.hannibal2.skyhanni.utils.guide.GuideGui
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -51,6 +53,7 @@ import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
+@Suppress("TooManyFunctions")
 interface Renderable {
 
     val width: Int
@@ -87,7 +90,7 @@ interface Renderable {
             }
         }
 
-        fun fromAny(any: Any?, itemScale: Double = NeuItems.itemFontSize): Renderable? = when (any) {
+        fun fromAny(any: Any?, itemScale: Double = NeuItems.ITEM_FONT_SIZE): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
             is String -> string(any)
@@ -302,7 +305,7 @@ interface Renderable {
 
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
+            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null || GuiData.preDrawEventCancelled
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
@@ -417,7 +420,7 @@ interface Renderable {
 
         fun itemStackWithTip(
             item: ItemStack,
-            scale: Double = NeuItems.itemFontSize,
+            scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
             ySpacing: Int = 0,
             rescaleSkulls: Boolean = true,
@@ -439,12 +442,13 @@ interface Renderable {
 
         fun itemStack(
             item: ItemStack,
-            scale: Double = NeuItems.itemFontSize,
+            scale: Double = NeuItems.ITEM_FONT_SIZE,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+            highlight: Boolean = false,
         ) = object : Renderable {
             override val width = (15.5 * scale + 0.5).toInt() + xSpacing
             override val height = (15.5 * scale + 0.5).toInt() + ySpacing
@@ -452,6 +456,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
+                if (highlight) {
+                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+                }
                 item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
         }
@@ -553,50 +560,63 @@ interface Renderable {
         }
 
         fun searchableTable(
-            map: Map<List<Renderable?>, String?>,
+            content: Map<List<Renderable>, String>,
             textInput: TextInput,
             key: Int,
             xPadding: Int = 1,
             yPadding: Int = 0,
+            header: List<Renderable> = emptyList(),
             useEmptySpace: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            var content = filter()
-            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
+            var list = filterListMap(content, textInput.textBox)
+            private val fullContent = if (header.isNotEmpty()) listOf(header) + content.keys else content.keys
+            val xOffsets = RenderableUtils.calculateTableX(fullContent, xPadding)
+            val yOffsets = RenderableUtils.calculateTableY(fullContent, yPadding)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            override val width = xOffsets.last() - xPadding
-            override val height = yOffsets.last() - yPadding
+            override val width = xOffsets.sum()
+            override val height = yOffsets.sumAllValues().toInt()
 
             val emptySpaceX = if (useEmptySpace) 0 else xPadding
             val emptySpaceY = if (useEmptySpace) 0 else yPadding
 
             init {
                 textInput.registerToEvent(key) {
-                    content = filter()
+                    list = filterListMap(content, textInput.textBox)
                 }
             }
 
-            // null = ignored, never filtered
-            private fun filter() = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
+            @Suppress("NOTHING_TO_INLINE")
+            inline fun renderRow(posX: Int, posY: Int, row: List<Renderable>, renderY: Int): Int {
+                var renderX = 0
+                val yShift = yOffsets[row] ?: row.firstOrNull()?.height ?: 0
+                for ((index, renderable) in row.withIndex()) {
+                    val xShift = xOffsets[index]
+                    renderable.renderXYAligned(
+                        posX + renderX,
+                        posY + renderY,
+                        xShift - emptySpaceX,
+                        yShift - emptySpaceY,
+                    )
+                    GlStateManager.translate(xShift.toFloat(), 0f, 0f)
+                    renderX += xShift
+                }
+                GlStateManager.translate(-renderX.toFloat(), yShift.toFloat(), 0f)
+                return renderY + yShift
+            }
 
             override fun render(posX: Int, posY: Int) {
-                for ((rowIndex, row) in content.withIndex()) {
-                    for ((index, renderable) in row.withIndex()) {
-                        GlStateManager.pushMatrix()
-                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.renderXYAligned(
-                            posX + xOffsets[index],
-                            posY + yOffsets[rowIndex],
-                            xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
-                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
-                        )
-                        GlStateManager.popMatrix()
-                    }
+                var renderY = 0
+                if (header.isNotEmpty()) {
+                    renderY = renderRow(posX, posY, header, renderY)
                 }
+                for (row in list) {
+                    renderY = renderRow(posX, posY, row, renderY)
+                }
+                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
         }
 
@@ -825,7 +845,6 @@ interface Renderable {
             }
         }
 
-        // TODO use this to render current boosted crop in next jacob contest crops
         fun Renderable.renderBounds(color: Color = LorenzColor.GREEN.toColor().addAlpha(100)) = object : Renderable {
             override val width = this@renderBounds.width
             override val height = this@renderBounds.height
@@ -921,6 +940,10 @@ interface Renderable {
 
         fun line(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
             return horizontalContainer(buildList { builderAction() })
+        }
+
+        fun vertical(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
+            return verticalContainer(buildList { builderAction() }, spacing = 2)
         }
 
         fun horizontalContainer(

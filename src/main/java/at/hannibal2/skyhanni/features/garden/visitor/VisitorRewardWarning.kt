@@ -31,8 +31,8 @@ object VisitorRewardWarning {
         if (!VisitorApi.inInventory) return
 
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
-        val refuseOfferSlot = event.gui.inventorySlots.getSlot(REFUSE_SLOT)
-        val acceptOfferSlot = event.gui.inventorySlots.getSlot(ACCEPT_SLOT)
+        val refuseOfferSlot = event.container.getSlot(REFUSE_SLOT)
+        val acceptOfferSlot = event.container.getSlot(ACCEPT_SLOT)
         val blockReason = visitor.blockReason ?: return
 
         if (blockReason.blockRefusing) {
@@ -44,10 +44,10 @@ object VisitorRewardWarning {
 
     private fun renderColor(backgroundSlot: Slot?, outlineSlot: Slot?, outlineColor: LorenzColor) {
         if (!config.bypassKey.isKeyHeld() && backgroundSlot != null) {
-            backgroundSlot highlight LorenzColor.DARK_GRAY.addOpacity(config.opacity)
+            backgroundSlot.highlight(LorenzColor.DARK_GRAY.addOpacity(config.opacity))
         }
         if (config.optionOutline && outlineSlot != null) {
-            outlineSlot drawBorder outlineColor.addOpacity(200)
+            outlineSlot.drawBorder(outlineColor.addOpacity(200))
         }
     }
 
