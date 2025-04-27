@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.model.SoopyWaypoint
-import at.hannibal2.skyhanni.data.model.SoopyWaypointList
+import at.hannibal2.skyhanni.data.model.waypoints.SkyhanniWaypoint
+import at.hannibal2.skyhanni.data.model.waypoints.Waypoints
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.WaypointLoader
+import at.hannibal2.skyhanni.utils.WaypointParserUtils
 import kotlinx.coroutines.launch
 import java.awt.Color
 
@@ -30,7 +30,7 @@ import java.awt.Color
 object OrderedWaypoints {
     private val config get() = SkyHanniMod.feature.mining.orderedWaypoints
 
-    private var orderedWaypointsList = SoopyWaypointList()
+    private var orderedWaypointsList = Waypoints<SkyhanniWaypoint>()
     private val renderWaypoints: MutableList<Int> = mutableListOf()
     private var currentOrderedWaypointIndex = 0
     private var lastCloser = 0
@@ -41,33 +41,15 @@ object OrderedWaypoints {
         if (!enabled) return
 
         for (i in renderWaypoints.indices) {
-            var wpColor: Color? = null
-            var r = 0
-            var g = 0
-            var b = 0
-            if (!config.showAll) {
+            val wpColor = if (!config.showAll) {
                 when (i) {
-                    0 -> {
-                        wpColor = config.previousWaypointColor.toSpecialColor()
-                    }
-                    1 -> {
-                        wpColor = config.currentWaypointColor.toSpecialColor()
-                    }
-                    2 -> {
-                        wpColor = config.nextWaypointColor.toSpecialColor()
-                    }
-                    else -> {
-                        r = 255
-                    }
+                    0 -> config.previousWaypointColor.toSpecialColor()
+                    1 -> config.currentWaypointColor.toSpecialColor()
+                    2 -> config.nextWaypointColor.toSpecialColor()
+                    else -> Color(255, 0, 0)
                 }
             } else {
-                wpColor = orderedWaypointsList[renderWaypoints[i]].color
-            }
-
-            if (wpColor != null) {
-                r = wpColor.red
-                g = wpColor.green
-                b = wpColor.blue
+                orderedWaypointsList[renderWaypoints[i]].color
             }
 
             if (orderedWaypointsList.size <= renderWaypoints[i]) {
@@ -78,7 +60,7 @@ object OrderedWaypoints {
             // Outline
             event.drawEdges(
                 orderedWaypointsList[renderWaypoints[i]].location,
-                Color(r, g, b),
+                wpColor,
                 1,
                 false
             )
@@ -107,7 +89,7 @@ object OrderedWaypoints {
         if (!config.setupMode && config.traceLine && !config.showAll) {
             event.drawLineToEye(
                 traceWP.location.add(0.5, 0.25, 0.5),
-                Color(lineColor.red, lineColor.green, lineColor.blue),
+                lineColor,
                 config.traceLineThickness.toInt(),
                 false
             )
@@ -118,7 +100,7 @@ object OrderedWaypoints {
             event.draw3DLine(
                 currentWP.location.add(0.5, 2.65, 0.5),
                 traceWP.location.add(0.5, 0.5, 0.5),
-                Color(lineColor.red, lineColor.green, lineColor.blue),
+                lineColor,
                 config.setupModeLineThickness.toInt(),
                 depth = false
             )
@@ -127,8 +109,8 @@ object OrderedWaypoints {
         decideWaypoints()
     }
 
-    @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    @HandleEvent(WorldChangeEvent::class)
+    fun onWorldChange() {
         currentOrderedWaypointIndex = 0
     }
 
@@ -200,7 +182,7 @@ object OrderedWaypoints {
         event.register("shorderedexport") {
             description = "Exports the loaded ordered waypoints to clipboard."
             category = CommandCategory.USERS_ACTIVE
-            callback { export() }
+            callback { export(it) }
             aliases = generateAliases(listOf("export"))
         }
 
@@ -228,40 +210,25 @@ object OrderedWaypoints {
 
     private fun load(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            val res = if (args.isEmpty()) WaypointLoader.getWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
+            val res = if (args.isEmpty()) WaypointParserUtils.loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
             else {
-                ProfileStorageData.playerSpecific?.routes?.get(args[0])?.let {
-                    WaypointLoader.getWaypoints(it.toJson(), "soopy")
-                } ?: run {
+                ProfileStorageData.playerSpecific?.routes?.get(args[0]) ?: run {
                     ChatUtils.chat("Route ${args[0]} doesn't exist.")
                     return@launch
                 }
             }
 
-            if (res != null) {
-                orderedWaypointsList = res
+            res?.let {
+                orderedWaypointsList = it
                 currentOrderedWaypointIndex = 0
                 renderWaypoints.clear()
                 ChatUtils.chat("Loaded ordered waypoints!")
-            } else {
+            } ?: run {
                 ChatUtils.chat("There was an error parsing waypoints. Please make sure they are Coleweight formatted waypoints.")
                 return@launch
             }
 
-            orderedWaypointsList.let {
-                it.sortedBy { item -> item.options["name"]?.toIntOrNull() }
-
-                for (i in 1 until it.size) {
-                    if (it[i].options["name"]?.toInt() != i + 1) {
-                        ChatUtils.chat(
-                            "Waypoint ${i + 1} is not in the right order or is not a number!" +
-                                "Current is ${it[i].options["name"]}." +
-                                "Changing to ${i + 1}."
-                        )
-                        it[i].options["name"] = (i + 1).toString()
-                    }
-                }
-            }
+            orderedWaypointsList.sortedBy { item -> item.number }
         }
     }
 
@@ -352,30 +319,37 @@ object OrderedWaypoints {
     }
 
     private fun add(args: Array<String>) {
-        val waypoint = LocationUtils.playerLocation().add(0, -1, 0).roundLocationToBlock()
+        val pos = LocationUtils.playerLocation().add(0, -1, 0).roundLocationToBlock()
         val wNum = args.getOrNull(0)?.toIntOrNull()
 
         if (wNum == null || wNum < 1 || wNum > orderedWaypointsList.size + 1) {
             return ChatUtils.chat("Please enter a number between 1 and ${orderedWaypointsList.size + 1})")
         }
 
+        val newWaypoint = SkyhanniWaypoint(pos, number = wNum, options = mutableMapOf("name" to wNum.toString()))
         if (wNum == orderedWaypointsList.size + 1) {
-            orderedWaypointsList.add(SoopyWaypoint(waypoint, options = mutableMapOf("name" to wNum.toString())))
+            orderedWaypointsList.add(newWaypoint)
         } else {
             for (i in wNum - 1 until orderedWaypointsList.size) {
                 orderedWaypointsList[i].options["name"] =
                     ((orderedWaypointsList[i].options["name"]?.toIntOrNull() ?: (i + 1)).inc()).toString()
             }
-            orderedWaypointsList.add(wNum - 1, SoopyWaypoint(waypoint, options = mutableMapOf("name" to wNum.toString())))
+            orderedWaypointsList.add(wNum - 1, newWaypoint)
         }
-        ChatUtils.chat("Inserted waypoint $wNum at ${waypoint.toCleanString()}.")
+        ChatUtils.chat("Inserted waypoint $wNum at ${pos.toCleanString()}.")
     }
 
-    private fun export() {
+    private fun export(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            val route = orderedWaypointsList.toJson()
-            ClipboardUtils.copyToClipboard(route)
-            ChatUtils.chat("Route was copied to clipboard!")
+            val route = if (args.isEmpty()) WaypointParserUtils.exportWaypoints(orderedWaypointsList)
+            else WaypointParserUtils.exportWaypoints(orderedWaypointsList, args[0])
+
+            route?.let {
+                ClipboardUtils.copyToClipboard(it)
+                ChatUtils.chat("Route was copied to clipboard!")
+            } ?: run {
+                ChatUtils.chat("Invalid waypoint format specified.")
+            }
         }
     }
 
@@ -383,9 +357,8 @@ object OrderedWaypoints {
         if (args.isEmpty()) {
             return ChatUtils.chat("Usage: /shorderedsave (name).")
         }
-        val waypoints = SoopyWaypointList(orderedWaypointsList)
 
-        ProfileStorageData.playerSpecific?.routes?.put(args[0], waypoints)
+        ProfileStorageData.playerSpecific?.routes?.put(args[0], Waypoints(orderedWaypointsList))
 
         ChatUtils.chat("Route saved as ${args[0]}. Do /shorderedimport ${args[0]} to import it.")
     }
