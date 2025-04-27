@@ -1326,7 +1326,7 @@ interface Renderable {
                         DrawContextUtils.translate(xOffsets[index].toFloat(), 0f, 0f)
                         renderable?.renderXYAligned(
                             posX + xOffsets[index],
-                            posY + renderY,
+                            posY,
                             xOffsets[index + 1] - xOffsets[index],
                             yOffsets[1],
                         )
