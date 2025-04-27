@@ -7,20 +7,23 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyHeldEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyReleaseEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import net.minecraft.client.Minecraft
-import org.lwjgl.input.Keyboard
+import kotlin.reflect.KClass
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class Keybinding(
     // it would be an easy change to support modifieres etc. with this,
-    // but it's not added as it's not really possible to set in config
+    // but it's not added as it's not frequently used,
+    // an example where it would be useful is the garden plot borders
     val keyCodeProvider: () -> Int, // this may range from -100 to keyboard.KEYBOARD_SIZE
     val functionToExecute: () -> Unit,
     val cooldown: Duration = 2.seconds,
@@ -28,23 +31,17 @@ class Keybinding(
     val instantCondition: (() -> Boolean)? = { Minecraft.getMinecraft().currentScreen == null && !NeuItems.neuHasFocus() },
     val onlyOnIsland: IslandType = IslandType.ANY,
     vararg val onlyOnIslands: IslandType = arrayOf(),
-    val requireSeparateTaps: Boolean = true, // TODO: define
+    val onEvent: KClass<out KeyEvent> = KeyPressEvent::class,
     val name: String? = null, // this is used for debugging and logging
 ) {
     private var keyCode: Int = keyCodeProvider()
         get() {
-            if (keyCodeProvider() != field) {
-                field = keyCodeProvider()
+            val newValue = keyCodeProvider()
+            if (newValue != field) {
+                field = newValue
                 updateActiveState()
             }
             return field
-        }
-
-    private val keybindingType: KeybindingType?
-        get() = when {
-            keyCode < 0 -> KeybindingType.MOUSE
-            keyCode in 1 until Keyboard.KEYBOARD_SIZE -> KeybindingType.KEYBOARD
-            else -> null
         }
 
     private var lastTimeActiveChecked: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -58,27 +55,18 @@ class Keybinding(
         private set
 
     private var lastTimeExecuted: SimpleTimeMark = SimpleTimeMark.farPast()
-    private var lastTimePressed: SimpleTimeMark = SimpleTimeMark.farPast()
-    private var lastTimeUnpressed: SimpleTimeMark = SimpleTimeMark.now()
 
     init {
         addKeyBinding(this)
     }
 
-    override fun toString(): String = if (name != null) {
-        "Keybinding(name='$name', keyCode=$keyCode, keybindingType=$keybindingType, " +
-            "active=$active, lastTimeActiveChecked=$lastTimeActiveChecked, lastTimeExecuted=$lastTimeExecuted)"
-    } else {
-        "Keybinding(keyCode=$keyCode, keybindingType=$keybindingType, active=$active, " +
-            "lastTimeActiveChecked=$lastTimeActiveChecked, lastTimeExecuted=$lastTimeExecuted)"
-    }
-
-    private fun isKeyDown(): Boolean = when (keybindingType) {
-        KeybindingType.MOUSE -> MouseCompat.isButtonDown(keyCode + 100)
-        KeybindingType.KEYBOARD -> Keyboard.isKeyDown(keyCode)
-        null -> false
-    }.also {
-        if (it) lastTimePressed = SimpleTimeMark.now() else lastTimeUnpressed = SimpleTimeMark.now()
+    override fun toString(): String = buildString {
+        append("Keybinding(")
+        if (name != null) append("'$name', ")
+        append(
+            "keyCode=$keyCode, active=$active, lastTimeActiveChecked=$lastTimeActiveChecked, " +
+                    "lastTimeExecuted=$lastTimeExecuted)"
+        )
     }
 
     fun checkCondition() = condition?.invoke() ?: true
@@ -87,7 +75,6 @@ class Keybinding(
     fun isActive() = active
 
     private fun checkIsActive(): Boolean {
-        if (keybindingType == null) return false
         if (onlyOnIsland != IslandType.ANY && !onlyOnIsland.isInIsland()) return false
         if (onlyOnIslands.isNotEmpty() && !onlyOnIslands.any { it.isInIsland() }) return false
         return checkCondition()
@@ -105,10 +92,8 @@ class Keybinding(
 
     private fun isOnCooldown(): Boolean = lastTimeExecuted.passedSince() < cooldown
 
-    private fun isKeyTapped(): Boolean = (!requireSeparateTaps || lastTimeUnpressed > lastTimePressed) && isKeyDown()
-
-    private fun onTick() {
-        if (active && checkInstantCondition() && isKeyTapped() && !isOnCooldown()) {
+    private fun onCorrectKeyEvent() {
+        if (active && checkInstantCondition() && !isOnCooldown()) {
             execute()
         }
     }
@@ -119,15 +104,19 @@ class Keybinding(
             forEach { it.updateActiveState() }
         }
 
-        private enum class KeybindingType {
-            MOUSE,
-            KEYBOARD,
-        }
-
-        private val keybindings = mutableSetOf<Keybinding>()
+        private val keybindings
+            get() = keybindingsOnPress + keybindingsOnHeld + keybindingsOnRelease
+        private val keybindingsOnPress = mutableSetOf<Keybinding>()
+        private val keybindingsOnHeld = mutableSetOf<Keybinding>()
+        private val keybindingsOnRelease = mutableSetOf<Keybinding>()
 
         private fun addKeyBinding(keybinding: Keybinding) {
-            keybindings.add(keybinding)
+            when (keybinding.onEvent) {
+                KeyPressEvent::class -> keybindingsOnPress.add(keybinding)
+                KeyHeldEvent::class -> keybindingsOnHeld.add(keybinding)
+                KeyReleaseEvent::class -> keybindingsOnRelease.add(keybinding)
+                else -> throw IllegalArgumentException("Invalid keybinding type: ${keybinding.onEvent}")
+            }
             keybinding.updateActiveState()
         }
 
@@ -137,16 +126,37 @@ class Keybinding(
         }
 
         @HandleEvent
-        fun onTick(event: SkyHanniTickEvent) {
-            keybindings.forEach { it.onTick() }
+        fun onKeyPress(event: KeyPressEvent) {
+            keybindingsOnPress.forEach { keybinding ->
+                if (keybinding.keyCode == event.keyCode) {
+                    keybinding.onCorrectKeyEvent()
+                }
+            }
+        }
+
+        @HandleEvent
+        fun onKeyHeld(event: KeyEvent) {
+            keybindingsOnHeld.forEach { keybinding ->
+                if (keybinding.keyCode == event.keyCode) {
+                    keybinding.onCorrectKeyEvent()
+                }
+            }
+        }
+
+        @HandleEvent
+        fun onKeyRelease(event: KeyReleaseEvent) {
+            keybindingsOnRelease.forEach { keybinding ->
+                if (keybinding.keyCode == event.keyCode) {
+                    keybinding.onCorrectKeyEvent()
+                }
+            }
         }
 
         @HandleEvent
         fun onDebug(event: DebugDataCollectEvent) {
             val activeKeybindings = keybindings.filter { it.active }
-            val nullKeybindings = keybindings.filter { it.keybindingType == null }
             val inactiveKeybindings = keybindings.filter {
-                !activeKeybindings.contains(it) && !nullKeybindings.contains(it)
+                !activeKeybindings.contains(it)
             }
 
             event.title("Keybindings")
@@ -155,12 +165,6 @@ class Keybinding(
                 if (activeKeybindings.isNotEmpty()) {
                     add("${activeKeybindings.size} active keybindings:")
                     activeKeybindings.forEach {
-                        add(it.toString())
-                    }
-                }
-                if (nullKeybindings.isNotEmpty()) {
-                    add("${nullKeybindings.size} keybindings without a set key:")
-                    nullKeybindings.forEach {
                         add(it.toString())
                     }
                 }
