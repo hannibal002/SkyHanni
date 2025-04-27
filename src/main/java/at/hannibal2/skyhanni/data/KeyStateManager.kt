@@ -33,15 +33,11 @@ object KeyStateManager {
         keyCode = getSyntheticKeyboardKeyCode(keyCode, keyChar)
 
         if (keyState) {
-            if (isRepeat) {
-                println("Key held: $keyCode ($keyChar)")
-                KeyHeldEvent(keyCode).post()
-            } else {
-                println("Key pressed: $keyCode ($keyChar)")
+            KeyHeldEvent(keyCode).post()
+            if (!isRepeat) {
                 KeyPressEvent(keyCode).post()
             }
         } else {
-            println("Key released: $keyCode ($keyChar), repeat: $isRepeat")
             KeyReleaseEvent(keyCode).post()
         }
     }
