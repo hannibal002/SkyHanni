@@ -34,12 +34,12 @@ class DianaConfig {
     @FeatureToggle
     var guess: Boolean = false
 
-    enum class GuessLogic(private val display: String) {
+    enum class GuessLogic(private val displayName: String) {
         SOOPY_GUESS("Soopy"),
         PRECISE_GUESS("Precise"),
         ;
 
-        override fun toString(): String = display
+        override fun toString(): String = displayName
     }
 
     @Expose
@@ -110,7 +110,6 @@ class DianaConfig {
     @Accordion
     var dianaProfitTracker: DianaProfitTrackerConfig = DianaProfitTrackerConfig()
 
-    // TODO rename mythologicalMobTracker
     @Expose
     @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
