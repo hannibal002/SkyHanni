@@ -2,20 +2,19 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.mining.PowderChestTimerConfig
+import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -35,7 +34,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.block.BlockChest
 import net.minecraft.block.state.IBlockState
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -57,23 +55,22 @@ object PowderChestTimer {
     }
 
     @HandleEvent
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled()) return
         if (event.soundName == "random.levelup" && event.pitch == 1.0f && event.volume == 1.0f) {
             lastSound = SimpleTimeMark.now()
         }
     }
 
-    @SubscribeEvent
-    fun onRenderGui(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.position.renderRenderable(display, posLabel = "Powder Chest Timer")
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (!isEnabled()) return
+    @HandleEvent
+    fun onWorldChange() {
 
         chestSet.clear()
     }
@@ -110,8 +107,8 @@ object PowderChestTimer {
         }
     }
 
-    @SubscribeEvent
-    fun onSecondPassed(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick() {
         if (!isEnabled()) return
 
         display = drawDisplay()
@@ -130,12 +127,11 @@ object PowderChestTimer {
         return Renderable.string("$color${timeUntil.format(TimeUnit.SECOND)} §8(§e$count §b$name§8)")
     }
 
-    @SubscribeEvent
-    fun onRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         for ((loc, time) in chestSet) {
-
-            val color = if (config.useStaticColor) config.staticColor.toChromaColor() else time.timeUntil().getColorBasedOnTime()
+            val color = if (config.useStaticColor) config.staticColor.toChromaColor().toColor() else time.timeUntil().getColorBasedOnTime()
 
             if (config.highlightChests)
                 event.drawWaypointFilled(loc, color, seeThroughBlocks = false)
@@ -154,34 +150,33 @@ object PowderChestTimer {
                 else -> continue
             }
 
-            if (sorted.isNotEmpty()) {
-                val chestToConnect = sorted.take(config.drawLineToChestAmount)
-                if (chestToConnect.isNotEmpty()) {
-                    val (firstPos, firstTime) = chestToConnect.first()
-                    event.draw3DLine(
-                        event.exactPlayerEyeLocation(),
-                        firstPos.blockCenter(),
-                        firstTime.timeUntil().getColorBasedOnTime(),
-                        3,
-                        true,
-                    )
+            if (sorted.isEmpty()) continue
+            val chestToConnect = sorted.take(config.drawLineToChestAmount)
 
-                    for (i in 0 until chestToConnect.size - 1) {
-                        val (current, currentTime) = chestToConnect[i]
-                        val (next, _) = chestToConnect[i + 1]
+            val (firstPos, firstTime) = chestToConnect.firstOrNull() ?: continue
 
-                        val currentUtil = currentTime.timeUntil()
-                        val currentColor = currentUtil.getColorBasedOnTime()
+            event.draw3DLine(
+                event.exactPlayerEyeLocation(),
+                firstPos.blockCenter(),
+                firstTime.timeUntil().getColorBasedOnTime(),
+                3,
+                true,
+            )
 
-                        event.draw3DLine(
-                            current.blockCenter(),
-                            next.blockCenter(),
-                            currentColor,
-                            3,
-                            true,
-                        )
-                    }
-                }
+            for (i in 0 until chestToConnect.size - 1) {
+                val (current, currentTime) = chestToConnect[i]
+                val (next, _) = chestToConnect[i + 1]
+
+                val currentUtil = currentTime.timeUntil()
+                val currentColor = currentUtil.getColorBasedOnTime()
+
+                event.draw3DLine(
+                    current.blockCenter(),
+                    next.blockCenter(),
+                    currentColor,
+                    3,
+                    true,
+                )
             }
         }
     }
