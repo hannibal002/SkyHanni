@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
-import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.HolographicEntities.renderHolographicEntity
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -48,15 +48,20 @@ object CraftRoomHolographicMob {
     }
 
     @HandleEvent
+    fun onWorldChange() {
+        entitiesList = emptyList()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        for (theMob in EntityUtils.getEntitiesNearby<EntityLivingBase>(LocationUtils.playerLocation(), 25.0)) {
+        for (theMob in EntityUtils.getEntitiesNextToPlayer<EntityLivingBase>(25.0)) {
             if (theMob is EntityPlayer) continue
 
-            if (!craftRoomArea.isInside(theMob.getLorenzVec())) continue
-
             val mobPos = theMob.getLorenzVec()
+            if (!craftRoomArea.isInside(mobPos)) continue
+
             val wallZ = -116.5
             val dist = abs(mobPos.z - wallZ)
             val holographicMobPos = mobPos.add(z = dist * 2)
@@ -76,7 +81,7 @@ object CraftRoomHolographicMob {
 
             instance.isChild = theMob.isChild
 
-            HolographicEntities.renderHolographicEntity(instance, event.partialTicks)
+            event.renderHolographicEntity(instance)
 
             if (displayString.isNotEmpty()) {
                 event.drawString(holographicMobPos.add(y = theMob.eyeHeight + .5), displayString)
@@ -96,5 +101,5 @@ object CraftRoomHolographicMob {
         }
     }
 
-    private fun isEnabled() = config.enabled && RiftApi.inRift()
+    private fun isEnabled() = RiftApi.inRift() && config.enabled
 }
