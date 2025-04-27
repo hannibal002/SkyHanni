@@ -64,8 +64,7 @@ class Keybinding(
         append("Keybinding(")
         if (name != null) append("'$name', ")
         append(
-            "keyCode=$keyCode, active=$active, lastTimeActiveChecked=$lastTimeActiveChecked, " +
-                    "lastTimeExecuted=$lastTimeExecuted)"
+            "keyCode=$keyCode, active=$active, lastTimeActiveChecked=$lastTimeActiveChecked, lastTimeExecuted=$lastTimeExecuted)"
         )
     }
 
