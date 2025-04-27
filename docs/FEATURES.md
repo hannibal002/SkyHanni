@@ -136,6 +136,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays player's Dungeon Class.
     + Shows Class Level (toggleable).
     + Added "(Dead)" text for dead teammates with customizable colors.
++ Added Color Override to Dungeon Livid Finder. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3511)
 
 </details>
 <details open><summary>

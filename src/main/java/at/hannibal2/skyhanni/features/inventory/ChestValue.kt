@@ -54,8 +54,8 @@ object ChestValue {
     private var inOwnInventory = false
     private val scrollValue = ScrollValue()
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onBackgroundDraw() {
         if (!isEnabled()) return
         if (DungeonApi.inDungeon() && !config.enableInDungeons) return
         if (!inOwnInventory) {
@@ -73,7 +73,7 @@ object ChestValue {
         }
     }
 
-    fun featureName() = if (inOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
+    private fun featureName() = if (inOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -85,8 +85,8 @@ object ChestValue {
         update()
     }
 
-    @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
+    @HandleEvent(InventoryOpenEvent::class)
+    fun onInventoryOpen() {
         if (!isEnabled()) return
         if (inInventory) {
             update()
@@ -237,6 +237,7 @@ object ChestValue {
         }
     }
 
+    @Suppress("ReturnCount")
     private fun isValidStorage(): Boolean {
         if (inOwnInventory) return true
         val name = InventoryUtils.openInventoryName().removeColor()
