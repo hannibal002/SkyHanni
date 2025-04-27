@@ -6,11 +6,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.removeIf
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onDisable
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -18,15 +14,18 @@ import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
@@ -62,7 +61,7 @@ object BeachBallCatchHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSkyHanniTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         predictors.removeIf { (id, predict) ->
             val entity = EntityUtils.getEntityByID(id) ?: return@removeIf true
@@ -72,7 +71,7 @@ object BeachBallCatchHelper {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSkyHanniRenderWorld(event: SkyHanniRenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val color = config.bouncyBallLineColor.toSpecialColor()
         RenderUtils.LineDrawer.draw3D(event.partialTicks) {
@@ -86,7 +85,7 @@ object BeachBallCatchHelper {
 
     private fun SkyHanniRenderWorldEvent.renderLandingPosition() {
         if (!config.bouncyBallLandingSpot.get()) return
-        val player = exactLocation(Minecraft.getMinecraft().thePlayer).add(y = 1)
+        val player = exactLocation(MinecraftCompat.localPlayer).add(y = 1)
         for ((e, predictor) in predictors.map { EntityUtils.getEntityByID(it.key) to it.value }) {
             val entity = e ?: continue
             val location = exactLocation(entity).copy(y = player.y)
@@ -111,7 +110,7 @@ object BeachBallCatchHelper {
 
     private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec, player: LorenzVec, predictor: Predictor) {
         val distance = location.distance(player)
-        drawFilledBoundingBoxNea(
+        drawFilledBoundingBox(
             location.getAABB(predictor.variant),
             when {
                 distance < 0.3 -> Color.GREEN
@@ -138,7 +137,7 @@ object BeachBallCatchHelper {
 
     private fun isEnabled() = config.bouncyBallLine.get()
 
-    enum class Variant {
+    private enum class Variant {
         NORMAL,
         GIANT,
     }
