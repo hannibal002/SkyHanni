@@ -1,12 +1,17 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyHeldEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyReleaseEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.InputEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 
@@ -42,6 +47,8 @@ object KeyStateManager {
         }
     }
 
+    private val heldMouseButtons = mutableSetOf<Int>()
+
     /**
      * Handles mouse input events. Only outside of GUIs.
      */
@@ -52,21 +59,30 @@ object KeyStateManager {
         var button = Mouse.getEventButton()
         if (button == -1) return // No button pressed
         button = button - 100
-        val buttonName = Mouse.getButtonName(button)
         val buttonState = Mouse.getEventButtonState()
-        val mouseX = Mouse.getEventX()
-        val mouseY = Mouse.getEventY()
-        val scrollDelta = Mouse.getEventDWheel()
 
         if (buttonState) {
-            println("Mouse button pressed: $button, name: $buttonName, position: ($mouseX, $mouseY), scroll delta: $scrollDelta")
             KeyPressEvent(button).post()
-
+            KeyHeldEvent(button).post()
         } else {
-            println("Mouse button released: $button, name: $buttonName, position: ($mouseX, $mouseY), scroll delta: $scrollDelta")
             KeyReleaseEvent(button).post()
+            heldMouseButtons.remove(button)
         }
     }
+
+    @HandleEvent(eventType = SkyHanniTickEvent::class)
+    fun onTick() {
+        if (Minecraft.getMinecraft().currentScreen != null) return // Don't process mouse events when in a GUI
+
+        heldMouseButtons.forEach { button ->
+            if (Mouse.isButtonDown(button)) {
+                KeyHeldEvent(button).post()
+            } else {
+                heldMouseButtons.remove(button)
+            }
+        }
+    }
+
     //#else
     //$$ // todo use fabric event or whatnot
     //#endif
