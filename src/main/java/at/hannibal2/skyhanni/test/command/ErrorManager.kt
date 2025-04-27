@@ -63,6 +63,15 @@ object ErrorManager {
         "at net.minecraft.launchwrapper.",
     )
 
+    // this hides the whole stack trace of one error of the list of all errors in the error message
+    // where the error class name is the key and the first line contains one of the entries in the list of values
+    private val skipErrorEntry = mapOf(
+        "java.lang.reflect.InvocationTargetException" to listOf(
+            "EventListeners.createZeroParameterConsumer",
+            "EventListeners.createSingleParameterConsumer",
+        ),
+    )
+
     fun resetCache() {
         cache.clear()
     }
@@ -140,7 +149,7 @@ object ErrorManager {
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
     private fun logError(
-        throwable: Throwable,
+        originalThrowable: Throwable,
         message: String,
         ignoreErrorCache: Boolean,
         noStackTrace: Boolean,
@@ -149,6 +158,7 @@ object ErrorManager {
         condition: () -> Boolean = { true },
     ): Boolean {
         if (betaOnly && !SkyHanniMod.isBetaVersion) return false
+        val throwable = originalThrowable.maybeSkipError()
         if (!ignoreErrorCache) {
             val cachedError = throwable.stackTrace.getOrNull(0)?.let {
                 CachedError(it.fileName ?: "<unknown>", it.lineNumber, message)
@@ -297,5 +307,21 @@ object ErrorManager {
         cause?.let {
             addAll(it.getCustomStackTrace(fullStackTrace, this))
         }
+    }
+
+    // tries to use the cause instead of the actual error. Returns itself if doesnt work.
+    fun Throwable.maybeSkipError(): Throwable {
+        val cause = cause ?: return this
+        val causeClassName = this@maybeSkipError.javaClass.name
+        val breakOnFirstLine = skipErrorEntry[causeClassName]
+
+        for (traceElement in stackTrace) {
+            val line = traceElement.toString()
+            breakOnFirstLine?.let { list ->
+                if (list.any { line.contains(it) }) return cause
+            }
+        }
+
+        return this
     }
 }

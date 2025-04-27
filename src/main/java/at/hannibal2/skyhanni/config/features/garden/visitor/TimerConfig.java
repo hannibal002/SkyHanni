@@ -24,6 +24,7 @@ public class TimerConfig {
     @ConfigOption(name = "Sixth Visitor Warning", desc = "Notify when it is believed that the sixth visitor has arrived.\n" +
         "§eMay be inaccurate with co-op members farming simultaneously.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean sixthVisitorWarning = true;
 
     @Expose

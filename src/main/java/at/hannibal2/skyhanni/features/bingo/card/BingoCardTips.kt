@@ -108,7 +108,7 @@ object BingoCardTips {
                 val difficulty = Difficulty.valueOf(it.difficulty.uppercase())
                 difficulty.color
             } ?: LorenzColor.GRAY
-            slot.highlight(event.context, color.addOpacity(120))
+            slot.highlight(color.addOpacity(120))
         }
     }
 
