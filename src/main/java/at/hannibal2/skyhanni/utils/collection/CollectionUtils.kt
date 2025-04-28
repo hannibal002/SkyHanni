@@ -8,6 +8,7 @@ import java.util.PriorityQueue
 import java.util.Queue
 import java.util.WeakHashMap
 import kotlin.math.ceil
+import kotlin.time.Duration
 
 object CollectionUtils {
 
@@ -63,6 +64,9 @@ object CollectionUtils {
 
     fun <K> MutableMap<K, Float>.addOrPut(key: K, number: Float): Float =
         this.merge(key, number, Float::plus)!! // Never returns null since "plus" can't return null
+
+    fun <K> MutableMap<K, Duration>.addOrPut(key: K, number: Duration): Duration =
+        this.merge(key, number, Duration::plus)!! // Never returns null since "plus" can't return null
 
     @Suppress("UnsafeCallOnNullableType")
     fun <K> MutableMap<K, MinMaxNumber>.addOrPut(key: K, number: MinMaxNumber): MinMaxNumber =

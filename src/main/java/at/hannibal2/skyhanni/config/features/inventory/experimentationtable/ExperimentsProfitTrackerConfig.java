@@ -32,6 +32,11 @@ public class ExperimentsProfitTrackerConfig {
     public int timeDisplayed = 30;
 
     @Expose
+    @ConfigOption(name = "Track Time Spent", desc = "Track time spent doing addons and experiments.")
+    @ConfigEditorBoolean
+    public boolean trackTimeSpent = true;
+
+    @Expose
     @ConfigOption(name = "Track Used Bottles", desc = "Track thrown XP bottles while near the experimentation table.")
     @ConfigEditorBoolean
     public boolean trackUsedBottles = true;
