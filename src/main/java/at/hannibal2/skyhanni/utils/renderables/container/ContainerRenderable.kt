@@ -24,7 +24,7 @@ open class VerticalContainerRenderable(
     spacing: Int = 0,
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-) : ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
+) : Renderable, ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
 
     override val width: Int
         get() = renderables.maxOfOrNull { it.width } ?: 0
@@ -46,7 +46,7 @@ class HorizontalContainerRenderable(
     spacing: Int = 0,
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-) : ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
+) : Renderable, ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
 
     override val width: Int
         get() = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
