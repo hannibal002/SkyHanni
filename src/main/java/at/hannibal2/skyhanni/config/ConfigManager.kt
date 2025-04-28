@@ -292,7 +292,13 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
         val default = super.createOptionGui(processedOption, field, option) ?: return null
         if (processedOption !is ProcessedOptionImpl) return default
         if (processedOption !is AcceessmoulConfigPlease) return default
-        if (EnforcedConfigValues.isBlockedFromEditing(processedOption.path)) {
+        var extraPath = ""
+        val categoryParent = processedOption.category.parentCategoryId
+        if (categoryParent != null) {
+            extraPath = categoryParent.split(".").last() + "."
+        }
+        extraPath += processedOption.path
+        if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
             return GuiOptionEditorBlocked(default)
         }
         return default

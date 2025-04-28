@@ -58,8 +58,10 @@ object EnforcedConfigValues {
         }
         val chat = enforcedValues.flatMap { it.chatPSA ?: emptyList() }
         if (chat.isNotEmpty()) {
+            var shouldPrefix = true
             for (line in chat) {
-                ChatUtils.chat(line)
+                ChatUtils.chat(line, prefix = shouldPrefix)
+                shouldPrefix = false
             }
         }
     }
