@@ -18,12 +18,12 @@ class ReputationHelperConfig {
     @ConfigOption(name = "Enabled", desc = "Enable features around Reputation features in the Crimson Isle.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Completed", desc = "Hide tasks after they've been completed.")
     @ConfigEditorBoolean
-    var hideComplete: Property<Boolean> = Property.of(true)
+    val hideComplete: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Use Hotkey", desc = "Only show the Reputation Helper while pressing the hotkey.")
@@ -37,17 +37,17 @@ class ReputationHelperConfig {
 
     @Expose
     @ConfigLink(owner = ReputationHelperConfig::class, field = "enabled")
-    var position: Position = Position(10, 10, false, true)
+    val position: Position = Position(10, 10, false, true)
 
     @Expose
     @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
     @ConfigEditorDropdown
-    var showLocation: ShowLocationEntry = ShowLocationEntry.ONLY_HOTKEY
+    val showLocation: ShowLocationEntry = ShowLocationEntry.ONLY_HOTKEY
 
     @Expose
     @ConfigOption(name = "Rescue Mission", desc = "")
     @Accordion
-    var rescueMission: RescueMissionConfig = RescueMissionConfig()
+    val rescueMission: RescueMissionConfig = RescueMissionConfig()
 
     enum class ShowLocationEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         ALWAYS("Always", 0),

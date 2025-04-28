@@ -26,5 +26,5 @@ class HalloweenBasketConfig {
     @Expose
     @ConfigOption(name = "Pathfind", desc = "Show a path to the closest basket.")
     @ConfigEditorBoolean
-    var pathfind: Property<Boolean> = Property.of(true)
+    val pathfind: Property<Boolean> = Property.of(true)
 }

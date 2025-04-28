@@ -28,5 +28,5 @@ class GiftTrackerConfig {
 
     @Expose
     @ConfigLink(owner = GiftTrackerConfig::class, field = "enabled")
-    var position: Position = Position(-274, 0)
+    val position: Position = Position(-274, 0)
 }

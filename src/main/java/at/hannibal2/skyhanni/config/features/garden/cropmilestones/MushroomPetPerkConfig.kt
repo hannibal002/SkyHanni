@@ -26,7 +26,7 @@ class MushroomPetPerkConfig {
         desc = "Drag text to change the appearance of the overlay.\n" + "Hold a farming tool to show the overlay.",
     )
     @ConfigEditorDraggableList
-    var text: MutableList<MushroomTextEntry> = mutableListOf(
+    val text: MutableList<MushroomTextEntry> = mutableListOf(
         MushroomTextEntry.TITLE,
         MushroomTextEntry.MUSHROOM_TIER,
         MushroomTextEntry.NUMBER_OUT_OF_TOTAL,
@@ -50,5 +50,5 @@ class MushroomPetPerkConfig {
 
     @Expose
     @ConfigLink(owner = MushroomPetPerkConfig::class, field = "enabled")
-    var pos: Position = Position(-112, -143, false, true)
+    val pos: Position = Position(-112, -143, false, true)
 }

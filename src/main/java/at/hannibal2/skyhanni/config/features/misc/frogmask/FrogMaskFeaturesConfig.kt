@@ -18,9 +18,9 @@ class FrogMaskFeaturesConfig {
     @Expose
     @ConfigOption(name = "Frog Mask Warning", desc = "")
     @Accordion
-    var warning: FrogMaskWarningConfig = FrogMaskWarningConfig()
+    val warning: FrogMaskWarningConfig = FrogMaskWarningConfig()
 
     @Expose
     @ConfigLink(owner = FrogMaskFeaturesConfig::class, field = "display")
-    var position: Position = Position(25, 25)
+    val position: Position = Position(25, 25)
 }

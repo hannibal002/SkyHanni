@@ -22,28 +22,28 @@ class ChatConfig {
     @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
     @Accordion
-    var filterType: FilterTypesConfig = FilterTypesConfig()
+    val filterType: FilterTypesConfig = FilterTypesConfig()
 
     // TODO move into own sub category
     @Expose
     @ConfigOption(name = "Player Messages", desc = "")
     @Accordion
-    var playerMessage: PlayerMessagesConfig = PlayerMessagesConfig()
+    val playerMessage: PlayerMessagesConfig = PlayerMessagesConfig()
 
     @Expose
     @ConfigOption(name = "Sound Responses", desc = "")
     @Accordion
-    var soundResponse: ChatSoundResponseConfig = ChatSoundResponseConfig()
+    val soundResponse: ChatSoundResponseConfig = ChatSoundResponseConfig()
 
     @Expose
     @ConfigOption(name = "Rare Drop Messages", desc = "")
     @Accordion
-    var rareDropMessages: RareDropMessagesConfig = RareDropMessagesConfig()
+    val rareDropMessages: RareDropMessagesConfig = RareDropMessagesConfig()
 
     @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
-    var dungeonFilteredMessageTypes: MutableList<DungeonMessageTypes> = mutableListOf()
+    val dungeonFilteredMessageTypes: MutableList<DungeonMessageTypes> = mutableListOf()
 
     enum class DungeonMessageTypes(private val displayName: String) {
         PREPARE("§bPreparation"),
@@ -99,13 +99,13 @@ class ChatConfig {
 
     @Expose
     @ConfigLink(owner = ChatConfig::class, field = "currentChatDisplay")
-    var currentChatDisplayPos: Position = Position(3, -21)
+    val currentChatDisplayPos: Position = Position(3, -21)
 
     // TODO jawbus + thunder
     @Expose
     @ConfigOption(name = "Compact Potion Messages", desc = "")
     @Accordion
-    var compactPotionMessages: CompactPotionConfig = CompactPotionConfig()
+    val compactPotionMessages: CompactPotionConfig = CompactPotionConfig()
 
     @Expose
     @ConfigOption(
@@ -164,7 +164,7 @@ class ChatConfig {
 
     @Category(name = "Translator", desc = "Chat translator settings.")
     @Expose
-    var translator: TranslatorConfig = TranslatorConfig()
+    val translator: TranslatorConfig = TranslatorConfig()
 
     @Expose
     @ConfigOption(name = "SkyBlock XP in Chat", desc = "Send the SkyBlock XP messages into the chat.")

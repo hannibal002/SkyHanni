@@ -10,7 +10,7 @@ class EndermanConfig {
     @Expose
     @ConfigOption(name = "Yang Glyph (Beacon)", desc = "")
     @Accordion
-    var beacon: EndermanBeaconConfig = EndermanBeaconConfig()
+    val beacon: EndermanBeaconConfig = EndermanBeaconConfig()
 
     @Expose
     @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlight the Enderman Slayer Nukekubi Skulls (Eyes).")

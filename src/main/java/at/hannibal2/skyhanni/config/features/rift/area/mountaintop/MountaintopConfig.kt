@@ -9,10 +9,10 @@ class MountaintopConfig {
     @Expose
     @ConfigOption(name = "Sun Gecko", desc = "")
     @Accordion
-    var sunGecko: SunGeckoConfig = SunGeckoConfig()
+    val sunGecko: SunGeckoConfig = SunGeckoConfig()
 
     @Expose
     @ConfigOption(name = "Timite", desc = "")
     @Accordion
-    var timite: TimiteConfig = TimiteConfig()
+    val timite: TimiteConfig = TimiteConfig()
 }

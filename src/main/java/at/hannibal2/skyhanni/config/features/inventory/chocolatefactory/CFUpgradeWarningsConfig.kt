@@ -40,5 +40,5 @@ class CFUpgradeWarningsConfig {
         desc = "Include Time Tower in the list of upgrades to be considered 'next best'."
     )
     @ConfigEditorBoolean
-    var upgradeWarningTimeTower: Property<Boolean> = Property.of(false)
+    val upgradeWarningTimeTower: Property<Boolean> = Property.of(false)
 }

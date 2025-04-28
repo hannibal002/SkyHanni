@@ -23,5 +23,5 @@ class DefenseBlockConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Set the color of the lines, blocks and the entity.")
     @ConfigEditorColour
-    var color: Property<String> = Property.of("0:255:77:104:255")
+    val color: Property<String> = Property.of("0:255:77:104:255")
 }

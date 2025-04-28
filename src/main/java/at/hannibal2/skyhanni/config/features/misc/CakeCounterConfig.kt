@@ -32,7 +32,7 @@ class CakeCounterConfig {
         desc = "Send a chat message with Cake Counter stat changes while you were away from your Private Island.",
     )
     @ConfigEditorDropdown
-    var offlineStatsMode: OfflineStatsMode = OfflineStatsMode.DISABLED
+    val offlineStatsMode: OfflineStatsMode = OfflineStatsMode.DISABLED
 
     enum class OfflineStatsMode(private val displayName: String) {
         DISABLED("Disabled"),
@@ -49,7 +49,7 @@ class CakeCounterConfig {
         desc = "Choose how \"Offline Cake Counter\" tracks: Since last leaving or since last joining your Private Island.",
     )
     @ConfigEditorDropdown
-    var offlineTrackingMode: OfflineTrackingMode = OfflineTrackingMode.SINCE_LAST_LEFT
+    val offlineTrackingMode: OfflineTrackingMode = OfflineTrackingMode.SINCE_LAST_LEFT
 
     enum class OfflineTrackingMode(private val displayName: String) {
         SINCE_LAST_LEFT("Since Last Left"),

@@ -31,12 +31,12 @@ class MiningEventConfig {
     @Expose
     @ConfigOption(name = "What to Show", desc = "Choose which island's events are shown in the GUI.")
     @ConfigEditorDropdown
-    var showType: ShowType = ShowType.ALL
+    val showType: ShowType = ShowType.ALL
 
     @Expose
     @ConfigOption(name = "Compressed Format", desc = "Compress the event names so that they are shorter.")
     @ConfigEditorDropdown
-    var compressedFormat: CompressFormat = CompressFormat.DEFAULT
+    val compressedFormat: CompressFormat = CompressFormat.DEFAULT
 
     @Expose
     @ConfigOption(name = "Compressed Island", desc = "Show the islands only as an icon.")
@@ -63,7 +63,7 @@ class MiningEventConfig {
 
     @Expose
     @ConfigLink(owner = MiningEventConfig::class, field = "enabled")
-    var position: Position = Position(200, 60, false, true)
+    val position: Position = Position(200, 60, false, true)
 
     @Expose
     @ConfigOption(

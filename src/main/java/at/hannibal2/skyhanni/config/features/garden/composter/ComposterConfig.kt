@@ -27,7 +27,7 @@ class ComposterConfig {
         desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
     )
     @ConfigEditorDropdown
-    var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY
+    val priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY
 
     @Expose
     @ConfigOption(
@@ -35,7 +35,7 @@ class ComposterConfig {
         desc = "Change where to retrieve the materials from in the composter overlay: Bazaar or Sacks."
     )
     @ConfigEditorDropdown
-    var retrieveFrom: RetrieveFromEntry = RetrieveFromEntry.SACKS
+    val retrieveFrom: RetrieveFromEntry = RetrieveFromEntry.SACKS
 
     enum class RetrieveFromEntry(
         private val displayName: String,
@@ -51,11 +51,11 @@ class ComposterConfig {
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")
-    var overlayOrganicMatterPos: Position = Position(140, 152, false, true)
+    val overlayOrganicMatterPos: Position = Position(140, 152, false, true)
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")
-    var overlayFuelExtrasPos: Position = Position(-320, 152, false, true)
+    val overlayFuelExtrasPos: Position = Position(-320, 152, false, true)
 
     @Expose
     @ConfigOption(name = "Composter Display", desc = "Display the Composter data from the tab list as GUI element.")
@@ -109,13 +109,13 @@ class ComposterConfig {
     @Expose
     @ConfigOption(name = "Notification When Low Composter", desc = "")
     @Accordion
-    var notifyLow: NotifyLowConfig = NotifyLowConfig()
+    val notifyLow: NotifyLowConfig = NotifyLowConfig()
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "displayEnabled")
-    var displayPos: Position = Position(-390, 10, false, true)
+    val displayPos: Position = Position(-390, 10, false, true)
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "displayEnabled")
-    var outsideGardenPos: Position = Position(-363, 13, false, true)
+    val outsideGardenPos: Position = Position(-363, 13, false, true)
 }

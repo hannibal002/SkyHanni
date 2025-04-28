@@ -23,12 +23,12 @@ class StereoHarmonyConfig {
     @Expose
     @ConfigOption(name = "Show Pest Head", desc = "Show the head of the pest being boosted.")
     @ConfigEditorBoolean
-    var showHead: Property<Boolean> = Property.of(true)
+    val showHead: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Show Crop Icon", desc = "Show the icon of the crops dropped by the pests being boosted.")
     @ConfigEditorBoolean
-    var showCrop: Property<Boolean> = Property.of(true)
+    val showCrop: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Hide when None", desc = "Hide when no vinyl selected.")
@@ -42,5 +42,5 @@ class StereoHarmonyConfig {
 
     @Expose
     @ConfigLink(owner = StereoHarmonyConfig::class, field = "displayEnabled")
-    var position: Position = Position(205, 55, 1f)
+    val position: Position = Position(205, 55, 1f)
 }

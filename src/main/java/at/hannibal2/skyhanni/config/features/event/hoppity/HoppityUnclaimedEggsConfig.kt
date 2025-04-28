@@ -21,12 +21,12 @@ class HoppityUnclaimedEggsConfig {
 
     @Expose
     @ConfigLink(owner = HoppityUnclaimedEggsConfig::class, field = "enabled")
-    var position: Position = Position(200, 120, false, true)
+    val position: Position = Position(200, 120, false, true)
 
     @Expose
     @ConfigOption(name = "Unclaimed Eggs Order", desc = "Order in which to display unclaimed eggs.")
     @ConfigEditorDropdown
-    var displayOrder: UnclaimedEggsOrder = UnclaimedEggsOrder.SOONEST_FIRST
+    val displayOrder: UnclaimedEggsOrder = UnclaimedEggsOrder.SOONEST_FIRST
 
     enum class UnclaimedEggsOrder(private val displayName: String) {
         SOONEST_FIRST("Soonest First"),

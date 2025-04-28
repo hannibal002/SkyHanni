@@ -19,7 +19,7 @@ class CenturyConfig {
 
     @Expose
     @ConfigLink(owner = CenturyConfig::class, field = "enableActiveTimer")
-    var activeTimerPosition: Position = Position(100, 100, false, true)
+    val activeTimerPosition: Position = Position(100, 100, false, true)
 
     @ConfigOption(name = "Enable Active Player Alert", desc = "Loudly proclaim when it is time to break some wheat.")
     @Expose

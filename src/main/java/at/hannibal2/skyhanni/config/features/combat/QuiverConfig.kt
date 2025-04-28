@@ -11,7 +11,7 @@ class QuiverConfig {
     @Expose
     @ConfigOption(name = "Quiver Display", desc = "")
     @Accordion
-    var quiverDisplay: QuiverDisplayConfig = QuiverDisplayConfig()
+    val quiverDisplay: QuiverDisplayConfig = QuiverDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Low Quiver Alert", desc = "Notifies you when your quiver reaches a set amount of arrows.")

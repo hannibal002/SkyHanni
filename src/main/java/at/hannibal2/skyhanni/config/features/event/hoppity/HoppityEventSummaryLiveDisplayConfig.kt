@@ -40,7 +40,7 @@ class HoppityEventSummaryLiveDisplayConfig {
             "§cNote§7: The Next Event option will only appear if Next Event is added here.",
     )
     @ConfigEditorDraggableList
-    var dateTimeDisplay: MutableList<HoppityDateTimeDisplayType> = mutableListOf(
+    val dateTimeDisplay: MutableList<HoppityDateTimeDisplayType> = mutableListOf(
         HoppityDateTimeDisplayType.CURRENT,
     )
 
@@ -55,7 +55,7 @@ class HoppityEventSummaryLiveDisplayConfig {
     @Expose
     @ConfigOption(name = "Date Time Format", desc = "The format of the date and time.")
     @ConfigEditorDropdown
-    var dateTimeFormat: HoppityDateTimeFormat = HoppityDateTimeFormat.RELATIVE
+    val dateTimeFormat: HoppityDateTimeFormat = HoppityDateTimeFormat.RELATIVE
 
     @Expose
     @ConfigOption(
@@ -77,7 +77,7 @@ class HoppityEventSummaryLiveDisplayConfig {
             "§eIf the list is empty, the card will show in all inventories.",
     )
     @ConfigEditorDraggableList
-    var specificInventories: MutableList<HoppityLiveDisplayInventoryType> = mutableListOf(
+    val specificInventories: MutableList<HoppityLiveDisplayInventoryType> = mutableListOf(
         HoppityLiveDisplayInventoryType.NO_INVENTORY,
         HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY,
     )

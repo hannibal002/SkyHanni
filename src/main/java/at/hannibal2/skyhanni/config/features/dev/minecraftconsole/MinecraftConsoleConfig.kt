@@ -35,5 +35,5 @@ class MinecraftConsoleConfig {
     @Expose
     @ConfigOption(name = "Console Filters", desc = "")
     @Accordion
-    var consoleFilter: ConsoleFiltersConfig = ConsoleFiltersConfig()
+    val consoleFilter: ConsoleFiltersConfig = ConsoleFiltersConfig()
 }

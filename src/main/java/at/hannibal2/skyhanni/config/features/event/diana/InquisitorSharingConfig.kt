@@ -36,7 +36,7 @@ class InquisitorSharingConfig {
     @Expose
     @ConfigOption(name = "Inquisitor Sound", desc = "")
     @Accordion
-    var sound: InquisitorSoundConfig = InquisitorSoundConfig()
+    val sound: InquisitorSoundConfig = InquisitorSoundConfig()
 
     @Expose
     @ConfigOption(name = "Show Despawn Time", desc = "Show the time until the shared Inquisitor will despawn.")

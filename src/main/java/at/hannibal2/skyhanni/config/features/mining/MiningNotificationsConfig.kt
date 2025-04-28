@@ -19,7 +19,7 @@ class MiningNotificationsConfig {
     @Expose
     @ConfigOption(name = "Notification List", desc = "Drag text to change which events send a title.")
     @ConfigEditorDraggableList
-    var notifications: MutableList<MiningNotificationList> = mutableListOf(
+    val notifications: MutableList<MiningNotificationList> = mutableListOf(
         MiningNotificationList.MINESHAFT_SPAWN,
         MiningNotificationList.SCRAP,
         MiningNotificationList.COLD,
@@ -35,7 +35,7 @@ class MiningNotificationsConfig {
     @Expose
     @ConfigOption(name = "Cold Threshold", desc = "Change when the Cold notification gets triggered.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 100f, minStep = 1f)
-    var coldThreshold: Property<Int> = Property.of(50)
+    val coldThreshold: Property<Int> = Property.of(50)
 
     @Expose
     @ConfigOption(

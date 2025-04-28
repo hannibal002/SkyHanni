@@ -13,12 +13,12 @@ class AllSkillDisplayConfig {
     @ConfigOption(name = "Enabled", desc = "Show a display with all skills progress.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Text", desc = "Choose what skills you want to see in the display.")
     @ConfigEditorDraggableList
-    var skillEntryList: MutableList<SkillType> = mutableListOf(
+    val skillEntryList: MutableList<SkillType> = mutableListOf(
         SkillType.COMBAT,
         SkillType.FARMING,
         SkillType.FISHING,

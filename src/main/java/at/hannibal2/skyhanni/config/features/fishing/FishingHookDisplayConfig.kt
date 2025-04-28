@@ -36,5 +36,5 @@ class FishingHookDisplayConfig {
 
     @Expose
     @ConfigLink(owner = FishingHookDisplayConfig::class, field = "enabled")
-    var position: Position = Position(-475, -240, 3.4f, true)
+    val position: Position = Position(-475, -240, 3.4f, true)
 }

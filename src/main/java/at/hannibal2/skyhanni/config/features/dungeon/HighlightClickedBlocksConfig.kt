@@ -51,7 +51,7 @@ class HighlightClickedBlocksConfig {
 
     @ConfigOption(name = "Reset Colors", desc = "Resets the colors of the highlights to default ones.")
     @ConfigEditorButton(buttonText = "Reset")
-    var reset: Runnable = Runnable {
+    val reset: Runnable = Runnable {
         chestColor = "0:178:85:255:85"
         trappedChestColor = "0:178:0:170:0"
         lockedChestColor = "0:178:255:85:85"

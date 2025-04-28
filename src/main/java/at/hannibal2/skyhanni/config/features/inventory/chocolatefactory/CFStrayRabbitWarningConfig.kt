@@ -15,7 +15,7 @@ class CFStrayRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Warning Level", desc = "Warn when stray rabbits of a certain tier appear.")
     @ConfigEditorDropdown
-    var rabbitWarningLevel: StrayTypeEntry = StrayTypeEntry.ALL
+    val rabbitWarningLevel: StrayTypeEntry = StrayTypeEntry.ALL
 
     @Expose
     @ConfigOption(name = "Highlight Color", desc = "Choose the color that stray rabbits should be highlighted as.")
@@ -31,7 +31,7 @@ class CFStrayRabbitWarningConfig {
             "§cMust be a .ogg file"
     )
     @ConfigEditorText
-    var specialRabbitSound: Property<String> = Property.of("note.pling")
+    val specialRabbitSound: Property<String> = Property.of("note.pling")
 
     @Expose
     @ConfigOption(name = "Repeat Sound", desc = "How many times the sound should be repeated.")
@@ -41,7 +41,7 @@ class CFStrayRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Flash Screen", desc = "Choose the stray rabbit type to flash the screen for.")
     @ConfigEditorDropdown
-    var flashScreenLevel: StrayTypeEntry = StrayTypeEntry.SPECIAL
+    val flashScreenLevel: StrayTypeEntry = StrayTypeEntry.SPECIAL
 
     enum class StrayTypeEntry(private val displayName: String) {
         SPECIAL("Special Only"),
@@ -63,5 +63,5 @@ class CFStrayRabbitWarningConfig {
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
-    var sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 }

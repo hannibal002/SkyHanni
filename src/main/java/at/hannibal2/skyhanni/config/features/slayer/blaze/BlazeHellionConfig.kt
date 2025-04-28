@@ -34,7 +34,7 @@ class BlazeHellionConfig {
     @Expose
     @ConfigOption(name = "First Dagger", desc = "Select the first, left sided dagger for the display.")
     @ConfigEditorDropdown
-    var firstDagger: FirstDaggerEntry = FirstDaggerEntry.SPIRIT_OR_CRYSTAL
+    val firstDagger: FirstDaggerEntry = FirstDaggerEntry.SPIRIT_OR_CRYSTAL
 
     enum class FirstDaggerEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         SPIRIT_OR_CRYSTAL("Spirit/Crystal", 0),
@@ -53,9 +53,9 @@ class BlazeHellionConfig {
 
     @Expose
     @ConfigLink(owner = BlazeHellionConfig::class, field = "daggers")
-    var positionTop: Position = Position(-475, 173, 4.4f, true)
+    val positionTop: Position = Position(-475, 173, 4.4f, true)
 
     @Expose
     @ConfigLink(owner = BlazeHellionConfig::class, field = "daggers")
-    var positionBottom: Position = Position(-475, 230, 3.2f, true)
+    val positionBottom: Position = Position(-475, 230, 3.2f, true)
 }

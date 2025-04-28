@@ -11,15 +11,15 @@ class ChumBucketHiderConfig {
     @ConfigOption(name = "Enable", desc = "Hide the Chum/Chumcap Bucket name tags for other players.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Bucket", desc = "Hide the Chum/Chumcap Bucket.")
     @ConfigEditorBoolean
-    var hideBucket: Property<Boolean> = Property.of(false)
+    val hideBucket: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Own", desc = "Hide your own Chum/Chumcap Bucket.")
     @ConfigEditorBoolean
-    var hideOwn: Property<Boolean> = Property.of(false)
+    val hideOwn: Property<Boolean> = Property.of(false)
 }

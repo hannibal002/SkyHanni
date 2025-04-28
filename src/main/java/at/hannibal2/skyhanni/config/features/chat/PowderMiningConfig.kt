@@ -55,7 +55,7 @@ class PowderMiningConfig {
     @Expose
     @ConfigOption(name = "Common Items", desc = "Hide reward messages for listed items.")
     @ConfigEditorDraggableList
-    var simplePowderMiningTypes: MutableList<SimplePowderMiningRewardTypes> = mutableListOf(
+    val simplePowderMiningTypes: MutableList<SimplePowderMiningRewardTypes> = mutableListOf(
         SimplePowderMiningRewardTypes.ASCENSION_ROPE,
         SimplePowderMiningRewardTypes.WISHING_COMPASS,
         SimplePowderMiningRewardTypes.OIL_BARREL,
@@ -68,7 +68,7 @@ class PowderMiningConfig {
     @Expose
     @ConfigOption(name = "Goblin Egg", desc = "Hide Goblin Egg rewards that are below a certain rarity.")
     @ConfigEditorDropdown
-    var goblinEggs: GoblinEggEntry = GoblinEggEntry.YELLOW_UP
+    val goblinEggs: GoblinEggEntry = GoblinEggEntry.YELLOW_UP
 
     enum class GoblinEggEntry(val displayName: String) {
         SHOW_ALL("Show all"),
@@ -84,5 +84,5 @@ class PowderMiningConfig {
     @Expose
     @ConfigOption(name = "Gemstones", desc = "")
     @Accordion
-    var gemstone: PowderMiningGemstoneConfig = PowderMiningGemstoneConfig()
+    val gemstone: PowderMiningGemstoneConfig = PowderMiningGemstoneConfig()
 }

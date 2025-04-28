@@ -13,7 +13,7 @@ class LavaReplacementConfig {
     @ConfigOption(name = "Enabled", desc = "Replace the lava texture with the water texture.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(false)
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -21,10 +21,10 @@ class LavaReplacementConfig {
         desc = "Replace the lava texture In All Islands regardless of List Below."
     )
     @ConfigEditorBoolean
-    var everywhere: Property<Boolean> = Property.of(true)
+    val everywhere: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Islands", desc = "Islands to Replace Lava In.")
     @ConfigEditorDraggableList
-    var islands: Property<MutableList<IslandsToReplace>> = Property.of(mutableListOf())
+    val islands: Property<MutableList<IslandsToReplace>> = Property.of(mutableListOf())
 }

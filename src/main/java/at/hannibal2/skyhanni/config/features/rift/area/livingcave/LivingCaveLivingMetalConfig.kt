@@ -23,5 +23,5 @@ class LivingCaveLivingMetalConfig {
     @Expose
     @ConfigOption(name = "Color", desc = "Set the color to highlight the blocks in.")
     @ConfigEditorColour
-    var color: Property<String> = Property.of("0:255:85:255:255")
+    val color: Property<String> = Property.of("0:255:85:255:255")
 }

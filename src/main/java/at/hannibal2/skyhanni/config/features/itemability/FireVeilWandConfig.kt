@@ -10,7 +10,7 @@ class FireVeilWandConfig {
     @Expose
     @ConfigOption(name = "Fire Veil Design", desc = "Change the flame particles of the Fire Veil Wand ability.")
     @ConfigEditorDropdown
-    var display: DisplayEntry = DisplayEntry.PARTICLES
+    val display: DisplayEntry = DisplayEntry.PARTICLES
 
     enum class DisplayEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         PARTICLES("Particles", 0),

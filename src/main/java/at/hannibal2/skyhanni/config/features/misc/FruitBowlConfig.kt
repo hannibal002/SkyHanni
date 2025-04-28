@@ -23,12 +23,12 @@ class FruitBowlConfig {
     @Expose
     @ConfigOption(name = "Can Click", desc = "Color for players you have not yet clicked at.")
     @ConfigEditorColour
-    var canColor: Property<String> = Property.of("0:1:85:255:85")
+    val canColor: Property<String> = Property.of("0:1:85:255:85")
 
     @Expose
     @ConfigOption(name = "Already Clicked", desc = "Color for players you have already clicked at.")
     @ConfigEditorColour
-    var canNotColor: Property<String> = Property.of("0:1:76:76:76")
+    val canNotColor: Property<String> = Property.of("0:1:76:76:76")
 
     @Expose
     @ConfigOption(name = "Show Stats Display", desc = "Show a display with Fruit Bowl stats.")
@@ -38,5 +38,5 @@ class FruitBowlConfig {
 
     @Expose
     @ConfigLink(owner = FruitBowlConfig::class, field = "display")
-    var position: Position = Position(150, 200)
+    val position: Position = Position(150, 200)
 }

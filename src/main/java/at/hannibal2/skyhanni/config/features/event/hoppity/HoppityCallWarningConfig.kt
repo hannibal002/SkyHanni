@@ -27,7 +27,7 @@ class HoppityCallWarningConfig {
             "§cMust be a .ogg file",
     )
     @ConfigEditorText
-    var hoppityCallSound: Property<String> = Property.of("note.pling")
+    val hoppityCallSound: Property<String> = Property.of("note.pling")
 
     @Expose
     @ConfigOption(name = "Flash Color", desc = "Color of the screen when flashing")
@@ -36,7 +36,7 @@ class HoppityCallWarningConfig {
 
     @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
     @ConfigEditorButton(buttonText = "OPEN")
-    var sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
+    val sounds: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 
     @Expose
     @ConfigOption(

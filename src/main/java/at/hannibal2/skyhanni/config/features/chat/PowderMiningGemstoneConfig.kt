@@ -14,37 +14,37 @@ class PowderMiningGemstoneConfig {
     @Expose
     @ConfigOption(name = "Ruby", desc = "Hide Ruby gemstones under a certain quality.")
     @ConfigEditorDropdown
-    var rubyGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
+    val rubyGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
 
     @Expose
     @ConfigOption(name = "Sapphire", desc = "Hide Sapphire gemstones under a certain quality.")
     @ConfigEditorDropdown
-    var sapphireGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
+    val sapphireGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
 
     @Expose
     @ConfigOption(name = "Amber", desc = "Hide Amber gemstones under a certain quality.")
     @ConfigEditorDropdown
-    var amberGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
+    val amberGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
 
     @Expose
     @ConfigOption(name = "Amethyst", desc = "Hide Amethyst gemstones under a certain quality.")
     @ConfigEditorDropdown
-    var amethystGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
+    val amethystGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
 
     @Expose
     @ConfigOption(name = "Jade", desc = "Hide Jade gemstones under a certain quality.")
     @ConfigEditorDropdown
-    var jadeGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
+    val jadeGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
 
     @Expose
     @ConfigOption(name = "Topaz", desc = "Hide Topaz gemstones under a certain quality.")
     @ConfigEditorDropdown
-    var topazGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
+    val topazGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
 
     @Expose
     @ConfigOption(name = "Jasper", desc = "Hide Jasper gemstones under a certain quality.")
     @ConfigEditorDropdown
-    var jasperGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
+    val jasperGemstones: GemstoneFilterEntry = GemstoneFilterEntry.FINE_UP
 
     enum class GemstoneFilterEntry(private val displayName: String) {
         SHOW_ALL("Show All"),

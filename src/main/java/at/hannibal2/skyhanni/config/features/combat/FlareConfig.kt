@@ -20,7 +20,7 @@ class FlareConfig {
     @Expose
     @ConfigOption(name = "Alert Type", desc = "What type of alert should be sent when a flare is about to expire.")
     @ConfigEditorDropdown
-    var alertType: AlertType = AlertType.CHAT
+    val alertType: AlertType = AlertType.CHAT
 
     enum class AlertType(private val displayName: String) {
         NONE("No alert"),
@@ -58,7 +58,7 @@ class FlareConfig {
     @Expose
     @ConfigOption(name = "Display Type", desc = "Where to show the timer.")
     @ConfigEditorDropdown
-    var displayType: DisplayType = DisplayType.GUI
+    val displayType: DisplayType = DisplayType.GUI
 
     enum class DisplayType(private val displayName: String) {
         GUI("GUI Element"),
@@ -74,7 +74,7 @@ class FlareConfig {
     @Expose
     @ConfigOption(name = "Show Effective Area", desc = "Show the effective area of the flare.")
     @ConfigEditorDropdown
-    var outlineType: OutlineType = OutlineType.NONE
+    val outlineType: OutlineType = OutlineType.NONE
 
     enum class OutlineType(private val displayName: String) {
         NONE("No Outline"),
@@ -104,7 +104,7 @@ class FlareConfig {
 
     @Expose
     @ConfigLink(owner = FlareConfig::class, field = "enabled")
-    var position: Position = Position(150, 200, false, true)
+    val position: Position = Position(150, 200, false, true)
 
     @Expose
     @ConfigOption(name = "Show Buff", desc = "Show the mana regen buff next to the flare name.")

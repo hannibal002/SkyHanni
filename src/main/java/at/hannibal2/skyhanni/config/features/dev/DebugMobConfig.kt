@@ -15,7 +15,7 @@ class DebugMobConfig {
     @Expose
     @ConfigOption(name = "Mob Detection", desc = "Debug feature to check the Mob Detection.")
     @Accordion
-    var mobDetection: MobDetection = MobDetection()
+    val mobDetection: MobDetection = MobDetection()
 
     enum class HowToShow(val displayName: String) {
         OFF("Off"),
@@ -53,7 +53,7 @@ class DebugMobConfig {
             desc = "Shows the internal mobs that are 'DisplayNPC' as highlight (in red) or the name."
         )
         @ConfigEditorDropdown
-        var displayNPC: HowToShow = HowToShow.OFF
+        val displayNPC: HowToShow = HowToShow.OFF
 
         @Expose
         @ConfigOption(
@@ -61,7 +61,7 @@ class DebugMobConfig {
             desc = "Shows the internal mobs that are 'SkyblockMob' as highlight (in green) or the name."
         )
         @ConfigEditorDropdown
-        var skyblockMob: HowToShow = HowToShow.OFF
+        val skyblockMob: HowToShow = HowToShow.OFF
 
         @Expose
         @ConfigOption(
@@ -69,7 +69,7 @@ class DebugMobConfig {
             desc = "Shows the internal mobs that are 'Summon' as highlight (in yellow) or the name."
         )
         @ConfigEditorDropdown
-        var summon: HowToShow = HowToShow.OFF
+        val summon: HowToShow = HowToShow.OFF
 
         @Expose
         @ConfigOption(
@@ -77,7 +77,7 @@ class DebugMobConfig {
             desc = "Shows the internal mobs that are 'Special' as highlight (in aqua) or the name."
         )
         @ConfigEditorDropdown
-        var special: HowToShow = HowToShow.OFF
+        val special: HowToShow = HowToShow.OFF
 
         @Expose
         @ConfigOption(

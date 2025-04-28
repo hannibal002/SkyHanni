@@ -26,7 +26,7 @@ class TranslatorConfig {
     @ConfigOption(name = "Your Language", desc = "The language that messages should be translated to.")
     @Expose
     @ConfigEditorDropdown
-    var languageName: Property<TranslatableLanguage> = Property.of(TranslatableLanguage.ENGLISH)
+    val languageName: Property<TranslatableLanguage> = Property.of(TranslatableLanguage.ENGLISH)
 
     @Expose
     @ConfigOption(
@@ -35,11 +35,11 @@ class TranslatorConfig {
             "E.g. 'es' for Spanish or 'de' for German. Empty will use English."
     )
     @ConfigEditorText
-    var languageCode: Property<String> = Property.of("en")
+    val languageCode: Property<String> = Property.of("en")
 
     @ConfigOption(name = "List of Language Codes", desc = "A list of Google Translate's supported language codes.")
     @ConfigEditorButton(buttonText = "Open")
-    var langCodesURL: Runnable = Runnable {
+    val langCodesURL: Runnable = Runnable {
         openBrowser(
             "https://cloud.google.com/translate/docs/languages#try-it-for-yourself"
         )

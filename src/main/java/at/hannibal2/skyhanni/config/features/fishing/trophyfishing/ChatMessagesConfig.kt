@@ -25,7 +25,7 @@ class ChatMessagesConfig {
             "§fStyle 3: §bYou caught your 2nd §6§lGOLD §5Moldfin§b."
     )
     @ConfigEditorDropdown
-    var design: DesignFormat = DesignFormat.STYLE_1
+    val design: DesignFormat = DesignFormat.STYLE_1
 
     enum class DesignFormat(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         STYLE_1("Style 1", 0),

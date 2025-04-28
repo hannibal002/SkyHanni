@@ -14,56 +14,56 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class CombatConfig {
     @Expose
     @Category(name = "Damage Indicator", desc = "Damage Indicator settings")
-    var damageIndicator: DamageIndicatorConfig = DamageIndicatorConfig()
+    val damageIndicator: DamageIndicatorConfig = DamageIndicatorConfig()
 
     @Expose
     @Category(name = "Ghost Counter", desc = "Ghost Counter settings")
-    var ghostCounter: GhostProfitTrackerConfig = GhostProfitTrackerConfig()
+    val ghostCounter: GhostProfitTrackerConfig = GhostProfitTrackerConfig()
 
     @Expose
     @Category(name = "End Island", desc = "Features for the End Island")
-    var endIsland: EndIslandConfig = EndIslandConfig()
+    val endIsland: EndIslandConfig = EndIslandConfig()
 
     @Expose
     @ConfigOption(name = "Quiver", desc = "")
     @Accordion
-    var quiverConfig: QuiverConfig = QuiverConfig()
+    val quiverConfig: QuiverConfig = QuiverConfig()
 
     // TODO rename to armor stack display
     @Expose
     @ConfigOption(name = "Armor Stack Display", desc = "")
     @Accordion
-    var stackDisplayConfig: StackDisplayConfig = StackDisplayConfig()
+    val stackDisplayConfig: StackDisplayConfig = StackDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Summonings", desc = "")
     @Accordion
-    var summonings: SummoningsConfig = SummoningsConfig()
+    val summonings: SummoningsConfig = SummoningsConfig()
 
     @Expose
     @ConfigOption(name = "Mobs", desc = "")
     @Accordion
-    var mobs: MobsConfig = MobsConfig()
+    val mobs: MobsConfig = MobsConfig()
 
     @Expose
     @ConfigOption(name = "Bestiary", desc = "")
     @Accordion
-    var bestiary: BestiaryConfig = BestiaryConfig()
+    val bestiary: BestiaryConfig = BestiaryConfig()
 
     @Expose
     @ConfigOption(name = "Ferocity Display", desc = "")
     @Accordion
-    var ferocityDisplay: FerocityDisplayConfig = FerocityDisplayConfig()
+    val ferocityDisplay: FerocityDisplayConfig = FerocityDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Flare", desc = "")
     @Accordion
-    var flare: FlareConfig = FlareConfig()
+    val flare: FlareConfig = FlareConfig()
 
     @Expose
     @ConfigOption(name = "Broodmother", desc = "")
     @Accordion
-    var broodmother: BroodmotherConfig = BroodmotherConfig()
+    val broodmother: BroodmotherConfig = BroodmotherConfig()
 
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")
