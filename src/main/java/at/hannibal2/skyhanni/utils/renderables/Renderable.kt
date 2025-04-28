@@ -483,7 +483,10 @@ interface Renderable {
             }
         }
 
-        @Deprecated("Use RenderableString instead", ReplaceWith("RenderableString()"))
+        @Deprecated(
+            "Use RenderableString instead",
+            ReplaceWith("RenderableString(text, scale, color, horizontalAlign, verticalAlign)"),
+        )
         fun string(
             text: String,
             scale: Double = 1.0,
@@ -498,7 +501,10 @@ interface Renderable {
             verticalAlign,
         )
 
-        @Deprecated("use WrappedRenderableString instead", ReplaceWith("WrappedRenderableString()"))
+        @Deprecated(
+            "use WrappedRenderableString instead",
+            ReplaceWith("WrappedRenderableString(text, width, scale, color, horizontalAlign, verticalAlign)"),
+        )
         fun wrappedString(
             text: String,
             width: Int,
@@ -890,7 +896,10 @@ interface Renderable {
             return VerticalContainerRenderable(buildList { builderAction() }, spacing = 2)
         }
 
-        @Deprecated("Use HorizontalContainerRenderable instead", ReplaceWith("HorizontalContainerRenderable()"))
+        @Deprecated(
+            "Use HorizontalContainerRenderable instead",
+            ReplaceWith("HorizontalContainerRenderable(content, spacing, horizontalAlign, verticalAlign)"),
+        )
         fun horizontalContainer(
             content: List<Renderable>,
             spacing: Int = 0,
@@ -903,7 +912,10 @@ interface Renderable {
             verticalAlign,
         )
 
-        @Deprecated("Use VerticalContainerRenderable instead", ReplaceWith("VerticalContainerRenderable()"))
+        @Deprecated(
+            "Use VerticalContainerRenderable instead",
+            ReplaceWith("VerticalContainerRenderable(content, spacing, horizontalAlign, verticalAlign)"),
+        )
         fun verticalContainer(
             content: List<Renderable>,
             spacing: Int = 0,
