@@ -167,7 +167,7 @@ object ExperimentsProfitTracker {
     private var lastAddedTimeWasted: SimpleTimeMark = SimpleTimeMark.farPast()
 
     @HandleEvent(SecondPassedEvent::class)
-    private fun checkAddTimeWasted() {
+    fun checkAddTimeWasted() {
         if (!ExperimentationTableApi.inTable || !config.trackTimeSpent) {
             lastAddedTimeWasted = SimpleTimeMark.farPast()
             return
