@@ -96,7 +96,10 @@ object BurrowWarpHelper {
         debug?.add("target: ${target.printWithAccuracy(1)}")
         val playerLocation = LocationUtils.playerLocation()
         debug?.add("playerLocation: ${playerLocation.printWithAccuracy(1)}")
-        val warpPoint = getNearestWarpPoint(target)
+        val warpPoint = getNearestWarpPoint(target) ?: run {
+            debug?.add("no nearest warp point found (everything disabled/not unlocked with tp scrolls)")
+            return
+        }
         debug?.add("warpPoint: ${warpPoint.displayName}")
 
         val playerDistance = playerLocation.distance(target)
@@ -110,9 +113,9 @@ object BurrowWarpHelper {
         currentWarp = if (setWarpPoint) warpPoint else null
     }
 
-    private fun getNearestWarpPoint(location: LorenzVec) =
+    private fun getNearestWarpPoint(location: LorenzVec): WarpPoint? =
         WarpPoint.entries.filter { it.unlocked && !it.ignored() }.map { it to it.distance(location) }
-            .sorted().first().first
+            .sorted().firstOrNull()?.first
 
     fun resetDisabledWarps() {
         WarpPoint.entries.forEach { it.unlocked = true }
