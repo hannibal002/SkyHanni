@@ -35,31 +35,27 @@ object BurrowWarpHelper {
         if (event.keyCode != config.keyBindWarp) return
         if (Minecraft.getMinecraft().currentScreen != null) return
 
-        currentWarp?.let {
-            if (lastWarpTime.passedSince() > 1.seconds) {
-                lastWarpTime = SimpleTimeMark.now()
-                HypixelCommands.warp(it.name)
-                lastWarp = currentWarp
-                GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
-                TitleManager.conditionallyStopTitle { currentTitle ->
-                    currentTitle.startsWith("§bWarp to ")
-                }
-            }
+        val warp = currentWarp ?: return
+        if (lastWarpTime.passedSince() < 1.seconds) return
+        lastWarpTime = SimpleTimeMark.now()
+        HypixelCommands.warp(warp.name)
+        lastWarp = currentWarp
+        GriffinBurrowHelper.lastTitleSentTime = SimpleTimeMark.now() + 2.seconds
+        TitleManager.conditionallyStopTitle { currentTitle ->
+            currentTitle.startsWith("§bWarp to ")
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
-        if (event.message == "§cYou haven't unlocked this fast travel destination!") {
-            if (lastWarpTime.passedSince() < 1.seconds) {
-                lastWarp?.let {
-                    it.unlocked = false
-                    ChatUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
-                    ChatUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
-                    lastWarp = null
-                    currentWarp = null
-                }
-            }
+        if (event.message != "§cYou haven't unlocked this fast travel destination!") return
+        if (lastWarpTime.passedSince() > 1.seconds) return
+        lastWarp?.let {
+            it.unlocked = false
+            ChatUtils.chat("Detected not having access to warp point §b${it.displayName}§e!")
+            ChatUtils.chat("Use §c/shresetburrowwarps §eonce you have activated this travel scroll.")
+            lastWarp = null
+            currentWarp = null
         }
     }
 
