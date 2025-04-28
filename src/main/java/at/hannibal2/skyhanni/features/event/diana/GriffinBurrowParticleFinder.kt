@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.minutes
@@ -64,7 +65,8 @@ object GriffinBurrowParticleFinder {
 
         val type = ParticleType.entries.firstOrNull { it.check(event) } ?: return
 
-        val location = event.location
+        // TODO remove the workaround once we know what is going on exactly and can fix this properly
+        val location = workaround(event.location)
         val burrow = burrows.getOrPut(location) { Burrow(location) }
         val oldBurrowType = burrow.type
 
@@ -86,6 +88,8 @@ object GriffinBurrowParticleFinder {
         }
     }
 
+    private fun workaround(location: LorenzVec) = location.toBlockPos().down().toLorenzVec()
+
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
@@ -101,21 +105,28 @@ object GriffinBurrowParticleFinder {
         }
     }
 
+    // TODO remove the roundTo calls as they are only workarounds
     private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
         EMPTY(
-            { type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset == LorenzVec(0.5, 0.1, 0.5) },
+            { type == EnumParticleTypes.CRIT_MAGIC && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         MOB(
-            { type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && offset == LorenzVec(0.5, 0.1, 0.5) },
+            { type == EnumParticleTypes.CRIT && count == 3 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
         TREASURE(
-            { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset == LorenzVec(0.35, 0.1, 0.35) },
+            { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
         ),
         FOOTSTEP(
-            { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && offset == LorenzVec(0.05, 0.0, 0.05) },
+            { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && offset.roundTo(2) == LorenzVec(0.05, 0.0, 0.05) },
         ),
         ENCHANT(
-            { type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset == LorenzVec(0.5, 0.4, 0.5) },
+            {
+                type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 5 && speed == 0.05f && offset.roundTo(2) == LorenzVec(
+                    0.5,
+                    0.4,
+                    0.5,
+                )
+            },
         )
     }
 
