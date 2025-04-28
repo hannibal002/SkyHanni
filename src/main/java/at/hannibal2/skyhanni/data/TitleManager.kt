@@ -553,7 +553,9 @@ object TitleManager {
         DrawContextUtils.popMatrix()
 
         if (intentionPosition != null) {
-            GuiEditManager.add(intentionPosition, intention?.displayName.orEmpty(), targetRenderable.width, targetRenderable.height)
+            val qualifiedIntention = intention ?: return
+            val intentionFormat = "Title: ${qualifiedIntention.displayName}"
+            GuiEditManager.add(intentionPosition, intentionFormat, targetRenderable.width, targetRenderable.height)
         } else {
             GuiEditManager.add(position, "Title", targetRenderable.width, targetRenderable.height)
         }
