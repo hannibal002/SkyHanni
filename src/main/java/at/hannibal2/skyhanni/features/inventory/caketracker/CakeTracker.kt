@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -151,11 +152,6 @@ object CakeTracker {
         val storage = storage ?: return
         val changed = storage.ownedCakes.remove(cakeYear)
         if (changed) recalculateMissingCakes()
-    }
-
-    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
-    private fun testFunction() {
-
     }
 
     @HandleEvent
