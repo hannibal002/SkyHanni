@@ -147,7 +147,7 @@ object GriffinBurrowHelper {
         val newLocation = calculateNewTarget()
         if (targetLocation != newLocation) {
             targetLocation = newLocation
-            // add island graphs here some day when the hub is fully added in the graph
+            // TODO: add island graphs here some day when the hub is fully added in the graph
 //             newLocation?.let {
 //                 IslandGraphs.find(it)
 //             }
@@ -189,12 +189,8 @@ object GriffinBurrowHelper {
         if (newLocation.distance(playerLocation) < 6) return
 
         latestGuess?.let {
-            if (it.precise && config.multiGuesses) {
-                if (event.new) {
-                    if (it.getLocation() !in particleBurrows) {
-                        additionalGuesses.add(it)
-                    }
-                }
+            if (it.precise && config.multiGuesses && event.new && it.getLocation() !in particleBurrows) {
+                additionalGuesses.add(it)
             }
         }
 
@@ -214,10 +210,8 @@ object GriffinBurrowHelper {
 
     private fun removePreciseGuess(location: LorenzVec) {
         latestGuess?.let {
-            if (it.precise) {
-                if (location == it.getLocation()) {
-                    latestGuess = null
-                }
+            if (it.precise && location == it.getLocation()) {
+                latestGuess = null
             }
         }
         additionalGuesses.removeIf { it.getLocation() == location }
@@ -430,11 +424,9 @@ object GriffinBurrowHelper {
 
         if (particleBurrows.containsKey(location)) {
             DelayedRun.runDelayed(1.seconds) {
-                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
-                    if (particleBurrows.containsKey(location)) {
-                        // workaround
-                        particleBurrows = particleBurrows.editCopy { keys.remove(location) }
-                    }
+                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds && particleBurrows.containsKey(location)) {
+                    // workaround
+                    particleBurrows = particleBurrows.editCopy { keys.remove(location) }
                 }
             }
         }
