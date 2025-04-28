@@ -92,7 +92,8 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
 
                 // Check if the function is isPublic or accessible
                 val isPublic = function.isPublic || function.hasModifier(KtTokens.PUBLIC_KEYWORD)
-                if (!isPublic && (hasEventType || hasEventAnnotation || isEvent || isPrimaryName)) {
+                val needsPublic = (hasEventAnnotation && (hasEventType || isPrimaryName))
+                if (!isPublic && needsPublic) {
                     holder.registerProblem(
                         function,
                         "Function should be public to be annotated with @HandleEvent",
