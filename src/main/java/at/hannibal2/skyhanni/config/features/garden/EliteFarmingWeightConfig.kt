@@ -27,16 +27,18 @@ class EliteFarmingWeightConfig {
 
     @Expose
     @ConfigOption(
-        name = "Leaderboard Ranking", desc = "Show your position in the farming weight leaderboard. " +
-                "Only if your farming weight is high enough! Updates periodically."
+        name = "Leaderboard Ranking",
+        desc = "Show your position in the farming weight leaderboard. " +
+            "Only if your farming weight is high enough! Updates periodically."
     )
     @ConfigEditorBoolean
     var leaderboard: Boolean = true
 
     @Expose
     @ConfigOption(
-        name = "Overtake ETA", desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
-                "Will show an ETA to placement weight required if not on the leaderboard yet."
+        name = "Overtake ETA",
+        desc = "Show a timer estimating when you'll move up a spot in the leaderboard! " +
+            "Will show an ETA to placement weight required if not on the leaderboard yet."
     )
     @ConfigEditorBoolean
     var overtakeETA: Boolean = false
@@ -58,7 +60,7 @@ class EliteFarmingWeightConfig {
     @ConfigOption(
         name = "Use ETA Goal",
         desc = "Use the ETA Goal number instead of the next upcoming rank. Useful when your rank is in the" +
-                "ten thousands and you don't want to see small ETAs."
+            "ten thousands and you don't want to see small ETAs."
     )
     @ConfigEditorBoolean
     var useEtaGoalRank: Property<Boolean> = Property.of(true)
