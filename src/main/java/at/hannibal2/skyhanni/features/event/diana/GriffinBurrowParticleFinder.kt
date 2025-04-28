@@ -90,6 +90,8 @@ object GriffinBurrowParticleFinder {
 
     private fun workaround(location: LorenzVec) = location.toBlockPos().down().toLorenzVec()
 
+    // TODO this funciton needs upgrades: currently only counts down the tile alive for burrows while holding a spade,
+    //  and instead of ticks alive, should use found time stamp and use passed since > 1.min
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
@@ -98,6 +100,8 @@ object GriffinBurrowParticleFinder {
                 if (location.distanceSqToPlayer() > 256) continue
                 burrow.burrowTimeToLive -= 1
                 if (burrow.burrowTimeToLive >= 0) continue
+                // TODO differentiate between user clicking the burrow and the burrow dissapears after a while,
+                //  important bc of wasCorrectPetAlready in GriffinPetWarning
                 BurrowDugEvent(location).post()
                 burrows.remove(location)
                 lastDugParticleBurrow = null
