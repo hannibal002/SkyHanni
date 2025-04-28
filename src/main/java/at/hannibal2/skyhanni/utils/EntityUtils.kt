@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -181,7 +182,12 @@ object EntityUtils {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
 
-    fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
+    fun Entity.canBeSeen(viewDistance: Number = 150.0): Boolean {
+        if (isDead) return false
+        // TODO add cache that only updates e.g. 10 times a second
+        if (!FrustumUtils.isVisible(entityBoundingBox)) return false
+        return getLorenzVec().up(0.5).canBeSeen(viewDistance)
+    }
 
     fun getEntityByID(entityId: Int) = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
 

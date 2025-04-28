@@ -42,6 +42,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object FastFairySoulsPathfinder {
     val config get() = SkyHanniMod.feature.misc
 
+    // TODO this does not work with glacite tunnels, should prob use strings and add the same workaround we have for graph area
+    // TODO also once this is fixed, add a chat message when finding the last soul in dwarven mines and have not yet found the souls in glacite tunnels
     private val foundSouls get() = ProfileStorageData.profileSpecific?.fairySouls?.found ?: mutableMapOf()
     private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound ?: mutableMapOf()
 

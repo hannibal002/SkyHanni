@@ -16,17 +16,18 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.specialRa
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader.clickMeRabbitPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -160,11 +161,10 @@ object CFStrayWarning {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!CFApi.inChocolateFactory) return
         if (!flashScreen && !config.partyMode.get()) return
-        val minecraft = Minecraft.getMinecraft()
-        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
+        val alpha = ((2 + sin(SimpleTimeMark.now().toMillis() / 1000.0)) * 255 / 4).toInt().coerceIn(0..255)
         val toUse = if (config.partyMode.get()) CHROMA_COLOR else warningConfig.flashColor
         val color = (alpha shl 24) or (toUse.toSpecialColorInt() and 0xFFFFFF)
-        Gui.drawRect(0, 0, minecraft.displayWidth, minecraft.displayHeight, color)
+        GuiRenderUtils.drawRect(0, 0, GuiScreenUtils.displayWidth, GuiScreenUtils.displayHeight, color)
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 }

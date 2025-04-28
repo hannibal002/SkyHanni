@@ -54,8 +54,7 @@ object LocationUtils {
         val b = this
         val noBlocks = canSee(a, b, offset)
         val notTooFar = a.distance(b) < viewDistance.toDouble()
-        val inFov = true // TODO add Frustum "Frustum().isBoundingBoxInFrustum(entity.entityBoundingBox)"
-        return noBlocks && notTooFar && inFov
+        return noBlocks && notTooFar
     }
 
     fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =
