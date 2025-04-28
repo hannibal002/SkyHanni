@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.json.Shimmy
@@ -70,12 +71,14 @@ object EnforcedConfigValues {
         for (enforcedValue in enforcedValues.flatMap { it.enforcedValues }) {
             val shimmy = Shimmy.makeShimmy(config, enforcedValue.path.split("."))
             if (shimmy == null) {
-                println("Could not create shimmy for path ${enforcedValue.path}")
-                continue
+                try {
+                    ErrorManager.skyHanniError("Could not create shimmy for path ${enforcedValue.path}")
+                } catch (_: Exception) {
+                    continue
+                }
             }
             val currentValue = shimmy.getJson()
             if (currentValue != enforcedValue.value) {
-                println("Resetting ${enforcedValue.path} to ${enforcedValue.value} from $currentValue")
                 shimmy.setJson(enforcedValue.value)
             }
         }
