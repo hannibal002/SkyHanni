@@ -25,6 +25,9 @@ class EventListeners private constructor(val name: String, private val isGeneric
     }
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
+        require(method.isAccessible) {
+            "Method ${method.name} must be accessible. Make sure to set it to public."
+        }
         val name = buildListenerName(method)
         val eventConsumer = when (method.parameterCount) {
             0 -> createZeroParameterConsumer(method, instance, options)

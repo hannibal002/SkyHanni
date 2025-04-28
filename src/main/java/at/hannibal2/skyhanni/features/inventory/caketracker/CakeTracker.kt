@@ -153,6 +153,11 @@ object CakeTracker {
         if (changed) recalculateMissingCakes()
     }
 
+    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
+    private fun testFunction() {
+
+    }
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shresetcaketracker") {
