@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
+import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -18,9 +19,11 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
+import kotlin.math.ceil
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -204,7 +207,7 @@ object GriffinBurrowParticleFinder {
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
-        var burrowTimeToLive: Int = 1,
+        var burrowTimeToLive: Int = CurrentPing.averagePing.inWholeTicks + 1
     ) {
 
         fun getType(): BurrowType {
