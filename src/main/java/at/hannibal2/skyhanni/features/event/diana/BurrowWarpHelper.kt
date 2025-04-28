@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -113,9 +115,16 @@ object BurrowWarpHelper {
         WarpPoint.entries.filter { it.unlocked && !it.ignored() }.map { it to it.distance(location) }
             .sorted().firstOrNull()?.first
 
-    fun resetDisabledWarps() {
-        WarpPoint.entries.forEach { it.unlocked = true }
-        ChatUtils.chat("Reset disabled burrow warps.")
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetburrowwarps") {
+            description = "Manually resetting disabled diana burrow warp points"
+            category = CommandCategory.USERS_RESET
+            callback {
+                WarpPoint.entries.forEach { it.unlocked = true }
+                ChatUtils.chat("Reset disabled burrow warps.")
+            }
+        }
     }
 
     enum class WarpPoint(
@@ -125,7 +134,6 @@ object BurrowWarpHelper {
         val ignored: () -> Boolean = { false },
         var unlocked: Boolean = true,
     ) {
-
         HUB("Hub", LorenzVec(-3, 70, -70), 2),
         CASTLE("Castle", LorenzVec(-250, 130, 45), 10),
         CRYPT("Crypt", LorenzVec(-190, 74, -88), 15, { config.ignoredWarps.crypt }),
