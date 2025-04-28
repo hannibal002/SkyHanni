@@ -207,13 +207,11 @@ object GriffinBurrowParticleFinder {
         var burrowTimeToLive: Int = 1,
     ) {
 
-        fun getType(): BurrowType {
-            return when (this.type) {
-                0 -> BurrowType.START
-                1 -> BurrowType.MOB
-                2 -> BurrowType.TREASURE
-                else -> BurrowType.UNKNOWN
-            }
+        fun getType(): BurrowType = when (this.type) {
+            0 -> BurrowType.START
+            1 -> BurrowType.MOB
+            2 -> BurrowType.TREASURE
+            else -> BurrowType.UNKNOWN
         }
     }
 
