@@ -10,7 +10,7 @@ class SkyhanniWaypoint(
     @Expose
     val color: Color = Color(0f, 1f, 0f, 0.4f),
     @Expose
-    val number: Int,
+    var number: Int,
     @Expose
     val options: MutableMap<String, String> = mutableMapOf(),
 )

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.WaypointParserUtils
 import kotlinx.coroutines.launch
-import java.awt.Color
 
 @SkyHanniModule
 object OrderedWaypoints {
@@ -46,7 +46,7 @@ object OrderedWaypoints {
                     0 -> config.previousWaypointColor.toSpecialColor()
                     1 -> config.currentWaypointColor.toSpecialColor()
                     2 -> config.nextWaypointColor.toSpecialColor()
-                    else -> Color(255, 0, 0)
+                    else -> LorenzColor.RED.toColor()
                 }
             } else {
                 orderedWaypointsList[renderWaypoints[i]].color
@@ -69,7 +69,7 @@ object OrderedWaypoints {
                 // Waypoint name (number)
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.5, 0.5),
-                    "§b${orderedWaypointsList[renderWaypoints[i]].options["name"]}",
+                    "${LorenzColor.YELLOW.getChatColor()}${orderedWaypointsList[renderWaypoints[i]].number}",
                     seeThroughBlocks = true
                 )
             }
@@ -78,7 +78,9 @@ object OrderedWaypoints {
                 // Distance
                 event.drawString(
                     orderedWaypointsList[renderWaypoints[i]].location.add(0.5, 2.0, 0.5),
-                    "§e" + orderedWaypointsList[renderWaypoints[i]].location.distanceToPlayer().roundTo(1).addSeparators() + "m",
+                    "${
+                        LorenzColor.YELLOW.getChatColor() + orderedWaypointsList[renderWaypoints[i]].location.distanceToPlayer().roundTo(1).addSeparators()
+                    } m",
                     seeThroughBlocks = true
                 )
             }
@@ -210,8 +212,9 @@ object OrderedWaypoints {
 
     private fun load(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            val res = if (args.isEmpty()) WaypointParserUtils.loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
-            else {
+            val res = if (args.isEmpty()) {
+                WaypointParserUtils.loadWaypoints(ClipboardUtils.readFromClipboard().orEmpty())
+            } else {
                 ProfileStorageData.playerSpecific?.routes?.get(args[0]) ?: run {
                     ChatUtils.chat("Route ${args[0]} doesn't exist.")
                     return@launch
@@ -224,7 +227,10 @@ object OrderedWaypoints {
                 renderWaypoints.clear()
                 ChatUtils.chat("Loaded ordered waypoints!")
             } ?: run {
-                ChatUtils.chat("There was an error parsing waypoints. Please make sure they are Coleweight formatted waypoints.")
+                ChatUtils.chat(
+                    "There was an error parsing waypoints. " +
+                        "Please make sure they are Coleweight formatted waypoints."
+                )
                 return@launch
             }
 
@@ -310,7 +316,8 @@ object OrderedWaypoints {
         }
 
         for (i in wNum - 1 until orderedWaypointsList.size) {
-            orderedWaypointsList[i].options["name"] = ((orderedWaypointsList[i].options["name"]?.toInt() ?: (i + 1)).dec()).toString()
+            orderedWaypointsList[i].options["name"] = orderedWaypointsList[i].number.dec().toString()
+            orderedWaypointsList[i].number--
         }
         orderedWaypointsList.removeAt(wNum - 1)
         renderWaypoints.clear()
@@ -331,8 +338,8 @@ object OrderedWaypoints {
             orderedWaypointsList.add(newWaypoint)
         } else {
             for (i in wNum - 1 until orderedWaypointsList.size) {
-                orderedWaypointsList[i].options["name"] =
-                    ((orderedWaypointsList[i].options["name"]?.toIntOrNull() ?: (i + 1)).inc()).toString()
+                orderedWaypointsList[i].options["name"] = orderedWaypointsList[i].number.inc().toString()
+                orderedWaypointsList[i].number++
             }
             orderedWaypointsList.add(wNum - 1, newWaypoint)
         }
@@ -358,9 +365,8 @@ object OrderedWaypoints {
             return ChatUtils.chat("Usage: /shorderedsave (name).")
         }
 
-        ProfileStorageData.playerSpecific?.routes?.put(args[0], Waypoints(orderedWaypointsList))
-
-        ChatUtils.chat("Route saved as ${args[0]}. Do /shorderedimport ${args[0]} to import it.")
+        ProfileStorageData.playerSpecific?.routes?.put(args[0], orderedWaypointsList)
+        ChatUtils.chat("Route saved as ${args[0]}. Do /shorderedload ${args[0]} to import it.")
     }
 
     private fun decideWaypoints() {
@@ -369,9 +375,9 @@ object OrderedWaypoints {
 
         val beforeWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex - 1)
         if (beforeWaypoint != null) {
-            beforeWaypoint.options["name"]?.let { renderWaypoints.add(it.toInt() - 1) }
+            renderWaypoints.add(beforeWaypoint.number - 1)
         } else {
-            orderedWaypointsList[orderedWaypointsList.size - 1].options["name"]?.let { renderWaypoints.add(it.toInt() - 1) }
+            renderWaypoints.add(orderedWaypointsList[orderedWaypointsList.size - 1].number - 1)
         }
 
         val currentWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex)
@@ -379,19 +385,24 @@ object OrderedWaypoints {
         var distanceTo1 = Double.POSITIVE_INFINITY
         if (currentWaypoint != null) {
             distanceTo1 = currentWaypoint.location.distanceToPlayer()
-            currentWaypoint.options["name"]?.let { renderWaypoints.add(it.toInt() - 1) }
+            renderWaypoints.add(currentWaypoint.number - 1)
         }
 
-        val nextWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex + 1) ?: orderedWaypointsList.getOrNull(0)
+        val nextWaypoint = orderedWaypointsList.getOrNull(currentOrderedWaypointIndex + 1)
+            ?: orderedWaypointsList.getOrNull(0)
 
         var distanceTo2 = Double.POSITIVE_INFINITY
         if (nextWaypoint != null) {
             distanceTo2 = nextWaypoint.location.distanceToPlayer()
 
-            nextWaypoint.options["name"]?.let { renderWaypoints.add(it.toInt() - 1) }
+            renderWaypoints.add(nextWaypoint.number - 1)
         }
 
-        if (lastCloser == currentOrderedWaypointIndex && distanceTo1 > distanceTo2 && distanceTo2 < config.waypointRange) {
+        if (
+            lastCloser == currentOrderedWaypointIndex &&
+            distanceTo1 > distanceTo2 &&
+            distanceTo2 < config.waypointRange
+        ) {
             return incrementIndex(1)
         }
 
@@ -403,14 +414,14 @@ object OrderedWaypoints {
             incrementIndex(1)
         }
 
-        orderedWaypointsList.forEach { waypoint ->
-            if ((
-                    config.setupMode && waypoint.options["name"]?.let { !renderWaypoints.contains(it.toInt() - 1) } == true &&
-                        waypoint.location.distanceToPlayer() < config.waypointRange
-                    ) || config.showAll
-            ) {
-                waypoint.options["name"]?.let { renderWaypoints.add(it.toInt() - 1) }
-            }
+        orderedWaypointsList.filter {
+            val inSetupRange = config.setupMode &&
+                !renderWaypoints.contains(it.number - 1) &&
+                it.location.distanceToPlayer() < config.setupModeRange
+            inSetupRange || config.showAll
+        }.forEach {
+                waypoint ->
+            renderWaypoints.add(waypoint.number - 1)
         }
     }
 

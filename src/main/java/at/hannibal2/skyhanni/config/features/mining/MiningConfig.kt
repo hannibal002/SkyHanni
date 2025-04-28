@@ -56,7 +56,7 @@ class MiningConfig {
     var crystalNucleusTracker: CrystalNucleusTrackerConfig = CrystalNucleusTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Ordered Waypoints", desc = "Settings for ordered waypoints (credit to Ninjune and Soopy).")
+    @ConfigOption(name = "Ordered Waypoints (credit to Ninjune and Soopy)", desc = "Settings for ordered waypoints.")
     @Accordion
     var orderedWaypoints: OrderedWaypointsConfig = OrderedWaypointsConfig()
 

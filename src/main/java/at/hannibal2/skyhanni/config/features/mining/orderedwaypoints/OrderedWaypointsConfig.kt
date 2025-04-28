@@ -57,6 +57,11 @@ class OrderedWaypointsConfig {
     var setupMode: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Setup Mode Range", desc = "How close you need to be for nearby waypoints to show in setup mode.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 100f, minStep = 1f)
+    var setupModeRange: Float = 16f
+
+    @Expose
     @ConfigOption(name = "Setup Mode Line Thickness", desc = "Thickness of the setup mode lines.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
     var setupModeLineThickness: Float = 1.0f

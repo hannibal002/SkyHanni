@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.GsonBuilder
@@ -15,6 +14,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.LegacyStringChromaColourTypeAdapter
 import io.github.notenoughupdates.moulconfig.observer.PropertyTypeAdapterFactory
 import net.minecraft.item.ItemStack
+import java.awt.Color
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
@@ -41,6 +41,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(SimpleTimeMark::class.java, SkyHanniTypeAdapters.TIME_MARK.nullSafe())
         .registerTypeAdapter(Duration::class.java, SkyHanniTypeAdapters.DURATION.nullSafe())
         .registerTypeAdapter(LocalDate::class.java, SkyHanniTypeAdapters.LOCALE_DATE.nullSafe())
+        .registerTypeAdapter(Color::class.java, SkyHanniTypeAdapters.COLOR)
         .enableComplexMapKeySerialization()
 
     fun lenientGson(): GsonBuilder = gson()

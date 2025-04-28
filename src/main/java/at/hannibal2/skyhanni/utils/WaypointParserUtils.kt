@@ -16,7 +16,7 @@ object WaypointParserUtils {
     }
 
     fun exportWaypoints(waypoints: Waypoints<SkyhanniWaypoint>, name: String = "Coleweight"): String? {
-        return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name != name }?.save(waypoints)
+        return ServiceLoader.load(WaypointFormat::class.java).firstOrNull { it.name == name }?.save(waypoints)
     }
 }
 

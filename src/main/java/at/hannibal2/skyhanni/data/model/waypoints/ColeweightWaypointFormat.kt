@@ -1,14 +1,15 @@
 package at.hannibal2.skyhanni.data.model.waypoints
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.auto.service.AutoService
 import com.google.gson.annotations.Expose
+import com.google.gson.reflect.TypeToken
 import java.awt.Color
 
 @AutoService(WaypointFormat::class)
 class ColeweightWaypointFormat : WaypointFormat {
-    @Suppress("LongParameterList")
     class ColeweightWaypoint(
         @Expose
         val x: Int,
@@ -26,17 +27,24 @@ class ColeweightWaypointFormat : WaypointFormat {
         val options: MutableMap<String, String> = mutableMapOf(),
     )
 
-    override fun load(string: String): Collection<SkyhanniWaypoint>? {
+    override fun load(string: String): Waypoints<SkyhanniWaypoint>? {
+        val type = object : TypeToken<Waypoints<ColeweightWaypoint>>() {}.type
+
         return try {
-            ConfigManager.gson.fromJson(string, Waypoints<ColeweightWaypoint>()::class.java).map {
-                SkyhanniWaypoint(
-                    LorenzVec(it.x, it.y, it.z),
-                    Color(it.r.toFloat(), it.g.toFloat(), it.b.toFloat()),
-                    it.options["name"]!!.toInt(),
-                    it.options
-                )
-            }
-        } catch (_: Exception) {
+            Waypoints(
+                ConfigManager.gson.fromJson<Waypoints<ColeweightWaypoint>>(string, type)
+                    .map {
+                        SkyhanniWaypoint(
+                            LorenzVec(it.x, it.y, it.z),
+                            Color(it.r.toFloat(), it.g.toFloat(), it.b.toFloat(), 0.4f),
+                            it.options["name"]!!.toInt(),
+                            it.options,
+                        )
+                    }
+                    .toMutableList()
+            )
+        } catch (e: Exception) {
+            ChatUtils.debug(e.stackTraceToString())
             null
         }
     }
@@ -45,7 +53,7 @@ class ColeweightWaypointFormat : WaypointFormat {
         return load(string) != null
     }
 
-    override fun save(waypoints: Collection<SkyhanniWaypoint>): String {
+    override fun save(waypoints: Waypoints<SkyhanniWaypoint>): String {
         return ConfigManager.gson.toJson(
             Waypoints(
                 waypoints.map {
@@ -53,14 +61,14 @@ class ColeweightWaypointFormat : WaypointFormat {
                         it.location.x.toInt(),
                         it.location.y.toInt(),
                         it.location.z.toInt(),
-                        it.color.red.toDouble(),
-                        it.color.green.toDouble(),
-                        it.color.blue.toDouble(),
-                        it.options
+                        it.color.red.toDouble() / 255,
+                        it.color.green.toDouble() / 255,
+                        it.color.blue.toDouble() / 255,
+                        it.options,
                     )
-                }.toMutableList()
+                }.toMutableList(),
             ),
-            Waypoints<SkyhanniWaypoint>()::class.java
+            Waypoints<ColeweightWaypoint>()::class.java,
         )
     }
 

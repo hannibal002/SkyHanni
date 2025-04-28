@@ -176,6 +176,9 @@ dependencies {
 
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
+    ksp(libs.autoservice.ksp)
+    implementation(libs.autoservice.annotations)
+
     val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
 
     if (!target.isFabric) {
