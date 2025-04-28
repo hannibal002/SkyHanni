@@ -94,10 +94,10 @@ object GriffinBurrowParticleFinder {
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
         if (isSpade) {
-            burrows.filter { (location, burrow) ->
+            for ((location, burrow) in burrows) {
+                if (location.distanceSqToPlayer() > 256) continue
                 burrow.burrowTimeToLive -= 1
-                location.distanceSqToPlayer() < 256 && burrow.burrowTimeToLive < 0
-            }.forEach { (location, burrow) ->
+                if (burrow.burrowTimeToLive >= 0) continue
                 BurrowDugEvent(location).post()
                 burrows.remove(location)
                 lastDugParticleBurrow = null
@@ -204,7 +204,7 @@ object GriffinBurrowParticleFinder {
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
-        var burrowTimeToLive: Int = 0,
+        var burrowTimeToLive: Int = 1,
     ) {
 
         fun getType(): BurrowType {

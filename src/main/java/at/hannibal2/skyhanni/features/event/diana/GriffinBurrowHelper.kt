@@ -180,8 +180,6 @@ object GriffinBurrowHelper {
         return newLocation
     }
 
-    private var correctCounter = 0
-
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
@@ -192,16 +190,10 @@ object GriffinBurrowHelper {
 
         latestGuess?.let {
             if (it.precise && config.multiGuesses) {
-                if (it.getLocation() == newLocation) {
-                    correctCounter++
-                } else {
-                    if (correctCounter > 5) {
-                        config.guess
-                        if (it.getLocation() !in particleBurrows) {
-                            additionalGuesses.add(it)
-                        }
+                if (event.new) {
+                    if (it.getLocation() !in particleBurrows) {
+                        additionalGuesses.add(it)
                     }
-                    correctCounter = 0
                 }
             }
         }
@@ -225,7 +217,6 @@ object GriffinBurrowHelper {
             if (it.precise) {
                 if (location == it.getLocation()) {
                     latestGuess = null
-                    correctCounter = 0
                 }
             }
         }
@@ -238,7 +229,6 @@ object GriffinBurrowHelper {
         val location = guess.getLocation()
         if (particleBurrows.any { location.distance(it.key) < distance }) {
             latestGuess = null
-            correctCounter = 0
         }
     }
 
@@ -273,7 +263,6 @@ object GriffinBurrowHelper {
 
     private fun resetAllData() {
         latestGuess = null
-        correctCounter = 0
         additionalGuesses.clear()
         targetLocation = null
         particleBurrows = emptyMap()
