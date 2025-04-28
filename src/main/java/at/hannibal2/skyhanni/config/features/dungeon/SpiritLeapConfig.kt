@@ -8,8 +8,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SpiritLeapConfig {
-    val defaultColor: String = "0:200:0:0:0"
-    private val deadColor: String = "0:200:120:0:0"
+    @Transient val defaultColor: String = "0:200:0:0:0"
+    @Transient private val deadColor: String = "0:200:120:0:0"
 
     @Expose
     @ConfigOption(name = "Enable Spirit Leap Overlay", desc = "Enable Spirit Leap Overlay inside Dungeons.")
