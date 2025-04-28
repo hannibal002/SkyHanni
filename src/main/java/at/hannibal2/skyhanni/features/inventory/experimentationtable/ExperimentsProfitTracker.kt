@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -168,6 +169,7 @@ object ExperimentsProfitTracker {
 
     @HandleEvent(SecondPassedEvent::class)
     fun checkAddTimeWasted() {
+        if (ExperimentationTableApi.expOverInventoryPattern.matches(InventoryUtils.openInventoryName())) return
         if (!ExperimentationTableApi.inTable || !config.trackTimeSpent) {
             lastAddedTimeWasted = SimpleTimeMark.farPast()
             return
@@ -204,7 +206,7 @@ object ExperimentsProfitTracker {
 
         if (config.trackTimeSpent) {
             val timeFormat = data.timeWasted.values.sumOf { it.inWholeSeconds }.seconds.format()
-            addSearchString("§eTime Spent: $timeFormat")
+            addSearchString("§eTime Spent: §b$timeFormat")
         }
 
         val startCostFormat = data.startCost.absoluteValue
