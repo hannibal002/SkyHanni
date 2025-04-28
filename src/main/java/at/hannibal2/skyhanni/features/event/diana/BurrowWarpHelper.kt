@@ -121,7 +121,7 @@ object BurrowWarpHelper {
             description = "Manually resetting disabled diana burrow warp points"
             category = CommandCategory.USERS_RESET
             callback {
-                WarpPoint.entries.forEach { it.unlocked = true }
+                WarpPoint.entries.forEach { point -> point.unlocked = true }
                 ChatUtils.chat("Reset disabled burrow warps.")
             }
         }
