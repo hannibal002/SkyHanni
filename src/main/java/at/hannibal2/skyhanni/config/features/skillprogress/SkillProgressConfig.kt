@@ -100,9 +100,9 @@ class SkillProgressConfig {
 
     @Expose
     @ConfigLink(owner = AllSkillDisplayConfig::class, field = "enabled")
-    var allSkillPosition: Position = Position(5, 209, false, true)
+    var allSkillPosition: Position = Position(5, 209, false)
 
     @Expose
     @ConfigLink(owner = SkillETADisplayConfig::class, field = "enabled")
-    var etaPosition: Position = Position(5, 155, false, true)
+    var etaPosition: Position = Position(5, 155, false)
 }
