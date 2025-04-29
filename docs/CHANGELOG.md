@@ -444,7 +444,7 @@
     + Now returns replacement and cancellation info for chat components.
 + Created and used MinecraftCompat. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3590)
     + Provides null-safe player and world access on modern versions.
-+ Migrated several features to use Renderables. - appable0 (https://github.com/hannibal002/SkyHanni/pull/3069)
++ Migrated several features to use Renderables. - appable (https://github.com/hannibal002/SkyHanni/pull/3069)
 + Ported `hoppity` config to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3571)
 + Updated to Loom 1.9 and Gradle 8.13. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3604)
 + Allowed loading, editing, and saving a Parkour via the Graph Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3615)
@@ -499,7 +499,7 @@
 + SkyHanniEvents can now be `@Handle`-d without an `event:` parameter, and without a HandleEvent parameter, if a default function name is provided for the event. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3656)
     + See `SkyhanniTickEvent` and `WorldChangeEvent` for examples.
 + Added block compat, changed inventory name getting. - nopo (https://github.com/hannibal002/SkyHanni/pull/3629)
-+ Added cache for `getSlayerTypeForCurrentArea()`. - hannibal2. (https://github.com/hannibal002/SkyHanni/pull/3730)
++ Added cache for `getSlayerTypeForCurrentArea()`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3730)
 + Added context option on default function names for navigating to event declaration. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3724)
 + Added debug command `/shdebugrecentitemadds`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3720)
 + Bumped `ModAPI` to 1.0.1.2. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3702)
@@ -546,7 +546,7 @@
 + Rewrote `GardenVisitorDropStatistics` to use a transformer instead of a map and ordinals. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3710)
 + Simplified Slayer config access. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3782)
 + Started porting `Garden` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3766)
-+ Update changelog builder. - CalMWolfs & hannibal2. (https://github.com/hannibal002/SkyHanni/pull/3794)
++ Update changelog builder. - CalMWolfs & hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3794)
 + Update contributing.md to mention Minecraft Development Plugin and Access Wideners. - nopo (https://github.com/hannibal002/SkyHanni/pull/3774)
 + Update loom. - nopo (https://github.com/hannibal002/SkyHanni/pull/3774)
 + Update Moulconfig to 3.6.0 for 1.21.5 support. - nea (https://github.com/hannibal002/SkyHanni/pull/3774)
@@ -6026,7 +6026,7 @@
 + In Melody's Harp, show buttons as stack size. - NetheriteMiner
     + Intended to be used with Harp Keybinds
 + Added timer till shared inquisitors will despawn. - hannibal2
-+ Account upgrade complete reminder. - appable0
++ Account upgrade complete reminder. - appable
 + Chat message how many places you dropped in the farming weight lb when joining garden.
 + Added command /shfarmingprofile [player name]
     + Opens the elitebot.dev website in your web browser to show your Farming Weight profile.
@@ -6115,9 +6115,9 @@
 + Api error messages are now formatted more helpful.
 + Added option to only show the reputation helper while pressing a hotkey.
 + Garden **Money per Hour** now uses the **dicer drops** from melon and pumpkins as well. - CalMWolfs
-+ Adds **Double Hook** to the **sea creature chat message** instead of in a previous line. - appable0
++ Adds **Double Hook** to the **sea creature chat message** instead of in a previous line. - appable
 + Rune display now shows always in sack display.
-+ Shark fish counter now counts twice for Double hook. - appable0
++ Shark fish counter now counts twice for Double hook. - appable
 + Ghost counter check for Mist now ignores y coordinates - HiZe
 + Telling the user about the bypass hotkey when the visitor drop warning blocks a visitor refusal. - CalMWolfs
 + Added warning sound when the worm fishing cap of 60 is hit. - CarsCupcake
@@ -6196,11 +6196,11 @@
 + Fixed holy ice cooldown sometimes not working.
 + Fixed a rare startup crash.
 + Fixed Ghost stats after bestiary update. - HiZe
-+ Watchdog hider now correctly hides empty lines as well, even when empty line hider is disabled. - appable0
++ Watchdog hider now correctly hides empty lines as well, even when empty line hider is disabled. - appable
 + Fixed `saw mob` title for trevor trapper solver still showing even when feature is disabled.
 + Fixed chicken from raider of the sea get detected as trevor trapper mob.
 + Fixed master star detection in estimate item value broken for some times.
-+ Fixed description in golden trophy fish info tooltip. - appable0
++ Fixed description in golden trophy fish info tooltip. - appable
 + Fixed End Node Tracker not updating when changing the text format.
 + Fixed neu repo error messages with runes.
 + Fixed rare crashes with scoreboard.
@@ -6244,7 +6244,7 @@
 + Garden Money Per Hour: Fixed the wrong NPC price when Merge Seeds is enabled. - hannibal2
 + Hopefully fixed error messages in bingo around collection values. - hannibal2
 + Hopefully fixed a rare chat error. - hannibal2
-+ Fixed duration format in non-god-potion display. - appable0
++ Fixed duration format in non-god-potion display. - appable
 + Fixed various typos. - pretz
 + Fixed minion nametag not getting removed after picking it up. - Cad
 + Fixed 3k hp spiders being falsely highlighted as Arachne's Keepers. - oofy
@@ -6443,7 +6443,7 @@
 + Added **Dungeon Potion level as item stack size - HiZe
 + Added **Griffin Pet Warning**
     + Warn when holding an Ancestral Spade while no Griffin pet is selected.
-+ More **Trophy Fish** features - appable0
++ More **Trophy Fish** features - appable
     + **Trophy Fish Info** - Hover over trophy fish caught chat message to see information and stats about the trophy
       fish.
     + **Fillet Tooltip** - Adding fillet amount and price to the tooltip of a trophy fish. Left shift to show stack

@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
-import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
@@ -205,11 +204,6 @@ object Commands {
             description = "Resets the saved values of the applied kismet feathers in Croesus"
             category = CommandCategory.USERS_RESET
             callback { CroesusChestTracker.resetChest() }
-        }
-        event.register("shresetburrowwarps") {
-            description = "Manually resetting disabled diana burrow warp points"
-            category = CommandCategory.USERS_RESET
-            callback { BurrowWarpHelper.resetDisabledWarps() }
         }
         event.register("shresetcontestdata") {
             description = "Resets Jacob's Contest Data"
