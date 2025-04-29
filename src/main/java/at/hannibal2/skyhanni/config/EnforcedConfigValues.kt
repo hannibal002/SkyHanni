@@ -19,8 +19,8 @@ import kotlin.time.Duration.Companion.INFINITE
 @SkyHanniModule
 object EnforcedConfigValues {
 
-    var enforcedValues: List<EnforcedValueData> = listOf()
-    var hasSentPSAsOnce = false
+    private var enforcedValues: List<EnforcedValueData> = listOf()
+    private var hasSentPSAsOnce = false
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -32,6 +32,7 @@ object EnforcedConfigValues {
             it.affectedMinecraftVersions?.contains(VersionConstants.MC_VERSION) ?: true
         }
         if (oldEnforcedValues == enforcedValues) return
+        hasSentPSAsOnce = false
         // we have to recreate the whole config when a value changes
         // so that the option is blocked off inside the config
         SkyHanniMod.configManager.recreateConfig()
@@ -50,7 +51,7 @@ object EnforcedConfigValues {
         enforceOntoConfig(SkyHanniMod.feature)
     }
 
-    fun sendPSAs() {
+    private fun sendPSAs() {
         val notifications = enforcedValues.mapNotNull { it.notificationPSA }
         for (notification in notifications) {
             if (notification.isNotEmpty()) {
@@ -67,7 +68,7 @@ object EnforcedConfigValues {
         }
     }
 
-    fun enforceOntoConfig(config: Any) {
+    private fun enforceOntoConfig(config: Any) {
         for (enforcedValue in enforcedValues.flatMap { it.enforcedValues }) {
             val shimmy = Shimmy.makeShimmy(config, enforcedValue.path.split("."))
             if (shimmy == null) {
