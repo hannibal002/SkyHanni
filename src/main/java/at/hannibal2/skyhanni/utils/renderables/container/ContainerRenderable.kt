@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.renderables.container
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.filterList
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -24,7 +25,7 @@ open class VerticalContainerRenderable(
     spacing: Int = 0,
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-) : Renderable, ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
+) : ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
 
     override val width: Int
         get() = renderables.maxOfOrNull { it.width } ?: 0
@@ -34,10 +35,14 @@ open class VerticalContainerRenderable(
 
     override fun render(posX: Int, posY: Int) {
         var y = posY
+        var totalOffset = 0
         renderables.forEach {
             it.renderXAligned(posX, y, width)
             y += it.height + spacing
+            DrawContextUtils.translate(0f, (it.height + spacing).toFloat(), 0f)
+            totalOffset += it.height + spacing
         }
+        DrawContextUtils.translate(0f, -totalOffset.toFloat(), 0f)
     }
 }
 
@@ -46,7 +51,7 @@ class HorizontalContainerRenderable(
     spacing: Int = 0,
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-) : Renderable, ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
+) : ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
 
     override val width: Int
         get() = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
@@ -56,10 +61,14 @@ class HorizontalContainerRenderable(
 
     override fun render(posX: Int, posY: Int) {
         var x = posX
+        var totalOffset = 0
         renderables.forEach {
             it.renderYAligned(x, posY, height)
             x += it.width + spacing
+            DrawContextUtils.translate((it.width + spacing).toFloat(), 0f, 0f)
+            totalOffset += it.width + spacing
         }
+        DrawContextUtils.translate(-totalOffset.toFloat(), 0f, 0f)
     }
 }
 
@@ -70,7 +79,7 @@ class SearchableVerticalContainer(
     key: Int,
     horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-) : Renderable, VerticalContainerRenderable(
+) : VerticalContainerRenderable(
     content.map { it.key },
     spacing,
     horizontalAlign,
