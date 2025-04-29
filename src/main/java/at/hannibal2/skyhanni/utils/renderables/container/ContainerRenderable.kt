@@ -38,7 +38,7 @@ open class VerticalContainerRenderable(
             y += it.height + spacing
             DrawContextUtils.translate(0f, (it.height + spacing).toFloat(), 0f)
         }
-        DrawContextUtils.translate(0f, -height - spacing.toFloat(), 0f)
+        DrawContextUtils.translate(0f, (-height - spacing).toFloat(), 0f)
     }
 }
 
@@ -60,7 +60,7 @@ class HorizontalContainerRenderable(
             x += it.width + spacing
             DrawContextUtils.translate((it.width + spacing).toFloat(), 0f, 0f)
         }
-        DrawContextUtils.translate(-width - spacing.toFloat(), 0f, 0f)
+        DrawContextUtils.translate((-width - spacing).toFloat(), 0f, 0f)
     }
 }
 
