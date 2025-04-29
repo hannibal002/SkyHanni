@@ -57,7 +57,7 @@ object EnforcedConfigValues {
                 NotificationManager.queueNotification(SkyHanniNotification(notification, INFINITE, true))
             }
         }
-        val chat = enforcedValues.flatMap { it.chatPSA ?: emptyList() }
+        val chat = enforcedValues.flatMap { it.chatPSA.orEmpty() }
         if (chat.isNotEmpty()) {
             var shouldPrefix = true
             for (line in chat) {
