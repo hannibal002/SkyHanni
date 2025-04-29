@@ -96,7 +96,7 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
                 if (!isPublic && needsPublic) {
                     holder.registerProblem(
                         function,
-                        "Function should be public to be annotated with @HandleEvent",
+                        "Function must be public to be annotated with @HandleEvent",
                         ProblemHighlightType.GENERIC_ERROR
                     )
                 }
