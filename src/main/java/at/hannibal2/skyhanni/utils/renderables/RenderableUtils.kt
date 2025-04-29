@@ -163,7 +163,7 @@ internal object RenderableUtils {
         return yOffset
     }
 
-    inline fun renderString(
+    fun renderString(
         text: String,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
