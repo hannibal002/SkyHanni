@@ -27,22 +27,18 @@ open class VerticalContainerRenderable(
     verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
 ) : ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
 
-    override val width: Int
-        get() = renderables.maxOfOrNull { it.width } ?: 0
+    override val width = renderables.maxOfOrNull { it.width } ?: 0
 
-    override val height: Int
-        get() = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
+    override val height = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
 
     override fun render(posX: Int, posY: Int) {
         var y = posY
-        var totalOffset = 0
         renderables.forEach {
             it.renderXAligned(posX, y, width)
             y += it.height + spacing
             DrawContextUtils.translate(0f, (it.height + spacing).toFloat(), 0f)
-            totalOffset += it.height + spacing
         }
-        DrawContextUtils.translate(0f, -totalOffset.toFloat(), 0f)
+        DrawContextUtils.translate(0f, -height - spacing.toFloat(), 0f)
     }
 }
 
@@ -53,22 +49,18 @@ class HorizontalContainerRenderable(
     verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
 ) : ContainerRenderable(renderables, spacing, horizontalAlign, verticalAlign) {
 
-    override val width: Int
-        get() = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
+    override val width = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
 
-    override val height: Int
-        get() = renderables.maxOfOrNull { it.height } ?: 0
+    override val height = renderables.maxOfOrNull { it.height } ?: 0
 
     override fun render(posX: Int, posY: Int) {
         var x = posX
-        var totalOffset = 0
         renderables.forEach {
             it.renderYAligned(x, posY, height)
             x += it.width + spacing
             DrawContextUtils.translate((it.width + spacing).toFloat(), 0f, 0f)
-            totalOffset += it.width + spacing
         }
-        DrawContextUtils.translate(-totalOffset.toFloat(), 0f, 0f)
+        DrawContextUtils.translate(-width - spacing.toFloat(), 0f, 0f)
     }
 }
 
