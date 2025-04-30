@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
-import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
@@ -33,7 +32,6 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
-import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
@@ -108,17 +106,6 @@ object Commands {
             description = "Calculates with your current crop per second how many items you can collect in this amount of time"
             category = CommandCategory.USERS_ACTIVE
             callback { GardenCropsInCommand.onCommand(it) }
-        }
-        event.register("shmouselock") {
-            description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
-            category = CommandCategory.USERS_ACTIVE
-            aliases = listOf("shlockmouse")
-            callback { LockMouseLook.toggleLock() }
-        }
-        event.register("shsensreduce") {
-            description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
-            category = CommandCategory.USERS_ACTIVE
-            callback { SensitivityReducer.manualToggle() }
         }
         event.register("shfandomwiki") {
             description = "Searches the fandom wiki with SkyHanni's own method."
