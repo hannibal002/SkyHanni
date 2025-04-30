@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
-  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+    <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>ArrayPrimitive:LorenzVec.kt$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$Array&lt;Double&gt;</ID>
