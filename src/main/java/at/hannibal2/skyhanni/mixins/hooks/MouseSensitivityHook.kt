@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 @SkyHanniModule
 object MouseSensitivityHook {
     private val config get() = SkyHanniMod.feature.garden.sensitivityReducer
-    var state: MouseSensitivityState = MouseSensitivityState.DEFAULT
+    var state: SensitivityState = SensitivityState.UNCHANGED
         private set
 
     private var lastIn: Float = Float.NaN
@@ -29,7 +29,7 @@ object MouseSensitivityHook {
         return getMouseSensitivity(actualSensitivity) * 0.6f + 0.2f
     }
 
-    fun setState(newState: MouseSensitivityState) {
+    fun setState(newState: SensitivityState) {
         state = newState
 
         lastIn = Float.NaN
@@ -40,7 +40,7 @@ object MouseSensitivityHook {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Mouse Sensitivity")
 
-        if (state == MouseSensitivityState.DEFAULT) {
+        if (state == SensitivityState.UNCHANGED) {
             event.addIrrelevant("not enabled")
             return
         }
@@ -50,10 +50,10 @@ object MouseSensitivityHook {
         }
     }
 
-    enum class MouseSensitivityState(
+    enum class SensitivityState(
         private val transform: ((Float) -> Float),
     ) {
-        DEFAULT({ it }),
+        UNCHANGED({ it }),
         LOCKED({ _ -> -1f / 3f }),
         AUTO_REDUCED(
             {

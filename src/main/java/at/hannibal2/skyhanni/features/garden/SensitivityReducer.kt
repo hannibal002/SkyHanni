@@ -24,9 +24,9 @@ object SensitivityReducer {
 
     private var shouldBeActive = false
     private val isActive get() = isAutoActive || isManualActive
-    private val isAutoActive get() = MouseSensitivityHook.state == MouseSensitivityHook.MouseSensitivityState.AUTO_REDUCED
-    private val isManualActive get() = MouseSensitivityHook.state == MouseSensitivityHook.MouseSensitivityState.MANUAL_REDUCED
-    private val isMouseLocked get() = MouseSensitivityHook.state == MouseSensitivityHook.MouseSensitivityState.LOCKED
+    private val isAutoActive get() = MouseSensitivityHook.state == MouseSensitivityHook.SensitivityState.AUTO_REDUCED
+    private val isManualActive get() = MouseSensitivityHook.state == MouseSensitivityHook.SensitivityState.MANUAL_REDUCED
+    private val isMouseLocked get() = MouseSensitivityHook.state == MouseSensitivityHook.SensitivityState.LOCKED
 
     @HandleEvent
     fun onTick() {
@@ -41,18 +41,16 @@ object SensitivityReducer {
     }
 
     private fun updatePlayerStatus() {
-        if (GardenApi.onBarnPlot && !inBarn) {
-            inBarn = true
-            tryAutoToggle()
-        } else if (!GardenApi.onBarnPlot && inBarn) {
-            inBarn = false
+        val newInBarn = GardenApi.onBarnPlot
+        val newOnGround = MinecraftCompat.localPlayer.onGround
+
+        if (inBarn != newInBarn) {
+            inBarn = newInBarn
             tryAutoToggle()
         }
-        if (MinecraftCompat.localPlayer.onGround && !onGround) {
-            onGround = true
-            tryAutoToggle()
-        } else if (!MinecraftCompat.localPlayer.onGround && onGround) {
-            onGround = false
+
+        if (onGround != newOnGround) {
+            onGround = newOnGround
             tryAutoToggle()
         }
     }
@@ -62,10 +60,10 @@ object SensitivityReducer {
 
         if (!isActive) {
             shouldBeActive = true
-            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.AUTO_REDUCED)
+            MouseSensitivityHook.setState(MouseSensitivityHook.SensitivityState.AUTO_REDUCED)
         } else {
             shouldBeActive = false
-            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.DEFAULT)
+            MouseSensitivityHook.setState(MouseSensitivityHook.SensitivityState.UNCHANGED)
         }
     }
 
@@ -89,21 +87,21 @@ object SensitivityReducer {
         if (config.onGround.get() && !onGround) return
         if (!isActive) {
             shouldBeActive = true
-            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.AUTO_REDUCED)
+            MouseSensitivityHook.setState(MouseSensitivityHook.SensitivityState.AUTO_REDUCED)
         } else {
             shouldBeActive = false
-            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.DEFAULT)
+            MouseSensitivityHook.setState(MouseSensitivityHook.SensitivityState.UNCHANGED)
         }
     }
 
     private fun manualToggle() {
         if (!isActive) {
             shouldBeActive = true
-            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.MANUAL_REDUCED)
+            MouseSensitivityHook.setState(MouseSensitivityHook.SensitivityState.MANUAL_REDUCED)
             ChatUtils.chat("§bMouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
         } else {
             shouldBeActive = false
-            MouseSensitivityHook.setState(MouseSensitivityHook.MouseSensitivityState.DEFAULT)
+            MouseSensitivityHook.setState(MouseSensitivityHook.SensitivityState.UNCHANGED)
             ChatUtils.chat("§bMouse sensitivity is now restored.")
         }
     }
