@@ -10,7 +10,7 @@ class ChunkedStatsConfig {
     @Expose
     @ConfigOption(name = "Chunked Stats", desc = "Select the stats you want to display chunked on the scoreboard.")
     @ConfigEditorDraggableList
-    var chunkedStats: MutableList<ChunkedStatsLine> = ChunkedStatsLine.entries.toMutableList()
+    val chunkedStats: MutableList<ChunkedStatsLine> = ChunkedStatsLine.entries.toMutableList()
 
     @Expose
     @ConfigOption(name = "Max Stats per Line", desc = "The maximum amount of stats that will be displayed in one line.")

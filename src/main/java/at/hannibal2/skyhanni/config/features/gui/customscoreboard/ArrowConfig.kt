@@ -9,7 +9,7 @@ class ArrowConfig {
     @Expose
     @ConfigOption(name = "Arrow Amount Display", desc = "Determine how the arrow amount is displayed.")
     @ConfigEditorDropdown
-    var arrowAmountDisplay: ArrowAmountDisplay = ArrowAmountDisplay.NUMBER
+    val arrowAmountDisplay: ArrowAmountDisplay = ArrowAmountDisplay.NUMBER
 
     enum class ArrowAmountDisplay(private val displayName: String) {
         NUMBER("Number"),

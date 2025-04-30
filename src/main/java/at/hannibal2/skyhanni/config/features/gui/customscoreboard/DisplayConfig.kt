@@ -16,42 +16,42 @@ class DisplayConfig {
     @Expose
     @ConfigOption(name = "Alignment Options", desc = "")
     @Accordion
-    var alignment: AlignmentConfig = AlignmentConfig()
+    val alignment: AlignmentConfig = AlignmentConfig()
 
     @Expose
     @ConfigOption(name = "Arrow Options", desc = "")
     @Accordion
-    var arrow: ArrowConfig = ArrowConfig()
+    val arrow: ArrowConfig = ArrowConfig()
 
     @Expose
     @ConfigOption(name = "Chunked Stats Options", desc = "")
     @Accordion
-    var chunkedStats: ChunkedStatsConfig = ChunkedStatsConfig()
+    val chunkedStats: ChunkedStatsConfig = ChunkedStatsConfig()
 
     @Expose
     @ConfigOption(name = "Events Options", desc = "")
     @Accordion
-    var events: EventsConfig = EventsConfig()
+    val events: EventsConfig = EventsConfig()
 
     @Expose
     @ConfigOption(name = "Maxwell Options", desc = "")
     @Accordion
-    var maxwell: MaxwellConfig = MaxwellConfig()
+    val maxwell: MaxwellConfig = MaxwellConfig()
 
     @Expose
     @ConfigOption(name = "Mayor Options", desc = "")
     @Accordion
-    var mayor: MayorConfig = MayorConfig()
+    val mayor: MayorConfig = MayorConfig()
 
     @Expose
     @ConfigOption(name = "Party Options", desc = "")
     @Accordion
-    var party: PartyConfig = PartyConfig()
+    val party: PartyConfig = PartyConfig()
 
     @Expose
     @ConfigOption(name = "Title and Footer Options", desc = "")
     @Accordion
-    var titleAndFooter: TitleAndFooterConfig = TitleAndFooterConfig()
+    val titleAndFooter: TitleAndFooterConfig = TitleAndFooterConfig()
 
     @Expose
     @ConfigOption(
@@ -61,7 +61,7 @@ class DisplayConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideVanillaScoreboard: Property<Boolean> = Property.of(true)
+    val hideVanillaScoreboard: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Show earned/lost", desc = "Show the amount you earned/lost on any Number display.")
@@ -89,7 +89,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(name = "Powder Display", desc = "Select how the powder display should be formatted.")
     @ConfigEditorDropdown
-    var powderDisplay: PowderDisplay = PowderDisplay.AVAILABLE
+    val powderDisplay: PowderDisplay = PowderDisplay.AVAILABLE
 
     enum class PowderDisplay(private val displayName: String) {
         AVAILABLE("Available"),
@@ -103,7 +103,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(name = "Number Format", desc = "Select how numbers should be formatted.")
     @ConfigEditorDropdown
-    var numberFormat: NumberFormat = NumberFormat.LONG
+    val numberFormat: NumberFormat = NumberFormat.LONG
 
     enum class NumberFormat(private val displayName: String) {
         LONG("1,234,567"),
@@ -120,7 +120,7 @@ class DisplayConfig {
         desc = "Select how numbers with their prefix and color should be formatted.",
     )
     @ConfigEditorDropdown
-    var numberDisplayFormat: NumberDisplayFormat = NumberDisplayFormat.TEXT_COLOR_NUMBER
+    val numberDisplayFormat: NumberDisplayFormat = NumberDisplayFormat.TEXT_COLOR_NUMBER
 
     @Expose
     @ConfigOption(
@@ -149,7 +149,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(name = "Lobby Code Date Format", desc = "Select your preferred date format.")
     @ConfigEditorDropdown
-    var dateFormat: DateFormat = DateFormat.US_SLASH_MMDDYYYY
+    val dateFormat: DateFormat = DateFormat.US_SLASH_MMDDYYYY
 
     @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
@@ -162,7 +162,7 @@ class DisplayConfig {
         desc = "Will align the text to the left, center or right, while not overriding certain lines, like title or footer.",
     )
     @ConfigEditorDropdown
-    var textAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
+    val textAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
 
     @Expose
     @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")
