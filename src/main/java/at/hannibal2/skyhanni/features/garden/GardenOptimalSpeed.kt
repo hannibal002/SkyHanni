@@ -28,6 +28,9 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.gui.inventory.GuiEditSign
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.21
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//#endif
 
 @SkyHanniModule
 object GardenOptimalSpeed {
