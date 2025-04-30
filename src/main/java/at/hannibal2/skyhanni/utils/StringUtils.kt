@@ -530,9 +530,10 @@ object StringUtils {
     }
 
     // copied from minecraft, thx jappa
-    private val colorCode = makeColorCodeArray()
+    private val colorCodes = makeColorCodeArray()
 
-    private fun makeColorCodeArray(): Array<Int> {
+    private fun makeColorCodeArray(): IntArray {
+        val colorCode = IntArray(32)
         for (i in 0..31) {
             val j = (i shr 3 and 1) * 85
             var k = (i shr 2 and 1) * 170 + j
@@ -548,12 +549,12 @@ object StringUtils {
                 i1 /= 4
             }
 
-            this.colorCode[i] = ((k and 0xFF) shl 16) or ((l and 0xFF) shl 8) or (i1 and 0xFF)
+            colorCode[i] = ((k and 0xFF) shl 16) or ((l and 0xFF) shl 8) or (i1 and 0xFF)
         }
-        return this.colorCode
+        return colorCode
     }
 
     fun getColorCode(color: Char): Int {
-        return colorCode["0123456789abcdef".indexOf(color)]
+        return colorCodes["0123456789abcdef".indexOf(color)]
     }
 }
