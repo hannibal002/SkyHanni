@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook
-import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook.SensitivityState
+import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager
+import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.SensitivityState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -25,7 +25,7 @@ object LockMouseLook {
     )
 
     private val config get() = SkyHanniMod.feature.misc
-    private val isActive get() = MouseSensitivityHook.state == SensitivityState.LOCKED
+    private val isActive get() = SensitivityState.LOCKED.isActive()
 
     @HandleEvent
     fun onWorldChange() {
@@ -41,7 +41,7 @@ object LockMouseLook {
     fun unlockMouse() {
         if (!isActive) return
 
-        MouseSensitivityHook.setState(SensitivityState.UNCHANGED)
+        MouseSensitivityManager.state = SensitivityState.UNCHANGED
         if (config.lockMouseLookChatMessage) {
             ChatUtils.chat("§bMouse rotation is now unlocked.")
         }
@@ -50,7 +50,7 @@ object LockMouseLook {
     private fun lockMouse() {
         if (isActive) return
 
-        MouseSensitivityHook.setState(SensitivityState.LOCKED)
+        MouseSensitivityManager.state = SensitivityState.LOCKED
         if (config.lockMouseLookChatMessage) {
             ChatUtils.chat("§bMouse rotation is now locked.")
         }

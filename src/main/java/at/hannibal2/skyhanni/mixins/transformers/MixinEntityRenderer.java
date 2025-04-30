@@ -24,6 +24,6 @@ public class MixinEntityRenderer {
         ordinal = 1
     )
     private float modifySensitivity(float value) {
-        return MouseSensitivityHook.INSTANCE.getMouseSensitivityWithWeirdMath(value);
+        return MouseSensitivityHook.INSTANCE.remapSensitivity(value);
     }
 }
