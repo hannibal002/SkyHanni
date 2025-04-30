@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.SensitivityState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -23,10 +24,10 @@ object SensitivityReducer {
     private var onGround: Boolean = false
 
     private var shouldBeActive = false
+
     private val isActive get() = isAutoActive || isManualActive
-    private val isAutoActive get() = MouseSensitivityManager.SensitivityState.AUTO_REDUCED.isActive()
-    private val isManualActive get() = MouseSensitivityManager.SensitivityState.MANUAL_REDUCED.isActive()
-    private val isMouseLocked get() = MouseSensitivityManager.SensitivityState.LOCKED.isActive()
+    private val isAutoActive get() = SensitivityState.AUTO_REDUCED.isActive()
+    private val isManualActive get() = SensitivityState.MANUAL_REDUCED.isActive()
 
     @HandleEvent
     fun onTick() {
@@ -34,7 +35,7 @@ object SensitivityReducer {
             if (isAutoActive) autoToggle()
             return
         }
-        if (isMouseLocked) return
+        if (SensitivityState.LOCKED.isActive()) return
 
         updatePlayerStatus()
         autoToggleIfNeeded()
@@ -60,10 +61,10 @@ object SensitivityReducer {
 
         if (!isActive) {
             shouldBeActive = true
-            MouseSensitivityManager.state = MouseSensitivityManager.SensitivityState.AUTO_REDUCED
+            MouseSensitivityManager.state = SensitivityState.AUTO_REDUCED
         } else {
             shouldBeActive = false
-            MouseSensitivityManager.state = MouseSensitivityManager.SensitivityState.UNCHANGED
+            MouseSensitivityManager.state = SensitivityState.UNCHANGED
         }
     }
 
@@ -87,21 +88,21 @@ object SensitivityReducer {
         if (config.onGround.get() && !onGround) return
         if (!isActive) {
             shouldBeActive = true
-            MouseSensitivityManager.state = MouseSensitivityManager.SensitivityState.AUTO_REDUCED
+            MouseSensitivityManager.state = SensitivityState.AUTO_REDUCED
         } else {
             shouldBeActive = false
-            MouseSensitivityManager.state = MouseSensitivityManager.SensitivityState.UNCHANGED
+            MouseSensitivityManager.state = SensitivityState.UNCHANGED
         }
     }
 
     private fun manualToggle() {
         if (!isActive) {
             shouldBeActive = true
-            MouseSensitivityManager.state = MouseSensitivityManager.SensitivityState.MANUAL_REDUCED
+            MouseSensitivityManager.state = SensitivityState.MANUAL_REDUCED
             ChatUtils.chat("§bMouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
         } else {
             shouldBeActive = false
-            MouseSensitivityManager.state = MouseSensitivityManager.SensitivityState.UNCHANGED
+            MouseSensitivityManager.state = SensitivityState.UNCHANGED
             ChatUtils.chat("§bMouse sensitivity is now restored.")
         }
     }
