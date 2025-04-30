@@ -45,7 +45,7 @@ object ShortenWarpCommand {
     fun onTabComplete(event: TabCompletionEvent) {
         if (!config.shortenWarp) return
 
-        if (' ' in event.leftOfCursor) return
+        if (event.leftOfCursor.contains(" ")) return
 
         val lastWord = event.lastWord.lowercase().removePrefix("/")
         val matchingWarps = warps.filter { it.startsWith(lastWord) }.map { "/$it" }
