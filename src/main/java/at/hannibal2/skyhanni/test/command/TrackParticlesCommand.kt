@@ -37,7 +37,7 @@ object TrackParticlesCommand {
 
     private var display: List<Renderable> = emptyList()
     private var worldParticles: Map<LorenzVec, List<ReceiveParticleEvent>> = emptyMap()
-    private var ignoredTypes = mutableListOf<EnumParticleTypes>()
+    private val ignoredTypes = mutableListOf<EnumParticleTypes>()
 
     // TODO write abstract code for this and TrackSoundsCommand
     private fun command(args: Array<String>) {
@@ -122,8 +122,8 @@ object TrackParticlesCommand {
         particles.addFirst(startTime.passedSince() to event)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (cutOffTime.isInPast()) return
         position.renderRenderables(display, posLabel = "Track particles log")
     }
