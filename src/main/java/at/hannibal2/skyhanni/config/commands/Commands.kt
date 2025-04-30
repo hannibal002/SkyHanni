@@ -125,7 +125,7 @@ object Commands {
         event.register("shofficialwikithis") {
             description = "Searches the official wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
-            callback { WikiManager.otherWikiCommands(it, false, true) }
+            callback { WikiManager.otherWikiCommands(it, useFandom = false, wikithis = true) }
         }
         event.register("shcalccrop") {
             description = "Calculate how many crops need to be farmed between different crop milestones."
