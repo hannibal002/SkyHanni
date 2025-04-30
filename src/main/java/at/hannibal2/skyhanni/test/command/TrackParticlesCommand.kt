@@ -36,7 +36,7 @@ object TrackParticlesCommand {
     private val position get() = SkyHanniMod.feature.dev.debug.trackParticlePosition
 
     private var display: List<Renderable> = emptyList()
-    private var worldParticles: Map<LorenzVec, List<ReceiveParticleEvent>> = emptyMap()
+    private var worldParticles = emptyMap<LorenzVec, List<ReceiveParticleEvent>>()
     private val ignoredTypes = mutableListOf<EnumParticleTypes>()
 
     // TODO write abstract code for this and TrackSoundsCommand
