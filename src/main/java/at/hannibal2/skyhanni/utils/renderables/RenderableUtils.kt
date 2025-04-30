@@ -163,7 +163,7 @@ internal object RenderableUtils {
         return yOffset
     }
 
-    inline fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
+    fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         GlStateManager.translate(1.0, 1.0, 0.0)
         GlStateManager.scale(scale, scale, 1.0)

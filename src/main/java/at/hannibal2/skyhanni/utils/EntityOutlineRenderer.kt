@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.client.shader.Framebuffer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.MinecraftForgeClient
 import org.lwjgl.opengl.GL11
@@ -167,7 +168,11 @@ object EntityOutlineRenderer {
 
                 try {
                     if (key !is EntityLivingBase) outlineColor(value)
-                    renderManager.renderEntityStatic(key, partialTicks, true)
+                    if (key is EntitySlime && key.isInvisible) {
+                        key.isInvisible = false
+                        renderManager.renderEntityStatic(key, partialTicks, true)
+                        key.isInvisible = true
+                    } else renderManager.renderEntityStatic(key, partialTicks, true)
                 } catch (ignored: Exception) {
                 }
             }
@@ -300,7 +305,7 @@ object EntityOutlineRenderer {
                 camera,
                 vector.x,
                 vector.y,
-                vector.z
+                vector.z,
             ) || entity.getFirstPassenger() === MinecraftCompat.localPlayerOrNull
             )
     // Only render if renderManager would render and the world is loaded at the entity
@@ -334,7 +339,7 @@ object EntityOutlineRenderer {
             GL30.glBlitFramebuffer(
                 0, 0, frameToCopy.framebufferWidth, frameToCopy.framebufferHeight,
                 0, 0, frameToPaste.framebufferWidth, frameToPaste.framebufferHeight,
-                buffersToCopy, GL11.GL_NEAREST
+                buffersToCopy, GL11.GL_NEAREST,
             )
         }
     }
@@ -377,7 +382,7 @@ object EntityOutlineRenderer {
             // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
             val noXrayOutlineEvent = RenderEntityOutlineEvent(
                 RenderEntityOutlineEvent.Type.NO_XRAY,
-                xrayOutlineEvent.entitiesToChooseFrom
+                xrayOutlineEvent.entitiesToChooseFrom,
             )
             noXrayOutlineEvent.post()
             // Cache the entities for future use
