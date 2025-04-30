@@ -56,5 +56,5 @@ class CustomScoreboardConfig {
 
     @Expose
     @ConfigLink(owner = CustomScoreboardConfig::class, field = "enabled")
-    var position: Position = Position(10, 80, false, true)
+    var position: Position = Position(10, 80)
 }

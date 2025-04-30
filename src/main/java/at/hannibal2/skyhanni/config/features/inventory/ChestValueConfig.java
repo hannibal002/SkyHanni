@@ -141,5 +141,5 @@ public class ChestValueConfig {
 
     @Expose
     @ConfigLink(owner = ChestValueConfig.class, field = "enabled")
-    public Position position = new Position(107, 141, false, true);
+    public Position position = new Position(107, 141);
 }
