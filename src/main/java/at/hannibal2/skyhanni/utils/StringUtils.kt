@@ -528,33 +528,4 @@ object StringUtils {
     private fun isFormatSpecial(formatChar: Char): Boolean {
         return formatChar in 'k'..'o' || formatChar in 'K'..'O' || formatChar in "rR"
     }
-
-    // copied from minecraft, thx jappa
-    private val colorCodes = makeColorCodeArray()
-
-    private fun makeColorCodeArray(): IntArray {
-        val colorCode = IntArray(32)
-        for (i in 0..31) {
-            val j = (i shr 3 and 1) * 85
-            var k = (i shr 2 and 1) * 170 + j
-            var l = (i shr 1 and 1) * 170 + j
-            var i1 = (i shr 0 and 1) * 170 + j
-            if (i == 6) {
-                k += 85
-            }
-
-            if (i >= 16) {
-                k /= 4
-                l /= 4
-                i1 /= 4
-            }
-
-            colorCode[i] = ((k and 0xFF) shl 16) or ((l and 0xFF) shl 8) or (i1 and 0xFF)
-        }
-        return colorCode
-    }
-
-    fun getColorCode(color: Char): Int {
-        return colorCodes["0123456789abcdef".indexOf(color)]
-    }
 }

@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -144,7 +144,7 @@ private data class DeferredTooltip(
 
     fun getBorderColor(): Int =
         (borderColor?.chatColorCode ?: stack?.getLore()?.lastOrNull()?.take(4)?.get(1))
-            ?.let { StringUtils.getColorCode(it) }
+            ?.let { ColorUtils.getColorCode(it) }
             ?: 0x505000FF
 
     fun isSpacedTitle(): Boolean {
