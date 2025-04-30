@@ -15,8 +15,7 @@ object MouseSensitivityManager {
     var state: SensitivityState = SensitivityState.UNCHANGED
         set(value) {
             field = value
-            lastIn = Float.NaN
-            lastOut = Float.NaN
+            destroyCache()
         }
 
     fun getSensitivity(original: Float): Float {
@@ -26,6 +25,11 @@ object MouseSensitivityManager {
         }
 
         return lastOut
+    }
+
+    fun destroyCache() {
+        lastIn = Float.NaN
+        lastOut = Float.NaN
     }
 
     @HandleEvent

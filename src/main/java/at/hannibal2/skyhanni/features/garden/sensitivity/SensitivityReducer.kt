@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.SensitivityState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -39,6 +41,19 @@ object SensitivityReducer {
 
         updatePlayerStatus()
         autoToggleIfNeeded()
+    }
+
+    @HandleEvent(eventType = ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        config.reducingFactor.afterChange {
+            MouseSensitivityManager.destroyCache()
+        }
+        config.onlyPlot.afterChange {
+            autoToggle()
+        }
+        config.onGround.afterChange {
+            autoToggle()
+        }
     }
 
     private fun updatePlayerStatus() {
@@ -84,15 +99,27 @@ object SensitivityReducer {
     }
 
     private fun autoToggle() {
-        if (config.onlyPlot.get() && inBarn) return
-        if (config.onGround.get() && !onGround) return
-        if (!isActive) {
-            shouldBeActive = true
-            MouseSensitivityManager.state = SensitivityState.AUTO_REDUCED
-        } else {
-            shouldBeActive = false
-            MouseSensitivityManager.state = SensitivityState.UNCHANGED
+        if (config.onlyPlot.get() && inBarn) {
+            if (isActive) disable()
+            return
         }
+        if (config.onGround.get() && !onGround) {
+            if (isActive) disable()
+            return
+        }
+
+        if (isActive) disable()
+        else enable()
+    }
+
+    private fun disable() {
+        shouldBeActive = false
+        MouseSensitivityManager.state = SensitivityState.UNCHANGED
+    }
+
+    private fun enable() {
+        shouldBeActive = true
+        MouseSensitivityManager.state = SensitivityState.AUTO_REDUCED
     }
 
     private fun manualToggle() {
