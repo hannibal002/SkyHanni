@@ -20,6 +20,7 @@
  */
 package at.hannibal2.skyhanni.config.core.config
 
+//#if MC < 1.21
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager.getEditorInstance
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -27,9 +28,9 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
-import java.lang.reflect.Field
-//#if MC < 1.21
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import java.lang.reflect.Field
+
 //#endif
 
 class Position @JvmOverloads constructor(
@@ -59,7 +60,7 @@ class Position @JvmOverloads constructor(
 
     @Expose
     var scale: Float = scale
-        get() = if (field == 0f) DEFAULT_SCALE else field
+        get() = if (field <= 0f) DEFAULT_SCALE else field
 
     @Expose
     var centerX: Boolean = centerX
