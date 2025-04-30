@@ -38,6 +38,8 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowL
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
@@ -481,7 +483,10 @@ interface Renderable {
             }
         }
 
-        @Deprecated("Use RenderableString instead", ReplaceWith("RenderableString()"))
+        @Deprecated(
+            "Use RenderableString instead",
+            ReplaceWith("RenderableString(text, scale, color, horizontalAlign, verticalAlign)"),
+        )
         fun string(
             text: String,
             scale: Double = 1.0,
@@ -496,7 +501,10 @@ interface Renderable {
             verticalAlign,
         )
 
-        @Deprecated("use WrappedRenderableString instead", ReplaceWith("WrappedRenderableString()"))
+        @Deprecated(
+            "use WrappedRenderableString instead",
+            ReplaceWith("WrappedRenderableString(text, width, scale, color, horizontalAlign, verticalAlign)"),
+        )
         fun wrappedString(
             text: String,
             width: Int,
@@ -881,27 +889,33 @@ interface Renderable {
         }
 
         fun line(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
-            return HorizontalRenderableContainer(buildList { builderAction() })
+            return HorizontalContainerRenderable(buildList { builderAction() })
         }
 
         fun vertical(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
             return VerticalContainerRenderable(buildList { builderAction() }, spacing = 2)
         }
 
-        @Deprecated("Use HorizontalRenderableContainer instead", ReplaceWith("HorizontalRenderableContainer()"))
+        @Deprecated(
+            "Use HorizontalContainerRenderable instead",
+            ReplaceWith("HorizontalContainerRenderable(content, spacing, horizontalAlign, verticalAlign)"),
+        )
         fun horizontalContainer(
             content: List<Renderable>,
             spacing: Int = 0,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ): Renderable = HorizontalRenderableContainer(
+        ): Renderable = HorizontalContainerRenderable(
             content,
             spacing,
             horizontalAlign,
             verticalAlign,
         )
 
-        @Deprecated("Use VerticalContainerRenderable instead", ReplaceWith("VerticalContainerRenderable()"))
+        @Deprecated(
+            "Use VerticalContainerRenderable instead",
+            ReplaceWith("VerticalContainerRenderable(content, spacing, horizontalAlign, verticalAlign)"),
+        )
         fun verticalContainer(
             content: List<Renderable>,
             spacing: Int = 0,
@@ -978,9 +992,9 @@ interface Renderable {
             private var scroll = createScroll()
             private var list: Set<Renderable> = filterList(content, textInput.textBox)
 
+            private val virtualHeight get() = list.sumOf { it.height }
             private val scrollUpTip = RenderableString("§7§oMore items above (scroll)")
             private val scrollDownTip = RenderableString("§7§oMore items below (scroll)")
-            private val virtualHeight get() = list.sumOf { it.height }
 
             override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollUpTip.width, scrollDownTip.width)
             override val height = height
@@ -1125,7 +1139,7 @@ interface Renderable {
                 )
             } else {
                 @Suppress("USELESS_CAST")
-                val content = table.mapKeys { HorizontalRenderableContainer(it.key) as Renderable }
+                val content = table.mapKeys { HorizontalContainerRenderable(it.key) as Renderable }
                 val height = content.maxOf { it.key.height }
                 searchableScrollList(
                     content,

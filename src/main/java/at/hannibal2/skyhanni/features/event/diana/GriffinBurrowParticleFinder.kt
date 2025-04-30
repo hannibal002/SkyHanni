@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
+import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.EnumParticleTypes
@@ -90,14 +92,18 @@ object GriffinBurrowParticleFinder {
 
     private fun workaround(location: LorenzVec) = location.toBlockPos().down().toLorenzVec()
 
+    // TODO this funciton needs upgrades: currently only counts down the tile alive for burrows while holding a spade,
+    //  and instead of ticks alive, should use found time stamp and use passed since > 1.min
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
         if (isSpade) {
-            burrows.filter { (location, burrow) ->
+            for ((location, burrow) in burrows) {
+                if (location.distanceSqToPlayer() > 256) continue
                 burrow.burrowTimeToLive -= 1
-                location.distanceSqToPlayer() < 256 && burrow.burrowTimeToLive < 0
-            }.forEach { (location, burrow) ->
+                if (burrow.burrowTimeToLive >= 0) continue
+                // TODO differentiate between user clicking the burrow and the burrow dissapears after a while,
+                //  important bc of wasCorrectPetAlready in GriffinPetWarning
                 BurrowDugEvent(location).post()
                 burrows.remove(location)
                 lastDugParticleBurrow = null
@@ -204,16 +210,14 @@ object GriffinBurrowParticleFinder {
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
-        var burrowTimeToLive: Int = 0,
+        var burrowTimeToLive: Int = CurrentPing.averagePing.inWholeTicks + 1
     ) {
 
-        fun getType(): BurrowType {
-            return when (this.type) {
-                0 -> BurrowType.START
-                1 -> BurrowType.MOB
-                2 -> BurrowType.TREASURE
-                else -> BurrowType.UNKNOWN
-            }
+        fun getType(): BurrowType = when (this.type) {
+            0 -> BurrowType.START
+            1 -> BurrowType.MOB
+            2 -> BurrowType.TREASURE
+            else -> BurrowType.UNKNOWN
         }
     }
 

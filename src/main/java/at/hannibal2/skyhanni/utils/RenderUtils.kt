@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.ScaledResolution
@@ -105,6 +107,10 @@ object RenderUtils {
     // TODO eventually removed awt.Color support, we should only use moulconfig.ChromaColour or LorenzColor
     fun Slot.highlight(color: Color) {
         highlight(color, xDisplayPosition, yDisplayPosition)
+    }
+
+    fun Slot.highlight(color: ChromaColour) {
+        highlight(color.toColor())
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {

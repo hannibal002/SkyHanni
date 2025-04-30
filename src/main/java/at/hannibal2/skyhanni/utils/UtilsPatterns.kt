@@ -141,7 +141,7 @@ object UtilsPatterns {
      */
     val seasonPattern by patternGroup.pattern(
         "skyblocktime.season",
-        "(?:Early |Late )?(?<season>Spring|Summer|Autumn|Winter)",
+        "((?<modifier>Early|Late) )?(?<season>Spring|Summer|Autumn|Winter)",
     )
 
     /**

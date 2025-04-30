@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
@@ -65,6 +66,7 @@ object HoppityEventSummary {
     private val updateCfConfig get() = config.eventSummary.cfReminder
     private val currentSbYear get() = SkyBlockTime.now().year
     private val yearSpawnCache: TimeLimitedCache<Int, Map<HoppityEggType, Int>> = TimeLimitedCache(30.seconds)
+    private val yearCache: TimeLimitedSet<Int> = TimeLimitedSet(5.seconds)
 
     private var lastAddedCfMillis: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastSentCfUpdateMessage: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -258,6 +260,8 @@ object HoppityEventSummary {
     private fun checkEnded() {
         if (!config.eventSummary.enabled) return
         val currentSeason = SkyblockSeason.currentSeason ?: return
+        if (currentSbYear - 1 in yearCache) return
+        yearCache.add(currentSbYear)
 
         getUnsummarizedYearStats().filter {
             it.key < currentSbYear || (it.key == currentSbYear && currentSeason > SkyblockSeason.SPRING)
