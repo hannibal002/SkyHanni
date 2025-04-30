@@ -7,7 +7,6 @@ import net.minecraft.enchantment.Enchantment
 //#if MC > 1.21
 //$$ import net.minecraft.registry.RegistryKeys
 //$$ import net.minecraft.registry.entry.RegistryEntry
-//$$ import net.minecraft.registry.RegistryKey
 //$$ import net.minecraft.util.Identifier
 //#endif
 
@@ -15,7 +14,7 @@ enum class EnchantmentsCompat(
     //#if MC < 1.21
     val enchantment: Enchantment
     //#else
-    //$$ val enchantment: RegistryKey<Enchantment>
+    //$$ val enchantment: RegistryEntry<Enchantment>
     //#endif
 ) {
     PROTECTION(
