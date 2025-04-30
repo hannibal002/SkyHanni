@@ -56,7 +56,7 @@ object TrackParticlesCommand {
         }
         if (isRecording) {
             args.getOrNull(0)?.let { name ->
-                val type = EnumParticleTypes.CRIT.getByIdOrNull(name)
+                val type = getParticleTypeByName(name)
                 if (type == null) {
                     ChatUtils.userError("unknown particle type: '$name'")
                     return
@@ -88,6 +88,7 @@ object TrackParticlesCommand {
         }
     }
 
+    // TODO move into utils
     private fun getParticleTypeByName(name: String): EnumParticleTypes? =
         EnumParticleTypes.entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
 
