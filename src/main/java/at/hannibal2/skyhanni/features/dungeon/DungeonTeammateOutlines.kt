@@ -34,7 +34,7 @@ object DungeonTeammateOutlines {
 
         val colorFormat = StringUtils.getFormatFromString(team.colorPrefix)
         return if (colorFormat.length >= 2)
-            Minecraft.getMinecraft().fontRendererObj.getColorCode(colorFormat[1])
+            StringUtils.getColorCode(colorFormat[1])
         else null
     }
 }
