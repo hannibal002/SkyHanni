@@ -259,15 +259,14 @@ object VampireSlayerFeatures {
         if (config.drawLine) {
             for (it in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
                 if (!it.isHighlighted()) continue
+                if (!it.canBeSeen(15)) continue
                 val vec = event.exactLocation(it)
-                if (vec.distanceToPlayer() < 15) {
-                    event.drawLineToEye(
-                        vec.up(1.54),
-                        config.lineColor.toSpecialColor(),
-                        config.lineWidth,
-                        true,
-                    )
-                }
+                event.drawLineToEye(
+                    vec.up(1.54),
+                    config.lineColor.toSpecialColor(),
+                    config.lineWidth,
+                    true,
+                )
             }
         }
         if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
@@ -299,14 +298,16 @@ object VampireSlayerFeatures {
                     ignoreBlocks = false,
                 )
                 for ((player, stand2) in standList) {
-                    if ((configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
-                        event.draw3DLine(
-                            event.exactPlayerEyeLocation(player),
-                            event.exactPlayerEyeLocation(stand2),
-                            linesColorStart,
-                            3,
-                            true,
-                        )
+                    if (!(configBloodIchor.showLines && isIchor) && !(configKillerSpring.showLines && isSpring)) continue
+                    if (!player.canBeSeen()) continue
+                    if (!stand2.canBeSeen()) continue
+                    event.draw3DLine(
+                        event.exactPlayerEyeLocation(player),
+                        event.exactPlayerEyeLocation(stand2),
+                        linesColorStart,
+                        3,
+                        true,
+                    )
 
                 }
             }
