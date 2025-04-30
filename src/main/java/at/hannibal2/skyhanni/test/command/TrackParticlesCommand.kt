@@ -88,8 +88,8 @@ object TrackParticlesCommand {
         }
     }
 
-    fun EnumParticleTypes.getByIdOrNull(name: String): EnumParticleTypes? =
-        EnumParticleTypes.entries.firstOrNull { it.name.equals(name, ignoreCase = false) }
+    private fun getParticleTypeByName(name: String): EnumParticleTypes? =
+        EnumParticleTypes.entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
 
     @HandleEvent
     fun onTick() {
