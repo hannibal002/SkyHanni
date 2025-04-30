@@ -111,6 +111,102 @@ enum class GraphNodeTag(
         "A Fairy Soul.",
     ),
 
+    DUNGEON_SECRET_BAT(
+        "dungeon_secret_bat",
+        LorenzColor.GOLD,
+        "Dungeon Secret Bat",
+        "A bat that is a secret in a dungeon room.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_SECRET_ITEM(
+        "dungeon_secret_item",
+        LorenzColor.WHITE,
+        "Dungeon Secret Item",
+        "A item on the ground spawnsx here.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_SECRET_CHEST(
+        "dungeon_secret_chest",
+        LorenzColor.YELLOW,
+        "Dungeon Secret Chest",
+        "A secret chest spawns here when getting close.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_SECRET_ESSENCE(
+        "dungeon_secret_essence",
+        LorenzColor.BLACK,
+        "Dungeon Secret Essence",
+        "Here is a secret essence.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_RED_SKULL(
+        "dungeon_red_skull",
+        LorenzColor.DARK_RED,
+        "Dungeon Red Skull",
+        "Here is a red skull that needs to be placed on a redstone block.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_ENTRANCE(
+        "dungeon_entrance",
+        LorenzColor.GREEN,
+        "Dungeon Entrance",
+        "A door to another dungeon room.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_LEVER(
+        "dungeon_lever",
+        LorenzColor.GRAY,
+        "Dungeon Lever",
+        "A lever that opens somehing somewhere else.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_CRYPT(
+        "dungeon_crypt",
+        LorenzColor.DARK_GRAY,
+        "Dungeon Crypt",
+        "A crypt that needs superbooming.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_CRACKED_WALL(
+        "dungeon_cracked_wall",
+        LorenzColor.GRAY,
+        "Cracked Wall",
+        "A weak wall that wants to get blowen up since somehting interesting lies behind.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_MINI_BOSS(
+        "dungeon_mini_boss",
+        LorenzColor.RED,
+        "Mini Boss",
+        "A mini boss spawns here.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_EHERWARP_SPOT(
+        "dungeon_etherwarp",
+        LorenzColor.DARK_BLUE,
+        "Etherwarp Spot",
+        "A spot where to etherwarp to.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
+    DUNGEON_STONK(
+        "dungeon_stonk",
+        LorenzColor.LIGHT_PURPLE,
+        "Stonk Spot",
+        "A spot where you can use ghost pickaxe / a stonking mechanic to click or go through.",
+        onlyIsland = IslandType.CATACOMBS,
+    ),
+
     ;
 
     val displayName: String = color.getChatColor() + cleanName

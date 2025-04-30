@@ -22,7 +22,7 @@ value class Graph(
 
     override fun containsAll(elements: Collection<GraphNode>) = nodes.containsAll(elements)
 
-    override fun get(index: Int) = nodes.get(index)
+    override fun get(index: Int) = nodes[index]
 
     override fun isEmpty() = nodes.isEmpty()
 
@@ -36,6 +36,19 @@ value class Graph(
     override fun subList(fromIndex: Int, toIndex: Int) = nodes.subList(fromIndex, toIndex)
 
     override fun lastIndexOf(element: GraphNode) = nodes.lastIndexOf(element)
+
+    fun transformNodes(function: (LorenzVec) -> LorenzVec): Graph {
+        val newNodes = mutableMapOf<GraphNode, GraphNode>()
+        for (node in nodes) {
+            newNodes[node] = GraphNode(node.id, function(node.position), node.name, node.tagNames)
+        }
+        for ((old, new) in newNodes) {
+            new.neighbours = old.neighbours.mapKeys { newNodes[it.key]!! }
+
+        }
+
+        return Graph(newNodes.values.toList())
+    }
 
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
@@ -154,7 +167,7 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, 
     var enabled = true
 
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */
-    lateinit var neighbours: Map<GraphNode, Double>
+    var neighbours = emptyMap<GraphNode, Double>()
 
     override fun hashCode(): Int {
         return id

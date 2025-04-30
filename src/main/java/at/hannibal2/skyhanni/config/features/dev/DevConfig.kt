@@ -3,10 +3,12 @@ package at.hannibal2.skyhanni.config.features.dev
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig
+import at.hannibal2.skyhanni.utils.OSUtils.openBrowser
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
@@ -142,6 +144,19 @@ class DevConfig {
     )
     @ConfigEditorBoolean
     var damageIndicatorBackend: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Dungeon Room Detection",
+        desc = "Using data from §eDungeon Room Mod §7to detect the dungeon room for §e/shnavigate §7support in dungeon. " +
+            "§cOnly works when DRM is installed!",
+    )
+    @ConfigEditorBoolean
+    var dungeonRoomDetection: Boolean = true
+
+    @ConfigOption(name = "Download DRM", desc = "Click here to open the Dungeon Room Mod GitHub page.")
+    @ConfigEditorButton(buttonText = "Source")
+    var dungeonRoomDownload: Runnable = Runnable { openBrowser("https://github.com/Quantizr/DungeonRoomsMod/") }
 
     @Expose
     @ConfigOption(

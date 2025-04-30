@@ -14,3 +14,4 @@ SkyHanni would not be possible without the following open source software:
 | [SoopyV2](https://github.com/Soopyboo32/SoopyV2)                               | [GPL 3.0](https://github.com/Soopyboo32/SoopyV2/blob/master/LICENSE)                                              |
 | [DiscordIPC](https://github.com/jagrosh/DiscordIPC)                            | [Apache 2.0](https://github.com/jagrosh/DiscordIPC/blob/master/LICENSE)                                           |
 | [SkyblockAddons](https://github.com/BiscuitDevelopment/SkyblockAddons/)        | [MIT](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/e9fd003f359b357f52b7430c24e64a4c8192a868/LICENSE) |
+| [DungeonRoomsMod](https://github.com/Quantizr/DungeonRoomsMod/)                | [GNU v3.0](https://github.com/Quantizr/DungeonRoomsMod/blob/4d9ce89042c5bbf11b6f5a9bcf689c84e521aeb0/LICENSE)     |

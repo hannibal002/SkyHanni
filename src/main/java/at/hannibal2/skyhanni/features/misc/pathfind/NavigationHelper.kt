@@ -33,6 +33,19 @@ object NavigationHelper {
         GraphNodeTag.GRIND_CROPS,
         GraphNodeTag.MINES_EMISSARY,
         GraphNodeTag.CRIMSON_MINIBOSS,
+
+        GraphNodeTag.DUNGEON_ENTRANCE,
+        GraphNodeTag.DUNGEON_SECRET_ITEM,
+        GraphNodeTag.DUNGEON_SECRET_CHEST,
+        GraphNodeTag.DUNGEON_CRYPT,
+        GraphNodeTag.DUNGEON_SECRET_BAT,
+        GraphNodeTag.DUNGEON_SECRET_ESSENCE,
+        GraphNodeTag.DUNGEON_LEVER,
+        GraphNodeTag.DUNGEON_STONK,
+        GraphNodeTag.DUNGEON_EHERWARP_SPOT,
+        GraphNodeTag.DUNGEON_MINI_BOSS,
+        GraphNodeTag.DUNGEON_CRACKED_WALL,
+        GraphNodeTag.DUNGEON_RED_SKULL,
     )
 
     fun onCommand(args: Array<String>) {

@@ -604,6 +604,14 @@ object GraphEditor {
     private fun handleNameShortcut(name: String?): Pair<GraphNodeTag, String>? = when (name) {
         "fsoul" -> GraphNodeTag.FAIRY_SOUL to "Fairy Soul"
         "na" -> GraphNodeTag.AREA to "no_area"
+        "e" -> GraphNodeTag.DUNGEON_ENTRANCE to "Entrance"
+        "s i" -> GraphNodeTag.DUNGEON_SECRET_ITEM to "Item Drop"
+        "s ch" -> GraphNodeTag.DUNGEON_SECRET_CHEST to "Chest"
+        "s cr" -> GraphNodeTag.DUNGEON_CRYPT to "Crypt"
+        "s b" -> GraphNodeTag.DUNGEON_SECRET_BAT to "Bat"
+        "s e" -> GraphNodeTag.DUNGEON_SECRET_ESSENCE to "Essence"
+        "d l" -> GraphNodeTag.DUNGEON_LEVER to "Lever"
+        "d w" -> GraphNodeTag.DUNGEON_CRACKED_WALL to "Cracked Wall"
         else -> null
     }
 
@@ -822,7 +830,7 @@ object GraphEditor {
         )
     }
 
-    private fun clear() {
+    fun clear() {
         id = 0
         nodes.clear()
         edges.clear()

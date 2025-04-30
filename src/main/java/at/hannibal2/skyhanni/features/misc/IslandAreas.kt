@@ -289,6 +289,7 @@ object IslandAreas {
         it in (if (config.includeSmallAreas || !useConfig) allAreas else onlyLargeAreas)
     }
 
+    @Suppress("DEPRECATION")
     private fun setTarget(node: GraphNode) {
         targetNode = node
         val tag = node.getAreaTag() ?: return
