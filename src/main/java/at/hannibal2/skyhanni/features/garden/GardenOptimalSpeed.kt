@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SignUtils
@@ -28,9 +29,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.gui.inventory.GuiEditSign
 import kotlin.time.Duration.Companion.seconds
-//#if MC > 1.21
-//$$ import net.minecraft.entity.attribute.EntityAttributes
-//#endif
 
 @SkyHanniModule
 object GardenOptimalSpeed {
@@ -67,11 +65,7 @@ object GardenOptimalSpeed {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
-        //#if MC < 1.21
-        currentSpeed = (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
-        //#else
-        //$$ currentSpeed = MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED).toInt()
-        //#endif
+        currentSpeed = PlayerUtils.getWalkSpeed()
 
         if (sneaking && !sneakingSince.isInPast()) {
             sneakingSince = SimpleTimeMark.now()
