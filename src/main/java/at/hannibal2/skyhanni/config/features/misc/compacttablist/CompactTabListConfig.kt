@@ -43,6 +43,11 @@ class CompactTabListConfig {
     var hideFiresales: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Hide Tab Background", desc = "Hides the main background in tab.")
+    @ConfigEditorBoolean
+    var hideTabBackground: Boolean = false;
+
+    @Expose
     @ConfigOption(name = "Advanced Player List", desc = "")
     @Accordion
     var advancedPlayerList: AdvancedPlayerListConfig = AdvancedPlayerListConfig()

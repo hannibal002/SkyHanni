@@ -61,7 +61,7 @@ object CurrentPetDisplay {
     fun onChat(event: SkyHanniChatEvent) {
         findPetInChat(event.message)?.let {
             PetApi.currentPet = it
-            if (config.hideAutopet) {
+            if (config.hideAutopet && chatPetRulePattern.matches(event.message)) {
                 event.blockedReason = "pets"
             }
         }
