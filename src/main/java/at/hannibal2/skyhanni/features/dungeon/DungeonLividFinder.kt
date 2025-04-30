@@ -34,11 +34,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.getWoolColor
-import at.hannibal2.skyhanni.utils.compat.WoolCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -120,7 +120,7 @@ object DungeonLividFinder {
         if (event.location != blockLocation) return
         if (!event.location.getBlockAt().isWool()) return
 
-        val newColor = event.newState.getWoolColor()
+        val newColor = event.newState.getBlockColor()
         color = newColor
         ChatUtils.debug("newColor! $newColor")
 
