@@ -149,6 +149,10 @@ Internal changes that do not impact the end user. Examples include:
 - Preparations for modern Minecraft versions
 - Documentation changes to markdown files, e.g., in `/docs` or this file.
 
+Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
+We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
+everything else can go in the normal PR description (What area). 
+
 #### Removed Features
 
 Features that have merged with existing features (in the config) or have become obsolete (e.g., if Hypixel implements them on the server

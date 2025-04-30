@@ -24,6 +24,7 @@ data class EliteLeaderboardJson(
 
 data class EliteLeaderboard(
     @Expose val rank: Int,
+    @Expose val minAmount: Int,
     @Expose val upcomingRank: Int,
     @Expose val upcomingPlayers: List<UpcomingLeaderboardPlayer>,
 )

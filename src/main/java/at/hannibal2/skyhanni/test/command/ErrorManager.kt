@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -79,8 +81,16 @@ object ErrorManager {
 //         ),
 //     )
 
-    fun resetCache() {
-        cache.clear()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestreseterrorcache") {
+            description = "Resets the cache of errors."
+            category = CommandCategory.DEVELOPER_TEST
+            callback {
+                cache.clear()
+                ChatUtils.chat("Error cache reset.")
+            }
+        }
     }
 
     // Extra data from last thrown error
@@ -88,14 +98,10 @@ object ErrorManager {
 
     // throw an error, best to not use it if not absolutely necessary
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
-        val exception = IllegalStateException(message.removeColor())
-        println("silent SkyHanni error:")
-        println("message: '$message'")
         buildExtraDataString(extraData)?.let {
-            println("extraData: \n$it")
             cachedExtraData = it
         }
-        throw exception
+        throw IllegalStateException(message.removeColor())
     }
 
     private fun copyError(errorId: String) {
