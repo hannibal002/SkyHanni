@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.garden.sensitivity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager
-import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.SensitivityState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -19,13 +17,13 @@ object LockMouseLook {
     /**
      * REGEX-TEST: §aTeleported you to §r§aPlot
      */
-    private val gardenTeleportPattern by RepoPattern.pattern(
+    private val gardenTeleportPattern by RepoPattern.Companion.pattern(
         "chat.garden.teleport",
         "§aTeleported you to .*",
     )
 
     private val config get() = SkyHanniMod.feature.misc
-    private val isActive get() = SensitivityState.LOCKED.isActive()
+    private val isActive get() = MouseSensitivityManager.SensitivityState.LOCKED.isActive()
 
     @HandleEvent
     fun onWorldChange() {
@@ -41,7 +39,7 @@ object LockMouseLook {
     fun unlockMouse() {
         if (!isActive) return
 
-        MouseSensitivityManager.state = SensitivityState.UNCHANGED
+        MouseSensitivityManager.state = MouseSensitivityManager.SensitivityState.UNCHANGED
         if (config.lockMouseLookChatMessage) {
             ChatUtils.chat("§bMouse rotation is now unlocked.")
         }
@@ -50,7 +48,7 @@ object LockMouseLook {
     private fun lockMouse() {
         if (isActive) return
 
-        MouseSensitivityManager.state = SensitivityState.LOCKED
+        MouseSensitivityManager.state = MouseSensitivityManager.SensitivityState.LOCKED
         if (config.lockMouseLookChatMessage) {
             ChatUtils.chat("§bMouse rotation is now locked.")
         }
