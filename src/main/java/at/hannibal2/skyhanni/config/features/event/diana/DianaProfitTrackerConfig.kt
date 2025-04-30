@@ -20,5 +20,5 @@ class DianaProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = DianaProfitTrackerConfig::class, field = "enabled")
-    var position: Position = Position(20, 20, false)
+    var position: Position = Position(20, 20)
 }

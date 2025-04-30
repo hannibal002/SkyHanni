@@ -82,5 +82,5 @@ class BarnTimerConfig {
 
     @Expose
     @ConfigLink(owner = BarnTimerConfig::class, field = "enabled")
-    var pos: Position = Position(10, 10, false)
+    var pos: Position = Position(10, 10)
 }

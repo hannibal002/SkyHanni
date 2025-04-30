@@ -23,7 +23,7 @@ class GreatSpookConfig {
 
     @Expose
     @ConfigLink(owner = GreatSpookConfig::class, field = "primalFearTimer")
-    var positionTimer: Position = Position(20, 20, false)
+    var positionTimer: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(
@@ -37,7 +37,7 @@ class GreatSpookConfig {
 
     @Expose
     @ConfigLink(owner = GreatSpookConfig::class, field = "fearStatDisplay")
-    var positionFear: Position = Position(30, 30, false)
+    var positionFear: Position = Position(30, 30)
 
     @Expose
     @ConfigOption(name = "IRL Time Left", desc = "Show the IRL time left before The Great Spook ends.")
@@ -47,7 +47,7 @@ class GreatSpookConfig {
 
     @Expose
     @ConfigLink(owner = GreatSpookConfig::class, field = "greatSpookTimeLeft")
-    var positionTimeLeft: Position = Position(40, 40, false)
+    var positionTimeLeft: Position = Position(40, 40)
 
     @ConfigOption(name = "Primal Fear Solvers", desc = "Solvers for the Primal Fears.")
     @Accordion

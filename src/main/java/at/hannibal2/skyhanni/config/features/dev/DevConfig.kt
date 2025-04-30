@@ -69,11 +69,11 @@ class DevConfig {
 
     // Does not have a config element!
     @Expose
-    var debugPos: Position = Position(10, 10, false)
+    var debugPos: Position = Position(10, 10)
 
     // Does not have a config element!
     @Expose
-    var debugLocationPos: Position = Position(1, 160, false)
+    var debugLocationPos: Position = Position(1, 160)
 
     // Does not have a config element!
     @Expose
@@ -81,7 +81,7 @@ class DevConfig {
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "raytracedOreblock")
-    var debugOrePos: Position = Position(1, 200, false)
+    var debugOrePos: Position = Position(1, 200)
 
     @Expose
     @ConfigOption(

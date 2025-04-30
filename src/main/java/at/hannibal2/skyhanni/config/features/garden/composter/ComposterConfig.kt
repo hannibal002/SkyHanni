@@ -51,7 +51,7 @@ class ComposterConfig {
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")
-    var overlayOrganicMatterPos: Position = Position(140, 152, false)
+    var overlayOrganicMatterPos: Position = Position(140, 152)
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")

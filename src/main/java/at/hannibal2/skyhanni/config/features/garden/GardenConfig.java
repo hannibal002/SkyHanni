@@ -175,7 +175,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigLink(owner = GardenConfig.class, field = "farmingFortuneForContest")
-    public Position farmingFortuneForContestPos = new Position(180, 156, false);
+    public Position farmingFortuneForContestPos = new Position(180, 156);
 
     @Expose
     @ConfigOption(
@@ -241,7 +241,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigLink(owner = GardenConfig.class, field = "showLogBookStats")
-    public Position logBookStatsPos = new Position(427, 92, false);
+    public Position logBookStatsPos = new Position(427, 92);
 
     @Expose
     @ConfigOption(name = "Carrolyn Fetch Helper", desc = "Helps to fetch items to Carrolyn for permanent buffs.")

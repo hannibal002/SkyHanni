@@ -97,5 +97,5 @@ class EnderNodeConfig {
 
     @Expose
     @ConfigLink(owner = EnderNodeConfig::class, field = "enabled")
-    var position: Position = Position(10, 80, false)
+    var position: Position = Position(10, 80)
 }

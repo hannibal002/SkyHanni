@@ -51,7 +51,7 @@ class CrimsonIsleConfig {
 
     @Expose
     @ConfigLink(owner = CrimsonIsleConfig::class, field = "volcanoExplosivity")
-    var positionVolcano: Position = Position(20, 20, false)
+    var positionVolcano: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(

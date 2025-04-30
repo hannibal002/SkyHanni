@@ -20,5 +20,5 @@ class UniqueGiftConfig {
 
     @Expose
     @ConfigLink(owner = UniqueGiftConfig::class, field = "enabled")
-    var position: Position = Position(100, 100, false)
+    var position: Position = Position(100, 100)
 }

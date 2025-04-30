@@ -61,5 +61,5 @@ class BestiaryConfig {
 
     @Expose
     @ConfigLink(owner = BestiaryConfig::class, field = "enabled")
-    var position: Position = Position(100, 100, false)
+    var position: Position = Position(100, 100)
 }
