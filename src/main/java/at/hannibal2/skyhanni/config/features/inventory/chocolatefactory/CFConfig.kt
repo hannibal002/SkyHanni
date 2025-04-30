@@ -196,7 +196,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "tooltipMove")
-    var tooltipMovePosition: Position = Position(-380, 150, false, true)
+    var tooltipMovePosition: Position = Position(-380, 150)
 
     @Expose
     @ConfigOption(

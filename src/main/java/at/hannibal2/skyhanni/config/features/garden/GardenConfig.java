@@ -206,7 +206,7 @@ public class GardenConfig {
 
     @Expose
     @ConfigLink(owner = GardenConfig.class, field = "jacobContestTimes")
-    public Position jacobContestTimesPosition = new Position(-359, 149, false, true);
+    public Position jacobContestTimesPosition = new Position(-359, 149);
 
     @Expose
     @ConfigOption(
@@ -219,7 +219,7 @@ public class GardenConfig {
 
     // Does not have a config element!
     @Expose
-    public Position cropSpeedMeterPos = new Position(278, -236, false, true);
+    public Position cropSpeedMeterPos = new Position(278, -236);
 
     @Expose
     @ConfigOption(name = "Enable Plot Borders", desc = "Enable the use of F3 + G hotkey to show Garden plot borders. Similar to how later Minecraft version render chunk borders.")
