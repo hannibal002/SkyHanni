@@ -95,9 +95,9 @@ object KeyboardManager {
     private fun getSyntheticKeyboardKeyCode(key: Int, char: Char): Int = if (key == 0) char.code + 256 else key
     //#endif
 
+    //#if MC < 1.16
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick() {
-        //#if MC < 1.16
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
         if (isConfigScreen || currentScreen is GuiChat) return
@@ -118,28 +118,30 @@ object KeyboardManager {
             val isDown = if (keyCode < 0) {
                 Mouse.isButtonDown(keyCode + 100)
             } else {
-                Keyboard.isKeyDown(keyCode)
+                if (keyCode < Keyboard.KEYBOARD_SIZE) {
+                    Keyboard.isKeyDown(keyCode)
+                } else {
+                    false
+                }
             }
 
             if (isDown) {
                 postKeyPressEvent(keyCode)
             } else {
                 postKeyUpEvent(keyCode)
-                if (pressedKeys.contains(keyCode)) {
-                    pressedKeys.remove(keyCode)
-                }
+                pressedKeys.remove(keyCode)
             }
         }
-
-        //#else
-        //$$ // todo use fabric event or whatnot
-        //#endif
     }
+    //#endif
+    // on 1.21 we use MixinKeyboard, it provides all of this
+
+    /*
+    The delay below is here to make sure the Text input features in graph editor
+    and in renderable calls have time to react first, and lock this key press event properly
+     */
 
     private fun postKeyPressEvent(keyCode: Int) {
-        // This cooldown is here to make sure the Text input features in graph editor
-        // and in renderable calls have time to react first,
-        // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyPressEvent(keyCode).post()
@@ -147,9 +149,6 @@ object KeyboardManager {
     }
 
     private fun postKeyDownEvent(keyCode: Int) {
-        // This cooldown is here to make sure the Text input features in graph editor
-        // and in renderable calls have time to react first,
-        // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyDownEvent(keyCode).post()
@@ -157,9 +156,6 @@ object KeyboardManager {
     }
 
     private fun postKeyUpEvent(keyCode: Int) {
-        // This cooldown is here to make sure the Text input features in graph editor
-        // and in renderable calls have time to react first,
-        // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyUpEvent(keyCode).post()

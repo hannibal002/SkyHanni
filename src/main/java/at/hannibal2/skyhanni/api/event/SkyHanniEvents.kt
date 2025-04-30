@@ -51,6 +51,7 @@ object SkyHanniEvents {
         GeneratedEventPrimaryFunctionNames.map
 
     private fun registerNoEventType(options: HandleEvent, method: Method, instance: Any) {
+        if (method.parameterTypes.any()) return
         val eventType = eventPrimaryFunctionNames[method.name] ?: return
         if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return
         listeners.getOrPut(eventType) { EventListeners(eventType) }
@@ -170,10 +171,12 @@ object SkyHanniEvents {
         classes.add(clazz)
 
         var current = clazz
+        @Suppress("LoopWithTooManyJumpStatements")
         while (current.superclass != null) {
             val superClass = current.superclass
             if (superClass == SkyHanniEvent::class.java) break
             if (superClass == GenericSkyHanniEvent::class.java) break
+            if (superClass == RenderingSkyHanniEvent::class.java) break
             if (superClass == CancellableSkyHanniEvent::class.java) break
             classes.add(superClass)
             current = superClass
