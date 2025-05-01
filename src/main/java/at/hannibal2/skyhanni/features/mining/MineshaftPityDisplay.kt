@@ -312,7 +312,7 @@ object MineshaftPityDisplay {
             "Gemstone",
             OreType.entries.filter { it.isGemstone() },
             4,
-            ColoredBlockCompat.LIGHT_BLUE.createGlassStack(),
+            ColoredBlockCompat.BLUE.createGlassStack(),
         ),
         GLACITE(
             "Glacite",
