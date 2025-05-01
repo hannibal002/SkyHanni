@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice.menuNamePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -370,6 +371,8 @@ object HoppityLiveDisplay {
         this.map { RenderableString(it.string) }
     )
 
+    var sent = false
+
     private fun HoppityEventStats.getRenderableContainer(
         statYear: Int,
     ): Renderable = VerticalContainerRenderable(
@@ -377,6 +380,12 @@ object HoppityLiveDisplay {
             this,
             statYear
         ).mapNotNull { (stat, statStrings) ->
+            if (!sent) {
+                ChatUtils.chat(
+                    "§7Stat: $stat, ${statStrings.size} strings:\n" + statStrings.joinToString("\n"),
+                )
+            }
+
             val baseRenderable = statStrings.dropConsecutiveEmpties().takeIfNotEmpty()?.getContainer()
                 ?: return@mapNotNull null
             val intendedOperation = RenderableOverrideOperation(
@@ -393,7 +402,7 @@ object HoppityLiveDisplay {
             if (isEmpty) buildEmptyFallback(isCurrentEvent).map {
                 RenderableString(it.string)
             } else renderableList
-        }
+        }.also { sent = true }
     )
 
     private fun Renderable.isEmpty(): Boolean = this is RenderableString && text.trim().isEmpty() ||

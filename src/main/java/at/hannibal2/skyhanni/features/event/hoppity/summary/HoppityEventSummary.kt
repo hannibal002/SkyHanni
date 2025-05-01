@@ -35,6 +35,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -477,10 +479,15 @@ object HoppityEventSummary {
         stat to operatedList
     }.toMap()
 
-    fun List<StatString>.dropConsecutiveEmpties(): MutableList<StatString> = fold(mutableListOf()) { acc, s ->
-        if (s.string.isEmpty() && acc.lastOrNull()?.string?.isEmpty() == true) {
-            acc
-        } else acc.apply { add(s) }
+    fun List<StatString>.dropConsecutiveEmpties(): MutableList<StatString> {
+        val out = mutableListOf<StatString>()
+        var lastWasEmpty = false
+        for (s in this) {
+            val nowEmpty = s.string.removeColor().trim().isEmpty()
+            if (!lastWasEmpty || !nowEmpty) out += s
+            lastWasEmpty = nowEmpty
+        }
+        return out
     }
 
     fun buildEmptyFallback(isCurrentEvent: Boolean): MutableList<StatString> {
