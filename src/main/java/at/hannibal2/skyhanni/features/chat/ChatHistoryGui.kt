@@ -54,7 +54,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
             msg.actionReason?.let { GuiRenderUtils.drawString(it, ChatManager.ActionKind.maxLength + 5, 0, -1) }
             var size = drawMultiLineText(msg.message, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             msg.modified?.let {
-                GuiRenderUtils.drawString("§e§lNEW TEXT", 0, size * 10, -1)
+                GuiRenderUtils.drawString("§e§lNEW TEXT", 0, 0, -1)
                 size += drawMultiLineText(it, ChatManager.ActionKind.maxLength + reasonMaxLength + 10)
             }
             val isHovered = mouseX in 0..w && mouseY in 0..(size * 10)

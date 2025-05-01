@@ -127,7 +127,6 @@ object ComposterOverlay {
 
     @HandleEvent(InventoryFullyOpenedEvent::class, onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened() {
-        if (!config.overlay) return
         if (inInventory) {
             update()
         }
@@ -155,6 +154,7 @@ object ComposterOverlay {
     }
 
     private fun update() {
+        if (!config.overlay) return
         val composterUpgrades = ComposterApi.composterUpgrades ?: return
         if (composterUpgrades.isEmpty()) {
             val list = Renderable.string("§cOpen Composter Upgrades!")
@@ -577,7 +577,7 @@ object ComposterOverlay {
     fun onBackgroundDraw() {
         if (EstimatedItemValue.isCurrentlyShowing()) return
 
-        if (!inInventory) return
+        if (!inInventory || !config.overlay) return
         config.overlayOrganicMatterPos.renderRenderable(
             organicMatterDisplay,
             posLabel = "Composter Overlay Organic Matter",

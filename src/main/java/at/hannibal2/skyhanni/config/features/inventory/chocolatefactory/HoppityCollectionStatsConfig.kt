@@ -19,7 +19,7 @@ class HoppityCollectionStatsConfig {
 
     @Expose
     @ConfigLink(owner = HoppityCollectionStatsConfig::class, field = "enabled")
-    var position: Position = Position(163, 160, false, true)
+    var position: Position = Position(163, 160)
 
     @Expose
     @ConfigOption(name = "Highlight Found Rabbits", desc = "Highlight rabbits that have already been found.")
