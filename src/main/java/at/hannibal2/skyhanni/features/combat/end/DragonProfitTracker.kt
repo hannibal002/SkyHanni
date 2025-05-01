@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import java.util.EnumMap
 
@@ -85,7 +86,7 @@ object DragonProfitTracker {
 
         var profit = tracker.drawItems(bucketData, { true }, this)
 
-        val eyePrice = SUMMONING_EYE.getPrice()
+        val eyePrice = SkyHanniTracker.getPricePer(SUMMONING_EYE)
         val totalEyePrice = eyePrice * bucketData.eyesPlaced
         profit -= totalEyePrice
         val eyeFormat = "§7${bucketData.eyesPlaced}x §5Summoning Eye §c${(-totalEyePrice).shortFormat()}"
@@ -150,7 +151,7 @@ object DragonProfitTracker {
         val lootMap = mutableMapOf<String, Double>()
         var totalProfit = 0.0
         items.forEach { (internalName, amount) ->
-            internalName.getPrice().takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
+            SkyHanniTracker.getPricePer(internalName).takeIf { price: Double -> price != -1.0 }?.let { pricePer: Double ->
                 val profit: Double = amount * pricePer
                 val nameFormat = internalName.repoItemName
                 val text = "§eFound $nameFormat §8${amount}x §7(§6${profit.shortFormat()}§7)"
@@ -159,7 +160,8 @@ object DragonProfitTracker {
             }
         }
 
-        val eyePrice = NeuInternalName.fromItemNameOrNull("Summoning Eye")?.getPrice()
+
+        val eyePrice = SkyHanniTracker.getPricePer(SUMMONING_EYE)
         if (eyePrice != null) {
             totalProfit -= eyePrice * lastPlaced
         }
