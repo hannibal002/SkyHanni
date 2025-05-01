@@ -16,5 +16,5 @@ class DungeonCopilotConfig {
 
     @Expose
     @ConfigLink(owner = DungeonCopilotConfig::class, field = "enabled")
-    val pos: Position = Position(10, 10, false, true)
+    val pos: Position = Position(10, 10)
 }

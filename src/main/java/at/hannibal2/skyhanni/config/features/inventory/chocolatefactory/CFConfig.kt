@@ -169,7 +169,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "statsDisplay")
-    val position: Position = Position(163, 160, false, true)
+    val position: Position = Position(163, 160)
 
     @Expose
     @ConfigOption(name = "Compact On Click", desc = "Compact the item tooltip when clicking on the chocolate.")
@@ -196,7 +196,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "tooltipMove")
-    val tooltipMovePosition: Position = Position(-380, 150, false, true)
+    val tooltipMovePosition: Position = Position(-380, 150)
 
     @Expose
     @ConfigOption(
@@ -243,7 +243,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "strayRabbitTracker")
-    val strayRabbitTrackerPosition: Position = Position(300, 300, false, true)
+    val strayRabbitTrackerPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(name = "Hitman Costs", desc = "Show the sum cost of remaining hitman slots.")
@@ -253,7 +253,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "hitmanCosts")
-    val hitmanCostsPosition: Position = Position(300, 300, false, true)
+    val hitmanCostsPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(

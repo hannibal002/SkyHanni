@@ -35,5 +35,5 @@ class MineshaftPityDisplayConfig {
 
     @Expose
     @ConfigLink(owner = MineshaftPityDisplayConfig::class, field = "enabled")
-    val position: Position = Position(16, 192, false, true)
+    val position: Position = Position(16, 192)
 }

@@ -21,7 +21,7 @@ class DragonProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = DragonProfitTrackerConfig::class, field = "enabled")
-    val position: Position = Position(20, 20, false, true)
+    val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(

@@ -63,5 +63,5 @@ class BestiaryConfig {
 
     @Expose
     @ConfigLink(owner = BestiaryConfig::class, field = "enabled")
-    val position: Position = Position(100, 100, false, true)
+    val position: Position = Position(100, 100)
 }

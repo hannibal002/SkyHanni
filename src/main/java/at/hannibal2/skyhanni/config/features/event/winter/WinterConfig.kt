@@ -30,7 +30,7 @@ class WinterConfig {
 
     @Expose
     @ConfigLink(owner = WinterConfig::class, field = "islandCloseTime")
-    val islandCloseTimePosition: Position = Position(10, 10, false, true)
+    val islandCloseTimePosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(

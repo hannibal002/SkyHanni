@@ -92,17 +92,17 @@ class SkillProgressConfig {
 
     @Expose
     @ConfigLink(owner = SkillProgressConfig::class, field = "enabled")
-    val displayPosition: Position = Position(384, -105, false, true)
+    val displayPosition: Position = Position(384, -105)
 
     @Expose
     @ConfigLink(owner = SkillProgressBarConfig::class, field = "enabled")
-    val barPosition: Position = Position(384, -87, false, true)
+    val barPosition: Position = Position(384, -87)
 
     @Expose
     @ConfigLink(owner = AllSkillDisplayConfig::class, field = "enabled")
-    val allSkillPosition: Position = Position(5, 209, false, true)
+    val allSkillPosition: Position = Position(5, 209)
 
     @Expose
     @ConfigLink(owner = SkillETADisplayConfig::class, field = "enabled")
-    val etaPosition: Position = Position(5, 155, false, true)
+    val etaPosition: Position = Position(5, 155)
 }

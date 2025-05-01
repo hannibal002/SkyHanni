@@ -78,7 +78,7 @@ class FishingConfig {
 
     @Expose
     @ConfigLink(owner = FishingConfig::class, field = "sharkFishCounter")
-    val sharkFishCounterPos: Position = Position(10, 10, false, true)
+    val sharkFishCounterPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(

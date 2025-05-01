@@ -110,5 +110,5 @@ class DropsStatisticsConfig {
 
     @Expose
     @ConfigLink(owner = DropsStatisticsConfig::class, field = "enabled")
-    val pos: Position = Position(5, 20, false, true)
+    val pos: Position = Position(5, 20)
 }

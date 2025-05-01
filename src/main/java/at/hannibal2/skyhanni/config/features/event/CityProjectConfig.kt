@@ -28,5 +28,5 @@ class CityProjectConfig {
 
     @Expose
     @ConfigLink(owner = CityProjectConfig::class, field = "showMaterials")
-    val pos: Position = Position(150, 150, false, true)
+    val pos: Position = Position(150, 150)
 }

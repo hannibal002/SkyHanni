@@ -75,5 +75,5 @@ class TotemOfCorruptionConfig {
 
     @Expose
     @ConfigLink(owner = TotemOfCorruptionConfig::class, field = "showOverlay")
-    val position: Position = Position(50, 20, false, true)
+    val position: Position = Position(50, 20)
 }

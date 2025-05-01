@@ -17,7 +17,7 @@ class CFShopPriceConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "chocolateShopPrice")
-    val position: Position = Position(200, 150, false, true)
+    val position: Position = Position(200, 150)
 
     @Expose
     @ConfigOption(name = "Item Scale", desc = "Change the size of the items.")

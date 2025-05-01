@@ -35,7 +35,7 @@ class FarmingLaneConfig {
 
     @Expose
     @ConfigLink(owner = FarmingLaneConfig::class, field = "distanceDisplay")
-    val distanceDisplayPosition: Position = Position(0, 200, false, true)
+    val distanceDisplayPosition: Position = Position(0, 200)
 
     @Expose
     @ConfigOption(name = "Corner Waypoints", desc = "Show the corner for the current lane in the world.")

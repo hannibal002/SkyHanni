@@ -50,5 +50,5 @@ class MushroomPetPerkConfig {
 
     @Expose
     @ConfigLink(owner = MushroomPetPerkConfig::class, field = "enabled")
-    val pos: Position = Position(-112, -143, false, true)
+    val pos: Position = Position(-112, -143)
 }

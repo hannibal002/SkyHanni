@@ -38,5 +38,5 @@ class RiftInventoryValueConfig {
 
     @Expose
     @ConfigLink(owner = RiftInventoryValueConfig::class, field = "enabled")
-    val position: Position = Position(126, 156, false, true)
+    val position: Position = Position(126, 156)
 }

@@ -38,7 +38,7 @@ class AshfangConfig {
 
     @Expose
     @ConfigLink(owner = AshfangConfig::class, field = "freezeCooldown")
-    val freezeCooldownPos: Position = Position(10, 10, false, true)
+    val freezeCooldownPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Reset Time", desc = "Show the cooldown until Ashfang pulls his underlings back.")
@@ -48,5 +48,5 @@ class AshfangConfig {
 
     @Expose
     @ConfigLink(owner = AshfangConfig::class, field = "nextResetCooldown")
-    val nextResetCooldownPos: Position = Position(10, 10, false, true)
+    val nextResetCooldownPos: Position = Position(10, 10)
 }

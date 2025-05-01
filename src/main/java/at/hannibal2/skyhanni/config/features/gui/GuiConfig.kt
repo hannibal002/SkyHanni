@@ -142,7 +142,7 @@ class GuiConfig {
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "realTime")
-    val realTimePosition: Position = Position(10, 10, false, true)
+    val realTimePosition: Position = Position(10, 10)
 
     @Expose
     @Category(name = "Cosmetic", desc = "Cosmetics Settings")
@@ -156,7 +156,7 @@ class GuiConfig {
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "tpsDisplay")
-    val tpsDisplayPosition: Position = Position(10, 10, false, true)
+    val tpsDisplayPosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")

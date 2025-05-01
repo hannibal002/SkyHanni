@@ -21,5 +21,5 @@ class CorpseTrackerConfig {
 
     @Expose
     @ConfigLink(owner = CorpseTrackerConfig::class, field = "enabled")
-    val position: Position = Position(-274, 0, false, true)
+    val position: Position = Position(-274, 0)
 }

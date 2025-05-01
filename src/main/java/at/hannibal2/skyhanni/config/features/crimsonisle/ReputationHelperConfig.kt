@@ -37,7 +37,7 @@ class ReputationHelperConfig {
 
     @Expose
     @ConfigLink(owner = ReputationHelperConfig::class, field = "enabled")
-    val position: Position = Position(10, 10, false, true)
+    val position: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")

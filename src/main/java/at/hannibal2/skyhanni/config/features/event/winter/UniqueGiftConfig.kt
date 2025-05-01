@@ -20,5 +20,5 @@ class UniqueGiftConfig {
 
     @Expose
     @ConfigLink(owner = UniqueGiftConfig::class, field = "enabled")
-    val position: Position = Position(100, 100, false, true)
+    val position: Position = Position(100, 100)
 }

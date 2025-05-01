@@ -73,5 +73,5 @@ class PestTimerConfig {
 
     @Expose
     @ConfigLink(owner = PestTimerConfig::class, field = "enabled")
-    val position: Position = Position(383, 93, false, true)
+    val position: Position = Position(383, 93)
 }

@@ -19,7 +19,7 @@ class CrystalNucleusTrackerConfig {
 
     @Expose
     @ConfigLink(owner = CrystalNucleusTrackerConfig::class, field = "enabled")
-    val position: Position = Position(20, 20, false, true)
+    val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Show Outside of Nucleus", desc = "Show the tracker anywhere in the Crystal Hollows.")

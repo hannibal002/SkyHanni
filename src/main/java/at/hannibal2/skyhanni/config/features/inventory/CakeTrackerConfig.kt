@@ -29,7 +29,7 @@ class CakeTrackerConfig {
 
     @Expose
     @ConfigLink(owner = CakeTrackerConfig::class, field = "enabled")
-    val cakeTrackerPosition: Position = Position(300, 300, false, true)
+    val cakeTrackerPosition: Position = Position(300, 300)
 
     @Expose
     val displayType: Property<CakeTrackerDisplayType> = Property.of(CakeTrackerDisplayType.MISSING_CAKES)

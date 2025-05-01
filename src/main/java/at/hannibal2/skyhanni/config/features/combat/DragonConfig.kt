@@ -27,7 +27,7 @@ class DragonConfig {
 
     @Expose
     @ConfigLink(owner = DragonConfig::class, field = "display")
-    val displayPosition: Position = Position(120, 40, false, true)
+    val displayPosition: Position = Position(120, 40)
 
     @Expose
     @ConfigOption(name = "Weight Message", desc = "Shows your dragon weight in chat after the dragon died.")

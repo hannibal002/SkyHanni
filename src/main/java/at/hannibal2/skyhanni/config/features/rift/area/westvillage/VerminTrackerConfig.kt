@@ -34,6 +34,6 @@ class VerminTrackerConfig {
 
     @Expose
     @ConfigLink(owner = VerminTrackerConfig::class, field = "enabled")
-    val position: Position = Position(16, -232, false, true)
+    val position: Position = Position(16, -232)
 }
 

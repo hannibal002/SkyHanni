@@ -16,7 +16,7 @@ class FishingProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = FishingProfitTrackerConfig::class, field = "enabled")
-    val position: Position = Position(20, 20, false, true)
+    val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(

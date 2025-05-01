@@ -50,5 +50,5 @@ class SprayConfig {
 
     @Expose
     @ConfigLink(owner = SprayConfig::class, field = "displayEnabled")
-    val displayPosition: Position = Position(390, 75, false, true)
+    val displayPosition: Position = Position(390, 75)
 }

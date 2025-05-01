@@ -36,5 +36,5 @@ class ZombieShootoutConfig {
 
     @Expose
     @ConfigLink(owner = ZombieShootoutConfig::class, field = "lampTimer")
-    val lampPosition: Position = Position(20, 20, false, true)
+    val lampPosition: Position = Position(20, 20)
 }

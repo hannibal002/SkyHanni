@@ -51,11 +51,11 @@ class ComposterConfig {
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")
-    val overlayOrganicMatterPos: Position = Position(140, 152, false, true)
+    val overlayOrganicMatterPos: Position = Position(140, 152)
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "overlay")
-    val overlayFuelExtrasPos: Position = Position(-320, 152, false, true)
+    val overlayFuelExtrasPos: Position = Position(-320, 152)
 
     @Expose
     @ConfigOption(name = "Composter Display", desc = "Display the Composter data from the tab list as GUI element.")
@@ -113,9 +113,9 @@ class ComposterConfig {
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "displayEnabled")
-    val displayPos: Position = Position(-390, 10, false, true)
+    val displayPos: Position = Position(-390, 10)
 
     @Expose
     @ConfigLink(owner = ComposterConfig::class, field = "displayEnabled")
-    val outsideGardenPos: Position = Position(-363, 13, false, true)
+    val outsideGardenPos: Position = Position(-363, 13)
 }

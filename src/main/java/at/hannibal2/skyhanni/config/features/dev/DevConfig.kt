@@ -69,11 +69,11 @@ class DevConfig {
 
     // Does not have a config element!
     @Expose
-    val debugPos: Position = Position(10, 10, false, true)
+    val debugPos: Position = Position(10, 10)
 
     // Does not have a config element!
     @Expose
-    val debugLocationPos: Position = Position(1, 160, false, true)
+    val debugLocationPos: Position = Position(1, 160)
 
     // Does not have a config element!
     @Expose
@@ -81,7 +81,7 @@ class DevConfig {
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "raytracedOreblock")
-    val debugOrePos: Position = Position(1, 200, false, true)
+    val debugOrePos: Position = Position(1, 200)
 
     @Expose
     @ConfigOption(

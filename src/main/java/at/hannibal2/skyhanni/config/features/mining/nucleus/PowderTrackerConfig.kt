@@ -92,5 +92,5 @@ class PowderTrackerConfig {
 
     @Expose
     @ConfigLink(owner = PowderTrackerConfig::class, field = "enabled")
-    val position: Position = Position(-274, 0, false, true)
+    val position: Position = Position(-274, 0)
 }

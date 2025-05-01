@@ -31,5 +31,5 @@ class TextBoxConfig {
 
     @Expose
     @ConfigLink(owner = TextBoxConfig::class, field = "enabled")
-    val position: Position = Position(10, 80, false, true)
+    val position: Position = Position(10, 80)
 }

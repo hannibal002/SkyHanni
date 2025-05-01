@@ -51,5 +51,5 @@ class DanceRoomHelperConfig {
 
     @Expose
     @ConfigLink(owner = DanceRoomHelperConfig::class, field = "enabled")
-    val position: Position = Position(442, 239, false, true)
+    val position: Position = Position(442, 239)
 }

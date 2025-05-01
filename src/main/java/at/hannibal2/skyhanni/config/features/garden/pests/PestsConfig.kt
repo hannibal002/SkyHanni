@@ -57,6 +57,6 @@ class PestsConfig {
 
     @Expose
     @ConfigLink(owner = PestsConfig::class, field = "pestChanceDisplay")
-    val pestChanceDisplayPosition: Position = Position(5, -115, false, true)
+    val pestChanceDisplayPosition: Position = Position(5, -115)
 }
 

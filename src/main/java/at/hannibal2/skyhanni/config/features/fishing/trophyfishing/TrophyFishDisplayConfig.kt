@@ -143,5 +143,5 @@ class TrophyFishDisplayConfig {
 
     @Expose
     @ConfigLink(owner = TrophyFishDisplayConfig::class, field = "enabled")
-    val position: Position = Position(144, 139, false, true)
+    val position: Position = Position(144, 139)
 }

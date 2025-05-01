@@ -51,7 +51,7 @@ class CrimsonIsleConfig {
 
     @Expose
     @ConfigLink(owner = CrimsonIsleConfig::class, field = "volcanoExplosivity")
-    val positionVolcano: Position = Position(20, 20, false, true)
+    val positionVolcano: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(
@@ -65,5 +65,5 @@ class CrimsonIsleConfig {
 
     @Expose
     @ConfigLink(owner = CrimsonIsleConfig::class, field = "showDojoRankDisplay")
-    val dojoRankDisplayPosition: Position = Position(-378, 206, false, true)
+    val dojoRankDisplayPosition: Position = Position(-378, 206)
 }
