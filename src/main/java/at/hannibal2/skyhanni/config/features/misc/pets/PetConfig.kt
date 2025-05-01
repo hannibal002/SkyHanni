@@ -20,7 +20,7 @@ class PetConfig {
 
     @Expose
     @ConfigLink(owner = PetConfig::class, field = "display")
-    var displayPos: Position = Position(-330, -15, false, true)
+    var displayPos: Position = Position(-330, -15)
 
     @Expose
     @ConfigOption(name = "Pet Experience Tooltip", desc = "")

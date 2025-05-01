@@ -21,7 +21,7 @@ public class EliteFarmingWeightConfig {
 
     @Expose
     @ConfigLink(owner = EliteFarmingWeightConfig.class, field = "display")
-    public Position pos = new Position(180, 10, false, true);
+    public Position pos = new Position(180, 10);
 
     @Expose
     @ConfigOption(name = "Leaderboard Ranking", desc = "Show your position in the farming weight leaderboard. " +

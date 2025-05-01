@@ -100,5 +100,5 @@ class EstimatedItemValueConfig {
 
     @Expose
     @ConfigLink(owner = EstimatedItemValueConfig::class, field = "enabled")
-    var position: Position = Position(140, 90, false, true)
+    var position: Position = Position(140, 90)
 }

@@ -17,7 +17,7 @@ class AreaPathfinderConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    var enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Show Always", desc = "Show the list always, also while outside of an inventory.")
