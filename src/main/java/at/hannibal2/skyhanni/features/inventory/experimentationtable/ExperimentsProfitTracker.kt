@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import kotlin.math.absoluteValue
 
@@ -162,19 +163,22 @@ object ExperimentsProfitTracker {
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {
-        val price = internalName.getPrice()
+        val price = SkyHanniTracker.getPricePer(internalName)
         val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         return npcPrice.coerceAtLeast(price).toInt()
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
-        val profit = tracker.drawItems(data, { true }, this) + data.startCost
+        val startCost = if (SkyHanniMod.feature.misc.tracker.priceSource != ItemPriceSource.NPC_SELL) {
+            data.startCost
+        } else 0
+        val profit = tracker.drawItems(data, { true }, this) + startCost
 
         val experimentsDone = data.experimentsDone
         addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
 
-        val startCostFormat = data.startCost.absoluteValue
+        val startCostFormat = startCost.absoluteValue
         val bitCostFormat = data.bitCost
         add(
             Renderable.hoverTips(

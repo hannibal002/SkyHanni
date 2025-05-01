@@ -104,13 +104,15 @@ object TabListRenderer {
         val x = screenWidth - totalWidth / 2
         val y = 10
 
-        GuiRenderUtils.drawRect(
-            x - COLUMN_SPACING,
-            y - TAB_PADDING,
-            screenWidth + totalWidth / 2 + COLUMN_SPACING,
-            10 + totalHeight + TAB_PADDING,
-            -0x80000000,
-        )
+        if (!config.hideTabBackground) {
+            GuiRenderUtils.drawRect(
+                x - COLUMN_SPACING,
+                y - TAB_PADDING,
+                screenWidth + totalWidth / 2 + COLUMN_SPACING,
+                10 + totalHeight + TAB_PADDING,
+                -0x80000000,
+            )
+        }
 
         var headerY = y
         if (header.isNotEmpty()) {
@@ -165,7 +167,7 @@ object TabListRenderer {
                 middleY - TAB_PADDING + 1,
                 middleX + column.getMaxWidth() + TAB_PADDING - 2,
                 middleY + column.size() * LINE_HEIGHT + TAB_PADDING - 2,
-                0x20AAAAAA,
+                if (config.hideTabBackground) 0x8F262626.toInt() else 0x20AAAAAA,
             )
 
             for (tabLine in column.lines) {

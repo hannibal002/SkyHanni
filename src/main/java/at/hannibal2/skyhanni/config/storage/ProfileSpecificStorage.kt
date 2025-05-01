@@ -646,9 +646,9 @@ class ProfileSpecificStorage {
 
     // - mining
     @Expose
-    var mining: MiningConfig = MiningConfig()
+    var mining: MiningStorage = MiningStorage()
 
-    class MiningConfig {
+    class MiningStorage {
         @Expose
         var kingsTalkedTo: MutableList<String> = mutableListOf()
 

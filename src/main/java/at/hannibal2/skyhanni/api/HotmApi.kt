@@ -52,8 +52,8 @@ object HotmApi {
 
         fun pattern(isHeart: Boolean) = if (isHeart) heartPattern else resetPattern
 
-        private val storage: ProfileSpecificStorage.MiningConfig.PowderStorage?
-            get() = ProfileStorageData.profileSpecific?.mining?.powder?.getOrPut(this, ProfileSpecificStorage.MiningConfig::PowderStorage)
+        private val storage: ProfileSpecificStorage.MiningStorage.PowderStorage?
+            get() = ProfileStorageData.profileSpecific?.mining?.powder?.getOrPut(this, ProfileSpecificStorage.MiningStorage::PowderStorage)
 
         var current: Long
             get() = storage?.available ?: 0L

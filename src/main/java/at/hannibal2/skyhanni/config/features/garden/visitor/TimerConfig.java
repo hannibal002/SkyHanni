@@ -36,5 +36,5 @@ public class TimerConfig {
     @Expose
     @ConfigLink(owner = TimerConfig.class, field = "enabled")
     // TODO rename to position
-    public Position pos = new Position(-200, 40, false, true);
+    public Position pos = new Position(-200, 40);
 }
