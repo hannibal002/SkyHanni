@@ -71,5 +71,5 @@ class BroodmotherConfig {
 
     @Expose
     @ConfigLink(owner = BroodmotherConfig::class, field = "countdown")
-    var countdownPosition: Position = Position(10, 10, false, true)
+    var countdownPosition: Position = Position(10, 10)
 }

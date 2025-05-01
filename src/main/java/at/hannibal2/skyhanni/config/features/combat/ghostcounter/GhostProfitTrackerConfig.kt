@@ -39,5 +39,5 @@ class GhostProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = GhostProfitTrackerConfig::class, field = "enabled")
-    var position: Position = Position(50, 50, false, true)
+    var position: Position = Position(50, 50)
 }

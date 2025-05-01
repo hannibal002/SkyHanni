@@ -112,5 +112,5 @@ public class NextJacobContestConfig {
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
-    public Position pos = new Position(-200, 10, false, true);
+    public Position pos = new Position(-200, 10);
 }
