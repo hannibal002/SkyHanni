@@ -59,7 +59,7 @@ class Position @JvmOverloads constructor(
 
     @Expose
     var scale: Float = scale
-        get() = if (field == 0f) DEFAULT_SCALE else field
+        get() = if (field <= 0f) DEFAULT_SCALE else field
 
     @Expose
     var centerX: Boolean = centerX

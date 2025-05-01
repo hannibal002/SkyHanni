@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -33,6 +34,19 @@ class EliteFarmingWeightConfig {
     )
     @ConfigEditorBoolean
     var leaderboard: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Leaderboard Type", desc = "Select normal or monthly weight leaderboard!")
+    @ConfigEditorDropdown
+    val eliteLBType: Property<EliteFarmingWeightLBType> = Property.of(EliteFarmingWeightLBType.DEFAULT);
+
+    enum class EliteFarmingWeightLBType(private val displayName: String) {
+        DEFAULT("All-Time"),
+        MONTHLY("Monthly"),
+        ;
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(
