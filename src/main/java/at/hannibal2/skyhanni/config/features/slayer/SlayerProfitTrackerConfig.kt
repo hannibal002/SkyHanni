@@ -20,7 +20,7 @@ class SlayerProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = SlayerProfitTrackerConfig::class, field = "enabled")
-    var pos: Position = Position(20, 20)
+    val pos: Position = Position(20, 20)
 
     // TODO move out of slayer profit tracker and into the generic slayer config.
     @Expose
