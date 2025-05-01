@@ -116,7 +116,7 @@ class CropMilestonesConfig {
 
     @Expose
     @ConfigLink(owner = CropMilestonesConfig::class, field = "progress")
-    var progressDisplayPos: Position = Position(-400, -200, false, true)
+    var progressDisplayPos: Position = Position(-400, -200)
 
     @Expose
     @ConfigOption(name = "Best Crop", desc = "")

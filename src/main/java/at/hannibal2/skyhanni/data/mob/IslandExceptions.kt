@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
+import at.hannibal2.skyhanni.utils.MobUtils.getNextEntity
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -81,7 +82,8 @@ object IslandExceptions {
         baseEntity is EntityOtherPlayerMP &&
             baseEntity.isNpc() &&
             (nextEntity is EntityGiantZombie || nextEntity == null) &&
-            baseEntity.name.contains("Livid") -> MobUtils.getClosestArmorStandWithName(baseEntity, 6.0, "﴾ Livid")
+            baseEntity.name.contains("Livid") -> MobUtils.getArmorStand(baseEntity, 10)
+            ?.takeIf { getNextEntity(it, -1)?.takeIf { entity -> entity.name.contains("Livid") } == null }
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
         baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.orEmpty()) ->

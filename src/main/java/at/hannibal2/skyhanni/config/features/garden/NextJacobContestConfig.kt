@@ -106,5 +106,5 @@ class NextJacobContestConfig {
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
-    var pos: Position = Position(-200, 10, false, true)
+    var pos: Position = Position(-200, 10)
 }

@@ -29,5 +29,5 @@ class DicerRngDropTrackerConfig {
 
     @Expose
     @ConfigLink(owner = DicerRngDropTrackerConfig::class, field = "display")
-    var position: Position = Position(16, -232, false, true)
+    var position: Position = Position(16, -232)
 }

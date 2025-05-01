@@ -29,5 +29,5 @@ class GardenLevelConfig {
 
     @Expose
     @ConfigLink(owner = GardenLevelConfig::class, field = "display")
-    var pos: Position = Position(390, 40, false, true)
+    var pos: Position = Position(390, 40)
 }

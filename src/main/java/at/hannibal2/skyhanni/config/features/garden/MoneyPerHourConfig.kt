@@ -117,5 +117,5 @@ class MoneyPerHourConfig {
 
     @Expose
     @ConfigLink(owner = MoneyPerHourConfig::class, field = "display")
-    var pos: Position = Position(-330, 170, false, true)
+    var pos: Position = Position(-330, 170)
 }

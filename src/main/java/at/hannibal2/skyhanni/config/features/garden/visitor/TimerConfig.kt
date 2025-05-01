@@ -47,5 +47,5 @@ class TimerConfig {
 
     @Expose
     @ConfigLink(owner = TimerConfig::class, field = "enabled")
-    var position: Position = Position(-200, 40, false, true)
+    var position: Position = Position(-200, 40)
 }

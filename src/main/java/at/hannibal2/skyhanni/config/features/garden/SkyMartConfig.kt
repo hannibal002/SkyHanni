@@ -24,7 +24,7 @@ class SkyMartConfig {
 
     @Expose
     @ConfigLink(owner = SkyMartConfig::class, field = "copperPrice")
-    var copperPricePos: Position = Position(211, 132, false, true)
+    var copperPricePos: Position = Position(211, 132)
 
     @Expose
     @ConfigOption(

@@ -38,5 +38,5 @@ class FarmingFortuneConfig {
 
     @Expose
     @ConfigLink(owner = FarmingFortuneConfig::class, field = "display")
-    var position: Position = Position(5, -180, false, true)
+    var position: Position = Position(5, -180)
 }

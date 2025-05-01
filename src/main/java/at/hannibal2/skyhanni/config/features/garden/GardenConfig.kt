@@ -179,7 +179,7 @@ class GardenConfig {
 
     @Expose
     @ConfigLink(owner = GardenConfig::class, field = "farmingFortuneForContest")
-    var farmingFortuneForContestPos: Position = Position(180, 156, false, true)
+    var farmingFortuneForContestPos: Position = Position(180, 156)
 
     @Expose
     @ConfigOption(
@@ -206,7 +206,7 @@ class GardenConfig {
 
     @Expose
     @ConfigLink(owner = GardenConfig::class, field = "jacobContestTimes")
-    var jacobContestTimesPosition: Position = Position(-359, 149, false, true)
+    var jacobContestTimesPosition: Position = Position(-359, 149)
 
     @Expose
     @ConfigOption(
@@ -219,7 +219,7 @@ class GardenConfig {
 
     // Does not have a config element!
     @Expose
-    var cropSpeedMeterPos: Position = Position(278, -236, false, true)
+    var cropSpeedMeterPos: Position = Position(278, -236)
 
     @Expose
     @ConfigOption(
@@ -249,7 +249,7 @@ class GardenConfig {
 
     @Expose
     @ConfigLink(owner = GardenConfig::class, field = "showLogBookStats")
-    var logBookStatsPos: Position = Position(427, 92, false, true)
+    var logBookStatsPos: Position = Position(427, 92)
 
     @Expose
     @ConfigOption(name = "Carrolyn Fetch Helper", desc = "Helps to fetch items to Carrolyn for permanent buffs.")

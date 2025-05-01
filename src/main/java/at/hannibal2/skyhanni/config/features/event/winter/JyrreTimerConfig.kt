@@ -21,5 +21,5 @@ class JyrreTimerConfig {
 
     @Expose
     @ConfigLink(owner = JyrreTimerConfig::class, field = "enabled")
-    var pos: Position = Position(390, 65, false, true)
+    var pos: Position = Position(390, 65)
 }

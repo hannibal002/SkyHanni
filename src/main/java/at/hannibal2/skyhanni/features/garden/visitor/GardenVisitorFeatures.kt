@@ -72,6 +72,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
@@ -567,6 +568,10 @@ object GardenVisitorFeatures {
         }
     }
 
+    private fun doesVisitorEntityExist(name: String) = EntityUtils.getEntities<EntityOtherPlayerMP>().any {
+        it.name.trim().equals(name, true)
+    }
+
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
         val color = group("color")
         if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
@@ -574,7 +579,10 @@ object GardenVisitorFeatures {
         val name = group("name")
         if (name in setOf("Beth", "Maeve", "Spaceman")) return false
 
-        return VisitorApi.getVisitorsMap().keys.any { it.removeColor() == name }
+        val isInKnownVisitors = VisitorApi.getVisitorsMap().keys.any { it.removeColor() == name }
+
+        return if (isInKnownVisitors) true
+        else doesVisitorEntityExist(name)
     } ?: false
 
     private fun update() {
