@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -171,7 +170,7 @@ object DragonProfitTracker {
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
         val totalMessage = "Profit for Dragon§e: $profitPrefix${totalProfit.shortFormat()}"
 
-        hover.add("§cPlaced §5Summoning Eye§7: §c-${eyePrice?.times(lastPlaced)?.shortFormat()}")
+        hover.add("§cPlaced §5Summoning Eye§7: §c-${eyePrice.times(lastPlaced).shortFormat()}")
         hover.add("§e$totalMessage")
 
         ChatUtils.hoverableChat(totalMessage, hover)
