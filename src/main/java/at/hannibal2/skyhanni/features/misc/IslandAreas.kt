@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
-import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
@@ -90,11 +89,11 @@ object IslandAreas {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
-        if (event.isMod(2) && hasMoved) {
+        if (!isEnabled() || !event.isMod(2) || !hasMoved) return
+        if (isPathfinderEnabled()) {
             updatePosition()
-            hasMoved = false
         }
+        hasMoved = false
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -108,10 +107,10 @@ object IslandAreas {
         display = buildDisplay().buildSearchBox(textInput)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
-        if (!config.pathfinder.enabled) return
+        if (!isPathfinderEnabled()) return
         if (!config.pathfinder.showAlways) return
         val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (isInOwnInventory) return
@@ -121,10 +120,10 @@ object IslandAreas {
         }
     }
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onBackgroundDraw() {
         if (!isEnabled()) return
-        if (!config.pathfinder.enabled) return
+        if (!isPathfinderEnabled()) return
         val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (!isInOwnInventory) return
 
@@ -133,15 +132,18 @@ object IslandAreas {
         }
     }
 
-    @HandleEvent
-    fun onIslandGraphReload(event: IslandGraphReloadEvent) {
+    @HandleEvent(IslandGraphReloadEvent::class)
+    fun onIslandGraphReload() {
         nodeMoved()
-        DelayedRun.runDelayed(150.milliseconds) {
-            updatePosition()
+
+        if (isPathfinderEnabled()) {
+            DelayedRun.runDelayed(150.milliseconds) {
+                updatePosition()
+            }
         }
     }
 
-    private fun buildDisplay() = buildList<Searchable> {
+    private fun buildDisplay() = buildList {
         var foundCurrentArea = false
         var foundAreas = 0
 
@@ -269,16 +271,22 @@ object IslandAreas {
         }
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.pathfinder.color) {
-            targetNode?.let {
-                setTarget(it)
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        with(config.pathfinder) {
+            ConditionalUtils.onToggle(color) {
+                targetNode?.let {
+                    setTarget(it)
+                }
             }
-        }
-        ConditionalUtils.onToggle(config.pathfinder.color, config.pathfinder.includeCurrentArea) {
-            updateNodes()
-            updatePosition()
+            ConditionalUtils.onToggle(
+                color,
+                includeCurrentArea,
+                enabled,
+            ) {
+                updateNodes()
+                updatePosition()
+            }
         }
     }
 
@@ -302,10 +310,12 @@ object IslandAreas {
                 updatePosition()
             },
             allowRerouting = true,
-            condition = { config.pathfinder.enabled },
+            condition = { isPathfinderEnabled() },
         )
         updatePosition()
     }
 
-    fun isEnabled() = IslandGraphs.currentIslandGraph != null
+    private fun isPathfinderEnabled(): Boolean = config.pathfinder.enabled.get()
+
+    private fun isEnabled() = IslandGraphs.currentIslandGraph != null
 }
