@@ -184,6 +184,7 @@ object GriffinBurrowHelper {
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
         val newLocation = event.guessLocation
+        if (!IslandType.HUB.isInBounds(newLocation)) return
         val playerLocation = LocationUtils.playerLocation()
 
         if (newLocation.distance(playerLocation) < 6) return
