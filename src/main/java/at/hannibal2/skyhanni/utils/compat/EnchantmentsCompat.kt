@@ -21,7 +21,7 @@ enum class EnchantmentsCompat(
         //#if MC < 1.12
         Enchantment.protection
         //#else
-        //$$ MinecraftCompat.localWorld.registryManager.getOrThrow(RegistryKeys.ENCHANTMENT).getEntry(Identifier.ofVanilla("protection")).get().registryKey()
+        //$$ MinecraftCompat.localWorld.registryManager.getOrThrow(RegistryKeys.ENCHANTMENT).getEntry(Identifier.ofVanilla("protection")).get()
         //#endif
     ),
 }
