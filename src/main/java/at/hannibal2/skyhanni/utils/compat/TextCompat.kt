@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -143,6 +144,30 @@ var IChatComponent.url: String?
         //$$ this.style.withClickEvent(value?.let { ClickEvent.OpenUrl(URI.create(it)) })
         //#endif
     }
+
+fun ChatStyle.setClickRunCommand(text: String): ChatStyle {
+    //#if MC < 1.21
+    return this.setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, text))
+    //#else
+    //$$ return this.withClickEvent(ClickEvent.RunCommand(text))
+    //#endif
+}
+
+fun ChatStyle.setHoverShowText(text: String): ChatStyle {
+    //#if MC < 1.21
+    return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text.asComponent()))
+    //#else
+    //$$ return this.withHoverEvent(HoverEvent.ShowText(text.asComponent()))
+    //#endif
+}
+
+fun ChatStyle.setHoverShowText(text: IChatComponent): ChatStyle {
+    //#if MC < 1.21
+    return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text))
+    //#else
+    //$$ return this.withHoverEvent(HoverEvent.ShowText(text))
+    //#endif
+}
 
 fun IChatComponent.appendString(text: String): IChatComponent =
     //#if MC < 1.16
