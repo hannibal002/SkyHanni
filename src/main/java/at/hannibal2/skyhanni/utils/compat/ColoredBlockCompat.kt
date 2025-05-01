@@ -9,11 +9,11 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
 /**
- * Enum class that represents colored blocks in Minecraft, wool, stained-glass, and stained-glass panes.
+ * Enum class that represents colored blocks in Minecraft, stained clay, wool, stained-glass, and stained-glass panes.
  * This is because on modern versions instead of all stemming from the same block but having different metadata,
  * they are all separate blocks
  *
- * This does not include uncolored blocks like glass and glass panes
+ * This does not include uncolored blocks like glass, glass panes clay and unstained hardened clay
  */
 enum class ColoredBlockCompat(
     private val metaColor: Int,
@@ -22,6 +22,7 @@ enum class ColoredBlockCompat(
     //$$ private val glassBlock: Block,
     //$$ private val glassPaneBlock: Block,
     //$$ private val woolBlock: Block,
+    //$$ private val clayBlock: Block,
     //#endif
 ) {
     WHITE(
@@ -31,6 +32,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.WHITE_STAINED_GLASS,
         //$$ Blocks.WHITE_STAINED_GLASS_PANE,
         //$$ Blocks.WHITE_WOOL,
+        //$$ Blocks.WHITE_TERRACOTTA,
         //#endif
     ),
     ORANGE(
@@ -40,6 +42,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.ORANGE_STAINED_GLASS,
         //$$ Blocks.ORANGE_STAINED_GLASS_PANE,
         //$$ Blocks.ORANGE_WOOL,
+        //$$ Blocks.ORANGE_TERRACOTTA,
         //#endif
     ),
     MAGENTA(
@@ -49,6 +52,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.MAGENTA_STAINED_GLASS,
         //$$ Blocks.MAGENTA_STAINED_GLASS_PANE,
         //$$ Blocks.MAGENTA_WOOL,
+        //$$ Blocks.MAGENTA_TERRACOTTA,
         //#endif
     ),
     LIGHT_BLUE(
@@ -58,6 +62,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.LIGHT_BLUE_STAINED_GLASS,
         //$$ Blocks.LIGHT_BLUE_STAINED_GLASS_PANE,
         //$$ Blocks.LIGHT_BLUE_WOOL,
+        //$$ Blocks.LIGHT_BLUE_TERRACOTTA,
         //#endif
     ),
     YELLOW(
@@ -67,6 +72,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.YELLOW_STAINED_GLASS,
         //$$ Blocks.YELLOW_STAINED_GLASS_PANE,
         //$$ Blocks.YELLOW_WOOL,
+        //$$ Blocks.YELLOW_TERRACOTTA,
         //#endif
 
     ),
@@ -77,6 +83,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.LIME_STAINED_GLASS,
         //$$ Blocks.LIME_STAINED_GLASS_PANE,
         //$$ Blocks.LIME_WOOL,
+        //$$ Blocks.LIME_TERRACOTTA,
         //#endif
     ),
     PINK(
@@ -86,6 +93,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.PINK_STAINED_GLASS,
         //$$ Blocks.PINK_STAINED_GLASS_PANE,
         //$$ Blocks.PINK_WOOL,
+        //$$ Blocks.PINK_TERRACOTTA,
         //#endif
     ),
     GRAY(
@@ -95,6 +103,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.GRAY_STAINED_GLASS,
         //$$ Blocks.GRAY_STAINED_GLASS_PANE,
         //$$ Blocks.GRAY_WOOL,
+        //$$ Blocks.GRAY_TERRACOTTA,
         //#endif
     ),
     LIGHT_GRAY(
@@ -104,6 +113,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.LIGHT_GRAY_STAINED_GLASS,
         //$$ Blocks.LIGHT_GRAY_STAINED_GLASS_PANE,
         //$$ Blocks.LIGHT_GRAY_WOOL,
+        //$$ Blocks.LIGHT_GRAY_TERRACOTTA,
         //#endif
     ),
     CYAN(
@@ -113,6 +123,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.CYAN_STAINED_GLASS,
         //$$ Blocks.CYAN_STAINED_GLASS_PANE,
         //$$ Blocks.CYAN_WOOL,
+        //$$ Blocks.CYAN_TERRACOTTA,
         //#endif
     ),
     PURPLE(
@@ -122,6 +133,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.PURPLE_STAINED_GLASS,
         //$$ Blocks.PURPLE_STAINED_GLASS_PANE,
         //$$ Blocks.PURPLE_WOOL,
+        //$$ Blocks.PURPLE_TERRACOTTA,
         //#endif
     ),
     BLUE(
@@ -131,6 +143,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.BLUE_STAINED_GLASS,
         //$$ Blocks.BLUE_STAINED_GLASS_PANE,
         //$$ Blocks.BLUE_WOOL,
+        //$$ Blocks.BLUE_TERRACOTTA,
         //#endif
     ),
     BROWN(
@@ -140,6 +153,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.BROWN_STAINED_GLASS,
         //$$ Blocks.BROWN_STAINED_GLASS_PANE,
         //$$ Blocks.BROWN_WOOL,
+        //$$ Blocks.BROWN_TERRACOTTA,
         //#endif
     ),
     GREEN(
@@ -149,6 +163,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.GREEN_STAINED_GLASS,
         //$$ Blocks.GREEN_STAINED_GLASS_PANE,
         //$$ Blocks.GREEN_WOOL,
+        //$$ Blocks.GREEN_TERRACOTTA,
         //#endif
     ),
     RED(
@@ -158,6 +173,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.RED_STAINED_GLASS,
         //$$ Blocks.RED_STAINED_GLASS_PANE,
         //$$ Blocks.RED_WOOL,
+        //$$ Blocks.RED_TERRACOTTA,
         //#endif
     ),
     BLACK(
@@ -167,6 +183,7 @@ enum class ColoredBlockCompat(
         //$$ Blocks.BLACK_STAINED_GLASS,
         //$$ Blocks.BLACK_STAINED_GLASS_PANE,
         //$$ Blocks.BLACK_WOOL,
+        //$$ Blocks.BLACK_TERRACOTTA,
         //#endif
     );
 
@@ -193,11 +210,19 @@ enum class ColoredBlockCompat(
         //$$ return ItemStack(woolBlock, amount)
         //#endif
     }
+    fun createStainedClay(amount: Int = 1): ItemStack {
+        //#if MC < 1.16
+        return ItemStack(Blocks.stained_hardened_clay, amount, metaColor)
+        //#else
+        //$$ return ItemStack(clayBlock, amount)
+        //#endif
+    }
 
     companion object {
         fun ItemStack.isStainedGlass(color: ColoredBlockCompat): Boolean = this.isStainedGlass(color.metaColor)
         fun ItemStack.isStainedGlassPane(color: ColoredBlockCompat): Boolean = this.isStainedGlassPane(color.metaColor)
         fun ItemStack.isWool(color: ColoredBlockCompat): Boolean = this.isWool(color.metaColor)
+        fun ItemStack.isStainedClay(color: ColoredBlockCompat): Boolean = this.isStainedClay(color.metaColor)
 
         /**
          * No metadata means any stained-glass
@@ -238,9 +263,23 @@ enum class ColoredBlockCompat(
             //#endif
         }
 
+        /**
+         * No metadata means any stained clay
+         */
+        fun ItemStack.isStainedClay(meta: Int? = null): Boolean {
+            //#if MC < 1.16
+            if (this.item != ItemStack(Blocks.stained_hardened_clay).item) return false
+            meta ?: return true
+            return this.metadata == meta
+            //#else
+            //$$ return entries.any { (meta == null || it.metaColor == meta) && this.item == it.clayBlock.asItem() }
+            //#endif
+        }
+
         fun Block.isStainedGlass(color: ColoredBlockCompat): Boolean = isStainedGlass(color.metaColor)
         fun Block.isStainedGlassPane(color: ColoredBlockCompat): Boolean = isStainedGlassPane(color.metaColor)
         fun Block.isWool(color: ColoredBlockCompat): Boolean = isWool(color.metaColor)
+        fun Block.isStainedClay(color: ColoredBlockCompat): Boolean = isStainedClay(color.metaColor)
 
         /**
          * No metadata means any stained-glass
@@ -281,12 +320,25 @@ enum class ColoredBlockCompat(
             //#endif
         }
 
+        /**
+         * No metadata means any stained clay
+         */
+        fun Block.isStainedClay(meta: Int? = null): Boolean {
+            //#if MC < 1.16
+            if (this != Blocks.stained_hardened_clay) return false
+            meta ?: return true
+            return defaultState.getValue(BlockStainedGlass.COLOR).metadata == meta
+            //#else
+            //$$ return entries.any { (meta == null || it.metaColor == meta) && this == it.clayBlock }
+            //#endif
+        }
+
         fun IBlockState.getBlockColor(): LorenzColor {
             //#if MC < 1.16
             return this.getValue(BlockStainedGlass.COLOR).toLorenzColor()
             //#else
             //$$ return ColoredBlockCompat.entries.firstOrNull { block ->
-            //$$     block.glassBlock == this.block || block.glassPaneBlock == this.block || block.woolBlock == this.block
+            //$$     block.glassBlock == this.block || block.glassPaneBlock == this.block || block.woolBlock == this.block || block.clayBlock == this.block
             //$$ }?.color ?: LorenzColor.WHITE
             //#endif
         }
