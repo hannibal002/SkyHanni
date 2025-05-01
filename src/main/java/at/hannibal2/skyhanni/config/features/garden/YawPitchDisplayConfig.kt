@@ -53,9 +53,9 @@ class YawPitchDisplayConfig {
 
     @Expose
     @ConfigLink(owner = YawPitchDisplayConfig::class, field = "enabled")
-    var pos: Position = Position(445, 225, false, true)
+    var pos: Position = Position(445, 225)
 
     @Expose
     @ConfigLink(owner = YawPitchDisplayConfig::class, field = "showOutsideGarden")
-    var posOutside: Position = Position(445, 225, false, true)
+    var posOutside: Position = Position(445, 225)
 }

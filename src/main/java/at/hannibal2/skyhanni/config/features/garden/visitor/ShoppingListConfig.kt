@@ -16,7 +16,7 @@ class ShoppingListConfig {
 
     @Expose
     @ConfigLink(owner = ShoppingListConfig::class, field = "display")
-    var position: Position = Position(180, 170, false, true)
+    var position: Position = Position(180, 170)
 
     @Expose
     @ConfigOption(name = "Only when Close", desc = "Only show the shopping list when close to the visitors.")

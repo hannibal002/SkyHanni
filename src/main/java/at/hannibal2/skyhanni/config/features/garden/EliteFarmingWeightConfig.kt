@@ -23,7 +23,7 @@ class EliteFarmingWeightConfig {
 
     @Expose
     @ConfigLink(owner = EliteFarmingWeightConfig::class, field = "display")
-    var pos: Position = Position(180, 10, false, true)
+    var pos: Position = Position(180, 10)
 
     @Expose
     @ConfigOption(
