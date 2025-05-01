@@ -6,11 +6,14 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -76,6 +79,11 @@ object ExcavatorProfitTracker {
     }
 
     private val scrapItem get() = FossilExcavatorApi.scrapItem
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.isIronman.onToggle(tracker::update)
+    }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lFossil Excavation Profit Tracker")
@@ -146,7 +154,7 @@ object ExcavatorProfitTracker {
         if (timesExcavated <= 0) return profit
         // TODO use same price source as profit tracker
 
-        if (!config.isIronman) {
+        if (!config.isIronman.get()) {
             val scrapPrice = timesExcavated * scrapItem.getPrice()
             val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
             add(

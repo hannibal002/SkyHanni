@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 @SkyHanniModule
 object CrystalNucleusTracker {
@@ -119,6 +120,7 @@ object CrystalNucleusTracker {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.professorUsage.onToggle(tracker::update)
+        config.isIronman.onToggle(tracker::update)
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -127,7 +129,7 @@ object CrystalNucleusTracker {
         val runsCompleted = data.runsCompleted
         if (runsCompleted > 0) {
             var profit = tracker.drawItems(data, { true }, this)
-            if (!config.isIronman) {
+            if (!config.isIronman.get()) {
                 val jungleKeyCost: Double = JUNGLE_KEY_ITEM.getPrice() * runsCompleted
                 profit -= jungleKeyCost
                 val jungleKeyCostFormat = jungleKeyCost.shortFormat()
@@ -153,7 +155,7 @@ object CrystalNucleusTracker {
                 "§5Precursor Apparatuses",
             )
             else rawConfigString
-            if (!config.isIronman) {
+            if (!config.isIronman.get()) {
                 val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
                 profit -= totalSapphireCost

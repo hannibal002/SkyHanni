@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ExcavatorProfitTrackerConfig {
     @Expose
@@ -32,8 +33,7 @@ class ExcavatorProfitTrackerConfig {
     var position: Position = Position(-380, 150)
 
     @Expose
-    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the cost of Scrap from Profit Calculations. (Requires Restart)")
+    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the cost of Scrap from Profit Calculations.")
     @ConfigEditorBoolean
-    var isIronman: Boolean = false
-    // Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
+    var isIronman: Property<Boolean> = Property.of(false)
 }

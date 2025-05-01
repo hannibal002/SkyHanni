@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +33,9 @@ public class ExperimentsProfitTrackerConfig {
     public int timeDisplayed = 30;
 
     @Expose
-    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the Cost of Experience Bottles from Profit Calculations. (Requires Restart)")
+    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the Cost of Experience Bottles from Profit Calculations.")
     @ConfigEditorBoolean
-    public boolean isIronman = false;
-    // Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
+    public Property<Boolean> isIronman = Property.of(false);
 
     @Expose
     @ConfigLink(owner = ExperimentsProfitTrackerConfig.class, field = "enabled")
