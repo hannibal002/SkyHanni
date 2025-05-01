@@ -149,6 +149,10 @@ Internal changes that do not impact the end user. Examples include:
 - Preparations for modern Minecraft versions
 - Documentation changes to markdown files, e.g., in `/docs` or this file.
 
+Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
+We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
+everything else can go in the normal PR description (What area). 
+
 #### Removed Features
 
 Features that have merged with existing features (in the config) or have become obsolete (e.g., if Hypixel implements them on the server
@@ -227,6 +231,9 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
+- Always combine title messages with chat message.
+  - This way users know what feature and what mod sends the title, if they want to disable it.
+  - Also we can include more informations why the title just showed up, as the title should not be too long.
 
 ### Compatibility with modern versions
 As SkyHanni gets closer to supporting multiple Minecraft versions, there are a few additional coding conventions to follow. Below are some
