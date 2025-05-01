@@ -35,5 +35,5 @@ class ExcavatorProfitTrackerConfig {
     @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the cost of Scrap from Profit Calculations. (Requires Restart)")
     @ConfigEditorBoolean
     var isIronman: Boolean = false
-    //Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
+    // Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
 }
