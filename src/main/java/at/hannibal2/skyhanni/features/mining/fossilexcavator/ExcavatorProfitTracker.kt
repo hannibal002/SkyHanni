@@ -145,19 +145,24 @@ object ExcavatorProfitTracker {
     ): Double {
         if (timesExcavated <= 0) return profit
         // TODO use same price source as profit tracker
-        val scrapPrice = timesExcavated * scrapItem.getPrice()
-        val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
-        add(
-            Renderable.hoverTips(
-                "$name §7price: §c-${scrapPrice.shortFormat()}",
-                listOf(
-                    "§7You paid §c${scrapPrice.shortFormat()} coins §7in total",
-                    "§7for all §e$timesExcavated $name",
-                    "§7you have used.",
-                ),
-            ).toSearchable("Scrap"),
-        )
-        return profit - scrapPrice
+
+        if (!config.isIronman) {
+            val scrapPrice = timesExcavated * scrapItem.getPrice()
+            val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
+            add(
+                Renderable.hoverTips(
+                    "$name §7price: §c-${scrapPrice.shortFormat()}",
+                    listOf(
+                        "§7You paid §c${scrapPrice.shortFormat()} coins §7in total",
+                        "§7for all §e$timesExcavated $name",
+                        "§7you have used.",
+                    ),
+                ).toSearchable("Scrap"),
+            )
+            return profit - scrapPrice
+        } else {
+            return profit
+        }
     }
 
     @HandleEvent

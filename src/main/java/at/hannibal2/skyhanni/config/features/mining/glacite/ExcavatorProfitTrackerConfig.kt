@@ -30,4 +30,10 @@ class ExcavatorProfitTrackerConfig {
     @Expose
     @ConfigLink(owner = ExcavatorProfitTrackerConfig::class, field = "enabled")
     var position: Position = Position(-380, 150)
+
+    @Expose
+    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the cost of Scrap from Profit Calculations. (Requires Restart)")
+    @ConfigEditorBoolean
+    var isIronman: Boolean = false
+    //Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
 }

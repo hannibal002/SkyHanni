@@ -232,25 +232,39 @@ object ExperimentsProfitTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
-        val profit = tracker.drawItems(data, { true }, this) + data.startCost
+        if (!config.isIronman) {
+            val profit = tracker.drawItems(data, { true }, this) + data.startCost
 
-        val experimentsDone = data.experimentsDone
-        addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
-        val startCostFormat = data.startCost.absoluteValue.shortFormat()
-        val bitCostFormat = data.bitCost.shortFormat()
-        add(
-            Renderable.hoverTips(
-                "§eTotal Cost: §c-$startCostFormat§e/§b-$bitCostFormat",
-                listOf(
-                    "§7You paid §c$startCostFormat §7coins and", "§b$bitCostFormat §7bits for starting",
-                    "§7experiments.",
-                ),
-            ).toSearchable(),
-        )
-        add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
-        addSearchString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
+            val experimentsDone = data.experimentsDone
+            addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
+            val startCostFormat = data.startCost.absoluteValue.shortFormat()
+            val bitCostFormat = data.bitCost.shortFormat()
+            add(
+                Renderable.hoverTips(
+                    "§eTotal Cost: §c-$startCostFormat§e/§b-$bitCostFormat",
+                    listOf(
+                        "§7You paid §c$startCostFormat §7coins and", "§b$bitCostFormat §7bits for starting",
+                        "§7experiments.",
+                    ),
+                ).toSearchable(),
+            )
+            add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
+            addSearchString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
 
-        tracker.addPriceFromButton(this)
+            tracker.addPriceFromButton(this)
+        } else {
+            val profit = tracker.drawItems(data, { true }, this)
+
+            val experimentsDone = data.experimentsDone
+            addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
+            val startCostFormat = data.startCost.absoluteValue.shortFormat()
+            val bitCostFormat = data.bitCost.shortFormat()
+            add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
+            addSearchString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
+
+            tracker.addPriceFromButton(this)
+        }
+
     }
 
     init {

@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -127,18 +128,21 @@ object CrystalNucleusTracker {
         val runsCompleted = data.runsCompleted
         if (runsCompleted > 0) {
             var profit = tracker.drawItems(data, { true }, this)
-            val jungleKeyCost: Double = JUNGLE_KEY_ITEM.getPrice() * runsCompleted
-            profit -= jungleKeyCost
-            val jungleKeyCostFormat = jungleKeyCost.shortFormat()
-            add(
-                Renderable.hoverTips(
-                    " §7${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
-                    tips = listOf(
-                        "§7You lost §c$jungleKeyCostFormat §7of total profit",
-                        "§7due to §5Jungle Keys§7.",
-                    ),
-                ).toSearchable("Jungle Key"),
-            )
+            if (!config.isIronman){
+                val jungleKeyCost: Double = JUNGLE_KEY_ITEM.getPrice() * runsCompleted
+                profit -= jungleKeyCost
+                val jungleKeyCostFormat = jungleKeyCost.shortFormat()
+                add(
+                    Renderable.hoverTips(
+                        " §7${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
+                        tips = listOf(
+                            "§7You lost §c$jungleKeyCostFormat §7of total profit",
+                            "§7due to §5Jungle Keys§7.",
+                        ),
+                    ).toSearchable("Jungle Key"),
+                )
+            }
+
 
             val usesApparatus = CrystalNucleusApi.usesApparatus()
             val partsCost = CrystalNucleusApi.getPrecursorRunPrice()
@@ -150,19 +154,22 @@ object CrystalNucleusTracker {
                 "§5Precursor Apparatuses",
             )
             else rawConfigString
-            val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
+            if (!config.isIronman) {
+                val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
-            profit -= totalSapphireCost
-            val totalSapphireCostFormat = totalSapphireCost.shortFormat()
-            add(
-                Renderable.hoverTips(
-                    " §7${usageTotal}x $usageString§7: §c-$totalSapphireCostFormat",
-                    tips = listOf(
-                        "§7You lost §c$totalSapphireCostFormat §7of total profit",
-                        "§7due to $usageString§7.",
-                    ),
-                ).toSearchable(usageString.removeColor()),
-            )
+                profit -= totalSapphireCost
+                val totalSapphireCostFormat = totalSapphireCost.shortFormat()
+                add(
+                    Renderable.hoverTips(
+                        " §7${usageTotal}x $usageString§7: §c-$totalSapphireCostFormat",
+                        tips = listOf(
+                            "§7You lost §c$totalSapphireCostFormat §7of total profit",
+                            "§7due to $usageString§7.",
+                        ),
+                    ).toSearchable(usageString.removeColor()),
+                )
+            }
+
 
             add(
                 Renderable.hoverTips(
