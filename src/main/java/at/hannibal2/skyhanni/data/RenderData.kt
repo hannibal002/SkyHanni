@@ -41,7 +41,7 @@ object RenderData {
 
         if (GuiEditManager.isInGui()) {
             DrawContextUtils.translate(0f, 0f, -3f)
-            renderOverlay(event.context,true)
+            renderOverlay(event.context, true)
             DrawContextUtils.translate(0f, 0f, 3f)
         }
 
@@ -53,7 +53,7 @@ object RenderData {
 
     var outsideInventory = false
 
-    fun renderOverlay(context: DrawContext,inventoryPresent: Boolean = false) {
+    fun renderOverlay(context: DrawContext, inventoryPresent: Boolean = false) {
         outsideInventory = true
         GuiRenderEvent.GuiOverlayRenderEvent(context).post()
         if (!inventoryPresent) GuiRenderEvent.GuiOnTopRenderEvent(context).post()

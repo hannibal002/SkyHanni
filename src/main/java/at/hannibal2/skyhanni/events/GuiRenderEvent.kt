@@ -21,5 +21,6 @@ open class GuiRenderEvent(context: DrawContext) : RenderingSkyHanniEvent(context
     /**
      * Renders as [GuiOverlayRenderEvent] if not inside an inventory and runs as [ChestGuiOverlayRenderEvent] when inside an inventory
      */
-    class GuiOnTopRenderEvent(context: DrawContext) : RenderingSkyHanniEvent(context) // This is intentional not an [GuiRenderEvent] since it will cause double renders
+    class GuiOnTopRenderEvent(context: DrawContext) : RenderingSkyHanniEvent(context)
+    // This is intentional not an [GuiRenderEvent] since it will cause double renders
 }
