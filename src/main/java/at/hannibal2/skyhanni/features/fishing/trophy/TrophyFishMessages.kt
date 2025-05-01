@@ -45,7 +45,7 @@ object TrophyFishMessages {
                 group("displayRarity")
         } ?: return
 
-        val internalName = getInternalName(displayName)
+        val internalName = TrophyFishApi.getInternalName(displayName)
         val rarity = TrophyRarity.getByName(displayRarity.lowercase().removeColor()) ?: return
 
         val trophyFishes = TrophyFishManager.fish ?: return
@@ -72,7 +72,7 @@ object TrophyFishMessages {
 
         if (config.enabled) {
             edited = (
-                "§6§lTROPHY FISH! " + when (config.design) {
+                "§6♔ §6§lTROPHY FISH! " + when (config.design) {
                     DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
                     else "§7$amount${amount.ordinal()} §r$displayRarity $displayName"
 
@@ -103,14 +103,7 @@ object TrophyFishMessages {
 
     private fun sendTitle(displayName: String, displayRarity: String?, amount: Int) {
         val text = "$displayName $displayRarity §8$amount§c!"
-        TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
-    }
-
-    val regex = "[- ]".toRegex()
-
-    fun getInternalName(displayName: String): String {
-        return displayName.replace("Obfuscated", "Obfuscated Fish")
-            .replace(regex, "").lowercase().removeColor()
+        TitleManager.sendTitle(text)
     }
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =

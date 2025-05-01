@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -20,8 +21,10 @@ import java.util.Locale
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.item.Items
 //#endif
 
+@Suppress("TooManyFunctions")
 object SkyBlockItemModifierUtils {
 
     fun ItemStack.getCoinsOfAvarice() = getAttributeLong("collected_coins")
@@ -163,7 +166,7 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.hasKey("attributes", 10) }
+        ?.takeIf { it.containsCompound("attributes") }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
@@ -202,7 +205,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
-    fun ItemStack.getSecondsHeld() = when (getItemId()) {
+    fun ItemStack.getSecondsHeld() = when (getItemId()) { // TODO move item IDs and attribute tags to repo
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
         "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
@@ -240,6 +243,16 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getMinecraftId() = Item.itemRegistry.getNameForObject(item) as ResourceLocation
     //#else
     //$$ fun ItemStack.getMinecraftId() = Registries.ITEM.getId(item)
+    //#endif
+
+    //#if MC < 1.21
+    fun isVanillaItem(itemId: String): Boolean {
+        return Item.itemRegistry.getObject(ResourceLocation(itemId)) != null
+    }
+    //#else
+    //$$ fun isVanillaItem(itemId: String): Boolean {
+    //$$     return Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
+    //$$ }
     //#endif
 
     fun ItemStack.getGemstones() = getExtraAttributes()?.let {

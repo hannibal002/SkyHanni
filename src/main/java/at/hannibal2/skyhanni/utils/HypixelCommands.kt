@@ -22,12 +22,16 @@ object HypixelCommands {
         send("playtime")
     }
 
+    fun skyblockMenu() {
+        send("sbmenu")
+    }
+
     fun skills() {
         send("skills")
     }
 
-    fun viewRecipe(itemName: String) {
-        send("viewrecipe $itemName")
+    fun viewRecipe(itemId: NeuInternalName, page: Int = 1) {
+        send("viewrecipe ${itemId.skyblockCommandId} $page")
     }
 
     fun recipe(itemName: String) {
@@ -113,6 +117,10 @@ object HypixelCommands {
 
     fun enderChest(position: Int) {
         send("ec $position")
+    }
+
+    fun partyAccept(player: String) {
+        send("party accept $player")
     }
 
     fun partyWarp() {

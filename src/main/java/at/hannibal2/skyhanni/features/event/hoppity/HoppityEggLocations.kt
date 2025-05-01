@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -25,12 +25,8 @@ import at.hannibal2.skyhanni.utils.StringUtils
 @SkyHanniModule
 object HoppityEggLocations {
 
-    // TODO add gui/command to show total data/missing islands
-    private var collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
-        get() = ChocolateFactoryApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
-        set(value) {
-            ChocolateFactoryApi.profileStorage?.collectedEggLocations = value
-        }
+    private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
+        get() = CFApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
 
     var apiEggLocations: Map<IslandType, Map<String, LorenzVec>> = mapOf()
 
@@ -83,7 +79,7 @@ object HoppityEggLocations {
 
     @HandleEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
-        if (loadedNeuThisProfile || !HoppityEggsManager.config.loadFromNeuPv) return
+        if (loadedNeuThisProfile || !HoppityEggsManager.config.waypoints.loadFromNeuPv) return
 
         val rawLocations = event.getCurrentPlayerData()?.events?.easter?.rabbits?.collectedLocations ?: return
         loadedNeuThisProfile = true
@@ -109,7 +105,7 @@ object HoppityEggLocations {
                 loadApiCollectedEggs(collectedEggsApiData)
                 ChatUtils.chat("Updated Hoppity egg location data!")
             },
-            oneTimeClick = true
+            oneTimeClick = true,
         )
     }
 

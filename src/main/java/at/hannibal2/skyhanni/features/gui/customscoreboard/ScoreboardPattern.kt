@@ -197,10 +197,14 @@ object ScoreboardPattern {
         "§3§lSolo",
     )
 
+    /**
+     * REGEX-TEST: §a[H] §6Eisengolem §7[Lv48]
+     * REGEX-TEST: §e[M] §b04032006 §a7,361§c❤
+     */
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSB.pattern(
         "teammates",
-        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
+        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) (?:(?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§(?<color>.))*(?<health>[\\w,.]+)(?:§.)*.?)",
     )
 
     /**
@@ -257,15 +261,16 @@ object ScoreboardPattern {
      */
     val lockedPattern by farmingSB.pattern(
         "locked",
-        "\\s*§cLocked",
+        "\\s*§cLocked.*",
     )
 
     /**
      * REGEX-TEST:    §fCleanup§7: §e0.3%
+     * REGEX-TEST:    §fCleanup§7: §b2 §4§lൠ§7 x1
      */
     val cleanUpPattern by farmingSB.pattern(
         "cleanup",
-        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*[\\d,.]*%?",
+        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*.*",
     )
 
     /**

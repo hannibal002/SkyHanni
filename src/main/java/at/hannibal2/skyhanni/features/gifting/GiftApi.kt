@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.gifting
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,7 +28,7 @@ object GiftApi {
     fun isHoldingGift() = LorenzUtils.inSkyBlock && holdingGift
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         holdingGift = false
     }
 

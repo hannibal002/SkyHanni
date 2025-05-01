@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -52,7 +51,7 @@ object UpdateManager {
     private var hasCheckedForUpdate = false
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (hasCheckedForUpdate) return
         hasCheckedForUpdate = true
 
@@ -87,8 +86,8 @@ object UpdateManager {
             config.updateStream = Property.of(UpdateStream.BETA)
             updateStream = UpdateStream.BETA
         }
-        activePromise = context.checkUpdate(updateStream.stream)
-            .thenAcceptAsync({
+        activePromise = context.checkUpdate(updateStream.stream).thenAcceptAsync(
+            {
                 logger.log("Update check completed")
                 if (updateState != UpdateState.NONE) {
                     logger.log("This appears to be the second update check. Ignoring this one")
@@ -104,13 +103,15 @@ object UpdateManager {
                         ChatUtils.chatAndOpenConfig(
                             "§aSkyHanni found a new update: ${it.update.versionName}. " +
                                 "Check §b/sh download update §afor more info.",
-                            config::autoUpdates
+                            config::autoUpdates,
                         )
                     }
                 } else if (forceDownload) {
                     ChatUtils.chat("§aSkyHanni didn't find a new update.")
                 }
-            }, DelayedRun.onThread)
+            },
+            DelayedRun.onThread,
+        )
     }
 
     fun queueUpdate() {
@@ -121,13 +122,16 @@ object UpdateManager {
         activePromise = CompletableFuture.supplyAsync {
             logger.log("Update download started")
             potentialUpdate!!.prepareUpdate()
-        }.thenAcceptAsync({
-            logger.log("Update download completed, setting exit hook")
-            updateState = UpdateState.DOWNLOADED
-            potentialUpdate!!.executePreparedUpdate()
-            ChatUtils.chat("Download of update complete. ")
-            ChatUtils.chat("§aThe update will be installed after your next restart.")
-        }, DelayedRun.onThread)
+        }.thenAcceptAsync(
+            {
+                logger.log("Update download completed, setting exit hook")
+                updateState = UpdateState.DOWNLOADED
+                potentialUpdate!!.executePreparedUpdate()
+                ChatUtils.chat("Download of update complete. ")
+                ChatUtils.chat("§aThe update will be installed after your next restart.")
+            },
+            DelayedRun.onThread,
+        )
     }
 
     private val context = UpdateContext(

@@ -138,6 +138,7 @@ class Mob(
         }
     }
 
+    // TODO add support for moulconfig.ChromaColour, and eventually removed awt.Color support
     fun highlight(color: Color, condition: () -> Boolean) {
         highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
         this.condition = condition
@@ -259,7 +260,7 @@ class Mob(
     }
 
     // TODO add max distance
-    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean = { true }) =
+    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean) =
         LineToMobHandler.register(this, color, lineWidth, depth, condition)
 
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()

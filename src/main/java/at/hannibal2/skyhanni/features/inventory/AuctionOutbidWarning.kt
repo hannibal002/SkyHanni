@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AuctionOutbidWarning {
@@ -26,7 +25,7 @@ object AuctionOutbidWarning {
         if (!SkyHanniMod.feature.inventory.auctions.auctionOutbid) return
         if (!outbidPattern.matches(event.message)) return
 
-        TitleManager.sendTitle("§cYou have been outbid!", duration = 5.seconds, height = 3.6, fontSize = 7f)
+        TitleManager.sendTitle("§cYou have been outbid!")
         SoundUtils.playBeepSound()
     }
 }

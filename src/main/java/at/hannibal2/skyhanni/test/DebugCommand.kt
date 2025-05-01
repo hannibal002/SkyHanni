@@ -18,6 +18,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -125,6 +127,10 @@ object DebugCommand {
             event.addData("Unknown SkyBlock island!")
             return
         }
+        if (LorenzUtils.skyBlockIsland == IslandType.NONE) {
+            event.addData("No SkyBlock island found!")
+            return
+        }
 
         if (LorenzUtils.skyBlockIsland != HypixelData.skyBlockIsland) {
             event.addData {
@@ -141,6 +147,9 @@ object DebugCommand {
             add("skyBlockArea:")
             add("  scoreboard: '${LorenzUtils.skyBlockArea}'")
             add("  graph network: '${IslandAreas.currentAreaName}'")
+            with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
+                add(" /shtestwaypoint $x $y $z pathfind")
+            }
             add("isOnAlphaServer: '${LorenzUtils.isOnAlphaServer}'")
         }
     }

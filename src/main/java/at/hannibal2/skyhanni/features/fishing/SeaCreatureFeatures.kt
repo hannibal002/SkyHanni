@@ -3,16 +3,15 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,10 +19,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntitySlime
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -31,11 +31,9 @@ import kotlin.time.Duration.Companion.seconds
 object SeaCreatureFeatures {
 
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
-    private val damageIndicatorConfig get() = SkyHanniMod.feature.combat.damageIndicator
     private var lastRareCatch = SimpleTimeMark.farPast()
     private val rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
     private val entityIds = TimeLimitedSet<Int>(6.minutes)
-    private val seaCreaturesBosses = BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
 
     @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -47,9 +45,7 @@ object SeaCreatureFeatures {
         rareSeaCreatures.add(mob)
 
         if (!config.highlight) return
-        if (DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
-            if (seaCreaturesBosses.none { it.fullName.removeColor() == mob.name }) return
-        }
+
         mob.highlight(LorenzColor.GREEN.toColor())
     }
 
@@ -69,7 +65,7 @@ object SeaCreatureFeatures {
         if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
             else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
-            TitleManager.sendTitle(text, duration = 1.5.seconds, height = 3.6, fontSize = 7f)
+            TitleManager.sendTitle(text, duration = 1.5.seconds)
             if (config.playSound) SoundUtils.playBeepSound()
         }
     }
@@ -81,19 +77,26 @@ object SeaCreatureFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
-        if (!config.alertOwnCatches) return
-
-        if (event.seaCreature.rare) {
+        if (!event.seaCreature.rare) return
+        if (config.alertOwnCatches) {
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
-            TitleManager.sendTitle(text, height = 2.8, fontSize = 7f)
+            TitleManager.sendTitle(text)
             if (config.playSound) SoundUtils.playBeepSound()
             lastRareCatch = SimpleTimeMark.now()
+        }
+        if (config.announceRareInParty && PartyApi.isInParty()) {
+            val name = event.seaCreature.name
+            val message = buildString {
+                if (event.doubleHook) append("DOUBLE HOOK: ")
+                append("I caught ${StringUtils.optionalAn(name)} $name!")
+            }
+            HypixelCommands.partyChat(message)
         }
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         rareSeaCreatures.clear()
         entityIds.clear()
     }
@@ -118,5 +121,17 @@ object SeaCreatureFeatures {
                 LorenzColor.GREEN.toColor().rgb
             } else null
         }
+    }
+
+    @JvmStatic
+    fun isRareSeaCreature(entity: Entity): Boolean {
+        return (entity as? EntityLivingBase)?.mob?.let { mob ->
+            mob in rareSeaCreatures
+        } ?: false
+    }
+
+    @JvmStatic
+    fun isRareSeaCreatureBody(entity: Entity): Boolean {
+        return entity is EntitySlime && isRareSeaCreature(entity)
     }
 }

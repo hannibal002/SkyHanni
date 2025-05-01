@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
+import at.hannibal2.skyhanni.utils.compat.DrawContext
 
-open class GuiRenderEvent : SkyHanniEvent() {
+open class GuiRenderEvent(context: DrawContext) : RenderingSkyHanniEvent(context) {
 
     /**
      * Renders only while inside an inventory
@@ -10,15 +11,15 @@ open class GuiRenderEvent : SkyHanniEvent() {
      * Use ScreenDrawnEvent instead.
      * Also, ensure you do not render with this event while in a sign, as it will override ScreenDrawnEvent.
      */
-    object ChestGuiOverlayRenderEvent : GuiRenderEvent()
+    class ChestGuiOverlayRenderEvent(context: DrawContext) : GuiRenderEvent(context)
 
     /**
      * Renders always, and while in an inventory it renders a bit darker, gray
      */
-    object GuiOverlayRenderEvent : GuiRenderEvent()
+    class GuiOverlayRenderEvent(context: DrawContext) : GuiRenderEvent(context)
 
     /**
      * Renders as [GuiOverlayRenderEvent] if not inside an inventory and runs as [ChestGuiOverlayRenderEvent] when inside an inventory
      */
-    object GuiOnTopRenderEvent : SkyHanniEvent() // This is intentional not an [GuiRenderEvent] since it will cause double renders
+    class GuiOnTopRenderEvent(context: DrawContext) : RenderingSkyHanniEvent(context) // This is intentional not an [GuiRenderEvent] since it will cause double renders
 }

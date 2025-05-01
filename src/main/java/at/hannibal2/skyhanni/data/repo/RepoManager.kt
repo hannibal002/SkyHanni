@@ -152,13 +152,13 @@ object RepoManager {
                 unsuccessfulConstants.isEmpty()
             ) {
                 if (command) {
-                    ChatUtils.hoverableChat(
-                        "§7The repo is already up to date! (hover for info)",
-                        hover = buildList {
-                            add("§7latest commit sha: §e$currentDownloadedCommit")
+                    ChatUtils.clickToClipboard(
+                        "§7The repo is already up to date!",
+                        lines = buildList {
+                            add("latest commit sha: §e$currentDownloadedCommit")
                             latestRepoCommitTime?.let { latestTime ->
-                                add("§7latest commit time: §b$latestTime")
-                                add("  §7(§b${latestTime.passedSince().format()} ago§7)")
+                                add("latest commit time: §b$latestTime")
+                                add("  (§b${latestTime.passedSince().format()} ago§7)")
                             }
                         },
                     )
@@ -167,23 +167,23 @@ object RepoManager {
                 return
             }
             if (command) {
-                ChatUtils.hoverableChat(
-                    "Repo is outdated, updating.. (hover for info)",
-                    hover = buildList {
-                        add("§7local commit sha: §e$latestRepoCommit")
+                ChatUtils.clickToClipboard(
+                    "Repo is outdated, updating..",
+                    lines = buildList {
+                        add("local commit sha: §e$latestRepoCommit")
                         currentDownloadedCommitTime?.let { localTime ->
-                            add("§7local commit time: §b$localTime")
-                            add("  §7(§b${localTime.passedSince().format()} ago§7)")
+                            add("local commit time: §b$localTime")
+                            add("  (§b${localTime.passedSince().format()} ago§7)")
                         }
                         add("")
-                        add("§7latest commit sha: §e$currentDownloadedCommit")
+                        add("latest commit sha: §e$currentDownloadedCommit")
                         latestRepoCommitTime?.let<SimpleTimeMark, Unit> { latestTime ->
-                            add("§7latest commit time: §b$latestTime")
-                            add("  §7(§b${latestTime.passedSince().format()} ago§7)")
+                            add("latest commit time: §b$latestTime")
+                            add("  (§b${latestTime.passedSince().format()} ago§7)")
                             currentDownloadedCommitTime?.let<SimpleTimeMark, Unit> { localTime ->
                                 val outdatedDuration = latestTime - localTime
                                 add("")
-                                add("§7outdated by: §b${outdatedDuration.format()}")
+                                add("outdated by: §b${outdatedDuration.format()}")
                             }
                         }
                     },
@@ -243,8 +243,6 @@ object RepoManager {
 
     private fun reloadRepository(answerMessage: String = "") {
         if (!shouldManuallyReload) return
-        // TODO move away
-        ErrorManager.resetCache()
         error = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
@@ -287,10 +285,10 @@ object RepoManager {
         }
     }
 
-    private fun readCurrentCommit(): Pair<String, SimpleTimeMark>? {
+    private fun readCurrentCommit(): Pair<String, SimpleTimeMark?>? {
         val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
         val sha = currentCommitJSON?.get("sha")?.asString
-        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark() ?: SimpleTimeMark.farPast()
+        val time = currentCommitJSON?.get("time")?.asLong?.asTimeMark()
         return sha?.let { it to time }
     }
 
@@ -316,12 +314,12 @@ object RepoManager {
             }
             return
         }
-        val currentCommit = readCurrentCommit()
+        val (currentDownloadedCommit, _) = readCurrentCommit() ?: (null to null)
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $currentCommit", prefixColor = "§a")
+            ChatUtils.chat("Repo working fine! Commit hash: $currentDownloadedCommit", prefixColor = "§a")
             return
         }
-        ChatUtils.chat("Repo has errors! Commit hash: $currentCommit", prefixColor = "§c")
+        ChatUtils.chat("Repo has errors! Commit hash: $currentDownloadedCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",

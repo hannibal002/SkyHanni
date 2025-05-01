@@ -11,6 +11,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+//#if MC == 1.8.9
+import net.minecraftforge.fml.client.FMLClientHandler
+import net.minecraftforge.fml.common.Loader
+//#endif
 import java.lang.management.ManagementFactory
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
@@ -26,6 +30,9 @@ object ComputerEnvDebug {
         launcher(event)
         ram(event)
         uptime(event)
+        //#if MC == 1.8.9
+        performanceMods(event)
+        //#endif
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -69,7 +76,7 @@ object ComputerEnvDebug {
         if (firstStack.contains("org.multimc.EntryPoint.main")) {
             return Pair("MultiMC", false)
         }
-        if (firstStack.contains("net.digitalingot.vendor.")) {
+        if (firstStack.contains("net.digitalingot.vendor.") || firstStack.contains("net.digitalingot.rustextension.")) {
             return Pair("Feather Client", true)
         }
         return Pair(null, true)
@@ -215,6 +222,32 @@ object ComputerEnvDebug {
     }
 
     private fun getUptime() = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
+
+    //#if MC == 1.8.9
+    private fun performanceMods(event: DebugDataCollectEvent) {
+        if (PlatformUtils.isDevEnvironment) return
+        val hasOptifine = FMLClientHandler.instance().hasOptifine()
+        val hasPatcher = Loader.isModLoaded("patcher")
+        event.title("Performance Mods")
+        if (!hasOptifine || !hasPatcher) {
+            event.addData {
+                add("Optifine is ${if (hasOptifine) "" else "not"} installed")
+                add("Patcher is ${if (hasPatcher) "" else "not"} installed")
+                add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
+                if (!hasOptifine) {
+                    add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
+                }
+                if (!hasPatcher) {
+                    add("https://modrinth.com/mod/patcher")
+                }
+            }
+        } else {
+            event.addIrrelevant {
+                add("Optifine and Patcher are installed")
+            }
+        }
+    }
+    //#endif
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
