@@ -100,7 +100,7 @@ object StashCompact {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    fun onIslandChange() {
         if (!config.hideDuplicateWarning.worldChangeReset) return
         currentMessages.clear()
         lastMessages.clear()
