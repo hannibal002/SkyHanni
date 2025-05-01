@@ -66,6 +66,7 @@ object BlockStrengthGuide {
                 OreBlock.PURE_GOLD,
                 OreBlock.PURE_EMERALD,
                 OreBlock.PURE_DIAMOND,
+                OreBlock.PURE_QUARTZ,
                 OreBlock.PURE_REDSTONE,
             ),
         ),
