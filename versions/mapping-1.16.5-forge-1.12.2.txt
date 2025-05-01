@@ -34,11 +34,11 @@ net.minecraft.client.Options keyFullscreen keyBindFullscreen
 net.minecraft.client.Options keyInventory keyBindInventory
 net.minecraft.client.Options keyJump keyBindJump
 net.minecraft.client.Options keyLeft keyBindLeft
-net.minecraft.client.Options keyUp keyBindForward
+net.minecraft.client.Options keyPlayerList keyBindPlayerList
 net.minecraft.client.Options keyRight keyBindRight
 net.minecraft.client.Options keyScreenshot keyBindScreenshot
 net.minecraft.client.Options keyShift keyBindSneak
-net.minecraft.client.Options keyPlayerList keyBindPlayerList
+net.minecraft.client.Options keyUp keyBindForward
 net.minecraft.client.Options keyUse keyBindUseItem
 
 net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
@@ -358,11 +358,13 @@ net.minecraft.world.entity.monster.WitherSkeleton net.minecraft.entity.monster.E
 net.minecraft.world.entity.monster.Zombie net.minecraft.entity.monster.EntityZombie
 net.minecraft.world.entity.monster.ZombifiedPiglin net.minecraft.entity.monster.EntityPigZombie
 
+net.minecraft.world.entity.monster.Creeper isIgnited() hasIgnited()
 net.minecraft.world.entity.monster.Creeper isPowered() getPowered()
 
 net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
 
 net.minecraft.world.entity.monster.Slime getSize() getSlimeSize()
+net.minecraft.world.entity.monster.Slime squish squishFactor
 
 net.minecraft.world.entity.npc.Villager net.minecraft.entity.passive.EntityVillager
 

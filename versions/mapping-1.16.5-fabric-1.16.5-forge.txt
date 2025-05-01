@@ -29,6 +29,8 @@ net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.deco
 net.minecraft.entity.decoration.ArmorStandEntity shouldHideBasePlate() isNoBasePlate()
 net.minecraft.entity.decoration.ArmorStandEntity shouldShowArms() isShowArms()
 
+net.minecraft.entity.mob.CreeperEntity isIgnited() getCreeperState()
+
 net.minecraft.entity.passive.VillagerEntity net.minecraft.world.entity.npc.Villager
 
 net.minecraft.item.ItemStack net.minecraft.world.item.ItemsStack

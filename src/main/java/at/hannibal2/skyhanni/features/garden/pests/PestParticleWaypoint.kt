@@ -25,6 +25,9 @@ import net.minecraft.util.EnumParticleTypes
 import java.awt.Color
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.12
+//$$ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
+//#endif
 
 // TODO delete workaround class PestParticleLine when this class works again
 @SkyHanniModule
@@ -118,10 +121,18 @@ object PestParticleWaypoint {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onFireWorkSpawn(event: PacketReceivedEvent) {
+        //#if MC < 1.12
         if (event.packet !is S0EPacketSpawnObject) return
+        //#else
+        //$$ if (event.packet !is ParticleS2CPacket) return
+        //#endif
         if (!config.hideParticles) return
         val fireworkId = 76
+        //#if MC < 1.12
         if (event.packet.type == fireworkId) event.cancel()
+        //#else
+        //$$ if (event.packet.parameters == ParticleTypes.FIREWORK) event.cancel()
+        //#endif
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
