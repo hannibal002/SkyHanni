@@ -35,7 +35,7 @@ public class ExperimentsProfitTrackerConfig {
     @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the Cost of Experience Bottles from Profit Calculations. (Requires Restart)")
     @ConfigEditorBoolean
     public boolean isIronman = false;
-    //Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
+    // Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
 
     @Expose
     @ConfigLink(owner = ExperimentsProfitTrackerConfig.class, field = "enabled")

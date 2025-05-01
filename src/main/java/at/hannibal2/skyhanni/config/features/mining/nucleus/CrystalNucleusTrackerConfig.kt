@@ -30,7 +30,7 @@ class CrystalNucleusTrackerConfig {
     @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the cost of the Jungle Keys & Automaton Parts from Profit Calculations. (Requires Restart)")
     @ConfigEditorBoolean
     var isIronman: Boolean = false
-    //Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
+    // Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
 
     @Expose
     @ConfigOption(name = "Profit Per", desc = "Show profit summary message for the completed nucleus run.")
