@@ -158,5 +158,5 @@ public class MoneyPerHourConfig {
 
     @Expose
     @ConfigLink(owner = MoneyPerHourConfig.class, field = "display")
-    public Position pos = new Position(-330, 170, false, true);
+    public Position pos = new Position(-330, 170);
 }
