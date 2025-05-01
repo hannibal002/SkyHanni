@@ -382,7 +382,7 @@ object HoppityLiveDisplay {
         ).mapNotNull { (stat, statStrings) ->
             if (!sent) {
                 ChatUtils.chat(
-                    "§7Stat: $stat, ${statStrings.size} strings:\n" + statStrings.joinToString("\n"),
+                    "§7Stat: ${stat.name}, ${statStrings.size} strings:\n" + statStrings.joinToString("\n"),
                 )
             }
 
