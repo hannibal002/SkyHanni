@@ -27,8 +27,7 @@ class CrystalNucleusTrackerConfig {
     var showOutsideNucleus: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the cost of the Jungle Keys & Automaton Parts " +
-        "from Profit Calculations. (Requires Restart)")
+    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes Jungle Keys & Automaton Part cost from profit. (Restart required)")
     @ConfigEditorBoolean
     var isIronman: Boolean = false
     // Unable to make the Overlay update automatically, needs fixing!! Therefore the "Requires Restart" note
