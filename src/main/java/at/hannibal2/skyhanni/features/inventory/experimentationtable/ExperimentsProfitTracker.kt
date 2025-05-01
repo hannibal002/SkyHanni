@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -239,7 +240,18 @@ object ExperimentsProfitTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
-        if (!config.isIronman.get()) {
+        if (config.isIronman.get() && LorenzUtils.isIronmanProfile) {
+            val profit = tracker.drawItems(data, { true }, this)
+
+            val experimentsDone = data.experimentsDone
+            addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
+            val startCostFormat = data.startCost.absoluteValue.shortFormat()
+            val bitCostFormat = data.bitCost.shortFormat()
+            add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
+            addSearchString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
+
+            tracker.addPriceFromButton(this)
+        } else {
             val profit = tracker.drawItems(data, { true }, this) + data.startCost
 
             val experimentsDone = data.experimentsDone
@@ -255,17 +267,6 @@ object ExperimentsProfitTracker {
                     ),
                 ).toSearchable(),
             )
-            add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
-            addSearchString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
-
-            tracker.addPriceFromButton(this)
-        } else {
-            val profit = tracker.drawItems(data, { true }, this)
-
-            val experimentsDone = data.experimentsDone
-            addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
-            val startCostFormat = data.startCost.absoluteValue.shortFormat()
-            val bitCostFormat = data.bitCost.shortFormat()
             add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
             addSearchString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
 

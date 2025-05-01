@@ -33,9 +33,9 @@ public class ExperimentsProfitTrackerConfig {
     public int timeDisplayed = 30;
 
     @Expose
-    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the Cost of Experience Bottles from Profit Calculations.")
+    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes Experience Bottles from Profit Calculations. (Ironman only)")
     @ConfigEditorBoolean
-    public Property<Boolean> isIronman = Property.of(false);
+    public Property<Boolean> isIronman = Property.of(true);
 
     @Expose
     @ConfigLink(owner = ExperimentsProfitTrackerConfig.class, field = "enabled")

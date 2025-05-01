@@ -128,7 +128,9 @@ object CrystalNucleusTracker {
         val runsCompleted = data.runsCompleted
         if (runsCompleted > 0) {
             var profit = tracker.drawItems(data, { true }, this)
-            if (!config.isIronman.get()) {
+            if (config.isIronman.get() && LorenzUtils.isIronmanProfile) {
+                // Leave Empty, nothing is supposed to happen when the player is Ironman and has this enabled
+            } else {
                 val jungleKeyCost: Double = JUNGLE_KEY_ITEM.getPrice() * runsCompleted
                 profit -= jungleKeyCost
                 val jungleKeyCostFormat = jungleKeyCost.shortFormat()
@@ -154,7 +156,9 @@ object CrystalNucleusTracker {
                 "§5Precursor Apparatuses",
             )
             else rawConfigString
-            if (!config.isIronman.get()) {
+            if (config.isIronman.get() && LorenzUtils.isIronmanProfile) {
+                // Leave Empty, nothing is supposed to happen when the player is Ironman and has this enabled
+            } else {
                 val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
                 profit -= totalSapphireCost

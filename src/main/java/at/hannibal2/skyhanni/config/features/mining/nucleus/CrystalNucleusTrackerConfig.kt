@@ -27,9 +27,9 @@ class CrystalNucleusTrackerConfig {
     var showOutsideNucleus: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes Jungle Keys & Automaton Part cost from profit.")
+    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes Jungle Keys & Automaton Part cost from profit. (Ironman only)")
     @ConfigEditorBoolean
-    var isIronman: Property<Boolean> = Property.of(false)
+    var isIronman: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Profit Per", desc = "Show profit summary message for the completed nucleus run.")

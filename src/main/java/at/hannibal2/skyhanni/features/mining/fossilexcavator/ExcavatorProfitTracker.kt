@@ -153,7 +153,9 @@ object ExcavatorProfitTracker {
         if (timesExcavated <= 0) return profit
         // TODO use same price source as profit tracker
 
-        if (!config.isIronman.get()) {
+        if (config.isIronman.get() && LorenzUtils.isIronmanProfile) {
+            return profit
+        } else {
             val scrapPrice = timesExcavated * scrapItem.getPrice()
             val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.repoItemName)
             add(
@@ -167,8 +169,6 @@ object ExcavatorProfitTracker {
                 ).toSearchable("Scrap"),
             )
             return profit - scrapPrice
-        } else {
-            return profit
         }
     }
 

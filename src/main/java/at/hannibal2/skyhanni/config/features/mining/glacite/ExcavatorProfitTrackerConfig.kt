@@ -33,7 +33,7 @@ class ExcavatorProfitTrackerConfig {
     var position: Position = Position(-380, 150)
 
     @Expose
-    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the cost of Scrap from Profit Calculations.")
+    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the cost of Scrap from Profit Calculations. (Ironman only)")
     @ConfigEditorBoolean
-    var isIronman: Property<Boolean> = Property.of(false)
+    var isIronman: Property<Boolean> = Property.of(true)
 }
