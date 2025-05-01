@@ -34,10 +34,11 @@ net.minecraft.client.Options keyFullscreen keyBindFullscreen
 net.minecraft.client.Options keyInventory keyBindInventory
 net.minecraft.client.Options keyJump keyBindJump
 net.minecraft.client.Options keyLeft keyBindLeft
+net.minecraft.client.Options keyUp keyBindForward
 net.minecraft.client.Options keyRight keyBindRight
 net.minecraft.client.Options keyScreenshot keyBindScreenshot
 net.minecraft.client.Options keyShift keyBindSneak
-net.minecraft.client.Options keyUp keyBindForward
+net.minecraft.client.Options keyPlayerList keyBindPlayerList
 net.minecraft.client.Options keyUse keyBindUseItem
 
 net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
@@ -88,6 +89,10 @@ net.minecraft.client.player.LocalPlayer setExperienceValues() setXPStats()
 net.minecraft.client.renderer.LevelRenderer net.minecraft.client.renderer.RenderGlobal
 
 net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
+
+net.minecraft.client.renderer.entity.EntityRenderDispatcher net.minecraft.client.renderer.entity.RenderManager
+
+net.minecraft.client.renderer.entity.EntityRenderDispatcher getRenderer() getEntityRenderObject()
 
 net.minecraft.client.renderer.texture.AbstractTexture getId() getGlTextureId()
 net.minecraft.client.renderer.texture.AbstractTexture load() loadTexture()
@@ -425,6 +430,7 @@ net.minecraft.world.level.Level net.minecraft.world.World
 net.minecraft.world.level.Level getBlockEntity() getTileEntity()
 net.minecraft.world.level.Level getDayTime() getWorldTime()
 net.minecraft.world.level.Level getEntity() getEntityByID()
+net.minecraft.world.level.Level getPlayerByUUID() getPlayerEntityByUUID()
 
 net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
 net.minecraft.world.level.block.StainedGlassBlock net.minecraft.block.BlockStainedGlass
@@ -539,7 +545,3 @@ org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
 
-net.minecraft.world.level.Level getPlayerByUUID() getPlayerEntityByUUID()
-
-net.minecraft.client.renderer.entity.EntityRenderDispatcher net.minecraft.client.renderer.entity.RenderManager
-net.minecraft.client.renderer.entity.EntityRenderDispatcher getRenderer() getEntityRenderObject()
