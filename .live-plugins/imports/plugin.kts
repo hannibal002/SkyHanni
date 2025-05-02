@@ -21,10 +21,19 @@ data class ConditionalBlock(
     val elseImportLines: Set<String>?,
     val ifStartLine: Int,
     val elseStartLine: Int?,
+    val negatives: Set<String>
 ) {
 
     val ifOrder = mutableListOf<String>()
     val elseOrder = mutableListOf<String>()
+
+    fun correctedImport(line: String): String {
+        if (negatives.contains(line)) {
+            return "//\$\$ $line"
+        } else {
+            return line
+        }
+    }
 }
 
 fun Document.deleteLine(line: Int) {
@@ -51,11 +60,13 @@ fun findConditionalBlocks(text: String, doc: Document): Pair<List<ConditionalBlo
     var i = 0
     while (i < lines.size) {
         var trim = lines[i].trim()
-        if (trim.startsWith("//#if") && lines[i + 1].trim().startsWith("import ")) {
+        if (trim.startsWith("//#if") && (lines[i + 1].trim().startsWith("import ") || lines[i + 1].trim().startsWith("//\$\$ import "))) {
             val cond = trim
             toDelete.add(i)
             val ifImports = mutableSetOf<String>()
             var elseImports: MutableSet<String>? = null
+            var importList = ifImports
+            val negatives = mutableSetOf<String>()
             var elseStart: Int? = null
             val ifStart = i + 1
             i++
@@ -63,30 +74,29 @@ fun findConditionalBlocks(text: String, doc: Document): Pair<List<ConditionalBlo
             while (i < lines.size && !trim.startsWith("//#endif")) {
                 if (trim.startsWith("//#else")) {
                     elseImports = mutableSetOf()
+                    importList = elseImports
                     elseStart = i + 1
                     toDelete.add(i)
                     i++
                     trim = lines[i].trim()
                     continue
                 }
-                if (elseImports == null) {
-                    if (trim.startsWith("import ")) {
-                        ifImports.add(trim)
-                        toDelete.add(i)
-                    }
-                } else {
-                    if (trim.startsWith("//\$\$ import ")) {
-                        val edited = trim.removePrefix("//\$\$ ")
-                        doc.replaceLine(i, edited)
-                        elseImports.add(edited)
-                        toDelete.add(i)
-                    }
+                if (trim.startsWith("import ")) {
+                    importList.add(trim)
+                    toDelete.add(i)
+                }
+                if (trim.startsWith("//\$\$ import ")) {
+                    val edited = trim.removePrefix("//\$\$ ")
+                    importList.add(edited)
+                    doc.replaceLine(i, edited)
+                    negatives.add(edited)
+                    toDelete.add(i)
                 }
                 i++
                 trim = lines[i].trim()
             }
             toDelete.add(i)
-            blocks.add(ConditionalBlock(cond, ifImports, elseImports, ifStart, elseStart))
+            blocks.add(ConditionalBlock(cond, ifImports, elseImports, ifStart, elseStart, negatives))
         } else {
             if (trim.startsWith("import ")) {
                 globalImports.add(trim)
@@ -95,7 +105,7 @@ fun findConditionalBlocks(text: String, doc: Document): Pair<List<ConditionalBlo
         }
         i++
     }
-    blocks.add(ConditionalBlock("", globalImports, null, 2, null))
+    blocks.add(ConditionalBlock("", globalImports, null, 2, null, emptySet()))
     return blocks to toDelete
 }
 
@@ -110,7 +120,6 @@ class CustomOptimizeImports(val oldAction: AnAction) : AnAction(
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        show("Custom Optimize Imports run!")
         val project = e.project ?: return
         val editor = e.getData(com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR) ?: return
         var psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? KtFile ?: return
@@ -118,75 +127,84 @@ class CustomOptimizeImports(val oldAction: AnAction) : AnAction(
         val originalText = psiFile.text
         var originalBlocks: List<ConditionalBlock> = emptyList()
         var linesToDelete: List<Int> = emptyList()
+
         WriteCommandAction.runWriteCommandAction(project) {
             val pair = findConditionalBlocks(originalText, editor.document)
             originalBlocks = pair.first
             linesToDelete = pair.second
-        }
-        val blocks = originalBlocks.sortedBy { it.ifStartLine }
+            val blocks = originalBlocks.sortedBy { it.ifStartLine }
 
-        val postActions = object : Runnable {
-            override fun run() {
-                if (blocks.size == 1) {
-                    PsiDocumentManager.getInstance(project).commitDocument(editor.document)
-                    return
-                }
-                // Read the order of imports after sort
-                psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? KtFile ?: return
-                for (line in psiFile.text.lines()) {
-                    val trim = line.trim()
-                    if (!trim.startsWith("import ")) continue
-                    for (block in blocks) {
-                        if (block.ifImportLines.contains(trim)) {
-                            block.ifOrder.add(trim)
-                            break
-                        } else if (block?.elseImportLines?.contains(trim) == true) {
-                            block.elseOrder.add(trim)
-                            break
-                        }
-                    }
-                }
-                // Fix removed else Imports
-                for (block in blocks) {
-                    if (block.elseImportLines == null) continue
-                    if (block.elseOrder.size != block.elseImportLines.size) {
-                        for (import in block.elseImportLines) {
-                            if (block.elseOrder.contains(import)) continue
-                            block.elseOrder.add(import)
-                        }
-                    }
-                }
-
-                // Reset File, remove all import lines and then insert them back in order
-                WriteCommandAction.runWriteCommandAction(project) {
-                    val doc = editor.document
-                    doc.replaceString(0, doc.textLength, originalText)
-
-                    for (line in linesToDelete.reversed()) {
-                        doc.deleteLine(line)
-                    }
-
-                    var i = 1
-                    for (block in blocks) {
-                        doc.insertLine(i++, block.condition)
-                        for (importLine in block.ifOrder) {
-                            doc.insertLine(i++, importLine)
-                        }
-                        if (block.elseImportLines != null) {
-                            doc.insertLine(i++, "//#else")
-                            for (importLine in block.elseOrder) {
-                                doc.insertLine(i++, "//\$\$ " + importLine)
+            val postActions = object : Runnable {
+                override fun run() {
+                    if (blocks.size == 1) return
+                    show("Custom Optimize Imports run!")
+                    // Read the order of imports after sort
+                    psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? KtFile ?: return
+                    for (line in psiFile.text.lines()) {
+                        val trim = line.trim()
+                        if (!trim.startsWith("import ")) continue
+                        for (block in blocks) {
+                            if (block.ifImportLines.contains(trim)) {
+                                block.ifOrder.add(trim)
+                                break
+                            } else if (block?.elseImportLines?.contains(trim) == true) {
+                                block.elseOrder.add(trim)
+                                break
                             }
                         }
-                        if (block.condition.isNotEmpty()) doc.insertLine(i++, "//#endif")
                     }
-                    PsiDocumentManager.getInstance(project).commitDocument(editor.document)
+                    // Fix removed Imports
+                    for (block in blocks) {
+                        if (block.ifOrder.size != block.ifImportLines.size) {
+                            for (import in block.ifImportLines) {
+                                if (block.ifOrder.contains(import)) continue
+                                block.ifOrder.add(import)
+                            }
+                        }
+                        if (block.elseImportLines == null) continue
+                        if (block.elseOrder.size != block.elseImportLines.size) {
+                            for (import in block.elseImportLines) {
+                                if (block.elseOrder.contains(import)) continue
+                                block.elseOrder.add(import)
+                            }
+                        }
+                    }
+
+                    // Reset File, remove all import lines and then insert them back in order
+                    WriteCommandAction.runWriteCommandAction(project) {
+                        val doc = editor.document
+                        doc.replaceString(0, doc.textLength, originalText)
+
+                        for (line in linesToDelete.reversed()) {
+                            doc.deleteLine(line)
+                        }
+                        val lines = doc.text.lines()
+                        var i = lines.indexOfFirst { it.startsWith("package") } + 1
+                        for (line in lines.drop(i)) {
+                            if (line.isNotBlank()) break
+                            doc.deleteLine(i)
+                        }
+                        show(blocks.size)
+                        for (block in blocks) {
+                            show(block.condition)
+                            doc.insertLine(i++, block.condition)
+                            for (importLine in block.ifOrder) {
+                                doc.insertLine(i++, block.correctedImport(importLine))
+                            }
+                            if (block.elseImportLines != null) {
+                                doc.insertLine(i++, "//#else")
+                                for (importLine in block.elseOrder) {
+                                    doc.insertLine(i++, block.correctedImport(importLine))
+                                }
+                            }
+                            if (block.condition.isNotEmpty()) doc.insertLine(i++, "//#endif")
+                        }
+                        doc.insertLine(i++, "") // Empty Line at the End of Imports
+                        PsiDocumentManager.getInstance(project).commitDocument(editor.document)
+                    }
                 }
             }
-        }
-        // Run the original optimize imports action
-
-        WriteCommandAction.runWriteCommandAction(project) {
+            // Run the original optimize imports action
             PsiDocumentManager.getInstance(project).commitDocument(editor.document)
             val directPsiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? PsiFile
                 ?: return@runWriteCommandAction
