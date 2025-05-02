@@ -60,7 +60,7 @@ class CrimsonIsleConfig {
 
     @Expose
     @ConfigLink(owner = CrimsonIsleConfig::class, field = "volcanoExplosivity")
-    var positionVolcano: Position = Position(20, 20, false, true)
+    var positionVolcano: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(
@@ -74,5 +74,5 @@ class CrimsonIsleConfig {
 
     @Expose
     @ConfigLink(owner = CrimsonIsleConfig::class, field = "showDojoRankDisplay")
-    var dojoRankDisplayPosition: Position = Position(-378, 206, false, true)
+    var dojoRankDisplayPosition: Position = Position(-378, 206)
 }
