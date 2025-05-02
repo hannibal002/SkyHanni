@@ -49,13 +49,11 @@ object ItemClickData {
                 val clickType = when (packet.action) {
                     C02PacketUseEntity.Action.INTERACT -> ClickType.RIGHT_CLICK
                     C02PacketUseEntity.Action.ATTACK -> ClickType.LEFT_CLICK
-                    else -> {
-                        event.cancel()
-                        return
-                    }
+                    C02PacketUseEntity.Action.INTERACT_AT -> ClickType.RIGHT_CLICK
+                    else -> return
                 }
                 val clickedEntity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
-                EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).post()
+                EntityClickEvent(clickType, packet.action, clickedEntity, InventoryUtils.getItemInHand()).post()
             }
 
             else -> {
