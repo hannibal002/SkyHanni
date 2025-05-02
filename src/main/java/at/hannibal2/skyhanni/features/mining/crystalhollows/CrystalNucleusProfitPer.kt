@@ -44,7 +44,7 @@ object CrystalNucleusProfitPer {
         map.filter { it.key !in hover }.takeIf { it.isNotEmpty() }?.let {
             hover.add("§7${it.size} cheap items are hidden §7(§6${it.values.sum().shortFormat()}§7).")
         }
-        if (config.isIronman.get() && LorenzUtils.isIronmanProfile){
+        if (config.isIronman.get() && LorenzUtils.isIronmanProfile) {
 
             val profitPrefix = if (totalProfit < 0) "§c" else "§6"
             val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"

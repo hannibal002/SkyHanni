@@ -40,7 +40,7 @@ object ProfitPerExcavation {
         val scrapPrice = scrapItem.getPrice()
         map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
 
-        if (config.isIronman.get() && LorenzUtils.isIronmanProfile){
+        if (config.isIronman.get() && LorenzUtils.isIronmanProfile) {
             // Empty: Removes Scrap from calculations
         } else {
             totalProfit -= scrapPrice
