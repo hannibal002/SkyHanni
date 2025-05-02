@@ -121,7 +121,7 @@ object PestParticleWaypoint {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
         if (!isEnabled()) return
         val guessPoint = guessPosition ?: return
@@ -131,7 +131,7 @@ object PestParticleWaypoint {
         reset()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent
     fun onPestUpdate(event: PestUpdateEvent) {
         if (PestApi.scoreboardPests == 0) reset()
     }
