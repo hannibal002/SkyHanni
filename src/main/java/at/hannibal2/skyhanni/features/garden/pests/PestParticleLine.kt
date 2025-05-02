@@ -23,7 +23,7 @@ import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
 // TODO remove this workaround once PestParticleWaypoint does work again
-@SkyHanniModule
+//@SkyHanniModule
 object PestParticleLine {
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
