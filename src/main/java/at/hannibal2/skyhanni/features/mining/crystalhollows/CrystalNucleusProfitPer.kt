@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -43,20 +44,32 @@ object CrystalNucleusProfitPer {
         map.filter { it.key !in hover }.takeIf { it.isNotEmpty() }?.let {
             hover.add("§7${it.size} cheap items are hidden §7(§6${it.values.sum().shortFormat()}§7).")
         }
+        if (config.isIronman.get() && LorenzUtils.isIronmanProfile){
 
-        val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
-        val partsCost = CrystalNucleusApi.getPrecursorRunPrice()
-        totalProfit -= (jungleKeyCost + partsCost)
+            val profitPrefix = if (totalProfit < 0) "§c" else "§6"
+            val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"
 
-        val profitPrefix = if (totalProfit < 0) "§c" else "§6"
-        val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"
+            hover.add("§e$totalMessage")
 
-        hover.add("")
-        hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
-        hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")
-        hover.add("")
-        hover.add("§e$totalMessage")
+            ChatUtils.hoverableChat(totalMessage, hover)
 
-        ChatUtils.hoverableChat(totalMessage, hover)
+        } else {
+
+            val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
+            val partsCost = CrystalNucleusApi.getPrecursorRunPrice()
+            totalProfit -= (jungleKeyCost + partsCost)
+
+            val profitPrefix = if (totalProfit < 0) "§c" else "§6"
+            val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"
+
+            hover.add("")
+            hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
+            hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")
+            hover.add("")
+            hover.add("§e$totalMessage")
+
+            ChatUtils.hoverableChat(totalMessage, hover)
+
+        }
     }
 }

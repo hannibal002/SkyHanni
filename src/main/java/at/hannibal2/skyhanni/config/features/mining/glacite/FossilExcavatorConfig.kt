@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class FossilExcavatorConfig {
     @Expose
@@ -30,6 +31,12 @@ class FossilExcavatorConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var profitPerExcavation: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Ironman Profit Calculations", desc = "Removes the price of Scrap form calculations. (Ironman only)")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var isIronman: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Glacite Powder Stack", desc = "Show Glacite Powder as stack size in the Fossil Excavator.")

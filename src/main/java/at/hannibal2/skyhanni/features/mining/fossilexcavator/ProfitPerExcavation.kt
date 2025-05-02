@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 @SkyHanniModule
 object ProfitPerExcavation {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator
-
     @HandleEvent
     fun onFossilExcavation(event: FossilExcavationEvent) {
         if (!config.profitPerExcavation) return
@@ -39,7 +39,13 @@ object ProfitPerExcavation {
 
         val scrapPrice = scrapItem.getPrice()
         map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
-        totalProfit -= scrapPrice
+
+        if (config.isIronman.get() && LorenzUtils.isIronmanProfile){
+            // Empty: Removes Scrap from calculations
+        } else {
+            totalProfit -= scrapPrice
+        }
+
 
         val hover = map.sortedDesc().keys.toMutableList()
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
