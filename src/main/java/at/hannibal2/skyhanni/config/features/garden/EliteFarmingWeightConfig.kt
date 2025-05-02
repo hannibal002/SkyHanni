@@ -38,7 +38,7 @@ class EliteFarmingWeightConfig {
     @Expose
     @ConfigOption(name = "Leaderboard Type", desc = "Select normal or monthly weight leaderboard!")
     @ConfigEditorDropdown
-    val eliteLBType: Property<EliteFarmingWeightLBType> = Property.of(EliteFarmingWeightLBType.DEFAULT);
+    val eliteLBType: Property<EliteFarmingWeightLBType> = Property.of(EliteFarmingWeightLBType.DEFAULT)
 
     enum class EliteFarmingWeightLBType(private val displayName: String) {
         DEFAULT("All-Time"),
