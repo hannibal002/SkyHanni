@@ -66,7 +66,7 @@ enum class IslandType(private val nameFallback: String) {
 
     fun isInBounds(vec: LorenzVec): Boolean {
         val bounds = islandData?.bounds ?: return true
-        return vec.x < bounds.maxX && vec.x > bounds.minX && vec.z < bounds.maxZ && vec.z > bounds.minZ
+        return vec.x < bounds.maxX && vec.x > bounds.minX && vec.z < bounds.maxZ && vec.z > bounds.minZ && vec.y > 0 && vec.y < 256
     }
 
     @SkyHanniModule
