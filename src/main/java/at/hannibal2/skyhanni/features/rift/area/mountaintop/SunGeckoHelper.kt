@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -270,7 +270,8 @@ object SunGeckoHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onAreaChanged(event: GraphAreaChangeEvent) {
+    fun onAreaChanged(event: ScoreboardAreaChangeEvent) {
+        // Do not use GraphAreaChangeEvent here, Time Chamber has multiple locations
         if (!isEnabled()) return
         reset()
         inTimeChamber = event.area == "Time Chamber"

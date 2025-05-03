@@ -2,6 +2,12 @@
 
 ## Version 4.0.0
 
+### New Features
+
+#### Garden
+
++ Added Monthly Farming Weight Leaderboard option. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
+
 ### Improvements
 
 #### Garden
@@ -31,6 +37,8 @@
 #### Garden
 
 + Fixed Sensitivity Reducer not disabling correctly sometimes. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3879)
++ Fixed farming weight leaderboard upcoming players repeating. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
+    + When elitebot.dev doesn't update your data the same upcoming players would be repeated, this fixes that.
 
 #### Chat
 
@@ -39,14 +47,20 @@
 #### Rift
 
 + Fixed Craft Room Holographic Helper requiring NEU to be installed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3894)
++ Fixed Sun Gecko Helper sometimes not showing up. - Luna (https://github.com/hannibal002/SkyHanni/pull/3920)
 
 #### Inventory
 
 + Fixed Reforge Helper locking when nothing is selected. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3907)
++ Fixed display of Craftable Item List and Graph Node Editor. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3914)
 
 #### Misc
 
 + Fixed Hide Autopet Messages incorrectly hiding manual pet summon/despawn messages. - Luna (https://github.com/hannibal002/SkyHanni/pull/3895)
++ Fixed GUI positions going negative. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3910)
++ Fixed internal area detection when "Island Navigation" is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3922)
+    + Broke multiple features, notably Slayer and Mining.
++ Fixed Item Profit Trackers not using NPC price for some items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3917)
 
 ### Technical Details
 
@@ -58,6 +72,7 @@
 + Replaced some `Renderable` methods with structured classes. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3890)
     + Renderable.string` → `StringRenderable`, `Renderable.horizontalContainer` → `HorizontalContainerRenderable`.
     + Deprecations for replaced methods, now pointing at the class.
++ Added ignore option for particle types in `/shtrackparticles`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3900)
 
 ## Version 3.0.0
 
