@@ -635,7 +635,7 @@ object GardenNextJacobContest {
         null
     }
 
-    private val config get() = GardenApi.config.nextJacobContests
+    private val config get() = GardenApi.config.jacobContest.nextContest
     private val nextContestCrops = mutableListOf<CropType>()
 
     fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.otherGuis

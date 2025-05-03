@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -8,7 +9,6 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrue
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -28,11 +28,11 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object JacobContestTimeNeeded {
 
-    private val config get() = GardenApi.config
+    private val config get() = GardenApi.config.jacobContest.timesNeeded
     private var display = emptyList<Renderable>()
     private var currentBracket = ContestBracket.GOLD
 
-    @HandleEvent(priority = HandleEvent.LOW)
+    @HandleEvent(priority = HandleEvent.LOW, onlyOnIsland = IslandType.GARDEN)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (FarmingContestApi.inInventory) {
             update()
@@ -189,18 +189,16 @@ object JacobContestTimeNeeded {
         )
     }
 
-    private fun addBpsTitle() = if (config.jacobContestCustomBps) "Custom Blocks/Second: " else "Your Blocks/Second: "
+    private fun addBpsTitle() = if (config.customBPS.enabled) "Custom Blocks/Second: " else "Your Blocks/Second: "
 
-    private fun CropType.getBps() = if (config.jacobContestCustomBps) {
-        config.jacobContestCustomBpsValue
+    private fun CropType.getBps() = if (config.customBPS.enabled) {
+        config.customBPS.value
     } else getLatestBlocksPerSecond()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (!FarmingContestApi.inInventory) return
-        config.jacobContestTimesPosition.renderRenderables(display, posLabel = "Jacob Contest Time Needed")
+        config.position.renderRenderables(display, posLabel = "Jacob Contest Time Needed")
     }
-
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.jacobContestTimes
 }

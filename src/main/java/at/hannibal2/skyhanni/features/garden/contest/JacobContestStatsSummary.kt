@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -15,13 +17,13 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 @SkyHanniModule
 object JacobContestStatsSummary {
 
-    private val config get() = GardenApi.config
+    private val config get() = GardenApi.config.jacobContest.contestSummary
     private var blocksBroken = 0
     private var startTime = SimpleTimeMark.farPast()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onCropClick(event: CropClickEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (event.clickType != ClickType.LEFT_CLICK) return
 
         if (FarmingContestApi.inContest && event.crop == FarmingContestApi.contestCrop) {
@@ -29,9 +31,9 @@ object JacobContestStatsSummary {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onFarmingContest(event: FarmingContestEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
 
         when (event.phase) {
             FarmingContestPhase.START -> {
@@ -40,6 +42,7 @@ object JacobContestStatsSummary {
             }
 
             FarmingContestPhase.STOP -> {
+                if (config.hideZeroCropStats && blocksBroken == 0) return
                 val duration = startTime.passedSince()
                 val blocksPerSecond = (blocksBroken.toDouble() / duration.inWholeSeconds).roundTo(2)
                 val cropName = event.crop.cropName
@@ -61,5 +64,24 @@ object JacobContestStatsSummary {
 
     private fun getBlocksPerSecondColor(blocksPerSecond: Double) = if (blocksPerSecond > 19) "§c" else "§a"
 
-    fun isEnabled() = GardenApi.inGarden() && config.jacobContestSummary
+    private val massMigrationPairs: List<Pair<String, String>> = listOf(
+        "nextJacobContests" to "jacobContest.nextContest",
+        "personalBests" to "jacobContest.personalBests",
+        "farmingFortuneForContest" to "jacobContest.ffForContest",
+        "farmingFortuneForContestPos" to "jacobContest.ffForContestPosition",
+        "jacobContestTimes" to "jacobContest.timesNeeded.enabled",
+        "jacobContestTimesPosition" to "jacobContest.timesNeeded.position",
+        "jacobContestCustomBps" to "jacobContest.timesNeeded.customBps.enabled",
+        "jacobContestCustomBpsValue" to "jacobContest.timesNeeded.customBps.value",
+        "jacobContestSummary" to "jacobContest.contestSummary.enabled",
+    )
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val oldBase = "#garden"
+        val newBase = "#garden.jacobContest"
+        massMigrationPairs.forEach { (oldPath, newPath) ->
+            event.move(87, "$oldBase.$oldPath", "$newBase.$newPath")
+        }
+    }
 }
