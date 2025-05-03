@@ -756,6 +756,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Compact Jacob Claim. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3235)
     + When collecting the rewards from many farming contests at the same time at Anita.
     + Compact the Jacob Claim message, only showing full information when hovering.
++ Added Monthly Farming Weight Leaderboard option. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
 
 ### Garden Pests
 

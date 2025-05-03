@@ -7,5 +7,5 @@ fun WorldClient.getLoadedPlayers(): List<EntityPlayer> =
 //#if MC < 1.14
     this.playerEntities
 //#else
-//$$ this.players()
+//$$ this.players
 //#endif
