@@ -34,15 +34,8 @@ object GraphNodeEditor {
     private var lastUpdate = SimpleTimeMark.farPast()
     private val tagsToShow: MutableList<GraphNodeTag> = GraphNodeTag.entries.toMutableList()
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
     fun onRenderOverlay() {
-        if (Minecraft.getMinecraft().currentScreen == null) {
-            doRender()
-        }
-    }
-
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onBackgroundDraw() {
         doRender()
     }
 
