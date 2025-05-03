@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-import at.hannibal2.skyhanni.features.chat.ChatFilterGui
+import at.hannibal2.skyhanni.features.chat.ChatHistoryGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
@@ -150,17 +150,17 @@ object ChatManager {
             return null to true
         }
 
-        val eventComponent = chatEvent.chatComponent
+        val modifiedComponent = chatEvent.chatComponent
         var modified = false
         loggerAllowed.log("[allowed] $message")
         loggerAll.log("[allowed] $message")
-        if (eventComponent.formattedText != component.formattedText) {
+        if (modifiedComponent.formattedText != component.formattedText) {
             modified = true
-            component = chatEvent.chatComponent
             loggerModified.log(" ")
             loggerModified.log("[original] " + component.formattedText)
-            loggerModified.log("[modified] " + eventComponent.formattedText)
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, eventComponent)
+            loggerModified.log("[modified] " + modifiedComponent.formattedText)
+            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent)
+            component = modifiedComponent
         } else {
             messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null)
         }
@@ -173,9 +173,9 @@ object ChatManager {
         return Pair(component.takeIf { modified }, cancelled)
     }
 
-    private fun openChatFilterGUI(args: Array<String>) {
+    private fun openChatHistoryGui(args: Array<String>) {
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
-            ChatFilterGui(getRecentMessageHistory())
+            ChatHistoryGui(getRecentMessageHistory())
         } else {
             val searchTerm = args.joinToString(" ")
             val history = getRecentMessageHistoryWithSearch(searchTerm)
@@ -183,7 +183,7 @@ object ChatManager {
                 ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
                 return
             }
-            ChatFilterGui(history)
+            ChatHistoryGui(history)
         }
     }
 
@@ -265,7 +265,7 @@ object ChatManager {
         event.register("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            callback { openChatFilterGUI(it) }
+            callback { openChatHistoryGui(it) }
         }
     }
 }

@@ -80,6 +80,6 @@ private fun carrolynToolTip(crop: CropType): String =
 private fun carrolynOnClick(crop: CropType) =
     CarrolynTable.getByCrop(crop)?.let {
         it.setVisibleActive(!it.get())
-        FFGuideGUI.updateDisplay()
+        FFGuideGui.updateDisplay()
     }
 

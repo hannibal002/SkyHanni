@@ -61,7 +61,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isBazaarSign
 import at.hannibal2.skyhanni.utils.SignUtils.isSupercraftAmountSetSign
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -73,6 +72,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.EntityLivingBase
@@ -296,7 +296,7 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             SignUtils.setTextIntoSign("$leftToCraft")
                         } else {
-                            HypixelCommands.viewRecipe(internalName.asString())
+                            HypixelCommands.viewRecipe(internalName)
                         }
                     },
                 ) { GardenApi.inGarden() && !NeuItems.neuHasFocus() },
@@ -363,7 +363,7 @@ object GardenVisitorFeatures {
     @HandleEvent
     fun onVisitorRefused(event: VisitorRefusedEvent) {
         update()
-        GardenVisitorDropStatistics.deniedVisitors += 1
+        GardenApi.storage?.visitorDrops?.let { it.deniedVisitors += 1 }
         GardenVisitorDropStatistics.saveAndUpdate()
     }
 
@@ -371,8 +371,7 @@ object GardenVisitorFeatures {
     fun onVisitorAccepted(event: VisitorAcceptedEvent) {
         VisitorAcceptEvent(event.visitor).post()
         update()
-        GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
-        GardenVisitorDropStatistics.lastAccept = SimpleTimeMark.now()
+        GardenApi.storage?.visitorDrops?.let { it.coinsSpent += round(lastFullPrice).toLong() }
     }
 
     @HandleEvent
@@ -530,9 +529,10 @@ object GardenVisitorFeatures {
         update()
 
         logger.log("New visitor detected: '$name'")
-        val recentWorldSwitch = LorenzUtils.lastWorldSwitch.passedSince() < 2.seconds
+        // do not show titles and chat messages for visitors that spawned while the player was offline
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 3.seconds) return
 
-        if (config.notificationTitle && !recentWorldSwitch) {
+        if (config.notificationTitle) {
             TitleManager.sendTitle("§eNew Visitor")
         }
         if (config.notificationChat) {
@@ -540,15 +540,13 @@ object GardenVisitorFeatures {
             ChatUtils.chat("$displayName §eis visiting your garden!")
         }
 
-        if (!recentWorldSwitch) {
-            if (name.removeColor().contains("Jerry")) {
-                logger.log("Jerry!")
-                ItemBlink.setBlink(NeuItems.getItemStackOrNull("JERRY;4"), 5_000)
-            }
-            if (name.removeColor().contains("Spaceman")) {
-                logger.log("Spaceman!")
-                ItemBlink.setBlink(NeuItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
-            }
+        if (name.removeColor().contains("Jerry")) {
+            logger.log("Jerry!")
+            ItemBlink.setBlink(NeuItems.getItemStackOrNull("JERRY;4"), 5_000)
+        }
+        if (name.removeColor().contains("Spaceman")) {
+            logger.log("Spaceman!")
+            ItemBlink.setBlink(NeuItems.getItemStackOrNull("DCTR_SPACE_HELM"), 5_000)
         }
     }
 
@@ -570,6 +568,10 @@ object GardenVisitorFeatures {
         }
     }
 
+    private fun doesVisitorEntityExist(name: String) = EntityUtils.getEntities<EntityOtherPlayerMP>().any {
+        it.name.trim().equals(name, true)
+    }
+
     private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
         val color = group("color")
         if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
@@ -577,7 +579,10 @@ object GardenVisitorFeatures {
         val name = group("name")
         if (name in setOf("Beth", "Maeve", "Spaceman")) return false
 
-        return VisitorApi.getVisitorsMap().keys.any { it.removeColor() == name }
+        val isInKnownVisitors = VisitorApi.getVisitorsMap().keys.any { it.removeColor() == name }
+
+        return if (isInKnownVisitors) true
+        else doesVisitorEntityExist(name)
     } ?: false
 
     private fun update() {

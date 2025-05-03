@@ -109,7 +109,7 @@ public class TrevorTheTrapperConfig {
 
     @Expose
     @ConfigLink(owner = TrevorTheTrapperConfig.class, field = "dataTracker")
-    public Position position = new Position(10, 80, false, true);
+    public Position position = new Position(10, 80);
 
     @Expose
     @ConfigOption(name = "Trapper Solver", desc = "Assist in finding Trevor's mobs.\n" +
@@ -159,5 +159,5 @@ public class TrevorTheTrapperConfig {
 
     @Expose
     @ConfigLink(owner = TrevorTheTrapperConfig.class, field = "trapperCooldownGui")
-    public Position trapperCooldownPos = new Position(10, 10, false, true);
+    public Position trapperCooldownPos = new Position(10, 10);
 }

@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils.system
 
+import at.hannibal2.skyhanni.utils.VersionConstants
 import net.minecraftforge.fml.common.ModContainer
 //#if MC < 1.16
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.VersionConstants
 import kotlin.time.Duration.Companion.INFINITE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
@@ -23,7 +23,7 @@ import net.minecraftforge.fml.common.Loader
  */
 object PlatformUtils {
 
-    const val MC_VERSION = VersionConstants.MC_VERSION
+    const val MC_VERSION: String = VersionConstants.MC_VERSION
 
     val isDevEnvironment: Boolean by lazy {
         //#if MC < 1.16
@@ -59,6 +59,15 @@ object PlatformUtils {
     //#else
     //$$ fun Class<*>.getModInstance(): ModInstance? = null
     //#endif
+
+    fun isModInstalled(modId: String): Boolean {
+        //#if FORGE
+        return Loader.isModLoaded(modId)
+        //#else
+        // TODO implement this for fabric
+        //$$ return false
+        //#endif
+    }
 
     private var validNeuInstalled = false
 
@@ -96,7 +105,6 @@ object PlatformUtils {
         DelayedRun.runNextTick { NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true)) }
         //#endif
     }
-
 }
 
 data class ModInstance(val id: String, val name: String, val version: String)

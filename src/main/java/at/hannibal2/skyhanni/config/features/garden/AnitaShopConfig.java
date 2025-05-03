@@ -27,5 +27,5 @@ public class AnitaShopConfig {
 
     @Expose
     @ConfigLink(owner = AnitaShopConfig.class, field = "medalProfitEnabled")
-    public Position medalProfitPos = new Position(206, 158, false, true);
+    public Position medalProfitPos = new Position(206, 158);
 }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemAliases
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -14,7 +15,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isVanillaItem
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -26,6 +30,8 @@ import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import java.util.NavigableMap
+import java.util.TreeMap
 
 @SkyHanniModule
 object NeuItems {
@@ -33,8 +39,13 @@ object NeuItems {
     private val itemIdCache = mutableMapOf<Item, List<NeuInternalName>>()
 
     var allItemsCache = mapOf<String, NeuInternalName>() // item name -> internal name
-    var allInternalNames = setOf<NeuInternalName>()
+    var itemNamesWithoutColor: NavigableMap<String, NeuInternalName> = TreeMap()
+
+    /** Keys are internal names as String */
+    val allInternalNames: NavigableMap<String, NeuInternalName> = TreeMap()
     val ignoreItemsFilter = MultiFilter()
+
+    var commonItemAliases: ItemAliases = ItemAliases()
 
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
@@ -48,6 +59,8 @@ object NeuItems {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
         ignoreItemsFilter.load(ignoredItems)
+        val aliases = event.getConstant<ItemAliases>("ItemAliases")
+        commonItemAliases = aliases
     }
 
     @HandleEvent
@@ -56,15 +69,15 @@ object NeuItems {
     }
 
     private fun readAllNeuItems() {
+        allInternalNames.clear()
         val map = mutableMapOf<String, NeuInternalName>()
-        val names = mutableSetOf<NeuInternalName>()
+        val noColor = TreeMap<String, NeuInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             val internalName = rawInternalName.toInternalName()
             var name = internalName.getItemStackOrNull()?.displayName?.lowercase() ?: run {
                 ChatUtils.debug("skipped `$rawInternalName` from readAllNeuItems")
                 continue
             }
-            names.add(internalName)
 
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
@@ -81,9 +94,15 @@ object NeuItems {
                 }
                 println("wrong name: '$name'")
             }
+
+            name.removeNonAscii().trim()
+
             map[name] = internalName
+            noColor[name.removeColor()] = internalName
+            allInternalNames[rawInternalName] = internalName
         }
-        allInternalNames = names
+        @Suppress("UNCHECKED_CAST")
+        itemNamesWithoutColor = noColor as NavigableMap<String, NeuInternalName>
         allItemsCache = map
     }
 
@@ -140,6 +159,10 @@ object NeuItems {
         return isVanillaItem(vanillaName)
     }
 
+    private val generatorPattern = "GENERATOR_\\d+".toPattern()
+
+    fun NeuInternalName.isGenerator(): Boolean = generatorPattern.matches(this.asString())
+
     fun NeuInternalName.removePrefix(prefix: String): NeuInternalName {
         if (prefix.isEmpty()) return this
         val string = asString()
@@ -163,6 +186,18 @@ object NeuItems {
         itemIdCache[item] = result
         return result
     }
+
+    fun findInternalNameStartingWithWithoutNPCs(prefix: String, valid: (NeuInternalName) -> Boolean): Set<String> =
+        StringUtils.subMapOfStringsStartingWith(prefix, allInternalNames).filterNot { npcInternal.matches(it.key) }
+            .filter { valid(it.value) }.keys
+
+    private val npcName = ".*\\((?:(?:rift )?npc|monster|mayor)\\)".toPattern()
+    private val npcInternal = ".*\\((?:(?:RIFT_)?NPC|MONSTER|MAYOR)\\)".toPattern()
+
+    fun findItemNameStartingWithWithoutNPCs(prefix: String, valid: (NeuInternalName) -> Boolean): Set<String> =
+        findItemNameStartingWith(prefix).filterNot { npcName.matches(it.key) }.filter { valid(it.value) }.keys
+
+    fun findItemNameStartingWith(prefix: String) = StringUtils.subMapOfStringsStartingWith(prefix, itemNamesWithoutColor)
 
     fun getPrimitiveMultiplier(internalName: NeuInternalName, tryCount: Int = 0): PrimitiveItemStack {
         multiplierCache[internalName]?.let { return it }

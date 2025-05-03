@@ -37,10 +37,10 @@ object FFStats {
     var totalBaseFF = mapOf<FFTypes, Double>()
 
     fun loadFFData() {
-        equipmentTotalFF = FarmingItems.equip.getFFData()
+        equipmentTotalFF = FarmingItemType.equip.getFFData()
 
-        armorTotalFF = FarmingItems.armor.getFFData()
-        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName().asString() in farmingBoots
+        armorTotalFF = FarmingItemType.armor.getFFData()
+        usingSpeedBoots = FarmingItemType.BOOTS.getItem().getInternalName().asString() in farmingBoots
 
         baseFF = getGenericFF()
 
@@ -153,16 +153,16 @@ object FFStats {
     }
 
     fun getTotalFF() {
-        currentPetItem = FarmingItems.currentPet.getItem().getPetItem().toString()
+        currentPetItem = FarmingItemType.currentPet.getItem().getPetItem().toString()
 
         totalBaseFF = combineFFData(
-            baseFF, armorTotalFF, equipmentTotalFF, FarmingItems.currentPet.getFFData(),
+            baseFF, armorTotalFF, equipmentTotalFF, FarmingItemType.currentPet.getFFData(),
         )
 
-        FFGuideGUI.updateDisplay()
+        FFGuideGui.updateDisplay()
     }
 
-    private fun List<FarmingItems>.getFFData(): Map<FFTypes, Double> = combineFFData(this.map { it.getFFData() })
+    private fun List<FarmingItemType>.getFFData(): Map<FFTypes, Double> = combineFFData(this.map { it.getFFData() })
 
     private fun combineFFData(vararg value: Map<FFTypes, Double>) = combineFFData(value.toList())
     private fun combineFFData(value: List<Map<FFTypes, Double>>) =

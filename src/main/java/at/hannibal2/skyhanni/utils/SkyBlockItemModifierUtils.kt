@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -21,8 +22,10 @@ import java.util.Locale
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.item.Items
 //#endif
 
+@Suppress("TooManyFunctions")
 object SkyBlockItemModifierUtils {
 
     fun ItemStack.getCoinsOfAvarice() = getAttributeLong("collected_coins")
@@ -164,7 +167,7 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.hasKey("attributes", 10) }
+        ?.takeIf { it.containsCompound("attributes") }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
@@ -203,7 +206,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
-    fun ItemStack.getSecondsHeld() = when (getItemId()) {
+    fun ItemStack.getSecondsHeld() = when (getItemId()) { // TODO move item IDs and attribute tags to repo
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
         "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
@@ -249,7 +252,7 @@ object SkyBlockItemModifierUtils {
     }
     //#else
     //$$ fun isVanillaItem(itemId: String): Boolean {
-    //$$     Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
+    //$$     return Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
     //$$ }
     //#endif
 

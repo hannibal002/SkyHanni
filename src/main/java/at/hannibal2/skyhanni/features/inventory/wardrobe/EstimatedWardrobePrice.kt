@@ -40,8 +40,8 @@ object EstimatedWardrobePrice {
         tooltip.addAll(index, lore)
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.armor && WardrobeApi.inWardrobe() && !WardrobeApi.inCustomWardrobe
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.armor && WardrobeApi.inWardrobe() &&
+        (!WardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
