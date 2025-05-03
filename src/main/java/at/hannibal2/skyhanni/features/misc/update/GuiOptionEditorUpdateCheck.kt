@@ -5,10 +5,7 @@ import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
-import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.EnumChatFormatting.GREEN
 import net.minecraft.util.EnumChatFormatting.RED
 
@@ -16,11 +13,11 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
     val button = GuiElementButton("", -1) {}
 
-    override fun render(context: RenderContext?, x: Int, y: Int, width: Int) {
-        val fr = Minecraft.getMinecraft().fontRendererObj
+    override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
+        val fr = context.minecraft.defaultFontRenderer
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(x.toFloat() + 10, y.toFloat(), 1F)
+        context.pushMatrix()
+        context.translate(x.toFloat() + 10, y.toFloat(), 1F)
         val adjustedWidth = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
@@ -33,22 +30,22 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         button.render(getButtonPosition(adjustedWidth), 10)
 
         if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
-            TextRenderUtils.drawStringCentered(
-                "${GREEN}The update will be installed after your next restart.",
+            context.drawString(
                 fr,
-                adjustedWidth / 2F,
-                40F,
-                true,
+                "${GREEN}The update will be installed after your next restart.",
+                (adjustedWidth / 2F).toInt(),
+                40,
                 -1,
+                true,
             )
         }
 
         val widthRemaining = adjustedWidth - button.width - 10
 
-        GlStateManager.scale(2F, 2F, 1F)
+        context.scale(2F, 2F, 1F)
         val currentVersion = SkyHanniMod.VERSION
         val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
-        TextRenderUtils.drawStringCenteredScaledMaxWidth(
+        context.drawStringCenteredScaledMaxWidth(
             "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) GREEN else RED}$currentVersion" +
                 if (nextVersion != null && !sameVersion) "➜ $GREEN$nextVersion" else "",
             fr,
@@ -59,7 +56,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             -1,
         )
 
-        GlStateManager.popMatrix()
+        context.popMatrix()
     }
 
     private fun getButtonPosition(width: Int) = width - button.width

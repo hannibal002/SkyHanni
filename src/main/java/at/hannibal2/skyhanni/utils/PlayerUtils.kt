@@ -5,6 +5,11 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.minutes
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import net.minecraft.client.Minecraft
+//#if MC > 1.21
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//#endif
 
 @SkyHanniModule
 object PlayerUtils {
@@ -47,4 +52,12 @@ object PlayerUtils {
     }
 
     val isAFK = lastAction.passedSince() > 5.minutes
+
+    fun getWalkSpeed(): Int {
+        //#if MC < 1.21
+        return (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
+        //#else
+        //$$ return MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED).toInt()
+        //#endif
+    }
 }
