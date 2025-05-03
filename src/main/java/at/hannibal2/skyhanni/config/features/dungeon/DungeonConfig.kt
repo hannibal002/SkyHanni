@@ -117,6 +117,24 @@ class DungeonConfig {
     var lividFinder: LividFinderConfig = LividFinderConfig()
 
     @Expose
+    @ConfigOption(name = "Trinity", desc = "")
+    @Accordion
+    val trinityHelper: TrinityConfig = TrinityConfig()
+
+    class TrinityConfig {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Notifies user when Trinity is highly likely to appear on dungeon. (Puzzle count == 5)")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        var enabled: Boolean = true
+
+        @Expose
+        @ConfigOption(name = "Notify party", desc = "Automatically send message to party to watch out for Trinity")
+        @ConfigEditorBoolean
+        var sendPartyChat: Boolean = true
+    }
+
+    @Expose
     @ConfigOption(name = "Terracotta Phase", desc = "")
     @Accordion
     var terracottaPhase: TerracottaPhaseConfig = TerracottaPhaseConfig()
