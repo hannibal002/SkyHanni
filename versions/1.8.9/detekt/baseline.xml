@@ -252,6 +252,7 @@
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
     <ID>SpreadOperator:TextHelper.kt$TextHelper$(*component.toTypedArray(), separator = separator)</ID>
     <ID>TooManyFunctions:CollectionUtils.kt$CollectionUtils</ID>
+    <ID>TooManyFunctions:ColorUtils.kt$ColorUtils</ID>
     <ID>TooManyFunctions:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator</ID>
     <ID>TooManyFunctions:HypixelCommands.kt$HypixelCommands</ID>
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
