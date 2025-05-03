@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.CurrentPetApi.petDespawnMenuPattern
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.Gson
 import net.minecraft.item.ItemStack
+import java.util.UUID
 
 /**
  * TODO: Skins still need to be loaded from the API.
@@ -28,6 +30,7 @@ data class PetData(
     val rarity: LorenzRarity? = null, // The rarity of the pet, e.g., `COMMON`
     val level: Int? = null, // The current level of the pet as an integer, e.g., `100`
     val xp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
+    val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
     val displayName = petItem?.repoItemName
     val formattedName = "${rarity?.chatColorCode}$cleanName"
@@ -89,15 +92,21 @@ data class PetData(
             xpHandlerList: (List<String>) -> Double?,
             petHandlerList: (List<String>) -> PetData?
         ): Pair<PetData, Double>? {
-            val petItem = itemHandlerList(lines) ?: return null
+            val petItem = itemHandlerList(lines) ?: run {
+                ChatUtils.chat("Pet item not found in lore 1.")
+                return null
+            }
             val overflowXP = xpHandlerList(lines) ?: 0.0
 
-            val data = petHandlerList(lines) ?: return null
+            val data = petHandlerList(lines) ?: run {
+                ChatUtils.chat("Pet data not found in lore 2.")
+                return null
+            }
             val petData = PetData(
                 petItem = data.petItem,
                 cleanName = data.cleanName,
                 rarity = data.rarity,
-                heldItem = petItem,
+                heldItem = data.heldItem,
                 level = data.level,
                 xp = data.xp,
             )

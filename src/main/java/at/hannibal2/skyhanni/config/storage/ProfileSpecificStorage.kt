@@ -60,6 +60,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
+import jline.internal.Nullable
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import kotlin.time.Duration
@@ -799,7 +800,8 @@ class ProfileSpecificStorage {
 
     // data
     @Expose
-    var currentPetData: PetData = PetData()
+    @Nullable
+    var currentPetData: PetData? = PetData()
 
     @Expose
     var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()

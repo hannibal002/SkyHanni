@@ -15,13 +15,15 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.skyblock.PetChangeEvent
+import at.hannibal2.skyhanni.events.pet.PetChangeEvent
+import at.hannibal2.skyhanni.events.pet.PetDataChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.maxPetLevel
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -35,9 +37,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.convertToUnformatted
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
+import java.util.UUID
 
 @SkyHanniModule
 object CurrentPetApi {
@@ -48,9 +53,9 @@ object CurrentPetApi {
     private var lastPetLine: String? = null
 
     var currentPet: PetData?
-        get() = ProfileStorageData.profileSpecific?.currentPetData?.takeIf { it.isInitialized() }
+        get() = ProfileStorageData.profileSpecific?.currentPetData
         set(value) {
-            ProfileStorageData.profileSpecific?.currentPetData = value ?: PetData()
+            ProfileStorageData.profileSpecific?.currentPetData = value
         }
 
     fun isCurrentPet(petName: String): Boolean = currentPet?.cleanName?.contains(petName) ?: false
@@ -91,10 +96,11 @@ object CurrentPetApi {
      * REGEX-TEST: §7§7Selected pet: §6Hedgehog
      * REGEX-TEST: §7§7Selected pet: §6Enderman
      * REGEX-TEST: §7§7Selected pet: §cNone
+     * REGEX-TEST: §7§7Selected pet: §dRabbit§9 ✦
      */
     private val inventorySelectedPetPattern by patternGroup.pattern(
         "inventory.selected",
-        "§7§7Selected pet: §?(?<rarity>.)?(?<pet>.*)"
+        "§7§7Selected pet: §?(?<rarity>.)?(?<pet>[^§]*).*"
     )
 
     /**
@@ -189,15 +195,19 @@ object CurrentPetApi {
     // </editor-fold>
 
     // <editor-fold desc="Helpers">
+    private fun ItemStack.getPetUUID(): UUID? = getExtraAttributes()?.getString("uuid")?.takeIf {
+        it.isNotEmpty()
+    }?.let { UUID.fromString(it) }
+
     private fun updatePet(newPet: PetData?) {
-        if (newPet == currentPet) return
-        val oldPet = currentPet
+        val oldPet = currentPet.takeIf { it != newPet } ?: return
         currentPet = newPet
         if (SkyHanniMod.feature.dev.debug.petEventMessages) {
             ChatUtils.debug("oldPet: " + oldPet.toString().convertToUnformatted())
             ChatUtils.debug("newPet: " + newPet?.toString()?.convertToUnformatted())
         }
-        PetChangeEvent(oldPet, newPet).post()
+        if (newPet != null && newPet.uuid == oldPet.uuid) PetDataChangeEvent(oldPet, newPet).post()
+        else PetChangeEvent(oldPet, newPet).post()
     }
 
     private fun handlePetMessageBlock(event: SkyHanniChatEvent) {
@@ -279,14 +289,25 @@ object CurrentPetApi {
     // </editor-fold>
 
     // <editor-fold desc="Pet Data Extractors (Selected Pet)">
-    private fun extractSelectedPetData(lore: List<String>): Triple<Int, LorenzRarity, String>? {
-        val level = inventorySelectedProgressPattern.firstMatchGroup(lore, "level")?.toInt()
-        val rarity = inventorySelectedPetPattern.firstMatchGroup(lore, "rarity")?.let { rarityByColorGroup(it) }
-        val petName = inventorySelectedPetPattern.firstMatchGroup(lore, "pet")
+    private data class BasicPetData(
+        val level: Int,
+        val rarity: LorenzRarity,
+        val petName: String,
+    )
 
-        return if (level != null && rarity != null && petName != null) {
-            Triple(level, rarity, petName)
-        } else null
+    private fun extractSelectedPetData(lore: List<String>): BasicPetData? {
+        val nextLevel = inventorySelectedProgressPattern.firstMatchGroup(lore, "level")?.toInt()
+
+        val petName = inventorySelectedPetPattern.firstMatchGroup(lore, "pet")
+        val level = nextLevel?.let { it - 1 } ?: maxPetLevel(petName ?: return null)
+        val rarity = inventorySelectedPetPattern.firstMatchGroup(lore, "rarity")?.let { rarityByColorGroup(it) }
+
+        return if (rarity != null && petName != null) {
+            BasicPetData(level, rarity, petName)
+        } else {
+            ChatUtils.chat("Level: $level, Rarity: $rarity, PetName: $petName")
+            null
+        }
     }
 
     private fun handleSelectedPetName(lore: List<String>): NeuInternalName? = inventorySelectedPetPattern.firstMatcher(lore) {
@@ -357,18 +378,32 @@ object CurrentPetApi {
     }
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inPetMenu = isPetMenu(event.inventoryName, event.inventoryItems)
         if (!inPetMenu) return
 
-        val lore = event.inventoryItems[4]?.getLore() ?: return
+        val selectedPetItem = event.inventoryItems[4] ?: run {
+            ChatUtils.chat("Selected pet item is null, ignoring 1.")
+            return
+        }
+        val petLore = selectedPetItem.getLore()
+
         val (petData, overflowXp) = parsePetDataLists(
-            lore,
-            { handleSelectedPetName(lore) },
-            { handleSelectedPetOverflowXp(lore) },
-            { handleSelectedPetData(lore) }
-        ) ?: return
-        updatePet(petData.copy(xp = petData.xp?.plus(overflowXp)))
+            petLore,
+            { handleSelectedPetName(petLore) },
+            { handleSelectedPetOverflowXp(petLore) },
+            { handleSelectedPetData(petLore) }
+        ) ?: run {
+            ChatUtils.chat("Selected pet item is null, ignoring 2.")
+            return
+        }
+
+        updatePet(
+            petData.copy(
+                xp = overflowXp,
+                uuid = selectedPetItem.getPetUUID(),
+            )
+        )
     }
 
     @HandleEvent
@@ -389,7 +424,7 @@ object CurrentPetApi {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("CurrentPetApi")
-        if (currentPet?.isInitialized() == false) {
+        if (currentPet == null || currentPet?.isInitialized() == false) {
             event.addIrrelevant("no pet equipped")
             return
         }
