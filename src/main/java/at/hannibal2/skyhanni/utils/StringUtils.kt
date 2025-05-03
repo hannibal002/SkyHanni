@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.value
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -375,13 +376,11 @@ object StringUtils {
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
         val newComponent = new.asComponent().apply {
-            if (clickEvents.size == 1) command = clickEvents.first().value
+            if (clickEvents.size == 1) command = clickEvents.first().value()
             if (hoverEvents.size == 1) hover =
-                //#if MC < 1.21
-                hoverEvents.first().value
-            //#else
-            //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
-            //#endif
+
+                hoverEvents.first().value()
+
         }
 
         replaceComponent(newComponent, transformationReason.orEmpty())
@@ -396,16 +395,12 @@ object StringUtils {
         val clickEvent = chatStyle.chatClickEvent
         val hoverEvent = chatStyle.chatHoverEvent
 
-        if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
+        if (clickEvent?.action != null && clickEvents.none { it.value() == clickEvent.value() }) {
             clickEvents.add(clickEvent)
         }
 
         if (hoverEvent?.action != null && hoverEvents.none {
-                //#if MC < 1.21
-                it.value == hoverEvent.value
-                //#else
-                //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) == hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
-                //#endif
+                it.value() == hoverEvent.value()
             }
         ) {
             hoverEvents.add(hoverEvent)

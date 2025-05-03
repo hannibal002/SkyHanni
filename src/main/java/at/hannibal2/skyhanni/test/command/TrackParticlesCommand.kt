@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import net.minecraft.util.EnumParticleTypes
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -35,7 +36,8 @@ object TrackParticlesCommand {
     private val position get() = SkyHanniMod.feature.dev.debug.trackParticlePosition
 
     private var display: List<Renderable> = emptyList()
-    private var worldParticles: Map<LorenzVec, List<ReceiveParticleEvent>> = emptyMap()
+    private var worldParticles = emptyMap<LorenzVec, List<ReceiveParticleEvent>>()
+    private val ignoredTypes = mutableListOf<EnumParticleTypes>()
 
     // TODO write abstract code for this and TrackSoundsCommand
     private fun command(args: Array<String>) {
@@ -53,9 +55,24 @@ object TrackParticlesCommand {
             return
         }
         if (isRecording) {
+            args.getOrNull(0)?.let { name ->
+                val type = getParticleTypeByName(name)
+                if (type == null) {
+                    ChatUtils.userError("unknown particle type: '$name'")
+                    return
+                }
+                if (ignoredTypes.contains(type)) {
+                    ignoredTypes.remove(type)
+                    ChatUtils.chat("Removed $type from ignored types.")
+                } else {
+                    ignoredTypes.add(type)
+                    ChatUtils.chat("Add $type to ignored types.")
+                }
+                return
+            }
             ChatUtils.userError(
                 "Still tracking particles, wait for the other tracking to complete before starting a new one, " +
-                    "or type §e/shtrackparticles end §cto end it prematurely"
+                    "or type §e/shtrackparticles end §cto end it prematurely",
             )
             return
         }
@@ -70,6 +87,10 @@ object TrackParticlesCommand {
             SimpleTimeMark.farFuture()
         }
     }
+
+    // TODO move into utils
+    private fun getParticleTypeByName(name: String): EnumParticleTypes? =
+        EnumParticleTypes.entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
 
     @HandleEvent
     fun onTick() {
@@ -96,12 +117,13 @@ object TrackParticlesCommand {
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (cutOffTime.isInPast()) return
+        if (event.type in ignoredTypes) return
         event.distanceToPlayer // Need to call to initialize Lazy
         particles.addFirst(startTime.passedSince() to event)
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (cutOffTime.isInPast()) return
         position.renderRenderables(display, posLabel = "Track particles log")
     }
