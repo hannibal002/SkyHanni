@@ -7,6 +7,9 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
+//#if MC < 1.16
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+//#endif
 //#if MC > 1.16
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.MutableComponent
@@ -157,7 +160,7 @@ fun ChatStyle.setHoverShowText(text: String): ChatStyle {
     //#if MC < 1.21
     return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text.asComponent()))
     //#else
-    //$$ return this.withHoverEvent(HoverEvent.ShowText(text.asComponent()))
+    //$$ return this.withHoverEvent(HoverEvent.ShowText(Text.of(text)))
     //#endif
 }
 

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -29,6 +28,7 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -317,7 +317,7 @@ object GiftProfitTracker {
         var totalGiftCost = 0.0
         val giftCostStrings = applicableGifts.mapNotNull { (gift, count) ->
             val item = gift.toInternalName()
-            val totalPrice = item.getPrice() * count
+            val totalPrice = SkyHanniTracker.getPricePer(item) * count
             if (totalPrice > 0) {
                 profit -= totalPrice
                 totalGiftCost += totalPrice

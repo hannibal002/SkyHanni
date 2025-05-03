@@ -547,3 +547,7 @@ org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
 
+net.minecraft.world.level.Level getPlayerByUUID() getPlayerEntityByUUID()
+
+net.minecraft.client.renderer.entity.EntityRenderDispatcher net.minecraft.client.renderer.entity.RenderManager
+net.minecraft.client.renderer.entity.EntityRenderDispatcher getRenderer() getEntityRenderObject()
