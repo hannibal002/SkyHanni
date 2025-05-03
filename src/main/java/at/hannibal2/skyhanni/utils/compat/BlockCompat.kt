@@ -13,6 +13,18 @@ import net.minecraft.block.BlockStainedGlass
 //#endif
 
 
+object BlockCompat {
+    fun getAllLogs(): List<Block> {
+        val logs = mutableListOf<Block>()
+        logs.addLog()
+        logs.addLog2()
+        //#if MC > 1.21
+        //$$ logs.addModernLogs()
+        //#endif
+        return logs
+    }
+}
+
 fun MutableList<Block>.addLeaves() {
     //#if MC < 1.21
     this.add(Blocks.leaves)
@@ -91,6 +103,47 @@ fun MutableList<Block>.addLavas() {
     this.add(Blocks.flowing_lava)
     //#endif
 }
+
+fun MutableList<Block>.addLog() {
+    //#if MC < 1.16
+    this.add(Blocks.log)
+    //#else
+    //$$ this.add(Blocks.OAK_LOG)
+    //$$ this.add(Blocks.OAK_WOOD)
+    //$$ this.add(Blocks.SPRUCE_LOG)
+    //$$ this.add(Blocks.SPRUCE_WOOD)
+    //$$ this.add(Blocks.BIRCH_LOG)
+    //$$ this.add(Blocks.BIRCH_WOOD)
+    //$$ this.add(Blocks.JUNGLE_LOG)
+    //$$ this.add(Blocks.JUNGLE_WOOD)
+    //#endif
+}
+
+fun MutableList<Block>.addLog2() {
+    //#if MC < 1.16
+    this.add(Blocks.log2)
+    //#else
+    //$$ this.add(Blocks.ACACIA_LOG)
+    //$$ this.add(Blocks.ACACIA_WOOD)
+    //$$ this.add(Blocks.DARK_OAK_LOG)
+    //$$ this.add(Blocks.DARK_OAK_WOOD)
+    //#endif
+}
+
+//#if MC > 1.21
+//$$ fun MutableList<Block>.addModernLogs() {
+//$$     this.add(Blocks.WARPED_STEM)
+//$$     this.add(Blocks.WARPED_HYPHAE)
+//$$     this.add(Blocks.CRIMSON_STEM)
+//$$     this.add(Blocks.CRIMSON_HYPHAE)
+//$$     this.add(Blocks.MANGROVE_LOG)
+//$$     this.add(Blocks.MANGROVE_WOOD)
+//$$     this.add(Blocks.CHERRY_LOG)
+//$$     this.add(Blocks.CHERRY_WOOD)
+//$$     this.add(Blocks.PALE_OAK_LOG)
+//$$     this.add(Blocks.PALE_OAK_WOOD)
+//$$ }
+//#endif
 
 enum class WoolCompat(
     private val woolColor: Int,

@@ -9,44 +9,44 @@ object GuiScreenUtils {
 
     private val mc get() = Minecraft.getMinecraft()
 
-    val scaledWindowHeight
+    val scaledWindowHeight: Int
         get() =
 //#if MC < 1.16
             ScaledResolution(mc).scaledHeight
 //#else
-//$$            mc.window.guiScaledHeight
+//$$            mc.window.guiScaledHeight.toInt()
 //#endif
 
-    val scaledWindowWidth
+    val scaledWindowWidth: Int
         get() =
 //#if MC < 1.16
             ScaledResolution(mc).scaledWidth
 //#else
-//$$            mc.window.guiScaledWidth
+//$$            mc.window.guiScaledWidth.toInt()
 //#endif
 
-    val displayWidth
+    val displayWidth: Int
         get() =
 //#if MC < 1.16
             mc.displayWidth
 //#else
-//$$            mc.window.width
+//$$            mc.window.width.toInt()
 //#endif
 
-    val displayHeight
+    val displayHeight: Int
         get() =
 //#if MC < 1.16
             mc.displayHeight
 //#else
-//$$            mc.window.height
+//$$            mc.window.height.toInt()
 //#endif
 
-    val scaleFactor
+    val scaleFactor: Int
         get() =
 //#if MC < 1.16
             ScaledResolution(mc).scaleFactor
 //#else
-//$$            mc.window.scaleFactor
+//$$            mc.window.scaleFactor.toInt()
 //#endif
 
     private val globalMouseX get() = MouseCompat.getX()

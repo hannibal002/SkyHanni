@@ -13,11 +13,11 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
+import org.lwjgl.input.Mouse
 //#else
 //$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
@@ -58,7 +58,11 @@ object KeyboardManager {
     fun isRightMouseClicked() = RIGHT_MOUSE.isKeyClicked()
 
     fun isInventoryClosure(keycode: Int): Boolean =
+        //#if MC < 1.21
         keycode == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || keycode == Keyboard.KEY_ESCAPE
+    //#else
+    //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(keycode, keycode) || keycode == GLFW.GLFW_KEY_ESCAPE
+    //#endif
 
     /**
      * TODO make use of this function unnecessary: Try to avoid using `isModifierKeyDown` as the only option,

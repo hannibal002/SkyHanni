@@ -2,7 +2,9 @@ accessWidener v2 named
 accessible field net/minecraft/entity/LivingEntity equipment Lnet/minecraft/entity/EntityEquipment;
 accessible field net/minecraft/entity/EntityEquipment map Ljava/util/EnumMap;
 accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
+accessible field net/minecraft/client/gui/screen/ingame/HandledScreen focusedSlot Lnet/minecraft/screen/slot/Slot;
 accessible field net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket type Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler;
 accessible class net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType
 accessible method net/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractTypeHandler getType ()Lnet/minecraft/network/packet/c2s/play/PlayerInteractEntityC2SPacket$InteractType;
 accessible method net/minecraft/client/gui/hud/ChatHud logChatMessage (Lnet/minecraft/client/gui/hud/ChatHudLine;)V
+accessible field net/minecraft/client/render/WorldRenderer frustum Lnet/minecraft/client/render/Frustum;

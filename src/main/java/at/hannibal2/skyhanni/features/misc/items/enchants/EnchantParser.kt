@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.event.HoverEvent
@@ -139,7 +140,7 @@ object EnchantParser {
 
         currentItem = null
 
-        val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
+        val lore = event.getHoverEvent().value().formattedText.split("\n").toMutableList()
 
         // Check for any vanilla gray enchants at the top of the tooltip
         indexOfLastGrayEnchant = accountForAndRemoveGrayEnchants(lore, null)

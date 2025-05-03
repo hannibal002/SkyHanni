@@ -38,7 +38,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
-import java.awt.Color
 
 class GuiPositionEditor(
     private val positions: List<Position>,
@@ -146,13 +145,14 @@ class GuiPositionEditor(
                 elementHeight + border * 2,
             ) && !alreadyHadHover
 
-            val gray = -0x7fbfbfc0
+            val gray = -0x7fbfbfc0 // #40404080
+            val selected = -0x7F0F0F10 // #F0F0F080
             GuiRenderUtils.drawRect(
                 x - border,
                 y - border,
                 x + elementWidth + border * 2,
                 y + elementHeight + border * 2,
-                if (isHovering) Color.yellow.rgb else gray,
+                if (isHovering) selected else gray,
             )
 
             if (isHovering) {
