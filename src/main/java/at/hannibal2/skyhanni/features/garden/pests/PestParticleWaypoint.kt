@@ -9,177 +9,133 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
-import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
-import java.awt.Color
-import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
-// TODO delete workaround class PestParticleLine when this class works again
 @SkyHanniModule
 object PestParticleWaypoint {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
-    private var lastPestTrackerUse = SimpleTimeMark.farPast()
+    private val bezierFitter = ParticlePathBezierFitter(3)
+    private const val FIREWORK_ID = 76
 
-    private var firstParticlePoint: LorenzVec? = null
-    private var secondParticlePoint: LorenzVec? = null
-    private var lastParticlePoint: LorenzVec? = null
-    private var guessPoint: LorenzVec? = null
-    private var locations = listOf<LorenzVec>()
-    private var particles = 0
-    private var lastParticles = 0
-    private var isPointingToPest = false
-    private var color: Color? = null
+    private var lastPestTrackerUse = SimpleTimeMark.farPast()
+    private var lastParticle = SimpleTimeMark.farPast()
+
+    private var guessPosition: LorenzVec? = null
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
-        if (!isEnabled()) return
-        if (PestApi.hasVacuumInHand()) {
-            if (event.clickType == ClickType.LEFT_CLICK && !MinecraftCompat.localPlayer.isSneaking) {
-                reset()
-                lastPestTrackerUse = SimpleTimeMark.now()
-            }
-        }
-    }
-
-    @HandleEvent
-    fun onWorldChange() {
+        if (!isEnabled() || !PestApi.hasVacuumInHand()) return
+        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (MinecraftCompat.localPlayer.isSneaking) return
         reset()
-    }
-
-    private fun reset() {
-        lastPestTrackerUse = SimpleTimeMark.farPast()
-        locations = emptyList()
-        guessPoint = null
-        lastParticlePoint = null
-        firstParticlePoint = null
-        secondParticlePoint = null
-        particles = 0
-        lastParticles = 0
-        isPointingToPest = false
+        lastPestTrackerUse = SimpleTimeMark.now()
     }
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnIsland = IslandType.GARDEN)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (event.type != EnumParticleTypes.REDSTONE || event.speed != 1f) return
+        if (lastPestTrackerUse.passedSince() > 5.seconds) return
+        when {
+            event.isEnchantmentTable() -> {
+                if (config.hideParticles) event.cancel()
+                return
+            }
 
-        val darkYellow = LorenzVec(0.0, 0.8, 0.0)
-        val yellow = LorenzVec(0.8, 0.8, 0.0)
-        val redPest = LorenzVec(0.8, 0.4, 0.0)
-        val redPlot = LorenzVec(0.8, 0.0, 0.0)
-        isPointingToPest = when (event.offset.roundTo(5)) {
-            redPlot -> false
-            redPest, yellow, darkYellow -> true
-            else -> return
+            !event.isVillagerAngry() -> return
         }
-
-        val location = event.location
-
         if (config.hideParticles) event.cancel()
-        if (lastPestTrackerUse.passedSince() > 3.seconds) return
 
-        if (particles > 5) return
-        if (firstParticlePoint == null) {
-            if (playerLocation().distance(location) > 5) return
-            firstParticlePoint = location
-            val (r, g, b) = event.offset.toDoubleArray().map { it.toFloat() }
-            color = Color(r, g, b)
-        } else if (secondParticlePoint == null) {
-            secondParticlePoint = location
-            lastParticlePoint = location
-            locations = locations.editCopy {
-                add(location)
-            }
-        } else {
-            val firstDistance = secondParticlePoint?.let { firstParticlePoint?.distance(it) } ?: return
-            val distance = lastParticlePoint?.distance(location) ?: return
-            if ((distance - firstDistance).absoluteValue > 0.1) return
-            lastParticlePoint = location
-            locations = locations.editCopy {
-                add(location)
-            }
+        lastParticle = SimpleTimeMark.now()
+        val pos = event.location
+
+        if (bezierFitter.isEmpty()) {
+            bezierFitter.addPoint(pos)
+            return
         }
-        ++particles
+
+        val lastPoint = bezierFitter.getLastPoint() ?: return
+        val dist = lastPoint.distance(pos)
+        if (dist == 0.0 || dist > 3.0) return
+        bezierFitter.addPoint(pos)
+
+        val solved = bezierFitter.solve() ?: return
+        guessPosition = solved
+    }
+
+    private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =
+        type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 10 && speed == -2.0f && offset.isZero()
+
+    private fun ReceiveParticleEvent.isVillagerAngry(): Boolean =
+        type == EnumParticleTypes.VILLAGER_ANGRY && count == 1 && speed == 0f && offset.isZero()
+
+    @HandleEvent
+    fun onWorldChange() = reset()
+
+    private fun reset() {
+        lastPestTrackerUse = SimpleTimeMark.farPast()
+        guessPosition = null
+        bezierFitter.reset()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onFireWorkSpawn(event: PacketReceivedEvent) {
-        if (event.packet !is S0EPacketSpawnObject) return
+        val packet = event.packet as? S0EPacketSpawnObject ?: return
         if (!config.hideParticles) return
-        val fireworkId = 76
-        if (event.packet.type == fireworkId) event.cancel()
+        if (packet.type == FIREWORK_ID) event.cancel()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        if (locations.isEmpty()) return
+        if (bezierFitter.isEmpty()) return
         if (lastPestTrackerUse.passedSince() > config.showForSeconds.seconds) {
             reset()
             return
         }
-
-        val waypoint = getWaypoint() ?: return
-
-        val text = if (isPointingToPest) "§aPest Guess" else "§cInfested Plot Guess"
-        val color = color ?: error("color is null")
+        val waypoint = guessPosition ?: return
+        val color = LorenzColor.RED.toColor()
 
         event.drawWaypointFilled(waypoint, color, beacon = true)
-        event.drawDynamicText(waypoint, text, 1.3)
-        if (config.drawLine) event.drawLineToEye(
-            waypoint,
-            color,
-            3,
-            false,
-        )
-    }
-
-    private fun getWaypoint() = if (lastParticles != particles || guessPoint == null) {
-        calculateWaypoint()?.also {
-            guessPoint = it
-            lastParticles = particles
+        event.drawDynamicText(waypoint, "§aPest Guess", 1.3)
+        if (config.drawLine) {
+            event.drawLineToEye(
+                waypoint,
+                color,
+                3,
+                false,
+            )
         }
-    } else guessPoint
-
-    @HandleEvent
-    fun onTick() {
-        if (!isEnabled()) return
-        val guessPoint = guessPoint ?: return
-
-        if (guessPoint.distanceToPlayerIgnoreY() > 8) return
-        if (isPointingToPest && lastPestTrackerUse.passedSince() !in 1.seconds..config.showForSeconds.seconds) return
-        reset()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTick() {
+        if (!isEnabled()) return
+        val guessPoint = guessPosition ?: return
+
+        if (guessPoint.distanceToPlayerIgnoreY() > 8) return
+        if (lastPestTrackerUse.passedSince() !in 1.seconds..config.showForSeconds.seconds) return
+        reset()
+    }
+
+    @HandleEvent
     fun onPestUpdate(event: PestUpdateEvent) {
         if (PestApi.scoreboardPests == 0) reset()
     }
 
-    private fun calculateWaypoint(): LorenzVec? {
-        val firstParticle = firstParticlePoint ?: return null
-        val list = locations.toList()
-        var pos = LorenzVec(0.0, 0.0, 0.0)
-        for ((i, particle) in list.withIndex()) {
-            pos += (particle - firstParticle) / (i.toDouble() + 1.0)
-        }
-        return firstParticle + pos * (120.0 / list.size)
-    }
-
-    fun isEnabled() = GardenApi.inGarden() && config.enabled
+    private fun isEnabled() = config.enabled
 
 }

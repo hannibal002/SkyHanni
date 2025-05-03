@@ -463,7 +463,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 if (highlight) {
-                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
                 }
                 item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
