@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -126,6 +127,7 @@ object FannCost {
         val tooltip = event.toolTip
 
         val trainingType = tooltip.getTrainingType() ?: return
+        ChatUtils.debug("Training Type: $trainingType")
         if (trainingType == TrainingType.FREE) return
         if (!showCoins || !showBits) return
 
@@ -154,14 +156,14 @@ object FannCost {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!trainingSlotInventoryPattern.matches(event.inventoryName.removeColor())) return
+        if (!trainingSlotInventoryPattern.matches(InventoryUtils.openInventoryName().removeColor())) return
         val slot24 = event.inventoryItems[24] ?: return
 
         val name = slot24.displayName.removeColor()
-        if (userInputPattern.matches(name)) {
-            trainingMode = TrainingMode.DAY_COUNT
+        trainingMode = if (userInputPattern.matches(name)) {
+            TrainingMode.DAY_COUNT
         } else {
-            trainingMode = TrainingMode.UNTIL_LEVEL
+            TrainingMode.UNTIL_LEVEL
         }
     }
 
