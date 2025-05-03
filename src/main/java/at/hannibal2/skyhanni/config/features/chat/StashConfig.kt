@@ -31,7 +31,7 @@ class StashConfig {
     class HideDuplicateWarningConfig {
         @Expose
         @ConfigOption(
-            name = "Hide Dupe Warnings",
+            name = "Enabled",
             desc = "Hide duplicate warnings for previously reported stash counts."
         )
         @ConfigEditorBoolean
@@ -39,9 +39,8 @@ class StashConfig {
 
         @Expose
         @ConfigOption(
-            name = "World Change Reset",
-            desc = "Show duplicate warnings once per world change. If this is off, " +
-                "the warning will be shown once per count change."
+            name = "Once Per World",
+            desc = "Show warnings even if the counts are previously reported, once per world change."
         )
         @ConfigEditorBoolean
         var worldChangeReset: Boolean = true
