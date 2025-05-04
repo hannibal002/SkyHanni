@@ -346,7 +346,7 @@ object CollectionUtils {
         }
     }
 
-    @Deprecated("use ")
+    @Deprecated("Use the removeIf function provided by java")
     fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) = removeIf(predicate)
 
     fun <K, V> MutableMap<K, V>.removeIfKey(predicate: (K) -> Boolean) {
