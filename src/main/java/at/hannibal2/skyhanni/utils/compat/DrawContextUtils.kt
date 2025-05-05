@@ -57,6 +57,18 @@ object DrawContextUtils {
         drawContext.matrices.translate(vec)
     }
 
+    fun rotate(angle: Float, x: Double, y: Double, z: Double) {
+        drawContext.matrices.rotate(angle, x, y, z)
+    }
+
+    fun rotate(angle: Float, x: Float, y: Float, z: Float) {
+        drawContext.matrices.rotate(angle, x, y, z)
+    }
+
+    fun rotate(angle: Float, vec: Vec3) {
+        drawContext.matrices.rotate(angle, vec)
+    }
+
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)
     }

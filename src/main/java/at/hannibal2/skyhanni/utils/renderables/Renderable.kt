@@ -424,28 +424,10 @@ interface Renderable {
             }
         }
 
-        fun itemStackWithTip(
-            item: ItemStack,
-            scale: Double = NeuItems.ITEM_FONT_SIZE,
-            xSpacing: Int = 2,
-            ySpacing: Int = 0,
-            rescaleSkulls: Boolean = true,
-            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
-            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) = hoverTips(
-            itemStack(
-                item,
-                scale,
-                xSpacing,
-                ySpacing,
-                rescaleSkulls,
-                horizontalAlign = horizontalAlign,
-                verticalAlign = verticalAlign,
-            ),
-            item.getTooltipCompat(false),
-            stack = item,
+        @Deprecated(
+            "Use ItemStackRenderable instead",
+            ReplaceWith("ItemStackRenderable(item, scale, xSpacing, ySpacing, rescaleSkulls, horizontalAlign, verticalAlign)"),
         )
-
         fun itemStack(
             item: ItemStack,
             scale: Double = NeuItems.ITEM_FONT_SIZE,

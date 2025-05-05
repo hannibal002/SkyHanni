@@ -16,6 +16,18 @@ class MatrixStack {
         this.translate(vec.xCoord, vec.yCoord, vec.zCoord)
     }
 
+    fun rotate(angle: Float, x: Double, y: Double, z: Double) {
+        GlStateManager.rotate(angle, x.toFloat(), y.toFloat(), z.toFloat())
+    }
+
+    fun rotate(angle: Float, x: Float, y: Float, z: Float) {
+        GlStateManager.rotate(angle, x, y, z)
+    }
+
+    fun rotate(angle: Float, vec: Vec3) {
+        this.rotate(angle, vec.xCoord, vec.yCoord, vec.zCoord)
+    }
+
     fun scale(x: Float, y: Float, z: Float) {
         GlStateManager.scale(x, y, z)
     }
