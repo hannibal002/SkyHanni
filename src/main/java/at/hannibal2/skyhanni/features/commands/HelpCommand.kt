@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.commands
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandBuilderBase
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
@@ -17,7 +18,7 @@ object HelpCommand {
     private const val COMMANDS_PER_PAGE = 15
     private val messageId = ChatUtils.getUniqueMessageId()
 
-    private fun createCommandEntry(command: CommandBuilderBase): IChatComponent {
+    private fun createCommandEntry(command: CommandData): IChatComponent {
         val category = command.category
         val color = category.color
         val description = command.descriptor.splitLines(300).replace("§r", "§7")
@@ -37,11 +38,11 @@ object HelpCommand {
         }
     }
 
-    private fun showPage(page: Int, search: String, commands: List<CommandBuilderBase>) {
+    private fun showPage(page: Int, search: String, commands: List<CommandData>) {
         val filtered = commands.filter {
             it.name.contains(search, ignoreCase = true) ||
                 it.aliases.any { alias -> alias.contains(search, ignoreCase = true) } ||
-                it.description.contains(search, ignoreCase = true)
+                it.descriptor.contains(search, ignoreCase = true)
         }
 
         val title = if (search.isBlank()) "SkyHanni Commands" else "SkyHanni Commands Matching: \"$search\""
@@ -56,7 +57,7 @@ object HelpCommand {
         ) { createCommandEntry(it) }
     }
 
-    fun onCommand(args: Array<String>, commands: List<CommandBuilderBase>) {
+    fun onCommand(args: Array<String>, commands: List<CommandData>) {
         val page: Int
         val search: String
         if (args.firstOrNull() == "-p") {

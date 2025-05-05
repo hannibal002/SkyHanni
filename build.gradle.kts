@@ -203,6 +203,10 @@ dependencies {
     if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
     else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
+    if (target.minecraftVersion == MinecraftVersion.MC189) {
+        shadowImpl("com.mojang:brigadier:1.0.18")
+    }
+
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
         isTransitive = false

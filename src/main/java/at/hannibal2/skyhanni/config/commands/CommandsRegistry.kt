@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BaseBrigadierBuilder
+import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import com.mojang.brigadier.CommandDispatcher
 //#if MC < 1.21
 import net.minecraftforge.client.ClientCommandHandler
 
 //#else
-//$$ import com.mojang.brigadier.arguments.StringArgumentType
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -15,11 +17,13 @@ import net.minecraftforge.client.ClientCommandHandler
 
 @SkyHanniModule
 object CommandsRegistry {
-    private val builders = mutableListOf<CommandBuilderBase>()
+    private val builders = mutableListOf<CommandData>()
+
+    private val dispatcher: CommandDispatcher<Any?> = CommandDispatcher()
 
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
-        CommandRegistrationEvent(builders).post()
+        CommandRegistrationEvent(builders, dispatcher).post()
     }
 
     private fun String.isUnique() {
@@ -28,13 +32,21 @@ object CommandsRegistry {
         }
     }
 
-    fun <T : CommandBuilderBase> T.hasUniqueName() {
+    fun CommandData.hasUniqueName() {
         name.isUnique()
         aliases.forEach { it.isUnique() }
     }
 
-    fun <T : CommandBuilderBase> T.addToRegister() {
-        val command = this.toCommand()
+    fun BaseBrigadierBuilder.addToRegister(dispatcher: CommandDispatcher<Any?>) {
+        val command = toCommand(dispatcher)
+        //#if MC < 1.21
+        ClientCommandHandler.instance.registerCommand(command)
+        //#endif
+        builders.add(this)
+    }
+
+    fun <T : CommandBuilderBase> T.addToRegister(dispatcher: CommandDispatcher<Any?>) {
+        val command = this.toCommand(dispatcher)
         //#if MC < 1.21
         ClientCommandHandler.instance.registerCommand(command)
         //#else

@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.commands
 
+import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
+import com.mojang.brigadier.CommandDispatcher
 import net.minecraft.command.ICommand
 
 class CommandBuilder(name: String) : CommandBuilderBase(name) {
@@ -16,17 +18,15 @@ class CommandBuilder(name: String) : CommandBuilderBase(name) {
         this.autoComplete = autoComplete
     }
 
-    override fun toCommand() = SimpleCommand(name.lowercase(), aliases, callback, autoComplete)
+    override fun toCommand(dispatcher: CommandDispatcher<Any?>) = SimpleCommand(name.lowercase(), aliases, callback, autoComplete)
 }
 
-abstract class CommandBuilderBase(val name: String) {
+abstract class CommandBuilderBase(override val name: String) : CommandData {
     var description: String = ""
-    var category: CommandCategory = CommandCategory.MAIN
-    var aliases: List<String> = emptyList()
+    override var category: CommandCategory = CommandCategory.MAIN
+    override var aliases: List<String> = emptyList()
 
-    abstract fun toCommand(): ICommand
-
-    open val descriptor: String get() = description
+    override val descriptor: String get() = description
 }
 
 class ComplexCommandBuilder<O : CommandContextAwareObject, A : CommandArgument<O>>(name: String) : CommandBuilderBase(name) {
@@ -35,8 +35,10 @@ class ComplexCommandBuilder<O : CommandContextAwareObject, A : CommandArgument<O
 
     private var realDescription: String = ""
 
-    override fun toCommand() = ComplexCommand(name.lowercase(), specifiers, context, aliases).also {
-        realDescription = it.constructHelp(description)
+    override fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand {
+        return ComplexCommand(name.lowercase(), specifiers, context, aliases).also {
+            realDescription = it.constructHelp(description)
+        }
     }
 
     override val descriptor get() = realDescription

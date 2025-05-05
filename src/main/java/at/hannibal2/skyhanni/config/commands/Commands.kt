@@ -161,11 +161,6 @@ object Commands {
             category = CommandCategory.USERS_ACTIVE
             callback { FarmingLaneCreator.commandLaneDetection() }
         }
-        event.register("shignore") {
-            description = "Add/Remove a user from your blacklist"
-            category = CommandCategory.USERS_ACTIVE
-            callback { PartyChatCommands.blacklist(it) }
-        }
         event.register("shtpinfested") {
             description = "Teleports you to the nearest infested plot"
             category = CommandCategory.USERS_ACTIVE
