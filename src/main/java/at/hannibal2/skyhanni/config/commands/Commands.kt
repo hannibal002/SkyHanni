@@ -107,11 +107,6 @@ object Commands {
             category = CommandCategory.USERS_ACTIVE
             callback { GardenCropsInCommand.onCommand(it) }
         }
-        event.register("shsensreduce") {
-            description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
-            category = CommandCategory.USERS_ACTIVE
-            callback { SensitivityReducer.manualToggle() }
-        }
         event.register("shfandomwiki") {
             description = "Searches the fandom wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
