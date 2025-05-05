@@ -58,16 +58,16 @@ class WrappedRenderableString(
 
     override fun render(posX: Int, posY: Int) {
         DrawContextUtils.translate(1.0, 1.0, 0.0)
-        DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1.0f)
+        DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
         map.entries.forEachIndexed { index, (text, size) ->
             GuiRenderUtils.drawString(
                 text,
                 RenderableUtils.calculateAlignmentXOffset(size, rawWidth, internalAlign).toFloat(),
-                index * 10.0f,
+                index * 10f,
                 color.rgb,
             )
         }
-        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1.0f)
+        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
         DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
 }

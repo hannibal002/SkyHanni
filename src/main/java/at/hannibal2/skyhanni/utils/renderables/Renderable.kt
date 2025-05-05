@@ -463,13 +463,13 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 if (highlight) {
-                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
                 }
-                item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
+                item.renderOnScreen(xSpacing / 2f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
         }
 
-        fun Renderable.darken(amount: Float = 1.0f) = object : Renderable {
+        fun Renderable.darken(amount: Float = 1f) = object : Renderable {
             override val width = this@darken.width
             override val height = this@darken.height
             override val horizontalAlign = this@darken.horizontalAlign

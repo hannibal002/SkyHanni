@@ -246,6 +246,7 @@ object GardenVisitorTimer {
         event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")
         event.move(3, "garden.visitorTimerSixthVisitorWarning", "garden.visitors.timer.sixthVisitorWarning")
         event.move(3, "garden.visitorTimerPos", "garden.visitors.timer.pos")
-        event.move(86, "garden.visitors.timer.pos", "garden.visitors.timer.position")
+
+        event.move(87, "garden.visitors.timer.pos", "garden.visitors.timer.position")
     }
 }

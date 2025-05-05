@@ -201,9 +201,9 @@ object DicerRngDropTracker {
             ConfigManager.gson.toJsonTree(items)
         }
 
-        event.move(86, "garden.dicerCounters.pos", "garden.dicerCounters.position")
-        event.move(86, "garden.dicerCounters.display", "garden.dicerCounters.enabled")
-        event.move(86, "garden.dicerCounters", "garden.dicerRngDropTracker")
+        event.move(87, "garden.dicerCounters.pos", "garden.dicerCounters.position")
+        event.move(87, "garden.dicerCounters.display", "garden.dicerCounters.enabled")
+        event.move(87, "garden.dicerCounters", "garden.dicerRngDropTracker")
     }
 
     @HandleEvent

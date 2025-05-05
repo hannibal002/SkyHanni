@@ -24,7 +24,7 @@ class VisitorConfig {
     @Expose
     @ConfigOption(name = "Visitor Inventory", desc = "")
     @Accordion
-    var inventory: InventoryConfig = InventoryConfig()
+    var inventory: VisitorInventoryConfig = VisitorInventoryConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Reward Warning", desc = "")

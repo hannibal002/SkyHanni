@@ -210,7 +210,7 @@ object HoppityEggLocator {
         it.distance(location) < 5.0
     }
 
-    private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
+    private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0f && count == 1
 
     fun isEnabled() =
         LorenzUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&
