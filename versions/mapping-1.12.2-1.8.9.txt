@@ -83,3 +83,4 @@ net.minecraft.util.text.Style getHoverEvent() getChatHoverEvent()
 net.minecraft.util.text.event.ClickEvent net.minecraft.event.ClickEvent
 net.minecraft.util.text.event.HoverEvent net.minecraft.event.HoverEvent
 
+io.github.notenoughupdates.moulconfig.gui.GuiElementWrapper io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper

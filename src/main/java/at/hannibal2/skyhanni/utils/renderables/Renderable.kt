@@ -462,7 +462,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 if (highlight) {
-                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+                    item.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
                 }
                 item.renderOnScreen(xSpacing / 2.0f, 0F, scaleMultiplier = scale, rescaleSkulls)
             }
@@ -988,10 +988,8 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            private var scroll = createScroll()
             private var list: Set<Renderable> = filterList(content, textInput.textBox)
 
-            private val virtualHeight get() = list.sumOf { it.height }
             private val scrollUpTip = RenderableString("§7§oMore items above (scroll)")
             private val scrollDownTip = RenderableString("§7§oMore items below (scroll)")
 
@@ -999,6 +997,9 @@ interface Renderable {
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
+
+            private val virtualHeight get() = list.sumOf { it.height }
+            private var scroll = createScroll()
 
             init {
                 textInput.registerToEvent(key) {
