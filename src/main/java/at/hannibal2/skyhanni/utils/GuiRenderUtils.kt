@@ -24,6 +24,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
+import org.lwjgl.util.vector.Vector3f
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.math.min
@@ -236,35 +237,30 @@ object GuiRenderUtils {
         rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
-        val isSkull = rescaleSkulls && item.item === Items.skull
 
-        // normalize angles
         val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
         val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
         val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
 
-        val baseScale = if (isSkull) 4f / 3f else 1f
-        val finalScale = baseScale * scaleMultiplier
+        val baseScale = if (rescaleSkulls && item.item === Items.skull) 4f/3f else 1f
+        val s = baseScale * scaleMultiplier.toFloat()
 
-        // adjust translation for skulls
-        val (translateX, translateY) = if (isSkull) {
-            val skullDiff = (scaleMultiplier * 2.5).toFloat()
-            x - skullDiff to y - skullDiff
-        } else { x to y }
-
-        DrawContextUtils.pushMatrix()
-
-        DrawContextUtils.translate(translateX, translateY, -19f)
+        val (tx, ty) = if (rescaleSkulls && item.item === Items.skull) {
+            val d = (scaleMultiplier * 2.5).toFloat()
+            x - d to y - d
+        } else x to y
 
         val halfIcon = 8f
+
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate(tx, ty, 0f)
+        DrawContextUtils.scale(s, s, s)
+
         DrawContextUtils.translate(halfIcon, halfIcon, 0f)
         if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
         if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
         if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
         DrawContextUtils.translate(-halfIcon, -halfIcon, 0f)
-
-        DrawContextUtils.scale(finalScale.toFloat(), finalScale.toFloat(), 0.2f)
-        GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
 
         RenderHelper.enableGUIStandardItemLighting()
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
@@ -281,9 +277,10 @@ object GuiRenderUtils {
                 println(" ")
                 ChatUtils.debug("rendering an item has failed.")
             }
+        } finally {
+            RenderHelper.disableStandardItemLighting()
+            DrawContextUtils.popMatrix()
         }
-        RenderHelper.disableStandardItemLighting()
-        DrawContextUtils.popMatrix()
     }
 
     private var lastWarn = SimpleTimeMark.farPast()

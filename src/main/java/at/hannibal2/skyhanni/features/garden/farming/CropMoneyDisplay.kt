@@ -78,7 +78,7 @@ object CropMoneyDisplay {
             bounce = ItemStackBounceDefinition(
                 upwardBounce = 50,
                 downwardBounce = 50,
-                bounceSpeed = 4.0,
+                bounceSpeed = 0.0,
             )
         )
     }

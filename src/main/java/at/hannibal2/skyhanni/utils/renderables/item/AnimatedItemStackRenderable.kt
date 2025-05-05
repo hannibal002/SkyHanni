@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing.Axis
@@ -122,16 +121,15 @@ class AnimatedItemStackRenderable(
         currentBounceVelocity = generateNextBounceVelocity()
         currentPosition = generateNextPosition(deltaTime.inPartialSeconds)
 
-        val (x, y) = currentPosition.x.roundToInt() to currentPosition.y.roundToInt()
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(x.toFloat(), y.toFloat(), 0f)
+        val xOffset = posX + xSpacing / 2
+        val yOffset = posY + currentPosition.y.roundToInt()
+
         stack.renderOnScreen(
-            (xSpacing / 2.0f) + x,
-            y.toFloat(),
+            xOffset.toFloat(),
+            yOffset.toFloat(),
             scaleMultiplier = scale,
             rescaleSkulls,
-            rotationDegrees = currentRotation,
+            rotationDegrees = currentRotation
         )
-        DrawContextUtils.popMatrix()
     }
 }
