@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
 import at.hannibal2.skyhanni.utils.ColorUtils.component4
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -339,7 +341,17 @@ object GuiRenderUtils {
         //#if MC < 1.21
         RenderHelper.enableGUIStandardItemLighting()
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
-        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+
+        try {
+            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Error rendering item onto screen",
+                "itemName" to item.displayName,
+                "internalName" to item.getInternalNameOrNull(),
+            )
+        }
+
         RenderHelper.disableStandardItemLighting()
         //#else
         //$$ renderItemStack(item, 0, 0)
