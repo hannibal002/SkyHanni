@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
-import java.util.*
 
 class RewardWarningConfig {
     @Expose
@@ -56,8 +55,8 @@ class RewardWarningConfig {
         desc = "The price to use for the options below.\n" +
             "Requires at least one of them to be on."
     )
-    @ConfigEditorSlider(minValue = 1f, maxValue = 50000f, minStep = 250f)
-    var coinsPerCopperPrice: Int = 6000
+    @ConfigEditorSlider(minValue = 1f, maxValue = 50_000f, minStep = 250f)
+    var coinsPerCopperPrice: Int = 6_000
 
     @Expose
     @ConfigOption(
@@ -84,8 +83,8 @@ class RewardWarningConfig {
             "Requires one of the below options to be on.\n" +
             "Above options take precedence."
     )
-    @ConfigEditorSlider(minValue = 1f, maxValue = 500000f, minStep = 1000f)
-    var coinsLossThreshold: Int = 150000
+    @ConfigEditorSlider(minValue = 1f, maxValue = 500_000f, minStep = 1_000f)
+    var coinsLossThreshold: Int = 150_000
 
     @Expose
     @ConfigOption(

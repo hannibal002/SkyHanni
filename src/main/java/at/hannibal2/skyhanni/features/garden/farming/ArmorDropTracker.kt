@@ -173,8 +173,8 @@ object ArmorDropTracker {
             new.add("drops", old)
             new
         }
-        event.move(86, "garden.farmingArmorDrop.pos", "garden.armorDropTracker.position")
-        event.move(86, "garden.farmingArmorDrop", "garden.armorDropTracker")
+        event.move(87, "garden.farmingArmorDrop.pos", "garden.armorDropTracker.position")
+        event.move(87, "garden.farmingArmorDrop", "garden.armorDropTracker")
     }
 
     @HandleEvent

@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.setClickRunCommand
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import com.google.gson.JsonArray
@@ -88,9 +87,9 @@ object Translator {
 
     private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
         val text = messageContentRegex.find(message)!!.groupValues[1].removeColor()
-        var newStyle = style.setClickRunCommand("/shtranslate $text")
-        newStyle = newStyle.setHoverShowText("§bClick to translate!".asComponent())
-        return newStyle
+        return style
+            .setClickRunCommand("/shtranslate $text")
+            .setHoverShowText("§bClick to translate!")
     }
 
     private val config get() = SkyHanniMod.feature.chat.translator

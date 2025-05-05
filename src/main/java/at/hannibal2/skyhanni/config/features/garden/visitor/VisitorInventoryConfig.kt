@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class InventoryConfig {
+class VisitorInventoryConfig {
     @Expose
     @ConfigOption(
         name = "Visitor Price",

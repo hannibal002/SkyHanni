@@ -790,8 +790,8 @@ object GardenVisitorFeatures {
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")
 
-        event.move(86, "garden.visitors.shoppingList.display", "garden.visitors.shoppingList.enabled")
-        event.move(86, "garden.visitors.shoppingList.pos", "garden.visitors.shoppingList.position")
+        event.move(87, "garden.visitors.shoppingList.display", "garden.visitors.shoppingList.enabled")
+        event.move(87, "garden.visitors.shoppingList.pos", "garden.visitors.shoppingList.position")
     }
 }
 
