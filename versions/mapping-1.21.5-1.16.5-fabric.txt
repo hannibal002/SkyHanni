@@ -7,6 +7,8 @@ net.minecraft.client.gui.hud.ChatHudLine getContent() getChatComponent()
 
 net.minecraft.client.gui.screen.ingame.SignEditScreen blockEntity sign
 
+net.minecraft.client.gui.widget.Widget net.minecraft.client.gui.Drawable
+
 net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.network.ClientPlayerEntity
 
 net.minecraft.client.network.ClientPlayerEntity networkHandler.sendChatMessage() sendChatMessage()
