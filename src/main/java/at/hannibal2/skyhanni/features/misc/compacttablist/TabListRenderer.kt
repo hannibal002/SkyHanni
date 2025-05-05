@@ -104,13 +104,15 @@ object TabListRenderer {
         val x = screenWidth - totalWidth / 2
         val y = 10
 
-        GuiRenderUtils.drawRect(
-            x - COLUMN_SPACING,
-            y - TAB_PADDING,
-            screenWidth + totalWidth / 2 + COLUMN_SPACING,
-            10 + totalHeight + TAB_PADDING,
-            -0x80000000,
-        )
+        if (!config.hideTabBackground) {
+            GuiRenderUtils.drawRect(
+                x - COLUMN_SPACING,
+                y - TAB_PADDING,
+                screenWidth + totalWidth / 2 + COLUMN_SPACING,
+                10 + totalHeight + TAB_PADDING,
+                -0x80000000,
+            )
+        }
 
         var headerY = y
         if (header.isNotEmpty()) {
@@ -165,7 +167,7 @@ object TabListRenderer {
                 middleY - TAB_PADDING + 1,
                 middleX + column.getMaxWidth() + TAB_PADDING - 2,
                 middleY + column.size() * LINE_HEIGHT + TAB_PADDING - 2,
-                0x20AAAAAA,
+                if (config.hideTabBackground) 0x8F262626.toInt() else 0x20AAAAAA,
             )
 
             for (tabLine in column.lines) {
@@ -177,11 +179,11 @@ object TabListRenderer {
                     if (playerInfo != null) {
                         minecraft.textureManager.bindTexture(playerInfo.locationSkin)
                         GlStateManager.color(1f, 1f, 1f, 1f)
-                        Gui.drawScaledCustomSizeModalRect(middleX, middleY, 8f, 8f, 8, 8, 8, 8, 64.0f, 64.0f)
+                        Gui.drawScaledCustomSizeModalRect(middleX, middleY, 8f, 8f, 8, 8, 8, 8, 64f, 64f)
 
                         val player = tabLine.getEntity(playerInfo)
                         if (player != null && player.isWearing(EnumPlayerModelParts.HAT)) {
-                            Gui.drawScaledCustomSizeModalRect(middleX, middleY, 40.0f, 8f, 8, 8, 8, 8, 64.0f, 64.0f)
+                            Gui.drawScaledCustomSizeModalRect(middleX, middleY, 40f, 8f, 8, 8, 8, 8, 64f, 64f)
                         }
                     }
                     middleX += 8 + 2

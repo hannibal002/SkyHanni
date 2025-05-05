@@ -248,7 +248,11 @@ dependencies {
 
 afterEvaluate {
     loom.runs.named("client") {
-        programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+        if (target == ProjectTarget.MAIN) {
+            programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+        } else if (target == ProjectTarget.MODERN) {
+            programArgs("--quickPlayMultiplayer", "hypixel.net")
+        }
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
         this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))

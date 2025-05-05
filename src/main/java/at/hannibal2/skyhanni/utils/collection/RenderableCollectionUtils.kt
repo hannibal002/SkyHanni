@@ -42,7 +42,7 @@ object RenderableCollectionUtils {
     ) {
         if (highlight) {
             // Hack to add enchant glint, like Hypixel does it
-            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+            itemStack.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
         }
         add(Renderable.itemStack(itemStack, scale = scale))
     }

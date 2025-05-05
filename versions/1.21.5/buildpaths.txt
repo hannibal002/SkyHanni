@@ -1,5 +1,5 @@
 # at/hannibal2/skyhanni/SkyHanniMod.kt
-# at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
+at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
 
 at/hannibal2/skyhanni/utils/EnumUtils.kt
 at/hannibal2/skyhanni/config/features/dev/RepoPatternConfig.java
@@ -10,9 +10,9 @@ at/hannibal2/skyhanni/utils/TimeLimitedCache.kt
 #at/hannibal2/skyhanni/api/minecraftevents/ClientEvents.kt
 at/hannibal2/skyhanni/utils/ReflectionUtils.kt
 at/hannibal2/skyhanni/config/HasLegacyId.java
-
+at/hannibal2/skyhanni/utils/compat/TypeAliasCompat.kt
 # at/hannibal2/skyhanni/utils/compat/MinecraftCompat.kt
-# at/hannibal2/skyhanni/utils/compat/InventoryCompat.kt
+at/hannibal2/skyhanni/utils/compat/InventoryCompat.kt
 # at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
 # at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 
@@ -66,7 +66,7 @@ at/hannibal2/skyhanni/utils/OtherModsSettings.kt
 at/hannibal2/skyhanni/utils/RegexUtils.kt
 at/hannibal2/skyhanni/utils/compat/ArrayNormalization.kt
 at/hannibal2/skyhanni/utils/compat/EffectsCompat.kt
-at/hannibal2/skyhanni/utils/compat/EnchantmentsCompat.kt
+#at/hannibal2/skyhanni/utils/compat/EnchantmentsCompat.kt
 at/hannibal2/skyhanni/utils/compat/EntityCompat.kt
 at/hannibal2/skyhanni/utils/compat/GuiScreenUtils.kt
 at/hannibal2/skyhanni/utils/compat/ItemCompat.kt
@@ -75,5 +75,8 @@ at/hannibal2/skyhanni/utils/compat/ScoreboardCompat.kt
 at/hannibal2/skyhanni/utils/compat/TextCompat.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/compat/NbtCompat.kt
+at.hannibal2.skyhanni.utils.system.PlatformUtils.kt
+
+
 
 # \.(?!kt|java|\()

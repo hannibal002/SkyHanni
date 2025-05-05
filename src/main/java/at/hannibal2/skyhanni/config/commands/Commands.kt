@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
-import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.GriffinBurrowHelper
 import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.features.garden.FarmingMilestoneCommand
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand
 import at.hannibal2.skyhanni.features.garden.GardenCropsInCommand
-import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.farming.CropSpeedMeter
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator
@@ -132,7 +130,7 @@ object Commands {
         event.register("shofficialwikithis") {
             description = "Searches the official wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
-            callback { WikiManager.otherWikiCommands(it, false, true) }
+            callback { WikiManager.otherWikiCommands(it, useFandom = false, wikithis = true) }
         }
         event.register("shcalccrop") {
             description = "Calculate how many crops need to be farmed between different crop milestones."
@@ -198,11 +196,6 @@ object Commands {
             description = "Resets the saved values of the applied kismet feathers in Croesus"
             category = CommandCategory.USERS_RESET
             callback { CroesusChestTracker.resetChest() }
-        }
-        event.register("shresetburrowwarps") {
-            description = "Manually resetting disabled diana burrow warp points"
-            category = CommandCategory.USERS_RESET
-            callback { BurrowWarpHelper.resetDisabledWarps() }
         }
         event.register("shresetcontestdata") {
             description = "Resets Jacob's Contest Data"

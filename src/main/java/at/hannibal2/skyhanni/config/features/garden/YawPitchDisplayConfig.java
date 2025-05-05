@@ -60,8 +60,8 @@ public class YawPitchDisplayConfig {
 
     @Expose
     @ConfigLink(owner = YawPitchDisplayConfig.class, field = "enabled")
-    public Position pos = new Position(445, 225, false, true);
+    public Position pos = new Position(445, 225);
     @Expose
     @ConfigLink(owner = YawPitchDisplayConfig.class, field = "showOutsideGarden")
-    public Position posOutside = new Position(445, 225, false, true);
+    public Position posOutside = new Position(445, 225);
 }
