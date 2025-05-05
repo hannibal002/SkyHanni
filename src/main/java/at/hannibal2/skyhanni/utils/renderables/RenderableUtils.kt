@@ -106,8 +106,8 @@ internal object RenderableUtils {
         val xWithoutPadding = xSpace - padding * 2
         val yWithoutPadding = ySpace - padding * 2
 
-        val xScale = xWithoutPadding / width.toDouble()
-        val yScale = yWithoutPadding / height.toDouble()
+        val xScale = xWithoutPadding / width.toFloat()
+        val yScale = yWithoutPadding / height.toFloat()
         val scale = min(xScale, yScale)
         val inverseScale = 1 / scale
 
@@ -126,12 +126,12 @@ internal object RenderableUtils {
                 ((preScaleMouse.first - padding) * inverseScale).toInt() to ((preScaleMouse.second - padding) * inverseScale).toInt()
 
             DrawContextUtils.translate(xOffsetRender, yOffsetRender, 0f)
-            DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1.0f)
+            DrawContextUtils.scale(scale, scale, 1f)
             render(
                 posX + (xOffset * inverseScale).toInt(),
                 posY + (yOffset * inverseScale).toInt(),
             )
-            DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1.0f)
+            DrawContextUtils.scale(inverseScale, inverseScale, 1f)
             DrawContextUtils.translate(-xOffsetRender, -yOffsetRender, 0f)
         } finally {
             Renderable.currentRenderPassMousePosition = preScaleMouse
