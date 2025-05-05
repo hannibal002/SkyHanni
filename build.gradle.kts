@@ -203,6 +203,7 @@ dependencies {
     if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
     else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
+    // Brigadier comes bundled with more recent versions of Minecraft
     if (target.minecraftVersion == MinecraftVersion.MC189) {
         shadowImpl("com.mojang:brigadier:1.0.18")
     }

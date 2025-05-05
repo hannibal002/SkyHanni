@@ -10,6 +10,7 @@ import com.mojang.brigadier.CommandDispatcher
 import net.minecraftforge.client.ClientCommandHandler
 
 //#else
+//$$ import com.mojang.brigadier.arguments.StringArgumentType
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
