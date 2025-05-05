@@ -225,7 +225,7 @@ class Position @JvmOverloads constructor(
     companion object {
         const val DEFAULT_SCALE = 1f
         const val MIN_SCALE = 0.1f
-        const val MAX_SCALE = 10.0f
+        const val MAX_SCALE = 10f
 
         private class FieldNotFoundException(field: String, owner: Class<*>) :
             Exception("Config Link for field $field in class $owner not found")

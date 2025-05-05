@@ -34,7 +34,7 @@ class SensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Reducing factor", desc = "Change by how much the sensitivity is lowered by.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 50f, minStep = 1f)
-    var reducingFactor: Property<Float> = Property.of(15.0f)
+    var reducingFactor: Property<Float> = Property.of(15f)
 
     @Expose
     @ConfigOption(name = "Show GUI", desc = "Show the GUI element while the feature is enabled.")
