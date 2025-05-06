@@ -8,8 +8,10 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ComposterConfig {
     @Expose
@@ -36,6 +38,14 @@ class ComposterConfig {
     )
     @ConfigEditorDropdown
     var retrieveFrom: RetrieveFromEntry = RetrieveFromEntry.SACKS
+
+    @Expose
+    @ConfigOption(
+        name = "Minimum Item Organic Matter",
+        desc = "The minimum amount of organic matter an item needs to show up on the organic matter overlay list."
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100_000f, minStep = 1000f)
+    var minimumOrganicMatter: Property<Double> = Property.of(1000.0)
 
     enum class RetrieveFromEntry(
         private val displayName: String,
