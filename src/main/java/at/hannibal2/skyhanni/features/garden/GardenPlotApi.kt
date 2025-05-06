@@ -6,11 +6,10 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
-import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.features.garden.sensitivity.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -220,7 +219,7 @@ object GardenPlotApi {
     fun Plot.sendTeleportTo() {
         if (isBarn()) HypixelCommands.teleportToPlot("barn")
         else HypixelCommands.teleportToPlot(name)
-        LockMouseLook.autoDisable()
+        LockMouseLook.unlockMouse()
     }
 
     init {
@@ -290,11 +289,11 @@ object GardenPlotApi {
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
             val lore = itemStack.getLore()
-            plotNamePattern.matchMatcher(itemStack.name) {
+            plotNamePattern.matchMatcher(itemStack.displayName) {
                 val plotName = group("name")
                 plot.name = plotName
             }
-            barnNamePattern.matchMatcher(itemStack.name) {
+            barnNamePattern.matchMatcher(itemStack.displayName) {
                 plot.name = group("name")
             }
             plot.locked = false

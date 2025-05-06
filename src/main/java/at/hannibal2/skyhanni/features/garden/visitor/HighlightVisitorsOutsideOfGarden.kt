@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -18,9 +17,9 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
@@ -32,7 +31,7 @@ object HighlightVisitorsOutsideOfGarden {
 
     private var visitorJson = mapOf<String?, List<GardenVisitor>>()
 
-    private val config get() = GardenApi.config.visitors
+    private val config get() = VisitorApi.config
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -91,8 +90,8 @@ object HighlightVisitorsOutsideOfGarden {
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: PacketSentEvent) {
         if (!shouldBlock) return
-        val world = Minecraft.getMinecraft().theWorld ?: return
-        val player = Minecraft.getMinecraft().thePlayer ?: return
+        val world = MinecraftCompat.localWorldOrNull ?: return
+        val player = MinecraftCompat.localPlayerOrNull ?: return
         if (player.isSneaking) return
         val packet = event.packet as? C02PacketUseEntity ?: return
         val entity = packet.getEntityFromWorld(world) ?: return
@@ -101,7 +100,7 @@ object HighlightVisitorsOutsideOfGarden {
             if (packet.action == C02PacketUseEntity.Action.INTERACT) {
                 ChatUtils.chatAndOpenConfig(
                     "Blocked you from interacting with a visitor. Sneak to bypass or click here to change settings.",
-                    GardenApi.config.visitors::blockInteracting,
+                    VisitorApi.config::blockInteracting,
                 )
             }
         }

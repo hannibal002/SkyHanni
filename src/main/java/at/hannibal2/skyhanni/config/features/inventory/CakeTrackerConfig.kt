@@ -19,7 +19,6 @@ class CakeTrackerConfig {
     @FeatureToggle
     var enabled: Boolean = false
 
-    @Expose
     @ConfigOption(
         name = "Note",
         desc = "This feature is not compatible with the NEU Storage Overlay." +
@@ -30,7 +29,7 @@ class CakeTrackerConfig {
 
     @Expose
     @ConfigLink(owner = CakeTrackerConfig::class, field = "enabled")
-    var cakeTrackerPosition: Position = Position(300, 300, false, true)
+    var cakeTrackerPosition: Position = Position(300, 300)
 
     @Expose
     var displayType: Property<CakeTrackerDisplayType> = Property.of(CakeTrackerDisplayType.MISSING_CAKES)

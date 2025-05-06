@@ -17,11 +17,11 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.setClickRunCommand
+import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import com.google.gson.JsonArray
 import kotlinx.coroutines.launch
 import net.minecraft.event.ClickEvent
-import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -87,9 +87,9 @@ object Translator {
 
     private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
         val text = messageContentRegex.find(message)!!.groupValues[1].removeColor()
-        style.setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shtranslate $text"))
-        style.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, ChatComponentText("§bClick to translate!")))
         return style
+            .setClickRunCommand("/shtranslate $text")
+            .setHoverShowText("§bClick to translate!")
     }
 
     private val config get() = SkyHanniMod.feature.chat.translator

@@ -33,5 +33,5 @@ public class ExperimentsProfitTrackerConfig {
 
     @Expose
     @ConfigLink(owner = ExperimentsProfitTrackerConfig.class, field = "enabled")
-    public Position position = new Position(20, 20, false, true);
+    public Position position = new Position(20, 20);
 }

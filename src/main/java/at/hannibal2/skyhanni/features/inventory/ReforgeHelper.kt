@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,9 +28,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
@@ -124,7 +123,7 @@ object ReforgeHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.slotNumber == reforgeButton) {
-            if (event.slot.stack?.name == "§eReforge Item" || event.slot.stack?.name == "§cError!") return
+            if (event.slot.stack?.displayName == "§eReforge Item" || event.slot.stack?.displayName == "§cError!") return
             if (handleReforgeButtonClick(event)) return
         }
 
@@ -134,6 +133,7 @@ object ReforgeHelper {
     }
 
     private fun handleReforgeButtonClick(event: GuiContainerEvent.SlotClickEvent): Boolean {
+        if (reforgeToSearch == null) return false
         if (currentReforge == reforgeToSearch) {
             event.cancel()
             waitForChat.set(false)
@@ -197,7 +197,7 @@ object ReforgeHelper {
         isInReforgeMenu = true
         waitForChat.set(false)
         DelayedRun.runNextTick {
-            inventoryContainer = Minecraft.getMinecraft().thePlayer.openContainer
+            inventoryContainer = MinecraftCompat.localPlayer.openContainer
         }
     }
 
@@ -336,7 +336,6 @@ object ReforgeHelper {
         val alreadySelected = sortAfter == stat
         val fieldColor = if (alreadySelected) LorenzColor.GRAY else LorenzColor.DARK_GRAY
 
-
         val tips = if (alreadySelected) {
             listOf("§6Sort by", tip)
         } else {
@@ -415,7 +414,7 @@ object ReforgeHelper {
         val inventory = inventoryContainer?.inventorySlots ?: return
         val slot = inventory.firstOrNull { it?.stack?.cleanName() == reforgeStone }
         if (slot != null) {
-            slot highlight color
+            slot.highlight(color)
         } else {
             inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
             inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)

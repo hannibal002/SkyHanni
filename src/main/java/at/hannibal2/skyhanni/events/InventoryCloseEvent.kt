@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
-class InventoryCloseEvent(val reopenSameName: Boolean) : SkyHanniEvent()
+@PrimaryFunction("onInventoryClose")
+class InventoryCloseEvent(val inventoryTitle: String, val reopenSameName: Boolean) : SkyHanniEvent()

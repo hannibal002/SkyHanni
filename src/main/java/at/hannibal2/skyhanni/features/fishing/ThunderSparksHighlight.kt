@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -20,7 +18,6 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.init.Blocks
 
 @SkyHanniModule
 object ThunderSparksHighlight {
@@ -30,7 +27,7 @@ object ThunderSparksHighlight {
     private val sparks = mutableListOf<EntityArmorStand>()
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         EntityUtils.getEntities<EntityArmorStand>().filter {
@@ -48,8 +45,7 @@ object ThunderSparksHighlight {
             if (spark.isDead) continue
             val sparkLocation = spark.getLorenzVec()
             val block = sparkLocation.getBlockAt()
-            val seeThroughBlocks =
-                sparkLocation.distanceToPlayer() < 6 && (block == Blocks.flowing_lava || block == Blocks.lava)
+            val seeThroughBlocks = sparkLocation.distanceToPlayer() < 6 && (block in FishingApi.lavaBlocks)
             event.drawWaypointFilled(
                 sparkLocation.add(-0.5, 0.0, -0.5), color, extraSize = -0.25, seeThroughBlocks = seeThroughBlocks,
             )
@@ -60,7 +56,7 @@ object ThunderSparksHighlight {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         sparks.clear()
     }
 

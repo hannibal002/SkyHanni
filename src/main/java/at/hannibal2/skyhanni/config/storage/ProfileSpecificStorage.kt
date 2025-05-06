@@ -7,7 +7,8 @@ import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
+import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
+import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
@@ -29,12 +30,12 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.DicerRngDropTracker
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
-import at.hannibal2.skyhanni.features.garden.pests.VinylType
+import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
@@ -45,17 +46,18 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
@@ -131,6 +133,9 @@ class ProfileSpecificStorage {
     @Expose
     var enderNodeTracker: EnderNodeTracker.Data = EnderNodeTracker.Data()
 
+    @Expose
+    var dragonProfitTracker: DragonProfitTracker.BucketData = DragonProfitTracker.BucketData()
+
     // - event
     // -- carnival
     @Expose
@@ -178,9 +183,9 @@ class ProfileSpecificStorage {
 
     // -- hoppity
     @Expose
-    var chocolateFactory: ChocolateFactoryStorage = ChocolateFactoryStorage()
+    var chocolateFactory: CFStorage = CFStorage()
 
-    class ChocolateFactoryStorage {
+    class CFStorage {
         @Expose
         var currentRabbits: Int = 0
 
@@ -279,10 +284,16 @@ class ProfileSpecificStorage {
         var hoppityShopYearOpened: Int? = null
 
         @Expose
-        var strayTracker: ChocolateFactoryStrayTracker.Data = ChocolateFactoryStrayTracker.Data()
+        var strayTracker: CFStrayTracker.Data = CFStrayTracker.Data()
 
         @Expose
         var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+
+        @Expose
+        var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+
+        @Expose
+        var hotChocolateMixinExpiry = farPast()
 
         class HitmanStatsStorage {
             @Expose
@@ -309,42 +320,68 @@ class ProfileSpecificStorage {
     var hoppityStatLiveDisplayToggledOff: Boolean = false
 
     data class HoppityEventStats(
-        @Expose
-        var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
+        @Expose var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
+        @Expose var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
+        @Expose var dupeChocolateGained: Long = 0,
+        @Expose var strayChocolateGained: Long = 0,
+        @Expose var rabbitTheFishFinds: Int = 0,
 
-        @Expose
-        var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
+        @Expose var millisInCf: Duration = Duration.ZERO,
+        @Expose var initialLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
+        @Expose var finalLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
+        @Expose var lastLbUpdate: SimpleTimeMark = farPast(),
+        @Expose var summarized: Boolean = false,
 
-        @Expose
-        var dupeChocolateGained: Long = 0,
-
-        @Expose
-        var strayChocolateGained: Long = 0,
-
-        @Expose
-        var millisInCf: Duration = Duration.ZERO,
-
-        @Expose
-        var rabbitTheFishFinds: Int = 0,
-
-        @Expose
-        var initialLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
-
-        @Expose
-        var finalLeaderboardPosition: LeaderboardPosition = LeaderboardPosition(-1, -1.0),
-
-        @Expose
-        var lastLbUpdate: SimpleTimeMark = farPast(),
-
-        @Expose
-        var summarized: Boolean = false,
+        @Expose var typeCountSnapshot: RabbitData? = RabbitData(),
+        @Expose var typeCountsSince: RabbitData? = RabbitData(),
     ) {
+        @Transient
+        var containingYears: MutableSet<Int> = mutableSetOf()
+
+        constructor(year: Int) : this() {
+            containingYears.add(year)
+        }
+
+        constructor(years: Set<Int>) : this() {
+            containingYears = years.toMutableSet()
+        }
+
+        operator fun plusAssign(it: HoppityEventStats) {
+            it.mealsFound.forEach { (key, value) ->
+                mealsFound.merge(key, value, Int::plus)
+            }
+            it.rabbitsFound.forEach { (key, rabbitData) ->
+                rabbitsFound.merge(key, rabbitData) { existing, new ->
+                    RabbitData(
+                        uniques = existing.uniques + new.uniques,
+                        dupes = existing.dupes + new.dupes,
+                        strays = existing.strays + new.strays,
+                    )
+                }
+            }
+            dupeChocolateGained += it.dupeChocolateGained
+            strayChocolateGained += it.strayChocolateGained
+            rabbitTheFishFinds += it.rabbitTheFishFinds
+            millisInCf += it.millisInCf
+        }
+
         companion object {
             data class RabbitData(
                 @Expose var uniques: Int = 0,
                 @Expose var dupes: Int = 0,
                 @Expose var strays: Int = 0,
-            )
+            ) {
+                fun getByIndex(index: Int): Int = when (index) {
+                    0 -> uniques
+                    1 -> dupes
+                    2 -> strays
+                    else -> throw IllegalArgumentException("Invalid index: $index")
+                }
+
+                companion object {
+                    val EMPTY get() = RabbitData(0, 0, 0)
+                }
+            }
 
             data class LeaderboardPosition(@Expose var position: Int, @Expose var percentile: Double)
         }
@@ -432,6 +469,7 @@ class ProfileSpecificStorage {
         @Expose
         var visitorDrops: VisitorDrops = VisitorDrops()
 
+        // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
         class VisitorDrops {
             @Expose
             var acceptedVisitors: Int = 0
@@ -439,8 +477,10 @@ class ProfileSpecificStorage {
             @Expose
             var deniedVisitors: Int = 0
 
+            fun getTotalVisitors() = acceptedVisitors + deniedVisitors
+
             @Expose
-            var visitorRarities: MutableList<Long> = mutableListOf()
+            var acceptedRarities: MutableMap<LorenzRarity, Long> = enumMapOf()
 
             @Expose
             var copper: Int = 0
@@ -464,7 +504,7 @@ class ProfileSpecificStorage {
             var gemstonePowder: Long = 0
 
             @Expose
-            var rewardsCount: Map<VisitorReward, Int> = enumMapOf()
+            var rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
         }
 
         @Expose
@@ -495,7 +535,7 @@ class ProfileSpecificStorage {
 
         class Fortune {
             @Expose
-            var outdatedItems: MutableMap<FarmingItems, Boolean> = enumMapOf()
+            var outdatedItems: MutableMap<FarmingItemType, Boolean> = enumMapOf()
 
             @Expose
             var farmingLevel: Int = -1
@@ -519,7 +559,7 @@ class ProfileSpecificStorage {
             var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
 
             @Expose
-            var farmingItems: MutableMap<FarmingItems, ItemStack> = enumMapOf()
+            var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
         }
 
         @Expose
@@ -532,6 +572,7 @@ class ProfileSpecificStorage {
         var farmingWeight: FarmingWeightConfig = FarmingWeightConfig()
 
         class FarmingWeightConfig {
+            // TODO rename to lastLeaderboard
             @Expose
             var lastFarmingWeightLeaderboard: Int = -1
         }
@@ -605,9 +646,9 @@ class ProfileSpecificStorage {
 
     // - mining
     @Expose
-    var mining: MiningConfig = MiningConfig()
+    var mining: MiningStorage = MiningStorage()
 
-    class MiningConfig {
+    class MiningStorage {
         @Expose
         var kingsTalkedTo: MutableList<String> = mutableListOf()
 
@@ -736,6 +777,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var verminTracker: VerminTracker.Data = VerminTracker.Data()
+
+        @Expose
+        var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
     }
 
     // - slayer
@@ -803,4 +847,26 @@ class ProfileSpecificStorage {
         @Expose
         var museumMilestone: Int? = null
     }
+
+    @Expose
+    var godPotExpiry: SimpleTimeMark = farPast()
+
+    @Expose
+    var fairySouls: FairySoulsStorage = FairySoulsStorage()
+
+    class FairySoulsStorage {
+        @Expose
+        var totalFound: MutableMap<IslandType, Int> = mutableMapOf()
+
+        @Expose
+        var found: MutableMap<IslandType, MutableSet<LorenzVec>> = mutableMapOf()
+    }
+
+    @Expose
+    var cakeCounterData: CakeCounterData = CakeCounterData()
+
+    class CakeCounterData(
+        @Expose var cakesEaten: Int? = -1,
+        @Expose var soulsFound: Int = 0,
+    )
 }

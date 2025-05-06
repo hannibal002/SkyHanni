@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
@@ -13,6 +12,7 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.acos
 import kotlin.math.cos
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -33,7 +33,7 @@ data class LorenzVec(
 
     constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
-    fun toBlockPos(): BlockPos = BlockPos(x, y, z)
+    fun toBlockPos(): BlockPos = BlockPos(floor(x).toInt(), floor(y).toInt(), floor(z).toInt())
 
     fun toVec3(): Vec3 = Vec3(x, y, z)
 
@@ -160,10 +160,6 @@ data class LorenzVec(
 
     fun scale(scalar: Double): LorenzVec = LorenzVec(scalar * x, scalar * y, scalar * z)
 
-    fun applyTranslationToGL() {
-        GlStateManager.translate(x, y, z)
-    }
-
     fun axisAlignedTo(other: LorenzVec) = AxisAlignedBB(x, y, z, other.x, other.y, other.z)
 
     fun up(offset: Number = 1): LorenzVec = copy(y = y + offset.toDouble())
@@ -267,6 +263,7 @@ fun BlockPos.toLorenzVec(): LorenzVec = LorenzVec(x, y, z)
 
 fun Entity.getLorenzVec(): LorenzVec = LorenzVec(posX, posY, posZ)
 fun Entity.getPrevLorenzVec(): LorenzVec = LorenzVec(prevPosX, prevPosY, prevPosZ)
+
 fun Entity.getMotionLorenzVec(): LorenzVec = LorenzVec(motionX, motionY, motionZ)
 
 fun Vec3.toLorenzVec(): LorenzVec = LorenzVec(xCoord, yCoord, zCoord)
@@ -278,8 +275,6 @@ fun S2APacketParticles.toLorenzVec() = LorenzVec(xCoordinate, yCoordinate, zCoor
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }
-
-fun RenderUtils.translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
 
 fun AxisAlignedBB.expand(vec: LorenzVec): AxisAlignedBB = expand(vec.x, vec.y, vec.z)
 

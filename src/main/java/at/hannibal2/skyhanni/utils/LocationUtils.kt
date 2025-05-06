@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
 import kotlin.math.PI
@@ -20,9 +20,15 @@ object LocationUtils {
     }
 
     private fun canSee0(a: LorenzVec, b: LorenzVec) =
-        Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
+        MinecraftCompat.localWorld.rayTraceBlocks(
+            a.toVec3(),
+            b.toVec3(),
+            false, // stopOnLiquid
+            true, // ignoreBlockWithoutBoundingBox
+            false, // returnLastUncollidableBlock
+        ) == null
 
-    fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
+    fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 
     fun LorenzVec.distanceToPlayer() = distance(playerLocation())
 
@@ -40,7 +46,7 @@ object LocationUtils {
     fun Entity.distanceToIgnoreY(location: LorenzVec) = getLorenzVec().distanceIgnoreY(location)
 
     fun playerEyeLocation(): LorenzVec {
-        val player = Minecraft.getMinecraft().thePlayer
+        val player = MinecraftCompat.localPlayer
         val vec = player.getLorenzVec()
         return vec.up(player.getEyeHeight().toDouble())
     }
@@ -54,8 +60,7 @@ object LocationUtils {
         val b = this
         val noBlocks = canSee(a, b, offset)
         val notTooFar = a.distance(b) < viewDistance.toDouble()
-        val inFov = true // TODO add Frustum "Frustum().isBoundingBoxInFrustum(entity.entityBoundingBox)"
-        return noBlocks && notTooFar && inFov
+        return noBlocks && notTooFar
     }
 
     fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =
@@ -119,7 +124,7 @@ object LocationUtils {
     }
 
     fun calculatePlayerYaw(): Float {
-        val player = Minecraft.getMinecraft().thePlayer
+        val player = MinecraftCompat.localPlayer
         var yaw = player.rotationYaw % 360
         if (yaw < 0) yaw += 360
         if (yaw > 180) yaw -= 360
@@ -206,5 +211,14 @@ object LocationUtils {
             if (resultPitch == pitchRadians) return guessPitch
         }
         return guessPitch
+    }
+
+    fun AxisAlignedBB.getCornersAtHeight(y: Double): List<LorenzVec> {
+        val cornerOne = LorenzVec(minX, y, minZ)
+        val cornerTwo = LorenzVec(minX, y, maxZ)
+        val cornerThree = LorenzVec(maxX, y, maxZ)
+        val cornerFour = LorenzVec(maxX, y, minZ)
+
+        return listOf(cornerOne, cornerTwo, cornerThree, cornerFour)
     }
 }

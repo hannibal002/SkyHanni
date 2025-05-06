@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EVOLVING_ITEMS
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.KUUDRA_KEY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.LARVA_HOOK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.MASTER_SKULL_TIER
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKYBLOCK_LEVEL
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.TIME_POCKET_ITEMS
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -39,7 +39,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -73,6 +72,7 @@ object ItemDisplayOverlayFeatures {
         "masterskull.id",
         "MASTER_SKULL_TIER_(?<tier>\\d)",
     )
+
     /**
      * REGEX-TEST: §7Vacuum Bag: §21 Pest
      * REGEX-TEST: §7Vacuum Bag: §2444 Pests
@@ -211,7 +211,7 @@ object ItemDisplayOverlayFeatures {
         if (COLLECTION_LEVEL.isSelected() && InventoryUtils.openInventoryName().endsWith(" Collections")) {
             if (lore.any { it.contains("Click to view!") }) {
                 if (CollectionApi.isCollectionTier0(lore)) return "0"
-                val name = item.name
+                val name = item.displayName
                 if (name.startsWith("§e")) {
                     val text = name.split(" ").last()
                     return "" + text.romanToDecimalIfNecessary()
@@ -245,7 +245,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (DUNGEON_POTION_LEVEL.isSelected() && itemName.startsWith("Dungeon ") && itemName.contains(" Potion")) {
-            dungeonPotionPattern.matchMatcher(item.name.removeColor()) {
+            dungeonPotionPattern.matchMatcher(item.displayName.removeColor()) {
                 return when (val level = group("level").romanToDecimal()) {
                     in 1..2 -> "§f$level"
                     in 3..4 -> "§a$level"
@@ -271,7 +271,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (TIME_POCKET_ITEMS.isSelected()) {
+        if (EVOLVING_ITEMS.isSelected()) {
             item.getSecondsHeld()?.let { seconds ->
                 return "§a${(seconds / 3600)}"
             }
@@ -348,6 +348,9 @@ object ItemDisplayOverlayFeatures {
         event.transform(70, "inventory.itemNumberAsStackSize") { element ->
             migrateTimePocketItems(element)
         }
+        event.transform(86, "inventory.itemNumberAsStackSize") { element ->
+            fixRenamedConfigElement(element, "TIME_POCKET_ITEMS", "EVOLVING_ITEMS")
+        }
     }
 
     private fun fixRemovedConfigElement(data: JsonElement): JsonElement {
@@ -355,6 +358,19 @@ object ItemDisplayOverlayFeatures {
         val newList = JsonArray()
         for (element in data.asJsonArray) {
             if (element.asString == "REMOVED") continue
+            newList.add(element)
+        }
+        return newList
+    }
+
+    private fun fixRenamedConfigElement(data: JsonElement, oldName: String, newName: String): JsonElement {
+        if (!data.isJsonArray) return data
+        val newList = JsonArray()
+        for (element in data.asJsonArray) {
+            if (element.asString == oldName) {
+                newList.add(JsonPrimitive(newName))
+                continue
+            }
             newList.add(element)
         }
         return newList

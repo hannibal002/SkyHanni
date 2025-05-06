@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -16,7 +15,7 @@ import net.minecraft.entity.item.EntityArmorStand
 @SkyHanniModule
 object FirePillarDisplay {
 
-    private val config get() = SkyHanniMod.feature.slayer.blazes
+    private val config get() = SlayerApi.config.blazes
 
     /**
      * REGEX-TEST: §6§l2s §c§l8 hits
@@ -29,7 +28,7 @@ object FirePillarDisplay {
     private var display = ""
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         val entityNames = EntityUtils.getEntities<EntityArmorStand>().map { it.name }
