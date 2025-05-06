@@ -8,15 +8,25 @@ import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -38,6 +48,7 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -407,8 +418,21 @@ object BlockStrengthGuide {
     private var sbMenuOpened = false
 
     private var lastSet = SimpleTimeMark.farPast()
+    private var lastRunCommand = SimpleTimeMark.farPast()
 
     fun onCommand() {
+        val notWorkingReason = when {
+            RiftApi.inRift() -> "in the rift"
+            DungeonApi.inDungeon() -> "in dungeons"
+            KuudraApi.inKuudra() -> "in kuudra"
+            else -> null
+        }
+        notWorkingReason?.let {
+            ChatUtils.userError("The Block Strengh Guide does not work $it!")
+            return
+
+        }
+        lastRunCommand = SimpleTimeMark.now()
         shouldBlockSHMenu = true
         sbMenuOpened = false
         HypixelCommands.skyblockMenu()
@@ -418,18 +442,31 @@ object BlockStrengthGuide {
     fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
         if (!shouldBlockSHMenu) return
 
-        event.cancel()
-
         if (!sbMenuOpened) {
-            sbMenuOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
-            Renderable.string(
-                "Loading...",
-                scale = 2.0,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
+            if (lastRunCommand.passedSince() < 2.seconds) {
+                sbMenuOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
+                Renderable.string(
+                    "Loading...",
+                    scale = 2.0,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
+                event.cancel()
+            } else {
+                @Suppress("DEPRECATION") // we want the sb area here intentionally
+                ErrorManager.logErrorStateWithData(
+                    "could not load mining data for /shblockstrengh command",
+                    "opened /sbmenu and found no mining speed in the next 2s",
+                    "island" to LorenzUtils.skyBlockIsland,
+                    "graph area" to IslandAreas.currentAreaName,
+                    "scoreboard area" to LorenzUtils.skyBlockArea,
+                    "location" to LocationUtils.playerLocation(),
+                    betaOnly = true,
+                )
+            }
             return
         }
+        event.cancel()
 
         val display = display ?: createDisplay().also {
             display = it
@@ -437,6 +474,16 @@ object BlockStrengthGuide {
 
         Renderable.withMousePosition(event.mouseX, event.mouseY) {
             display.renderAndScale(0, 0, event.gui.width, event.gui.height, 20)
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (event.inventoryName != "SkyBlock Menu") return
+        DelayedRun.runDelayed(100.milliseconds) {
+            if (lastRunCommand.passedSince() < 3.seconds) {
+                lastRunCommand = SimpleTimeMark.farPast()
+            }
         }
     }
 
