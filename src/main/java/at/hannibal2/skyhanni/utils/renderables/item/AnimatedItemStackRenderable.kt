@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.inPartialSeconds
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.Vec3
-import kotlin.math.roundToInt
+import kotlin.math.sin
 
 /**
  * A data class that defines the bouncing behavior of an item stack.
@@ -24,10 +24,6 @@ data class ItemStackBounceDefinition(
     val downwardBounce: Int,
     val bounceSpeed: Double = 0.5,
 )
-
-private data class LocalPosition(val x: Double, val y: Double)
-
-private enum class BounceVelocity { UP, DOWN, NONE }
 
 /**
  * A data class that defines the rotation behavior of an item stack.
@@ -72,18 +68,8 @@ class AnimatedItemStackRenderable(
     highlight,
 ) {
     override val height = (15.5 * scale + 0.5).toInt() + ySpacing + bounce.upwardBounce + bounce.downwardBounce
-
-    private var lastTime: SimpleTimeMark = SimpleTimeMark.now()
-
-    private var currentPosition: LocalPosition = LocalPosition(0.0, 0.0)
-    private fun generateNextPosition(deltaTime: Double): LocalPosition = LocalPosition(
-        x = currentPosition.x,
-        y = currentPosition.y + when (currentBounceVelocity) {
-            BounceVelocity.UP -> bounce.upwardBounce * deltaTime
-            BounceVelocity.DOWN -> -bounce.downwardBounce * deltaTime
-            BounceVelocity.NONE -> 0
-        }.toDouble(),
-    )
+    private var lastTime = SimpleTimeMark.now()
+    private val startTime = SimpleTimeMark.now()
 
     private var currentRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
@@ -101,34 +87,28 @@ class AnimatedItemStackRenderable(
         },
     )
 
-    private var currentBounceVelocity = when {
-        bounce.upwardBounce > 0 -> BounceVelocity.UP
-        bounce.downwardBounce > 0 -> BounceVelocity.DOWN
-        else -> BounceVelocity.NONE
-    }
-    private fun generateNextBounceVelocity() = when {
-        currentPosition.y >= bounce.upwardBounce -> BounceVelocity.DOWN
-        currentPosition.y <= bounce.downwardBounce -> BounceVelocity.UP
-        else -> currentBounceVelocity
-    }
-
     override fun render(posX: Int, posY: Int) {
-        val now = SimpleTimeMark.now()
-        val deltaTime = now - lastTime
-        lastTime = now
+        val t = (SimpleTimeMark.now() - startTime).inPartialSeconds
+        // time to go up _and_ down once (seconds):
+        val period = (bounce.upwardBounce + bounce.downwardBounce) * 2 / bounce.bounceSpeed
+        // angle from 0 → 2π over one full cycle
+        val theta = (t % period) / period * (2 * Math.PI)
+        // build an asymmetric sine:
+        //   maps -1..1  →  -downwardBounce...upwardBounce
+        val amplitude = bounce.upwardBounce + bounce.downwardBounce
+        val offset = sin(theta) * (amplitude / 2)
+        val rest = (bounce.upwardBounce - bounce.downwardBounce) / 2
+        val currentOffsetY = offset + rest
 
-        currentRotation = generateNextRotation(deltaTime.inPartialSeconds)
-        currentBounceVelocity = generateNextBounceVelocity()
-        currentPosition = generateNextPosition(deltaTime.inPartialSeconds)
-
-        val xOffset = posX + xSpacing / 2
-        val yOffset = posY + currentPosition.y.roundToInt()
+        val dt = (SimpleTimeMark.now() - lastTime).inPartialSeconds
+        lastTime = SimpleTimeMark.now()
+        currentRotation = generateNextRotation(dt)
 
         stack.renderOnScreen(
-            xOffset.toFloat(),
-            yOffset.toFloat(),
+            x = (posX + (xSpacing / 2f)),
+            y = (posY + currentOffsetY).toFloat(),
             scaleMultiplier = scale,
-            rescaleSkulls,
+            rescaleSkulls = rescaleSkulls,
             rotationDegrees = currentRotation
         )
     }

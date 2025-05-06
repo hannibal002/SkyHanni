@@ -24,9 +24,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
-import org.lwjgl.util.vector.Vector3f
 import java.awt.Color
-import java.nio.FloatBuffer
 import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
@@ -251,34 +249,38 @@ object GuiRenderUtils {
             x - d to y - d
         } else x to y
 
-        val halfIcon = 8f
+        val halfIconX = 8f
+        val halfIconY = 8f  // ?
+        val halfIconZ = 100f  // ?
 
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(tx, ty, 0f)
-        DrawContextUtils.scale(s, s, s)
+        DrawContextUtils.translate(tx, ty, -19f)
+        DrawContextUtils.scale(s, s, 0.2f)
 
-        val savedMV = FloatBuffer.allocate(3)
-        DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
-
+        // Rotation
         DrawContextUtils.pushMatrix()
         DrawContextUtils.loadIdentity()
 
-        DrawContextUtils.translate(halfIcon, halfIcon, halfIcon)
+        DrawContextUtils.translate(halfIconX, halfIconY, halfIconZ)
         if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
         if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
         if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
-        DrawContextUtils.translate(-halfIcon, -halfIcon, -halfIcon)
+        DrawContextUtils.translate(-halfIconX, -halfIconY, -halfIconZ)
 
-        savedMV.flip()
+        val savedMV = GLAllocation.createDirectFloatBuffer(16)
+        DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
+        DrawContextUtils.popMatrix()
+
         DrawContextUtils.multMatrix(savedMV)
 
+        GL11.glEnable(GL11.GL_NORMALIZE)
+        GL11.glNormal3f(0f, 0f, 1f)
         RenderHelper.enableGUIStandardItemLighting()
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
-
         item.tryRenderItemIntoGui()
-
         RenderHelper.disableStandardItemLighting()
-        DrawContextUtils.popMatrix()
+        GL11.glDisable(GL11.GL_NORMALIZE)
+
         DrawContextUtils.popMatrix()
     }
 
