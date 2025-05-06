@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.mixins.transformers.AcceessmoulConfigPlease
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -291,13 +290,12 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
     ): GuiOptionEditor? {
         val default = super.createOptionGui(processedOption, field, option) ?: return null
         if (processedOption !is ProcessedOptionImpl) return default
-        if (processedOption !is AcceessmoulConfigPlease) return default
         var extraPath = ""
         val categoryParent = processedOption.category.parentCategoryId
         if (categoryParent != null) {
             extraPath = categoryParent.split(".").last() + "."
         }
-        extraPath += processedOption.path
+        extraPath += processedOption.getPath()
         if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
             return GuiOptionEditorBlocked(default)
         }
