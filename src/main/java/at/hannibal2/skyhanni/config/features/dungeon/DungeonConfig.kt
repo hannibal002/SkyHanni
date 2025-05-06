@@ -34,7 +34,7 @@ class DungeonConfig {
 
     @Expose
     @ConfigLink(owner = DungeonConfig::class, field = "showMilestonesDisplay")
-    var showMileStonesDisplayPos: Position = Position(10, 10, false, true)
+    var showMileStonesDisplayPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Death Counter Display", desc = "Display the total amount of deaths in the current Dungeon.")
@@ -44,7 +44,7 @@ class DungeonConfig {
 
     @Expose
     @ConfigLink(owner = DungeonConfig::class, field = "deathCounterDisplay")
-    var deathCounterPos: Position = Position(10, 10, false, true)
+    var deathCounterPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Clean End", desc = "")
