@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -13,27 +14,31 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 
 @SkyHanniModule
 object JacobContestStatsSummary {
 
     private val config get() = GardenApi.config.jacobContest.contestSummary
-    private var blocksBroken = 0
+    private var blocksBroken: MutableMap<CropType, Int> = enumMapOf()
     private var startTime = SimpleTimeMark.farPast()
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN, priority = HandleEvent.HIGHEST)
     fun onCropClick(event: CropClickEvent) {
         if (!config.enabled) return
         if (event.clickType != ClickType.LEFT_CLICK) return
 
         if (FarmingContestApi.inContest && event.crop == FarmingContestApi.contestCrop) {
-            blocksBroken++
+            blocksBroken.addOrPut(event.crop, 1)
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onFarmingContest(event: FarmingContestEvent) {
         if (!config.enabled) return
+        val cropsBroken = blocksBroken[event.crop] ?: 0
+        if (config.hideZeroCropStats && cropsBroken == 0) return
 
         when (event.phase) {
             FarmingContestPhase.START -> {
@@ -42,13 +47,12 @@ object JacobContestStatsSummary {
             }
 
             FarmingContestPhase.STOP -> {
-                if (config.hideZeroCropStats && blocksBroken == 0) return
                 val duration = startTime.passedSince()
-                val blocksPerSecond = (blocksBroken.toDouble() / duration.inWholeSeconds).roundTo(2)
+                val blocksPerSecond = (cropsBroken.toDouble() / duration.inWholeSeconds).roundTo(2)
                 val cropName = event.crop.cropName
                 ChatUtils.chat("Stats for $cropName Contest:")
                 val time = duration.format()
-                ChatUtils.chat("§7Blocks Broken in total: §e${blocksBroken.addSeparators()}")
+                ChatUtils.chat("§7Blocks Broken in total: §e${cropsBroken.addSeparators()}")
                 val color = getBlocksPerSecondColor(blocksPerSecond)
                 ChatUtils.chat("§7Average Blocks Per Second: $color$blocksPerSecond")
                 ChatUtils.chat("§7Participated for §b$time")
@@ -59,7 +63,6 @@ object JacobContestStatsSummary {
                 startTime = SimpleTimeMark.now()
             }
         }
-        blocksBroken = 0
     }
 
     private fun getBlocksPerSecondColor(blocksPerSecond: Double) = if (blocksPerSecond > 19) "§c" else "§a"
