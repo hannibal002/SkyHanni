@@ -22,7 +22,6 @@ object CommandsRegistry {
 
     private val dispatcher: CommandDispatcher<Any?> = CommandDispatcher()
 
-    //#if MC < 1.21
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
         CommandRegistrationEvent(builders, dispatcher).post()
