@@ -1,22 +1,24 @@
 package at.hannibal2.skyhanni.config.core.elements
 
+import io.github.notenoughupdates.moulconfig.common.RenderContext
 import java.awt.Color
 
-class GuiElementButton(text: String, colour: Int, private val callback: Runnable) : GuiElementText(text, colour) {
+class GuiElementButton {
 
-    override val height: Int
-        get() = super.height + 5
+    var text: String = ""
 
-    override val width: Int
-        get() = super.width + 10
+    val height: Int = 18 + 5
+    var width: Int = -1
 
-    override fun mouseClicked(mouseX: Int, mouseY: Int, mouseButton: Int) {
-        callback.run()
+    fun getWidth(context: RenderContext): Int {
+        val fr = context.minecraft.defaultFontRenderer
+        return fr.getStringWidth(text) + 10
     }
 
-    override fun render(x: Int, y: Int) {
-        drawRect(x, y, x + width, y + super.height, Color.WHITE.rgb)
-        drawRect(x + 1, y + 1, x + width - 1, y + super.height - 1, Color.BLACK.rgb)
-        super.render(x + 5, y - 1)
+    fun render(context: RenderContext, x: Int, y: Int) {
+        context.drawColoredRect(x.toFloat(), y.toFloat(), (x + width).toFloat(), (y + 18).toFloat(), Color.WHITE.rgb)
+        context.drawColoredRect((x + 1).toFloat(), (y + 1).toFloat(), (x + width - 1).toFloat(), (y + 18 - 1).toFloat(), Color.BLACK.rgb)
+        val fr = context.minecraft.defaultFontRenderer
+        context.drawString(fr, text, x + 5, y + 5, -1, true)
     }
 }
