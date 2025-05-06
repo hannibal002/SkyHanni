@@ -57,7 +57,7 @@ class AnimatedItemStackRenderable(
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     override val highlight: Boolean = false,
-): ItemStackRenderable(
+) : ItemStackRenderable(
     item,
     scale,
     xSpacing,

@@ -241,7 +241,7 @@ object GuiRenderUtils {
         val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
         val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
 
-        val baseScale = if (rescaleSkulls && item.item === Items.skull) 4f/3f else 1f
+        val baseScale = if (rescaleSkulls && item.item === Items.skull) (4f / 3f) else 1f
         val s = baseScale * scaleMultiplier.toFloat()
 
         val (tx, ty) = if (rescaleSkulls && item.item === Items.skull) {
@@ -250,8 +250,8 @@ object GuiRenderUtils {
         } else x to y
 
         val halfIconX = 8f
-        val halfIconY = 8f  // ?
-        val halfIconZ = 100f  // ?
+        val halfIconY = 8f
+        val halfIconZ = 100f
 
         DrawContextUtils.pushMatrix()
         DrawContextUtils.translate(tx, ty, -19f)
@@ -284,6 +284,7 @@ object GuiRenderUtils {
         DrawContextUtils.popMatrix()
     }
 
+    @Suppress("EmptyElseBlock")
     private fun ItemStack.tryRenderItemIntoGui() = try {
         Minecraft.getMinecraft().renderItem.renderItemIntoGUI(this, 0, 0)
     } catch (e: Exception) {
