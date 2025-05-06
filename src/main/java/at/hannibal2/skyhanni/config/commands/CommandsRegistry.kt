@@ -22,6 +22,7 @@ object CommandsRegistry {
 
     private val dispatcher: CommandDispatcher<Any?> = CommandDispatcher()
 
+    //#if MC < 1.21
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
         CommandRegistrationEvent(builders, dispatcher).post()
@@ -39,9 +40,11 @@ object CommandsRegistry {
     }
 
     fun BaseBrigadierBuilder.addToRegister(dispatcher: CommandDispatcher<Any?>) {
-        val command = toCommand(dispatcher)
         //#if MC < 1.21
+        val command = toCommand(dispatcher)
         ClientCommandHandler.instance.registerCommand(command)
+        //#else
+        //$$ dispatcher.register(builder as LiteralArgumentBuilder<Any?>)
         //#endif
         builders.add(this)
     }

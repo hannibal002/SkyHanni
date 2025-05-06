@@ -9,7 +9,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.tree.CommandNode
+//#if MC < 1.21
 import net.minecraft.command.ICommand
+//#endif
 
 typealias LiteralCommandBuilder = BrigadierBuilder<LiteralArgumentBuilder<Any?>>
 typealias ArgumentCommandBuilder<T> = BrigadierBuilder<RequiredArgumentBuilder<Any?, T>>
@@ -26,7 +28,9 @@ class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBu
 
     lateinit var node: CommandNode<Any?>
 
+    //#if MC < 1.21
     override fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand = BrigadierCommand(this, dispatcher)
+    //#endif
 }
 
 open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(

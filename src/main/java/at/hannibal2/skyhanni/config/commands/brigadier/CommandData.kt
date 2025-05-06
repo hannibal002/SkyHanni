@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.commands.brigadier
 
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import com.mojang.brigadier.CommandDispatcher
+//#if MC < 1.21
 import net.minecraft.command.ICommand
+//#endif
 
 interface CommandData {
     val name: String
@@ -16,5 +18,7 @@ interface CommandData {
         return allNames
     }
 
+    //#if MC < 1.21
     fun toCommand(dispatcher: CommandDispatcher<Any?>): ICommand
+    //#endif
 }
