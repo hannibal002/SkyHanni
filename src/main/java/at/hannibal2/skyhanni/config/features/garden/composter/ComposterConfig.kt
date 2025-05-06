@@ -42,7 +42,7 @@ class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Minimum Item Organic Matter",
-        desc = "The minimum amount of organic matter an item needs to show up on the organic matter overlay list."
+        desc = "Change the minimum amount of organic matter items on the organic matter overlay have."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 100_000f, minStep = 1000f)
     var minimumOrganicMatter: Property<Double> = Property.of(1000.0)
