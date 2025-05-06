@@ -17,16 +17,18 @@ class SeaCreatureTrackerConfig {
 
     @Expose
     @ConfigLink(owner = SeaCreatureTrackerConfig::class, field = "enabled")
-    var position: Position = Position(20, 20, false, true)
+    var position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "Show Percentage", desc = "Show percentage how often what sea creature got caught.")
     @ConfigEditorBoolean
     var showPercentage: Property<Boolean> = Property.of(false)
 
+    // TODO move into sea creature category as this is now independent of the tracker
     @Expose
     @ConfigOption(name = "Hide Chat", desc = "Hide the chat messages when catching a sea creature.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var hideChat: Boolean = false
 
     @Expose

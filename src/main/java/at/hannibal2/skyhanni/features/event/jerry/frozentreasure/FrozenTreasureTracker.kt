@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -70,7 +69,7 @@ object FrozenTreasureTracker {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         icePerHour = 0
         stoppedChecks = 0
         icePerSecond = mutableListOf()

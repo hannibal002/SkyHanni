@@ -24,7 +24,7 @@ public class SkyMartConfig {
 
     @Expose
     @ConfigLink(owner = SkyMartConfig.class, field = "copperPrice")
-    public Position copperPricePos = new Position(211, 132, false, true);
+    public Position copperPricePos = new Position(211, 132);
 
     @Expose
     @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")

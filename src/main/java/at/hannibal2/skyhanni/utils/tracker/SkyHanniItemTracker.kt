@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -226,7 +227,8 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
         } else emptyList()
 
-        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
+        val coinFormat = "coin".pluralize(profit.toInt())
+        val text = "§eTotal Profit: $profitPrefix$profitFormat $coinFormat"
         return Renderable.hoverTips(text, tips).toSearchable()
     }
 }

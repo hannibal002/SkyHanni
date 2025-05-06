@@ -32,6 +32,15 @@ class CommandsConfig {
     @FeatureToggle
     var shortCommands: Boolean = true
 
+    @Expose
+    @ConfigOption(
+        name = "Accept Last Invite",
+        desc = "Automatically accept the latest party invite if no player is specified with /p accept.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var acceptLastInvite: Boolean = true
+
     @ConfigOption(
         name = "Party Kick Reason",
         desc = "Send a reason when kicking people using §e/pk lrg89 Dupe Archer §7or §e/party kick nea89o Low Cata Level§7."
@@ -40,6 +49,15 @@ class CommandsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var partyKickReason: Boolean = true
+
+    @ConfigOption(
+        name = "Shorten §e/warp",
+        desc = "Allows warping without the need for the §ewarp §7prefix.\n(§e/warp wizard §7-> §e/wizard§7)"
+    )
+    @Expose
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var shortenWarp: Boolean = false
 
     @Expose
     @ConfigOption(name = "Replace §e/warp is", desc = "Add §e/warp is §7alongside §e/is§7. Idk why. Ask §cKaeso")

@@ -57,7 +57,7 @@ class Position @JvmOverloads constructor(
 
     @Expose
     var scale: Float = scale
-        get() = if (field == 0f) DEFAULT_SCALE else field
+        get() = if (field <= 0f) DEFAULT_SCALE else field
 
     @Expose
     var centerX: Boolean = centerX
@@ -218,13 +218,14 @@ class Position @JvmOverloads constructor(
                 "owner" to configLink.owner,
                 "field" to configLink.field,
             )
+            ErrorManager.crashInDevEnv("Couldn't set config links") { e }
         }
     }
 
     companion object {
         const val DEFAULT_SCALE = 1f
         const val MIN_SCALE = 0.1f
-        const val MAX_SCALE = 10.0f
+        const val MAX_SCALE = 10f
 
         private class FieldNotFoundException(field: String, owner: Class<*>) :
             Exception("Config Link for field $field in class $owner not found")

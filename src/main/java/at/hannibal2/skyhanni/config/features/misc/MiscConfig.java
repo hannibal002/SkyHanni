@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
+import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
@@ -13,10 +14,12 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +43,7 @@ public class MiscConfig {
     public MinionsConfig minions = new MinionsConfig();
 
     @Expose
-    @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
+    @Category(name = "Stranded", desc = "Features designed for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
     @Expose
@@ -134,6 +137,21 @@ public class MiscConfig {
     @Expose
     public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
 
+    @ConfigOption(name = "Fruit Bowl", desc = "Features for Fruit Bowl")
+    @Accordion
+    @Expose
+    public FruitBowlConfig fruitBowl = new FruitBowlConfig();
+
+    @Expose
+    @ConfigOption(name = "Cake Counter Features", desc = "")
+    @Accordion
+    public CakeCounterConfig cakeCounter = new CakeCounterConfig();
+  
+    @Expose
+    @ConfigOption(name = "Frog Mask Features", desc = "")
+    @Accordion
+    public FrogMaskFeaturesConfig frogMaskFeatures = new FrogMaskFeaturesConfig();
+
     @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
@@ -164,10 +182,10 @@ public class MiscConfig {
     public boolean hideTemporaryArmorstands = true;
 
     @Expose
-    public Position collectionCounterPos = new Position(10, 10, false, true);
+    public Position collectionCounterPos = new Position(10, 10);
 
     @Expose
-    public Position carryPosition = new Position(10, 10, false, true);
+    public Position carryPosition = new Position(10, 10);
 
     @Expose
     @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
@@ -247,17 +265,7 @@ public class MiscConfig {
 
     @Expose
     @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
-    public Position playerMovementSpeedPos = new Position(394, 124, false, true);
-
-    @Expose
-    @ConfigOption(name = "Frog Mask Display", desc = "Displays information about the §5Frog Mask§7.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean frogMaskDisplay = false;
-
-    @Expose
-    @ConfigLink(owner = MiscConfig.class, field = "frogMaskDisplay")
-    public Position frogMaskDisplayPosition = new Position(25, 25, false, true);
+    public Position playerMovementSpeedPos = new Position(394, 124);
 
     @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
@@ -334,7 +342,7 @@ public class MiscConfig {
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
-    public Position inventoryLoadPos = new Position(394, 124, false, true);
+    public Position inventoryLoadPos = new Position(394, 124);
 
     @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Remove ghost entities caused by a Hypixel bug.\n" +
@@ -409,4 +417,17 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnAboutPcTimeOffset = true;
+
+    @Expose
+    @ConfigOption(name = "Transparent Tooltips", desc = "Shows item tooltips transparent. This only impacts tooltips shown in SkyHanni GUI's.. §cFUN!")
+    @ConfigEditorBoolean
+    public boolean transparentTooltips = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Abiphone Hotkey",
+        desc = "Answer incoming abiphone calls with a hotkey."
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int abiphoneAcceptKey = Keyboard.KEY_NONE;
 }

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
@@ -164,7 +163,7 @@ object TabListData {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!dirty) return
         dirty = false
 

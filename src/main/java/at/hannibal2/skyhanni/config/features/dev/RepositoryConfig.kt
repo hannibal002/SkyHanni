@@ -21,7 +21,7 @@ class RepositoryConfig {
 
     @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
-    var updateRepo: Runnable = Runnable { RepoManager::updateRepo }
+    var updateRepo: Runnable = Runnable(RepoManager::updateRepo)
 
     @Expose
     @ConfigOption(name = "Repository Location", desc = "")

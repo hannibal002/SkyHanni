@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -16,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -460,7 +458,7 @@ enum class TabWidget(
         }
 
         @HandleEvent
-        fun onWorldChange(event: WorldChangeEvent) {
+        fun onWorldChange() {
             sentSinceWorldChange = false
         }
 

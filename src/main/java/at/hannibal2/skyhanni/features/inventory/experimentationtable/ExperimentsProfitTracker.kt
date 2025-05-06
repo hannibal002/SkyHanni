@@ -25,8 +25,8 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import kotlin.math.absoluteValue
@@ -102,9 +103,11 @@ object ExperimentsProfitTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
-
-        tracker.addItem(event.internalName, event.amount, command = true)
+        if (isEnabled() && event.source == ItemAddManager.Source.COMMAND) {
+            if (config.enabled) {
+                tracker.addItem(event.internalName, event.amount, command = true)
+            }
+        }
     }
 
     @HandleEvent
@@ -113,7 +116,9 @@ object ExperimentsProfitTracker {
 
         val message = event.message.removeColor()
         if (claimMessagePattern.matches(message) && ExperimentMessages.DONE.isSelected()) {
-            event.blockedReason = "CLAIM_MESSAGE"
+            if (config.enabled) {
+                event.blockedReason = "CLAIM_MESSAGE"
+            }
         }
 
         experimentsDropPattern.matchMatcher(message) {
@@ -150,11 +155,13 @@ object ExperimentsProfitTracker {
         else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
     }
 
+    private val allowedSlots = listOf(11, 12, 14, 15)
+
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() ||
             InventoryUtils.openInventoryName() != "Bottles of Enchanting" ||
-            !listOf(11, 12, 14, 15).contains(event.slotId)
+            !allowedSlots.contains(event.slotId)
         ) return
         val stack = event.slot?.stack ?: return
 
@@ -208,7 +215,7 @@ object ExperimentsProfitTracker {
     }
 
     private fun calculateBottlePrice(internalName: NeuInternalName): Int {
-        val price = internalName.getPrice()
+        val price = SkyHanniTracker.getPricePer(internalName)
         val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
         return npcPrice.coerceAtLeast(price).toInt()
     }
@@ -226,11 +233,14 @@ object ExperimentsProfitTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lExperiments Profit Tracker")
-        val profit = tracker.drawItems(data, { true }, this) + data.startCost
+        val startCost = if (SkyHanniMod.feature.misc.tracker.priceSource != ItemPriceSource.NPC_SELL) {
+            data.startCost
+        } else 0
+        val profit = tracker.drawItems(data, { true }, this) + startCost
 
         val experimentsDone = data.experimentsDone
         addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
-        val startCostFormat = data.startCost.absoluteValue.shortFormat()
+        val startCostFormat = startCost.absoluteValue.shortFormat()
         val bitCostFormat = data.bitCost.shortFormat()
         add(
             Renderable.hoverTips(
@@ -251,7 +261,7 @@ object ExperimentsProfitTracker {
         tracker.initRenderer(
             { config.position },
             ExperimentationTableApi.superpairInventory,
-        ) { isEnabled() }
+        ) { config.enabled && isEnabled() }
     }
 
     @HandleEvent
@@ -299,7 +309,7 @@ object ExperimentsProfitTracker {
     private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
     private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
-        IslandType.PRIVATE_ISLAND.isInIsland() && config.enabled &&
+        IslandType.PRIVATE_ISLAND.isInIsland() &&
             (!checkDistanceToExperimentationTable || ExperimentationTableApi.inDistanceToTable(5.0))
 
 }

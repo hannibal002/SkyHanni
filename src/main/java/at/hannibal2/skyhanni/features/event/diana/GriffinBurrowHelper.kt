@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -39,6 +38,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.addDoublePlant
+import at.hannibal2.skyhanni.utils.compat.addLeaves
+import at.hannibal2.skyhanni.utils.compat.addLeaves2
+import at.hannibal2.skyhanni.utils.compat.addRedFlower
+import at.hannibal2.skyhanni.utils.compat.addTallGrass
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
@@ -50,16 +54,16 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val allowedBlocksAboveGround = listOf(
-        Blocks.air,
-        Blocks.leaves,
-        Blocks.leaves2,
-        Blocks.tallgrass,
-        Blocks.double_plant,
-        Blocks.red_flower,
-        Blocks.yellow_flower,
-        Blocks.spruce_fence,
-    )
+    private val allowedBlocksAboveGround = buildList {
+        add(Blocks.air)
+        add(Blocks.yellow_flower)
+        add(Blocks.spruce_fence)
+        addLeaves()
+        addLeaves2()
+        addTallGrass()
+        addDoublePlant()
+        addRedFlower()
+    }
 
     var targetLocation: LorenzVec? = null
 
@@ -143,7 +147,7 @@ object GriffinBurrowHelper {
         val newLocation = calculateNewTarget()
         if (targetLocation != newLocation) {
             targetLocation = newLocation
-            // add island graphs here some day when the hub is fully added in the graph
+            // TODO: add island graphs here some day when the hub is fully added in the graph
 //             newLocation?.let {
 //                 IslandGraphs.find(it)
 //             }
@@ -176,8 +180,6 @@ object GriffinBurrowHelper {
         return newLocation
     }
 
-    private var correctCounter = 0
-
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
@@ -187,18 +189,8 @@ object GriffinBurrowHelper {
         if (newLocation.distance(playerLocation) < 6) return
 
         latestGuess?.let {
-            if (it.precise && config.multiGuesses) {
-                if (it.getLocation() == newLocation) {
-                    correctCounter++
-                } else {
-                    if (correctCounter > 5) {
-                        config.guess
-                        if (it.getLocation() !in particleBurrows) {
-                            additionalGuesses.add(it)
-                        }
-                    }
-                    correctCounter = 0
-                }
+            if (it.precise && config.multiGuesses && event.new && it.getLocation() !in particleBurrows) {
+                additionalGuesses.add(it)
             }
         }
 
@@ -218,11 +210,8 @@ object GriffinBurrowHelper {
 
     private fun removePreciseGuess(location: LorenzVec) {
         latestGuess?.let {
-            if (it.precise) {
-                if (location == it.getLocation()) {
-                    latestGuess = null
-                    correctCounter = 0
-                }
+            if (it.precise && location == it.getLocation()) {
+                latestGuess = null
             }
         }
         additionalGuesses.removeIf { it.getLocation() == location }
@@ -234,7 +223,6 @@ object GriffinBurrowHelper {
         val location = guess.getLocation()
         if (particleBurrows.any { location.distance(it.key) < distance }) {
             latestGuess = null
-            correctCounter = 0
         }
     }
 
@@ -269,7 +257,6 @@ object GriffinBurrowHelper {
 
     private fun resetAllData() {
         latestGuess = null
-        correctCounter = 0
         additionalGuesses.clear()
         targetLocation = null
         particleBurrows = emptyMap()
@@ -282,7 +269,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         resetAllData()
     }
 
@@ -437,11 +424,9 @@ object GriffinBurrowHelper {
 
         if (particleBurrows.containsKey(location)) {
             DelayedRun.runDelayed(1.seconds) {
-                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
-                    if (particleBurrows.containsKey(location)) {
-                        // workaround
-                        particleBurrows = particleBurrows.editCopy { keys.remove(location) }
-                    }
+                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds && particleBurrows.containsKey(location)) {
+                    // workaround
+                    particleBurrows = particleBurrows.editCopy { keys.remove(location) }
                 }
             }
         }
@@ -458,7 +443,7 @@ object GriffinBurrowHelper {
         } else ""
         if (lastTitleSentTime.passedSince() > 2.seconds) {
             lastTitleSentTime = SimpleTimeMark.now()
-            TitleManager.sendTitle(text + keybindSuffix, duration = 2.seconds, fontSize = 3f)
+            TitleManager.sendTitle(text + keybindSuffix, duration = 2.seconds)
         }
     }
 

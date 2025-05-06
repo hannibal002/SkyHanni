@@ -43,14 +43,14 @@ public class SensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Reducing factor", desc = "Change by how much the sensitivity is lowered by.")
     @ConfigEditorSlider(minValue = 1, maxValue = 50, minStep = 1)
-    public Property<Float> reducingFactor = Property.of(15.0F);
+    public Property<Float> reducingFactor = Property.of(15f);
 
     @Expose
     @ConfigOption(
         name = "Show GUI",
         desc = "Show the GUI element while the feature is enabled.")
     @ConfigEditorBoolean
-    public boolean showGUI = true;
+    public boolean showGui = true;
 
     @Expose
     @ConfigOption(
@@ -67,6 +67,6 @@ public class SensitivityReducerConfig {
     public Property<Boolean> onlyPlot = Property.of(true);
 
     @Expose
-    @ConfigLink(owner = SensitivityReducerConfig.class, field = "showGUI")
+    @ConfigLink(owner = SensitivityReducerConfig.class, field = "showGui")
     public Position position = new Position(400, 400, 0.8f);
 }

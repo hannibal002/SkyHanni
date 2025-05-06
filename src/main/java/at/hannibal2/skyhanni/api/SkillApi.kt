@@ -31,11 +31,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.command.CommandBase
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -477,7 +477,7 @@ object SkillApi {
     fun onComplete(strings: Array<String>): List<String> {
         return when (strings.size) {
             1 -> listOf("levelwithxp", "xpforlevel", "goal")
-            2 -> if (strings[0].lowercase() == "goal") CommandBase.getListOfStringsMatchingLastWord(
+            2 -> if (strings[0].lowercase() == "goal") StringUtils.getListOfStringsMatchingLastWord(
                 strings,
                 SkillType.entries.map { it.displayName },
             ) else listOf()

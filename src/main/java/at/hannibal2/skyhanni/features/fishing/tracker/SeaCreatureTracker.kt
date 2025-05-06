@@ -83,7 +83,6 @@ object SeaCreatureTracker {
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
-        // manually migrating from "Phlhlegblast" to "Plhlegblast" when the new name is in the repo
         tryToMigrate(data.amount)
 
         addSearchString("§7Sea Creature Tracker:")
@@ -113,21 +112,24 @@ object SeaCreatureTracker {
         addSearchString(" §7- §e${total.addSeparators()} §7Total Sea Creatures")
     }
 
-    private fun tryToMigrate(
-        data: MutableMap<String, Int>,
-    ) {
+    // Hypixel renames sea creatures from time to time. This migration process fixes the invalid config entries.
+    private fun tryToMigrate(data: MutableMap<String, Int>) {
         if (!needMigration) return
         needMigration = false
 
-        val oldName = "Phlhlegblast"
-        val newName = "Plhlegblast"
+        val map = mutableMapOf(
+            "Phlhlegblast" to "Plhlegblast",
+            "Sea Emperor" to "The Sea Emperor",
+        )
 
-        // only migrate once the repo contains the new name
-        if (SeaCreatureManager.allFishingMobs.containsKey(newName)) {
-            data[oldName]?.let {
-                ChatUtils.debug("Sea Creature Tracker migrated $it $oldName to $newName")
-                data[newName] = it
-                data.remove(oldName)
+        for ((oldName, newName) in map) {
+            // only migrate once the repo contains the new name
+            if (SeaCreatureManager.allFishingMobs.containsKey(newName)) {
+                data[oldName]?.let {
+                    ChatUtils.debug("Sea Creature Tracker migrated $it $oldName to $newName")
+                    data[newName] = it + (data[newName] ?: 0)
+                    data.remove(oldName)
+                }
             }
         }
     }
@@ -187,6 +189,7 @@ object SeaCreatureTracker {
     }
 
     private fun shouldShowDisplay(): Boolean {
+        if (!config.enabled) return false
         if (!isEnabled()) return false
         if (!FishingApi.isFishing(checkRodInHand = false)) return false
 
@@ -202,5 +205,6 @@ object SeaCreatureTracker {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !FishingApi.wearingTrophyArmor && !LorenzUtils.inKuudraFight
+    private fun isEnabled() =
+        LorenzUtils.inSkyBlock && !FishingApi.hasTreasureHook && !FishingApi.wearingTrophyArmor && !LorenzUtils.inKuudraFight
 }

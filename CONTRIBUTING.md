@@ -83,7 +83,7 @@ out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/mast
 
 ## Pull Requests
 
-General infos about Pull Request can be found on [Github Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
+General infos about Pull Request can be found on the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests).
 
 ### Creating a Pull Request
 
@@ -146,8 +146,12 @@ Internal changes that do not impact the end user. Examples include:
 - Typos in object names (which the end user will not see)
 - API updates
 - Minor performance improvements
-- Preparations for 1.21
+- Preparations for modern Minecraft versions
 - Documentation changes to markdown files, e.g., in `/docs` or this file.
+
+Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
+We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
+everything else can go in the normal PR description (What area). 
 
 #### Removed Features
 
@@ -182,8 +186,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
-    - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
-    - This will automatically register it to the forge event bus and load the repo patterns.
+    - If the feature needs to register Forge/Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature classs it with `@SkyHanniModule`
+    - This will automatically register all events to the respective event bus, and loads the repo patterns.
     - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error in `SkyHanniMod.kt`.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
@@ -192,7 +196,13 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it. Do not use Forge events.
-    - (We inject the calls with Mixin)
+    - To expand the event systems you can create a new event that is called from a Mixin
+    - Or you can subscribe to a Forge event and then post a SkyHanni event from that. See the `api/minecraftevents` package for examples.
+    - If you make a new event there are a few different types of events that you can make, make sure your event extends one of these.
+      - SkyHanniEvent: This is just a normal event.
+      - CancelableSkyHanniEvent: This is a cancellable event. It has a `cancel()` method that you can call to cancel the event.
+      - GenericSkyHanniEvent: This is a generic event, typically used for entities but can be used for any generics.
+      - RenderingSkyHanniEvent: This is an event that you are allowed to do GUI rendering in.
 - Please use existing utils methods.
 - We try to avoid calling the NEU code too often.
     - (We plan to remove NEU as a dependency in the future.)
@@ -209,8 +219,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
-    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples.
-      for more information and usages.
+    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples, more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
@@ -222,6 +231,26 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
+- Always combine title messages with chat message.
+  - This way users know what feature and what mod sends the title, if they want to disable it.
+  - Also we can include more informations why the title just showed up, as the title should not be too long.
+
+### Compatibility with modern versions
+As SkyHanni gets closer to supporting multiple Minecraft versions, there are a few additional coding conventions to follow. Below are some
+of the main conventions to follow to ensure that code you write should work on both 1.8.9 and modern versions. Remember that the best
+way to ensure you are writing the correct code is to look at existing code for similar features and then try to follow that code. Also
+looking in the `at.hannibal2.skyhanni.utils.compat` package is a good idea, as this is where most of the compatibility code will be located.
+- When accessing either the player or the world use `MinecraftCompat.localPlayer()` and `MinecraftCompat.localWorld()`. These methods
+both have a nullable version as well: `MinecraftCompat.localPlayerOrNull()` and `MinecraftCompat.localWorldOrNull()`. This is because on
+1.8.9 while the player and world can be nullable at times, Minecraft's source code does not reflect this.
+- Rendering on modern versions is done completely differently than on 1.8.9. As such, on 1.8.9 we have adjusted our rendering code to more
+closely resemble modern rendering code. You may notice a `DrawContext` or `WorldRenderContext` object being passed around. These both hold
+a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack, translating and scaling.
+To do most of these calls instead of using `GlStateManager` directly, you should use `DrawContextUtils` instead. If you are unsure, make sure
+to look at existing code to see how it is done and if you are still unsure, ask for help.
+- When making GUI screens or other GUI elements, you should try to use Renderables where possible as these should already account for
+most modern rendering changes. If you are making a new GUI screen, make sure to extend `SkyHanniBaseScreen` instead of `GuiScreen` to ensure
+compatibility for modern versions.
 
 ## Additional Useful Development Tools
 
@@ -253,6 +282,10 @@ Allows project specific plugins to run. Eg: Regex Intention
 ### [Live Templates Sharing](https://plugins.jetbrains.com/plugin/25007-live-templates-sharing)
 
 Imports our custom live templates automatically. Live Templates allow for quicker code writing.
+
+### [Minecraft Development](https://plugins.jetbrains.com/plugin/8327-minecraft-development)
+
+Helps you write minecraft specific code such as mixins and access wideners.
 
 ## Software Used in SkyHanni
 
@@ -319,6 +352,11 @@ For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002
 
 We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
 
+### Discord Bot
+
+While not directly part of the Minecraft mod, it is useful to know that we have
+a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
+
 ## 1.21 / Modern version development
 
 You might have noticed that while the SkyHanni source code is found in `src/`, the actual tasks for compiling, building and running the mod
@@ -331,11 +369,6 @@ different Minecraft versions.
 
 Note also that the only targets we consider are 1.8.9 and 1.21 (or whatever the latest version we may target). The other versions are only there
 to make mappings translate more easily (more on that later).
-
-## Discord Bot
-
-While not directly part of the Minecraft mod, it is useful to know that we have
-a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
 
 ### Goals
 
@@ -428,6 +461,8 @@ Adding a mapping like this is the easiest way to fix a broken method call, field
 files, so you might be fixing issues in files you didn't even look at. It will even work in mixin targets, as long as they are unambiguous
 (consider using the method descriptor instead of just the method name for your mixin). However, if something aside from the name changed,
 this will not suffice.
+
+After adding new mappings to the mappings file don't forget to run `./gradlew cleanupMappingFiles` to automatically sort the mappings file.
 
 #### Custom mappings
 
@@ -550,3 +585,15 @@ These helper methods should generally be placed in the `at.hannibal2.skyhanni.ut
 compatability methods for. For example, `WorldClient.getAllEntities()` could be placed in `WorldCompat.kt`. This is not a strict rule, but
 it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files
 themselves.
+
+
+### Access Wideners
+
+You may want to use private minecraft methods or fields, this is where access wideners come in. 
+Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or 
+field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
+To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and 
+select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<version number>/src/main/resources/skyhanni.accesswidener`.
+Then you need to reload gradle for the changes to apply.
+
+This requires you to have the Minecraft Development plugin installed as mentioned earlier.

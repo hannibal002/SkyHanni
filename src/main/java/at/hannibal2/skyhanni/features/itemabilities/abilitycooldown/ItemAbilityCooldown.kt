@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.recentlyHeld
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ItemAbilityCooldown {
@@ -61,7 +63,6 @@ object ItemAbilityCooldown {
     private var lastAbility = ""
     private var items = mapOf<String, List<ItemText>>()
     private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
-    private val recentItemsInHand = InventoryUtils.recentItemsInHand.values
     private val WEIRD_TUBA = "WEIRD_TUBA".toInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".toInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".toInternalName()
@@ -82,7 +83,7 @@ object ItemAbilityCooldown {
                 ItemAbility.HYPERION.sound()
             }
             // Fire Fury Staff
-            event.soundName == "liquid.lavapop" && event.pitch == 1.0f && event.volume == 1f -> {
+            event.soundName == "liquid.lavapop" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.FIRE_FURY_STAFF.sound()
             }
             // Ice Spray Wand
@@ -128,13 +129,12 @@ object ItemAbilityCooldown {
                 ItemAbility.VOODOO_DOLL.sound()
             }
             // Jinxed Voodoo Doll Hit
-            event.soundName == "random.successful_hit" && event.volume == 1.0f && event.pitch == 0.7936508f -> {
+            event.soundName == "random.successful_hit" && event.volume == 1f && event.pitch == 0.7936508f -> {
                 ItemAbility.VOODOO_DOLL_WILTED.sound()
             }
             // Jinxed Voodoo Doll Miss
-            event.soundName == "mob.ghast.scream" && event.volume == 1.0f && event.pitch >= 1.6 && event.pitch <= 1.7 -> {
-                val recentItems = InventoryUtils.recentItemsInHand.values
-                if (VOODOO_DOLL_WILTED in recentItems) {
+            event.soundName == "mob.ghast.scream" && event.volume == 1f && event.pitch >= 1.6 && event.pitch <= 1.7 -> {
+                if (VOODOO_DOLL_WILTED.recentlyHeld()) {
                     ItemAbility.VOODOO_DOLL_WILTED.sound()
                 }
             }
@@ -144,16 +144,15 @@ object ItemAbilityCooldown {
             }
             // Weird Tuba & Weirder Tuba
             event.soundName == "mob.wolf.howl" && event.volume == 0.5f -> {
-                val recentItems = InventoryUtils.recentItemsInHand.values
-                if (WEIRD_TUBA in recentItems) {
+                if (WEIRD_TUBA.recentlyHeld()) {
                     ItemAbility.WEIRD_TUBA.sound()
                 }
-                if (WEIRDER_TUBA in recentItems) {
+                if (WEIRDER_TUBA.recentlyHeld()) {
                     ItemAbility.WEIRDER_TUBA.sound()
                 }
             }
             // End Stone Sword
-            event.soundName == "mob.zombie.unfect" && event.pitch == 2.0f && event.volume == 0.3f -> {
+            event.soundName == "mob.zombie.unfect" && event.pitch == 2f && event.volume == 0.3f -> {
                 ItemAbility.END_STONE_SWORD.sound()
             }
             // Soul Esoward
@@ -161,15 +160,15 @@ object ItemAbilityCooldown {
                 ItemAbility.SOUL_ESOWARD.sound()
             }
             // Pigman Sword
-            event.soundName == "mob.zombiepig.zpigangry" && event.pitch == 2.0f && event.volume == 0.3f -> {
+            event.soundName == "mob.zombiepig.zpigangry" && event.pitch == 2f && event.volume == 0.3f -> {
                 ItemAbility.PIGMAN_SWORD.sound()
             }
             // Ember Rod
-            event.soundName == "mob.ghast.fireball" && event.pitch == 1.0f && event.volume == 0.3f -> {
+            event.soundName == "mob.ghast.fireball" && event.pitch == 1f && event.volume == 0.3f -> {
                 ItemAbility.EMBER_ROD.sound()
             }
             // Fire Freeze Staff
-            event.soundName == "mob.guardian.elder.idle" && event.pitch == 2.0f && event.volume == 0.2f -> {
+            event.soundName == "mob.guardian.elder.idle" && event.pitch == 2f && event.volume == 0.2f -> {
                 ItemAbility.FIRE_FREEZE_STAFF.sound()
             }
             // Staff of the Volcano
@@ -177,23 +176,23 @@ object ItemAbilityCooldown {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
             // Staff of the Volcano
-            event.soundName == "random.eat" && event.pitch == 1.0f && event.volume == 1.0f -> {
+            event.soundName == "random.eat" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
             // Holy Ice
-            event.soundName == "random.drink" && event.pitch.roundTo(1) == 1.8f && event.volume == 1.0f -> {
+            event.soundName == "random.drink" && event.pitch.roundTo(1) == 1.8f && event.volume == 1f -> {
                 ItemAbility.HOLY_ICE.sound()
             }
             // Royal Pigeon
-            event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+            event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1f -> {
                 ItemAbility.ROYAL_PIGEON.sound()
             }
             // Wand of Strength
-            event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+            event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1f -> {
                 ItemAbility.WAND_OF_STRENGTH.sound()
             }
             // Tactical Insertion
-            event.soundName == "fire.ignite" && event.pitch == 0.74603176f && event.volume == 1.0f -> {
+            event.soundName == "fire.ignite" && event.pitch == 0.74603176f && event.volume == 1f -> {
                 ItemAbility.TACTICAL_INSERTION.activate(LorenzColor.DARK_PURPLE, 3_000)
             }
 
@@ -202,21 +201,21 @@ object ItemAbilityCooldown {
             }
             // Totem of Corruption
             event.soundName == "random.wood_click" && event.pitch == 0.84126985f && event.volume == 0.5f -> {
-                if (TOTEM_OF_CORRUPTION in recentItemsInHand) {
+                if (TOTEM_OF_CORRUPTION.recentlyHeld()) {
                     ItemAbility.TOTEM_OF_CORRUPTION.sound()
                 }
             }
             // Enrager
-            event.soundName == "mob.enderdragon.growl" && event.pitch == 0.4920635f && event.volume == 2.0f -> {
+            event.soundName == "mob.enderdragon.growl" && event.pitch == 0.4920635f && event.volume == 2f -> {
                 ItemAbility.ENRAGER.sound()
             }
 
             // Blaze Slayer Flares
-            event.soundName == "fireworks.launch" && event.pitch == 1.0f && event.volume == 3.0f -> {
-                if (WARNING_FLARE in recentItemsInHand || ALERT_FLARE in recentItemsInHand) {
+            event.soundName == "fireworks.launch" && event.pitch == 1f && event.volume == 3f -> {
+                if (WARNING_FLARE.recentlyHeld() || ALERT_FLARE.recentlyHeld()) {
                     ItemAbility.ALERT_FLARE.sound()
                 }
-                if (SOS_FLARE in recentItemsInHand) {
+                if (SOS_FLARE.recentlyHeld()) {
                     ItemAbility.SOS_FLARE.sound()
                 }
             }
@@ -237,9 +236,9 @@ object ItemAbilityCooldown {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         for (ability in ItemAbility.entries) {
-            ability.lastActivation = 0L
+            ability.lastActivation = SimpleTimeMark.farPast()
             ability.specialColor = null
         }
     }
@@ -318,8 +317,8 @@ object ItemAbilityCooldown {
         val specialColor = ability.specialColor
         val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration: Long = ability.lastActivation + ability.getCooldown() - System.currentTimeMillis()
-            val color = specialColor ?: if (duration < 600) LorenzColor.RED else LorenzColor.YELLOW
+            val duration = ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
+            val color = specialColor ?: if (duration < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
             if (specialColor != null) {
@@ -447,8 +446,8 @@ object ItemAbilityCooldown {
     }
 
     private fun ItemAbility.sound() {
-        val ping = System.currentTimeMillis() - lastItemClick
-        if (ping < 400) {
+        val ping = lastItemClick.passedSince()
+        if (ping < 400.milliseconds) {
             activate()
         }
     }

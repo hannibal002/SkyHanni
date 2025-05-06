@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.BossCategory
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig.NameVisibility
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
@@ -14,9 +15,8 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.end.DragonFightAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
@@ -45,8 +45,8 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
@@ -65,6 +65,7 @@ import net.minecraft.entity.passive.EntityWolf
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 // TODO cut class into smaller pieces
@@ -80,6 +81,8 @@ object DamageIndicatorManager {
 
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
+
+    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
 
     fun isDamageSplash(entity: EntityArmorStand): Boolean {
         if (entity.ticksExisted > 300) return false
@@ -115,8 +118,15 @@ object DamageIndicatorManager {
         }
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onServerTick(event: ServerTickEvent) {
+        data.forEach {
+            it.value.serverTicksAlive++
+        }
+    }
+
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         mobFinder = MobFinder()
         data = emptyMap()
     }
@@ -138,8 +148,8 @@ object DamageIndicatorManager {
 
         // TODO config to define between 100ms and 5 sec
         val filter = data.filter {
-            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4_000 else 100
-            (System.currentTimeMillis() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
+            val waitForRemoval = if (it.value.dead && !noDeathDisplay(it.value.bossType)) 4.seconds else 100.milliseconds
+            (SimpleTimeMark.now() > it.value.timeLastTick + waitForRemoval) || (it.value.dead && noDeathDisplay(it.value.bossType))
         }
         if (filter.isNotEmpty()) {
             data = data.editCopy {
@@ -225,8 +235,37 @@ object DamageIndicatorManager {
             }
             event.drawDynamicText(location, bossName, sizeBossName, -9f, smallestDistanceVew = smallestDistanceVew)
 
+            val icons = iconCache.getOrPut(data) {
+                buildList {
+                    if (config.shurikenIndicator && entity.getNameTagWith(3, "§b✯") != null) {
+                        add(
+                            if (config.compactStatusEffects) "§b✯"
+                            else "§bShuriken",
+                        )
+                    }
+                    if (config.twilightIndicator && entity.getNameTagWith(3, "§5ᛤ") != null) {
+                        add(
+                            if (config.compactStatusEffects) "§5ᛤ"
+                            else "§5Twilight",
+                        )
+                    }
+                }
+            }
+
+            val iconString = icons.joinToString(if (config.compactStatusEffects) "" else " ")
+            var diff = 9f
+            if (iconString.isNotEmpty()) {
+                event.drawDynamicText(
+                    location,
+                    iconString,
+                    sizeBossName,
+                    diff,
+                    smallestDistanceVew = smallestDistanceVew,
+                )
+                diff += 22f
+            } else diff += 4f
+
             if (config.showDamageOverTime) {
-                var diff = 13f
                 val currentDamage = data.damageCounter.currentDamage
                 val currentHealing = data.damageCounter.currentHealing
                 if (currentDamage != 0L || currentHealing != 0L) {
@@ -293,22 +332,22 @@ object DamageIndicatorManager {
     }
 
     private fun tickDamage(damageCounter: DamageCounter) {
-        val now = System.currentTimeMillis()
+        val now = SimpleTimeMark.now()
         if (damageCounter.currentDamage != 0L || damageCounter.currentHealing != 0L) {
-            if (damageCounter.firstTick == 0L) {
+            if (damageCounter.firstTick.isFarPast()) {
                 damageCounter.firstTick = now
             }
 
-            if (now > damageCounter.firstTick + 1_000) {
+            if (damageCounter.firstTick.passedSince() > 1.seconds) {
                 damageCounter.oldDamages.add(
                     0, OldDamage(now, damageCounter.currentDamage, damageCounter.currentHealing),
                 )
-                damageCounter.firstTick = 0L
+                damageCounter.firstTick = SimpleTimeMark.farPast()
                 damageCounter.currentDamage = 0
                 damageCounter.currentHealing = 0
             }
         }
-        damageCounter.oldDamages.removeIf { now > it.time + 5_000 }
+        damageCounter.oldDamages.removeIf { it.time.passedSince() > 5.seconds }
     }
 
     private fun formatDelay(delay: Duration): String {
@@ -323,7 +362,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
         data = data.editCopy {
             EntityUtils.getEntities<EntityLivingBase>()
@@ -378,7 +417,7 @@ object DamageIndicatorManager {
                 val color = NumberUtil.percentageColor(health, maxHealth)
                 entityData.healthText = color.getChatColor() + health.shortFormat()
             }
-            entityData.timeLastTick = System.currentTimeMillis()
+            entityData.timeLastTick = SimpleTimeMark.now()
             return entity.uniqueID to entityData
         } catch (e: Throwable) {
             ErrorManager.logErrorWithData(
@@ -516,7 +555,7 @@ object DamageIndicatorManager {
             entity.setHellionShield(null)
         }
 
-        if (!SkyHanniMod.feature.slayer.blazes.phaseDisplay) return ""
+        if (!SlayerApi.config.blazes.phaseDisplay) return ""
 
         var calcHealth = health
         val calcMaxHealth: Int
@@ -680,7 +719,7 @@ object DamageIndicatorManager {
             calcHealth.toLong(), calcMaxHealth.toLong(),
         ).getChatColor() + calcHealth.shortFormat()
 
-        if (!SkyHanniMod.feature.slayer.endermen.phaseDisplay) {
+        if (!SlayerApi.config.endermen.phaseDisplay) {
             result = ""
             entityData.namePrefix = ""
         }
@@ -857,7 +896,7 @@ object DamageIndicatorManager {
         val entityData = EntityData(
             entity,
             entityResult.ignoreBlocks,
-            entityResult.delayedStart?.asTimeMark(),
+            entityResult.delayedStart,
             entityResult.finalDungeonBoss,
             entityResult.bossType,
             foundTime = SimpleTimeMark.now(),
