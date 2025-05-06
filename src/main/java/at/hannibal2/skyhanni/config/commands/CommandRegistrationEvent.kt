@@ -15,7 +15,7 @@ class CommandRegistrationEvent(
 ) : SkyHanniEvent() {
 
     val commands: List<CommandData> get() = builders
-    
+
     fun registerBrigadier(name: String, builder: BaseBrigadierBuilder.() -> Unit) {
         val command = BaseBrigadierBuilder(name).apply(builder)
         command.hasUniqueName()

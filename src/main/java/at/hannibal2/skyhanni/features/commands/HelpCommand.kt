@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandBuilderBase
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
