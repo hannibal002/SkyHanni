@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.compat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.Vec3
+import java.nio.FloatBuffer
 
 class MatrixStack {
 
@@ -40,4 +41,11 @@ class MatrixStack {
         GlStateManager.popMatrix()
     }
 
+    fun getFloat(pName: Int, params: FloatBuffer) {
+        GlStateManager.getFloat(pName, params)
+    }
+
+    fun loadIdentity() = GlStateManager.loadIdentity()
+
+    fun multMatrix(matrix: FloatBuffer) = GlStateManager.multMatrix(matrix)
 }

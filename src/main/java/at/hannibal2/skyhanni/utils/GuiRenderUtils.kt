@@ -26,6 +26,7 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import org.lwjgl.util.vector.Vector3f
 import java.awt.Color
+import java.nio.FloatBuffer
 import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
@@ -256,31 +257,43 @@ object GuiRenderUtils {
         DrawContextUtils.translate(tx, ty, 0f)
         DrawContextUtils.scale(s, s, s)
 
-        DrawContextUtils.translate(halfIcon, halfIcon, 0f)
+        val savedMV = FloatBuffer.allocate(3)
+        DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
+
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.loadIdentity()
+
+        DrawContextUtils.translate(halfIcon, halfIcon, halfIcon)
         if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
         if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
         if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
-        DrawContextUtils.translate(-halfIcon, -halfIcon, 0f)
+        DrawContextUtils.translate(-halfIcon, -halfIcon, -halfIcon)
+
+        savedMV.flip()
+        DrawContextUtils.multMatrix(savedMV)
 
         RenderHelper.enableGUIStandardItemLighting()
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
 
-        try {
-            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
-        } catch (e: Exception) {
-            if (lastWarn.passedSince() > 1.seconds) {
-                lastWarn = SimpleTimeMark.now()
-                println(" ")
-                println("item: $item")
-                println("name: ${item.displayName}")
-                println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
-                println(" ")
-                ChatUtils.debug("rendering an item has failed.")
-            }
-        } finally {
-            RenderHelper.disableStandardItemLighting()
-            DrawContextUtils.popMatrix()
-        }
+        item.tryRenderItemIntoGui()
+
+        RenderHelper.disableStandardItemLighting()
+        DrawContextUtils.popMatrix()
+        DrawContextUtils.popMatrix()
+    }
+
+    private fun ItemStack.tryRenderItemIntoGui() = try {
+        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(this, 0, 0)
+    } catch (e: Exception) {
+        if (lastWarn.passedSince() > 1.seconds) {
+            lastWarn = SimpleTimeMark.now()
+            println(" ")
+            println("item: $this")
+            println("name: $displayName")
+            println("getInternalNameOrNull: ${getInternalNameOrNull()}")
+            println(" ")
+            ChatUtils.debug("rendering an item has failed.")
+        } else { }
     }
 
     private var lastWarn = SimpleTimeMark.farPast()
