@@ -1,5 +1,10 @@
 package at.hannibal2.skyhanni.api.enoughupdates
 
+//#if MC > 1.21
+//$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.util.Identifier
+//$$ import net.minecraft.nbt.NbtString
+//#else
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -30,21 +35,17 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.JsonToNBT
+import net.minecraft.nbt.NBTException
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.NBTTagString
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.TreeMap
 import kotlin.math.floor
-//#if MC > 1.21
-//$$ import net.minecraft.registry.Registries
-//$$ import net.minecraft.util.Identifier
-//$$ import net.minecraft.nbt.NbtString
-//#else
-import net.minecraft.nbt.NBTTagString
-import net.minecraft.nbt.NBTException
+
 //#endif
 
 // Most functions are taken from NotEnoughUpdates

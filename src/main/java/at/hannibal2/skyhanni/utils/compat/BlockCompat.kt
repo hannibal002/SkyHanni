@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import net.minecraft.block.Block
-import net.minecraft.block.state.IBlockState
-import net.minecraft.init.Blocks
-import net.minecraft.item.ItemStack
 //#if MC > 1.21
 //$$ import net.minecraft.registry.tag.BlockTags
 //#else
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
+import net.minecraft.block.Block
 import net.minecraft.block.BlockStainedGlass
+import net.minecraft.block.state.IBlockState
+import net.minecraft.init.Blocks
+import net.minecraft.item.ItemStack
+
 //#endif
 
 

@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.utils.compat
 
+//#if MC < 1.16
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
-//#if MC < 1.16
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+
 //#endif
 //#if MC > 1.16
 //$$ import net.minecraft.ChatFormatting
