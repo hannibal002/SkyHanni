@@ -299,6 +299,16 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
         if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
             return GuiOptionEditorBlocked(default)
         }
+
+        if (PlatformUtils.IS_LEGACY) {
+            if (field.isAnnotationPresent(OnlyModern::class.java)) {
+                return GuiOptionEditorHidden(default)
+            }
+        } else {
+            if (field.isAnnotationPresent(OnlyLegacy::class.java)) {
+                return GuiOptionEditorHidden(default)
+            }
+        }
         return default
     }
 }
