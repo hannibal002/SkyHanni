@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 object JacobContestStatsSummary {
 
     private val config get() = GardenApi.config.jacobContest.contestSummary
-    private var blocksBroken: MutableMap<CropType, Int> = enumMapOf()
+    private val blocksBroken: MutableMap<CropType, Int> = enumMapOf()
     private var startTime = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN, priority = HandleEvent.HIGHEST)
