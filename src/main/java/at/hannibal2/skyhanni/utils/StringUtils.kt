@@ -28,6 +28,7 @@ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
 //#endif
 
+// todo 1.21 impl needed
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
@@ -163,10 +164,15 @@ object StringUtils {
 
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
+            //#if MC < 1.21
             if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
+            //#else
+            //$$ this
+            //#endif
+
         } else {
             internalCleanPlayerName()
         }
@@ -451,9 +457,11 @@ object StringUtils {
         return message
     }
 
+    //#if MC < 1.21
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
         return asComponent { chatStyle = original.sampleStyleAtStart() }
     }
+    //#endif
 
     fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
         return asComponent { chatStyle = original.chatStyle }

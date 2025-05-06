@@ -3,13 +3,16 @@ package at.hannibal2.skyhanni.api.event
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+//#if MC < 1.21
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+//#endif
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import java.lang.reflect.Method
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object SkyHanniEvents {
 
@@ -89,12 +92,14 @@ object SkyHanniEvents {
         this.handlers.removeIfKey { it.isAssignableFrom(clazz) }
     }
 
+    //#if MC < 1.21
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         disabledHandlers = data.disabledHandlers
         disabledHandlerInvokers = data.disabledInvokers
     }
+    //#endif
 
     val seconds = setOf(10, 60, 60 * 5)
 

@@ -2,11 +2,17 @@ package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.ConfigManager
+//#endif
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
+//#if MC < 1.21
 import at.hannibal2.skyhanni.data.repo.RepoManager
+//#endif
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+//#if MC < 1.21
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+//#endif
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -26,6 +32,7 @@ import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 //#endif
 
+// todo 1.21 impl needed
 /**
  * Manages [RepoPattern]s.
  */
@@ -70,6 +77,7 @@ object RepoPatternManager {
 
     var inTestDuplicateUsage = true
 
+    //#if MC < 1.21
     private val config
         get() = if (!insideTest) {
             SkyHanniMod.feature.dev.repoPattern
@@ -78,9 +86,18 @@ object RepoPatternManager {
                 tolerateDuplicateUsage = inTestDuplicateUsage
             }
         }
+    //#else
+    //$$ private val config get() = RepoPatternConfig().apply {
+    //$$     tolerateDuplicateUsage = inTestDuplicateUsage
+    //$$ }
+    //#endif
+
 
     private val localLoading: Boolean
-        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.usingBackupRepo
+        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
+            //#if MC < 1.21
+            || RepoManager.usingBackupRepo
+            //#endif
 
     private val logger = LogManager.getLogger("SkyHanni")
 
@@ -158,10 +175,12 @@ object RepoPatternManager {
         checkExclusivity(owner, key)
     }
 
+    //#if MC < 1.21
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexes"))
     }
+    //#endif
 
     fun loadPatternsFromDump(dump: RepoPatternDump) {
         regexes = null
@@ -257,6 +276,7 @@ object RepoPatternManager {
      * Dump all regexes labeled with the label into the file.
      */
     fun dump(sourceLabel: String, file: File) {
+        //#if MC < 1.21
         val data =
             ConfigManager.gson.toJson(
                 RepoPatternDump(
@@ -266,6 +286,7 @@ object RepoPatternManager {
             )
         file.parentFile.mkdirs()
         file.writeText(data)
+        //#endif
     }
 
     @HandleEvent

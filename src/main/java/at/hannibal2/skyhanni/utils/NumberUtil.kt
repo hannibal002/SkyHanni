@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+//#if MC < 1.21
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+//#endif
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -9,9 +11,12 @@ import java.util.Locale
 import java.util.TreeMap
 import kotlin.math.pow
 
+// todo 1.21 impl needed
 object NumberUtil {
 
+    //#if MC < 1.21
     private val config get() = SkyHanniMod.feature
+    //#endif
 
     private val suffixes = TreeMap<Long, String>().apply {
         this[1000L] = "k"
@@ -103,8 +108,12 @@ object NumberUtil {
     }
 
     fun Number.addSeparators(): String {
+        //#if MC < 1.21
         return if (!config.dev.numberFormatOverride) NumberFormat.getNumberInstance().format(this)
         else NumberFormat.getNumberInstance(Locale.US).format(this)
+        //#else
+        //$$ return NumberFormat.getNumberInstance(Locale.US).format(this)
+        //#endif
     }
 
     fun String.romanToDecimalIfNecessary() = toIntOrNull() ?: romanToDecimal()
@@ -287,7 +296,11 @@ object NumberUtil {
 }
 
 class MinMaxNumber(val min: Double, val max: Double) {
+    //#if MC < 1.21
     override fun toString(): String = "${min.formatCoin()}§7-${max.formatCoin()}"
+    //#else
+    //$$ override fun toString(): String = "${min}§7-${max}"
+    //#endif
 
     operator fun plus(other: MinMaxNumber): MinMaxNumber = MinMaxNumber(min + other.min, max + other.max)
 }
