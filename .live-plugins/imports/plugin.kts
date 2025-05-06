@@ -13,6 +13,9 @@ import kotlin.reflect.full.memberProperties
 import org.jetbrains.kotlin.psi.KtFile
 import com.intellij.psi.PsiFile
 import liveplugin.show
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.ScrollType
+import com.intellij.openapi.editor.ex.ScrollingModelEx
 
 // Utility: find conditional blocks and their import line indices
 data class ConditionalBlock(
@@ -41,6 +44,7 @@ fun Document.deleteLine(line: Int) {
 }
 
 fun Document.insertLine(line: Int, text: String) {
+    if(line>16){show(this.text.replace("\n","\\n"))}
     this.insertString(this.getLineStartOffset(line), text + "\n")
 }
 
@@ -123,6 +127,13 @@ class CustomOptimizeImports(val oldAction: AnAction) : AnAction(
         val project = e.project ?: return
         val editor = e.getData(com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR) ?: return
         var psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? KtFile ?: return
+        // Capture View
+        val scrollingModel = editor.scrollingModel
+        val initialScroll = scrollingModel.verticalScrollOffset
+        val initialCaret  = editor.caretModel.logicalPosition
+
+        editor.settings.isAnimatedScrolling = false
+
         // Record imports in conditional blocks *before* optimization
         val originalText = psiFile.text
         var originalBlocks: List<ConditionalBlock> = emptyList()
@@ -211,7 +222,13 @@ class CustomOptimizeImports(val oldAction: AnAction) : AnAction(
                 ?: return@runWriteCommandAction
             OptimizeImportsProcessor(project, arrayOf(directPsiFile), postActions).run()
             PsiDocumentManager.getInstance(project).commitDocument(editor.document)
+
+            // Restore View
+            scrollingModel.scrollVertically(initialScroll)
+            editor.caretModel.moveToLogicalPosition(initialCaret)
+            editor.scrollingModel.scrollToCaret(ScrollType.RELATIVE)
         }
+        editor.settings.isAnimatedScrolling = true
     }
 }
 
