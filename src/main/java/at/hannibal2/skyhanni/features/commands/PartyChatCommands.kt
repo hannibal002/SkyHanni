@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments.getString
 import at.hannibal2.skyhanni.config.features.misc.PartyCommandsConfig
 import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.PartyApi
@@ -138,19 +137,20 @@ object PartyChatCommands {
             category = CommandCategory.USERS_ACTIVE
 
             literal("add") {
-                arg("name", BrigadierArguments.string()) {
+                arg("name", BrigadierArguments.string()) { nameArg ->
                     callback {
-                        val name = getString("name")
+                        val name = getArg(nameArg)
                         if (isBlockedUser(name)) {
                             ChatUtils.userError("$name is already ignored!")
                         } else blacklistModify(name)
                     }
                 }
             }
+
             literal("remove") {
-                arg("name", BrigadierArguments.string()) {
+                arg("name", BrigadierArguments.string()) { argName ->
                     callback {
-                        val name = getString("name")
+                        val name = getArg(argName)
                         if (!isBlockedUser(name)) {
                             ChatUtils.userError("$name isn't ignored!")
                         } else blacklistModify(name)
@@ -158,32 +158,26 @@ object PartyChatCommands {
                 }
             }
             literal("list") {
-                arg("name", BrigadierArguments.string()) {
-                    callback {
-                        blacklistView(getString("name"))
-                    }
+                argCallback("name", BrigadierArguments.string()) { name ->
+                    blacklistView(name)
                 }
                 callback {
                     blacklistView()
                 }
             }
-            literal("clear") {
-                callback {
-                    ChatUtils.clickableChat(
-                        "Are you sure you want to do this? Click here to confirm.",
-                        onClick = {
-                            storage.blacklistedUsers.clear()
-                            ChatUtils.chat("Cleared your ignored players list!")
-                        },
-                        "§eClick to confirm.",
-                        oneTimeClick = true,
-                    )
-                }
+            literalCallback("clear") {
+                ChatUtils.clickableChat(
+                    "Are you sure you want to do this? Click here to confirm.",
+                    onClick = {
+                        storage.blacklistedUsers.clear()
+                        ChatUtils.chat("Cleared your ignored players list!")
+                    },
+                    "§eClick to confirm.",
+                    oneTimeClick = true,
+                )
             }
-            arg("name", BrigadierArguments.string()) {
-                callback {
-                    blacklistModify(getString("name"))
-                }
+            argCallback("name", BrigadierArguments.string()) { name ->
+                blacklistModify(name)
             }
         }
     }
