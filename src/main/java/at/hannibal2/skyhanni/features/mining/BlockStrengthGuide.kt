@@ -41,8 +41,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.WrappedRenderableString
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
@@ -187,12 +191,14 @@ object BlockStrengthGuide {
             val (progressBar, percentLine, untilNextLine) = processProgressData(ticks, speed, ore)
 
             return Renderable.hoverTips(
-                Renderable.horizontalContainer(
+                HorizontalContainerRenderable(
                     listOf(
                         Renderable.itemStack(icon),
                         progressBar,
-                        Renderable.string("$ticks"),
+                        RenderableString("$ticks"),
                     ),
+                    spacing = 0,
+                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
                 ),
                 tips = buildList<Renderable> {
                     val blockName = name.allLettersFirstUppercase()
@@ -231,7 +237,7 @@ object BlockStrengthGuide {
                     add(Renderable.placeholder(0, 5))
                     addString("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}")
                     addString("§3Blocks in that group:")
-                    add(Renderable.wrappedString(hoverText, width = 200))
+                    add(WrappedRenderableString(hoverText, width = 200))
 
                     if (!showExtraInfos) {
                         add(Renderable.placeholder(0, 5))
@@ -334,14 +340,14 @@ object BlockStrengthGuide {
             base.toInt().addSeparators(),
             gemstone.toInt().addSeparators(),
             dwarven.toInt().addSeparators(),
-        ).map { Renderable.string("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
+        ).map { RenderableString("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
     }
 
     private val headerHeaderLine = listOf("Base", "Gemstone", "Dwarven").map {
-        Renderable.string(
-            it,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        RenderableString(
+            text = it,
             scale = 0.75,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         )
     }
 
@@ -350,9 +356,9 @@ object BlockStrengthGuide {
     private fun createDisplay(): Renderable {
         requestSpeed()
         return Renderable.drawInsideRoundedRectWithOutline(
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 listOf(
-                    Renderable.verticalContainer(
+                    VerticalContainerRenderable(
                         createHeader(),
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                     ),
@@ -361,6 +367,7 @@ object BlockStrengthGuide {
                     ),
                 ),
                 spacing = 8,
+                RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
             ),
             color = LorenzColor.GRAY.addOpacity(180),
             topOutlineColor = Color(0, 0, 0, 200).rgb,
@@ -376,11 +383,11 @@ object BlockStrengthGuide {
     }.distribute(3)
 
     private fun createHeader(): List<Renderable> = listOf(
-        Renderable.string(
+        RenderableString(
             SkyblockStat.MINING_SPEED.iconWithName,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
-        Renderable.horizontalContainer(
+        HorizontalContainerRenderable(
             listOf(
                 Renderable.table(
                     listOf(
@@ -390,7 +397,7 @@ object BlockStrengthGuide {
                     xPadding = 5,
                 ),
                 Renderable.clickable(
-                    Renderable.string(
+                    RenderableString(
                         "§${if (inMineshaft) 'b' else '7'}Mineshaft",
                         scale = 0.5,
                         verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -421,13 +428,12 @@ object BlockStrengthGuide {
     private var lastRunCommand = SimpleTimeMark.farPast()
 
     fun onCommand() {
-        val notWorkingReason = when {
+        when {
             RiftApi.inRift() -> "in the rift"
             DungeonApi.inDungeon() -> "in dungeons"
             KuudraApi.inKuudra() -> "in kuudra"
             else -> null
-        }
-        notWorkingReason?.let {
+        }?.let {
             ChatUtils.userError("The Block Strengh Guide does not work $it!")
             return
 
@@ -445,11 +451,11 @@ object BlockStrengthGuide {
         if (!sbMenuOpened) {
             if (lastRunCommand.passedSince() < 2.seconds) {
                 sbMenuOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
-                Renderable.string(
+                RenderableString(
                     "Loading...",
                     scale = 2.0,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
                 event.cancel()
             } else {
@@ -496,14 +502,14 @@ object BlockStrengthGuide {
         }
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         if (!sbMenuOpened) return
         shouldBlockSHMenu = false
     }
 
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    @HandleEvent(IslandChangeEvent::class)
+    fun onIslandChange() {
         shouldBlockSHMenu = false
     }
 
