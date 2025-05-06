@@ -73,7 +73,7 @@ object DrawContextUtils {
     }
 
     fun rotate(angle: Float, x: Float, y: Float, z: Float) {
-         //#if MC < 1.21
+        //#if MC < 1.21
         GlStateManager.rotate(angle, x, y, z)
         //#else
         //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, x, y, z))
