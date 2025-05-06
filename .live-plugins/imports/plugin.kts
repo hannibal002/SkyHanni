@@ -153,8 +153,8 @@ class CustomOptimizeImports(val oldAction: AnAction) : AnAction(
                             }
                         }
                     }
-                    // Fix removed Imports
-                    for (block in blocks) {
+                    // Fix removed Imports (does not happen for globale to remove unused imports)
+                    for (block in blocks.drop(1)) {
                         if (block.ifOrder.size != block.ifImportLines.size) {
                             for (import in block.ifImportLines) {
                                 if (block.ifOrder.contains(import)) continue
@@ -170,6 +170,9 @@ class CustomOptimizeImports(val oldAction: AnAction) : AnAction(
                         }
                     }
 
+                    PsiDocumentManager.getInstance(project)
+                        .doPostponedOperationsAndUnblockDocument(editor.document)
+
                     // Reset File, remove all import lines and then insert them back in order
                     WriteCommandAction.runWriteCommandAction(project) {
                         val doc = editor.document
@@ -184,9 +187,8 @@ class CustomOptimizeImports(val oldAction: AnAction) : AnAction(
                             if (line.isNotBlank()) break
                             doc.deleteLine(i)
                         }
-                        show(blocks.size)
+
                         for (block in blocks) {
-                            show(block.condition)
                             doc.insertLine(i++, block.condition)
                             for (importLine in block.ifOrder) {
                                 doc.insertLine(i++, block.correctedImport(importLine))
@@ -200,7 +202,6 @@ class CustomOptimizeImports(val oldAction: AnAction) : AnAction(
                             if (block.condition.isNotEmpty()) doc.insertLine(i++, "//#endif")
                         }
                         doc.insertLine(i++, "") // Empty Line at the End of Imports
-                        PsiDocumentManager.getInstance(project).commitDocument(editor.document)
                     }
                 }
             }
