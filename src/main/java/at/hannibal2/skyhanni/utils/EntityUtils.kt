@@ -184,6 +184,7 @@ object EntityUtils {
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0): Boolean {
         if (isDead) return false
+        if (this.isInvisible) return false
         // TODO add cache that only updates e.g. 10 times a second
         if (!FrustumUtils.isVisible(entityBoundingBox)) return false
         return getLorenzVec().up(0.5).canBeSeen(viewDistance)
