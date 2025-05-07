@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
@@ -27,7 +28,11 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoinWithBrackets
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -230,7 +235,7 @@ object ComposterOverlay {
             addVerticalSpacer()
             addNotNull(profitDisplay())
             addString("§7Full §eOrganic Matter §7empty time: §b$organicMatterFormat")
-            addString("§7Full §eFuel §7empty time: §b$fuelFormat")
+            addString("§7Full §2Fuel §7empty time: §b$fuelFormat")
         }
     }
 
@@ -413,7 +418,6 @@ object ComposterOverlay {
             val factor = factors[internalName] ?: 1.0
 
             val item = internalName.getItemStack()
-            val price = getPrice(internalName)
             val itemsNeeded = if (config.roundDown) {
                 val amount = missing / factor
                 if (amount > .75 && amount < 1.0) {
@@ -423,13 +427,12 @@ object ComposterOverlay {
                 }
             } else {
                 ceil(missing / factor)
-            }
-            val totalPrice = itemsNeeded * price
+            }.toInt()
 
             addLine {
                 if (testOffset != 0) addString("#$i ")
                 addItemStack(item)
-                add(formatPrice(totalPrice, internalName, item.displayName, itemsNeeded, onClick))
+                add(formatPrice(internalName, itemsNeeded, onClick, factor))
             }
 
             if (i == 10 + testOffset) break
@@ -438,23 +441,52 @@ object ComposterOverlay {
     }
 
     private fun formatPrice(
-        totalPrice: Double,
         internalName: NeuInternalName,
-        itemName: String,
-        itemsNeeded: Double,
+        itemsNeeded: Int,
         onClick: (NeuInternalName) -> Unit,
+        factor: Double,
     ): Renderable {
-        val format = totalPrice.shortFormat()
-        val selected = if (internalName == currentOrganicMatterItem || internalName == currentFuelItem) "§n" else ""
-        val rawItemName = itemName.removeColor()
-        val name = itemName.substring(0, 2) + selected + rawItemName
-        return Renderable.link("$name §8x${itemsNeeded.addSeparators()} §7(§6$format§7)") {
-            onClick(internalName)
-            if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
-                lastAttemptTime = SimpleTimeMark.now()
-                retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+        val pricePer = getPrice(internalName)
+        val selected = internalName == currentOrganicMatterItem || internalName == currentFuelItem
+
+        val displayType = when (internalName) {
+            in organicMatterFactors -> "§eOrganic Matter"
+            in fuelFactors -> "§2Fuel"
+            else -> error("no type found: $internalName")
+        }
+        val totalPrice = itemsNeeded * pricePer
+
+        val tips = buildList {
+            add(internalName.repoItemName)
+            add(" ")
+            add("§7Price per: ${pricePer.formatCoin()}")
+            add("$displayType §7per: §e${factor.addSeparators()}")
+            add("§7Need §8$itemsNeeded §7items for max $displayType")
+            add("§7Total price: ${totalPrice.formatCoin()}")
+
+            add("")
+            if (selected) {
+                add(internalName.createBuyTipLine("Control + "))
+            } else {
+                add("§eClick to select for profit calculations!")
             }
         }
+
+        val itemName = internalName.repoItemNameCompact
+        val selectedFormat = if (selected) "§n" else ""
+        val displayName = itemName.substring(0, 2) + selectedFormat + itemName.removeColor()
+
+        return Renderable.clickable(
+            text = "$displayName §8x${itemsNeeded.addSeparators()} ${totalPrice.formatCoinWithBrackets()}",
+            onLeftClick = {
+                onClick(internalName)
+                if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+                    lastAttemptTime = SimpleTimeMark.now()
+                    retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+                }
+            },
+            tips = tips,
+        )
     }
 
     private fun retrieveMaterials(internalName: NeuInternalName, itemName: String, itemsNeeded: Int) {
