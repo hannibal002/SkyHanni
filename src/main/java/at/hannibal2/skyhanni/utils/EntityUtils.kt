@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat
+import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.getEntityLevel
@@ -184,6 +186,8 @@ object EntityUtils {
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0): Boolean {
         if (isDead) return false
+        if (isInvisible) return false
+        if (MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)) return false
         // TODO add cache that only updates e.g. 10 times a second
         if (!FrustumUtils.isVisible(entityBoundingBox)) return false
         return getLorenzVec().up(0.5).canBeSeen(viewDistance)

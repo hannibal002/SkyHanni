@@ -53,7 +53,7 @@ object TrevorSolver {
             val name = entity.name
             val isTrevor = MobData.entityToMob[entity]?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
-            currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) }
+            currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) || it.entityName.contains(name) }
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
 
                 val currentMob = currentMob ?: run {
