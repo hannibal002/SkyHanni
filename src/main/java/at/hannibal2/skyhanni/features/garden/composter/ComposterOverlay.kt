@@ -234,8 +234,22 @@ object ComposterOverlay {
             add(preview(extraComposterUpgrade))
             addVerticalSpacer()
             addNotNull(profitDisplay())
-            addString("§7Full §eOrganic Matter §7empty time: §b$organicMatterFormat")
-            addString("§7Full §2Fuel §7empty time: §b$fuelFormat")
+            addString(
+                "§eOrganic Matter §7empty in §b$organicMatterFormat",
+                tips = listOf(
+                    "§7The full §eOrganic Matter §7storage would",
+                    "§7become empty with your Composter Speed",
+                    "§7in $organicMatterFormat",
+                ),
+            )
+            addString(
+                "§2Fuel §7empty in $fuelFormat",
+                tips = listOf(
+                    "§7The full §2Fuel §7storage would",
+                    "§7become empty with your Composter Speed",
+                    "§7in $fuelFormat",
+                ),
+            )
         }
     }
 
@@ -245,12 +259,12 @@ object ComposterOverlay {
             ComposterApi.timePerCompost(upgrade) * floor(maxPreview / perPreview)
 
         val format = formatTime(matterMaxDuration)
-        val formatPreview = if (matterMaxDuration != matterMaxDurationPreview) " §c➜ §b" + formatTime(matterMaxDurationPreview) else ""
+        val formatPreview = if (matterMaxDuration != matterMaxDurationPreview) " §c➜ " + formatTime(matterMaxDurationPreview) else ""
 
         return "$format$formatPreview"
     }
 
-    private fun formatTime(duration: Duration) = duration.format(maxUnits = 2)
+    private fun formatTime(duration: Duration) = "§b" + duration.format(maxUnits = 2)
 
     private fun drawOrganicMatterDisplay(): Renderable {
         val maxOrganicMatter = ComposterApi.maxOrganicMatter(if (maxLevel) null else extraComposterUpgrade)
@@ -314,7 +328,7 @@ object ComposterOverlay {
         val compostPerTitlePreview =
             if (multiplier != multiplierPreview) " §c➜ §e" + multiplierPreview.roundTo(2) else ""
         val compostPerTitle =
-            if (currentTimeType == TimeType.COMPOST) "Compost multiplier" else "Composts per $timeText"
+            if (currentTimeType == TimeType.COMPOST) "Compost factor" else "Composts per $timeText"
 
         val organicMatterPrice = getPrice(organicMatterItem)
         val organicMatterFactor = organicMatterFactors[organicMatterItem] ?: 1.0
@@ -357,17 +371,46 @@ object ComposterOverlay {
                 },
             )
 
-            addLine {
-                addString("§7Using: ")
+            addLine(
+                tips = listOf(
+                    "§7The variables below are calcualted with",
+                    "${organicMatterItem.repoItemName} §7and ${fuelItem.repoItemName}.",
+                ),
+            ) {
+                addString("§7Using ")
                 addItemStack(organicMatterItem)
                 addString(" §7and ")
                 addItemStack(fuelItem)
             }
 
-            addString(" §7Time per Compost: §b$format$formatPreview")
-            addString(" §7$compostPerTitle: §e${multiplier.roundTo(2).addSeparators()}$compostPerTitlePreview")
-            addString(" §7Material costs per $timeText: §6${totalCost.shortFormat()}$materialCostFormatPreview")
-            addString(" §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview")
+            addString(
+                text = " §7Time per Compost: §b$format$formatPreview",
+                tips = listOf(
+                    "§7It takes §b$format §7for",
+                    "§7your composter to create one §aCompost.",
+                ),
+            )
+            addString(
+                " §7$compostPerTitle: §e${multiplier.roundTo(2).addSeparators()}$compostPerTitlePreview",
+                tips = listOf(
+                    "§7The §aCompost Factor §7is calcualted by adding",
+                    "§aMulti Drop §7and §aComposter Speed §7together.",
+                ),
+            )
+            addString(
+                " §7Cost per $timeText: §6${totalCost.shortFormat()}$materialCostFormatPreview",
+                tips = listOf(
+                    "§7Shows how much you §cpay as cost §7in",
+                    "§eOrganic Matter §7and §2Fuel§7.",
+                ),
+            )
+            addString(
+                " §7Profit per $timeText: §6${profit.shortFormat()}$profitFormatPreview",
+                tips = listOf(
+                    "§7Shows how much you make as §6profit §7from",
+                    "§7selling §aCompsot §7after subtracting the §ccosts§6.",
+                ),
+            )
             addVerticalSpacer()
         }
     }

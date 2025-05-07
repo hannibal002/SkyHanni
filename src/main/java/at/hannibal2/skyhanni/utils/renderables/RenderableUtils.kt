@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
@@ -403,7 +404,11 @@ internal object RenderableUtils {
 }
 
 fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
-    add(Renderable.horizontalContainer(buildList { builderAction() }))
+    add(HorizontalContainerRenderable(buildList { builderAction() }))
+}
+
+fun MutableList<Renderable>.addLine(tips: List<String>, builderAction: MutableList<Renderable>.() -> Unit) {
+    add(hoverTips(HorizontalContainerRenderable(buildList { builderAction() }, 0), tips = tips))
 }
 
 internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
