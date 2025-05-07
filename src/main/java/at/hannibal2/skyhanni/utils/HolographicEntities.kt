@@ -138,11 +138,11 @@ object HolographicEntities {
 
     private fun interpolateRotation(last: Float, next: Float, progress: Float): Float {
         var direction: Float = next - last
-        while (direction < -180.0f) {
-            direction += 360.0f
+        while (direction < -180f) {
+            direction += 360f
         }
-        while (direction >= 180.0f) {
-            direction -= 360.0f
+        while (direction >= 180f) {
+            direction -= 360f
         }
         return last + progress * direction
     }
@@ -183,7 +183,7 @@ object HolographicEntities {
         val headPitch = 0F
         val scaleFactor = 0.0625f
         renderer.setBrightness_skyhanni(entity, 0f, true)
-        GlStateManager.color(1.0f, 1.0f, 1.0f, holographicness)
+        GlStateManager.color(1f, 1f, 1f, holographicness)
         GlStateManager.depthMask(false)
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
