@@ -10,6 +10,7 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
 
+// todo 1.21 impl needed
 class LorenzLogger(filePath: String) {
 
     private val format = SimpleDateFormat("HH:mm:ss")
@@ -60,8 +61,11 @@ class LorenzLogger(filePath: String) {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-
+        //#if MC < 1.21
         if (!hasDone && LorenzUtils.onHypixel) {
+        //#else
+        //$$  if (!hasDone ) {
+        //#endif
             hasDone = true
             OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
         }

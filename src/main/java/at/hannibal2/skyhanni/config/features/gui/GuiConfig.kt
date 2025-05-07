@@ -2,13 +2,17 @@ package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
 import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig
+//#endif
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
+//#if MC < 1.21
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -20,7 +24,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
+// todo 1.21 impl needed
 class GuiConfig {
+    //#if MC < 1.21
     @Expose
     @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
     @Accordion
@@ -41,6 +47,7 @@ class GuiConfig {
     )
     @ConfigEditorButton(buttonText = "Edit")
     var positions: Runnable = Runnable { openGuiPositionEditor(true) }
+    //#endif
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
@@ -58,6 +65,7 @@ class GuiConfig {
     @FeatureToggle
     var timeFormat24h: Boolean = false
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Discord Rich Presence", desc = "")
     @Accordion
@@ -102,6 +110,7 @@ class GuiConfig {
     @ConfigOption(name = "In-Game Date", desc = "")
     @Accordion
     var inGameDate: InGameDateConfig = InGameDateConfig()
+    //#endif
 
     @Expose
     @ConfigOption(name = "Beacon Power", desc = "Display the current beacon power duration and what stat is boosted.")

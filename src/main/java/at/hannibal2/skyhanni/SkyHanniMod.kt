@@ -66,9 +66,9 @@ object SkyHanniMod {
     }
 
     fun init() {
-        //#if MC < 1.21
         configManager = ConfigManager()
         configManager.firstLoad()
+        //#if MC < 1.21
         initLogging()
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },

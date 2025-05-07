@@ -21,12 +21,12 @@ class DevConfig {
     @ConfigOption(name = "Repository", desc = "")
     @Accordion
     var repo: RepositoryConfig = RepositoryConfig()
+    //#endif
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")
     @Accordion
     var debug: DebugConfig = DebugConfig()
-    //#endif
 
     @Expose
     @ConfigOption(name = "Repo Pattern", desc = "")
@@ -82,11 +82,9 @@ class DevConfig {
     @Expose
     var debugItemPos: Position = Position(90, 70)
 
-    //#if MC < 1.21
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "raytracedOreblock")
     var debugOrePos: Position = Position(1, 200)
-    //#endif
 
     @Expose
     @ConfigOption(

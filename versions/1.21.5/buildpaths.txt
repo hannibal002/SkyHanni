@@ -183,9 +183,11 @@ at.hannibal2.skyhanni.config.features.dev.minecraftconsole.ConsoleFiltersConfig.
 at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig.kt
 at.hannibal2.skyhanni.config.features.dev.DevConfig.kt
 at.hannibal2.skyhanni.config.core.elements.GuiElementButton.kt
-
-
-
+at.hannibal2.skyhanni.config.features.dev.DebugConfig.kt
+at.hannibal2.skyhanni.config.features.gui.GuiConfig.kt
+at.hannibal2.skyhanni.config.features.misc.cosmetic.ArrowTrailConfig.java
+at.hannibal2.skyhanni.config.features.misc.cosmetic.FollowingLineConfig.java
+at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig.java
 
 
 

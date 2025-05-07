@@ -13,7 +13,9 @@ import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig
 import at.hannibal2.skyhanni.config.features.event.EventConfig
 import at.hannibal2.skyhanni.config.features.fishing.FishingConfig
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig
+//#endif
 import at.hannibal2.skyhanni.config.features.gui.GuiConfig
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
 import at.hannibal2.skyhanni.config.features.mining.MiningConfig
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig
@@ -80,12 +82,12 @@ class Features : Config() {
     @Category(name = "About", desc = "Information about SkyHanni and updates.")
     var about: About = About()
 
-    //#if MC < 1.21
     @JvmField
     @Expose
     @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
     var gui: GuiConfig = GuiConfig()
 
+    //#if MC < 1.21
     // Islands
     @Expose
     @Category(name = "Garden", desc = "Features for the Garden island.")
