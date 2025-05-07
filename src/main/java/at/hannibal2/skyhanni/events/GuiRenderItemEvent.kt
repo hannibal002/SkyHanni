@@ -13,8 +13,8 @@ abstract class GuiRenderItemEvent(context: DrawContext) : RenderingSkyHanniEvent
         open val text: String?,
     ) : GuiRenderItemEvent(context) {
 
-        data class GuiRenderItemPost(
-            override val context: DrawContext,
+        class GuiRenderItemPost(
+            context: DrawContext,
             override val stack: ItemStack?,
             override val x: Int,
             override val y: Int,
