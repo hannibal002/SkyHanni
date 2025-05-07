@@ -45,7 +45,7 @@ class ComposterConfig {
         desc = "Change the minimum amount of organic matter items on the organic matter overlay have."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 20_000f, minStep = 1000f)
-    var minimumOrganicMatter: Property<Double> = Property.of(1000.0)
+    var minimumOrganicMatter: Property<Double> = Property.of(1_000.0)
 
     enum class RetrieveFromEntry(
         private val displayName: String,
