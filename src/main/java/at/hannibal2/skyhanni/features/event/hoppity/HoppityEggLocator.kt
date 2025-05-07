@@ -159,10 +159,7 @@ object HoppityEggLocator {
             if (lastPoint.distanceSq(event.location) > 9) return
         }
 
-        if (EntityUtils.getEntitiesNearby<EntityFishHook>(event.location, 0.3).any()) {
-            return
-        }
-
+        if (EntityUtils.getEntitiesNearby<EntityFishHook>(event.location, 0.3).any()) return
 
         bezierFitter.addPoint(event.location)
 
