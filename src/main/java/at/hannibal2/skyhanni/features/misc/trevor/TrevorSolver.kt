@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.resources.I18n
 import net.minecraft.entity.EntityLivingBase
 
 object TrevorSolver {
@@ -54,7 +53,7 @@ object TrevorSolver {
             val name = entity.name
             val isTrevor = MobData.entityToMob[entity]?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is EntityLivingBase) entity.baseMaxHealth.derpy() else 0
-            currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) || I18n.format(it.i18n).contains(name) }
+            currentMob = TrevorMob.entries.firstOrNull { it.mobName.contains(name) || it.entityName.contains(name) }
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
 
                 val currentMob = currentMob ?: run {
