@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.math.ceil
@@ -159,9 +160,10 @@ object ComposterOverlay {
         if (!config.overlay) return
         val composterUpgrades = ComposterApi.composterUpgrades ?: return
         if (composterUpgrades.isEmpty()) {
-            val list = Renderable.string("§cOpen Composter Upgrades!")
-            organicMatterDisplay = list
-            fuelExtraDisplay = list
+            RenderableString("§cOpen Composter Upgrades!").let {
+                organicMatterDisplay = it
+                fuelExtraDisplay = it
+            }
             return
         }
         if (organicMatterFactors.isEmpty()) {
@@ -196,12 +198,12 @@ object ComposterOverlay {
 
     private fun preview(upgrade: ComposterUpgrade?): Renderable =
         if (upgrade == null) {
-            Renderable.string("§7Preview: Nothing")
+            RenderableString("§7Preview: Nothing")
         } else {
             val level = upgrade.getLevel(null)
             val nextLevel = if (maxLevel) "§6§lMAX" else "§c➜ §a" + (level + 1)
             val displayName = upgrade.displayName
-            Renderable.string("§7Preview §a$displayName§7: §a$level $nextLevel")
+            RenderableString("§7Preview §a$displayName§7: §a$level $nextLevel")
         }
 
     private fun drawUpgradeStats(): Renderable {
@@ -213,14 +215,7 @@ object ComposterOverlay {
         val matterPer = ComposterApi.organicMatterRequiredPer(null)
         val matterPerPreview = ComposterApi.organicMatterRequiredPer(upgrade)
 
-        // Todo: Extract duplicate code
-        val matterMaxDuration = ComposterApi.timePerCompost(null) * floor(maxOrganicMatter / matterPer)
-        val matterMaxDurationPreview =
-            ComposterApi.timePerCompost(upgrade) * floor(maxOrganicMatterPreview / matterPerPreview)
-
-        val organicMatterFormat = formatTime(matterMaxDuration)
-        val organicMatterFormatPreview =
-            if (matterMaxDuration != matterMaxDurationPreview) " §c➜ §b" + formatTime(matterMaxDurationPreview) else ""
+        val organicMatterFormat = format(maxOrganicMatter, matterPer, upgrade, maxOrganicMatterPreview, matterPerPreview)
 
         val maxFuel = ComposterApi.maxFuel(null)
         val maxFuelPreview = ComposterApi.maxFuel(upgrade)
@@ -228,21 +223,26 @@ object ComposterOverlay {
         val fuelRequiredPer = ComposterApi.fuelRequiredPer(null)
         val fuelRequiredPerPreview = ComposterApi.fuelRequiredPer(upgrade)
 
-        val fuelMaxDuration = ComposterApi.timePerCompost(null) * floor(maxFuel / fuelRequiredPer)
-        val fuelMaxDurationPreview =
-            ComposterApi.timePerCompost(upgrade) * floor(maxFuelPreview / fuelRequiredPerPreview)
-
-        val fuelFormat = formatTime(fuelMaxDuration)
-        val fuelFormatPreview =
-            if (fuelMaxDuration != fuelMaxDurationPreview) " §c➜ §b" + formatTime(fuelMaxDurationPreview) else ""
+        val fuelFormat = format(maxFuel, fuelRequiredPer, upgrade, maxFuelPreview, fuelRequiredPerPreview)
 
         return Renderable.vertical {
             add(preview(extraComposterUpgrade))
             addVerticalSpacer()
             addNotNull(profitDisplay())
-            addString("§7Full §eOrganic Matter §7empty time: §b$organicMatterFormat$organicMatterFormatPreview")
-            addString("§7Full §eFuel §7empty time: §b$fuelFormat$fuelFormatPreview")
+            addString("§7Full §eOrganic Matter §7empty time: §b$organicMatterFormat")
+            addString("§7Full §eFuel §7empty time: §b$fuelFormat")
         }
+    }
+
+    private fun format(max: Int, per: Double, upgrade: ComposterUpgrade?, maxPreview: Int, perPreview: Double): String {
+        val matterMaxDuration = ComposterApi.timePerCompost(null) * floor(max / per)
+        val matterMaxDurationPreview =
+            ComposterApi.timePerCompost(upgrade) * floor(maxPreview / perPreview)
+
+        val format = formatTime(matterMaxDuration)
+        val formatPreview = if (matterMaxDuration != matterMaxDurationPreview) " §c➜ §b" + formatTime(matterMaxDurationPreview) else ""
+
+        return "$format$formatPreview"
     }
 
     private fun formatTime(duration: Duration) = duration.format(maxUnits = 2)
@@ -532,8 +532,8 @@ object ComposterOverlay {
         updateOrganicMatterFactors()
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(minimumOrganicMatter) {
                 updateOrganicMatterFactors()
