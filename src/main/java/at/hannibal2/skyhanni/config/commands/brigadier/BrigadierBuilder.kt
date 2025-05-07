@@ -109,7 +109,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
      * the name of the argument, and the previous ones are treated as literals.
      *
      * To get the value of the argument in the callback block, use the [ArgContext.getArg]
-     * or [ArgContext.get] methods with the [CommandArgument] given by [arg], or use
+     * or [ArgContext.get] methods with the [BrigadierArgument] given by [arg], or use
      * [ArgContext.getArgByName] if you want to use the argument name instead.
      *
      * Example usage:
@@ -126,7 +126,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         name: String,
         argument: ArgumentType<T>,
         suggestions: Collection<String>,
-        crossinline action: ArgumentCommandBuilder<T>.(CommandArgument<T>) -> Unit,
+        crossinline action: ArgumentCommandBuilder<T>.(BrigadierArgument<T>) -> Unit,
     ): BrigadierBuilder<B> = arg(name, argument, suggestions.toSuggestionProvider(), action)
 
 
@@ -137,20 +137,20 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         name: String,
         argument: ArgumentType<T>,
         suggestions: SuggestionProvider<Any?>? = null,
-        crossinline action: ArgumentCommandBuilder<T>.(CommandArgument<T>) -> Unit,
+        crossinline action: ArgumentCommandBuilder<T>.(BrigadierArgument<T>) -> Unit,
     ): BrigadierBuilder<B> {
         if (!name.contains("  ")) {
-            return internalArg(name, argument, suggestions) { action(CommandArgument(name, T::class.java)) }
+            return internalArg(name, argument, suggestions) { action(BrigadierArgument(name, T::class.java)) }
         }
         val split = name.split(" ")
         val beforeArg = split.subList(0, split.size - 1).joinToString(" ")
         val argName = split.last()
-        return internalArg(beforeArg, argument, suggestions) { action(CommandArgument(argName, T::class.java)) }
+        return internalArg(beforeArg, argument, suggestions) { action(BrigadierArgument(argName, T::class.java)) }
     }
 
     /**
      * Intended for internal use only. It's the same as other arg functions, but it
-     * doesn't have the CommandArgument passed as a parameter. The reason for this method
+     * doesn't have the [BrigadierArgument] passed as a parameter. The reason for this method
      * existing is that all the other arg methods have to use reified types, which means that
      * they can't be used recursively.
      */
@@ -205,7 +205,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
      * create a block for each one.
      *
      * However, differently from [literalCallback]
-     * For args, the same applies; the only difference is that instead of giving a CommandArgument<T> as a parameter,
+     * For args, the same applies; the only difference is that instead of giving a [BrigadierArgument] as a parameter,
      * it directly gives the value of the argument.
      *
      * For example, the following two usages are the same:
