@@ -111,8 +111,14 @@ object SuperpairDataDisplay {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.superpairDisplay || !ExperimentationTableApi.inTable) return
 
-        display = display.takeIfNotEmpty() ?: drawDisplay()
-        config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experimentation Data")
+        display = display.takeIfNotEmpty()
+            ?: drawDisplay().takeIfNotEmpty()
+            ?: return
+
+        config.superpairDisplayPosition.renderStrings(
+            display,
+            posLabel = "Superpair Experimentation Data",
+        )
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)

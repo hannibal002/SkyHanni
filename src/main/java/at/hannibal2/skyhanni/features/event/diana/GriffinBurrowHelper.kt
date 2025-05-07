@@ -194,7 +194,8 @@ object GriffinBurrowHelper {
             }
         }
 
-        latestGuess = Guess(newLocation, event.precise)
+        latestGuess = if (IslandType.HUB.isInBounds(newLocation)) Guess(newLocation, event.precise) else null
+
         update()
     }
 
