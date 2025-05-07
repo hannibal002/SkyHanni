@@ -21,4 +21,8 @@ class GuiOptionEditorHidden(base: GuiOptionEditor) : GuiOptionEditor(base.getOpt
         // We use -7 to correct the padding between the option above and below the hidden one
         return -7
     }
+
+    override fun fulfillsSearch(word: String?): Boolean {
+        return false
+    }
 }
