@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.EntityLivingBase
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
 import java.util.UUID

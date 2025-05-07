@@ -84,12 +84,13 @@ object RepoPatternManager {
             }
         }
 
-
+    //#if MC < 1.21
     private val localLoading: Boolean
-        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
-            //#if MC < 1.21
-            || RepoManager.usingBackupRepo
-            //#endif
+        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.usingBackupRepo
+    //#else
+    //$$ private val localLoading: Boolean
+    //$$      get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
+    //#endif
 
     private val logger = LogManager.getLogger("SkyHanni")
 

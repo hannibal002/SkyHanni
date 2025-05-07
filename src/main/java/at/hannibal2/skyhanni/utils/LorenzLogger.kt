@@ -63,9 +63,9 @@ class LorenzLogger(filePath: String) {
         }
         //#if MC < 1.21
         if (!hasDone && LorenzUtils.onHypixel) {
-        //#else
-        //$$  if (!hasDone ) {
-        //#endif
+            //#else
+            //$$  if (!hasDone ) {
+            //#endif
             hasDone = true
             OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
         }
