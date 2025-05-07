@@ -83,7 +83,7 @@ object ItemAbilityCooldown {
                 ItemAbility.HYPERION.sound()
             }
             // Fire Fury Staff
-            event.soundName == "liquid.lavapop" && event.pitch == 1.0f && event.volume == 1f -> {
+            event.soundName == "liquid.lavapop" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.FIRE_FURY_STAFF.sound()
             }
             // Ice Spray Wand
@@ -129,11 +129,11 @@ object ItemAbilityCooldown {
                 ItemAbility.VOODOO_DOLL.sound()
             }
             // Jinxed Voodoo Doll Hit
-            event.soundName == "random.successful_hit" && event.volume == 1.0f && event.pitch == 0.7936508f -> {
+            event.soundName == "random.successful_hit" && event.volume == 1f && event.pitch == 0.7936508f -> {
                 ItemAbility.VOODOO_DOLL_WILTED.sound()
             }
             // Jinxed Voodoo Doll Miss
-            event.soundName == "mob.ghast.scream" && event.volume == 1.0f && event.pitch >= 1.6 && event.pitch <= 1.7 -> {
+            event.soundName == "mob.ghast.scream" && event.volume == 1f && event.pitch >= 1.6 && event.pitch <= 1.7 -> {
                 if (VOODOO_DOLL_WILTED.recentlyHeld()) {
                     ItemAbility.VOODOO_DOLL_WILTED.sound()
                 }
@@ -152,7 +152,7 @@ object ItemAbilityCooldown {
                 }
             }
             // End Stone Sword
-            event.soundName == "mob.zombie.unfect" && event.pitch == 2.0f && event.volume == 0.3f -> {
+            event.soundName == "mob.zombie.unfect" && event.pitch == 2f && event.volume == 0.3f -> {
                 ItemAbility.END_STONE_SWORD.sound()
             }
             // Soul Esoward
@@ -160,15 +160,15 @@ object ItemAbilityCooldown {
                 ItemAbility.SOUL_ESOWARD.sound()
             }
             // Pigman Sword
-            event.soundName == "mob.zombiepig.zpigangry" && event.pitch == 2.0f && event.volume == 0.3f -> {
+            event.soundName == "mob.zombiepig.zpigangry" && event.pitch == 2f && event.volume == 0.3f -> {
                 ItemAbility.PIGMAN_SWORD.sound()
             }
             // Ember Rod
-            event.soundName == "mob.ghast.fireball" && event.pitch == 1.0f && event.volume == 0.3f -> {
+            event.soundName == "mob.ghast.fireball" && event.pitch == 1f && event.volume == 0.3f -> {
                 ItemAbility.EMBER_ROD.sound()
             }
             // Fire Freeze Staff
-            event.soundName == "mob.guardian.elder.idle" && event.pitch == 2.0f && event.volume == 0.2f -> {
+            event.soundName == "mob.guardian.elder.idle" && event.pitch == 2f && event.volume == 0.2f -> {
                 ItemAbility.FIRE_FREEZE_STAFF.sound()
             }
             // Staff of the Volcano
@@ -176,23 +176,23 @@ object ItemAbilityCooldown {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
             // Staff of the Volcano
-            event.soundName == "random.eat" && event.pitch == 1.0f && event.volume == 1.0f -> {
+            event.soundName == "random.eat" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
             // Holy Ice
-            event.soundName == "random.drink" && event.pitch.roundTo(1) == 1.8f && event.volume == 1.0f -> {
+            event.soundName == "random.drink" && event.pitch.roundTo(1) == 1.8f && event.volume == 1f -> {
                 ItemAbility.HOLY_ICE.sound()
             }
             // Royal Pigeon
-            event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+            event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1f -> {
                 ItemAbility.ROYAL_PIGEON.sound()
             }
             // Wand of Strength
-            event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+            event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1f -> {
                 ItemAbility.WAND_OF_STRENGTH.sound()
             }
             // Tactical Insertion
-            event.soundName == "fire.ignite" && event.pitch == 0.74603176f && event.volume == 1.0f -> {
+            event.soundName == "fire.ignite" && event.pitch == 0.74603176f && event.volume == 1f -> {
                 ItemAbility.TACTICAL_INSERTION.activate(LorenzColor.DARK_PURPLE, 3_000)
             }
 
@@ -206,12 +206,12 @@ object ItemAbilityCooldown {
                 }
             }
             // Enrager
-            event.soundName == "mob.enderdragon.growl" && event.pitch == 0.4920635f && event.volume == 2.0f -> {
+            event.soundName == "mob.enderdragon.growl" && event.pitch == 0.4920635f && event.volume == 2f -> {
                 ItemAbility.ENRAGER.sound()
             }
 
             // Blaze Slayer Flares
-            event.soundName == "fireworks.launch" && event.pitch == 1.0f && event.volume == 3.0f -> {
+            event.soundName == "fireworks.launch" && event.pitch == 1f && event.volume == 3f -> {
                 if (WARNING_FLARE.recentlyHeld() || ALERT_FLARE.recentlyHeld()) {
                     ItemAbility.ALERT_FLARE.sound()
                 }

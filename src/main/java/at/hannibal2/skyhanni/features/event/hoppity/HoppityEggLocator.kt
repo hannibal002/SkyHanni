@@ -159,14 +159,12 @@ object HoppityEggLocator {
             if (lastPoint.distanceSq(event.location) > 9) return
         }
 
-        if (EntityUtils.getEntitiesNearby<EntityFishHook>(event.location, 0.3).any()) {
-            return
-        }
-
+        if (EntityUtils.getEntitiesNearby<EntityFishHook>(event.location, 0.3).any()) return
 
         bezierFitter.addPoint(event.location)
 
         val guess = guessEggLocation() ?: return
+        if (!LorenzUtils.skyBlockIsland.isInBounds(guess)) return
         possibleEggLocations = listOf(guess)
         drawLocations = true
         if (possibleEggLocations.size == 1) {
@@ -210,7 +208,7 @@ object HoppityEggLocator {
         it.distance(location) < 5.0
     }
 
-    private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
+    private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0f && count == 1
 
     fun isEnabled() =
         LorenzUtils.inSkyBlock && config.waypoints.enabled && !GardenApi.inGarden() && !ReminderUtils.isBusy(true) &&
