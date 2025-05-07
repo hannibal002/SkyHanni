@@ -459,13 +459,14 @@ object BlockStrengthGuide {
                 ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
                 event.cancel()
             } else {
-                @Suppress("DEPRECATION") // we want the sb area here intentionally
+                @Suppress("DEPRECATION") // we want intentionally the scoreboard area here
+                val scoreboardArea = LorenzUtils.skyBlockArea
                 ErrorManager.logErrorStateWithData(
                     "could not load mining data for /shblockstrengh command",
                     "opened /sbmenu and found no mining speed in the next 2s",
                     "island" to LorenzUtils.skyBlockIsland,
                     "graph area" to IslandAreas.currentAreaName,
-                    "scoreboard area" to LorenzUtils.skyBlockArea,
+                    "scoreboard area" to scoreboardArea,
                     "location" to LocationUtils.playerLocation(),
                     betaOnly = true,
                 )
