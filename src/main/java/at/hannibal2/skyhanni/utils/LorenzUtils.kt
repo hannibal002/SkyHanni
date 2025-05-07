@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
@@ -60,9 +59,6 @@ object LorenzUtils {
             val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
             val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
             val result = (!never && (always || itsTime))
-            if (previousApril != result) {
-                ModifyVisualWords.update()
-            }
             previousApril = result
             return result
         }

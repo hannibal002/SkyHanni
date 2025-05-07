@@ -78,6 +78,7 @@ net.minecraft.client.multiplayer.PlayerInfo getGameMode() getGameType()
 net.minecraft.client.multiplayer.PlayerInfo getProfile() getGameProfile()
 net.minecraft.client.multiplayer.PlayerInfo getTeam() getPlayerTeam()
 
+net.minecraft.client.player.AbstractClientPlayer net.minecraft.client.entity.AbstractClientPlayer
 net.minecraft.client.player.LocalPlayer net.minecraft.client.entity.EntityPlayerSP
 net.minecraft.client.player.RemotePlayer net.minecraft.client.entity.EntityOtherPlayerMP
 
@@ -212,6 +213,8 @@ net.minecraft.network.protocol.game.ClientboundAnimatePacket getId() getEntityID
 
 net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket getPos() getBlockPosition()
 
+net.minecraft.network.protocol.game.ClientboundContainerAckPacket getUid() getActionNumber()
+
 net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getContainerId() getWindowId()
 net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getItem() getStack()
 
@@ -292,12 +295,9 @@ net.minecraft.world.entity.Entity setCustomName() setCustomNameTag()
 net.minecraft.world.entity.Entity tickCount ticksExisted
 net.minecraft.world.entity.Entity xOld prevPosX
 net.minecraft.world.entity.Entity xRot rotationPitch
-net.minecraft.world.entity.Entity xo posX
 net.minecraft.world.entity.Entity yOld prevPosY
 net.minecraft.world.entity.Entity yRot rotationYaw
-net.minecraft.world.entity.Entity yo posY
 net.minecraft.world.entity.Entity zOld prevPosZ
-net.minecraft.world.entity.Entity zo posZ
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
