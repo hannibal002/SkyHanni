@@ -11,7 +11,7 @@ import net.minecraft.util.EnumChatFormatting.RED
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
-    val button = GuiElementButton("", -1) {}
+    val button = GuiElementButton()
 
     override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
         val fr = context.minecraft.defaultFontRenderer
@@ -27,16 +27,19 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             UpdateManager.UpdateState.DOWNLOADED -> "Downloaded"
             UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
-        button.render(getButtonPosition(adjustedWidth), 10)
+        button.width = button.getWidth(context)
+        button.render(context, getButtonPosition(adjustedWidth), 10)
 
         if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
-            context.drawString(
+            val updateText = "${GREEN}The update will be installed after your next restart."
+            context.drawStringCenteredScaledMaxWidth(
+                updateText,
                 fr,
-                "${GREEN}The update will be installed after your next restart.",
-                (adjustedWidth / 2F).toInt(),
-                40,
-                -1,
+                adjustedWidth / 2F,
+                40f,
                 true,
+                x - fr.getStringWidth(updateText) / 2,
+                -1
             )
         }
 

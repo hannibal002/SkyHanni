@@ -28,6 +28,6 @@ class DicerRngDropTrackerConfig {
     var hideChat: Boolean = false
 
     @Expose
-    @ConfigLink(owner = DicerRngDropTrackerConfig::class, field = "display")
+    @ConfigLink(owner = DicerRngDropTrackerConfig::class, field = "enabled")
     var position: Position = Position(16, -232)
 }
