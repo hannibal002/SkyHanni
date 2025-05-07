@@ -8,9 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
-//#if MC < 1.21
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -265,7 +263,6 @@ object ErrorManager {
         return if (hideError) null else finalMessage
     }
 
-    //#if MC < 1.21
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ChangedChatErrorsJson>("ChangedChatErrors")
@@ -273,7 +270,6 @@ object ErrorManager {
 
         repoErrors = data.changedErrorMessages.filter { it.fixedIn == null || version < it.fixedIn }
     }
-    //#endif
 
     private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String? {
         val extraDataString = if (extraData.isNotEmpty()) {

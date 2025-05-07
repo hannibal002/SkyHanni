@@ -47,15 +47,11 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     }
 
     fun formattedDate(pattern: String): String {
-        //#if MC < 1.21
         val newPattern = if (SkyHanniMod.feature.gui.timeFormat24h) {
             pattern.replace("h", "H").replace("a", "")
         } else {
             pattern
         }
-        //#else
-        //$$ val newPattern = pattern
-        //#endif
 
 
         val instant = Instant.ofEpochMilli(millis)

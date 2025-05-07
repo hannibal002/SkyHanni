@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 
-// todo 1.21 impl needed
 object ColorUtils {
 
     @JvmStatic
@@ -40,11 +39,7 @@ object ColorUtils {
 
     fun getBlue(color: Int) = color and 0xFF
 
-    //#if MC < 1.21
     private val tooltipFixBool get() = SkyHanniMod.feature.misc.transparentTooltips
-    //#else
-    //$$ private val tooltipFixBool = false
-    //#endif
 
     // I think you need to manually import these
     operator fun Color.component1(): Float = if (!tooltipFixBool) this.alpha / 255f else this.red / 255f

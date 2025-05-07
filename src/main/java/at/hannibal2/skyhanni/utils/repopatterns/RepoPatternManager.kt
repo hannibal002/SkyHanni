@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
 import at.hannibal2.skyhanni.data.repo.RepoManager
 //#endif
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-//#if MC < 1.21
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-//#endif
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -77,7 +75,6 @@ object RepoPatternManager {
 
     var inTestDuplicateUsage = true
 
-    //#if MC < 1.21
     private val config
         get() = if (!insideTest) {
             SkyHanniMod.feature.dev.repoPattern
@@ -86,11 +83,6 @@ object RepoPatternManager {
                 tolerateDuplicateUsage = inTestDuplicateUsage
             }
         }
-    //#else
-    //$$ private val config get() = RepoPatternConfig().apply {
-    //$$     tolerateDuplicateUsage = inTestDuplicateUsage
-    //$$ }
-    //#endif
 
 
     private val localLoading: Boolean
@@ -175,12 +167,10 @@ object RepoPatternManager {
         checkExclusivity(owner, key)
     }
 
-    //#if MC < 1.21
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexes"))
     }
-    //#endif
 
     fun loadPatternsFromDump(dump: RepoPatternDump) {
         regexes = null

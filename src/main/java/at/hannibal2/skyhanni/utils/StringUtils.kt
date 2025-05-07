@@ -164,14 +164,10 @@ object StringUtils {
 
     fun String.cleanPlayerName(displayName: Boolean = false): String {
         return if (displayName) {
-            //#if MC < 1.21
             if (SkyHanniMod.feature.chat.playerMessage.playerRankHider) {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
-            //#else
-            //$$ this
-            //#endif
 
         } else {
             internalCleanPlayerName()

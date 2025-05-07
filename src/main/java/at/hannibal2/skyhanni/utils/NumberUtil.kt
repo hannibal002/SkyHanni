@@ -14,9 +14,7 @@ import kotlin.math.pow
 // todo 1.21 impl needed
 object NumberUtil {
 
-    //#if MC < 1.21
     private val config get() = SkyHanniMod.feature
-    //#endif
 
     private val suffixes = TreeMap<Long, String>().apply {
         this[1000L] = "k"
@@ -108,12 +106,8 @@ object NumberUtil {
     }
 
     fun Number.addSeparators(): String {
-        //#if MC < 1.21
         return if (!config.dev.numberFormatOverride) NumberFormat.getNumberInstance().format(this)
         else NumberFormat.getNumberInstance(Locale.US).format(this)
-        //#else
-        //$$ return NumberFormat.getNumberInstance(Locale.US).format(this)
-        //#endif
     }
 
     fun String.romanToDecimalIfNecessary() = toIntOrNull() ?: romanToDecimal()

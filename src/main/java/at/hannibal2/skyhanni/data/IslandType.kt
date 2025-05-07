@@ -3,12 +3,9 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
-//#if MC < 1.21
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
-// todo 1.21 impl needed
 enum class IslandType(private val nameFallback: String) {
     PRIVATE_ISLAND("Private Island"),
     PRIVATE_ISLAND_GUEST("Private Island Guest"),
@@ -86,7 +83,6 @@ enum class IslandType(private val nameFallback: String) {
         fun getByIdOrNull(id: String): IslandType? = entries.find { it.islandData?.apiName == id }
         fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
 
-        //#if MC < 1.21
         @HandleEvent(priority = HIGHEST)
         fun onRepoReload(event: RepositoryReloadEvent) {
             val data = event.getConstant<IslandTypeJson>("misc/IslandType")
@@ -103,7 +99,6 @@ enum class IslandType(private val nameFallback: String) {
             maxPlayers = data.maxPlayers
             maxPlayersMega = data.maxPlayersMega
         }
-        //#endif
     }
 }
 

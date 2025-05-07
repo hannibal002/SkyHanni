@@ -43,9 +43,7 @@ import kotlin.time.times
 object ChatUtils {
 
     // TODO log based on chat category (error, warning, debug, user error, normal)
-    //#if MC < 1.21
     private val log = LorenzLogger("chat/mod_sent")
-    //#endif
     var lastButtonClicked = 0L
 
     private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
@@ -139,9 +137,7 @@ object ChatUtils {
 
     fun chat(message: IChatComponent, send: Boolean = true): Boolean {
         val formattedMessage = message.formattedText
-        //#if MC < 1.21
         log.log(formattedMessage)
-        //#endif
 
         if (!MinecraftCompat.localPlayerExists) {
             consoleLog(formattedMessage.removeColor())

@@ -63,7 +63,6 @@ class GuiConfig {
     @FeatureToggle
     var timeFormat24h: Boolean = false
 
-    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Discord Rich Presence", desc = "")
     @Accordion
@@ -108,7 +107,6 @@ class GuiConfig {
     @ConfigOption(name = "In-Game Date", desc = "")
     @Accordion
     var inGameDate: InGameDateConfig = InGameDateConfig()
-    //#endif
 
     @Expose
     @ConfigOption(name = "Beacon Power", desc = "Display the current beacon power duration and what stat is boosted.")
