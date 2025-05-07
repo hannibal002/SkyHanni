@@ -6,6 +6,9 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
+//#if MC < 1.16
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+//#endif
 //#if MC > 1.16
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.MutableComponent
@@ -16,6 +19,7 @@ import net.minecraft.util.ResourceLocation
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //$$ import net.minecraft.network.message.MessageSignatureData
 //$$ import java.net.URI
+//$$ import kotlin.jvm.optionals.getOrNull
 //$$ import kotlin.math.abs
 //#endif
 
@@ -143,6 +147,30 @@ var IChatComponent.url: String?
         //#endif
     }
 
+fun ChatStyle.setClickRunCommand(text: String): ChatStyle {
+    //#if MC < 1.21
+    return this.setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, text))
+    //#else
+    //$$ return this.withClickEvent(ClickEvent.RunCommand(text))
+    //#endif
+}
+
+fun ChatStyle.setHoverShowText(text: String): ChatStyle {
+    //#if MC < 1.21
+    return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text.asComponent()))
+    //#else
+    //$$ return this.withHoverEvent(HoverEvent.ShowText(Text.of(text)))
+    //#endif
+}
+
+fun ChatStyle.setHoverShowText(text: IChatComponent): ChatStyle {
+    //#if MC < 1.21
+    return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text))
+    //#else
+    //$$ return this.withHoverEvent(HoverEvent.ShowText(text))
+    //#endif
+}
+
 fun IChatComponent.appendString(text: String): IChatComponent =
     //#if MC < 1.16
     this.appendText(text)
@@ -196,3 +224,35 @@ val defaultStyleConstructor: ChatStyle get() =
 //#else
 //$$ Style.EMPTY
 //#endif
+
+fun ClickEvent.value(): String {
+    //#if MC < 1.21
+    return this.value
+    //#else
+    //$$ return when (this.action) {
+    //$$     ClickEvent.Action.OPEN_URL -> (this as ClickEvent.OpenUrl).uri.toString()
+    //$$     ClickEvent.Action.RUN_COMMAND -> (this as ClickEvent.RunCommand).command
+    //$$     ClickEvent.Action.SUGGEST_COMMAND -> (this as ClickEvent.SuggestCommand).command
+    //$$     // we don't use these bottom 3 but might as well have them here
+    //$$     ClickEvent.Action.CHANGE_PAGE -> (this as ClickEvent.ChangePage).page.toString()
+    //$$     ClickEvent.Action.COPY_TO_CLIPBOARD -> (this as ClickEvent.CopyToClipboard).value
+    //$$     ClickEvent.Action.OPEN_FILE -> (this as ClickEvent.OpenFile).path
+    //$$     // todo use error manager here probably, not doing it now because it doesnt compile on 1.21
+    //$$     else -> ""
+    //$$ }
+    //#endif
+
+}
+
+fun HoverEvent.value(): IChatComponent {
+    //#if MC < 1.21
+    return this.value
+    //#else
+    //$$ return when (this.action) {
+    //$$     HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
+    //$$     HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.name
+    //$$     HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Text.empty()
+    //$$     else -> Text.empty()
+    //$$ }
+    //#endif
+}

@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
+//#if MC > 1.21
+//$$ import net.minecraft.entity.attribute.EntityAttributes
+//#endif
 
 object PlayerUtils {
 
@@ -31,6 +35,14 @@ object PlayerUtils {
         return Minecraft.getMinecraft().gameSettings.thirdPersonView == 2
         //#else
         //$$ return MinecraftClient.getInstance().options.perspective.isFrontView
+        //#endif
+    }
+
+    fun getWalkSpeed(): Int {
+        //#if MC < 1.21
+        return (MinecraftCompat.localPlayer.capabilities.walkSpeed * 1000).toInt()
+        //#else
+        //$$ return MinecraftCompat.localPlayer.getAttributeValue(EntityAttributes.MOVEMENT_SPEED).toInt()
         //#endif
     }
 }

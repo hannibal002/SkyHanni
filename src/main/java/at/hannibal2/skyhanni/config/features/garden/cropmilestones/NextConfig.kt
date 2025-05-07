@@ -74,5 +74,5 @@ class NextConfig {
 
     @Expose
     @ConfigLink(owner = NextConfig::class, field = "bestDisplay")
-    var displayPos: Position = Position(-200, -200, false, true)
+    var displayPos: Position = Position(-200, -200)
 }

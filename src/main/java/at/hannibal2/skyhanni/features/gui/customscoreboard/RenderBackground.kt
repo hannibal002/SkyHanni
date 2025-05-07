@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConf
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -27,7 +28,6 @@ object RenderBackground {
                 backgroundRenderable,
                 0,
                 config.roundedCornerSmoothness,
-                1,
                 outline.colorTop.toSpecialColor().rgb,
                 outline.colorBottom.toSpecialColor().rgb,
                 outline.thickness,
@@ -52,7 +52,7 @@ object RenderBackground {
         } else {
             Renderable.drawInsideRoundedRect(
                 renderable,
-                config.color.toSpecialColor(),
+                config.color.toColor(),
                 borderSize,
                 config.roundedCornerSmoothness,
                 1,

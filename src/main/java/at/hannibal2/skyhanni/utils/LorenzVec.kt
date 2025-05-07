@@ -12,6 +12,7 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.acos
 import kotlin.math.cos
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -32,7 +33,7 @@ data class LorenzVec(
 
     constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
 
-    fun toBlockPos(): BlockPos = BlockPos(x.toInt(), y.toInt(), z.toInt())
+    fun toBlockPos(): BlockPos = BlockPos(floor(x).toInt(), floor(y).toInt(), floor(z).toInt())
 
     fun toVec3(): Vec3 = Vec3(x, y, z)
 

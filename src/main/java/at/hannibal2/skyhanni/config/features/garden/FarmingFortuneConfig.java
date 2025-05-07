@@ -35,5 +35,5 @@ public class FarmingFortuneConfig {
 
     @Expose
     @ConfigLink(owner = FarmingFortuneConfig.class, field = "display")
-    public Position pos = new Position(5, -180, false, true);
+    public Position pos = new Position(5, -180);
 }

@@ -2,9 +2,13 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
+import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandBounds
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.LorenzVec
+import net.minecraft.util.AxisAlignedBB
 
 enum class IslandType(private val nameFallback: String) {
     PRIVATE_ISLAND("Private Island"),
@@ -36,6 +40,15 @@ enum class IslandType(private val nameFallback: String) {
     UNKNOWN("???"),
     ;
 
+    fun isValidIsland(): Boolean = when (this) {
+        NONE,
+        ANY,
+        UNKNOWN,
+        -> false
+
+        else -> true
+    }
+
     fun guestVariant(): IslandType = when (this) {
         PRIVATE_ISLAND -> PRIVATE_ISLAND_GUEST
         GARDEN -> GARDEN_GUEST
@@ -52,6 +65,19 @@ enum class IslandType(private val nameFallback: String) {
         private set
 
     val displayName: String get() = islandData?.name ?: nameFallback
+
+    private var boundingBox: AxisAlignedBB? = null
+
+    fun isInBounds(vec: LorenzVec): Boolean {
+        val bounds = islandData?.bounds ?: return false
+
+        val box = boundingBox ?: AxisAlignedBB(
+            bounds.minX.toDouble(), 0.0, bounds.minZ.toDouble(),
+            bounds.maxX.toDouble(), 256.0, bounds.maxZ.toDouble(),
+        ).also { boundingBox = it }
+
+        return box.isInside(vec)
+    }
 
     @SkyHanniModule
     companion object {
@@ -80,10 +106,11 @@ enum class IslandType(private val nameFallback: String) {
 
             val islandDataMap = data.islands.mapValues {
                 val island = it.value
-                IslandData(island.name, island.apiName, island.maxPlayers ?: data.maxPlayers)
+                IslandData(island.name, island.apiName, island.maxPlayers ?: data.maxPlayers, island.bounds)
             }
 
             entries.forEach { islandType ->
+                islandType.boundingBox = null
                 islandType.islandData = islandDataMap[islandType.name]
             }
 
@@ -97,4 +124,5 @@ data class IslandData(
     val name: String,
     val apiName: String?,
     val maxPlayers: Int,
+    val bounds: IslandBounds?,
 )

@@ -25,7 +25,7 @@ object RenderData {
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
         DrawContextUtils.translated(z = -3) {
-            renderOverlay(event.context)
+            renderOverlay(DrawContextUtils.drawContext)
         }
     }
 
@@ -41,11 +41,11 @@ object RenderData {
 
             if (GuiEditManager.isInGui()) {
                 DrawContextUtils.translated(z = -3) {
-                    renderOverlay(event.context)
+                    renderOverlay(DrawContextUtils.drawContext)
                 }
             }
 
-            GuiRenderEvent.ChestGuiOverlayRenderEvent(event.context).post()
+            GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
         }
     }
 

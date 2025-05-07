@@ -43,7 +43,7 @@ public class SensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Reducing factor", desc = "Change by how much the sensitivity is lowered by.")
     @ConfigEditorSlider(minValue = 1, maxValue = 50, minStep = 1)
-    public Property<Float> reducingFactor = Property.of(15.0F);
+    public Property<Float> reducingFactor = Property.of(15f);
 
     @Expose
     @ConfigOption(

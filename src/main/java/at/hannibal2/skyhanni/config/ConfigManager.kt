@@ -107,6 +107,7 @@ class ConfigManager {
         "features.misc.MiscConfig.collectionCounterPos",
         "features.misc.MiscConfig.carryPosition",
         "features.misc.MiscConfig.lockedMouseDisplay",
+        "features.gui.GuiConfig.titlePosition",
 
         // debug features
         "features.dev.DebugConfig.trackSoundPosition",

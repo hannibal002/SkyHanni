@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.removePrefix
@@ -551,7 +550,7 @@ object EstimatedItemValueCalculator {
         }
 
         price.coinPrice.takeIf { it != 0L }?.let {
-            items[SKYBLOCK_COIN] = it
+            items[NeuInternalName.SKYBLOCK_COIN] = it
         }
 
         for ((materialInternalName, amount) in price.itemPrice) {
@@ -868,6 +867,9 @@ object EstimatedItemValueCalculator {
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName().removeKuudraTier()
+
+        // ignore cases where players put bugged items in ah/trade/chest to break mods
+        if (internalName == NeuInternalName.NONE) return 0.0
 
         stack.getAttributeFromShard()?.let {
             val price = it.getAttributePrice()
