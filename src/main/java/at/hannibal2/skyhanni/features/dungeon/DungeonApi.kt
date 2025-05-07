@@ -124,7 +124,7 @@ object DungeonApi {
     @Suppress("MaxLineLength")
     val playerDungeonTeamPattern by patternGroup.pattern(
         "tablist.playerteam",
-        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+) (?<symbols>[^(]*)\\((?:§.)*(?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))(?:§.)*\\)(?:§.)*\$",
+        "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) §r§f\\((?:§.)*(?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))(?:§.)*\\)(?:§.)*\$",
     )
 
     enum class DungeonBlessings(var power: Int) {

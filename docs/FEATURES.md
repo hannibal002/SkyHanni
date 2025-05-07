@@ -45,6 +45,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Use the color of the SkyBlock level for the player color.
 + Added Right Click to Copy Chat. - Empa (https://github.com/hannibal002/SkyHanni/pull/2149)
     + Hold Shift to copy with `/shwords`, Control for a single line, and Alt to format color codes.
++ Added Current Chat Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/3491)
+    + Displays a GUI element that indicates what chat you are in (e.g. Party, Guild, Coop, All).
 
 #### Chat Filter
 
@@ -129,6 +131,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows enchantment name in rare drop messages and sends a custom one if none is provided by Hypixel.
 + Added Dungeon Low Health Alert. - jani (https://github.com/hannibal002/SkyHanni/pull/3734)
     + Shows a title and plays a sound when a teammate's health is low.
++ Added Spirit Leap Overlay. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2514)
+    + Highlights specific Dungeon Classes with customizable colors.
+    + Displays player's Dungeon Class.
+    + Shows Class Level (toggleable).
+    + Added "(Dead)" text for dead teammates with customizable colors.
++ Added Color Override to Dungeon Livid Finder. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3511)
 
 </details>
 <details open><summary>
@@ -259,6 +267,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays XP for super pairs in the bottom right corner of the item.
 + Added Outside Sack Value Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3778)
     + Show value of all items in Sacks as GUI while not in Sacks.
++ Added Trade Value Overlay. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
+    + Doesn't suppport coins.
++ Added Evolving Item time remaining in lore (Bottle of Jyrre, Dark Cacao Truffle, etc.). - Obsidian (https://github.com/hannibal002/SkyHanni/pull/3614)
 
 </details>
 <details open><summary>
@@ -742,6 +753,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show sack item amount to the visitor shopping list. - CalMWolfs
 + Added Bonus Pest Chance Display. - Zickles & Empa (https://github.com/hannibal002/SkyHanni/pull/2509)
     + Displays your Bonus Pest Chance and its enabled status.
++ Added Compact Jacob Claim. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3235)
+    + When collecting the rewards from many farming contests at the same time at Anita.
+    + Compact the Jacob Claim message, only showing full information when hovering.
++ Added Monthly Farming Weight Leaderboard option. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
 
 ### Garden Pests
 
@@ -1183,6 +1198,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added command `/shedittracker <item name> <amount>`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2448)
     + Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers.
     + Use a negative amount to remove items.
++ Added Shorten /warp option. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3524)
+    + `/gold` warps to Gold Mines, `/crimson` to Crimson Isles, etc.
 
 </details>
 <details open><summary>
@@ -1573,6 +1590,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Customizable chat message detailing any Century Cakes eaten (and, if lucky, Cake Souls found) while away from your Private Island.
     + Requires Cake Counter placed on Private Island.
     + Prompts you to enable this feature when placing Cake Counter.
++ Added Fruit Bowl Player Highlighter and Stats Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3394)
++ Added Frog Mask Warning. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3449)
+    + Displays a warning when foraging in an incorrect park region while wearing a Frog Mask.
 
 </details>
 <details open><summary>

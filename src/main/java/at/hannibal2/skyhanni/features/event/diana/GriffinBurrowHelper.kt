@@ -147,7 +147,7 @@ object GriffinBurrowHelper {
         val newLocation = calculateNewTarget()
         if (targetLocation != newLocation) {
             targetLocation = newLocation
-            // add island graphs here some day when the hub is fully added in the graph
+            // TODO: add island graphs here some day when the hub is fully added in the graph
 //             newLocation?.let {
 //                 IslandGraphs.find(it)
 //             }
@@ -180,8 +180,6 @@ object GriffinBurrowHelper {
         return newLocation
     }
 
-    private var correctCounter = 0
-
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
@@ -191,22 +189,13 @@ object GriffinBurrowHelper {
         if (newLocation.distance(playerLocation) < 6) return
 
         latestGuess?.let {
-            if (it.precise && config.multiGuesses) {
-                if (it.getLocation() == newLocation) {
-                    correctCounter++
-                } else {
-                    if (correctCounter > 5) {
-                        config.guess
-                        if (it.getLocation() !in particleBurrows) {
-                            additionalGuesses.add(it)
-                        }
-                    }
-                    correctCounter = 0
-                }
+            if (it.precise && config.multiGuesses && event.new && it.getLocation() !in particleBurrows) {
+                additionalGuesses.add(it)
             }
         }
 
-        latestGuess = Guess(newLocation, event.precise)
+        latestGuess = if (IslandType.HUB.isInBounds(newLocation)) Guess(newLocation, event.precise) else null
+
         update()
     }
 
@@ -222,11 +211,8 @@ object GriffinBurrowHelper {
 
     private fun removePreciseGuess(location: LorenzVec) {
         latestGuess?.let {
-            if (it.precise) {
-                if (location == it.getLocation()) {
-                    latestGuess = null
-                    correctCounter = 0
-                }
+            if (it.precise && location == it.getLocation()) {
+                latestGuess = null
             }
         }
         additionalGuesses.removeIf { it.getLocation() == location }
@@ -238,7 +224,6 @@ object GriffinBurrowHelper {
         val location = guess.getLocation()
         if (particleBurrows.any { location.distance(it.key) < distance }) {
             latestGuess = null
-            correctCounter = 0
         }
     }
 
@@ -273,7 +258,6 @@ object GriffinBurrowHelper {
 
     private fun resetAllData() {
         latestGuess = null
-        correctCounter = 0
         additionalGuesses.clear()
         targetLocation = null
         particleBurrows = emptyMap()
@@ -441,11 +425,9 @@ object GriffinBurrowHelper {
 
         if (particleBurrows.containsKey(location)) {
             DelayedRun.runDelayed(1.seconds) {
-                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds) {
-                    if (particleBurrows.containsKey(location)) {
-                        // workaround
-                        particleBurrows = particleBurrows.editCopy { keys.remove(location) }
-                    }
+                if (BurrowApi.lastBurrowRelatedChatMessage.passedSince() > 2.seconds && particleBurrows.containsKey(location)) {
+                    // workaround
+                    particleBurrows = particleBurrows.editCopy { keys.remove(location) }
                 }
             }
         }
@@ -462,7 +444,7 @@ object GriffinBurrowHelper {
         } else ""
         if (lastTitleSentTime.passedSince() > 2.seconds) {
             lastTitleSentTime = SimpleTimeMark.now()
-            TitleManager.sendTitle(text + keybindSuffix, duration = 2.seconds, fontSize = 3f)
+            TitleManager.sendTitle(text + keybindSuffix, duration = 2.seconds)
         }
     }
 

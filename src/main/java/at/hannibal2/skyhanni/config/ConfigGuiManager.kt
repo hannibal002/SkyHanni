@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GuiEditManager
-import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
-//#if MC < 1.21
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-//#endif
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 
 object ConfigGuiManager {
 
@@ -19,9 +17,7 @@ object ConfigGuiManager {
         if (search != null) {
             editor.search(search)
         }
-        //#if MC < 1.21
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
-        //#endif
     }
 
     fun onCommand(args: Array<String>) {

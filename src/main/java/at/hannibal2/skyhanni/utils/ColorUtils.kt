@@ -1,17 +1,33 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import java.awt.Color
 
 object ColorUtils {
 
-    @Deprecated("Use toSpecialColor() instead", ReplaceWith("this.toSpecialColor()"))
-    fun String.toChromaColor() = this.toSpecialColor()
+    @JvmStatic
+    @JvmOverloads
+    fun Color.toChromaColor(alpha: Int = this.alpha, chroma: Int = 0): ChromaColour =
+        ChromaColour.fromRGB(red, green, blue, alpha, chroma)
 
-    @Deprecated("Use toSpecialColorInt() instead", ReplaceWith("this.toSpecialColorInt()"))
-    fun String.toChromaColorInt() = this.toSpecialColorInt()
+    @JvmStatic
+    fun String.toChromaColor() = ChromaColour.forLegacyString(this)
+
+    fun ChromaColour.toColor(): Color = Color(toInt(), true)
+
+    // TODO: Replace this code with the call to moulconfig's function once its fixed. revert #3821
+    fun ChromaColour.toInt(): Int {
+        val effectiveHue: Double
+        if (timeForFullRotationInMillis > 0) {
+            effectiveHue = System.currentTimeMillis() / timeForFullRotationInMillis.toDouble()
+        } else {
+            effectiveHue = hue.toDouble()
+        }
+
+        val rgb = Color.HSBtoRGB((effectiveHue % 1.0).toFloat(), this.saturation, this.brightness)
+        return (alpha and 0xFF) shl 24 or (rgb and 0xFFFFFF)
+    }
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
 
@@ -53,4 +69,33 @@ object ColorUtils {
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 
     fun getColorFromHex(hex: String): Int = runCatching { Color(Integer.decode(hex)) }.getOrNull()?.rgb ?: 0
+
+    // copied from minecraft, thx jappa
+    private val colorCodes = makeColorCodeArray()
+
+    private fun makeColorCodeArray(): IntArray {
+        val colorCode = IntArray(32)
+        for (i in 0..31) {
+            val j = (i shr 3 and 1) * 85
+            var k = (i shr 2 and 1) * 170 + j
+            var l = (i shr 1 and 1) * 170 + j
+            var i1 = (i shr 0 and 1) * 170 + j
+            if (i == 6) {
+                k += 85
+            }
+
+            if (i >= 16) {
+                k /= 4
+                l /= 4
+                i1 /= 4
+            }
+
+            colorCode[i] = ((k and 0xFF) shl 16) or ((l and 0xFF) shl 8) or (i1 and 0xFF)
+        }
+        return colorCode
+    }
+
+    fun getColorCode(color: Char): Int {
+        return colorCodes["0123456789abcdef".indexOf(color)]
+    }
 }

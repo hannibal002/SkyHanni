@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
+import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import java.io.Serializable
 import java.nio.file.Path
@@ -120,6 +121,10 @@ val headlessLwjgl by configurations.creating {
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
     this.branch = "main"
+}
+
+val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
+    this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
 }
 
 tasks.runClient {
@@ -243,7 +248,11 @@ dependencies {
 
 afterEvaluate {
     loom.runs.named("client") {
-        programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+        if (target == ProjectTarget.MAIN) {
+            programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+        } else if (target == ProjectTarget.MODERN) {
+            programArgs("--quickPlayMultiplayer", "hypixel.net")
+        }
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
         this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))

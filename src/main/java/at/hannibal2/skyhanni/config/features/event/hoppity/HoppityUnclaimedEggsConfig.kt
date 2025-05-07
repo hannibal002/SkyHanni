@@ -21,7 +21,7 @@ class HoppityUnclaimedEggsConfig {
 
     @Expose
     @ConfigLink(owner = HoppityUnclaimedEggsConfig::class, field = "enabled")
-    var position: Position = Position(200, 120, false, true)
+    var position: Position = Position(200, 120)
 
     @Expose
     @ConfigOption(name = "Unclaimed Eggs Order", desc = "Order in which to display unclaimed eggs.")

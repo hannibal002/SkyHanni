@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.DisplayTypeEntry
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -451,8 +450,8 @@ object BestiaryData {
     }
 
     private fun Long.formatNumber(): String = when (config.numberFormat) {
-        BestiaryConfig.NumberFormatEntry.SHORT -> this.shortFormat()
-        BestiaryConfig.NumberFormatEntry.LONG -> this.addSeparators()
+        NumberFormatEntry.SHORT -> this.shortFormat()
+        NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }
 
