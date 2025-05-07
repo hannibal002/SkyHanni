@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -11,11 +12,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
@@ -106,8 +106,8 @@ internal object RenderableUtils {
         val xWithoutPadding = xSpace - padding * 2
         val yWithoutPadding = ySpace - padding * 2
 
-        val xScale = xWithoutPadding / width.toDouble()
-        val yScale = yWithoutPadding / height.toDouble()
+        val xScale = xWithoutPadding / width.toFloat()
+        val yScale = yWithoutPadding / height.toFloat()
         val scale = min(xScale, yScale)
         val inverseScale = 1 / scale
 
@@ -125,14 +125,14 @@ internal object RenderableUtils {
             Renderable.currentRenderPassMousePosition =
                 ((preScaleMouse.first - padding) * inverseScale).toInt() to ((preScaleMouse.second - padding) * inverseScale).toInt()
 
-            GlStateManager.translate(xOffsetRender, yOffsetRender, 0f)
-            GlStateManager.scale(scale, scale, 1.0)
+            DrawContextUtils.translate(xOffsetRender, yOffsetRender, 0f)
+            DrawContextUtils.scale(scale, scale, 1f)
             render(
                 posX + (xOffset * inverseScale).toInt(),
                 posY + (yOffset * inverseScale).toInt(),
             )
-            GlStateManager.scale(inverseScale, inverseScale, 1.0)
-            GlStateManager.translate(-xOffsetRender, -yOffsetRender, 0f)
+            DrawContextUtils.scale(inverseScale, inverseScale, 1f)
+            DrawContextUtils.translate(-xOffsetRender, -yOffsetRender, 0f)
         } finally {
             Renderable.currentRenderPassMousePosition = preScaleMouse
         }
@@ -141,35 +141,39 @@ internal object RenderableUtils {
     fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         val yOffset = calculateAlignmentYOffset(this, ySpace)
-        GlStateManager.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
         this.render(posX + xOffset, posY + yOffset)
-        GlStateManager.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
         return xOffset to yOffset
     }
 
     fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int): Int {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
-        GlStateManager.translate(xOffset.toFloat(), 0f, 0f)
+        DrawContextUtils.translate(xOffset.toFloat(), 0f, 0f)
         this.render(posX + xOffset, posY)
-        GlStateManager.translate(-xOffset.toFloat(), 0f, 0f)
+        DrawContextUtils.translate(-xOffset.toFloat(), 0f, 0f)
         return xOffset
     }
 
     fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int): Int {
         val yOffset = calculateAlignmentYOffset(this, ySpace)
-        GlStateManager.translate(0f, yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(0f, yOffset.toFloat(), 0f)
         this.render(posX, posY + yOffset)
-        GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
+        DrawContextUtils.translate(0f, -yOffset.toFloat(), 0f)
         return yOffset
     }
 
-    fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
-        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
-        GlStateManager.translate(1.0, 1.0, 0.0)
-        GlStateManager.scale(scale, scale, 1.0)
-        fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
-        GlStateManager.scale(inverseScale, inverseScale, 1.0)
-        GlStateManager.translate(-1.0, -1.0, 0.0)
+    fun renderString(
+        text: String,
+        scale: Double = 1.0,
+        color: Color = Color.WHITE,
+        inverseScale: Double = 1 / scale,
+    ) {
+        DrawContextUtils.translate(1.0, 1.0, 0.0)
+        DrawContextUtils.scale(scale.toFloat(), scale.toFloat(), 1f)
+        GuiRenderUtils.drawString(text, 0f, 0f, color.rgb)
+        DrawContextUtils.scale(inverseScale.toFloat(), inverseScale.toFloat(), 1f)
+        DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
 
     inline fun <T> MutableList<Searchable>.addNullableButton(
