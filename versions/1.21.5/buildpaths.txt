@@ -150,6 +150,41 @@ at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig.kt
 at.hannibal2.skyhanni.utils.ChatUtils.kt
 at.hannibal2.skyhanni.utils.ConfigUtils.kt
 at.hannibal2.skyhanni.utils.DelayedRun.kt
+at.hannibal2.skyhanni.config.ConfigManager.kt
+at.hannibal2.skyhanni.config.features.About.kt
+at.hannibal2.skyhanni.config.Features.kt
+at.hannibal2.skyhanni.config.core.config.Position.kt
+at.hannibal2.skyhanni.config.ConfigGuiManager.kt
+at.hannibal2.skyhanni.config.core.config.PositionList.kt
+at.hannibal2.skyhanni.config.FeatureToggle.kt
+at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay.java
+at.hannibal2.skyhanni.utils.IdentityCharacteristics.kt
+at.hannibal2.skyhanni.utils.StringFileHandler.kt
+at.hannibal2.skyhanni.utils.json.BaseGsonBuilder.kt
+at.hannibal2.skyhanni.utils.LorenzLogger.kt
+at.hannibal2.skyhanni.events.RepositoryReloadEvent.kt
+at.hannibal2.skyhanni.utils.ApiUtils.kt
+at/hannibal2/skyhanni/utils/json/JsonUtils.kt
+at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.kt
+at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity.kt
+at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.kt
+at.hannibal2.skyhanni.utils.json.SkippingTypeAdapterFactory.kt
+at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
+at.hannibal2.skyhanni.utils.json.SimpleStringTypeAdapter.kt
+at.hannibal2.skyhanni.features.misc.update.UpdateManager.kt
+at.hannibal2.skyhanni.features.misc.update.CustomGithubReleaseUpdateSource.kt
+at.hannibal2.skyhanni.features.misc.update.GuiOptionEditorUpdateCheck.kt
+at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig.kt
+at.hannibal2.skyhanni.config.features.dev.DevConfig.kt
+at.hannibal2.skyhanni.config.features.dev.WaypointsConfig.kt
+at.hannibal2.skyhanni.config.features.dev.GraphConfig.kt
+at.hannibal2.skyhanni.config.features.dev.DevToolConfig.kt
+at.hannibal2.skyhanni.config.features.dev.minecraftconsole.ConsoleFiltersConfig.kt
+at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig.kt
+at.hannibal2.skyhanni.config.features.dev.DevConfig.kt
+at.hannibal2.skyhanni.config.core.elements.GuiElementButton.kt
+
+
 
 
 

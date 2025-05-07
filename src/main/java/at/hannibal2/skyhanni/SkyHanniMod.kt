@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 //#if MC < 1.21
 import at.hannibal2.skyhanni.config.ConfigFileType
+//#endif
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.data.OtherInventoryData
 //#endif
@@ -106,9 +108,9 @@ object SkyHanniMod {
     val isBetaVersion: Boolean
         get() = modVersion.isBeta
 
-    //#if MC < 1.21
     @JvmField
     var feature: Features = Features()
+    //#if MC < 1.21
     lateinit var sackData: SackData
     //#endif
     lateinit var friendsData: FriendsJson
@@ -118,9 +120,7 @@ object SkyHanniMod {
     //#endif
     lateinit var visualWordsData: VisualWordsJson
 
-    //#if MC < 1.21
     lateinit var configManager: ConfigManager
-    //#endif
     val logger: Logger = LogManager.getLogger("SkyHanni")
     fun getLogger(name: String): Logger {
         return LogManager.getLogger("SkyHanni.$name")

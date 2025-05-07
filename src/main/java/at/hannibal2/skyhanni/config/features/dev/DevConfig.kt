@@ -14,7 +14,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
+// todo 1.21 impl needed
 class DevConfig {
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Repository", desc = "")
     @Accordion
@@ -24,6 +26,7 @@ class DevConfig {
     @ConfigOption(name = "Debug", desc = "")
     @Accordion
     var debug: DebugConfig = DebugConfig()
+    //#endif
 
     @Expose
     @ConfigOption(name = "Repo Pattern", desc = "")
@@ -79,9 +82,11 @@ class DevConfig {
     @Expose
     var debugItemPos: Position = Position(90, 70)
 
+    //#if MC < 1.21
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "raytracedOreblock")
     var debugOrePos: Position = Position(1, 200)
+    //#endif
 
     @Expose
     @ConfigOption(
@@ -159,7 +164,9 @@ class DevConfig {
     @Category(name = "Dev Tools", desc = "Tooling for devs")
     var devTool: DevToolConfig = DevToolConfig()
 
+    //#if MC < 1.21
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
     var mobDebug: DebugMobConfig = DebugMobConfig()
+    //#endif
 }

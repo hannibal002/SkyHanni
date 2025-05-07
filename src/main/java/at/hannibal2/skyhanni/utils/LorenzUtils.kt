@@ -69,9 +69,6 @@ object LorenzUtils {
 
     val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
-    // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
-    fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
-
     // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int
         //#if MC < 1.21

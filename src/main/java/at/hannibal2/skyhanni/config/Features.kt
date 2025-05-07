@@ -2,10 +2,13 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.About
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig
 import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig
+//#endif
 import at.hannibal2.skyhanni.config.features.dev.DevConfig
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig
 import at.hannibal2.skyhanni.config.features.event.EventConfig
 import at.hannibal2.skyhanni.config.features.fishing.FishingConfig
@@ -19,6 +22,7 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
 import at.hannibal2.skyhanni.config.storage.Storage
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAprilFoolsDay
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.Config
 import io.github.notenoughupdates.moulconfig.Social
@@ -27,6 +31,7 @@ import io.github.notenoughupdates.moulconfig.common.MyResourceLocation
 import io.github.notenoughupdates.moulconfig.gui.HorizontalAlign
 import io.github.notenoughupdates.moulconfig.processor.ProcessedCategory
 
+// todo 1.21 impl needed
 class Features : Config() {
     private val discord = MyResourceLocation("skyhanni", "social/discord.png")
     private val github = MyResourceLocation("skyhanni", "social/github.png")
@@ -38,7 +43,9 @@ class Features : Config() {
     }
 
     override fun alignCategory(category: ProcessedCategory, isSelected: Boolean): HorizontalAlign {
+        //#if MC < 1.21
         if (isAprilFoolsDay) return HorizontalAlign.RIGHT
+        //#endif
         return super.alignCategory(category, isSelected)
     }
 
@@ -55,7 +62,11 @@ class Features : Config() {
     }
 
     override fun getTitle(): String {
+        //#if MC < 1.21
         val modName = if (isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
+        //#else
+        //$$ val modName = "SkyHanni"
+        //#endif
         return "$modName ${SkyHanniMod.VERSION} by §channibal2§r, config by §5Moulberry §rand §5nea89"
     }
 
@@ -69,6 +80,7 @@ class Features : Config() {
     @Category(name = "About", desc = "Information about SkyHanni and updates.")
     var about: About = About()
 
+    //#if MC < 1.21
     @JvmField
     @Expose
     @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
@@ -131,10 +143,12 @@ class Features : Config() {
     @Category(name = "Misc", desc = "Settings without a category.")
     var misc: MiscConfig = MiscConfig()
 
+    //#endif
     // Bottom
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
     var dev: DevConfig = DevConfig()
+    //#if MC < 1.21
 
     @Expose
     var storage: Storage = Storage()
@@ -142,4 +156,5 @@ class Features : Config() {
     @Expose
     @Suppress("unused")
     var lastVersion: Int = ConfigUpdaterMigrator.CONFIG_VERSION
+    //#endif
 }
