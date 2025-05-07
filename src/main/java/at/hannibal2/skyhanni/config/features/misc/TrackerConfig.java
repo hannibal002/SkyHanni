@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.utils.ItemPriceSource;
+//#if MC < 1.21
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+// todo 1.21 impl needed
 public class TrackerConfig {
 
     @Expose
@@ -28,10 +31,12 @@ public class TrackerConfig {
     @ConfigEditorDropdown
     public ItemPriceSource priceSource = ItemPriceSource.BAZAAR_INSTANT_BUY;
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
     @ConfigEditorDropdown
     public Property<SkyHanniTracker.DefaultDisplayMode> defaultDisplayMode = Property.of(SkyHanniTracker.DefaultDisplayMode.REMEMBER_LAST);
+    //#endif
 
     @Expose
     @ConfigOption(name = "Recent Drops", desc = "Highlight the amount in green on recently gained items.")

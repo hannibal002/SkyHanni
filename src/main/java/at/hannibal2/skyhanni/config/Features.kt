@@ -2,26 +2,22 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.About
-//#if MC < 1.21
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.config.features.combat.CombatConfig
 import at.hannibal2.skyhanni.config.features.crimsonisle.CrimsonIsleConfig
-//#endif
 import at.hannibal2.skyhanni.config.features.dev.DevConfig
-//#if MC < 1.21
 import at.hannibal2.skyhanni.config.features.dungeon.DungeonConfig
 import at.hannibal2.skyhanni.config.features.event.EventConfig
 import at.hannibal2.skyhanni.config.features.fishing.FishingConfig
 import at.hannibal2.skyhanni.config.features.garden.GardenConfig
-//#endif
 import at.hannibal2.skyhanni.config.features.gui.GuiConfig
-//#if MC < 1.21
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig
 import at.hannibal2.skyhanni.config.features.mining.MiningConfig
 import at.hannibal2.skyhanni.config.features.misc.MiscConfig
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.storage.Storage
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAprilFoolsDay
 //#endif
@@ -87,7 +83,7 @@ class Features : Config() {
     @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
     var gui: GuiConfig = GuiConfig()
 
-    //#if MC < 1.21
+
     // Islands
     @Expose
     @Category(name = "Garden", desc = "Features for the Garden island.")
@@ -145,13 +141,12 @@ class Features : Config() {
     @Category(name = "Misc", desc = "Settings without a category.")
     var misc: MiscConfig = MiscConfig()
 
-    //#endif
     // Bottom
     @Expose
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
     var dev: DevConfig = DevConfig()
-    //#if MC < 1.21
 
+    //#if MC < 1.21
     @Expose
     var storage: Storage = Storage()
 

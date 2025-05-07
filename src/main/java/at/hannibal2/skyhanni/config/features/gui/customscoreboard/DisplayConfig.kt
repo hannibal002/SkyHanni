@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.data.DateFormat
+//#if MC < 1.21
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
 import at.hannibal2.skyhanni.utils.RenderUtils
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,6 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
+// todo 1.21 impl needed
 class DisplayConfig {
     @Expose
     @ConfigOption(name = "Alignment Options", desc = "")
@@ -114,6 +117,7 @@ class DisplayConfig {
         }
     }
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(
         name = "Number Display Format",
@@ -121,6 +125,7 @@ class DisplayConfig {
     )
     @ConfigEditorDropdown
     var numberDisplayFormat: NumberDisplayFormat = NumberDisplayFormat.TEXT_COLOR_NUMBER
+    //#endif
 
     @Expose
     @ConfigOption(
@@ -156,6 +161,7 @@ class DisplayConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
     var lineSpacing: Int = 10
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(
         name = "Text Alignment",
@@ -163,6 +169,7 @@ class DisplayConfig {
     )
     @ConfigEditorDropdown
     var textAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
+    //#endif
 
     @Expose
     @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")

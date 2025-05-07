@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if MC < 1.21
 import at.hannibal2.skyhanni.features.gui.MayorOverlay
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -9,16 +11,19 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
+// todo 1.21 impl needed
 class MayorOverlayConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enable the Mayor Overlay.")
     @ConfigEditorBoolean
     var enabled: Boolean = false
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Appearance", desc = "Change the order of appearance of the Mayor Overlay.")
     @ConfigEditorDraggableList
     var mayorOverlay: MutableList<MayorOverlay> = MayorOverlay.entries.toMutableList()
+    //#endif
 
     @Expose
     @ConfigOption(name = "Show Perks", desc = "Show the perks of the mayor.")
