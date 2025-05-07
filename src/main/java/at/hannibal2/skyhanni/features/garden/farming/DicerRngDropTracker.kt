@@ -203,7 +203,7 @@ object DicerRngDropTracker {
 
         event.move(87, "garden.dicerCounters.pos", "garden.dicerCounters.position")
         event.move(87, "garden.dicerCounters.display", "garden.dicerCounters.enabled")
-        event.move(87, "garden.dicerCounters", "garden.dicerRngDropTracker")
+        event.move(88, "garden.dicerCounters", "garden.dicerRngDropTracker")
     }
 
     @HandleEvent

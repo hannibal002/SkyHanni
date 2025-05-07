@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import io.github.notenoughupdates.moulconfig.internal.RenderUtils
 import net.minecraft.client.Minecraft
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
@@ -45,7 +44,7 @@ object NotificationManager {
         val midX = GuiScreenUtils.scaledWindowWidth / 2
         val topY = (GuiScreenUtils.scaledWindowHeight * 0.75 - notification.height / 2).toInt()
 
-        RenderUtils.drawFloatingRectDark(midX - notification.width / 2, topY, notification.width, notification.height)
+        GuiRenderUtils.drawFloatingRectDark(midX - notification.width / 2, topY, notification.width, notification.height)
         val closeTextWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(CLOSE_TEXT)
 
         GuiRenderUtils.drawString(CLOSE_TEXT, midX + notification.width / 2 - 3 - closeTextWidth, topY + 4)
