@@ -44,7 +44,7 @@ object FishingHotspotRadar {
         if (!isEnabled()) return
         val type = event.type
         if (type != EnumParticleTypes.FLAME) return
-        if (event.count != 1 || event.speed != 0.0f) return
+        if (event.count != 1 || event.speed != 0f) return
 
         lastParticle = SimpleTimeMark.now()
         val currLoc = event.location

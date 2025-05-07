@@ -289,7 +289,7 @@ object GuiRenderUtils {
 
         init {
             itemLightBuffer.clear()
-            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1.0f)
+            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1f)
             itemLightBuffer.flip()
         }
 

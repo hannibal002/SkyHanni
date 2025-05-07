@@ -45,6 +45,7 @@ net.minecraft.client.gui.Gui net.minecraft.client.gui.GuiIngame
 net.minecraft.client.gui.Gui getChat() getChatGUI()
 
 net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNewChat
+net.minecraft.client.gui.components.Widget net.minecraft.client.gui.GuiButton
 
 net.minecraft.client.gui.components.ChatComponent allMessages chatLines
 net.minecraft.client.gui.components.ChatComponent getWidth() getChatWidth()
@@ -52,6 +53,7 @@ net.minecraft.client.gui.components.ChatComponent rescaleChat() refreshChat()
 net.minecraft.client.gui.components.ChatComponent trimmedMessages drawnChatLines
 
 net.minecraft.client.gui.screens.ChatScreen net.minecraft.client.gui.GuiChat
+net.minecraft.client.gui.screens.PauseScreen net.minecraft.client.gui.GuiIngameMenu
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
 
 net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
@@ -406,6 +408,7 @@ net.minecraft.world.item.DyeColor LIGHT_GRAY SILVER
 net.minecraft.world.item.Item byBlock() getItemFromBlock()
 
 net.minecraft.world.item.ItemStack count stackSize
+net.minecraft.world.item.ItemStack getEnchantmentTags() getEnchantmentTagList()
 net.minecraft.world.item.ItemStack getTag() getTagCompound()
 net.minecraft.world.item.ItemStack isEnchanted() isItemEnchanted()
 
@@ -536,3 +539,7 @@ org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
 
+net.minecraft.world.level.Level getPlayerByUUID() getPlayerEntityByUUID()
+
+net.minecraft.client.renderer.entity.EntityRenderDispatcher net.minecraft.client.renderer.entity.RenderManager
+net.minecraft.client.renderer.entity.EntityRenderDispatcher getRenderer() getEntityRenderObject()
