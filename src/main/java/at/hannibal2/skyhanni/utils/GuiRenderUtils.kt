@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.component1
 import at.hannibal2.skyhanni.utils.ColorUtils.component2
 import at.hannibal2.skyhanni.utils.ColorUtils.component3
@@ -10,24 +11,29 @@ import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
-import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
+import net.minecraft.util.ResourceLocation
 import net.minecraft.util.Vec3
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.math.min
-import kotlin.time.Duration.Companion.seconds
+//#if MC < 1.21
+import net.minecraft.client.renderer.GLAllocation
+import net.minecraft.client.renderer.OpenGlHelper
+//#else
+//$$ import net.minecraft.client.render.RenderLayer
+//#endif
 
 /**
  * Some functions taken from NotEnoughUpdates
@@ -42,7 +48,7 @@ object GuiRenderUtils {
         val strLen = fr.getStringWidth(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.FONT_HEIGHT / 2f
-        DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+        DrawContextUtils.drawContext.drawText(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
     fun drawStringCentered(str: String?, x: Int, y: Int) {
@@ -60,20 +66,24 @@ object GuiRenderUtils {
     }
 
     fun drawString(str: String, x: Float, y: Float, color: Int = 0xffffff, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
+        DrawContextUtils.drawContext.drawText(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
-        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
+        DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
     private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
+        //#if MC < 1.21
         val itemRender = Minecraft.getMinecraft().renderItem
         RenderHelper.enableGUIStandardItemLighting()
         itemRender.zLevel = -145f
         itemRender.renderItemAndEffectIntoGUI(item, x, y)
         itemRender.zLevel = 0f
         RenderHelper.disableStandardItemLighting()
+        //#else
+        //$$ DrawContextUtils.drawContext.drawItem(item, x, y)
+        //#endif
     }
 
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
@@ -150,6 +160,7 @@ object GuiRenderUtils {
     ) {
         val (startAlpha, startRed, startGreen, startBlue) = Color(startColor)
         val (endAlpha, endRed, endGreen, endBlue) = Color(endColor)
+        //#if MC < 1.21
         GlStateManager.disableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.disableAlpha()
@@ -171,12 +182,21 @@ object GuiRenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
+        //#else
+        //$$ DrawContextUtils.drawContext.fillGradient(left, top, right, bottom, startColor, endColor)
+        //#endif
     }
 
-    fun drawTexturedRect(x: Float, y: Float) {
-        with(ScaledResolution(Minecraft.getMinecraft())) {
-            drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), filter = GL11.GL_NEAREST)
-        }
+    fun drawTexturedRect(x: Float, y: Float, texture: ResourceLocation, alpha: Float = 1f) {
+        drawTexturedRect(
+            x,
+            y,
+            GuiScreenUtils.scaledWindowWidth.toFloat(),
+            GuiScreenUtils.scaledWindowHeight.toFloat(),
+            filter = GL11.GL_NEAREST,
+            texture = texture,
+            alpha = alpha,
+        )
     }
 
     fun drawTexturedRect(
@@ -188,9 +208,23 @@ object GuiRenderUtils {
         uMax: Float = 1f,
         vMin: Float = 0f,
         vMax: Float = 1f,
+        texture: ResourceLocation,
+        alpha: Float = 1f,
         filter: Int = GL11.GL_NEAREST,
     ) {
-        drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), uMin, uMax, vMin, vMax, filter)
+        drawTexturedRect(
+            x.toFloat(),
+            y.toFloat(),
+            width.toFloat(),
+            height.toFloat(),
+            uMin,
+            uMax,
+            vMin,
+            vMax,
+            texture,
+            alpha,
+            filter,
+        )
     }
 
     // Taken from NEU
@@ -203,8 +237,13 @@ object GuiRenderUtils {
         uMax: Float = 1f,
         vMin: Float = 0f,
         vMax: Float = 1f,
+        texture: ResourceLocation,
+        alpha: Float = 1f,
         filter: Int = GL11.GL_NEAREST,
     ) {
+        //#if MC < 1.21
+        Minecraft.getMinecraft().textureManager.bindTexture(texture)
+        GlStateManager.color(1f, 1f, 1f, alpha)
         GlStateManager.enableTexture2D()
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
@@ -226,6 +265,49 @@ object GuiRenderUtils {
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST)
 
         GlStateManager.disableBlend()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        //#else
+        //$$ DrawContextUtils.drawContext.drawTexture(RenderLayer::getGuiTextured, texture, x.toInt(), y.toInt(), uMin, vMin, uMax.toInt(), vMax.toInt(), width.toInt(), height.toInt())
+        //#endif
+    }
+
+    fun enableScissor(left: Int, top: Int, right: Int, bottom: Int) {
+        DrawContextUtils.drawContext.enableScissor(left, top, right, bottom)
+    }
+
+    fun disableScissor() {
+        DrawContextUtils.drawContext.disableScissor()
+    }
+
+    fun drawFloatingRectDark(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        shadow: Boolean = true,
+    ) {
+        //#if MC < 1.21
+        var alpha = -0x10000000
+
+        if (!OpenGlHelper.isFramebufferEnabled()) {
+            alpha = -0x1000000
+        }
+        //#else
+        //$$ val alpha = -0x1000000
+        //#endif
+
+        val main = alpha or 0x202026
+        val light = -0xcfcfca
+        val dark = -0xefefea
+        drawRect(x, y, x + 1, y + height, light) // Left
+        drawRect(x + 1, y, x + width, y + 1, light) // Top1
+        drawRect(x + width - 1, y + 1, x + width, y + height, dark) // Right
+        drawRect(x + 1, y + height - 1, x + width - 1, y + height, dark) // Bottom
+        drawRect(x + 1, y + 1, x + width - 1, y + height - 1, main) // Middle
+        if (shadow) {
+            drawRect(x + width, y + 2, x + width + 2, y + height + 2, 0x70000000) // Right shadow
+            drawRect(x + 2, y + height, x + width, y + height + 2, 0x70000000) // Bottom shadow
+        }
     }
 
     fun ItemStack.renderOnScreen(
@@ -236,17 +318,18 @@ object GuiRenderUtils {
         rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
+        val isSkull = rescaleSkulls && item.item === Items.skull
 
         val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
         val rotY = ((rotationDegrees?.yCoord ?: 0.0) % 360).toFloat()
         val rotZ = ((rotationDegrees?.zCoord ?: 0.0) % 360).toFloat()
 
-        val baseScale = if (rescaleSkulls && item.item === Items.skull) (4f / 3f) else 1f
-        val s = baseScale * scaleMultiplier.toFloat()
+        val baseScale = if (isSkull) (4f / 3f) else 1f
+        val finalScale = (baseScale * scaleMultiplier).toFloat()
 
-        val (tx, ty) = if (rescaleSkulls && item.item === Items.skull) {
-            val d = (scaleMultiplier * 2.5).toFloat()
-            x - d to y - d
+        val (translateX, translateY) = if (isSkull) {
+            val skullDiff = ((scaleMultiplier) * 2.5f).toFloat()
+            x - skullDiff to y - skullDiff
         } else x to y
 
         val halfIconX = 8f
@@ -254,8 +337,8 @@ object GuiRenderUtils {
         val halfIconZ = 100f
 
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(tx, ty, -19f)
-        DrawContextUtils.scale(s, s, 0.2f)
+        DrawContextUtils.translate(translateX, translateY, -19f)
+        DrawContextUtils.scale(finalScale, finalScale, 0.2f)
 
         // Rotation
         DrawContextUtils.pushMatrix()
@@ -275,32 +358,30 @@ object GuiRenderUtils {
 
         GL11.glEnable(GL11.GL_NORMALIZE)
         GL11.glNormal3f(0f, 0f, 1f)
+
+        //#if MC < 1.21
         RenderHelper.enableGUIStandardItemLighting()
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
-        item.tryRenderItemIntoGui()
+        try {
+            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Error rendering item onto screen",
+                "itemName" to item.displayName,
+                "internalName" to item.getInternalNameOrNull(),
+            )
+        }
         RenderHelper.disableStandardItemLighting()
         GL11.glDisable(GL11.GL_NORMALIZE)
+        RenderHelper.disableStandardItemLighting()
+        //#else
+        //$$ renderItemStack(item, 0, 0)
+        //#endif
 
         DrawContextUtils.popMatrix()
     }
 
-    @Suppress("EmptyElseBlock")
-    private fun ItemStack.tryRenderItemIntoGui() = try {
-        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(this, 0, 0)
-    } catch (e: Exception) {
-        if (lastWarn.passedSince() > 1.seconds) {
-            lastWarn = SimpleTimeMark.now()
-            println(" ")
-            println("item: $this")
-            println("name: $displayName")
-            println("getInternalNameOrNull: ${getInternalNameOrNull()}")
-            println(" ")
-            ChatUtils.debug("rendering an item has failed.")
-        } else { }
-    }
-
-    private var lastWarn = SimpleTimeMark.farPast()
-
+    //#if MC < 1.21
     private object AdjustStandardItemLighting {
 
         private const val lightScaling = 2.47f // Adjust as needed
@@ -310,7 +391,7 @@ object GuiRenderUtils {
 
         init {
             itemLightBuffer.clear()
-            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1.0f)
+            itemLightBuffer.put(lightIntensity).put(lightIntensity).put(lightIntensity).put(1f)
             itemLightBuffer.flip()
         }
 
@@ -319,4 +400,5 @@ object GuiRenderUtils {
             GL11.glLight(16385, 4609, itemLightBuffer)
         }
     }
+    //#endif
 }

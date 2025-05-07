@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
@@ -109,7 +109,7 @@ enum class FarmingItemType(
         override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
         override fun render(posX: Int, posY: Int) {
-            GuiScreen.drawRect(
+            GuiRenderUtils.drawRect(
                 0,
                 0,
                 width,
