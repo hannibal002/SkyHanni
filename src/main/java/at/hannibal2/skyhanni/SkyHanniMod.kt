@@ -5,9 +5,7 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 //#endif
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
-//#if MC < 1.21
 import at.hannibal2.skyhanni.config.ConfigFileType
-//#endif
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 //#if MC < 1.21
@@ -70,9 +68,11 @@ object SkyHanniMod {
         configManager.firstLoad()
         //#if MC < 1.21
         initLogging()
+        //#endif
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
+        //#if MC < 1.21
         try {
             RepoManager.initRepo()
         } catch (e: Exception) {
