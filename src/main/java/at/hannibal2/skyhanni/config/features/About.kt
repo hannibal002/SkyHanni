@@ -77,6 +77,6 @@ class About {
 
         @ConfigOption(name = "Twemoji", desc = "Twemoji is available under the Creative Commons Attribution 4.0 Licence (CC-BY-4.0)")
         @ConfigEditorButton(buttonText = "Source")
-        var twomoji: Runnable = Runnable { openBrowser("https://github.com/jdecked/Twemoji") }
+        var twemoji: Runnable = Runnable { openBrowser("https://github.com/jdecked/Twemoji") }
     }
 }
