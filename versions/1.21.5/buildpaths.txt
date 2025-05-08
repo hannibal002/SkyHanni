@@ -595,6 +595,7 @@ at.hannibal2.skyhanni.config.enums.OutsideSBFeature.kt
 
 
 
+at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
 
 
 # \.(?!kt|java|\()
