@@ -60,7 +60,7 @@ object GoldenGoblinHighlight {
         val goblin = lastGoblin ?: return
         goblin.highlight(LorenzColor.GREEN.toColor())
         if (config.lineToYourGoldenGoblin) {
-            goblin.lineToPlayer(LorenzColor.GREEN.toColor())
+            goblin.lineToPlayer(LorenzColor.GREEN.toColor()) { config.lineToYourGoldenGoblin }
         }
         lastGoblin = null
     }

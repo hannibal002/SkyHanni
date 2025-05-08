@@ -77,6 +77,7 @@ object CrystalHollowsWalls {
                 if (!config.nucleus) return
                 drawNucleus(event)
             }
+
             position.x > MIDDLE_X -> {
                 if (position.z > MIDDLE_Z) {
                     drawPrecursor(event)
@@ -84,6 +85,7 @@ object CrystalHollowsWalls {
                     drawMithril((event))
                 }
             }
+
             else -> {
                 if (position.z > MIDDLE_Z) {
                     drawGoblin(event)
@@ -190,14 +192,14 @@ object CrystalHollowsWalls {
     }
 
     private fun RenderUtils.QuadDrawer.drawArea(
-        isMinXEsleMaxX: Boolean,
+        isMinXElseMaxX: Boolean,
         isMinZElseMaxZ: Boolean,
         color1: Color,
         color2: Color,
     ) {
-        val nucleusX = if (isMinXEsleMaxX) nucleusBBExpand.minX else nucleusBBExpand.maxX
-        val middleX = if (isMinXEsleMaxX) MIDDLE_X.shiftNX() else MIDDLE_X.shiftPX()
-        val x = if (isMinXEsleMaxX) MIN_X else MAX_X
+        val nucleusX = if (isMinXElseMaxX) nucleusBBExpand.minX else nucleusBBExpand.maxX
+        val middleX = if (isMinXElseMaxX) MIDDLE_X.shiftNX() else MIDDLE_X.shiftPX()
+        val x = if (isMinXElseMaxX) MIN_X else MAX_X
 
         val nucleusZ = if (isMinZElseMaxZ) nucleusBBExpand.minZ else nucleusBBExpand.maxZ
         val middleZ = if (isMinZElseMaxZ) MIDDLE_Z.shiftNZ() else MIDDLE_Z.shiftPZ()
@@ -247,16 +249,16 @@ object CrystalHollowsWalls {
     }
 
     private fun RenderUtils.QuadDrawer.drawHeatAreaForHeat(
-        isMinXEsleMaxX: Boolean,
+        isMinXElseMaxX: Boolean,
         isMinZElseMaxZ: Boolean,
         color: Color,
         heatHeight: Double,
     ) = this.drawHeatArea(
         color,
         heatHeight,
-        nucleusX = if (isMinXEsleMaxX) nucleusBB.minX else nucleusBB.maxX,
+        nucleusX = if (isMinXElseMaxX) nucleusBB.minX else nucleusBB.maxX,
         middleX = MIDDLE_X,
-        x = if (isMinXEsleMaxX) MIN_X else MAX_X,
+        x = if (isMinXElseMaxX) MIN_X else MAX_X,
         nucleusZ = if (isMinZElseMaxZ) nucleusBB.minZ else nucleusBB.maxZ,
         middleZ = MIDDLE_X,
         z = if (isMinZElseMaxZ) MIN_Z else MAX_Z,

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity
 import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
@@ -95,9 +96,7 @@ object HolographicEntities {
      * Some of these entities rely on mixins from NEU for their proper null
      * world handling.
      */
-    class HolographicBase<T : EntityLivingBase> internal constructor(
-        private val entity: T
-    ) {
+    class HolographicBase<T : EntityLivingBase> internal constructor(private val entity: T) {
         fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T> {
             return HolographicEntity(entity, position, yaw)
         }
@@ -139,11 +138,11 @@ object HolographicEntities {
 
     private fun interpolateRotation(last: Float, next: Float, progress: Float): Float {
         var direction: Float = next - last
-        while (direction < -180.0f) {
-            direction += 360.0f
+        while (direction < -180f) {
+            direction += 360f
         }
-        while (direction >= 180.0f) {
-            direction -= 360.0f
+        while (direction >= 180f) {
+            direction -= 360f
         }
         return last + progress * direction
     }
@@ -151,19 +150,22 @@ object HolographicEntities {
     /**
      * Render a fake [HolographicEntity]. In order to render a fully opaque entity, set [holographicness] to `1F`.
      */
-    fun <T : EntityLivingBase> renderHolographicEntity(
+    fun <T : EntityLivingBase> SkyHanniRenderWorldEvent.renderHolographicEntity(
         holographicEntity: HolographicEntity<T>,
-        partialTicks: Float,
-        holographicness: Float = 0.3f
+        holographicness: Float = 0.3f,
     ) {
         val renderManager = Minecraft.getMinecraft().renderManager
-        val renderer = renderManager.getEntityRenderObject<EntityLivingBase>(holographicEntity.entity)
-        renderer as RendererLivingEntity<T>
-        renderer as AccessorRendererLivingEntity<T>
+        val entity = holographicEntity.entity
+
+        val renderer = renderManager.getEntityRenderObject<EntityLivingBase>(entity)
+            ?: error("getEntityRenderObject is null for ${entity.name}")
+        @Suppress("UNCHECKED_CAST")
+        renderer as? RendererLivingEntity<T> ?: error("can not cast to RendererLivingEntity")
+        @Suppress("UNCHECKED_CAST")
+        renderer as? AccessorRendererLivingEntity<T> ?: error("can not cast to AccessorRendererLivingEntity")
 
         renderer.setRenderOutlines(false)
-        if (!renderer.bindEntityTexture_skyhanni(holographicEntity.entity))
-            return
+        if (!renderer.bindEntityTexture_skyhanni(entity)) return
 
         GlStateManager.pushMatrix()
         val viewerPosition = getViewerPos(partialTicks)
@@ -174,14 +176,14 @@ object HolographicEntities {
         GlStateManager.enableRescaleNormal()
         GlStateManager.scale(-1f, -1f, 1f)
         GlStateManager.translate(0F, -1.5078125f, 0f)
-        val limbSwing: Float = 0F
-        val limbSwingAmount: Float = 0F
-        val ageInTicks: Float = 1_000_000.toFloat()
-        val netHeadYaw: Float = holographicEntity.interpolatedYaw(partialTicks)
-        val headPitch: Float = 0F
-        val scaleFactor: Float = 0.0625f
-        renderer.setBrightness_skyhanni(holographicEntity.entity, 0f, true)
-        GlStateManager.color(1.0f, 1.0f, 1.0f, holographicness)
+        val limbSwing = 0F
+        val limbSwingAmount = 0F
+        val ageInTicks = 1_000_000.toFloat()
+        val netHeadYaw = holographicEntity.interpolatedYaw(partialTicks)
+        val headPitch = 0F
+        val scaleFactor = 0.0625f
+        renderer.setBrightness_skyhanni(entity, 0f, true)
+        GlStateManager.color(1f, 1f, 1f, holographicness)
         GlStateManager.depthMask(false)
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
@@ -190,21 +192,22 @@ object HolographicEntities {
         GlStateManager.enableTexture2D()
         renderer.mainModel.isChild = holographicEntity.isChild
         renderer.mainModel.setRotationAngles(
-            limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, holographicEntity.entity
+            limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entity,
         )
         renderer.mainModel.render(
-            holographicEntity.entity,
+            entity,
             limbSwing,
             limbSwingAmount,
             ageInTicks,
             netHeadYaw,
             headPitch,
-            scaleFactor
+            scaleFactor,
         )
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f)
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.depthMask(true)
         GlStateManager.disableBlend()
+        renderer.unsetBrightness_skyhanni()
         GlStateManager.popMatrix()
     }
 

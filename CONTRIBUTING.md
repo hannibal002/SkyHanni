@@ -149,6 +149,10 @@ Internal changes that do not impact the end user. Examples include:
 - Preparations for modern Minecraft versions
 - Documentation changes to markdown files, e.g., in `/docs` or this file.
 
+Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
+We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
+everything else can go in the normal PR description (What area). 
+
 #### Removed Features
 
 Features that have merged with existing features (in the config) or have become obsolete (e.g., if Hypixel implements them on the server
@@ -182,8 +186,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
-    - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
-    - This will automatically register it to the forge event bus and load the repo patterns.
+    - If the feature needs to register Forge/Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature classs it with `@SkyHanniModule`
+    - This will automatically register all events to the respective event bus, and loads the repo patterns.
     - In the background, this will create a new file `LoadedModules.kt` when compiling. Please ignore this file and the related error in `SkyHanniMod.kt`.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
@@ -192,7 +196,13 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it. Do not use Forge events.
-    - (We inject the calls with Mixin)
+    - To expand the event systems you can create a new event that is called from a Mixin
+    - Or you can subscribe to a Forge event and then post a SkyHanni event from that. See the `api/minecraftevents` package for examples.
+    - If you make a new event there are a few different types of events that you can make, make sure your event extends one of these.
+      - SkyHanniEvent: This is just a normal event.
+      - CancelableSkyHanniEvent: This is a cancellable event. It has a `cancel()` method that you can call to cancel the event.
+      - GenericSkyHanniEvent: This is a generic event, typically used for entities but can be used for any generics.
+      - RenderingSkyHanniEvent: This is an event that you are allowed to do GUI rendering in.
 - Please use existing utils methods.
 - We try to avoid calling the NEU code too often.
     - (We plan to remove NEU as a dependency in the future.)
@@ -209,8 +219,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
-    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples.
-      for more information and usages.
+    - All repo patterns must be accompanied by a regex test. Look at other patterns for examples, more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
@@ -222,6 +231,9 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
+- Always combine title messages with chat message.
+  - This way users know what feature and what mod sends the title, if they want to disable it.
+  - Also we can include more informations why the title just showed up, as the title should not be too long.
 
 ### Compatibility with modern versions
 As SkyHanni gets closer to supporting multiple Minecraft versions, there are a few additional coding conventions to follow. Below are some
@@ -232,9 +244,9 @@ looking in the `at.hannibal2.skyhanni.utils.compat` package is a good idea, as t
 both have a nullable version as well: `MinecraftCompat.localPlayerOrNull()` and `MinecraftCompat.localWorldOrNull()`. This is because on
 1.8.9 while the player and world can be nullable at times, Minecraft's source code does not reflect this.
 - Rendering on modern versions is done completely differently than on 1.8.9. As such, on 1.8.9 we have adjusted our rendering code to more
-closely resemble modern rendering code. You will notice that we pass around both a `DrawContext` and a `WorldRenderContext` object. Both of
-these objects both hold a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack,
-translating and scaling. Where possible you should use these objects instead of the `GlStateManager` directly. If you are unsure, make sure
+closely resemble modern rendering code. You may notice a `DrawContext` or `WorldRenderContext` object being passed around. These both hold
+a `MatrixStack` object which is used to do some `GlStateManager` calls such as pushing and popping the matrix stack, translating and scaling.
+To do most of these calls instead of using `GlStateManager` directly, you should use `DrawContextUtils` instead. If you are unsure, make sure
 to look at existing code to see how it is done and if you are still unsure, ask for help.
 - When making GUI screens or other GUI elements, you should try to use Renderables where possible as these should already account for
 most modern rendering changes. If you are making a new GUI screen, make sure to extend `SkyHanniBaseScreen` instead of `GuiScreen` to ensure
@@ -270,6 +282,10 @@ Allows project specific plugins to run. Eg: Regex Intention
 ### [Live Templates Sharing](https://plugins.jetbrains.com/plugin/25007-live-templates-sharing)
 
 Imports our custom live templates automatically. Live Templates allow for quicker code writing.
+
+### [Minecraft Development](https://plugins.jetbrains.com/plugin/8327-minecraft-development)
+
+Helps you write minecraft specific code such as mixins and access wideners.
 
 ## Software Used in SkyHanni
 
@@ -446,6 +462,8 @@ files, so you might be fixing issues in files you didn't even look at. It will e
 (consider using the method descriptor instead of just the method name for your mixin). However, if something aside from the name changed,
 this will not suffice.
 
+After adding new mappings to the mappings file don't forget to run `./gradlew cleanupMappingFiles` to automatically sort the mappings file.
+
 #### Custom mappings
 
 If you need to do a bit more advanced remapping that requires an import to be added to the file, you can add a custom mapping. This is
@@ -567,3 +585,15 @@ These helper methods should generally be placed in the `at.hannibal2.skyhanni.ut
 compatability methods for. For example, `WorldClient.getAllEntities()` could be placed in `WorldCompat.kt`. This is not a strict rule, but
 it is a good guideline to follow as for the most part we do not want to be doing large amount of preprocessing in the feature files
 themselves.
+
+
+### Access Wideners
+
+You may want to use private minecraft methods or fields, this is where access wideners come in. 
+Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or 
+field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
+To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and 
+select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom of `versions/<version number>/src/main/resources/skyhanni.accesswidener`.
+Then you need to reload gradle for the changes to apply.
+
+This requires you to have the Minecraft Development plugin installed as mentioned earlier.

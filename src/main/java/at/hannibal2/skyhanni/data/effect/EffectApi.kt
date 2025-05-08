@@ -248,7 +248,7 @@ object EffectApi {
             } ?: false
 
     private fun ItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        it.inventoryItemName == displayName
+        displayName.contains(it.inventoryItemName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

@@ -37,10 +37,11 @@ object CFBlockOpen {
      * REGEX-TEST: /chocolatefactory
      * REGEX-TEST: /chocolatefactory123456789
      * REGEX-TEST: /factory
+     * REGEX-TEST: /CF
      */
     private val commandPattern by RepoPattern.pattern(
         "inventory.chocolatefactory.opencommand",
-        "\\/(?:cf|(?:chocolate)?factory)(?: .*)?",
+        "(?i)\\/(?:cf|(?:chocolate)?factory)(?: .*)?",
     )
 
     /**
@@ -130,7 +131,7 @@ object CFBlockOpen {
             val godPotExpiryTime = profileStorage?.godPotExpiry ?: SimpleTimeMark.farPast()
             if (mixinExpiryTime.isInPast()) {
                 ChatUtils.clickToActionOrDisable(
-                    "§cBlocked opening the Chocolate Factory without a §dHot Chocolate Mix §cactive! " +
+                    "§cBlocked opening the Chocolate Factory without a §dHot Chocolate Mixin §cactive! " +
                         "§7You may need to open §c/effects §7to refresh mixin status.",
                     config::hotChocolateMixinRequirement,
                     actionName = "search AH for mixin",
