@@ -24,7 +24,7 @@ class LorenzLogger(filePath: String) {
         private val LOG_DIRECTORY = File("config/skyhanni/logs")
         private var PREFIX_PATH: String
         var hasDone = false
-        //todo remove once lorenz utils works
+        // todo remove once lorenz utils works
         //#if MC > 1.21
         //$$ fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
         //#endif
