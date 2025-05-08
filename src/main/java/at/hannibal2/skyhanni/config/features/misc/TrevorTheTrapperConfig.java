@@ -142,12 +142,20 @@ public class TrevorTheTrapperConfig {
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int keyBindWarpTrapper = Keyboard.KEY_NONE;
 
-
     @Expose
     @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean trapperTalkCooldown = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Trapper Ready Title",
+        desc = "Show title and sould when the cooldown is over and trapper is ready for the next quest."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean readyTitle = true;
 
     @Expose
     @ConfigOption(

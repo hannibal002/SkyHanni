@@ -216,8 +216,10 @@ object TrevorFeatures {
 
         if (timeUntilNextReady <= 0 && trapperReady) {
             if (timeUntilNextReady == 0) {
-                TitleManager.sendTitle("§2Trapper Ready")
-                SoundUtils.playBeepSound()
+                if (config.readyTitle) {
+                    TitleManager.sendTitle("§2Trapper Ready")
+                    SoundUtils.playBeepSound()
+                }
             }
             currentStatus = TrapperStatus.READY
             currentLabel = "§2Ready"
