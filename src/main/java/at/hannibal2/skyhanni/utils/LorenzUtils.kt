@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.entity.EntityLivingBase
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.Month
 import java.util.UUID
@@ -74,6 +75,9 @@ object LorenzUtils {
         }
 
     val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
+
+    // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
+    fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
     // TODO use derpy() on every use case
     val EntityLivingBase.baseMaxHealth: Int

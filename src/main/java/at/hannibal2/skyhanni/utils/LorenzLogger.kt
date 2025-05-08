@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+//#if MC < 1.21
+import at.hannibal2.skyhanni.utils.LorenzUtils.formatCurrentTime
+//#endif
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -21,7 +24,10 @@ class LorenzLogger(filePath: String) {
         private val LOG_DIRECTORY = File("config/skyhanni/logs")
         private var PREFIX_PATH: String
         var hasDone = false
-        fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
+        //todo remove once lorenz utils works
+        //#if MC > 1.21
+        //$$ fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
+        //#endif
 
         init {
             val format = SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
