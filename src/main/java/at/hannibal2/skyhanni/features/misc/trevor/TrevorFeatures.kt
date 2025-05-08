@@ -124,8 +124,8 @@ object TrevorFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!onFarmingIsland()) return
         updateTrapper()
         TrevorTracker.update()
@@ -200,8 +200,8 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST)
+    fun onRenderOverlay() {
         if (!config.trapperCooldownGui) return
         if (!onFarmingIsland()) return
 
@@ -294,10 +294,10 @@ object TrevorFeatures {
             if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
                 val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
                 location = TrevorSolver.mobCoordinates
-                event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), true, true)
+                event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.up(), displayName, 1.5)
             } else {
-                event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
+                event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.up(), TrevorSolver.mobLocation.location, 1.5)
             }
         }
@@ -353,7 +353,7 @@ object TrevorFeatures {
 
     @HandleEvent
     fun onTick() {
-        inTrapperDen = areaTrappersDenPattern.matches(IslandAreas.currentAreaName)
+        inTrapperDen = areaTrappersDenPattern.matches(IslandAreas.currentArea)
     }
 
     enum class TrapperStatus(baseColor: LorenzColor) {
