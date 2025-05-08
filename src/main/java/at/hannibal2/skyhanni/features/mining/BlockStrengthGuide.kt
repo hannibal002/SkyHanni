@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -459,14 +458,12 @@ object BlockStrengthGuide {
                 ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
                 event.cancel()
             } else {
-                @Suppress("DEPRECATION") // we want intentionally the scoreboard area here
-                val scoreboardArea = LorenzUtils.skyBlockArea
                 ErrorManager.logErrorStateWithData(
                     "could not load mining data for /shblockstrengh command",
                     "opened /sbmenu and found no mining speed in the next 2s",
                     "island" to LorenzUtils.skyBlockIsland,
-                    "graph area" to IslandAreas.currentAreaName,
-                    "scoreboard area" to scoreboardArea,
+                    "graph area" to LorenzUtils.graphArea,
+                    "scoreboard area" to LorenzUtils.scoreboardArea,
                     "location" to LocationUtils.playerLocation(),
                     betaOnly = true,
                 )
