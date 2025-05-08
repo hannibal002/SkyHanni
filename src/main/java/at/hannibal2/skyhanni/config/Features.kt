@@ -83,7 +83,6 @@ class Features : Config() {
     @Category(name = "GUI", desc = "Change the locations of GUI elements (§e/sh gui§7).")
     var gui: GuiConfig = GuiConfig()
 
-
     // Islands
     @Expose
     @Category(name = "Garden", desc = "Features for the Garden island.")

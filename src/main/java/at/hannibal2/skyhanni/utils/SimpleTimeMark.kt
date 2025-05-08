@@ -53,7 +53,6 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
             pattern
         }
 
-
         val instant = Instant.ofEpochMilli(millis)
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         val formatter = DateTimeFormatter.ofPattern(newPattern.trim())
