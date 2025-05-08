@@ -5,7 +5,7 @@ data class BrigadierArgument<T>(val argumentName: String, val clazz: Class<T>) {
     operator fun invoke(context: ArgContext) = get(context)
 
     companion object {
-        inline fun <reified T : Any> of(argumentName: String) = BrigadierArgument(argumentName, T::class.java)
+        inline fun <reified T> of(argumentName: String) = BrigadierArgument(argumentName, T::class.java)
     }
 
 }

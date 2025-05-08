@@ -148,9 +148,9 @@ object PartyChatCommands {
             }
 
             literal("remove") {
-                arg("name", BrigadierArguments.string()) { argName ->
+                arg("name", BrigadierArguments.string()) { nameArg ->
                     callback {
-                        val name = getArg(argName)
+                        val name = getArg(nameArg)
                         if (!isBlockedUser(name)) {
                             ChatUtils.userError("$name isn't ignored!")
                         } else blacklistModify(name)

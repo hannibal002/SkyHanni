@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.config.commands.brigadier
 
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
+import at.hannibal2.skyhanni.utils.StringUtils.hasWhitespace
+import at.hannibal2.skyhanni.utils.StringUtils.splitLastWhitespace
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
@@ -36,9 +38,7 @@ class BaseBrigadierBuilder(override val name: String) : CommandData, BrigadierBu
 open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
     val builder: ArgumentBuilder<Any?, B>,
 ) {
-    /**
-     * Executes the code block when the command is executed.
-     */
+    /** Executes the code block when the command is executed. */
     fun callback(block: ArgContext.() -> Unit) {
         this.builder.executes {
             block(ArgContext(it))
@@ -64,7 +64,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         argCallback("allArgs", BrigadierArguments.greedyString()) { allArgs ->
             block(allArgs.split(" ").toTypedArray())
         }
-        callback { block(emptyArray()) }
+        simpleCallback { block(emptyArray()) }
     }
 
     /**
@@ -88,19 +88,21 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
      * }
      * ```
      */
-    fun literal(vararg names: String, action: LiteralCommandBuilder.() -> Unit): BrigadierBuilder<B> {
+    fun literal(vararg names: String, action: LiteralCommandBuilder.() -> Unit) {
         for (name in names) {
-            if (name.contains(" ")) {
-                val builder = BrigadierBuilder(LiteralArgumentBuilder.literal(name.substringBefore(" ")))
-                builder.literal(name.substringAfter(" "), action = action)
-                this.builder.then(builder.builder)
+            if (name.hasWhitespace()) {
+                val (prevLiteral, nextLiteral) = name.splitLastWhitespace()
+                literal(prevLiteral) {
+                    literal(nextLiteral) {
+                        action(this)
+                    }
+                }
                 continue
             }
             val builder = BrigadierBuilder(LiteralArgumentBuilder.literal(name))
             builder.action()
             this.builder.then(builder.builder)
         }
-        return this
     }
 
     /**
@@ -127,25 +129,23 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         argument: ArgumentType<T>,
         suggestions: Collection<String>,
         crossinline action: ArgumentCommandBuilder<T>.(BrigadierArgument<T>) -> Unit,
-    ): BrigadierBuilder<B> = arg(name, argument, suggestions.toSuggestionProvider(), action)
+    ) = arg(name, argument, suggestions.toSuggestionProvider(), action)
 
-
-    /**
-     * @see arg
-     * */
+    /** @see arg */
     inline fun <reified T> arg(
         name: String,
         argument: ArgumentType<T>,
         suggestions: SuggestionProvider<Any?>? = null,
         crossinline action: ArgumentCommandBuilder<T>.(BrigadierArgument<T>) -> Unit,
-    ): BrigadierBuilder<B> {
-        if (!name.contains("  ")) {
-            return internalArg(name, argument, suggestions) { action(BrigadierArgument(name, T::class.java)) }
+    ) {
+        if (!name.hasWhitespace()) {
+            internalArg(name, argument, suggestions) { action(BrigadierArgument.of(name)) }
+            return
         }
-        val split = name.split(" ")
-        val beforeArg = split.subList(0, split.size - 1).joinToString(" ")
-        val argName = split.last()
-        return internalArg(beforeArg, argument, suggestions) { action(BrigadierArgument(argName, T::class.java)) }
+        val (literalNames, argName) = name.splitLastWhitespace()
+        literal(literalNames) {
+            internalArg(argName, argument, suggestions) { action(BrigadierArgument.of<T>(argName)) }
+        }
     }
 
     /**
@@ -159,12 +159,13 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         argument: ArgumentType<T>,
         suggestions: SuggestionProvider<Any?>? = null,
         action: ArgumentCommandBuilder<T>.() -> Unit,
-    ): BrigadierBuilder<B> {
-        if (name.contains(" ")) {
-            val builder = BrigadierBuilder(LiteralArgumentBuilder.literal(name.substringBefore(" ")))
-            builder.internalArg(name.substringAfter(" "), argument, suggestions, action)
-            this.builder.then(builder.builder)
-            return this
+    ) {
+        if (name.hasWhitespace()) {
+            val (prevLiteral, nextLiteral) = name.splitLastWhitespace()
+            literal(prevLiteral) {
+                internalArg(nextLiteral, argument, suggestions, action)
+            }
+            return
         }
         val builder = BrigadierBuilder(
             RequiredArgumentBuilder.argument<Any?, T>(name, argument).apply {
@@ -173,7 +174,7 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         )
         builder.action()
         this.builder.then(builder.builder)
-        return this
+        return
     }
 
     /**
@@ -238,6 +239,5 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         suggestions: SuggestionProvider<Any?>? = null,
         crossinline callback: ArgContext.(T) -> Unit,
     ) = arg(name, argument, suggestions) { callback { callback(getArg(it)) } }
-
 
 }

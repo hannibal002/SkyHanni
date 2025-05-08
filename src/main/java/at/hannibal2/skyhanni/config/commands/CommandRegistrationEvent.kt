@@ -19,23 +19,27 @@ class CommandRegistrationEvent(
     fun registerBrigadier(name: String, builder: BaseBrigadierBuilder.() -> Unit) {
         val command = BaseBrigadierBuilder(name).apply(builder)
         command.hasUniqueName()
-        if (command.description.isEmpty() && command.category !in CommandCategory.developmentCategories) {
-            error("The command '$name' has no description!")
-        }
+        command.checkDescriptionAndCategory()
         command.addToRegister(dispatcher)
     }
 
+    // TODO: Use Brigadier as backend and eventually deprecate it
     fun register(name: String, block: CommandBuilder.() -> Unit) {
         val command = CommandBuilder(name).apply(block)
         command.hasUniqueName()
-        if (command.description.isEmpty() && command.category !in CommandCategory.developmentCategories) {
-            error("The command '$name' has no description!")
-        }
+        command.checkDescriptionAndCategory()
         command.addToRegister(dispatcher)
     }
 
+    private fun CommandData.checkDescriptionAndCategory() {
+        require(descriptor.isNotEmpty() || category in CommandCategory.developmentCategories) {
+            "The command '$name' has no required description"
+        }
+    }
+
     fun <O : CommandContextAwareObject> registerComplex(
-        name: String, block: ComplexCommandBuilder<O, CommandArgument<O>>.() -> Unit,
+        name: String,
+        block: ComplexCommandBuilder<O, CommandArgument<O>>.() -> Unit,
     ) {
         val command = ComplexCommandBuilder<O, CommandArgument<O>>(name).apply(block)
         command.hasUniqueName()

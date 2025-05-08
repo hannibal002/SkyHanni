@@ -11,8 +11,8 @@ import net.minecraftforge.client.ClientCommandHandler
 
 //#else
 //$$ import com.mojang.brigadier.arguments.StringArgumentType
-//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument
-//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal
+//$$ import com.mojang.brigadier.builder.LiteralArgumentBuilder
+//$$ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 //#endif
 
@@ -20,16 +20,24 @@ import net.minecraftforge.client.ClientCommandHandler
 object CommandsRegistry {
     private val builders = mutableListOf<CommandData>()
 
+    //#if MC < 1.21
     private val dispatcher: CommandDispatcher<Any?> = CommandDispatcher()
+    //#endif
 
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
+        //#if MC < 1.21
         CommandRegistrationEvent(builders, dispatcher).post()
+        //#else
+        //$$ ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+        //$$     CommandRegistrationEvent(builders, dispatcher).post()
+        //$$ }
+        //#endif
     }
 
     private fun String.isUnique() {
-        if (builders.any { it.name == this || it.aliases.contains(this) }) {
-            error("The command '$this is already registered!'")
+        require(builders.all { this !in it.getAllNames() }) {
+            "The command $this is already registered!"
         }
     }
 
@@ -43,32 +51,38 @@ object CommandsRegistry {
         val command = toCommand(dispatcher)
         ClientCommandHandler.instance.registerCommand(command)
         //#else
-        //$$ dispatcher.register(builder as LiteralArgumentBuilder<Any?>)
+        //$$ val original = dispatcher.register(builder as LiteralArgumentBuilder<Any?>)
+        //$$ aliases.forEach {
+        //$$     dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original))
+        //$$ }
         //#endif
+
         builders.add(this)
     }
 
     fun <T : CommandBuilderBase> T.addToRegister(dispatcher: CommandDispatcher<Any?>) {
+        // TODO: register CommandBuilderBase without using toCommand
         val command = this.toCommand(dispatcher)
         //#if MC < 1.21
         ClientCommandHandler.instance.registerCommand(command)
         //#else
-        //$$ ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-        //$$     val original = dispatcher.register(
-        //$$         literal(name).executes {
-        //$$             command.processCommand(emptyArray())
+        //$$ val original = dispatcher.register(
+        //$$     LiteralArgumentBuilder.literal<Any?>(name).executes {
+        //$$         command.processCommand(null, emptyArray())
+        //$$         1
+        //$$     }.then(
+        //$$         RequiredArgumentBuilder.argument<Any?, String>(
+        //$$             "please type the arguments of this command here",
+        //$$             StringArgumentType.greedyString()
+        //$$         ).executes { context ->
+        //$$             val arguments = StringArgumentType.getString(context, "please type the arguments of this command here").split(" ")
+        //$$             command.processCommand(null, arguments.toTypedArray())
         //$$             1
-        //$$         }.then(
-        //$$             argument("please type the arguments of this here command", StringArgumentType.greedyString()).executes { context ->
-        //$$                 val itemName = StringArgumentType.getString(context, "please type the arguments of this here command").split(" ")
-        //$$                 command.processCommand(itemName.toTypedArray())
-        //$$                 1
-        //$$             },
-        //$$         ),
+        //$$         }
         //$$     )
-        //$$     command.getCommandAliases().forEach {
-        //$$         dispatcher.register(literal(it).redirect(original))
-        //$$     }
+        //$$ )
+        //$$ command.commandAliases.forEach {
+        //$$     dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original))
         //$$ }
         //#endif
 
