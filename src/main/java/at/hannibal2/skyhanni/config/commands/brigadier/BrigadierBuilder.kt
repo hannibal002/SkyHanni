@@ -174,7 +174,6 @@ open class BrigadierBuilder<B : ArgumentBuilder<Any?, B>>(
         )
         builder.action()
         this.builder.then(builder.builder)
-        return
     }
 
     /**
