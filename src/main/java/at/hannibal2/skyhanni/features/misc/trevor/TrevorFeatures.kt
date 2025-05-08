@@ -90,10 +90,6 @@ object TrevorFeatures {
         "mob.died",
         "§aReturn to the Trapper soon to get a new animal to hunt!",
     )
-    private val startDialoguePattern by patternGroup.pattern(
-        "start.dialogue",
-        "\\[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task\\.",
-    )
     private val outOfTimePattern by patternGroup.pattern(
         "outoftime",
         "You ran out of time and the animal disappeared!",
@@ -116,7 +112,6 @@ object TrevorFeatures {
     private var timeLastWarped = SimpleTimeMark.farPast()
     private var lastChatPrompt = ""
     private var lastChatPromptTime = SimpleTimeMark.farPast()
-    private var teleportBlock = SimpleTimeMark.farPast()
 
     var questActive = false
     var inBetweenQuests = false
@@ -181,9 +176,6 @@ object TrevorFeatures {
             TrevorSolver.averageHeight = LocationUtils.playerLocation().y
         }
 
-        startDialoguePattern.matchMatcher(formattedMessage) {
-            teleportBlock = SimpleTimeMark.now()
-        }
         outOfTimePattern.matchMatcher(formattedMessage) {
             resetTrapper()
         }
@@ -322,7 +314,7 @@ object TrevorFeatures {
             }
         }
 
-        if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds && teleportBlock.passedSince() > 5.seconds) {
+        if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds) {
             HypixelCommands.warp("trapper")
             timeLastWarped = SimpleTimeMark.now()
         }
