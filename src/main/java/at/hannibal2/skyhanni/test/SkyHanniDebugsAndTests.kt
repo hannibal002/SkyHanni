@@ -116,9 +116,6 @@ object SkyHanniDebugsAndTests {
             val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
             val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
             val result = (!never && (always || itsTime))
-            if (previousApril != result) {
-                ModifyVisualWords.update()
-            }
             previousApril = result
             return result
         }
