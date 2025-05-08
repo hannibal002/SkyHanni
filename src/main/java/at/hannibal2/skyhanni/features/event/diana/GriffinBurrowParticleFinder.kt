@@ -98,7 +98,7 @@ object GriffinBurrowParticleFinder {
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
         if (isSpade) {
-            for ((location, burrow) in burrows) {
+            for ((location, burrow) in burrows.toMutableMap()) {
                 if (location.distanceSqToPlayer() > 256) continue
                 burrow.burrowTimeToLive -= 1
                 if (burrow.burrowTimeToLive >= 0) continue

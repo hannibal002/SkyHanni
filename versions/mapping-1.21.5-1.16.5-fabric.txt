@@ -1,4 +1,6 @@
 
+at.hannibal2.skyhanni.utils.render.ModernGlStateManager com.mojang.blaze3d.systems.RenderSystem
+
 net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext at.hannibal2.skyhanni.utils.compat.WorldRenderContext
 
 net.minecraft.client.gui.DrawContext at.hannibal2.skyhanni.utils.compat.DrawContext

@@ -249,16 +249,16 @@ object CrystalHollowsWalls {
     }
 
     private fun RenderUtils.QuadDrawer.drawHeatAreaForHeat(
-        isMinXEsleMaxX: Boolean,
+        isMinXElseMaxX: Boolean,
         isMinZElseMaxZ: Boolean,
         color: Color,
         heatHeight: Double,
     ) = this.drawHeatArea(
         color,
         heatHeight,
-        nucleusX = if (isMinXEsleMaxX) nucleusBB.minX else nucleusBB.maxX,
+        nucleusX = if (isMinXElseMaxX) nucleusBB.minX else nucleusBB.maxX,
         middleX = MIDDLE_X,
-        x = if (isMinXEsleMaxX) MIN_X else MAX_X,
+        x = if (isMinXElseMaxX) MIN_X else MAX_X,
         nucleusZ = if (isMinZElseMaxZ) nucleusBB.minZ else nucleusBB.maxZ,
         middleZ = MIDDLE_X,
         z = if (isMinZElseMaxZ) MIN_Z else MAX_Z,
