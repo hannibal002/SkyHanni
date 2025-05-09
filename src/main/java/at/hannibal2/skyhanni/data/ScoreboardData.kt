@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.FixIronman
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -193,7 +193,7 @@ object ScoreboardData {
             return null
         }
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-            //#if MC < 1.21
+            //#if TODO
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")
                 return "Purse: $coins"
@@ -208,7 +208,7 @@ object ScoreboardData {
                 }
             }
         }
-        //#if MC < 1.21
+        //#if TODO
         FixIronman.fixScoreboard(text)?.let {
             return it
         }

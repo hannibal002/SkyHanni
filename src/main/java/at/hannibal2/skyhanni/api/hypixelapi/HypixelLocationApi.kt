@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiJoinEvent
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
 //#endif
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-//#if MC < 1.21
+//#if TODO
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.ServerType
 //#endif
@@ -42,7 +42,7 @@ object HypixelLocationApi {
     var inAlpha: Boolean = false
         private set
 
-    //#if MC < 1.21
+    //#if TODO
     var serverType: ServerType? = null
         private set
     //#endif
@@ -74,7 +74,7 @@ object HypixelLocationApi {
     }
 
     // todo remove once hypixel mod api is added to 1.21
-    //#if MC < 1.21
+    //#if TODO
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onServerChange(event: HypixelApiServerChangeEvent) {
         logger.log(event.toString())
@@ -152,7 +152,7 @@ object HypixelLocationApi {
         island = IslandType.NONE
         serverId = null
         inAlpha = false
-        //#if MC < 1.21
+        //#if TODO
         serverType = null
         //#endif
         mode = null
@@ -200,7 +200,7 @@ object HypixelLocationApi {
             "island" to island,
             "HypixelData.serverId" to HypixelData.serverId,
             "serverId" to serverId,
-            //#if MC < 1.21
+            //#if TODO
             "serverType" to serverType,
             //#endif
             "map" to map,

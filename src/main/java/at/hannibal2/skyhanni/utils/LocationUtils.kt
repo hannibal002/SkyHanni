@@ -21,7 +21,7 @@ object LocationUtils {
     }
 
     private fun canSee0(a: LorenzVec, b: LorenzVec) =
-        //#if MC < 1.21
+        //#if TODO
         MinecraftCompat.localWorld.rayTraceBlocks(
             a.toVec3(),
             b.toVec3(),

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 //#endif
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -198,7 +198,7 @@ object TabListData {
         }
     }
 
-    //#if MC < 1.21
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shtesttablist") {

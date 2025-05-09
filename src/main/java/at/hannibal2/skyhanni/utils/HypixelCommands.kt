@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.api.GetFromSackApi
 //#endif
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 //#endif
 
@@ -35,7 +35,7 @@ object HypixelCommands {
         send("skills")
     }
 
-    //#if MC < 1.21
+    //#if TODO
     fun viewRecipe(itemId: NeuInternalName, page: Int = 1) {
         send("viewrecipe ${itemId.skyblockCommandId} $page")
     }
@@ -78,7 +78,7 @@ object HypixelCommands {
         send("sethome")
     }
 
-    //#if MC < 1.21
+    //#if TODO
     fun getFromSacks(itemName: String, amount: Int) {
         GetFromSackApi.getFromSack(itemName.toInternalName(), amount)
     }

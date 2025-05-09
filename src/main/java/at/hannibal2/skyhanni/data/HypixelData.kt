@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
-//#if MC < 1.21
 import at.hannibal2.skyhanni.data.repo.RepoManager
-//#endif
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -19,7 +17,7 @@ import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -271,7 +269,7 @@ object HypixelData {
             playerAmountPattern,
             playerAmountGuestingPattern,
         )
-        //#if MC < 1.21
+        //#if TODO
         if (DungeonApi.inDungeon()) {
             playerPatternList.add(dungeonPartyAmountPattern)
         }
@@ -380,7 +378,7 @@ object HypixelData {
         }
         if (message.startsWith("you are playing on profile:")) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
-            //#if MC < 1.21
+            //#if TODO
             ProfileStorageData.profileJoinMessage()
             //#endif
             if (profileName == newProfile) return
@@ -393,7 +391,7 @@ object HypixelData {
         TabWidget.PROFILE.matchMatcherFirstLine {
             var newProfile = group("profile").lowercase()
             // Hypixel shows the profile name reversed while in the Rift
-            //#if MC < 1.21
+            //#if TODO
             if (RiftApi.inRift()) newProfile = newProfile.reversed()
             //#endif
             if (profileName == newProfile) return
@@ -433,9 +431,7 @@ object HypixelData {
         when {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
-                //#if MC < 1.21
                 RepoManager.displayRepoStatus(true)
-                //#endif
             }
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
@@ -545,7 +541,7 @@ object HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            //#if MC < 1.21
+            //#if TODO
             if (BingoApi.getRankFromScoreboard(line) != null) {
                 bingo = true
             }

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 //#endif
@@ -22,7 +22,7 @@ object SkyBlockUtils {
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
 
-    //#if MC < 1.21
+    //#if TODO
     /**
      * Consider using [IslandType.isInIsland] instead
      */
