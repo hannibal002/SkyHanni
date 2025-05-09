@@ -149,6 +149,7 @@ object HypixelData {
 
     var lastLocRaw = SimpleTimeMark.farPast()
     private var hasScoreboardUpdated = false
+    val connectedToHypixel get() = hypixelLive || hypixelAlpha
 
     var hypixelLive = false
     var hypixelAlpha = false
