@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import com.google.gson.reflect.TypeToken
 import java.util.EnumSet
 
+// A group of islands that have someting in common.
 class IslandTypeTag internal constructor(name: String, private val types: EnumSet<IslandType>) {
 
     internal constructor(name: String, vararg types: Any) : this(
@@ -37,7 +38,7 @@ class IslandTypeTag internal constructor(name: String, private val types: EnumSe
         }
     }
 
-    fun inAny() = LorenzUtils.inSkyBlock && LorenzUtils.skyBlockIsland in types
+    fun inAny() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland in types
 
     @SkyHanniModule
     companion object {
