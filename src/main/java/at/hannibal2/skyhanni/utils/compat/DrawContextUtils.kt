@@ -34,6 +34,7 @@ object DrawContextUtils {
         }
         _drawContext = context
     }
+
     fun clearContext() {
         if (renderDepth == 1) {
             _drawContext = null
