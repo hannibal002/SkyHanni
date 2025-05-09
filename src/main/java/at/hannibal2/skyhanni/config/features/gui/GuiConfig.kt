@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
+//#if MC < 1.21
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -20,6 +22,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
+// todo 1.21 impl needed
 class GuiConfig {
     @Expose
     @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
@@ -35,12 +38,14 @@ class GuiConfig {
     @Accordion
     var chroma: ChromaConfig = ChromaConfig()
 
+    //#if MC < 1.21
     @ConfigOption(
         name = "Edit GUI Locations",
         desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays."
     )
     @ConfigEditorButton(buttonText = "Edit")
     var positions: Runnable = Runnable { openGuiPositionEditor(true) }
+    //#endif
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")

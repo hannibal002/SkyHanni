@@ -2,13 +2,16 @@ package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if MC < 1.21
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
+// todo 1.21 impl needed
 class MiningEventConfig {
     @Expose
     @ConfigOption(
@@ -33,10 +36,12 @@ class MiningEventConfig {
     @ConfigEditorDropdown
     var showType: ShowType = ShowType.ALL
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Compressed Format", desc = "Compress the event names so that they are shorter.")
     @ConfigEditorDropdown
     var compressedFormat: CompressFormat = CompressFormat.DEFAULT
+    //#endif
 
     @Expose
     @ConfigOption(name = "Compressed Island", desc = "Show the islands only as an icon.")

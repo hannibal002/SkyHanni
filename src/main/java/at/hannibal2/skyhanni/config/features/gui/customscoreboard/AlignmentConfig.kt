@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
+//#if MC < 1.21
 import at.hannibal2.skyhanni.utils.RenderUtils
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
+// todo 1.21 impl needed
 class AlignmentConfig {
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Horizontal Alignment", desc = "Alignment for the scoreboard on the horizontal axis.")
     @ConfigEditorDropdown
@@ -16,6 +20,7 @@ class AlignmentConfig {
     @ConfigOption(name = "Vertical Alignment", desc = "Alignment for the scoreboard on the vertical axis.")
     @ConfigEditorDropdown
     var verticalAlignment: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER
+    //#endif
 
     @Expose
     @ConfigOption(name = "Margin", desc = "Space between the border of your screen and the scoreboard.")

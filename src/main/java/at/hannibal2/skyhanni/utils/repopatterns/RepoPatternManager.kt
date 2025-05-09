@@ -2,9 +2,13 @@ package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.ConfigManager
+//#endif
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
+//#if MC < 1.21
 import at.hannibal2.skyhanni.data.repo.RepoManager
+//#endif
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
@@ -26,6 +30,7 @@ import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 //#endif
 
+// todo 1.21 impl needed
 /**
  * Manages [RepoPattern]s.
  */
@@ -79,8 +84,13 @@ object RepoPatternManager {
             }
         }
 
+    //#if MC < 1.21
     private val localLoading: Boolean
         get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.usingBackupRepo
+    //#else
+    //$$ private val localLoading: Boolean
+    //$$      get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
+    //#endif
 
     private val logger = LogManager.getLogger("SkyHanni")
 
@@ -257,6 +267,7 @@ object RepoPatternManager {
      * Dump all regexes labeled with the label into the file.
      */
     fun dump(sourceLabel: String, file: File) {
+        //#if MC < 1.21
         val data =
             ConfigManager.gson.toJson(
                 RepoPatternDump(
@@ -266,6 +277,7 @@ object RepoPatternManager {
             )
         file.parentFile.mkdirs()
         file.writeText(data)
+        //#endif
     }
 
     @HandleEvent

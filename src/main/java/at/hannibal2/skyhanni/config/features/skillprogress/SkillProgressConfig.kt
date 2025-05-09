@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.skillprogress
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if MC < 1.21
 import at.hannibal2.skyhanni.utils.RenderUtils
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -11,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
+// todo 1.21 impl needed
 class SkillProgressConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show the Skill Progress Display.")
@@ -18,6 +21,7 @@ class SkillProgressConfig {
     @FeatureToggle
     var enabled: Property<Boolean> = Property.of(false)
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Text Alignment", desc = "Align the display text with the progress bar.")
     @ConfigEditorDropdown
@@ -34,6 +38,7 @@ class SkillProgressConfig {
 
         override fun toString() = displayName
     }
+    //#endif
 
     @Expose
     @ConfigOption(name = "Hide In Action Bar", desc = "Hide the skill progress in the Hypixel action bar.")
