@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
+//#if MC < 1.21
 import at.hannibal2.skyhanni.data.repo.RepoManager
+//#endif
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -17,20 +19,22 @@ import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
+//#if MC < 1.21
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
+//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -41,6 +45,7 @@ import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object HypixelData {
 
@@ -196,9 +201,9 @@ object HypixelData {
     val map get() = locraw["map"].orEmpty()
 
     fun checkCurrentServerId() {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
         if (serverId != null) return
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
+        if (SkyBlockUtils.lastWorldSwitch.passedSince() < 1.seconds) return
         if (!TabListData.fullyLoaded) return
 
         TabWidget.SERVER.matchMatcherFirstLine {
@@ -228,7 +233,7 @@ object HypixelData {
             "failedServerIdFetchCounter" to failedServerIdFetchCounter,
             "lastSuccessfulServerIdFetchTime" to lastSuccessfulServerIdFetchTime,
             "lastSuccessfulServerIdFetchType" to lastSuccessfulServerIdFetchType,
-            "islandType" to LorenzUtils.skyBlockIsland,
+            "islandType" to SkyBlockUtils.currentIsland,
             "tablist" to TabListData.getTabList(),
             "scoreboard" to ScoreboardData.sidebarLinesFormatted,
         )
@@ -237,7 +242,7 @@ object HypixelData {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Server ID")
-        if (!LorenzUtils.inSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock) {
             event.addIrrelevant("not in sb")
             return
         }
@@ -266,9 +271,11 @@ object HypixelData {
             playerAmountPattern,
             playerAmountGuestingPattern,
         )
+        //#if MC < 1.21
         if (DungeonApi.inDungeon()) {
             playerPatternList.add(dungeonPartyAmountPattern)
         }
+        //#endif
 
         out@ for (pattern in playerPatternList) {
             for (line in TabListData.getTabList()) {
@@ -362,7 +369,7 @@ object HypixelData {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
 
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
@@ -373,7 +380,9 @@ object HypixelData {
         }
         if (message.startsWith("you are playing on profile:")) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
+            //#if MC < 1.21
             ProfileStorageData.profileJoinMessage()
+            //#endif
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).post()
@@ -384,7 +393,9 @@ object HypixelData {
         TabWidget.PROFILE.matchMatcherFirstLine {
             var newProfile = group("profile").lowercase()
             // Hypixel shows the profile name reversed while in the Rift
+            //#if MC < 1.21
             if (RiftApi.inRift()) newProfile = newProfile.reversed()
+            //#endif
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).post()
@@ -394,11 +405,11 @@ object HypixelData {
     // TODO rewrite everything in here
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!LorenzUtils.inSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock) {
             sendLocraw()
         }
 
-        if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
+        if (SkyBlockUtils.onHypixel && SkyBlockUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
                     val originalLocation = group("area").removeColor()
@@ -416,13 +427,15 @@ object HypixelData {
             checkProfileName()
         }
 
-        val wasOnHypixel = LorenzUtils.onHypixel
+        val wasOnHypixel = SkyBlockUtils.onHypixel
         checkHypixel()
-        val nowOnHypixel = LorenzUtils.onHypixel
+        val nowOnHypixel = SkyBlockUtils.onHypixel
         when {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
+                //#if MC < 1.21
                 RepoManager.displayRepoStatus(true)
+                //#endif
             }
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
@@ -433,7 +446,7 @@ object HypixelData {
             }
         }
 
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
 
         if (!event.isMod(5)) return
 
@@ -453,7 +466,7 @@ object HypixelData {
     }
 
     private fun sendLocraw() {
-        if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
+        if (SkyBlockUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
             lastLocRaw = SimpleTimeMark.now()
             HypixelCommands.locraw()
         }
@@ -532,9 +545,11 @@ object HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
+            //#if MC < 1.21
             if (BingoApi.getRankFromScoreboard(line) != null) {
                 bingo = true
             }
+            //#endif
             when (line) {
                 " §7♲ §7Ironman" -> {
                     ironman = true

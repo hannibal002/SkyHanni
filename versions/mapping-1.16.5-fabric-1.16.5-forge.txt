@@ -67,6 +67,7 @@ net.minecraft.util.math.Box net.minecraft.world.phys.AABB
 net.minecraft.util.math.Vec3d net.minecraft.world.phys.Vec3
 
 net.minecraft.util.math.Box contains() contains()
+net.minecraft.util.math.Box expand() inflate()
 net.minecraft.util.math.Box offset() move()
 
 net.minecraft.util.math.Vec3d squaredDistanceTo() distanceToSqr()
