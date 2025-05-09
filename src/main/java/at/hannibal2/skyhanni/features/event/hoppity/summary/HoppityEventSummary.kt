@@ -43,6 +43,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -329,100 +330,100 @@ object HoppityEventSummary {
     fun HoppityEventStats.getMealEggCounts(): Map<HoppityEggType, Int> =
         mealsFound.filterKeys { it in HoppityEggType.resettingEntries }
 
+    private fun MutableList<StatString>.getAndAddRabbitsFormat(
+        rarityMap: Map<LorenzRarity, Int>,
+        name: String,
+        countTriple: Triple<Int, Int, Int>,
+    ) = getRabbitsFormat(
+        rarityMap = rarityMap,
+        name = name,
+        countTriple = countTriple,
+    ).forEach { addStr(it) }
+
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
             put(HoppityStat.MEAL_EGGS_FOUND) { statList, stats, year ->
-                stats.getMealEggCounts().sumAllValues().toInt().takeIf { it > 0 }?.let {
-                    val spawnedMealEggs = stats.getSpawnedEggCounts(year).sumAllValues()
-                    val eggFormat = StringUtils.pluralize(it, "Egg")
-                    val amount = "${it.addSeparators()}§7/§a${spawnedMealEggs.addSeparators()}"
-                    statList.addStr("§7You found §b$amount §6Chocolate Meal $eggFormat§7.")
-                }
+                val totalMealEggs = stats.getMealEggCounts().sumAllValues().toInt().takeIf { it > 0 } ?: return@put
+                val spawnedMealEggs = stats.getSpawnedEggCounts(year).sumAllValues()
+                val eggFormat = StringUtils.pluralize(totalMealEggs, "Egg")
+                val amount = "$totalMealEggs§7/§a${spawnedMealEggs.addSeparators()}"
+                statList.addStr("§7You found §b$amount §6Chocolate Meal $eggFormat§7.")
             }
 
             put(HoppityStat.HITMAN_EGGS) { statList, stats, year ->
                 // We only want to show events after hitman was added (Hunt #41)
                 getHoppityEventNumber(year).takeIf { it > 41 } ?: return@put
+                val hitmanCount = stats.getMealEggCounts()[HoppityEggType.HITMAN]?.takeIf { it > 0 } ?: return@put
+
                 val spawnedMealEggs = stats.getSpawnedEggCounts(year)
                 val collectedEggs = stats.getMealEggCounts()
                 val missedMealEggs = (spawnedMealEggs).map { (type, spawnedCount) ->
                     val collectedOfType = collectedEggs[type] ?: 0
                     type to (spawnedCount - collectedOfType)
-                }.toMap().sumAllValues()
+                }.toMap().sumAllValues().toInt()
 
-                stats.mealsFound[HoppityEggType.HITMAN]?.let {
-                    val eggFormat = StringUtils.pluralize(it, "Egg")
-                    val divisorFormat = "§b${it.addSeparators()}§7/§a${missedMealEggs.addSeparators()}"
-                    statList.addStr("§7You recovered $divisorFormat §7missed §6Meal $eggFormat §7from §cRabbit Hitman§7.")
-                }
+                val eggFormat = StringUtils.pluralize(missedMealEggs, "Egg")
+                val divisorFormat = "§b$hitmanCount§7/§a$missedMealEggs"
+                statList.addStr("§7You recovered $divisorFormat §7missed §6Meal $eggFormat §7from §cRabbit Hitman§7.")
             }
 
             put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { statList, stats, _ ->
-                stats.getBoughtCount().takeIf { it > 0 }?.let {
-                    val rabbitFormat = StringUtils.pluralize(it, "Rabbit")
-                    statList.addStr("§7You bought §b${it.addSeparators()} §f$rabbitFormat §7from §aHoppity§7.")
-                }
+                val boughtCount = stats.getBoughtCount().takeIf { it > 0 } ?: return@put
+                val rabbitFormat = StringUtils.pluralize(boughtCount, "Rabbit")
+                statList.addStr("§7You bought §b$boughtCount §f$rabbitFormat §7from §aHoppity§7.")
             }
 
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->
-                stats.mealsFound[HoppityEggType.SIDE_DISH]?.let {
-                    val eggFormat = StringUtils.pluralize(it, "Egg")
-                    statList.addStr("§7You found §b${it.addSeparators()} §6§lSide Dish $eggFormat §r§7in the §6Chocolate Factory§7.")
-                }
+                val sideDishCount = stats.getMealEggCounts()[HoppityEggType.SIDE_DISH] ?: 0
+                val eggFormat = StringUtils.pluralize(sideDishCount, "Egg")
+                statList.addStr("§7You found §b$sideDishCount §6§lSide Dish $eggFormat §r§7in the §6Chocolate Factory§7.")
             }
 
             put(HoppityStat.MILESTONE_RABBITS) { statList, stats, _ ->
-                stats.getMilestoneCount().takeIf { it > 0 }?.let {
-                    val rabbitFormat = StringUtils.pluralize(it, "Rabbit")
-                    statList.addStr("§7You claimed §b$it §6§lMilestone $rabbitFormat§7.")
-                }
+                val milestoneCount = stats.getMilestoneCount().takeIf { it > 0 } ?: return@put
+                val rabbitFormat = StringUtils.pluralize(milestoneCount, "Rabbit")
+                statList.addStr("§7You claimed §b$milestoneCount §6§lMilestone $rabbitFormat§7.")
             }
 
             put(HoppityStat.NEW_RABBITS) { statList, stats, year ->
-                getRabbitsFormat(
+                if (stats.rabbitsFound.none { it.value.uniques > 0 }) return@put
+                statList.getAndAddRabbitsFormat(
                     rarityMap = stats.rabbitsFound.mapValues { m -> m.value.uniques },
                     name = "Unique",
                     countTriple = stats.getPairTriple(year, 0),
-                ).forEach {
-                    statList.addStr(it)
-                }
+                )
             }
 
             put(HoppityStat.DUPLICATE_RABBITS) { statList, stats, year ->
-                getRabbitsFormat(
+                if (stats.rabbitsFound.none { it.value.dupes > 0 }) return@put
+                statList.getAndAddRabbitsFormat(
                     rarityMap = stats.rabbitsFound.mapValues { m -> m.value.dupes },
                     name = "Duplicate",
                     countTriple = stats.getPairTriple(year, 1),
-                ).forEach {
-                    statList.addStr(it)
-                }
+                )
                 statList.addExtraChocFormatLine(stats.dupeChocolateGained)
             }
 
             put(HoppityStat.STRAY_RABBITS) { statList, stats, year ->
-                getRabbitsFormat(
+                if (stats.rabbitsFound.none { it.value.strays > 0 }) return@put
+                statList.getAndAddRabbitsFormat(
                     rarityMap = stats.rabbitsFound.mapValues { m -> m.value.strays },
                     name = "Stray",
                     countTriple = stats.getPairTriple(year, 2),
-                ).forEach {
-                    statList.addStr(it)
-                }
+                )
                 statList.addExtraChocFormatLine(stats.strayChocolateGained)
             }
 
             put(HoppityStat.TIME_IN_CF) { statList, stats, _ ->
-                stats.millisInCf.takeIf { it > 0.seconds }?.let {
-                    val cfTimeFormat = it.format(maxUnits = 2)
-                    statList.addStr("§7You spent §b$cfTimeFormat §7in the §6Chocolate Factory§7.")
-                }
+                val timeInCf = stats.millisInCf.takeIf { it > Duration.ZERO } ?: return@put
+                val timeFormat = timeInCf.format(maxUnits = 2)
+                statList.addStr("§7You spent §b$timeFormat §7in the §6Chocolate Factory§7.")
             }
 
             put(HoppityStat.RABBIT_THE_FISH_FINDS) { statList, stats, _ ->
-                stats.rabbitTheFishFinds.takeIf { it > 0 }?.let {
-                    val timesFormat = StringUtils.pluralize(it, "time")
-                    val eggsFormat = StringUtils.pluralize(it, "Egg")
-                    statList.addStr("§7You found §cRabbit the Fish §7in Meal $eggsFormat §b$it §7$timesFormat.")
-                }
+                val rabbitTheFishFinds = stats.rabbitTheFishFinds.takeIf { it > 0 } ?: return@put
+                val timesFormat = StringUtils.pluralize(rabbitTheFishFinds, "time")
+                statList.addStr("§7You found §cRabbit the Fish §7in Meal Eggs §b$rabbitTheFishFinds §7$timesFormat.")
             }
 
             put(HoppityStat.LEADERBOARD_CHANGE) { statList, stats, _ ->
@@ -550,7 +551,7 @@ object HoppityEventSummary {
                 it.key to it.value.toInt()
             }.toMap()
         }
-        (year > SkyBlockTime.now().year) -> mapOf<HoppityEggType, Int>()
+        (year > SkyBlockTime.now().year) -> mapOf()
         // Hoppity Event #41 was the first event with the new egg types
         (getHoppityEventNumber(year) < 41) -> mapOf(
             HoppityEggType.BREAKFAST to 93,
@@ -574,13 +575,11 @@ object HoppityEventSummary {
                 it.hour to it.isAlternateDay()
             }
 
-            HoppityEggType.resettingEntries.map { eggType ->
-                val spawnedCount = when {
-                    (isAltDay == eggType.altDay && hourNow >= eggType.resetsAt) -> currentCompleteCycles + 1
-                    else -> currentCompleteCycles
-                }
-                eggType to spawnedCount
-            }.toMap()
+            HoppityEggType.resettingEntries.associateWith { eggType ->
+                currentCompleteCycles +
+                    if (isAltDay == eggType.altDay && hourNow >= eggType.resetsAt) 1
+                    else 0
+            }
         }
     }.also { yearSpawnCache[year] = it }
 
