@@ -416,7 +416,7 @@ val skipTodos by lazy {
     if (file.exists()) {
         file.inputStream().use(prop::load)
     }
-    (prop["skyhanni.skipTodos"] as? String)?.toBoolean() ?: false
+    (prop["skyhanni.skipPreprocessTodos"] as? String)?.toBoolean() ?: false
 }
 
 preprocess {

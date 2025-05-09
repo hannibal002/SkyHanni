@@ -413,7 +413,7 @@ Again, this will only use the files specified in `versions/<version>/buildpaths.
 
 You may notice some `//#if TODO` comments in the code, these are preprocessor comments that we are using to signify that we need to make 
 this functionality work again on 1.21. If for whatever reason you want the preprocessor to ignore these comments, you can add 
-`skyhanni.skipTodos=true` to your `.gradle/private.properties` file. This will make the preprocessor ignore all `//#if TODO` comments.
+`skyhanni.skipPreprocessTodos=true` to your `.gradle/private.properties` file. This will make the preprocessor ignore all `//#if TODO` comments.
 
 ### Improving mappings
 
