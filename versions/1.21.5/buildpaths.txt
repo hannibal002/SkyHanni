@@ -592,7 +592,7 @@ at.hannibal2.skyhanni.data.ClickedBlockType.kt
 at.hannibal2.skyhanni.data.DateFormat.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableEnums.kt
 at.hannibal2.skyhanni.config.enums.OutsideSBFeature.kt
-
+at/hannibal2/skyhanni/api/minecraftevents/RenderEvents.kt
 
 
 at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
