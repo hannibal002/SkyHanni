@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.util.AxisAlignedBB
 
 enum class IslandType(private val nameFallback: String) {
@@ -112,6 +113,9 @@ enum class IslandType(private val nameFallback: String) {
             maxPlayersMega = data.maxPlayersMega
         }
     }
+
+    // TODO rename to isInIsland once the funciton in lorenz utils is gone
+    fun isCurrent() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
 }
 
 data class IslandData(
