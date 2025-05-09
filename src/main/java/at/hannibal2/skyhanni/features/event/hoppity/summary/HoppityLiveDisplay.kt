@@ -176,25 +176,23 @@ object HoppityLiveDisplay {
 
     private fun inMatchingInventory(): Boolean {
         val setting = liveDisplayConfig.specificInventories
-        val currentScreen = Minecraft.getMinecraft().currentScreen ?: return HoppityLiveDisplayInventoryType.NO_INVENTORY in setting
+        val currentScreen = Minecraft.getMinecraft().currentScreen
+            ?: return HoppityLiveDisplayInventoryType.NO_INVENTORY in setting
 
         // Get the inventory name and check if it matches any of the specific inventories
         val inventoryName = InventoryUtils.openInventoryName()
 
-        val inChocolateFactory =
-            CFApi.inChocolateFactory ||
-                menuNamePattern.matches(inventoryName) ||
-                miscCfInventoryPatterns.matches(inventoryName)
+        val inChocolateFactory = CFApi.inChocolateFactory ||
+            menuNamePattern.matches(inventoryName) ||
+            miscCfInventoryPatterns.matches(inventoryName)
 
-        return if (currentScreen is GuiInventory) {
-            HoppityLiveDisplayInventoryType.OWN_INVENTORY in setting
-        } else if (inChocolateFactory) {
-            HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY in setting
-        } else if (inventoryName == "Hoppity") {
-            HoppityLiveDisplayInventoryType.HOPPITY in setting
-        } else if (mealEggInventoryPattern.matches(inventoryName)) {
-            HoppityLiveDisplayInventoryType.MEAL_EGGS in setting
-        } else false
+        return when {
+            currentScreen is GuiInventory -> HoppityLiveDisplayInventoryType.OWN_INVENTORY
+            inChocolateFactory -> HoppityLiveDisplayInventoryType.CHOCOLATE_FACTORY
+            inventoryName == "Hoppity" -> HoppityLiveDisplayInventoryType.HOPPITY
+            mealEggInventoryPattern.matches(inventoryName) -> HoppityLiveDisplayInventoryType.MEAL_EGGS
+            else -> return false
+        } in setting
     }
 
     private fun isInInventory(): Boolean =
