@@ -117,12 +117,12 @@ public class TrevorTheTrapperConfig {
         "§cWill not help you to find rabbits or sheep in the Oasis!")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean trapperSolver = true;
+    public boolean trapperSolver = true; // TODO rename to solver
 
     @Expose
     @ConfigOption(name = "Mob Dead Warning", desc = "Show a message when Trevor's mob dies.")
     @ConfigEditorBoolean
-    public boolean trapperMobDiedMessage = true;
+    public boolean trapperMobDiedMessage = true; // TODO rename to mobDiedMessage
 
     @Expose
     @ConfigOption(name = "Warp to Trapper", desc = "Warp to Trevor's Den. Works only inside the Farming Islands.")
@@ -140,14 +140,22 @@ public class TrevorTheTrapperConfig {
     @ConfigOption(name = "Trapper Hotkey", desc = "Press this key to warp to Trevor's Den or to accept the quest. " +
         "§eRequires the relevant above settings to be toggled")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    public int keyBindWarpTrapper = Keyboard.KEY_NONE;
-
+    public int keyBindWarpTrapper = Keyboard.KEY_NONE; // TODO rename to keyBind - its more than just warp
 
     @Expose
     @ConfigOption(name = "Trapper Cooldown", desc = "Change the color of Trevor and adds a cooldown over his head.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean trapperTalkCooldown = true;
+    public boolean trapperTalkCooldown = true; // TODO rename to talkCooldown
+
+    @Expose
+    @ConfigOption(
+        name = "Trapper Ready Title",
+        desc = "Show title and sould when the cooldown is over and trapper is ready for the next quest."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean readyTitle = true;
 
     @Expose
     @ConfigOption(
@@ -155,9 +163,9 @@ public class TrevorTheTrapperConfig {
         desc = "Show the cooldown on screen in an overlay (intended for Abiphone users)."
     )
     @ConfigEditorBoolean
-    public boolean trapperCooldownGui = false;
+    public boolean trapperCooldownGui = false; // TODO rename to showCooldownGui
 
     @Expose
     @ConfigLink(owner = TrevorTheTrapperConfig.class, field = "trapperCooldownGui")
-    public Position trapperCooldownPos = new Position(10, 10);
+    public Position trapperCooldownPos = new Position(10, 10); // TODO rename to cooldownPosition
 }

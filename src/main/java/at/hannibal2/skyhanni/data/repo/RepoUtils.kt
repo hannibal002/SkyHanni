@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.zip.ZipInputStream
 
+// todo 1.21 impl needed
 object RepoUtils {
 
     fun recursiveDelete(file: File) {
@@ -107,6 +108,8 @@ object RepoUtils {
 
     @JvmStatic
     fun resetRepoLocation() {
+        //#if MC < 1.21
         RepoManager.resetRepositoryLocation(manual = true)
+        //#endif
     }
 }

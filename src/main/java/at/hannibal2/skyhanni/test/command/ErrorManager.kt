@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+//#if MC < 1.21
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -20,6 +22,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object ErrorManager {
 
@@ -81,6 +84,7 @@ object ErrorManager {
 //         ),
 //     )
 
+    //#if MC < 1.21
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shtestreseterrorcache") {
@@ -92,6 +96,8 @@ object ErrorManager {
             }
         }
     }
+    //#endif
+
 
     // Extra data from last thrown error
     private var cachedExtraData: String? = null

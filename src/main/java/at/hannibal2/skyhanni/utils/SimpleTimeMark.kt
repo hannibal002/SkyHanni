@@ -10,6 +10,7 @@ import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+// todo 1.21 impl needed
 @JvmInline
 value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark> {
 
@@ -62,7 +63,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun toMillis() = millis
 
+    //#if MC < 1.21
     fun toSkyBlockTime(): SkyBlockTime = SkyBlockTime.fromTimeMark(this)
+    //#endif
 
     fun toLocalDate(): LocalDate = toLocalDateTime().toLocalDate()
 
@@ -79,7 +82,10 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
         fun Long.asTimeMark() = SimpleTimeMark(this)
 
+        //#if MC < 1.21
         @Deprecated("Use toTimeMark() instead", ReplaceWith("this.toTimeMark()"))
         fun SkyBlockTime.asTimeMark() = SimpleTimeMark(toMillis())
+        //#endif
+
     }
 }

@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if MC < 1.21
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -13,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
+// todo 1.21 impl needed
 class CustomScoreboardConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Show a custom scoreboard instead of the vanilla one.")
@@ -20,6 +23,7 @@ class CustomScoreboardConfig {
     @FeatureToggle
     var enabled: Property<Boolean> = Property.of(false)
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Appearance", desc = "Drag text to change the appearance of the advanced scoreboard.")
     @ConfigEditorDraggableList
@@ -29,6 +33,7 @@ class CustomScoreboardConfig {
     @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.")
     @ConfigEditorButton(buttonText = "Reset")
     var reset: Runnable = Runnable(CustomScoreboard::resetAppearance)
+    //#endif
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")

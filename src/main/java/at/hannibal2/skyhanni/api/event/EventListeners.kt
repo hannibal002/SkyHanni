@@ -2,15 +2,18 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
+//#if MC < 1.21
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+//#endif
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import java.lang.reflect.Method
 import java.util.function.Consumer
 
 typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
 
+// todo 1.21 impl needed
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
 
     private val listeners: MutableList<Listener> = mutableListOf()
@@ -124,6 +127,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         init {
             cachedPredicates = buildList {
+                //#if MC < 1.21
                 if (options.onlyOnSkyblock) add { _ -> LorenzUtils.inSkyBlock }
 
                 if (options.onlyOnIsland != IslandType.ANY) {
@@ -135,6 +139,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
                     val set = options.onlyOnIslands.toSet()
                     add { _ -> inAnyIsland(set) }
                 }
+                //#endif
             }
             // These predicates cant be cached since they depend on info about the actual event
             predicates = buildList {
