@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -280,7 +279,7 @@ object HypixelData {
             }
         }
 
-        if (!inAnyIsland(IslandType.GARDEN, IslandType.GARDEN_GUEST, IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST)) {
+        if (!IslandTypeTags.PERSONAL_ISLAND.inAny()) {
             playerAmountOnIsland = 0
         }
 
@@ -589,8 +588,7 @@ object HypixelData {
     private fun getIslandType(name: String, guesting: Boolean): IslandType {
         val islandType = IslandType.getByNameOrUnknown(name)
         if (guesting) {
-            if (islandType == IslandType.PRIVATE_ISLAND) return IslandType.PRIVATE_ISLAND_GUEST
-            if (islandType == IslandType.GARDEN) return IslandType.GARDEN_GUEST
+            return islandType.guestVariant()
         }
         return islandType
     }

@@ -90,13 +90,13 @@ object LorenzUtils {
     //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
 
-    @Deprecated("moved", ReplaceWith("PlayerUtils.getUuid"))
+    @Deprecated("moved", ReplaceWith("PlayerUtils.getUuid()"))
     fun getPlayerUuid() = getRawPlayerUuid().toDashlessUUID()
 
-    @Deprecated("moved", ReplaceWith("PlayerUtils.getRawUuid"))
+    @Deprecated("moved", ReplaceWith("PlayerUtils.getRawUuid()"))
     fun getRawPlayerUuid(): UUID = MinecraftCompat.localPlayer.uniqueID
 
-    @Deprecated("moved", ReplaceWith("PlayerUtils.getName"))
+    @Deprecated("moved", ReplaceWith("PlayerUtils.getName()"))
     fun getPlayerName(): String = MinecraftCompat.localPlayer.name
 
     @Deprecated("moved into IslandType", ReplaceWith("this.isCurrent()"))

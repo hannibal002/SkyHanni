@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
@@ -18,7 +19,7 @@ object ScoreboardElementCold : ScoreboardElement() {
 
     override val elementPatterns = listOf(MiningApi.coldPattern)
 
-    override fun showIsland() = MiningApi.inColdIsland()
+    override fun showIsland() = IslandTypeTags.IS_COLD.inAny()
 }
 
 // click: warp basecamp
