@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.dungeon.DungeonLividFinder.LividColorHighlight
 //#endif
 import com.google.gson.annotations.Expose
@@ -23,7 +23,7 @@ class LividFinderConfig {
     @ConfigEditorBoolean
     var hideWrong: Boolean = false
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Color Override", desc = "Forces the livid highlight to be a specific color.")
     @ConfigEditorDropdown

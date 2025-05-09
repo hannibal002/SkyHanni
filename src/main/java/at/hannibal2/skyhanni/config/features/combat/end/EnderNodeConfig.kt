@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat.end
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNode
 //#endif
 import com.google.gson.annotations.Expose
@@ -87,7 +87,7 @@ class EnderNodeConfig {
         override fun getLegacyId() = legacyId
         override fun toString() = displayName
 
-        //#if MC < 1.21
+        //#if TODO
         companion object {
             private val enderNodeCache: MutableMap<EnderNodeDisplayEntry, EnderNode?> = mutableMapOf()
         }

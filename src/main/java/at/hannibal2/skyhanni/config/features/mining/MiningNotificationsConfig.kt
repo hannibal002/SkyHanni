@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.MiningNotifications.MiningNotificationList
 //#endif
 import com.google.gson.annotations.Expose
@@ -19,7 +19,7 @@ class MiningNotificationsConfig {
     @FeatureToggle
     var enabled: Boolean = false
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Notification List", desc = "Drag text to change which events send a title.")
     @ConfigEditorDraggableList

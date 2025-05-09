@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.gui.MayorOverlay
 //#endif
 import com.google.gson.annotations.Expose
@@ -18,7 +18,7 @@ class MayorOverlayConfig {
     @ConfigEditorBoolean
     var enabled: Boolean = false
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Appearance", desc = "Change the order of appearance of the Mayor Overlay.")
     @ConfigEditorDraggableList

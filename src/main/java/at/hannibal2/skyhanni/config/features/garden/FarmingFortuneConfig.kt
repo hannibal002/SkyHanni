@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
 //#endif
 import com.google.gson.annotations.Expose
@@ -32,7 +32,7 @@ class FarmingFortuneConfig {
     @ConfigEditorBoolean
     var hideMissingFortuneWarnings: Boolean = false
 
-    //#if MC < 1.21
+    //#if TODO
     @ConfigOption(
         name = "Farming Fortune Guide",
         desc = "Open a guide that breaks down your Farming Fortune.\n§eCommand: /ff"

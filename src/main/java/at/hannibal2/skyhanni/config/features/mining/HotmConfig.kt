@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.PowderSpentDesign
 //#endif
 import com.google.gson.annotations.Expose
@@ -38,7 +38,7 @@ class HotmConfig {
     @FeatureToggle
     var powderSpent: Boolean = true
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Powder Spent Design", desc = "Change the design of the powder spent display.")
     @ConfigEditorDropdown
