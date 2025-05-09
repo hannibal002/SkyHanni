@@ -183,11 +183,12 @@ object EstimatedItemValueCalculator {
         var subTotal = 0.0
         val combo = ("$internalNameString+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
         val comboPrice = combo.toInternalName().getPriceOrNull()?.minus(basePrice)
+        val shouldIgnorePrice = config.ignoreAttributes.get()
 
         if (comboPrice != null) {
-            val useless = isUselessAttribute(combo)
-            list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(useless)}")
-            if (!useless) {
+            val ignore = shouldIgnorePrice || isUselessAttribute(combo)
+            list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(ignore)}")
+            if (!ignore) {
                 subTotal += comboPrice
             }
         } else {
@@ -202,10 +203,10 @@ object EstimatedItemValueCalculator {
             val price = listOfNotNull(itemBasedPrice, shardBasedPrice).minOrNull()
 
             var gray = true
-            val useless = isUselessAttribute(itemWithAttributeName)
-            val nameColor = if (!useless) "§9" else "§7"
+            val ignore = shouldIgnorePrice || isUselessAttribute(itemWithAttributeName)
+            val nameColor = if (!ignore) "§9" else "§7"
             price?.let {
-                if (it > 0 && !useless) {
+                if (it > 0 && !ignore) {
                     subTotal += addAttributePrice(it, basePrice)
                     gray = false
                 }
