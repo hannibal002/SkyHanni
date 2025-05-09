@@ -191,13 +191,17 @@ dependencies {
     } else if (target == ProjectTarget.MODERN) {
         modImplementation("net.fabricmc:fabric-loader:0.16.13")
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
+        // on fabric everyone be using the kotlin language mod so we don't need to bundle kotlin ourselves
+        modImplementation("net.fabricmc:fabric-language-kotlin:1.13.2+kotlin.2.1.20")
 
         modLocalRuntime(libs.modmenu)
     }
 
-    implementation(kotlin("stdlib-jdk8"))
-    shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
-        exclude(group = "org.jetbrains.kotlin")
+    if (target != ProjectTarget.MODERN) {
+        implementation(kotlin("stdlib-jdk8"))
+        shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
+            exclude(group = "org.jetbrains.kotlin")
+        }
     }
 
     if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
@@ -223,7 +227,9 @@ dependencies {
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
-    shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    if (target != ProjectTarget.MODERN) {
+        shadowImpl("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
+    }
     implementation(libs.hotswapagentforge)
 
     testImplementation("com.github.NotEnoughUpdates:NotEnoughUpdates:faf22b5dd9:all") {
