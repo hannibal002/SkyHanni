@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -127,7 +127,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         init {
             cachedPredicates = buildList {
-                //#if MC < 1.21
+                //#if TODO
                 if (options.onlyOnSkyblock) add { _ -> LorenzUtils.inSkyBlock }
 
                 if (options.onlyOnIsland != IslandType.ANY) {

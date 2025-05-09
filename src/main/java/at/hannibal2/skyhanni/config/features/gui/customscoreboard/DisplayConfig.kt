@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.data.DateFormat
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
 import at.hannibal2.skyhanni.utils.RenderUtils
 //#endif
@@ -117,7 +117,7 @@ class DisplayConfig {
         }
     }
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(
         name = "Number Display Format",
@@ -161,7 +161,7 @@ class DisplayConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
     var lineSpacing: Int = 10
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(
         name = "Text Alignment",

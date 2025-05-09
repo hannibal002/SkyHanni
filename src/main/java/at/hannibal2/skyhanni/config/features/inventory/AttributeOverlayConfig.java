@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi;
 //#endif
 import com.google.gson.annotations.Expose;
@@ -22,7 +22,7 @@ public class AttributeOverlayConfig {
     @FeatureToggle
     public boolean enabled = false;
 
-    //#if MC < 1.21
+    //#if TODO
     // TODO: add way of making config options with data classes from repo
     @Expose
     @ConfigOption(name = "Attributes Shown", desc = "List of attributes shown.")

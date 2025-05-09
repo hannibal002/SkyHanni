@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzRarity
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 //#endif
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.system.ModVersion
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 //#endif
 import com.google.gson.GsonBuilder
@@ -30,11 +30,11 @@ object BaseGsonBuilder {
         .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         .registerTypeAdapter(UUID::class.java, SkyHanniTypeAdapters.UUID.nullSafe())
-        //#if MC < 1.21
+        //#if TODO
         .registerTypeAdapter(LorenzVec::class.java, SkyHanniTypeAdapters.VEC_STRING.nullSafe())
         //#endif
         .registerTypeAdapter(TrophyRarity::class.java, SkyHanniTypeAdapters.TROPHY_RARITY.nullSafe())
-        //#if MC < 1.21
+        //#if TODO
         .registerTypeAdapter(ItemStack::class.java, SkyHanniTypeAdapters.NEU_ITEMSTACK.nullSafe())
         .registerTypeAdapter(NeuInternalName::class.java, SkyHanniTypeAdapters.INTERNAL_NAME.nullSafe())
         //#endif
@@ -42,7 +42,7 @@ object BaseGsonBuilder {
         .registerTypeAdapter(IslandType::class.java, SkyHanniTypeAdapters.ISLAND_TYPE.nullSafe())
         .registerTypeAdapter(ModVersion::class.java, SkyHanniTypeAdapters.MOD_VERSION.nullSafe())
         .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
-        //#if MC < 1.21
+        //#if TODO
         .registerTypeAdapter(
             SkyHanniTracker.DefaultDisplayMode::class.java,
             SkyHanniTypeAdapters.TRACKER_DISPLAY_MODE.nullSafe(),

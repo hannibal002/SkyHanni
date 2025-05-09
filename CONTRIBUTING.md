@@ -411,6 +411,10 @@ If you want to compile more files, you can add them to this file or if you want 
 If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in intellij. This will compile the 1.21 version and run it.
 Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
 
+You may notice some `//#if TODO` comments in the code, these are preprocessor comments that we are using to signify that we need to make 
+this functionality work again on 1.21. If for whatever reason you want the preprocessor to ignore these comments, you can add 
+`skyhanni.skipTodos=true` to your `.gradle/private.properties` file. This will make the preprocessor ignore all `//#if TODO` comments.
+
 ### Improving mappings
 
 The different project versions are set up in such a way that each version depends on a slightly older version from which it is then adapted.

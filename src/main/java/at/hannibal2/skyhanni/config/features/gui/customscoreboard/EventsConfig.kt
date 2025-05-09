@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigEventElement
 //#endif
 import com.google.gson.annotations.Expose
@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 // todo 1.21 impl needed
 class EventsConfig {
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Events Priority", desc = "Drag your list to select the priority of each event.")
     @ConfigEditorDraggableList
