@@ -625,8 +625,8 @@ at.hannibal2.skyhanni.data.LocationFixData.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.LocationFixJson.kt
 at.hannibal2.skyhanni.utils.LorenzVec.kt
 at.hannibal2.skyhanni.utils.LocationUtils.kt
-
-
+at.hannibal2.skyhanni.data.repo.RepoManager.kt
+at.hannibal2.skyhanni.data.repo.RepoUtils.kt
 
 
 
