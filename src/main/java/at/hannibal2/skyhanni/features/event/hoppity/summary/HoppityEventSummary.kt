@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -353,7 +352,7 @@ object HoppityEventSummary {
             put(HoppityStat.HITMAN_EGGS) { statList, stats, year ->
                 // We only want to show events after hitman was added (Hunt #41)
                 getHoppityEventNumber(year).takeIf { it > 41 } ?: return@put
-                val hitmanCount = stats.getMealEggCounts()[HoppityEggType.HITMAN]?.takeIf { it > 0 } ?: return@put
+                val hitmanCount = stats.mealsFound[HoppityEggType.HITMAN]?.takeIf { it > 0 } ?: return@put
 
                 val spawnedMealEggs = stats.getSpawnedEggCounts(year)
                 val collectedEggs = stats.getMealEggCounts()
@@ -374,7 +373,7 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.SIDE_DISH_EGGS) { statList, stats, _ ->
-                val sideDishCount = stats.getMealEggCounts()[HoppityEggType.SIDE_DISH] ?: 0
+                val sideDishCount = stats.mealsFound[HoppityEggType.SIDE_DISH]?.takeIf { it > 0 } ?: return@put
                 val eggFormat = StringUtils.pluralize(sideDishCount, "Egg")
                 statList.addStr("§7You found §b$sideDishCount §6§lSide Dish $eggFormat §r§7in the §6Chocolate Factory§7.")
             }
@@ -473,23 +472,30 @@ object HoppityEventSummary {
         }
     }
 
+    private val EMPTY_STATS = setOf(
+        HoppityStat.EMPTY_1, HoppityStat.EMPTY_2,
+        HoppityStat.EMPTY_3, HoppityStat.EMPTY_4
+    )
+
     fun getMappedStatStrings(stats: HoppityEventStats, eventYear: Int): MappedStatStrings = statDisplayList.mapNotNull { stat ->
         val operator = summaryOperationList[stat] ?: return@mapNotNull null
         val operatedList: MutableList<StatString> = mutableListOf()
         operator.invoke(operatedList, stats, eventYear)
+
+        val listEmpty = operatedList.isEmpty() || operatedList.all { it.string.removeColor().trim().isBlank() }
+        if (listEmpty && stat !in EMPTY_STATS) return@mapNotNull null
+
         stat to operatedList
     }.toMap()
 
-    fun List<StatString>.dropConsecutiveEmpties(): MutableList<StatString> {
-        val out = mutableListOf<StatString>()
-        var lastWasEmpty = false
-        for (s in this) {
-            val nowEmpty = s.string.removeColor().trim().isEmpty()
-            if (!lastWasEmpty || !nowEmpty) out += s
-            lastWasEmpty = nowEmpty
+    fun MappedStatStrings.dropConsecutiveEmpties(): MappedStatStrings =
+        entries.fold(mutableMapOf()) { acc, (stat, list) ->
+            val nowEmpty = stat in EMPTY_STATS
+            val lastEmpty = acc.keys.lastOrNull()?.let { it in EMPTY_STATS } ?: true
+
+            if (!lastEmpty || !nowEmpty) acc[stat] = list
+            acc
         }
-        return out
-    }
 
     fun buildEmptyFallback(isCurrentEvent: Boolean): MutableList<StatString> {
         val timeFmt = if (isCurrentEvent) "§c§l§oRIGHT NOW§c§o" else "in the future"
@@ -502,14 +508,16 @@ object HoppityEventSummary {
 
     private fun getStatsStrings(stats: HoppityEventStats, eventYear: Int?): MutableList<StatString> {
         if (eventYear == null) return mutableListOf()
-        val statList = getMappedStatStrings(stats, eventYear).values.flatten().toMutableList()
-        val collapsedStatList = statList.dropConsecutiveEmpties().toMutableList()
+        val statList = getMappedStatStrings(stats, eventYear)
+            .dropConsecutiveEmpties()
+            .values.flatten()
+            .toMutableList()
 
-        val finalStatList = if (collapsedStatList.isEmpty() || collapsedStatList.all { it.string.isBlank() }) {
+        val finalStatList = if (statList.isEmpty() || statList.all { it.string.isBlank() }) {
             buildEmptyFallback(
                 isCurrentEvent = HoppityApi.isHoppityEvent() && eventYear == currentSbYear
             ).toMutableList()
-        } else collapsedStatList
+        } else statList
 
         return finalStatList.chromafyHoppityStats()
     }
