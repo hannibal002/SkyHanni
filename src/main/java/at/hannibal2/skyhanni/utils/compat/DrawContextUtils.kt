@@ -42,7 +42,7 @@ object DrawContextUtils {
         } else if (renderDepth > 1) {
             renderDepth--
         } else {
-            ErrorManager.logErrorStateWithData("Error rending", "Render depth is negative, something went wrong")
+            ErrorManager.logErrorStateWithData("Error rendering", "Render depth is negative, something went wrong")
         }
     }
 
