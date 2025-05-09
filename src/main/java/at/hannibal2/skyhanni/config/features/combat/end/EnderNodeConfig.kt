@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.config.features.combat.end
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if MC < 1.21
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNode
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -11,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
+// todo 1.21 impl needed
 class EnderNodeConfig {
     @Expose
     @ConfigOption(
@@ -84,6 +87,7 @@ class EnderNodeConfig {
         override fun getLegacyId() = legacyId
         override fun toString() = displayName
 
+        //#if MC < 1.21
         companion object {
             private val enderNodeCache: MutableMap<EnderNodeDisplayEntry, EnderNode?> = mutableMapOf()
         }
@@ -93,6 +97,7 @@ class EnderNodeConfig {
                 it.toEnderNodeDisplayEntryOrNull() == this
             }
         }
+        //#endif
     }
 
     @Expose

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ReflectionUtils
 import java.lang.reflect.Method
 import java.util.function.Consumer
 
+// todo 1.21 impl needed
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
 
     private val listeners: MutableList<Listener> = mutableListOf()
@@ -118,13 +119,15 @@ class EventListeners private constructor(val name: String, private val isGeneric
         }
 
         init {
-            val eventPredicates = EventPredicateProvider.getEventPredicates(method, options, generic)
             val cachedPredicates = mutableListOf<EventPredicate>()
             val predicates = mutableListOf<EventPredicate>()
+            //#if MC < 1.21
+            val eventPredicates = EventPredicateProvider.getEventPredicates(method, options, generic)
             for ((predicate, isCached) in eventPredicates) {
                 if (isCached) cachedPredicates.add(predicate)
                 else predicates.add(predicate)
             }
+            //#endif
             this.cachedPredicates = cachedPredicates
             this.predicates = predicates
         }

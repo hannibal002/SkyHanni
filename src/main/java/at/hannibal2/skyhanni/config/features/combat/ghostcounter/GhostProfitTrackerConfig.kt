@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if MC < 1.21
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker.GhostTrackerLines
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -11,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import java.util.*
 
+// todo 1.21 impl needed
 class GhostProfitTrackerConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enables the Ghost Profit Tracker.")
@@ -18,6 +21,7 @@ class GhostProfitTrackerConfig {
     @FeatureToggle
     var enabled: Boolean = true
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Display Text", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
@@ -29,6 +33,7 @@ class GhostProfitTrackerConfig {
         GhostTrackerLines.AVERAGE_MAGIC_FIND,
         GhostTrackerLines.BESTIARY_KILLS
     )
+    //#endif
 
     @ConfigOption(
         name = "Max Bestiary",

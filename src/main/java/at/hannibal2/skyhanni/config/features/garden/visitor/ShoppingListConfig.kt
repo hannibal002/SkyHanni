@@ -15,7 +15,7 @@ class ShoppingListConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigLink(owner = ShoppingListConfig::class, field = "display")
+    @ConfigLink(owner = ShoppingListConfig::class, field = "enabled")
     var position: Position = Position(180, 170)
 
     @Expose
