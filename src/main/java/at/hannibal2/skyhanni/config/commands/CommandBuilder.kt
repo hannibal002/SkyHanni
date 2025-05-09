@@ -16,7 +16,8 @@ class CommandBuilder(name: String) : CommandBuilderBase(name) {
         this.callback = callback
     }
 
-    @Suppress("unused") // Used for command registration in 1.21.5
+    // Used for command registration in 1.21.5
+    @Suppress("unused")
     fun getCallback(): (Array<String>) -> Unit = callback
 
     fun autoComplete(autoComplete: (Array<String>) -> List<String>) {
