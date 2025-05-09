@@ -223,6 +223,7 @@ dependencies {
         shadowModImpl(libs.moulconfig)
     } else if (target == ProjectTarget.MODERN) {
         shadowModImpl(libs.moulconfigModern)
+        include(libs.moulconfigModern)
     }
 
     shadowImpl(libs.libautoupdate) {
