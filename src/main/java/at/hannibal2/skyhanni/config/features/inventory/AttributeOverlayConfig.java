@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+//#if MC < 1.21
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -11,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import java.util.ArrayList;
 import java.util.List;
 
+// todo 1.21 impl needed
 public class AttributeOverlayConfig {
 
     @Expose
@@ -19,11 +22,13 @@ public class AttributeOverlayConfig {
     @FeatureToggle
     public boolean enabled = false;
 
+    //#if MC < 1.21
     // TODO: add way of making config options with data classes from repo
     @Expose
     @ConfigOption(name = "Attributes Shown", desc = "List of attributes shown.")
     @ConfigEditorDraggableList
     public List<AttributeApi.AttributeType> attributesList = new ArrayList<>(AttributeApi.AttributeType.getEntries());
+    //#endif
 
     @Expose
     @ConfigOption(

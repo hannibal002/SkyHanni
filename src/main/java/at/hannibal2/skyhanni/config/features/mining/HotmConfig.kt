@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+//#if MC < 1.21
 import at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.PowderSpentDesign
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
+// todo 1.21 impl needed
 class HotmConfig {
     @Expose
     @ConfigOption(
@@ -35,10 +38,12 @@ class HotmConfig {
     @FeatureToggle
     var powderSpent: Boolean = true
 
+    //#if MC < 1.21
     @Expose
     @ConfigOption(name = "Powder Spent Design", desc = "Change the design of the powder spent display.")
     @ConfigEditorDropdown
     var powderSpentDesign: PowderSpentDesign = PowderSpentDesign.NUMBER_AND_PERCENTAGE
+    //#endif
 
     @Expose
     @ConfigOption(
