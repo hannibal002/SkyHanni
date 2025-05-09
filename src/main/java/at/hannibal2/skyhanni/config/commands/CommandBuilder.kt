@@ -16,6 +16,9 @@ class CommandBuilder(name: String) : CommandBuilderBase(name) {
         this.callback = callback
     }
 
+    @Suppress("unused") // Used for command registration in 1.21.5
+    fun getCallback(): (Array<String>) -> Unit = callback
+
     fun autoComplete(autoComplete: (Array<String>) -> List<String>) {
         this.autoComplete = autoComplete
     }
@@ -25,7 +28,7 @@ class CommandBuilder(name: String) : CommandBuilderBase(name) {
     //#endif
 }
 
-abstract class CommandBuilderBase(override val name: String) : CommandData {
+sealed class CommandBuilderBase(override val name: String) : CommandData {
     var description: String = ""
     override var category: CommandCategory = CommandCategory.MAIN
     override var aliases: List<String> = emptyList()

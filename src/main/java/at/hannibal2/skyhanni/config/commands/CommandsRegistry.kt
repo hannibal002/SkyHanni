@@ -10,9 +10,6 @@ import com.mojang.brigadier.CommandDispatcher
 import net.minecraftforge.client.ClientCommandHandler
 
 //#else
-//$$ import com.mojang.brigadier.arguments.StringArgumentType
-//$$ import com.mojang.brigadier.builder.LiteralArgumentBuilder
-//$$ import com.mojang.brigadier.builder.RequiredArgumentBuilder
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 //#endif
 
@@ -61,31 +58,20 @@ object CommandsRegistry {
     }
 
     fun <T : CommandBuilderBase> T.addToRegister(dispatcher: CommandDispatcher<Any?>) {
-        // TODO: register CommandBuilderBase without using toCommand
-        val command = this.toCommand(dispatcher)
         //#if MC < 1.21
+        val command = this.toCommand(dispatcher)
         ClientCommandHandler.instance.registerCommand(command)
-        //#else
-        //$$ val original = dispatcher.register(
-        //$$     LiteralArgumentBuilder.literal<Any?>(name).executes {
-        //$$         command.processCommand(null, emptyArray())
-        //$$         1
-        //$$     }.then(
-        //$$         RequiredArgumentBuilder.argument<Any?, String>(
-        //$$             "please type the arguments of this command here",
-        //$$             StringArgumentType.greedyString()
-        //$$         ).executes { context ->
-        //$$             val arguments = StringArgumentType.getString(context, "please type the arguments of this command here").split(" ")
-        //$$             command.processCommand(null, arguments.toTypedArray())
-        //$$             1
-        //$$         }
-        //$$     )
-        //$$ )
-        //$$ command.commandAliases.forEach {
-        //$$     dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original))
-        //$$ }
-        //#endif
-
         builders.add(this)
+        //#else
+        //$$ if (this !is CommandBuilder) return // complex commands are not supported in 1.21.5 right now
+        //$$ val builder = BaseBrigadierBuilder(name).apply {
+        //$$     this.description = this@addToRegister.descriptor
+        //$$     this.aliases = this@addToRegister.aliases
+        //$$     this.category = this@addToRegister.category
+        //$$
+        //$$     legacyCallbackArgs(this@addToRegister.getCallback())
+        //$$ }
+        //$$ builder.addToRegister(dispatcher)
+        //#endif
     }
 }
