@@ -579,6 +579,10 @@ You can also check if you are on Forge using the `FORGE` variable. It is set to 
 check the Java version this Minecraft version is on. For the `FORGE` variable there is an implicit `!= 0` to check added if you just check
 for the variable using `#if FORGE`.
 
+We also have a `#if TODO` directive. This is a special directive that is used to mark code that needs to be changed on modern versions. 
+Anything within this directive will only compile on 1.8 and otherwise will be commented out. This is useful for marking code that needs to 
+be changed in the future, but you don't want to do it right now.
+
 #### Helpers
 
 Sadly, `#if` expressions cannot be applied globally (unlike name changes), so it is often very helpful to create a helper method and call
