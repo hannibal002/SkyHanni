@@ -45,6 +45,11 @@ import kotlin.math.floor
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
 //$$ import net.minecraft.nbt.NbtString
+//$$ import net.minecraft.text.Text
+//$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.component.type.LoreComponent
+//$$ import at.hannibal2.skyhanni.utils.ComponentUtils
+//$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 //#else
 import net.minecraft.nbt.NBTTagString
 import net.minecraft.nbt.NBTException
@@ -248,8 +253,57 @@ object EnoughUpdatesManager {
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
         //#else
-        //$$ // todo clearly this isnt correct but this is lot that has to change and this works for now
-        //$$ return ItemStack(Items.PAINTING)
+        //$$ json ?: return ItemStack(Items.PAINTING)
+        //$$ var usingCache = useCache && !useReplacements
+        //$$ val internalName = json["internalname"].asString
+        //$$ if (internalName == "_") usingCache = false
+        //$$
+        //$$ if (usingCache) {
+        //$$     val cachedStack = itemStackCache[internalName]
+        //$$     if (cachedStack != null) return cachedStack.copy()
+        //$$ }
+        //$$
+        //$$ val damage = json["damage"]?.asInt ?: 0
+        //$$ val stack = ItemStack(
+        //$$             ComponentUtils.convertMinecraftIdToModern(json["itemid"].asString, damage).getVanillaItem() ?: run {
+        //$$                 println(json["itemid"].asString + " " + damage + " is invalid item")
+        //$$                 return ItemStack(Blocks.STONE.asItem())
+        //$$             },
+        //$$         )
+        //$$ if (stack.item == Items.AIR) {
+        //$$     return ItemStack(Blocks.STONE.asItem())
+        //$$ }
+        //$$
+        //$$ json["count"]?.asInt?.let { stack.count = it }
+        //$$
+        //$$
+        //$$ json["nbttag"]?.asString?.let { nbt ->
+        //$$     ComponentUtils.convertToComponents(stack, convertNbtToJson(nbt))
+        //$$ }
+        //$$
+        //$$ var replacements = mapOf<String, String>()
+        //$$ if (useReplacements) {
+        //$$     replacements = getPetLoreReplacements(stack, -1)
+        //$$     json["displayname"]?.asString?.let {
+        //$$         var name = it
+        //$$         for ((key, value) in replacements) {
+        //$$             name = name.replace("{$key}", value)
+        //$$         }
+        //$$         stack.setCustomItemName(name)
+        //$$     }
+        //$$ }
+        //$$
+        //$$ json["lore"]?.asJsonArray?.let { lore ->
+        //$$     val loreList: MutableList<String> = mutableListOf()
+        //$$     for (nbtElement in processLore(lore, replacements)) {
+        //$$         loreList.add(nbtElement.asString().get())
+        //$$     }
+        //$$
+        //$$     stack.setLore(loreList)
+        //$$ }
+        //$$
+        //$$ if (usingCache) itemStackCache[internalName] = stack
+        //$$ return stack.copy()
         //#endif
     }
 
