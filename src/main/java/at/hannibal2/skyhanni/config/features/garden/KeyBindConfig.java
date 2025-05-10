@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds;
 //#endif
 import at.hannibal2.skyhanni.utils.KeyboardManager;
@@ -26,7 +26,7 @@ public class KeyBindConfig {
     @ConfigEditorBoolean
     public boolean excludeBarn = false;
 
-    //#if MC < 1.21
+    //#if TODO
     @ConfigOption(name = "Disable All", desc = "Disable all keys.")
     @ConfigEditorButton(buttonText = "Disable")
     public Runnable presetDisable = GardenCustomKeybinds::disableAll;

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.mining.glacite
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.MineshaftPityLine
 //#endif
 import com.google.gson.annotations.Expose
@@ -19,7 +19,7 @@ class MineshaftPityDisplayConfig {
     @FeatureToggle
     var enabled: Boolean = true
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Stats List", desc = "Drag text to change the appearance of the display.")
     @ConfigEditorDraggableList

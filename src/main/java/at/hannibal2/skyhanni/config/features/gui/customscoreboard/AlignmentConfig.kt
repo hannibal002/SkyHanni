@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils
 //#endif
 import com.google.gson.annotations.Expose
@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 // todo 1.21 impl needed
 class AlignmentConfig {
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Horizontal Alignment", desc = "Alignment for the scoreboard on the horizontal axis.")
     @ConfigEditorDropdown

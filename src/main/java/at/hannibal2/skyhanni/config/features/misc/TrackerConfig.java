@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.utils.ItemPriceSource;
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 //#endif
 import com.google.gson.annotations.Expose;
@@ -31,7 +31,7 @@ public class TrackerConfig {
     @ConfigEditorDropdown
     public ItemPriceSource priceSource = ItemPriceSource.BAZAAR_INSTANT_BUY;
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Default Display Mode", desc = "Change the display mode that gets shown on default.")
     @ConfigEditorDropdown

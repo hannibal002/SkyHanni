@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.mining
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.Companion.CompressFormat
 //#endif
 import com.google.gson.annotations.Expose
@@ -36,7 +36,7 @@ class MiningEventConfig {
     @ConfigEditorDropdown
     var showType: ShowType = ShowType.ALL
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Compressed Format", desc = "Compress the event names so that they are shorter.")
     @ConfigEditorDropdown

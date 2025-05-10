@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 //#endif
 import com.google.gson.annotations.Expose
@@ -38,7 +38,7 @@ class RewardWarningConfig {
     var bypassKey: Int = Keyboard.KEY_LCONTROL
 
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Items", desc = "Warn for these reward item visitor drops.")
     @ConfigEditorDraggableList
