@@ -8,15 +8,24 @@ import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -31,13 +40,18 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.WrappedRenderableString
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -176,12 +190,14 @@ object BlockStrengthGuide {
             val (progressBar, percentLine, untilNextLine) = processProgressData(ticks, speed, ore)
 
             return Renderable.hoverTips(
-                Renderable.horizontalContainer(
+                HorizontalContainerRenderable(
                     listOf(
                         Renderable.itemStack(icon),
                         progressBar,
-                        Renderable.string("$ticks"),
+                        RenderableString("$ticks"),
                     ),
+                    spacing = 0,
+                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
                 ),
                 tips = buildList<Renderable> {
                     val blockName = name.allLettersFirstUppercase()
@@ -220,7 +236,7 @@ object BlockStrengthGuide {
                     add(Renderable.placeholder(0, 5))
                     addString("§3Category: §f${ore.category.toString().allLettersFirstUppercase()}")
                     addString("§3Blocks in that group:")
-                    add(Renderable.wrappedString(hoverText, width = 200))
+                    add(WrappedRenderableString(hoverText, width = 200))
 
                     if (!showExtraInfos) {
                         add(Renderable.placeholder(0, 5))
@@ -323,14 +339,14 @@ object BlockStrengthGuide {
             base.toInt().addSeparators(),
             gemstone.toInt().addSeparators(),
             dwarven.toInt().addSeparators(),
-        ).map { Renderable.string("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
+        ).map { RenderableString("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
     }
 
     private val headerHeaderLine = listOf("Base", "Gemstone", "Dwarven").map {
-        Renderable.string(
-            it,
-            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        RenderableString(
+            text = it,
             scale = 0.75,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         )
     }
 
@@ -339,9 +355,9 @@ object BlockStrengthGuide {
     private fun createDisplay(): Renderable {
         requestSpeed()
         return Renderable.drawInsideRoundedRectWithOutline(
-            Renderable.verticalContainer(
+            VerticalContainerRenderable(
                 listOf(
-                    Renderable.verticalContainer(
+                    VerticalContainerRenderable(
                         createHeader(),
                         horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                     ),
@@ -350,6 +366,7 @@ object BlockStrengthGuide {
                     ),
                 ),
                 spacing = 8,
+                RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
             ),
             color = LorenzColor.GRAY.addOpacity(180),
             topOutlineColor = Color(0, 0, 0, 200).rgb,
@@ -365,11 +382,11 @@ object BlockStrengthGuide {
     }.distribute(3)
 
     private fun createHeader(): List<Renderable> = listOf(
-        Renderable.string(
+        RenderableString(
             SkyblockStat.MINING_SPEED.iconWithName,
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
-        Renderable.horizontalContainer(
+        HorizontalContainerRenderable(
             listOf(
                 Renderable.table(
                     listOf(
@@ -379,7 +396,7 @@ object BlockStrengthGuide {
                     xPadding = 5,
                 ),
                 Renderable.clickable(
-                    Renderable.string(
+                    RenderableString(
                         "§${if (inMineshaft) 'b' else '7'}Mineshaft",
                         scale = 0.5,
                         verticalAlign = RenderUtils.VerticalAlignment.CENTER,
@@ -407,8 +424,20 @@ object BlockStrengthGuide {
     private var sbMenuOpened = false
 
     private var lastSet = SimpleTimeMark.farPast()
+    private var lastRunCommand = SimpleTimeMark.farPast()
 
     fun onCommand() {
+        when {
+            RiftApi.inRift() -> "in the rift"
+            DungeonApi.inDungeon() -> "in dungeons"
+            KuudraApi.inKuudra() -> "in kuudra"
+            else -> null
+        }?.let {
+            ChatUtils.userError("The Block Strengh Guide does not work $it!")
+            return
+
+        }
+        lastRunCommand = SimpleTimeMark.now()
         shouldBlockSHMenu = true
         sbMenuOpened = false
         HypixelCommands.skyblockMenu()
@@ -418,18 +447,30 @@ object BlockStrengthGuide {
     fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
         if (!shouldBlockSHMenu) return
 
-        event.cancel()
-
         if (!sbMenuOpened) {
-            sbMenuOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
-            Renderable.string(
-                "Loading...",
-                scale = 2.0,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-            ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
+            if (lastRunCommand.passedSince() < 2.seconds) {
+                sbMenuOpened = SkyblockStat.MINING_SPEED.lastAssignment.passedSince() < 1.0.seconds
+                RenderableString(
+                    "Loading...",
+                    scale = 2.0,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                ).renderXYAligned(0, 0, event.gui.width, event.gui.height)
+                event.cancel()
+            } else {
+                ErrorManager.logErrorStateWithData(
+                    "could not load mining data for /shblockstrengh command",
+                    "opened /sbmenu and found no mining speed in the next 2s",
+                    "island" to LorenzUtils.skyBlockIsland,
+                    "graph area" to LorenzUtils.graphArea,
+                    "scoreboard area" to LorenzUtils.scoreboardArea,
+                    "location" to LocationUtils.playerLocation(),
+                    betaOnly = true,
+                )
+            }
             return
         }
+        event.cancel()
 
         val display = display ?: createDisplay().also {
             display = it
@@ -437,6 +478,16 @@ object BlockStrengthGuide {
 
         Renderable.withMousePosition(event.mouseX, event.mouseY) {
             display.renderAndScale(0, 0, event.gui.width, event.gui.height, 20)
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (event.inventoryName != "SkyBlock Menu") return
+        DelayedRun.runDelayed(100.milliseconds) {
+            if (lastRunCommand.passedSince() < 3.seconds) {
+                lastRunCommand = SimpleTimeMark.farPast()
+            }
         }
     }
 
@@ -449,14 +500,14 @@ object BlockStrengthGuide {
         }
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         if (!sbMenuOpened) return
         shouldBlockSHMenu = false
     }
 
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    @HandleEvent(IslandChangeEvent::class)
+    fun onIslandChange() {
         shouldBlockSHMenu = false
     }
 
