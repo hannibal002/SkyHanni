@@ -74,7 +74,7 @@ object CarnivalZombieShootout {
 
         lamp?.let {
             if (config.coloredLines) event.draw3DLine(event.exactPlayerEyeLocation(), it.pos.add(0.0, 0.5, 0.0), Color.RED, 3, false)
-            if (config.coloredHitboxes) event.drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1.0f)
+            if (config.coloredHitboxes) event.drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1f)
         }
 
         if (!config.coloredHitboxes) return

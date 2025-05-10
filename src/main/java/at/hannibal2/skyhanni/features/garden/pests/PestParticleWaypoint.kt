@@ -77,7 +77,7 @@ object PestParticleWaypoint {
     }
 
     private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =
-        type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 10 && speed == -2.0f && offset.isZero()
+        type == EnumParticleTypes.ENCHANTMENT_TABLE && count == 10 && speed == -2f && offset.isZero()
 
     private fun ReceiveParticleEvent.isVillagerAngry(): Boolean =
         type == EnumParticleTypes.VILLAGER_ANGRY && count == 1 && speed == 0f && offset.isZero()
