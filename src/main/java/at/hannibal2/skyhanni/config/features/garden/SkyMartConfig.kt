@@ -22,9 +22,10 @@ class SkyMartConfig {
     @ConfigEditorSlider(minValue = 0.3f, maxValue = 5f, minStep = 0.1f)
     var itemScale: Double = 1.0
 
+    // TODO move to an accordion for Copper Price Config, rename to position
     @Expose
     @ConfigLink(owner = SkyMartConfig::class, field = "copperPrice")
-    var copperPricePos: Position = Position(211, 132)
+    val copperPricePos: Position = Position(211, 132)
 
     @Expose
     @ConfigOption(
@@ -32,5 +33,5 @@ class SkyMartConfig {
         desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
     )
     @ConfigEditorDropdown
-    var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_SELL
+    val priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_SELL
 }

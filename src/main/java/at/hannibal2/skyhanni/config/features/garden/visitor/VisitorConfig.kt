@@ -14,22 +14,27 @@ class VisitorConfig {
     @Expose
     @ConfigOption(name = "Visitor Timer", desc = "")
     @Accordion
-    var timer: TimerConfig = TimerConfig()
+    val timer: TimerConfig = TimerConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Shopping List", desc = "")
     @Accordion
-    var shoppingList: ShoppingListConfig = ShoppingListConfig()
+    val shoppingList: ShoppingListConfig = ShoppingListConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Inventory", desc = "")
     @Accordion
-    var inventory: VisitorInventoryConfig = VisitorInventoryConfig()
+    val inventory: VisitorInventoryConfig = VisitorInventoryConfig()
 
     @Expose
     @ConfigOption(name = "Visitor Reward Warning", desc = "")
     @Accordion
-    var rewardWarning: RewardWarningConfig = RewardWarningConfig()
+    val rewardWarning: RewardWarningConfig = RewardWarningConfig()
+
+    @Expose
+    @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
+    @Accordion
+    val dropsStatistics: DropsStatisticsConfig = DropsStatisticsConfig()
 
     @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
@@ -55,7 +60,7 @@ class VisitorConfig {
         desc = "Highlight the status for visitors with a text above or with color."
     )
     @ConfigEditorDropdown
-    var highlightStatus: HighlightMode = HighlightMode.BOTH
+    val highlightStatus: HighlightMode = HighlightMode.BOTH
 
     enum class HighlightMode(
         private val displayName: String,
@@ -90,11 +95,6 @@ class VisitorConfig {
     var hideChat: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Visitor Drops Statistics Counter", desc = "")
-    @Accordion
-    var dropsStatistics: DropsStatisticsConfig = DropsStatisticsConfig()
-
-    @Expose
     @ConfigOption(
         name = "Accept Hotkey",
         desc = "Accept a visitor when you press this keybind while in the visitor GUI.\n" +
@@ -116,7 +116,7 @@ class VisitorConfig {
         desc = "Prevent interacting with / unlocking Visitors to allow for Dedication Cycling."
     )
     @ConfigEditorDropdown
-    var blockInteracting: VisitorBlockBehaviour = VisitorBlockBehaviour.DONT
+    val blockInteracting: VisitorBlockBehaviour = VisitorBlockBehaviour.DONT
 
     enum class VisitorBlockBehaviour(val displayName: String) {
         DONT("Don't"),

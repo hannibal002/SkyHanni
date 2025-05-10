@@ -35,7 +35,7 @@ class TooltipTweaksConfig {
             "§fReplace: §7Edits the total Fortune to include crop-specific Fortune."
     )
     @ConfigEditorDropdown
-    var cropTooltipFortune: CropTooltipFortuneEntry = CropTooltipFortuneEntry.SHOW
+    val cropTooltipFortune: CropTooltipFortuneEntry = CropTooltipFortuneEntry.SHOW
 
     enum class CropTooltipFortuneEntry(
         private val displayName: String,
