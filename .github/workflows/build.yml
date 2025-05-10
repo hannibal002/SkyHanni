@@ -6,7 +6,7 @@ on:
             - "*"
         paths-ignore:
             - ".gitignore"
-    pull_request:
+    pull_request_target:
         branches:
             - "*"
         paths-ignore:
@@ -20,6 +20,10 @@ jobs:
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
             -   uses: ./.github/actions/setup-normal-workspace
             -   name: Build with Gradle
                 run: ./gradlew assemble -x test --stacktrace
@@ -43,6 +47,10 @@ jobs:
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
+                with:
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
             -   uses: ./.github/actions/setup-normal-workspace
             -   name: Enable preprocessor
                 run: |
