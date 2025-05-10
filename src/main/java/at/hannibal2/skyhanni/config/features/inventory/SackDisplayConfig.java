@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.utils.ItemPriceSource;
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils;
 //#endif
 import com.google.gson.annotations.Expose;
@@ -41,7 +41,7 @@ public class SackDisplayConfig {
     @ConfigEditorDropdown
     public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Alignment", desc = "Change the alignment for numbers and money.")
     @ConfigEditorDropdown

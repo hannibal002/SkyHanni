@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.ItemPickupLog;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 //#endif
@@ -47,7 +47,7 @@ public class ItemPickupLogConfig {
     @ConfigEditorBoolean
     public boolean coins = false;
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(
         name = "Alignment",

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.dungeon.DungeonSecretChime
 //#endif
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -59,7 +59,7 @@ class SecretChimeConfig {
     @ConfigEditorButton(buttonText = "OPEN")
     var soundsListURL: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 
-    //#if MC < 1.21
+    //#if TODO
     @ConfigOption(name = "Play Sound", desc = "Plays current secret chime sound.")
     @ConfigEditorButton(buttonText = "Play")
     var checkSound: Runnable = Runnable(DungeonSecretChime::playSound)

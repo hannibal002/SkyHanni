@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.combat.broodmother
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.combat.BroodmotherFeatures.StageEntry
 //#endif
 import com.google.gson.annotations.Expose
@@ -11,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 // todo 1.21 impl needed
 class BroodmotherConfig {
@@ -42,7 +41,7 @@ class BroodmotherConfig {
     @FeatureToggle
     var imminentWarning: Boolean = false
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(
         name = "Chat Messages",

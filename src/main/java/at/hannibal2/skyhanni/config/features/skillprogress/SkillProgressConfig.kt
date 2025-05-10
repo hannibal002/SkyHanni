@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.skillprogress
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils
 //#endif
 import com.google.gson.annotations.Expose
@@ -21,7 +21,7 @@ class SkillProgressConfig {
     @FeatureToggle
     var enabled: Property<Boolean> = Property.of(false)
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Text Alignment", desc = "Align the display text with the progress bar.")
     @ConfigEditorDropdown

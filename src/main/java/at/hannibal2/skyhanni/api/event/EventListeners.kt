@@ -121,7 +121,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
         init {
             val cachedPredicates = mutableListOf<EventPredicate>()
             val predicates = mutableListOf<EventPredicate>()
-            //#if MC < 1.21
+            //#if TODO
             val eventPredicates = EventPredicateProvider.getEventPredicates(method, options, generic)
             for ((predicate, isCached) in eventPredicates) {
                 if (isCached) cachedPredicates.add(predicate)

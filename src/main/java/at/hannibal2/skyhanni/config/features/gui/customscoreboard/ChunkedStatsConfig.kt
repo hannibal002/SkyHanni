@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsLine
 //#endif
 import com.google.gson.annotations.Expose
@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 // todo 1.21 impl needed
 class ChunkedStatsConfig {
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Chunked Stats", desc = "Select the stats you want to display chunked on the scoreboard.")
     @ConfigEditorDraggableList

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper;
 //#endif
 import com.google.gson.annotations.Expose;
@@ -23,7 +23,7 @@ public class EnchantedClockConfig {
     @FeatureToggle
     public boolean reminder = true;
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Reminder Boosts", desc = "List of boost types to remind about.")
     @ConfigEditorDraggableList

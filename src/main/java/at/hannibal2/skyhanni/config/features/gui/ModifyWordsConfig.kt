@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 //#endif
 import com.google.gson.annotations.Expose
@@ -20,7 +20,7 @@ class ModifyWordsConfig {
     @FeatureToggle
     var enabled: Boolean = true
 
-    //#if MC < 1.21
+    //#if TODO
     @ConfigOption(name = "Open Config", desc = "Open the menu to setup the visual words.\n§eCommand: /shwords")
     @ConfigEditorButton(buttonText = "Open")
     var open: Runnable = Runnable(VisualWordGui::onCommand)
