@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Keyboard
@@ -144,7 +143,7 @@ object EstimatedItemValue {
 
         try {
             // TODO this code needs to be changed around
-            config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
+            config.position.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
             // that tries to over-render the tooltip, and is not explicitly something we can solve here?
@@ -297,6 +296,8 @@ object EstimatedItemValue {
         event.move(3, "misc.itemPriceDataPos", "misc.estimatedItemValues.itemPriceDataPos")
 
         event.move(31, "misc.estimatedItemValues", "inventory.estimatedItemValues")
+
+        event.move(88, "inventory.estimatedItemValues.itemPriceDataPos", "inventory.estimatedItemValues.position")
     }
 
     fun renderInNeuStorageOverlay() {
@@ -304,9 +305,9 @@ object EstimatedItemValue {
 
         //#if MC < 1.12
         // render the estimated item value over NEU Storage
-        GlStateManager.translate(0f, 0f, 200f)
+        DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
-        GlStateManager.translate(0f, 0f, -200f)
+        DrawContextUtils.translate(0f, 0f, -200f)
         renderedItems++
         //#endif
     }

@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.config.features.garden
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.CropType
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -13,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
+// todo 1.21 impl needed
 class NextJacobContestConfig {
     @Expose
     @ConfigOption(
@@ -99,10 +102,12 @@ class NextJacobContestConfig {
     @ConfigEditorBoolean
     var warnPopup: Boolean = false
 
+    //#if TODO
     @Expose
     @ConfigOption(name = "Warn For", desc = "Only warn for these crops.")
     @ConfigEditorDraggableList
     var warnFor: MutableList<CropType> = CropType.entries.toMutableList()
+    //#endif
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
