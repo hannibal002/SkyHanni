@@ -77,6 +77,16 @@
     <ID>PreprocessingImportOrdering:RepositoryConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:SkyHanniMod.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:TitleAndFooterConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:AlignmentConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:BroodmotherSpawnAlertConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:ChunkedStatsConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:EventsConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:InquisitorSoundConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:LaneSwitchSoundSettings.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:LowHealthAlertSoundConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:RepositoryConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:SkyHanniMod.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:TitleAndFooterConfig.kt$//#if TODO</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:BazaarCancelledBuyOrderClipboard.kt$BazaarCancelledBuyOrderClipboard$by patternGroup.pattern( "cancelledmessage", "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?&lt;coins&gt;.*) coins §r§7from cancelling Buy Order!", )</ID>
     <ID>RepoPatternRegexTestMissing:BeaconPower.kt$BeaconPower$by group.pattern( "stat", "§7Current Stat: (?&lt;stat&gt;.+)", )</ID>
