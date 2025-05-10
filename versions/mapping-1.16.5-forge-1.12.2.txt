@@ -330,6 +330,7 @@ net.minecraft.world.entity.boss.enderdragon.EnderDragon net.minecraft.entity.bos
 net.minecraft.world.entity.boss.wither.WitherBoss net.minecraft.entity.boss.EntityWither
 
 net.minecraft.world.entity.boss.wither.WitherBoss getInvulnerableTicks() getInvulTime()
+net.minecraft.world.entity.boss.wither.WitherBoss isPowered() isArmored()
 
 net.minecraft.world.entity.decoration.ArmorStand net.minecraft.entity.item.EntityArmorStand
 net.minecraft.world.entity.decoration.ItemFrame net.minecraft.entity.item.EntityItemFrame
