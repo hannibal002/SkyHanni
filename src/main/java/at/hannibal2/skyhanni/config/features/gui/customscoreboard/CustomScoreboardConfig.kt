@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement
 //#endif
@@ -23,7 +23,7 @@ class CustomScoreboardConfig {
     @FeatureToggle
     var enabled: Property<Boolean> = Property.of(false)
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Appearance", desc = "Drag text to change the appearance of the advanced scoreboard.")
     @ConfigEditorDraggableList

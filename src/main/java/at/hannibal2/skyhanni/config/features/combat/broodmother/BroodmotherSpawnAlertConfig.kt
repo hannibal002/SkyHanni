@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.combat.broodmother
 
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.combat.BroodmotherFeatures
 //#endif
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -22,7 +22,7 @@ class BroodmotherSpawnAlertConfig {
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 2f, minStep = 0.1f)
     var pitch: Float = 1f
 
-    //#if MC < 1.21
+    //#if TODO
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
     var testSound: Runnable = Runnable(BroodmotherFeatures::playTestSound)

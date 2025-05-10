@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.fishing
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.fishing.LavaReplacement.IslandsToReplace
 //#endif
 import com.google.gson.annotations.Expose
@@ -26,7 +26,7 @@ class LavaReplacementConfig {
     @ConfigEditorBoolean
     var everywhere: Property<Boolean> = Property.of(true)
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Islands", desc = "Islands to Replace Lava In.")
     @ConfigEditorDraggableList

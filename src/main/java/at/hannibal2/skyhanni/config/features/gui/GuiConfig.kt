@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
 //#endif
 import com.google.gson.annotations.Expose
@@ -38,7 +38,7 @@ class GuiConfig {
     @Accordion
     var chroma: ChromaConfig = ChromaConfig()
 
-    //#if MC < 1.21
+    //#if TODO
     @ConfigOption(
         name = "Edit GUI Locations",
         desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays."

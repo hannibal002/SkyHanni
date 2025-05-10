@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 // todo 1.21 impl needed
 class About {
-    //#if MC < 1.21
+    //#if TODO
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are currently running")
     @ConfigVersionDisplay
     @Transient

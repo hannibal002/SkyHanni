@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon;
 import at.hannibal2.skyhanni.utils.HypixelCommands;
 //#endif
@@ -18,7 +18,7 @@ public class PlotIconConfig {
     @FeatureToggle
     public boolean enabled = true;
 
-    //#if MC < 1.21
+    //#if TODO
     @ConfigOption(name = "Hard Reset", desc = "Reset every slot to its original item.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable hardReset = () -> {

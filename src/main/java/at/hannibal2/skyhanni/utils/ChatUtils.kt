@@ -2,14 +2,14 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 //#endif
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.misc.EmojiReplacer.replaceEmojis
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 //#endif
@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 //#endif
 import at.hannibal2.skyhanni.utils.chat.TextHelper
@@ -63,7 +63,7 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean = false,
     ) {
-        //#if MC < 1.21
+        //#if TODO
         val debug = LorenzUtils.debug
         //#else
         //$$ val debug = true
@@ -290,7 +290,7 @@ object ChatUtils {
 
     private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
 
-    //#if MC < 1.21
+    //#if TODO
     var chatLines: MutableList<ChatLine>
         get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
         set(value) {
@@ -310,7 +310,7 @@ object ChatUtils {
         reason: String,
         predicate: (ChatLine) -> Boolean,
     ) {
-        //#if MC < 1.21
+        //#if TODO
         chatLines.editChatLine(component, predicate, reason)
         chatGui.refreshChat()
         //#endif
@@ -324,7 +324,7 @@ object ChatUtils {
         amount: Int = 1,
         predicate: (ChatLine) -> Boolean,
     ) {
-        //#if MC < 1.21
+        //#if TODO
         chatLines.deleteChatLine(amount, reason, predicate)
         chatGui.refreshChat()
         //#endif

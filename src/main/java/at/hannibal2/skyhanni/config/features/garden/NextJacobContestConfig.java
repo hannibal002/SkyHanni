@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.garden;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.CropType;
 //#endif
 import com.google.gson.annotations.Expose;
@@ -105,7 +105,7 @@ public class NextJacobContestConfig {
     @ConfigEditorBoolean
     public boolean warnPopup = false;
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(
         name = "Warn For",

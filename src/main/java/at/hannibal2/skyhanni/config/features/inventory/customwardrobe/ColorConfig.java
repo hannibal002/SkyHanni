@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe;
 
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeReset;
 //#endif
 import com.google.gson.annotations.Expose;
@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 // todo 1.21 impl needed
 public class ColorConfig {
 
-    //#if MC < 1.21
+    //#if TODO
     @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe color settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable resetColor = CustomWardrobeReset::resetColor;

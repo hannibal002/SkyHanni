@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.HighlightRabbitTypes
 //#endif
 import com.google.gson.annotations.Expose
@@ -10,7 +10,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 // todo 1.21 impl needed
 class HoppityCollectionStatsConfig {
@@ -30,7 +29,7 @@ class HoppityCollectionStatsConfig {
     @FeatureToggle
     var highlightFoundRabbits: Boolean = false
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Highlight Rabbits", desc = "Highlight specific rabbit types in Hoppity's Collection.")
     @ConfigEditorDraggableList

@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.config.ConfigManager
 //#endif
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.data.repo.RepoManager
 //#endif
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -84,7 +84,7 @@ object RepoPatternManager {
             }
         }
 
-    //#if MC < 1.21
+    //#if TODO
     private val localLoading: Boolean
         get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.usingBackupRepo
     //#else
@@ -267,7 +267,7 @@ object RepoPatternManager {
      * Dump all regexes labeled with the label into the file.
      */
     fun dump(sourceLabel: String, file: File) {
-        //#if MC < 1.21
+        //#if TODO
         val data =
             ConfigManager.gson.toJson(
                 RepoPatternDump(

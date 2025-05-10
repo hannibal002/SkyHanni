@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -68,7 +68,7 @@ enum class IslandType(private val nameFallback: String) {
 
     val displayName: String get() = islandData?.name ?: nameFallback
 
-    //#if MC < 1.21
+    //#if TODO
     fun isInBounds(vec: LorenzVec): Boolean = islandData?.boundingBox?.isInside(vec) ?: true
     //#endif
 
@@ -118,7 +118,7 @@ enum class IslandType(private val nameFallback: String) {
         }
     }
 
-    //#if MC < 1.21
+    //#if TODO
     // TODO rename to isInIsland once the funciton in lorenz utils is gone
     fun isCurrent() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
     //#endif

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.combat.ghostcounter
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker.GhostTrackerLines
 //#endif
 import com.google.gson.annotations.Expose
@@ -11,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 // todo 1.21 impl needed
 class GhostProfitTrackerConfig {
@@ -21,7 +20,7 @@ class GhostProfitTrackerConfig {
     @FeatureToggle
     var enabled: Boolean = true
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Display Text", desc = "Drag text to change the appearance of the overlay.")
     @ConfigEditorDraggableList
