@@ -27,9 +27,10 @@ object CurrentPowderOnHotmPerk {
         val powderType = determinePowderType(perk) ?: return
         val index = event.toolTip.indexOfFirst { it.contains("Cost") }
 
-        event.toolTip.add(index + 2, "You have")
-        event.toolTip.add(index + 3, "${powderType.color}${powderType.current.addSeparators()} ${powderType.displayName} Powder")
-     }
+        event.toolTip.add(index + 2, " ")
+        event.toolTip.add(index + 3, "You have")
+        event.toolTip.add(index + 4, "${powderType.color}${powderType.current.addSeparators()} ${powderType.displayName} Powder")
+    }
 
     private val MITHRIL_PERKS = setOf(
         "MINING_SPEED", "MINING_SPEED_BOOST", "PRECISION_MINING", "MINING_FORTUNE",
