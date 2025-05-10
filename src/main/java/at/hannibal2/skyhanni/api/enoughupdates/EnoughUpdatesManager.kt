@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -47,6 +49,7 @@ import net.minecraft.nbt.NBTTagString
 import net.minecraft.nbt.NBTException
 //#endif
 
+// todo 1.21 impl needed
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
@@ -397,6 +400,7 @@ object EnoughUpdatesManager {
         neuPetNums = event.readConstant<JsonObject>("petnums")
     }
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         if (!PlatformUtils.isNeuLoaded()) {
@@ -432,4 +436,5 @@ object EnoughUpdatesManager {
             }
         }
     }
+    //#endif
 }
