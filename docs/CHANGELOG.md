@@ -13,6 +13,8 @@
 #### Garden
 
 + Added proper blocking of visitor chat messages even if the visitor isn’t in the Tab Widget yet. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3892)
++ Added option to set minimum item organic matter in Organic Matter Overlay. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3938)
++ Updated Composter Overlay to show information on hover. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3943)
 
 #### Commands
 
@@ -21,6 +23,15 @@
 #### GUIs
 
 + Added option to remove the main background in Compact Tab. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3870)
+
+#### Inventory
+
++ Added option to receive stash item reminders on world change. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3836)
+    + Only applicable if stash compact is on and duplicate counts are hidden.
+
+#### Mining
+
++ Improved Crystal Hollows Names in Nucleus Core to show the other three area names sooner. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3923)
 
 #### Misc
 
@@ -33,12 +44,17 @@
 + Fixed burrows being removed incorrectly when more than 16 blocks away. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3898)
 + Fixed error message when warping to a burrow with no unlocked hub warp point. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3901)
 + Fixed Multi Guess not saving guess locations sometimes. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3898)
++ Fixed burrows outside island boundaries. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3913)
++ Fixed error when removing burrow. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3913)
 
 #### Garden
 
 + Fixed Sensitivity Reducer not disabling correctly sometimes. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3879)
 + Fixed farming weight leaderboard upcoming players repeating. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
     + When elitebot.dev doesn't update your data the same upcoming players would be repeated, this fixes that.
++ Fixed missing items in Organic Matter Overlay. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3938)
++ Fixed Pest Particle Waypoints. - Empa (https://github.com/hannibal002/SkyHanni/pull/3924)
+    + This replaces the Pest Particle Line feature, which was supposed to be a temporary fix when Pest Particle Waypoints was broken.
 
 #### Chat
 
@@ -54,6 +70,14 @@
 + Fixed Reforge Helper locking when nothing is selected. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3907)
 + Fixed display of Craftable Item List and Graph Node Editor. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3914)
 
+#### Mining
+
++ Fixed Block Strength Guide blocking inventories in Rift, Kuudra, and Dungeons. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3934)
+
+#### Fishing
+
++ Fixed other particles interfering with hotspot guesses. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3913)
+
 #### Misc
 
 + Fixed Hide Autopet Messages incorrectly hiding manual pet summon/despawn messages. - Luna (https://github.com/hannibal002/SkyHanni/pull/3895)
@@ -61,6 +85,8 @@
 + Fixed internal area detection when "Island Navigation" is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3922)
     + Broke multiple features, notably Slayer and Mining.
 + Fixed Item Profit Trackers not using NPC price for some items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3917)
++ Fixed Trevor Mob detection for non-English languages. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3555)
++ Fixed Trevor Trapper triggering on invisible mobs or while blinded. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3555)
 
 ### Technical Details
 
@@ -73,6 +99,19 @@
     + Renderable.string` → `StringRenderable`, `Renderable.horizontalContainer` → `HorizontalContainerRenderable`.
     + Deprecations for replaced methods, now pointing at the class.
 + Added ignore option for particle types in `/shtrackparticles`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3900)
++ Added auto-join Hypixel with quick play args in dev env for modern. - nopo (https://github.com/hannibal002/SkyHanni/pull/3839)
++ Added more methods in `GuiRenderUtils`. - CalMWolfs & nopo (https://github.com/hannibal002/SkyHanni/pull/3687)
++ Added value compat method for click and hover events. - nopo (https://github.com/hannibal002/SkyHanni/pull/3839)
++ Continued porting `garden` configs to Kotlin. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3790)
++ Converted update checker option to support 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3933)
++ Fixed graph node editor not being searchable. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3916)
++ Fixed MouseCompat on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3945)
++ Made `Renderables` use `DrawContext`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3687)
++ Make RenderSystem (GlStateManager) do nothing on modern versions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3932)
++ Moved/renamed both `graph area` and `scoreboard area` getters to/in `LorenzUtils`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3934)
++ Removed unnecessary float decimals. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3929)
++ Renamed a lot of `pos` to `position` in configs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3790)
++ Used `DrawContext` for rendering strings and renderables. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3687)
 
 ## Version 3.0.0
 

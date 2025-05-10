@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -19,7 +20,16 @@ object RenderableCollectionUtils {
         horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
         verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
     ) {
-        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
+        add(RenderableString(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
+    }
+
+    fun MutableList<Renderable>.addString(
+        text: String,
+        tips: List<String>,
+        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+    ) {
+        add(Renderable.hoverTips(RenderableString(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign), tips = tips))
     }
 
     fun MutableList<Searchable>.addSearchString(

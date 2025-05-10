@@ -47,7 +47,11 @@ object IslandAreas {
     private var paths = mapOf<GraphNode, Graph>()
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
-    var currentAreaName = ""
+
+    @Deprecated("moved", ReplaceWith("LorenzUtils.graphArea"))
+    val currentAreaName get() = currentArea
+
+    var currentArea = ""
     private val textInput = SearchTextInput()
 
     @HandleEvent
@@ -160,7 +164,7 @@ object IslandAreas {
                 passedAreas.remove(name)
                 passedAreas.remove(null)
                 passedAreas.remove("null")
-                passedAreas.remove(currentAreaName)
+                passedAreas.remove(currentArea)
                 // so show areas needed to pass thorough
                 // TODO show this pass through in the /shnavigate command
                 if (passedAreas.isNotEmpty()) {
@@ -236,9 +240,9 @@ object IslandAreas {
     }
 
     private fun updateArea(name: String, onlyInternal: Boolean) {
-        if (name != currentAreaName) {
-            val oldArea = currentAreaName
-            currentAreaName = name
+        if (name != currentArea) {
+            val oldArea = currentArea
+            currentArea = name
             GraphAreaChangeEvent(name, oldArea, onlyInternal).post()
         }
     }
@@ -260,7 +264,7 @@ object IslandAreas {
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
             val name = node.name ?: continue
-            if (name == currentAreaName) continue
+            if (name == currentArea) continue
             if (name == "no_area") continue
             val position = node.position
             val areaTag = node.getAreaTag(useConfig = true) ?: continue
