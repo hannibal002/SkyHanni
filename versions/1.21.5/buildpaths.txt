@@ -633,7 +633,8 @@ at.hannibal2.skyhanni.data.ActionBarData.kt
 at/hannibal2/skyhanni/mixins/hooks/MessageHandlerHook.kt
 at.hannibal2.skyhanni.mixins.transformers.MixinMessageHandler.java
 at.hannibal2.skyhanni.events.ActionBarUpdateEvent.kt
-
-
+at/hannibal2/skyhanni/data/ActionBarStatsData.kt
+at.hannibal2.skyhanni.features.chat.SkyblockXPInChat.kt
+at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent.kt
 
 # \.(?!kt|java|\()
