@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -20,6 +22,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object ErrorManager {
 
@@ -81,6 +84,7 @@ object ErrorManager {
 //         ),
 //     )
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shtestreseterrorcache") {
@@ -92,20 +96,18 @@ object ErrorManager {
             }
         }
     }
+    //#endif
+
 
     // Extra data from last thrown error
     private var cachedExtraData: String? = null
 
     // throw an error, best to not use it if not absolutely necessary
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
-        val exception = IllegalStateException(message.removeColor())
-        println("silent SkyHanni error:")
-        println("message: '$message'")
         buildExtraDataString(extraData)?.let {
-            println("extraData: \n$it")
             cachedExtraData = it
         }
-        throw exception
+        throw IllegalStateException(message.removeColor())
     }
 
     private fun copyError(errorId: String) {
