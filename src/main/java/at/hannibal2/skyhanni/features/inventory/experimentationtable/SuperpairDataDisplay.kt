@@ -69,8 +69,8 @@ object SuperpairDataDisplay {
 
     /**
      * REGEX-TEST: 123k Enchanting Exp
-     * REGEX-TEST: Titanic Experience Bottle
      * REGEX-TEST: [Lvl 1] Guardian
+     * REGEX-TEST: Enchanted Book
      */
     @Suppress("MaxLineLength")
     private val rewardPattern by ExperimentationTableApi.patternGroup.pattern(
