@@ -627,36 +627,12 @@ at.hannibal2.skyhanni.utils.LorenzVec.kt
 at.hannibal2.skyhanni.utils.LocationUtils.kt
 at.hannibal2.skyhanni.data.repo.RepoManager.kt
 at.hannibal2.skyhanni.data.repo.RepoUtils.kt
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+at.hannibal2.skyhanni.data.ChatManager.kt
+at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent.kt
+at.hannibal2.skyhanni.data.ActionBarData.kt
+at/hannibal2/skyhanni/mixins/hooks/MessageHandlerHook.kt
+at.hannibal2.skyhanni.mixins.transformers.MixinMessageHandler.java
+at.hannibal2.skyhanni.events.ActionBarUpdateEvent.kt
 
 
 
