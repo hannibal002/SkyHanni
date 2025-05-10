@@ -1,14 +1,16 @@
 package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper.SimpleBoostType
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
+// todo 1.21 impl needed
 class EnchantedClockConfig {
     @Expose
     @ConfigOption(
@@ -19,6 +21,7 @@ class EnchantedClockConfig {
     @FeatureToggle
     var reminder: Boolean = true
 
+    //#if TODO
     @Expose
     @ConfigOption(name = "Reminder Boosts", desc = "List of boost types to remind about.")
     @ConfigEditorDraggableList
@@ -30,6 +33,7 @@ class EnchantedClockConfig {
         SimpleBoostType.AGING_ITEMS,
         SimpleBoostType.FORGE
     )
+    //#endif
 
     @Expose
     @ConfigOption(
