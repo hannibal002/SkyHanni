@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListC
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
 //#if TODO
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
-//#endif
 import at.hannibal2.skyhanni.data.TitleManager
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -173,6 +173,8 @@ class GuiConfig {
     @Expose
     var titlePosition: Position = Position(0, 160)
 
+    //#if TODO
     @Expose
     var titleIntentionPositions: MutableMap<TitleManager.TitleLocation, MutableMap<String, Position>> = mutableMapOf()
+    //#endif
 }
