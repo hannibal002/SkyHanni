@@ -117,7 +117,9 @@ enum class HoppityEggType(
                 profileStorage?.mealNextSpawn?.set(key, newMark)
             },
         )
-        val resettingEntries = entries.filter { it.resetsAt != -1 }.sortedBy { it.resetsAt }
+        val resettingEntries = entries
+            .filter { it.resetsAt != -1 }
+            .sortedWith(compareBy<HoppityEggType> { it.altDay }.thenBy { it.resetsAt })
 
         fun markAllFound() = resettingEntries.forEach { it.markClaimed() }
         fun anyEggsUnclaimed(): Boolean = resettingEntries.any { !it.claimed }
