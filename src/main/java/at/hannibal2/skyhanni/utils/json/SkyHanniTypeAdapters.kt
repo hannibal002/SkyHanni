@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
 //#if MC < 1.21
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 //#endif
@@ -43,12 +44,16 @@ object SkyHanniTypeAdapters {
         { java.util.UUID.fromString(this) },
     )
 
+    val NBT_BOOLEAN: TypeAdapter<NbtBoolean> = SimpleStringTypeAdapter(
+        { this.asString() },
+        { NbtBoolean.fromString(this) },
+    )
+
     //#if MC < 1.21
     val INTERNAL_NAME: TypeAdapter<NeuInternalName> = SimpleStringTypeAdapter(
         { this.asString() },
         { this.toInternalName() },
     )
-
 
     val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(
         LorenzVec::asStoredString,

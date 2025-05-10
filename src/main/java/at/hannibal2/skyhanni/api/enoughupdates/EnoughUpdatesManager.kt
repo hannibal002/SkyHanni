@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -176,6 +177,25 @@ object EnoughUpdatesManager {
         return json
     }
 
+    private val nbtListRegex = Regex("([\\[,])\\d+:")
+
+    private fun convertNbtToJson(nbtString: String): NeuNbtInfoJson? {
+        var string = nbtString
+        string = string.replace(nbtListRegex, "$1")
+        try {
+            val json = ConfigManager.gson.fromJson(string, JsonObject::class.java)
+            val fromJson = ConfigManager.gson.fromJson(json, NeuNbtInfoJson::class.java)
+            return fromJson
+        } catch (e: Exception) {
+            println("Error converting nbt to json: $e")
+            println("malformed nbt: $string")
+            println("original nbt: $nbtString")
+            e.printStackTrace()
+        }
+
+        return null
+    }
+
     fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {
         //#if MC < 1.21
         json ?: return ItemStack(Items.painting)
@@ -198,6 +218,7 @@ object EnoughUpdatesManager {
             try {
                 val tag = JsonToNBT.getTagFromJson(nbt)
                 stack.tagCompound = tag
+                convertNbtToJson(nbt)
             } catch (_: NBTException) {
             }
         }
@@ -221,7 +242,6 @@ object EnoughUpdatesManager {
             tag.setTag("display", displayTag)
             stack.tagCompound = tag
         }
-
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
