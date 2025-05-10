@@ -50,3 +50,24 @@ jobs:
                     echo skyhanni.multi-version=compile > .gradle/private.properties
             -   name: Build with Gradle
                 run: ./gradlew build --stacktrace -PskipDetekt=true
+
+            -   name: Add label if build fails
+                if: ${{ failure() && github.event_name == 'pull_request' && github.event.pull_request.state == 'open' }}
+                uses: actions-ecosystem/action-add-labels@v1
+                with:
+                    github_token: ${{ secrets.GITHUB_TOKEN }}
+                    labels: 'Fails Multi-Version'
+
+            -   name: Remove label if build passes
+                if: ${{ success() && github.event_name == 'pull_request' && github.event.pull_request.state == 'open' }}
+                uses: actions-ecosystem/action-remove-labels@v1
+                with:
+                    github_token: ${{ secrets.GITHUB_TOKEN }}
+                    labels: 'Fails Multi-Version'
+
+            -   name: Upload multi-version build
+                uses: actions/upload-artifact@v4
+                if: ${{ !cancelled() }}
+                with:
+                    name: "Multi-version Development Build"
+                    path: build/libs/*.jar
