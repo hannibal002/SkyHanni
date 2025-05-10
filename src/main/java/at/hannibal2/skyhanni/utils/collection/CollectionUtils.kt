@@ -261,9 +261,13 @@ object CollectionUtils {
 
     fun <E : Enum<E>> enumSetOf(element: E): EnumSet<E> = EnumSet.of(element)
 
-    fun <E : Enum<E>> enumSetOf(vararg elements: E): EnumSet<E> = elements.toList().toEnumSet()
+    inline fun <reified E : Enum<E>> enumSetOf(vararg elements: E): EnumSet<E> {
+        return if (elements.isEmpty()) enumSetOf() else EnumSet.copyOf(elements.toList())
+    }
 
-    fun <E : Enum<E>> Collection<E>.toEnumSet(): EnumSet<E> = EnumSet.copyOf(this)
+    inline fun <reified E : Enum<E>> Collection<E>.toEnumSet(): EnumSet<E> {
+        return if (isEmpty()) enumSetOf() else EnumSet.copyOf(this)
+    }
 
     /** Splits the input into equal sized lists. If the list can't get divided clean by [subs] then the last entry gets reduced. e.g. 13/4 = [4,4,4,1]*/
     fun <T> Collection<T>.split(subs: Int = 2): List<List<T>> {
