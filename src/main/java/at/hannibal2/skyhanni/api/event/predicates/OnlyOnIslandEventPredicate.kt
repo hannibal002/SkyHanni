@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.api.event.predicates
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.SkyBlockUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toEnumSet
 
 object OnlyOnIslandEventPredicate : EventPredicateProvider() {
@@ -12,7 +11,7 @@ object OnlyOnIslandEventPredicate : EventPredicateProvider() {
         when {
             data.options.onlyOnIsland != IslandType.ANY -> {
                 val island = data.options.onlyOnIsland
-                return { _, _ -> island.isInIsland() }
+                return { _, _ -> island.isCurrent() }
             }
 
             data.options.onlyOnIslands.isNotEmpty() -> {

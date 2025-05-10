@@ -18,13 +18,15 @@ abstract class EventPredicateProvider {
     abstract fun getPredicate(data: EventData): EventPredicate?
 
     companion object {
-        private val providers = listOf(
-            CancellableEventPredicate,
-            GenericEventPredicate,
-            OnlyOnIslandEventPredicate,
-            OnlyOnSkyblockEventPredicate,
-            OnlyWidgetEventPredicateProvider,
-        )
+        private val providers: List<EventPredicateProvider> = buildList {
+            add(CancellableEventPredicate)
+            add(GenericEventPredicate)
+            //#if TODO
+            add(OnlyOnIslandEventPredicate)
+            add(OnlyOnSkyblockEventPredicate)
+            add(OnlyWidgetEventPredicateProvider)
+            //#endif
+        }
 
         /**
          * Returns a list of pairs of [EventPredicate] and [Boolean], where

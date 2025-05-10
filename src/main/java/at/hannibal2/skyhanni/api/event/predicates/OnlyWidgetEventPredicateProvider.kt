@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getAnnotation
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toEnumSet
 
+// TODO: create detekt rule and live-plugin for only using this annotation on widget update event
 /**
  * [WidgetUpdateEvent]s annotated with this will only receive updates of the specified widgets.
  */
