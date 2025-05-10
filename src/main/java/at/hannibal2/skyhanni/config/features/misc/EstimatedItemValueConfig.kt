@@ -4,7 +4,12 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.*
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
 
@@ -85,8 +90,9 @@ class EstimatedItemValueConfig {
 
     @Expose
     @ConfigOption(
-        name = "Use Attribute Price", desc = "Show composite price for attributes instead of lowest bin. " +
-                "This will drastically decrease the estimated value but might be correct when buying multiple low tier items and combining them."
+        name = "Use Attribute Price",
+        desc = "Show composite price for attributes instead of lowest bin. This will drastically decrease the " +
+            "estimated value but might be correct when buying multiple low tier items and combining them."
     )
     @ConfigEditorBoolean
     var useAttributeComposite: Property<Boolean> = Property.of(false)
@@ -100,6 +106,6 @@ class EstimatedItemValueConfig {
     var ignoreAttributes: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigLink(owner = EstimatedItemValueConfig::class, field = "enabled") // TODO rename "position"
-    var itemPriceDataPos: Position = Position(140, 90)
+    @ConfigLink(owner = EstimatedItemValueConfig::class, field = "enabled")
+    var itemPriceDataPos: Position = Position(140, 90) // TODO rename "position"
 }

@@ -187,7 +187,7 @@ object EstimatedItemValueCalculator {
 
         if (comboPrice != null) {
             val ignore = shouldIgnorePrice || isUselessAttribute(combo)
-            list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(ignore)}")
+            list.add("§7Attribute Combo: ${comboPrice.formatCoin(ignore)}")
             if (!ignore) {
                 subTotal += comboPrice
             }
@@ -203,10 +203,10 @@ object EstimatedItemValueCalculator {
             val price = listOfNotNull(itemBasedPrice, shardBasedPrice).minOrNull()
 
             var gray = true
-            val ignore = shouldIgnorePrice || isUselessAttribute(itemWithAttributeName)
+            val ignore = isUselessAttribute(itemWithAttributeName)
             val nameColor = if (!ignore) "§9" else "§7"
             price?.let {
-                if (it > 0 && !ignore) {
+                if (it > 0 && !ignore && !shouldIgnorePrice) {
                     subTotal += addAttributePrice(it, basePrice)
                     gray = false
                 }
@@ -215,7 +215,7 @@ object EstimatedItemValueCalculator {
             list.add(
                 "  $nameColor${
                     displayName.allLettersFirstUppercase()
-                } ${attr.second}§7: ${price?.formatCoin(gray) ?: "Unknown"}",
+                } ${attr.second} ${price?.formatCoinWithBrackets(gray) ?: "Unknown"}",
             )
         }
         // Adding 0.1 so that we always show the estimated item value overlay
