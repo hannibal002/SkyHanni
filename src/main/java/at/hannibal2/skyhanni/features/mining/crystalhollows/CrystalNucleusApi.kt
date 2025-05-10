@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.fromItemNameOrNull
@@ -139,9 +138,9 @@ object CrystalNucleusApi {
     fun usesApparatus() =
         config.professorUsage.get() == CrystalNucleusTrackerConfig.ProfessorUsageType.PRECURSOR_APPARATUS
 
-    fun getPrecursorRunPrice() =
-        if (usesApparatus()) PRECURSOR_APPARATUS_ITEM.getPrice()
-        else ROBOT_PARTS_ITEMS.sumOf {
-            it.getPrice()
-        }
+    fun getPrecursorRunPrice(priceSource: (NeuInternalName) -> Double) = if (usesApparatus()) {
+        priceSource(PRECURSOR_APPARATUS_ITEM)
+    } else {
+        ROBOT_PARTS_ITEMS.sumOf { priceSource(it) }
+    }
 }

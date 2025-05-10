@@ -90,10 +90,6 @@ object TrevorFeatures {
         "mob.died",
         "§aReturn to the Trapper soon to get a new animal to hunt!",
     )
-    private val startDialoguePattern by patternGroup.pattern(
-        "start.dialogue",
-        "\\[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task\\.",
-    )
     private val outOfTimePattern by patternGroup.pattern(
         "outoftime",
         "You ran out of time and the animal disappeared!",
@@ -116,7 +112,6 @@ object TrevorFeatures {
     private var timeLastWarped = SimpleTimeMark.farPast()
     private var lastChatPrompt = ""
     private var lastChatPromptTime = SimpleTimeMark.farPast()
-    private var teleportBlock = SimpleTimeMark.farPast()
 
     var questActive = false
     var inBetweenQuests = false
@@ -124,8 +119,8 @@ object TrevorFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!onFarmingIsland()) return
         updateTrapper()
         TrevorTracker.update()
@@ -181,9 +176,6 @@ object TrevorFeatures {
             TrevorSolver.averageHeight = LocationUtils.playerLocation().y
         }
 
-        startDialoguePattern.matchMatcher(formattedMessage) {
-            teleportBlock = SimpleTimeMark.now()
-        }
         outOfTimePattern.matchMatcher(formattedMessage) {
             resetTrapper()
         }
@@ -200,8 +192,8 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST)
+    fun onRenderOverlay() {
         if (!config.trapperCooldownGui) return
         if (!onFarmingIsland()) return
 
@@ -224,8 +216,10 @@ object TrevorFeatures {
 
         if (timeUntilNextReady <= 0 && trapperReady) {
             if (timeUntilNextReady == 0) {
-                TitleManager.sendTitle("§2Trapper Ready")
-                SoundUtils.playBeepSound()
+                if (config.readyTitle) {
+                    TitleManager.sendTitle("§2Trapper Ready")
+                    SoundUtils.playBeepSound()
+                }
             }
             currentStatus = TrapperStatus.READY
             currentLabel = "§2Ready"
@@ -294,10 +288,10 @@ object TrevorFeatures {
             if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
                 val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
                 location = TrevorSolver.mobCoordinates
-                event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), true, true)
+                event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.up(), displayName, 1.5)
             } else {
-                event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), true, true)
+                event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), seeThroughBlocks = true, beacon = true)
                 event.drawDynamicText(location.up(), TrevorSolver.mobLocation.location, 1.5)
             }
         }
@@ -322,7 +316,7 @@ object TrevorFeatures {
             }
         }
 
-        if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds && teleportBlock.passedSince() > 5.seconds) {
+        if (config.warpToTrapper && timeLastWarped.passedSince() > 3.seconds) {
             HypixelCommands.warp("trapper")
             timeLastWarped = SimpleTimeMark.now()
         }
@@ -353,7 +347,7 @@ object TrevorFeatures {
 
     @HandleEvent
     fun onTick() {
-        inTrapperDen = areaTrappersDenPattern.matches(IslandAreas.currentAreaName)
+        inTrapperDen = areaTrappersDenPattern.matches(IslandAreas.currentArea)
     }
 
     enum class TrapperStatus(baseColor: LorenzColor) {
