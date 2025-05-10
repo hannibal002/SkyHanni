@@ -531,11 +531,11 @@ object ComposterOverlay {
                     onClick(internalName)
                     if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
                         lastAttemptTime = SimpleTimeMark.now()
-                        retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+                        retrieveMaterials(internalName, itemName, itemsNeeded)
                     }
                 },
                 RIGHT_MOUSE to {
-                    HypixelCommands.getFromSacks(itemName, itemsNeeded)
+                    HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded)
                 }
             ),
             tips = tips,
