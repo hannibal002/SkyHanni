@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
 import net.minecraft.init.Items
@@ -81,6 +83,12 @@ class NeuInternalName private constructor(private val internalName: String) {
         internalName.replace(oldValue, newValue, ignoreCase = true).toInternalName()
 
     fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
+
+    fun createGfsLine(additionalAction: String = "", itemsNeeded: Int): String? = when {
+        this.asString() in SackApi.sackListInternalNames ->
+            "§e${additionalAction}Click to get $repoItemName §8x$itemsNeeded §efrom sacks"
+        else -> null
+    }
 
     /**
      * This is because skyblock has special ids in commands such as /viewrecipe for items like enchanted books and pets

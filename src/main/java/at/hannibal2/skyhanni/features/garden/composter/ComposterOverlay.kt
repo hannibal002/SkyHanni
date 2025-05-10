@@ -34,6 +34,8 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
@@ -510,6 +512,9 @@ object ComposterOverlay {
             add("")
             if (selected) {
                 add(internalName.createBuyTipLine("Control + "))
+                internalName.createGfsLine("Right ", itemsNeeded)?.let {
+                    add(it)
+                }
             } else {
                 add("§eClick to select for profit calculations!")
             }
@@ -521,13 +526,18 @@ object ComposterOverlay {
 
         return Renderable.clickable(
             text = "$displayName §8x${itemsNeeded.addSeparators()} ${totalPrice.formatCoinWithBrackets()}",
-            onLeftClick = {
-                onClick(internalName)
-                if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
-                    lastAttemptTime = SimpleTimeMark.now()
-                    retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+            onAnyClick = mapOf(
+                LEFT_MOUSE to {
+                    onClick(internalName)
+                    if (KeyboardManager.isModifierKeyDown() && lastAttemptTime.passedSince() > 500.milliseconds) {
+                        lastAttemptTime = SimpleTimeMark.now()
+                        retrieveMaterials(internalName, itemName, itemsNeeded.toInt())
+                    }
+                },
+                RIGHT_MOUSE to {
+                    HypixelCommands.getFromSacks(itemName, itemsNeeded)
                 }
-            },
+            ),
             tips = tips,
         )
     }
