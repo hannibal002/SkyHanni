@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.composter
 
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -535,7 +536,7 @@ object ComposterOverlay {
                     }
                 },
                 RIGHT_MOUSE to {
-                    HypixelCommands.getFromSacks(internalName.asString(), itemsNeeded)
+                    GetFromSackApi.getFromSack(internalName, itemsNeeded)
                 }
             ),
             tips = tips,
