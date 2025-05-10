@@ -21,7 +21,6 @@ object SkyBlockUtils {
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
-
     //#if TODO
     /**
      * Consider using [IslandType.isInIsland] instead
@@ -50,7 +49,6 @@ object SkyBlockUtils {
     val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && currentIsland in islandTypes
-
 
     fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && currentIsland in islandTypes
 }
