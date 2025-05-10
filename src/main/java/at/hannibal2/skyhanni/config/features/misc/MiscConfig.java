@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSBFeature;
 import at.hannibal2.skyhanni.config.features.commands.CommandsConfig;
 import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig;
 import at.hannibal2.skyhanni.config.features.minion.MinionsConfig;
+import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig;
 import at.hannibal2.skyhanni.config.features.misc.pets.PetConfig;
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig;
 import com.google.gson.annotations.Expose;
@@ -145,6 +146,11 @@ public class MiscConfig {
     @ConfigOption(name = "Cake Counter Features", desc = "")
     @Accordion
     public CakeCounterConfig cakeCounter = new CakeCounterConfig();
+  
+    @Expose
+    @ConfigOption(name = "Frog Mask Features", desc = "")
+    @Accordion
+    public FrogMaskFeaturesConfig frogMaskFeatures = new FrogMaskFeaturesConfig();
 
     @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
@@ -176,10 +182,10 @@ public class MiscConfig {
     public boolean hideTemporaryArmorstands = true;
 
     @Expose
-    public Position collectionCounterPos = new Position(10, 10, false, true);
+    public Position collectionCounterPos = new Position(10, 10);
 
     @Expose
-    public Position carryPosition = new Position(10, 10, false, true);
+    public Position carryPosition = new Position(10, 10);
 
     @Expose
     @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
@@ -259,17 +265,7 @@ public class MiscConfig {
 
     @Expose
     @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
-    public Position playerMovementSpeedPos = new Position(394, 124, false, true);
-
-    @Expose
-    @ConfigOption(name = "Frog Mask Display", desc = "Displays information about the §5Frog Mask§7.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean frogMaskDisplay = false;
-
-    @Expose
-    @ConfigLink(owner = MiscConfig.class, field = "frogMaskDisplay")
-    public Position frogMaskDisplayPosition = new Position(25, 25, false, true);
+    public Position playerMovementSpeedPos = new Position(394, 124);
 
     @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
@@ -346,7 +342,7 @@ public class MiscConfig {
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
-    public Position inventoryLoadPos = new Position(394, 124, false, true);
+    public Position inventoryLoadPos = new Position(394, 124);
 
     @Expose
     @ConfigOption(name = "Fix Ghost Entities", desc = "Remove ghost entities caused by a Hypixel bug.\n" +

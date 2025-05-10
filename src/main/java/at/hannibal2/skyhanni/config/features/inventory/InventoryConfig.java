@@ -87,7 +87,7 @@ public class InventoryConfig {
     public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
 
     @Expose
-    @ConfigOption(name = "Focus Mode", desc="")
+    @ConfigOption(name = "Focus Mode", desc = "")
     @Accordion
     public FocusModeConfig focusMode = new FocusModeConfig();
 
@@ -145,7 +145,7 @@ public class InventoryConfig {
     @ConfigOption(name = "New Year Cake Tracker", desc = "")
     @Accordion
     public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
-  
+
     @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
@@ -155,6 +155,12 @@ public class InventoryConfig {
     @ConfigOption(name = "Attribute Overlay", desc = "")
     @Accordion
     public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
+
+    @Expose
+    @ConfigOption(name = "Evolving Items", desc = "")
+    @Accordion
+    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
+    public evolvingItemsConfig evolvingItems = new evolvingItemsConfig();
 
     @Expose
     @ConfigOption(name = "Trade Value", desc = "Creates a trade value overlay")
@@ -187,7 +193,7 @@ public class InventoryConfig {
         LARVA_HOOK("§bLarva Hook", 12),
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
-        TIME_POCKET_ITEMS("§bEvolving Items", 15), // TODO: Rename to EVOLVING_ITEMS
+        EVOLVING_ITEMS("§bEvolving Items (Jyrre, Truffle, etc.)", 15),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
@@ -302,13 +308,6 @@ public class InventoryConfig {
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Time Held for Evolving Items", desc = "Show time held in the lore of Evolving Items.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
-    public boolean timeHeldInLore = false;
-
-    @Expose
     @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -331,7 +330,7 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean essenceShopHelper = true;
-  
+
     @Expose
     @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
     @ConfigEditorBoolean

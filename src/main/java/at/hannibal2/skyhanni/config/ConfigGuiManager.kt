@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+//#if TODO
 import at.hannibal2.skyhanni.data.GuiEditManager
-import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
-//#if MC < 1.21
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 //#endif
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 
+// todo 1.21 impl needed
 object ConfigGuiManager {
 
     var editor: MoulConfigEditor<Features>? = null
@@ -19,15 +20,15 @@ object ConfigGuiManager {
         if (search != null) {
             editor.search(search)
         }
-        //#if MC < 1.21
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
-        //#endif
     }
 
     fun onCommand(args: Array<String>) {
         if (args.isNotEmpty()) {
             if (args[0].lowercase() == "gui") {
+                //#if TODO
                 GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
+                //#endif
             } else {
                 openConfigGui(args.joinToString(" "))
             }

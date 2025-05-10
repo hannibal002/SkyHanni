@@ -81,7 +81,7 @@ object PestSpawnTimer {
             val tablistCooldownEnd = SimpleTimeMark.now() + (minutes?.minutes ?: 0.seconds) + (seconds?.seconds ?: 0.seconds)
 
             if (shouldSetCooldown(tablistCooldownEnd, seconds)) {
-                // hypixel sometimes rounds down times, we'll assume times are rounded down if seconds are null and add a minute
+                // hypixel sometimes rounds time down, we'll assume times are rounded down if seconds are null and add a minute
                 pestCooldownEndTime = if (seconds == null) {
                     tablistCooldownEnd + 1.minutes
                 } else {
