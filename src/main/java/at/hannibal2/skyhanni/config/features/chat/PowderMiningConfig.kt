@@ -68,7 +68,7 @@ class PowderMiningConfig {
     @Expose
     @ConfigOption(name = "Goblin Egg", desc = "Hide Goblin Egg rewards that are below a certain rarity.")
     @ConfigEditorDropdown
-    val goblinEggs: GoblinEggEntry = GoblinEggEntry.YELLOW_UP
+    var goblinEggs: GoblinEggEntry = GoblinEggEntry.YELLOW_UP
 
     enum class GoblinEggEntry(val displayName: String) {
         SHOW_ALL("Show all"),

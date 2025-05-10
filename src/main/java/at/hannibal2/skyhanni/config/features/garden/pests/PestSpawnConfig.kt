@@ -11,7 +11,7 @@ class PestSpawnConfig {
     @Expose
     @ConfigOption(name = "Chat Message Format", desc = "Change how the pest spawn chat message should be formatted.")
     @ConfigEditorDropdown
-    val chatMessageFormat: ChatMessageFormatEntry = ChatMessageFormatEntry.HYPIXEL
+    var chatMessageFormat: ChatMessageFormatEntry = ChatMessageFormatEntry.HYPIXEL
 
     enum class ChatMessageFormatEntry(
         private val displayName: String,

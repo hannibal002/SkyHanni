@@ -29,7 +29,7 @@ class ComposterConfig {
         desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
     )
     @ConfigEditorDropdown
-    val priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY
+    var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY
 
     @Expose
     @ConfigOption(
@@ -37,7 +37,7 @@ class ComposterConfig {
         desc = "Change where to retrieve the materials from in the composter overlay: Bazaar or Sacks."
     )
     @ConfigEditorDropdown
-    val retrieveFrom: RetrieveFromEntry = RetrieveFromEntry.SACKS
+    var retrieveFrom: RetrieveFromEntry = RetrieveFromEntry.SACKS
 
     @Expose
     @ConfigOption(

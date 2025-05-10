@@ -48,7 +48,7 @@ class TotemOfCorruptionConfig {
         desc = "Show the effective area (16 blocks) of the Totem of Corruption."
     )
     @ConfigEditorDropdown
-    val outlineType: OutlineType = OutlineType.FILLED
+    var outlineType: OutlineType = OutlineType.FILLED
 
     enum class OutlineType(private val displayName: String) {
         NONE("No Outline"),

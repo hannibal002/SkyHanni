@@ -20,7 +20,7 @@ class CrystalHighlighterConfig {
     @Expose
     @ConfigOption(name = "Highlight Design", desc = "Change the design of the highlighted boxes.")
     @ConfigEditorDropdown
-    val boxStyle: BoundingBoxType = BoundingBoxType.FILLED
+    var boxStyle: BoundingBoxType = BoundingBoxType.FILLED
 
     enum class BoundingBoxType(private val displayName: String) {
         FILLED("Filled"),

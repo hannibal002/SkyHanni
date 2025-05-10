@@ -45,7 +45,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(name = "Guessing Logic", desc = "Change which guess strategy to use.")
     @ConfigEditorDropdown
-    val guessLogic: GuessLogic = GuessLogic.PRECISE_GUESS
+    var guessLogic: GuessLogic = GuessLogic.PRECISE_GUESS
 
     @Expose
     @ConfigOption(

@@ -26,7 +26,7 @@ class HoppityUnclaimedEggsConfig {
     @Expose
     @ConfigOption(name = "Unclaimed Eggs Order", desc = "Order in which to display unclaimed eggs.")
     @ConfigEditorDropdown
-    val displayOrder: UnclaimedEggsOrder = UnclaimedEggsOrder.SOONEST_FIRST
+    var displayOrder: UnclaimedEggsOrder = UnclaimedEggsOrder.SOONEST_FIRST
 
     enum class UnclaimedEggsOrder(private val displayName: String) {
         SOONEST_FIRST("Soonest First"),

@@ -53,7 +53,7 @@ class DebugMobConfig {
             desc = "Shows the internal mobs that are 'DisplayNPC' as highlight (in red) or the name."
         )
         @ConfigEditorDropdown
-        val displayNPC: HowToShow = HowToShow.OFF
+        var displayNPC: HowToShow = HowToShow.OFF
 
         @Expose
         @ConfigOption(
@@ -61,7 +61,7 @@ class DebugMobConfig {
             desc = "Shows the internal mobs that are 'SkyblockMob' as highlight (in green) or the name."
         )
         @ConfigEditorDropdown
-        val skyblockMob: HowToShow = HowToShow.OFF
+        var skyblockMob: HowToShow = HowToShow.OFF
 
         @Expose
         @ConfigOption(
@@ -69,7 +69,7 @@ class DebugMobConfig {
             desc = "Shows the internal mobs that are 'Summon' as highlight (in yellow) or the name."
         )
         @ConfigEditorDropdown
-        val summon: HowToShow = HowToShow.OFF
+        var summon: HowToShow = HowToShow.OFF
 
         @Expose
         @ConfigOption(
@@ -77,7 +77,7 @@ class DebugMobConfig {
             desc = "Shows the internal mobs that are 'Special' as highlight (in aqua) or the name."
         )
         @ConfigEditorDropdown
-        val special: HowToShow = HowToShow.OFF
+        var special: HowToShow = HowToShow.OFF
 
         @Expose
         @ConfigOption(

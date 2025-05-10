@@ -20,7 +20,7 @@ class FlareConfig {
     @Expose
     @ConfigOption(name = "Alert Type", desc = "What type of alert should be sent when a flare is about to expire.")
     @ConfigEditorDropdown
-    val alertType: AlertType = AlertType.CHAT
+    var alertType: AlertType = AlertType.CHAT
 
     enum class AlertType(private val displayName: String) {
         NONE("No alert"),
@@ -58,7 +58,7 @@ class FlareConfig {
     @Expose
     @ConfigOption(name = "Display Type", desc = "Where to show the timer.")
     @ConfigEditorDropdown
-    val displayType: DisplayType = DisplayType.GUI
+    var displayType: DisplayType = DisplayType.GUI
 
     enum class DisplayType(private val displayName: String) {
         GUI("GUI Element"),
@@ -74,7 +74,7 @@ class FlareConfig {
     @Expose
     @ConfigOption(name = "Show Effective Area", desc = "Show the effective area of the flare.")
     @ConfigEditorDropdown
-    val outlineType: OutlineType = OutlineType.NONE
+    var outlineType: OutlineType = OutlineType.NONE
 
     enum class OutlineType(private val displayName: String) {
         NONE("No Outline"),

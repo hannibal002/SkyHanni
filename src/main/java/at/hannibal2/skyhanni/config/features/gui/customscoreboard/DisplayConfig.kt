@@ -92,7 +92,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(name = "Powder Display", desc = "Select how the powder display should be formatted.")
     @ConfigEditorDropdown
-    val powderDisplay: PowderDisplay = PowderDisplay.AVAILABLE
+    var powderDisplay: PowderDisplay = PowderDisplay.AVAILABLE
 
     enum class PowderDisplay(private val displayName: String) {
         AVAILABLE("Available"),
@@ -106,7 +106,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(name = "Number Format", desc = "Select how numbers should be formatted.")
     @ConfigEditorDropdown
-    val numberFormat: NumberFormat = NumberFormat.LONG
+    var numberFormat: NumberFormat = NumberFormat.LONG
 
     enum class NumberFormat(private val displayName: String) {
         LONG("1,234,567"),
@@ -124,7 +124,7 @@ class DisplayConfig {
         desc = "Select how numbers with their prefix and color should be formatted.",
     )
     @ConfigEditorDropdown
-    val numberDisplayFormat: NumberDisplayFormat = NumberDisplayFormat.TEXT_COLOR_NUMBER
+    var numberDisplayFormat: NumberDisplayFormat = NumberDisplayFormat.TEXT_COLOR_NUMBER
     //#endif
 
     @Expose
@@ -154,7 +154,7 @@ class DisplayConfig {
     @Expose
     @ConfigOption(name = "Lobby Code Date Format", desc = "Select your preferred date format.")
     @ConfigEditorDropdown
-    val dateFormat: DateFormat = DateFormat.US_SLASH_MMDDYYYY
+    var dateFormat: DateFormat = DateFormat.US_SLASH_MMDDYYYY
 
     @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
@@ -168,7 +168,7 @@ class DisplayConfig {
         desc = "Will align the text to the left, center or right, while not overriding certain lines, like title or footer.",
     )
     @ConfigEditorDropdown
-    val textAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
+    var textAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
     //#endif
 
     @Expose

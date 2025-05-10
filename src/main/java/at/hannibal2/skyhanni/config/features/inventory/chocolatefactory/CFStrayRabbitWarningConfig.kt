@@ -15,7 +15,7 @@ class CFStrayRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Warning Level", desc = "Warn when stray rabbits of a certain tier appear.")
     @ConfigEditorDropdown
-    val rabbitWarningLevel: StrayTypeEntry = StrayTypeEntry.ALL
+    var rabbitWarningLevel: StrayTypeEntry = StrayTypeEntry.ALL
 
     @Expose
     @ConfigOption(name = "Highlight Color", desc = "Choose the color that stray rabbits should be highlighted as.")
@@ -41,7 +41,7 @@ class CFStrayRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Flash Screen", desc = "Choose the stray rabbit type to flash the screen for.")
     @ConfigEditorDropdown
-    val flashScreenLevel: StrayTypeEntry = StrayTypeEntry.SPECIAL
+    var flashScreenLevel: StrayTypeEntry = StrayTypeEntry.SPECIAL
 
     enum class StrayTypeEntry(private val displayName: String) {
         SPECIAL("Special Only"),

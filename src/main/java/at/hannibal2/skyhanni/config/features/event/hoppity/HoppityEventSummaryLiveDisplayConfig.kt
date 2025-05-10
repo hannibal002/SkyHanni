@@ -55,7 +55,7 @@ class HoppityEventSummaryLiveDisplayConfig {
     @Expose
     @ConfigOption(name = "Date Time Format", desc = "The format of the date and time.")
     @ConfigEditorDropdown
-    val dateTimeFormat: HoppityDateTimeFormat = HoppityDateTimeFormat.RELATIVE
+    var dateTimeFormat: HoppityDateTimeFormat = HoppityDateTimeFormat.RELATIVE
 
     @Expose
     @ConfigOption(

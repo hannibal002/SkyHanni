@@ -27,7 +27,7 @@ class PestFinderConfig {
     @Expose
     @ConfigOption(name = "Plot Visibility Type", desc = "Choose how to show infested plots in the world.")
     @ConfigEditorDropdown
-    val visibilityType: VisibilityType = VisibilityType.BOTH
+    var visibilityType: VisibilityType = VisibilityType.BOTH
 
     enum class VisibilityType(private val displayName: String) {
         BORDER("Border"),

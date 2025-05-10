@@ -15,7 +15,7 @@ class SensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Mode", desc = "Lower mouse sensitivity while in the garden.")
     @ConfigEditorDropdown
-    val mode: Mode = Mode.OFF
+    var mode: Mode = Mode.OFF
 
     enum class Mode(private val displayName: String) {
         OFF("Disabled"),

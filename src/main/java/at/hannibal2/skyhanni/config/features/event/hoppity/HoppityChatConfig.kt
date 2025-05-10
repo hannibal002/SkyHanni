@@ -17,7 +17,7 @@ class HoppityChatConfig {
     @Expose
     @ConfigOption(name = "Compacted Rarity", desc = "Show rarity of found rabbit in Compacted chat messages.")
     @ConfigEditorDropdown
-    val rarityInCompact: CompactRarityTypes = CompactRarityTypes.NEW
+    var rarityInCompact: CompactRarityTypes = CompactRarityTypes.NEW
 
     enum class CompactRarityTypes(private val displayName: String) {
         NONE("Neither"),

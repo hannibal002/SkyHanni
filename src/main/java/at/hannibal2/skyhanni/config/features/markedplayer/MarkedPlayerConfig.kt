@@ -29,7 +29,7 @@ class MarkedPlayerConfig {
     )
     @Expose
     @ConfigEditorDropdown
-    val chatColor: LorenzColor = LorenzColor.YELLOW
+    var chatColor: LorenzColor = LorenzColor.YELLOW
 
     @ConfigOption(
         name = "Marked Entity Color",

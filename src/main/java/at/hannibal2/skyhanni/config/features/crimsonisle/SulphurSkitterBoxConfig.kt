@@ -17,7 +17,7 @@ class SulphurSkitterBoxConfig {
     @Expose
     @ConfigOption(name = "Box Type", desc = "Choose the look of the box.")
     @ConfigEditorDropdown
-    val boxType: BoxType = BoxType.WIREFRAME
+    var boxType: BoxType = BoxType.WIREFRAME
 
     enum class BoxType(private val displayName: String) {
         FULL("Full"),

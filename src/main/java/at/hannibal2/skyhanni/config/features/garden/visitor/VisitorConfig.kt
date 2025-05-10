@@ -60,7 +60,7 @@ class VisitorConfig {
         desc = "Highlight the status for visitors with a text above or with color."
     )
     @ConfigEditorDropdown
-    val highlightStatus: HighlightMode = HighlightMode.BOTH
+    var highlightStatus: HighlightMode = HighlightMode.BOTH
 
     enum class HighlightMode(
         private val displayName: String,
@@ -116,7 +116,7 @@ class VisitorConfig {
         desc = "Prevent interacting with / unlocking Visitors to allow for Dedication Cycling."
     )
     @ConfigEditorDropdown
-    val blockInteracting: VisitorBlockBehaviour = VisitorBlockBehaviour.DONT
+    var blockInteracting: VisitorBlockBehaviour = VisitorBlockBehaviour.DONT
 
     enum class VisitorBlockBehaviour(val displayName: String) {
         DONT("Don't"),

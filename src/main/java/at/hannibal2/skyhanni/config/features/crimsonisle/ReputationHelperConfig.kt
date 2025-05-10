@@ -42,7 +42,7 @@ class ReputationHelperConfig {
     @Expose
     @ConfigOption(name = "Show Locations", desc = "Crimson Isles waypoints for locations to get reputation.")
     @ConfigEditorDropdown
-    val showLocation: ShowLocationEntry = ShowLocationEntry.ONLY_HOTKEY
+    var showLocation: ShowLocationEntry = ShowLocationEntry.ONLY_HOTKEY
 
     @Expose
     @ConfigOption(name = "Rescue Mission", desc = "")

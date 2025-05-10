@@ -33,5 +33,5 @@ class SkyMartConfig {
         desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC."
     )
     @ConfigEditorDropdown
-    val priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_SELL
+    var priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_SELL
 }

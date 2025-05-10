@@ -34,13 +34,13 @@ class MiningEventConfig {
     @Expose
     @ConfigOption(name = "What to Show", desc = "Choose which island's events are shown in the GUI.")
     @ConfigEditorDropdown
-    val showType: ShowType = ShowType.ALL
+    var showType: ShowType = ShowType.ALL
 
     //#if TODO
     @Expose
     @ConfigOption(name = "Compressed Format", desc = "Compress the event names so that they are shorter.")
     @ConfigEditorDropdown
-    val compressedFormat: CompressFormat = CompressFormat.DEFAULT
+    var compressedFormat: CompressFormat = CompressFormat.DEFAULT
     //#endif
 
     @Expose

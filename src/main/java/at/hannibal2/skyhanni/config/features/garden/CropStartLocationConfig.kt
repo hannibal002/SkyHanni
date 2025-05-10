@@ -19,7 +19,7 @@ class CropStartLocationConfig {
         desc = "Whether to show waypoint at start location (set with §e/shcropstartlocation §7) or last farmed location."
     )
     @ConfigEditorDropdown
-    val mode: CropLocationMode = CropLocationMode.START
+    var mode: CropLocationMode = CropLocationMode.START
 
     enum class CropLocationMode(private val displayName: String) {
         START("Start Only"),

@@ -25,7 +25,7 @@ class NextConfig {
     @Expose
     @ConfigOption(name = "Sort Type", desc = "Sort the crops by either garden or SkyBlock EXP.")
     @ConfigEditorDropdown
-    val bestType: BestTypeEntry = BestTypeEntry.GARDEN_EXP
+    var bestType: BestTypeEntry = BestTypeEntry.GARDEN_EXP
 
     enum class BestTypeEntry(
         private val displayName: String,

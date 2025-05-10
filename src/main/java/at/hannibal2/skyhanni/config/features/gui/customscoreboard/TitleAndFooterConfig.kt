@@ -15,7 +15,7 @@ class TitleAndFooterConfig {
     @Expose
     @ConfigOption(name = "Title Alignment", desc = "Align the title in the scoreboard.")
     @ConfigEditorDropdown
-    val alignTitle: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER
+    var alignTitle: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.CENTER
     //#endif
 
     @Expose
@@ -42,7 +42,7 @@ class TitleAndFooterConfig {
     @Expose
     @ConfigOption(name = "Footer Alignment", desc = "Align the footer in the scoreboard.")
     @ConfigEditorDropdown
-    val alignFooter: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
+    var alignFooter: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
     //#endif
 
     @Expose

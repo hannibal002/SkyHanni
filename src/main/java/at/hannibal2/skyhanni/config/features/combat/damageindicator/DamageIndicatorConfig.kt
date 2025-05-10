@@ -24,7 +24,7 @@ class DamageIndicatorConfig {
     @Expose
     @ConfigOption(name = "Boss Name", desc = "Change how boss names are displayed.")
     @ConfigEditorDropdown
-    val bossName: NameVisibility = NameVisibility.FULL_NAME
+    var bossName: NameVisibility = NameVisibility.FULL_NAME
 
     enum class NameVisibility(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         HIDDEN("Hidden", 0),
