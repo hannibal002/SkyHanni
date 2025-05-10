@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden.laneswitch
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.CropType
 //#endif
 import com.google.gson.annotations.Expose
@@ -46,7 +46,7 @@ class FarmingLaneConfig {
     @FeatureToggle
     var cornerWaypoints: Boolean = false
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Ignored Crops", desc = "Add the crops you wish to not setup a lane for.")
     @ConfigEditorDraggableList

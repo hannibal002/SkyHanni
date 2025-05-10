@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.config.features.misc.MiscConfig
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.config.features.slayer.SlayerConfig
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.config.storage.Storage
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAprilFoolsDay
 //#endif
@@ -41,7 +41,7 @@ class Features : Config() {
     }
 
     override fun alignCategory(category: ProcessedCategory, isSelected: Boolean): HorizontalAlign {
-        //#if MC < 1.21
+        //#if TODO
         if (isAprilFoolsDay) return HorizontalAlign.RIGHT
         //#endif
         return super.alignCategory(category, isSelected)
@@ -60,7 +60,7 @@ class Features : Config() {
     }
 
     override fun getTitle(): String {
-        //#if MC < 1.21
+        //#if TODO
         val modName = if (isAprilFoolsDay) "SkyHanni".reversed() else "SkyHanni"
         //#else
         //$$ val modName = "SkyHanni"
@@ -145,7 +145,7 @@ class Features : Config() {
     @Category(name = "Dev", desc = "Debug and test stuff. Developers are cool.")
     var dev: DevConfig = DevConfig()
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     var storage: Storage = Storage()
 

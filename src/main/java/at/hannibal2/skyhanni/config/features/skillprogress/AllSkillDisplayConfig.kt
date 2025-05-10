@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.skillprogress
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 //#endif
 import com.google.gson.annotations.Expose
@@ -18,7 +18,7 @@ class AllSkillDisplayConfig {
     @FeatureToggle
     var enabled: Property<Boolean> = Property.of(false)
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Text", desc = "Choose what skills you want to see in the display.")
     @ConfigEditorDraggableList

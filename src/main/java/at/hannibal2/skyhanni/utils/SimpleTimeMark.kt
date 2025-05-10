@@ -63,7 +63,7 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun toMillis() = millis
 
-    //#if MC < 1.21
+    //#if TODO
     fun toSkyBlockTime(): SkyBlockTime = SkyBlockTime.fromTimeMark(this)
     //#endif
 
@@ -82,7 +82,7 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
         fun Long.asTimeMark() = SimpleTimeMark(this)
 
-        //#if MC < 1.21
+        //#if TODO
         @Deprecated("Use toTimeMark() instead", ReplaceWith("this.toTimeMark()"))
         fun SkyBlockTime.asTimeMark() = SimpleTimeMark(toMillis())
         //#endif

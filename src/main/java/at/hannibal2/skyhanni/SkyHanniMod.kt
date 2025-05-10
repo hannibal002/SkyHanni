@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni
 
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 //#endif
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -8,24 +8,24 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.data.OtherInventoryData
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.data.repo.RepoManager
 //#endif
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
 //#endif
@@ -56,7 +56,7 @@ object SkyHanniMod {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
-        //#if MC < 1.21
+        //#if TODO
         if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
         //#endif
 
@@ -66,13 +66,13 @@ object SkyHanniMod {
     fun init() {
         configManager = ConfigManager()
         configManager.firstLoad()
-        //#if MC < 1.21
+        //#if TODO
         initLogging()
         //#endif
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
-        //#if MC < 1.21
+        //#if TODO
         try {
             RepoManager.initRepo()
         } catch (e: Exception) {
@@ -86,11 +86,11 @@ object SkyHanniMod {
         screenToOpen?.let {
             screenTicks++
             if (screenTicks == 5) {
-                //#if MC < 1.21
+                //#if TODO
                 val title = InventoryUtils.openInventoryName()
                 //#endif
                 MinecraftCompat.localPlayer.closeScreen()
-                //#if MC < 1.21
+                //#if TODO
                 OtherInventoryData.close(title)
                 //#endif
                 Minecraft.getMinecraft().displayGuiScreen(it)
@@ -110,12 +110,12 @@ object SkyHanniMod {
 
     @JvmField
     var feature: Features = Features()
-    //#if MC < 1.21
+    //#if TODO
     lateinit var sackData: SackData
     //#endif
     lateinit var friendsData: FriendsJson
     lateinit var knownFeaturesData: KnownFeaturesJson
-    //#if MC < 1.21
+    //#if TODO
     lateinit var jacobContestsData: JacobContestsJson
     //#endif
     lateinit var visualWordsData: VisualWordsJson

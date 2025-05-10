@@ -453,7 +453,7 @@ object StringUtils {
         return message
     }
 
-    //#if MC < 1.21
+    //#if TODO
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
         return asComponent { chatStyle = original.sampleStyleAtStart() }
     }

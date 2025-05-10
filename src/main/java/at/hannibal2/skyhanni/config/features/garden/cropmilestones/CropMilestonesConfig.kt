@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.garden.cropmilestones
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.TimeUnit
 //#endif
 import com.google.gson.annotations.Expose
@@ -58,7 +58,7 @@ class CropMilestonesConfig {
         SECOND("Second", 4),
         ;
 
-        //#if MC < 1.21
+        //#if TODO
         val timeUnit = TimeUnit.entries.firstOrNull { it.name == this.name } ?: TimeUnit.SECOND
         //#endif
         override fun getLegacyId(): Int = legacyId

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 //#endif
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -290,7 +290,7 @@ object NumberUtil {
 }
 
 class MinMaxNumber(val min: Double, val max: Double) {
-    //#if MC < 1.21
+    //#if TODO
     override fun toString(): String = "${min.formatCoin()}§7-${max.formatCoin()}"
     //#else
     //$$ override fun toString(): String = "${min}§7-${max}"

@@ -411,6 +411,10 @@ If you want to compile more files, you can add them to this file or if you want 
 If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in intellij. This will compile the 1.21 version and run it.
 Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
 
+You may notice some `//#if TODO` comments in the code, these are preprocessor comments that we are using to signify that we need to make 
+this functionality work again on 1.21. If for whatever reason you want the preprocessor to ignore these comments, you can add 
+`skyhanni.skipPreprocessTodos=true` to your `.gradle/private.properties` file. This will make the preprocessor ignore all `//#if TODO` comments.
+
 ### Improving mappings
 
 The different project versions are set up in such a way that each version depends on a slightly older version from which it is then adapted.
@@ -574,6 +578,10 @@ The actual versions being worked with here are not actually semantically compare
 You can also check if you are on Forge using the `FORGE` variable. It is set to either 1 or 0. Similarly, there is also a `JAVA` variable to
 check the Java version this Minecraft version is on. For the `FORGE` variable there is an implicit `!= 0` to check added if you just check
 for the variable using `#if FORGE`.
+
+We also have a `#if TODO` directive. This is a special directive that is used to mark code that needs to be changed on modern versions. 
+Anything within this directive will only compile on 1.8 and otherwise will be commented out. This is useful for marking code that needs to 
+be changed in the future, but you don't want to do it right now.
 
 #### Helpers
 
