@@ -1,14 +1,12 @@
 package at.hannibal2.skyhanni.config.features.event.winter
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class FrozenTreasureConfig {
     @Expose
@@ -40,31 +38,28 @@ class FrozenTreasureConfig {
         FrozenTreasureDisplayEntry.GLACIAL_TALISMAN
     )
 
-    enum class FrozenTreasureDisplayEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1
-    ) : HasLegacyId {
-        TITLE("§e§lFrozen Treasure Tracker", 0),
-        TREASURES_MINED("§61,636 Treasures Mined", 1),
-        TOTAL_ICE("§33.2m Total Ice", 2),
-        ICE_PER_HOUR("§3342,192 Ice/hr", 3),
-        COMPACT_PROCS("§81,002 Compact Procs", 4),
-        SPACER_1(" ", 5),
-        WHITE_GIFT("§b182 §fWhite Gift", 6),
-        GREEN_GIFT("§b94 §aGreen Gift", 7),
-        RED_GIFT("§b17 §9§cRed Gift", 8),
-        PACKED_ICE("§b328 §fPacked Ice", 9),
-        ENCHANTED_ICE("§b80 §aEnchanted Ice", 10),
-        ENCHANTED_PACKED_ICE("§b4 §9Enchanted Packed Ice", 11),
-        ICE_BAIT("§b182 §aIce Bait", 12),
-        GLOWY_CHUM_BAIT("§b3 §aGlowy Chum Bait", 13),
-        GLACIAL_FRAGMENT("§b36 §5Glacial Fragment", 14),
-        GLACIAL_TALISMAN("§b6 §fGlacial Talisman", 15),
+    enum class FrozenTreasureDisplayEntry(private val displayName: String) {
+        TITLE("§e§lFrozen Treasure Tracker"),
+        TREASURES_MINED("§61,636 Treasures Mined"),
+        TOTAL_ICE("§33.2m Total Ice"),
+        ICE_PER_HOUR("§3342,192 Ice/hr"),
+        COMPACT_PROCS("§81,002 Compact Procs"),
+        SPACER_1(" "),
+        WHITE_GIFT("§b182 §fWhite Gift"),
+        GREEN_GIFT("§b94 §aGreen Gift"),
+        RED_GIFT("§b17 §9§cRed Gift"),
+        PACKED_ICE("§b328 §fPacked Ice"),
+        ENCHANTED_ICE("§b80 §aEnchanted Ice"),
+        ENCHANTED_PACKED_ICE("§b4 §9Enchanted Packed Ice"),
+        ICE_BAIT("§b182 §aIce Bait"),
+        GLOWY_CHUM_BAIT("§b3 §aGlowy Chum Bait"),
+        GLACIAL_FRAGMENT("§b36 §5Glacial Fragment"),
+        GLACIAL_TALISMAN("§b6 §fGlacial Talisman"),
         FROZEN_BAIT("§b20 §9Frozen Bait"),
         EINARY_RED_HOODIE("§b1 §cEinary's Red Hoodie"),
-        SPACER_2(" ", 16);
+        SPACER_2(" "),
+        ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

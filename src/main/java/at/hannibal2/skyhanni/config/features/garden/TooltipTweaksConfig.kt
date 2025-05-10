@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -37,16 +36,12 @@ class TooltipTweaksConfig {
     @ConfigEditorDropdown
     var cropTooltipFortune: CropTooltipFortuneEntry = CropTooltipFortuneEntry.SHOW
 
-    enum class CropTooltipFortuneEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1
-    ) : HasLegacyId {
-        DEFAULT("Default", 0),
-        SHOW("Show", 1),
-        REPLACE("Replace", 2),
+    enum class CropTooltipFortuneEntry(private val displayName: String) {
+        DEFAULT("Default"),
+        SHOW("Show"),
+        REPLACE("Replace"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

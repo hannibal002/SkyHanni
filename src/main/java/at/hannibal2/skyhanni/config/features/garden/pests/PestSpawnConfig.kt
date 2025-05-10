@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.pests
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.HasLegacyId
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -13,16 +12,12 @@ class PestSpawnConfig {
     @ConfigEditorDropdown
     var chatMessageFormat: ChatMessageFormatEntry = ChatMessageFormatEntry.HYPIXEL
 
-    enum class ChatMessageFormatEntry(
-        private val displayName: String,
-        private val legacyId: Int = -1,
-    ) : HasLegacyId {
-        HYPIXEL("Hypixel Style", 0),
-        COMPACT("Compact", 1),
-        DISABLED("Disabled", 2),
+    enum class ChatMessageFormatEntry(private val displayName: String) {
+        HYPIXEL("Hypixel Style"),
+        COMPACT("Compact"),
+        DISABLED("Disabled"),
         ;
 
-        override fun getLegacyId() = legacyId
         override fun toString() = displayName
     }
 

@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -55,30 +54,18 @@ public class DiscordRPCConfig {
         AFK
     ));
 
-    public enum PriorityEntry implements HasLegacyId {
-        CROP_MILESTONES("Crop Milestones", 0),
-        SLAYER("Slayer", 1),
-        STACKING_ENCHANT("Stacking Enchantment", 2),
-        DUNGEONS("Dungeon", 3),
-        AFK("AFK Indicator", 4),
+    public enum PriorityEntry {
+        CROP_MILESTONES("Crop Milestones"),
+        SLAYER("Slayer"),
+        STACKING_ENCHANT("Stacking Enchantment"),
+        DUNGEONS("Dungeon"),
+        AFK("AFK Indicator"),
         ;
 
         private final String displayName;
-        private final int legacyId;
 
-        PriorityEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         PriorityEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.displayName = displayName;
         }
 
         @Override
@@ -102,38 +89,26 @@ public class DiscordRPCConfig {
     @ConfigEditorBoolean
     public Property<Boolean> showEliteBotButton = Property.of(true);
 
-    public enum LineEntry implements HasLegacyId {
-        NOTHING("Nothing", 0),
-        LOCATION("Location", 1),
-        PURSE("Purse", 2),
-        BITS("Bits", 3),
-        STATS("Stats", 4),
-        HELD_ITEM("Held Item", 5),
-        SKYBLOCK_DATE("SkyBlock Date", 6),
-        PROFILE("Profile", 7),
-        SLAYER("Slayer", 8),
-        CUSTOM("Custom", 9),
-        DYNAMIC("Dynamic", 10),
-        CROP_MILESTONE("Crop Milestone", 11),
-        CURRENT_PET("Current Pet", 12),
+    public enum LineEntry {
+        NOTHING("Nothing"),
+        LOCATION("Location"),
+        PURSE("Purse"),
+        BITS("Bits"),
+        STATS("Stats"),
+        HELD_ITEM("Held Item"),
+        SKYBLOCK_DATE("SkyBlock Date"),
+        PROFILE("Profile"),
+        SLAYER("Slayer"),
+        CUSTOM("Custom"),
+        DYNAMIC("Dynamic"),
+        CROP_MILESTONE("Crop Milestone"),
+        CURRENT_PET("Current Pet"),
         ;
 
         private final String displayName;
-        private final int legacyId;
 
-        LineEntry(String displayName, int legacyId) {
-            this.displayName = displayName;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
         LineEntry(String displayName) {
-            this(displayName, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
+            this.displayName = displayName;
         }
 
         @Override

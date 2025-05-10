@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -265,19 +264,6 @@ object DiscordRPCManager : IPCListener {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(11, "misc.discordRPC.firstLine") { element ->
-            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
-        }
-        event.transform(11, "misc.discordRPC.secondLine") { element ->
-            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
-        }
-        event.transform(11, "misc.discordRPC.auto") { element ->
-            ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)
-        }
-        event.transform(11, "misc.discordRPC.autoPriority") { element ->
-            ConfigUtils.migrateIntArrayListToEnumArrayList(element, PriorityEntry::class.java)
-        }
-
         event.move(31, "misc.discordRPC", "gui.discordRPC")
     }
 
