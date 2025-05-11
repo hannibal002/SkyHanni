@@ -51,8 +51,6 @@ object DiscordLocationKey {
         "precursor-remnants",
         "goblin-holdout",
         "magma-fields",
-        "crystal-nucleus",
-        "dungeon-hub"
     )
     // list of tokens where the name can be lowercased and spaces can be replaced with dashes
 
@@ -66,19 +64,6 @@ object DiscordLocationKey {
         "Colosseum Arena" to "colosseum",
         "Museum" to "unincorporated",
         "Personal Garden" to "garden",
-
-        "Jerry's Workshop" to "winter-island",
-        "Jerry Pond" to "winter-island",
-        "Mount Jerry" to "winter-island",
-        "Gary's Shack" to "winter-island",
-        "Glacial Cave" to "winter-island",
-        "Terry's Shack" to "winter-island",
-        "Hot Springs" to "winter-island",
-        "Jerry Pond" to "winter-island",
-        "Reflective Pond" to "winter-island",
-        "Sunken Jerry Pond" to "winter-island",
-        "Sherry's Showroom" to "winter-island",
-        "Einary's Emporium" to "winter-island",
 
         "Archery Range" to "village",
         "Bazaar Alley" to "village",
@@ -117,50 +102,11 @@ object DiscordLocationKey {
         "Lonely Island" to "spruce-woods",
         "Howling Cave" to "birch-park",
 
-        "Aristocrat Passage" to "dwarven-mines",
-        "Barracks of Heroes" to "dwarven-mines",
-        "C&C Minecarts Co." to "dwarven-mines",
-        "Cliffside Veins" to "dwarven-mines",
-        "Divan's Gateway" to "dwarven-mines",
-        "Dwarven Tavern" to "dwarven-mines",
-        "Dwarven Village" to "dwarven-mines",
-        "Far Reserve" to "dwarven-mines",
-        "Forge Basin" to "dwarven-mines",
-        "Gates to the Mines" to "dwarven-mines",
-        "Goblin Burrows" to "dwarven-mines",
-        "Grand Library" to "dwarven-mines",
-        "Great Ice Wall" to "dwarven-mines",
-        "Hanging Court" to "dwarven-mines",
-        "Lava Springs" to "dwarven-mines",
-        "Miner's Guild" to "dwarven-mines",
-        "Palace Bridge" to "dwarven-mines",
-        "Rampart's Quarry" to "dwarven-mines",
-        "Royal Mines" to "dwarven-mines",
-        "Royal Palace" to "dwarven-mines",
-        "Royal Quarters" to "dwarven-mines",
-        "The Forge" to "dwarven-mines",
-        "The Lift" to "dwarven-mines",
-        "The Mist" to "dwarven-mines",
-        "Upper Mines" to "dwarven-mines",
-
-        "Dragon's Lair" to "mithril-deposits",
-        "Fairy Grotto" to "crystal-nucleus",
-        "Goblin Queen's Den" to "goblin-holdout",
-        "Jungle Temple" to "jungle",
-        "Khazad-dûm" to "magma-fields",
-        "Lost Precursor City" to "precursor-remnants",
-        "Mines of Divan" to "mithril-deposits",
-
         "Diamond Reserve" to "coal-mine",
         "Gunpowder Mines" to "coal-mine",
         "Lapis Quarry" to "coal-mine",
         "Obsidian Sanctuary" to "coal-mine",
         "Pigmen's Den" to "coal-mine",
-
-        "Dwarven Base Camp" to "glacite-tunnels",
-        "Fossil Research Center" to "glacite-tunnels",
-        "Great Glacite Lake" to "glacite-tunnels",
-        "Glacite Mineshafts" to "glacite-tunnels",
     ) // maps sublocations to their broader image
 
     private val specialNetherRPC = arrayOf(
