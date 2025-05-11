@@ -46,7 +46,7 @@ data class DisplayInfo(
 fun SkullOwnerInfo.toGameProfile(): GameProfile {
     val profile = GameProfile(UUID.fromString(this.uuid), this.uuid)
     val textures = this.properties?.textures?.get(0)
-    profile.properties.put("textures", Property("textures", textures?.value ?: "", textures?.signature ?: ""))
+    profile.properties.put("textures", Property("textures", textures?.value.orEmpty(), textures?.signature.orEmpty()))
     return profile
 }
 

@@ -67,6 +67,7 @@
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>PreprocessingImportOrdering:AlignmentConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:InventoryUtils.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:BroodmotherSpawnAlertConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:ChunkedStatsConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:EventsConfig.kt$//#if TODO</ID>

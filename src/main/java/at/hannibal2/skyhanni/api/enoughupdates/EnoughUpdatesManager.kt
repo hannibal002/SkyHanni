@@ -188,17 +188,14 @@ object EnoughUpdatesManager {
     private val nbtListRegex = Regex("([\\[,])\\d+:")
 
     private fun convertNbtToJson(nbtString: String): NeuNbtInfoJson? {
-        var string = nbtString
-        string = string.replace(nbtListRegex, "$1")
+        var convertedNbt = nbtString
+        convertedNbt = convertedNbt.replace(nbtListRegex, "$1")
         try {
-            val json = ConfigManager.gson.fromJson(string, JsonObject::class.java)
+            val json = ConfigManager.gson.fromJson(convertedNbt, JsonObject::class.java)
             val fromJson = ConfigManager.gson.fromJson(json, NeuNbtInfoJson::class.java)
             return fromJson
         } catch (e: Exception) {
-            println("Error converting nbt to json: $e")
-            println("malformed nbt: $string")
-            println("original nbt: $nbtString")
-            e.printStackTrace()
+            ErrorManager.logErrorWithData(e, "Error converting nbt to json", "malformed nbt" to convertedNbt, "original nbt" to nbtString)
         }
 
         return null
