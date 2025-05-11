@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.mining.nucleus
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
@@ -48,14 +49,13 @@ class PowderChestTimerConfig {
     @ConfigEditorDropdown
     var lineMode: LineMode = LineMode.OLDEST
 
-    enum class LineMode(private val str: String) {
-        OLDEST("Oldest"),
-        NEAREST("Nearest"),
-        NONE("None");
+    enum class LineMode {
+        OLDEST,
+        NEAREST,
+        NONE;
 
-        override fun toString(): String {
-            return str
-        }
+        private val displayName = toFormattedName()
+        override fun toString(): String = displayName
     }
 
     @Expose
@@ -65,5 +65,5 @@ class PowderChestTimerConfig {
 
     @Expose
     @ConfigLink(owner = PowderChestTimerConfig::class, field = "enabled")
-    var position: Position = Position(100, 100, false, true)
+    var position: Position = Position(100, 100)
 }

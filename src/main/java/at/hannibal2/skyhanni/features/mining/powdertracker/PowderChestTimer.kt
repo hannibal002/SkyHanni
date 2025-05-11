@@ -18,20 +18,19 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.block.BlockChest
 import net.minecraft.block.state.IBlockState
 import java.awt.Color
@@ -44,8 +43,9 @@ object PowderChestTimer {
 
     private val config get() = SkyHanniMod.feature.mining.powderChestTimer
 
-    private var display = Renderable.string("Chest Timer")
-    private val chestSet = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
+    private var display: String? = null
+    private val chests = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
+    private val maxDuration = 60.seconds
     private const val MAX_CHEST_DISTANCE = 15
     private const val NEAR_PLAYER_DISTANCE = 25
     private var lastSound = SimpleTimeMark.farPast()
@@ -54,45 +54,37 @@ object PowderChestTimer {
         EntityUtils.getPlayerEntities().any { it.distanceToPlayer() < NEAR_PLAYER_DISTANCE }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!isEnabled()) return
-        if (event.soundName == "random.levelup" && event.pitch == 1.0f && event.volume == 1.0f) {
-            lastSound = SimpleTimeMark.now()
-        }
+        if (event.soundName != "random.levelup" || event.pitch != 1f || event.volume != 1.0f) return
+        lastSound = SimpleTimeMark.now()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-
-        config.position.renderRenderable(display, posLabel = "Powder Chest Timer")
+        config.position.renderString(display, posLabel = "Powder Chest Timer")
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    fun onWorldChange() = chests.clear()
 
-        chestSet.clear()
-    }
-
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onServerBlockChange(event: ServerBlockChangeEvent) {
-        if (!isEnabled()) return
         val location = event.location
-        if (location.distanceToPlayer() > 15) return
+        if (location.distanceToPlayer() > MAX_CHEST_DISTANCE) return
         val isNewChest = event.newState.isChest()
         val isOldChest = event.oldState.isChest()
 
         if (isNewChest && !isOldChest) {
             if (arePlayersNearby && lastSound.passedSince() > 200.milliseconds) return
-            if (location.distanceToPlayer() > MAX_CHEST_DISTANCE) return
-            chestSet[location] = SimpleTimeMark.now() + 60500.milliseconds
+            chests[location] = maxDuration.fromNow()
         } else if (isOldChest && !isNewChest) {
-            chestSet.remove(location)
+            chests.remove(location)
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         val location = event.position
@@ -102,82 +94,74 @@ object PowderChestTimer {
 
         if (location.isOpened()) return
         if (event.clickType == ClickType.RIGHT_CLICK) {
-            chestSet.remove(location)
+            chests.remove(location)
             return
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onTick() {
         if (!isEnabled()) return
-
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): Renderable {
-        if (chestSet.entries.isEmpty()) return Renderable.string("")
+    private fun drawDisplay(): String? {
+        if (chests.isEmpty()) return null
 
-        val count = chestSet.entries.size
+        val count = chests.size
         val name = StringUtils.pluralize(count, "chest")
-        val first = chestSet.minByOrNull { it.value.timeUntil() } ?: return Renderable.string("")
+        val first = chests.values.minByOrNull { it.timeUntil() } ?: return null
 
-        val timeUntil = first.value.timeUntil()
+        val timeUntil = first.timeUntil()
         val color = timeUntil.getColorBasedOnTime().toChatColor()
 
-        return Renderable.string("$color${timeUntil.format(TimeUnit.SECOND)} §8(§e$count §b$name§8)")
+        return "$color${timeUntil.format(TimeUnit.SECOND)} §8(§e$count §b$name§8)"
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-        for ((loc, time) in chestSet) {
-            val color = if (config.useStaticColor) config.staticColor.toChromaColor().toColor() else time.timeUntil().getColorBasedOnTime()
+        if (chests.isEmpty()) return
 
-            if (config.highlightChests)
-                event.drawWaypointFilled(loc, color, seeThroughBlocks = false)
+        val playerY = LocationUtils.playerLocation().y
+
+        for ((loc, time) in chests) {
+            val timeLeft = time.timeUntil()
+            val color = if (config.useStaticColor) config.staticColor.toChromaColor().toColor()
+            else timeLeft.getColorBasedOnTime()
+
+            if (config.highlightChests) event.drawWaypointFilled(loc, color)
 
             if (config.drawTimerOnChest) {
-                val y = if (loc.y <= LocationUtils.playerLocation().y) 1.25 else -0.25
-                event.drawString(
-                    loc.add(y = y, x = 0.5, z = 0.5), time.timeUntil().format(TimeUnit.SECOND),
-                    seeThroughBlocks = false,
-                )
+                val yOffset = if (loc.y <= playerY) 1.25 else -0.25
+                val textPos = loc.add(x = 0.5, y = yOffset, z = 0.5)
+                event.drawString(textPos, timeLeft.format(TimeUnit.SECOND))
             }
+        }
 
-            val sorted = when (config.lineMode) {
-                PowderChestTimerConfig.LineMode.OLDEST -> chestSet.entries.sortedBy { it.value.timeUntil() }
-                PowderChestTimerConfig.LineMode.NEAREST -> chestSet.entries.sortedBy { it.key.distanceToPlayer() }
-                else -> continue
-            }
+        val sortedChests = when (config.lineMode) {
+            PowderChestTimerConfig.LineMode.OLDEST -> chests.entries.sortedBy { it.value.timeUntil() }
+            PowderChestTimerConfig.LineMode.NEAREST -> chests.entries.sortedBy { it.key.distanceToPlayer() }
+            else -> return
+        }
 
-            if (sorted.isEmpty()) continue
-            val chestToConnect = sorted.take(config.drawLineToChestAmount)
+        val chestToConnect = sortedChests.take(config.drawLineToChestAmount)
+        val (firstPos, firstTime) = chestToConnect.firstOrNull() ?: return
 
-            val (firstPos, firstTime) = chestToConnect.firstOrNull() ?: continue
+        event.drawLineToEye(
+            firstPos.blockCenter(),
+            firstTime.timeUntil().getColorBasedOnTime(),
+            3,
+            true
+        )
 
-            event.draw3DLine(
-                event.exactPlayerEyeLocation(),
-                firstPos.blockCenter(),
-                firstTime.timeUntil().getColorBasedOnTime(),
-                3,
-                true,
-            )
+        val zipped = chestToConnect.zipWithNext()
+        for ((first, second) in zipped) {
+            val (current, currentTime) = first
+            val (next, _) = second
 
-            for (i in 0 until chestToConnect.size - 1) {
-                val (current, currentTime) = chestToConnect[i]
-                val (next, _) = chestToConnect[i + 1]
-
-                val currentUtil = currentTime.timeUntil()
-                val currentColor = currentUtil.getColorBasedOnTime()
-
-                event.draw3DLine(
-                    current.blockCenter(),
-                    next.blockCenter(),
-                    currentColor,
-                    3,
-                    true,
-                )
-            }
+            val color = currentTime.timeUntil().getColorBasedOnTime()
+            event.draw3DLine(current.blockCenter(), next.blockCenter(), color, 3, true)
         }
     }
 
@@ -192,7 +176,6 @@ object PowderChestTimer {
     }
 
     private fun Duration.getColorBasedOnTime(): Color {
-        val maxDuration = 60.seconds
 
         val ratio = (inWholeMilliseconds.toDouble() / maxDuration.inWholeMilliseconds).coerceIn(0.0, 1.0)
 
@@ -202,9 +185,9 @@ object PowderChestTimer {
         return Color(red, green, 0)
     }
 
-    private fun LorenzVec.isOpened() = !chestSet.containsKey(this)
+    private fun LorenzVec.isOpened() = !chests.containsKey(this)
 
     private fun IBlockState.isChest() = block is BlockChest
 
-    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
+    private fun isEnabled() = config.enabled
 }
