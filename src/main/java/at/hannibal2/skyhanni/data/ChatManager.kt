@@ -177,12 +177,12 @@ object ChatManager {
         return Pair(component.takeIf { modified }, cancelled)
     }
 
-    private fun openChatHistoryGui(args: String) {
+    private fun openChatHistoryGui(args: Array<String>) {
         //#if TODO
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
             ChatHistoryGui(getRecentMessageHistory())
         } else {
-            val searchTerm = args
+            val searchTerm = args.joinToString(" ")
             val history = getRecentMessageHistoryWithSearch(searchTerm)
             if (history.isEmpty()) {
                 ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
@@ -271,10 +271,7 @@ object ChatManager {
         event.registerBrigadier("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            arg("search", BrigadierArguments.greedyString()) {
-                callback { openChatHistoryGui(getArg(it)) }
-            }
-            simpleCallback { openChatHistoryGui("") }
+            legacyCallbackArgs { openChatHistoryGui(it) }
         }
     }
 }

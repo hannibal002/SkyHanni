@@ -159,13 +159,8 @@ object SkyHanniMod {
         event.registerBrigadier("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"
-            arg("search", BrigadierArguments.greedyString()) { search ->
-                callback {
-                    ConfigGuiManager.onCommand(arrayOf(getArg(search)))
-                }
-            }
-            simpleCallback {
-                ConfigGuiManager.onCommand(arrayOf(""))
+            legacyCallbackArgs {
+                ConfigGuiManager.onCommand(it)
             }
         }
     }
