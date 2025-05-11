@@ -670,5 +670,17 @@ at.hannibal2.skyhanni.utils.InventoryUtils.kt
 at.hannibal2.skyhanni.mixins.transformers.MixinItemStack.java
 at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson.kt
 at.hannibal2.skyhanni.utils.ComponentUtils.kt
+at.hannibal2.skyhanni.config.commands.brigadier.ArgContext.kt
+at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArgument.kt
+at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments.kt
+at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.kt
+at.hannibal2.skyhanni.config.commands.brigadier.CommandData.kt
+at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent.kt
+at.hannibal2.skyhanni.features.commands.HelpCommand.kt
+at/hannibal2/skyhanni/config/commands/brigadier/BrigadierBuilder.kt
+at.hannibal2.skyhanni.config.commands.CommandBuilder.kt
+at.hannibal2.skyhanni.config.commands.CommandsRegistry.kt
+at/hannibal2/skyhanni/utils/CommandUtils.kt
+at.hannibal2.skyhanni.utils.NeuCalculator.kt
 
 # \.(?!kt|java|\()

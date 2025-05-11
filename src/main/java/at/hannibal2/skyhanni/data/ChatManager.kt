@@ -3,9 +3,8 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#endif
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
@@ -178,12 +177,12 @@ object ChatManager {
         return Pair(component.takeIf { modified }, cancelled)
     }
 
-    private fun openChatHistoryGui(args: Array<String>) {
+    private fun openChatHistoryGui(args: String) {
         //#if TODO
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
             ChatHistoryGui(getRecentMessageHistory())
         } else {
-            val searchTerm = args.joinToString(" ")
+            val searchTerm = args
             val history = getRecentMessageHistoryWithSearch(searchTerm)
             if (history.isEmpty()) {
                 ChatUtils.chat("§eNot found in chat history! ($searchTerm)")
@@ -267,14 +266,15 @@ object ChatManager {
         }
     }
 
-    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shchathistory") {
+        event.registerBrigadier("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            callback { openChatHistoryGui(it) }
+            arg("search", BrigadierArguments.greedyString()) {
+                callback { openChatHistoryGui(getArg(it)) }
+            }
+            simpleCallback { openChatHistoryGui("") }
         }
     }
-    //#endif
 }

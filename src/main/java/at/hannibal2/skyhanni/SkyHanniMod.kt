@@ -4,10 +4,15 @@ import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
 //#if TODO
 import at.hannibal2.skyhanni.config.SackData
+//#endif
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+//#if TODO
 import at.hannibal2.skyhanni.data.OtherInventoryData
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
@@ -145,6 +150,22 @@ object SkyHanniMod {
                     e,
                     e.message ?: "Asynchronous exception caught",
                 )
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("sh") {
+            aliases = listOf("skyhanni")
+            description = "Opens the main SkyHanni config"
+            arg("search", BrigadierArguments.greedyString()) { search ->
+                callback {
+                    ConfigGuiManager.onCommand(arrayOf(getArg(search)))
+                }
+            }
+            simpleCallback {
+                ConfigGuiManager.onCommand(arrayOf(""))
             }
         }
     }

@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#endif
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -198,14 +196,12 @@ object TabListData {
         }
     }
 
-    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtesttablist") {
+        event.registerBrigadier("shtesttablist") {
             description = "Set your clipboard as a fake tab list."
             category = CommandCategory.DEVELOPER_TEST
-            callback { toggleDebug() }
+            simpleCallback { toggleDebug() }
         }
     }
-    //#endif
 }

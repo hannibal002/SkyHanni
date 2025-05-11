@@ -74,11 +74,6 @@ object Commands {
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
-        event.register("sh") {
-            aliases = listOf("skyhanni")
-            description = "Opens the main SkyHanni config"
-            callback { ConfigGuiManager.onCommand(it) }
-        }
         event.register("ff") {
             description = "Opens the Farming Fortune Guide"
             callback { FFGuideGui.onCommand() }
