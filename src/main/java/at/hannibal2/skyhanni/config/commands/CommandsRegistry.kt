@@ -15,8 +15,6 @@ import net.minecraftforge.client.ClientCommandHandler
 
 @SkyHanniModule
 object CommandsRegistry {
-    private val builders = mutableListOf<CommandData>()
-
     //#if MC < 1.21
     private val dispatcher: CommandDispatcher<Any?> = CommandDispatcher()
     //#endif
@@ -24,26 +22,26 @@ object CommandsRegistry {
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
         //#if MC < 1.21
-        CommandRegistrationEvent(builders, dispatcher).post()
+        CommandRegistrationEvent(dispatcher).post()
         //#else
         //$$ ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-        //$$     CommandRegistrationEvent(builders, dispatcher).post()
+        //$$     CommandRegistrationEvent(dispatcher).post()
         //$$ }
         //#endif
     }
 
-    private fun String.isUnique() {
+    private fun String.isUnique(builders: List<CommandData>) {
         require(builders.all { this !in it.getAllNames() }) {
             "The command $this is already registered!"
         }
     }
 
-    fun CommandData.hasUniqueName() {
-        name.isUnique()
-        aliases.forEach { it.isUnique() }
+    fun CommandData.hasUniqueName(builders: List<CommandData>) {
+        name.isUnique(builders)
+        aliases.forEach { it.isUnique(builders) }
     }
 
-    fun BaseBrigadierBuilder.addToRegister(dispatcher: CommandDispatcher<Any?>) {
+    fun BaseBrigadierBuilder.addToRegister(dispatcher: CommandDispatcher<Any?>, builders: MutableList<CommandData>) {
         //#if MC < 1.21
         val command = toCommand(dispatcher)
         ClientCommandHandler.instance.registerCommand(command)
@@ -57,7 +55,7 @@ object CommandsRegistry {
         builders.add(this)
     }
 
-    fun <T : CommandBuilderBase> T.addToRegister(dispatcher: CommandDispatcher<Any?>) {
+    fun <T : CommandBuilderBase> T.addToRegister(dispatcher: CommandDispatcher<Any?>, builders: MutableList<CommandData>) {
         //#if MC < 1.21
         val command = this.toCommand(dispatcher)
         ClientCommandHandler.instance.registerCommand(command)
@@ -71,7 +69,7 @@ object CommandsRegistry {
         //$$
         //$$     legacyCallbackArgs(this@addToRegister.getCallback())
         //$$ }
-        //$$ builder.addToRegister(dispatcher)
+        //$$ builder.addToRegister(dispatcher, builders)
         //#endif
     }
 }
