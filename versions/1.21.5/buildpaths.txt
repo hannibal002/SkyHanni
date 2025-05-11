@@ -682,5 +682,8 @@ at.hannibal2.skyhanni.config.commands.CommandBuilder.kt
 at.hannibal2.skyhanni.config.commands.CommandsRegistry.kt
 at/hannibal2/skyhanni/utils/CommandUtils.kt
 at.hannibal2.skyhanni.utils.NeuCalculator.kt
+at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.kt
+
+
 
 # \.(?!kt|java|\()
