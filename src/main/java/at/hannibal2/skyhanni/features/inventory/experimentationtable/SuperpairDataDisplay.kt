@@ -201,13 +201,24 @@ object SuperpairDataDisplay {
         handleFoundPair(item, emptySuperpairItem)
     }
 
+
+
     private fun handleFoundPair(
         foundFirst: SuperpairItem,
         foundSecond: SuperpairItem,
     ) {
         // Remove from matched & normal, since it's now found
-        currentFoundData[FoundType.MATCH]?.removeIf { foundFirst in listOf(it.first, it.second) }
-        currentFoundData[FoundType.NORMAL]?.removeIf { it.item in listOf(foundSecond, foundSecond) }
+        currentFoundData[FoundType.MATCH]?.removeIf { data ->
+            listOf(data.first, data.second).any {
+                it.sameAs(foundFirst)
+            }
+        }
+        currentFoundData[FoundType.NORMAL]?.removeIf { data ->
+            val dataItem = data.item ?: return@removeIf false
+            listOf(foundFirst, foundSecond).any {
+                it.sameAs(dataItem)
+            }
+        }
 
         val pairData = FoundData(first = foundFirst, second = foundSecond)
         currentFoundData.getOrPut(FoundType.PAIR) { mutableListOf() }
