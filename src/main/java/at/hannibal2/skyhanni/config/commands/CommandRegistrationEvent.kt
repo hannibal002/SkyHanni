@@ -10,30 +10,25 @@ import at.hannibal2.skyhanni.utils.CommandContextAwareObject
 import com.mojang.brigadier.CommandDispatcher
 
 class CommandRegistrationEvent(
-    private val builders: MutableList<CommandData>,
     val dispatcher: CommandDispatcher<Any?>,
 ) : SkyHanniEvent() {
+    private val builders = mutableListOf<CommandData>()
 
     val commands: List<CommandData> get() = builders
 
     fun registerBrigadier(name: String, builder: BaseBrigadierBuilder.() -> Unit) {
         val command = BaseBrigadierBuilder(name).apply(builder)
-        // on 1.21 the command gets registered every world swap so this doesnt work
-        //#if MC < 1.21
-        command.hasUniqueName()
-        //#endif
+        command.hasUniqueName(builders)
         command.checkDescriptionAndCategory()
-        command.addToRegister(dispatcher)
+        command.addToRegister(dispatcher, builders)
     }
 
     // TODO: Use Brigadier as backend and eventually deprecate it
     fun register(name: String, block: CommandBuilder.() -> Unit) {
         val command = CommandBuilder(name).apply(block)
-        //#if MC < 1.21
-        command.hasUniqueName()
-        //#endif
+        command.hasUniqueName(builders)
         command.checkDescriptionAndCategory()
-        command.addToRegister(dispatcher)
+        command.addToRegister(dispatcher, builders)
     }
 
     private fun CommandData.checkDescriptionAndCategory() {
@@ -47,7 +42,7 @@ class CommandRegistrationEvent(
         block: ComplexCommandBuilder<O, CommandArgument<O>>.() -> Unit,
     ) {
         val command = ComplexCommandBuilder<O, CommandArgument<O>>(name).apply(block)
-        command.hasUniqueName()
-        command.addToRegister(dispatcher)
+        command.hasUniqueName(builders)
+        command.addToRegister(dispatcher, builders)
     }
 }
