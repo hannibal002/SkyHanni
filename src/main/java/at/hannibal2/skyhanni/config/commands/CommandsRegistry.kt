@@ -1,62 +1,77 @@
 package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BaseBrigadierBuilder
+import at.hannibal2.skyhanni.config.commands.brigadier.CommandData
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import com.mojang.brigadier.CommandDispatcher
 //#if MC < 1.21
 import net.minecraftforge.client.ClientCommandHandler
 
 //#else
-//$$ import com.mojang.brigadier.arguments.StringArgumentType
-//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument
-//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal
 //$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 //#endif
 
 @SkyHanniModule
 object CommandsRegistry {
-    private val builders = mutableListOf<CommandBuilderBase>()
+    private val builders = mutableListOf<CommandData>()
+
+    //#if MC < 1.21
+    private val dispatcher: CommandDispatcher<Any?> = CommandDispatcher()
+    //#endif
 
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
-        CommandRegistrationEvent(builders).post()
+        //#if MC < 1.21
+        CommandRegistrationEvent(builders, dispatcher).post()
+        //#else
+        //$$ ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+        //$$     CommandRegistrationEvent(builders, dispatcher).post()
+        //$$ }
+        //#endif
     }
 
     private fun String.isUnique() {
-        if (builders.any { it.name == this || it.aliases.contains(this) }) {
-            error("The command '$this is already registered!'")
+        require(builders.all { this !in it.getAllNames() }) {
+            "The command $this is already registered!"
         }
     }
 
-    fun <T : CommandBuilderBase> T.hasUniqueName() {
+    fun CommandData.hasUniqueName() {
         name.isUnique()
         aliases.forEach { it.isUnique() }
     }
 
-    fun <T : CommandBuilderBase> T.addToRegister() {
-        val command = this.toCommand()
+    fun BaseBrigadierBuilder.addToRegister(dispatcher: CommandDispatcher<Any?>) {
         //#if MC < 1.21
+        val command = toCommand(dispatcher)
         ClientCommandHandler.instance.registerCommand(command)
         //#else
-        //$$ ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-        //$$     val original = dispatcher.register(
-        //$$         literal(name).executes {
-        //$$             command.processCommand(emptyArray())
-        //$$             1
-        //$$         }.then(
-        //$$             argument("please type the arguments of this here command", StringArgumentType.greedyString()).executes { context ->
-        //$$                 val itemName = StringArgumentType.getString(context, "please type the arguments of this here command").split(" ")
-        //$$                 command.processCommand(itemName.toTypedArray())
-        //$$                 1
-        //$$             },
-        //$$         ),
-        //$$     )
-        //$$     command.getCommandAliases().forEach {
-        //$$         dispatcher.register(literal(it).redirect(original))
-        //$$     }
+        //$$ val original = dispatcher.register(builder as LiteralArgumentBuilder<Any?>)
+        //$$ aliases.forEach {
+        //$$     dispatcher.register(LiteralArgumentBuilder.literal<Any?>(it).redirect(original))
         //$$ }
         //#endif
 
         builders.add(this)
+    }
+
+    fun <T : CommandBuilderBase> T.addToRegister(dispatcher: CommandDispatcher<Any?>) {
+        //#if MC < 1.21
+        val command = this.toCommand(dispatcher)
+        ClientCommandHandler.instance.registerCommand(command)
+        builders.add(this)
+        //#else
+        //$$ if (this !is CommandBuilder) return // complex commands are not supported in 1.21.5 right now
+        //$$ val builder = BaseBrigadierBuilder(name).apply {
+        //$$     this.description = this@addToRegister.descriptor
+        //$$     this.aliases = this@addToRegister.aliases
+        //$$     this.category = this@addToRegister.category
+        //$$
+        //$$     legacyCallbackArgs(this@addToRegister.getCallback())
+        //$$ }
+        //$$ builder.addToRegister(dispatcher)
+        //#endif
     }
 }
