@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 //#endif
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 //#if TODO
 import at.hannibal2.skyhanni.data.OtherInventoryData
 //#endif
