@@ -18,7 +18,10 @@ class CommandRegistrationEvent(
 
     fun registerBrigadier(name: String, builder: BaseBrigadierBuilder.() -> Unit) {
         val command = BaseBrigadierBuilder(name).apply(builder)
+        // on 1.21 the command gets registered every world swap so this doesnt work
+        //#if MC < 1.21
         command.hasUniqueName()
+        //#endif
         command.checkDescriptionAndCategory()
         command.addToRegister(dispatcher)
     }
@@ -26,7 +29,9 @@ class CommandRegistrationEvent(
     // TODO: Use Brigadier as backend and eventually deprecate it
     fun register(name: String, block: CommandBuilder.() -> Unit) {
         val command = CommandBuilder(name).apply(block)
+        //#if MC < 1.21
         command.hasUniqueName()
+        //#endif
         command.checkDescriptionAndCategory()
         command.addToRegister(dispatcher)
     }
