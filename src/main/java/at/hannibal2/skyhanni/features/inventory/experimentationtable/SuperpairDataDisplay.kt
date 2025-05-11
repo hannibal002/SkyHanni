@@ -106,8 +106,7 @@ object SuperpairDataDisplay {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        miscRewards = event.getConstant<ExperimentsJson>("Experiments").miscRewards.takeIfNotEmpty()
-            ?: emptyList()
+        miscRewards = event.getConstant<ExperimentsJson>("Experiments").miscRewards
     }
 
     @HandleEvent
