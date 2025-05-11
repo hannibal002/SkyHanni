@@ -25,7 +25,7 @@ object CommandsRegistry {
         CommandRegistrationEvent(dispatcher).post()
         //#else
         //$$ ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-        //$$     CommandRegistrationEvent(dispatcher).post()
+        //$$     CommandRegistrationEvent(dispatcher as CommandDispatcher<Any?>).post()
         //$$ }
         //#endif
     }
