@@ -165,7 +165,7 @@ dependencies {
     }
 
     // Discord RPC client
-    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
+    shadowImpl("com.github.CDAGaming:DiscordIPC:4b62ba3") {
         exclude(module = "log4j")
         because("Different version conflicts with Minecraft's Log4J")
         exclude(module = "gson")

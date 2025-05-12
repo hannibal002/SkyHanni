@@ -25,14 +25,20 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import com.jagrosh.discordipc.IPCClient
 import com.jagrosh.discordipc.IPCListener
+import com.jagrosh.discordipc.entities.ActivityType
+import com.jagrosh.discordipc.entities.Packet
 import com.jagrosh.discordipc.entities.RichPresence
-import com.jagrosh.discordipc.entities.RichPresenceButton
+import com.jagrosh.discordipc.entities.User
 import com.jagrosh.discordipc.entities.pipe.PipeStatus
+import com.jagrosh.discordipc.exceptions.NoDiscordClientException
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
@@ -90,8 +96,7 @@ object DiscordRPCManager : IPCListener {
             // confirm that /shrpcstart worked
             ChatUtils.chat("Successfully started Rich Presence!", prefixColor = "§a")
             updateDebugStatus("Successfully started")
-            status
-        } catch (e: Exception) {
+        } catch (e: NoDiscordClientException) {
             updateDebugStatus("Failed to connect: ${e.message} (discord not started yet?)", error = true)
             ChatUtils.clickableChat(
                 "Discord Rich Presence was unable to start! " +
@@ -99,6 +104,14 @@ object DiscordRPCManager : IPCListener {
                     "Please run /shrpcstart to retry once you have launched Discord.",
                 onClick = { startCommand() },
                 "§eClick to run /shrpcstart!",
+            )
+        } catch (e: Exception) {
+            updateDebugStatus("Failed to connect, not from NoDiscordClientException: ${e.message}", error = true)
+            ErrorManager.logErrorWithData(
+                e,
+                "Discord Rich Presence was unable to start! " +
+                    "This was probably NOT due to something you did. " +
+                    "Please report this and ping NetheriteMiner.",
             )
         }
     }
@@ -127,33 +140,50 @@ object DiscordRPCManager : IPCListener {
     private fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
+        val buttons = JsonArray()
+        if (config.showEliteBotButton.get()) {
+            val eliteBotEntry = JsonObject()
+            eliteBotEntry.add(
+                "Open EliteBot",
+                JsonPrimitive("https://elitebot.dev/@${PlayerUtils.getName()}/${HypixelData.profileName}"),
+            )
+            buttons.add(eliteBotEntry)
+        }
+
+        if (config.showSkyCryptButton.get()) {
+            val skyCryptEntry = JsonObject()
+            skyCryptEntry.add(
+                "Open SkyCrypt",
+                JsonPrimitive("https://sky.shiiyu.moe/stats/${PlayerUtils.getName()}/${HypixelData.profileName}"),
+            )
+            buttons.add(skyCryptEntry)
+        }
         client?.sendRichPresence(
             RichPresence.Builder().apply {
+                setActivityType(ActivityType.Playing)
                 setDetails(getStatusByConfigId(config.firstLine.get()).getDisplayString())
                 setState(getStatusByConfigId(config.secondLine.get()).getDisplayString())
                 setStartTimestamp(startTimestamp)
                 setLargeImage(discordIconKey, location)
-
-                if (config.showEliteBotButton.get()) {
-                    addButton(
-                        RichPresenceButton(
-                            "https://elitebot.dev/@${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
-                            "Open EliteBot",
-                        ),
-                    )
-                }
-
-                if (config.showSkyCryptButton.get()) {
-                    addButton(
-                        RichPresenceButton(
-                            "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
-                            "Open SkyCrypt",
-                        ),
-                    )
-                }
+                setButtons(buttons)
             }.build(),
         )
     }
+
+    // Required override methods from being an IPCListener
+    override fun onPacketSent(p0: IPCClient?, p1: Packet?) = Unit
+
+    override fun onPacketReceived(p0: IPCClient?, p1: Packet?) = Unit
+
+    override fun onActivityJoin(p0: IPCClient?, p1: String?) = Unit
+
+    override fun onActivitySpectate(p0: IPCClient?, p1: String?) = Unit
+
+    override fun onActivityJoinRequest(
+        p0: IPCClient?,
+        p1: String?,
+        p2: User?,
+    ) = Unit
 
     override fun onReady(client: IPCClient) {
         updateDebugStatus("Discord RPC Ready.")
@@ -188,7 +218,7 @@ object DiscordRPCManager : IPCListener {
         // The mod has already started the connection process. This variable is my way of running a function when
         // the player joins SkyBlock but only running it again once they join and leave.
         if (started || !isEnabled()) return
-        if (LorenzUtils.inSkyBlock) {
+        if (SkyBlockUtils.inSkyBlock) {
             start()
             started = true
         }
@@ -199,7 +229,7 @@ object DiscordRPCManager : IPCListener {
         if (nextUpdate.isInFuture()) return
         // wait 5 seconds to check if the new world is skyblock or not before stopping the function
         nextUpdate = DelayedRun.runDelayed(5.seconds) {
-            if (!LorenzUtils.inSkyBlock) {
+            if (!SkyBlockUtils.inSkyBlock) {
                 stop()
             }
         }
@@ -241,7 +271,7 @@ object DiscordRPCManager : IPCListener {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Discord RCP")
+        event.title("Discord RPC")
 
         if (debugError) {
             event.addData {
@@ -290,5 +320,11 @@ object DiscordRPCManager : IPCListener {
             category = CommandCategory.USERS_ACTIVE
             callback { startCommand() }
         }
+//         Debug command
+//         event.register("shrpcstop") {
+//             description = "Manually stops the Discord Rich Presence feature"
+//             category = CommandCategory.DEVELOPER_DEBUG
+//             callback { stop() }
+//         }
     }
 }
