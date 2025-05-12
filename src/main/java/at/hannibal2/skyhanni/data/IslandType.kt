@@ -2,12 +2,14 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
-import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandBounds
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if TODO
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+//#endif
 import net.minecraft.util.AxisAlignedBB
 
 enum class IslandType(private val nameFallback: String) {
@@ -66,18 +68,9 @@ enum class IslandType(private val nameFallback: String) {
 
     val displayName: String get() = islandData?.name ?: nameFallback
 
-    private var boundingBox: AxisAlignedBB? = null
-
-    fun isInBounds(vec: LorenzVec): Boolean {
-        val bounds = islandData?.bounds ?: return false
-
-        val box = boundingBox ?: AxisAlignedBB(
-            bounds.minX.toDouble(), 0.0, bounds.minZ.toDouble(),
-            bounds.maxX.toDouble(), 256.0, bounds.maxZ.toDouble(),
-        ).also { boundingBox = it }
-
-        return box.isInside(vec)
-    }
+    //#if TODO
+    fun isInBounds(vec: LorenzVec): Boolean = islandData?.boundingBox?.isInside(vec) ?: true
+    //#endif
 
     @SkyHanniModule
     companion object {
@@ -106,11 +99,17 @@ enum class IslandType(private val nameFallback: String) {
 
             val islandDataMap = data.islands.mapValues {
                 val island = it.value
-                IslandData(island.name, island.apiName, island.maxPlayers ?: data.maxPlayers, island.bounds)
+                val boundingBox = island.bounds?.let { bounds ->
+                    AxisAlignedBB(
+                        bounds.minX.toDouble(), 0.0, bounds.minZ.toDouble(),
+                        bounds.maxX.toDouble(), 256.0, bounds.maxZ.toDouble(),
+                    )
+                }
+
+                IslandData(island.name, island.apiName, island.maxPlayers ?: data.maxPlayers, boundingBox)
             }
 
             entries.forEach { islandType ->
-                islandType.boundingBox = null
                 islandType.islandData = islandDataMap[islandType.name]
             }
 
@@ -118,11 +117,16 @@ enum class IslandType(private val nameFallback: String) {
             maxPlayersMega = data.maxPlayersMega
         }
     }
+
+    //#if TODO
+    // TODO rename to isInIsland once the funciton in lorenz utils is gone
+    fun isCurrent() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
+    //#endif
 }
 
 data class IslandData(
     val name: String,
     val apiName: String?,
     val maxPlayers: Int,
-    val bounds: IslandBounds?,
+    val boundingBox: AxisAlignedBB?,
 )
