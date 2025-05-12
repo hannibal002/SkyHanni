@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -259,11 +258,6 @@ object Commands {
     }
 
     private fun devDebug(event: CommandRegistrationEvent) {
-        event.register("shdebug") {
-            description = "Copies SkyHanni debug data in the clipboard."
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { DebugCommand.command(it) }
-        }
         event.register("shconfig") {
             description = "Searches or resets config elements §c(warning, dangerous!)"
             category = CommandCategory.DEVELOPER_DEBUG
