@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
+//#if TODO
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -20,6 +22,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
+// todo 1.21 impl needed
 class GuiConfig {
     @Expose
     @Category(name = "Compact Tab List", desc = "Compact Tab List Settings")
@@ -35,12 +38,14 @@ class GuiConfig {
     @Accordion
     var chroma: ChromaConfig = ChromaConfig()
 
+    //#if TODO
     @ConfigOption(
         name = "Edit GUI Locations",
         desc = "Opens the Position Editor, allows changing the position of SkyHanni's overlays."
     )
     @ConfigEditorButton(buttonText = "Edit")
     var positions: Runnable = Runnable { openGuiPositionEditor(true) }
+    //#endif
 
     @Expose
     @ConfigOption(name = "Open Hotkey", desc = "Press this key to open the GUI Editor.")
@@ -142,7 +147,7 @@ class GuiConfig {
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "realTime")
-    var realTimePosition: Position = Position(10, 10, false, true)
+    var realTimePosition: Position = Position(10, 10)
 
     @Expose
     @Category(name = "Cosmetic", desc = "Cosmetics Settings")
@@ -156,11 +161,14 @@ class GuiConfig {
 
     @Expose
     @ConfigLink(owner = GuiConfig::class, field = "tpsDisplay")
-    var tpsDisplayPosition: Position = Position(10, 10, false, true)
+    var tpsDisplayPosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Config Button", desc = "Add a button to the pause menu to configure SkyHanni.")
     @ConfigEditorBoolean
     @FeatureToggle
     var configButtonOnPause: Boolean = true
+
+    @Expose
+    var titlePosition: Position = Position(0, 160)
 }

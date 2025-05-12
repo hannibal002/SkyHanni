@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,6 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
+// todo 1.21 impl needed
 class CFConfig {
     @Expose
     @ConfigOption(name = "Chocolate Factory Features", desc = "Global toggle for all chocolate factory features.")
@@ -25,10 +28,11 @@ class CFConfig {
     @FeatureToggle
     var statsDisplay: Boolean = true
 
+    //#if TODO
     @Expose
     @ConfigOption(
         name = "Stats List",
-        desc = "Drag text to change what displays in the chocolate factory stats list and what order the text appears in."
+        desc = "Drag text to change what displays in the chocolate factory stats list and what order the text appears in.",
     )
     @ConfigEditorDraggableList
     var statsDisplayList: MutableList<CFStat> = mutableListOf(
@@ -48,8 +52,9 @@ class CFConfig {
         CFStat.TIME_TOWER,
         CFStat.TIME_TOWER_FULL,
         CFStat.LEADERBOARD_POS,
-        CFStat.TIME_TO_BEST_UPGRADE
+        CFStat.TIME_TO_BEST_UPGRADE,
     )
+    //#endif
 
     @Expose
     @ConfigOption(name = "Stray Rabbit Warning", desc = "")
@@ -84,7 +89,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Show Stack Sizes",
-        desc = "Show additional info as many items in the chocolate menu as the stack size."
+        desc = "Show additional info as many items in the chocolate menu as the stack size.",
     )
     @ConfigEditorBoolean
     var showStackSizes: Boolean = true
@@ -92,7 +97,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Contributor Rabbit Name",
-        desc = "Replaces the rabbit names in the rabbit collection menu with SkyHanni contributor names."
+        desc = "Replaces the rabbit names in the rabbit collection menu with SkyHanni contributor names.",
     )
     @ConfigEditorBoolean
     var contributorRabbitName: Boolean = false
@@ -101,7 +106,7 @@ class CFConfig {
     @ConfigOption(
         name = "Highlight Upgrades",
         desc = "Highlight any upgrades that you can afford.\n" +
-            "The upgrade with a star is the most optimal and the lightest color of green is the most optimal you can afford."
+            "The upgrade with a star is the most optimal and the lightest color of green is the most optimal you can afford.",
     )
     @ConfigEditorBoolean
     var highlightUpgrades: Boolean = true
@@ -114,7 +119,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Rabbit Crush Threshold",
-        desc = "How close should you be to your barn capacity before being warned about needing to upgrade it."
+        desc = "How close should you be to your barn capacity before being warned about needing to upgrade it.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
     var barnCapacityThreshold: Int = 6
@@ -122,7 +127,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Rabbit Crush During Hoppity",
-        desc = "Only warn about rabbit crush when the Hoppity event is active."
+        desc = "Only warn about rabbit crush when the Hoppity event is active.",
     )
     @ConfigEditorBoolean
     var rabbitCrushOnlyDuringHoppity: Boolean = false
@@ -136,7 +141,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Duplicate Rabbit Time",
-        desc = "Show the production time of chocolate gained from duplicate rabbits."
+        desc = "Show the production time of chocolate gained from duplicate rabbits.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -152,7 +157,7 @@ class CFConfig {
     @ConfigOption(
         name = "Time Tower Usage Warning",
         desc = "Notify when you have a new time tower usage available and " +
-            "continuously warn when your time tower is full."
+            "continuously warn when your time tower is full.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -161,7 +166,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Time Tower Expiry Reminder",
-        desc = "Notify when the time tower ends and you have one or more remaining charges."
+        desc = "Notify when the time tower ends and you have one or more remaining charges.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -169,7 +174,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "statsDisplay")
-    var position: Position = Position(163, 160, false, true)
+    var position: Position = Position(163, 160)
 
     @Expose
     @ConfigOption(name = "Compact On Click", desc = "Compact the item tooltip when clicking on the chocolate.")
@@ -180,7 +185,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Always Compact",
-        desc = "Always compact the item tooltip on the chocolate. Requires the above option to be enabled."
+        desc = "Always compact the item tooltip on the chocolate. Requires the above option to be enabled.",
     )
     @ConfigEditorBoolean
     var compactOnClickAlways: Boolean = false
@@ -188,7 +193,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Tooltip Move",
-        desc = "Move tooltip away from the item you hover over while inside the Chocolate Factory."
+        desc = "Move tooltip away from the item you hover over while inside the Chocolate Factory.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -196,13 +201,13 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "tooltipMove")
-    var tooltipMovePosition: Position = Position(-380, 150, false, true)
+    var tooltipMovePosition: Position = Position(-380, 150)
 
     @Expose
     @ConfigOption(
         name = "Leaderboard Change",
         desc = "Show the change of your chocolate leaderboard over time in chat.\n" +
-            "This updates every time you first open the §e/cf §7menu on a new server."
+            "This updates every time you first open the §e/cf §7menu on a new server.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -211,7 +216,7 @@ class CFConfig {
     @Expose
     @ConfigOption(
         name = "Hoppity Menu Shortcut",
-        desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs §e/chocolatefactory §7on click."
+        desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs §e/chocolatefactory §7on click.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -230,6 +235,12 @@ class CFConfig {
     var boosterCookieRequirement: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Hot Chocolate Mixin", desc = "Blocks running /cf without §9Hot Chocolate Mixin §7active.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hotChocolateMixinRequirement: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Stray Tracker", desc = "Track stray rabbits found in the Chocolate Factory menu.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -237,7 +248,7 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "strayRabbitTracker")
-    var strayRabbitTrackerPosition: Position = Position(300, 300, false, true)
+    var strayRabbitTrackerPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(name = "Hitman Costs", desc = "Show the sum cost of remaining hitman slots.")
@@ -247,12 +258,12 @@ class CFConfig {
 
     @Expose
     @ConfigLink(owner = CFConfig::class, field = "hitmanCosts")
-    var hitmanCostsPosition: Position = Position(300, 300, false, true)
+    var hitmanCostsPosition: Position = Position(300, 300)
 
     @Expose
     @ConfigOption(
         name = "§6CF §zParty Mode",
-        desc = "Don't turn this on.\n§cRequires SkyHanni Chroma to be enabled to fully function."
+        desc = "Don't turn this on.\n§cRequires SkyHanni Chroma to be enabled to fully function.",
     )
     @ConfigEditorBoolean
     var partyMode: Property<Boolean> = Property.of(false)

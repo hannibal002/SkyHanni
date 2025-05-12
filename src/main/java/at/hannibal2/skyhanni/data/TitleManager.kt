@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.TitleManager.CountdownTitleContext.Companion.fromTitleData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -23,6 +25,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -31,7 +34,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.opengl.GL11
-import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -46,21 +48,20 @@ object TitleManager {
         private var titleText: String = "",
         private var subtitleText: String? = null,
         var duration: Duration = 1.seconds,
-        var height: Double = 1.8,
-        var fontSize: Float = 4f,
         val weight: Double = 1.0,
         var discardOnWorldChange: Boolean = true,
     ) {
+        var endTime: SimpleTimeMark? = null
+        var hasBeenRequeued: Boolean = false
+
         open val alive get() = endTime != null && (endTime?.isInPast() == false)
 
-        var endTime: SimpleTimeMark? = null
-
         open fun getTitleText(): String = titleText
-
         open fun getSubtitleText(): String? = subtitleText
-
         open fun start() {
-            endTime = if (endTime == null) (now() + duration) else endTime
+            if (endTime == null || endTime?.isInPast() == true) {
+                endTime = now() + duration
+            }
         }
 
         open fun stop() {
@@ -70,14 +71,11 @@ object TitleManager {
         override fun equals(other: Any?): Boolean = this === other || other is TitleContext && this.dataEquivalent(other)
         override fun hashCode(): Int =
             titleText.hashCode() * 31 + (subtitleText?.hashCode() ?: 0) * 31 +
-                duration.hashCode() * 31 + height.hashCode() * 31 +
-                fontSize.hashCode() * 31 + weight.hashCode()
+                duration.hashCode() * 31 + weight.hashCode()
 
         protected fun dataEquivalent(other: TitleContext): Boolean = titleText == other.titleText &&
             subtitleText == other.subtitleText &&
             duration == other.duration &&
-            height == other.height &&
-            fontSize == other.fontSize &&
             weight == other.weight
     }
 
@@ -95,7 +93,10 @@ object TitleManager {
         var countdownDuration: Duration = 5.seconds,
         var displayType: CountdownTitleDisplayType = CountdownTitleDisplayType.WHOLE_SECONDS,
         var updateInterval: Duration = 1.seconds,
-        var loomInterval: Duration = 250.milliseconds, // TODO add explanation what this is
+        /**
+         * How long the title will 'stick around' for after the countdown is done.
+         */
+        var loomDuration: Duration = 250.milliseconds,
         var onInterval: () -> Unit = {},
         var onFinish: () -> Unit = {},
     ) : TitleContext() {
@@ -119,7 +120,7 @@ object TitleManager {
             isActive = true
             virtualEndTime = if (virtualEndTime == null) (now() + countdownDuration) else {
                 virtualEndTime?.also {
-                    endTime = it + loomInterval
+                    endTime = it + loomDuration
                 }
             }
             onIntervalOutward()
@@ -135,14 +136,14 @@ object TitleManager {
         override fun equals(other: Any?): Boolean = this === other || other is CountdownTitleContext && this.dataEquivalent(other)
         override fun hashCode(): Int = formattedTitleText.hashCode() * 31 + (formattedSubtitleText?.hashCode() ?: 0) * 31 +
             countdownDuration.hashCode() * 31 + displayType.hashCode() * 31 +
-            updateInterval.hashCode() * 31 + loomInterval.hashCode() * 31 +
+            updateInterval.hashCode() * 31 + loomDuration.hashCode() * 31 +
             onInterval.hashCode() * 31 + onFinish.hashCode()
 
         private fun dataEquivalent(other: CountdownTitleContext): Boolean = super.dataEquivalent(other) &&
             countdownDuration == other.countdownDuration &&
             displayType == other.displayType &&
             updateInterval == other.updateInterval &&
-            loomInterval == other.loomInterval &&
+            loomDuration == other.loomDuration &&
             onInterval == other.onInterval &&
             onFinish == other.onFinish
 
@@ -168,7 +169,7 @@ object TitleManager {
             fun TitleContext.fromTitleData(
                 displayType: CountdownTitleDisplayType,
                 updateInterval: Duration,
-                loomInterval: Duration,
+                loomDuration: Duration,
                 discardOnWorldChange: Boolean = true,
                 onInterval: () -> Unit = {},
                 onFinish: () -> Unit = {},
@@ -178,7 +179,7 @@ object TitleManager {
                 formattedSubtitleText = getSubtitleText(),
                 displayType = displayType,
                 updateInterval = updateInterval,
-                loomInterval = loomInterval,
+                loomDuration = loomDuration,
                 onInterval = onInterval,
                 onFinish = onFinish,
             ).apply {
@@ -209,9 +210,7 @@ object TitleManager {
     fun sendTitle(
         titleText: String,
         subtitleText: String? = null,
-        duration: Duration = 3.seconds,
-        height: Double = 1.8,
-        fontSize: Float = 4f,
+        duration: Duration = 5.seconds,
         location: TitleLocation = TitleLocation.GLOBAL,
         addType: TitleAddType = TitleAddType.QUEUE,
         weight: Double = 1.0,
@@ -231,16 +230,18 @@ object TitleManager {
         countDownInterval: Duration = 1.seconds,
         onInterval: () -> Unit = {},
         onFinish: () -> Unit = {},
-        // How long the title will stay around for after the countdown is done.
-        loomInterval: Duration = 250.milliseconds,
+        /**
+         * How long the title will 'stick around' for after the countdown is done.
+         */
+        loomDuration: Duration = 250.milliseconds,
     ): TitleContext? {
-        val newTitle = TitleContext(titleText, subtitleText, duration, height, fontSize, weight).let {
+        val newTitle = TitleContext(titleText, subtitleText, duration, weight).let {
             when (countDownDisplayType) {
                 null -> it
                 else -> it.fromTitleData(
                     countDownDisplayType,
                     countDownInterval,
-                    loomInterval,
+                    loomDuration,
                     discardOnWorldChange,
                     onInterval,
                     onFinish,
@@ -290,8 +291,16 @@ object TitleManager {
     }
 
     private fun command(args: Array<String>, command: String, location: TitleLocation = TitleLocation.GLOBAL, countdown: Boolean = false) {
-        if (args.size < 4) {
-            ChatUtils.userError("Usage: /$command <duration> <height> <fontSize> <text ..>")
+        if (args.getOrNull(0) == "reset") {
+            titleLocationQueues.clear()
+            for (context in currentTitles.values) {
+                context?.stop()
+            }
+            ChatUtils.chat("Reset all active titles!")
+            return
+        }
+        if (args.size < 2) {
+            ChatUtils.userError("Usage: /$command <duration> <text ..>")
             return
         }
 
@@ -299,16 +308,12 @@ object TitleManager {
             ChatUtils.userError("Invalid duration format `${args[0]}`! Use e.g. 10s, or 20m or 30h")
             return
         }
-        val height = args[1].toDouble()
-        val fontSize = args[2].toFloat()
-        val title = "§6" + args.drop(3).joinToString(" ").replace("&", "§")
+        val title = "§6" + args.drop(1).joinToString(" ").replace("&", "§")
 
         sendTitle(
             title,
             subtitleText = null,
             duration = duration,
-            height,
-            fontSize,
             location,
             countDownDisplayType = if (countdown) CountdownTitleDisplayType.PARTIAL_SECONDS else null,
         )
@@ -328,8 +333,6 @@ object TitleManager {
                                 append("Title: ${titleItem.getTitleText()}\n")
                                 append("Subtitle: ${titleItem.getSubtitleText()}\n")
                                 append("Duration: ${titleItem.duration.inWholeSeconds}s\n")
-                                append("Height: ${titleItem.height}\n")
-                                append("Font Size: ${titleItem.fontSize}\n")
                                 append("Weight: ${titleItem.weight}\n")
                                 append("End Time: ${titleItem.endTime?.timeUntil()?.inWholeSeconds ?: 0.0}s\n")
                             }
@@ -345,8 +348,6 @@ object TitleManager {
                             append("Title: ${titleItem?.getTitleText()}\n")
                             append("Subtitle: ${titleItem?.getSubtitleText()}\n")
                             append("Duration: ${titleItem?.duration?.inWholeSeconds}s\n")
-                            append("Height: ${titleItem?.height}\n")
-                            append("Font Size: ${titleItem?.fontSize}\n")
                             append("Weight: ${titleItem?.weight}\n")
                             append("End Time: ${titleItem?.endTime?.timeUntil()?.inWholeSeconds}s\n")
                         }
@@ -396,13 +397,18 @@ object TitleManager {
                 null -> dequeueNextTitle(location)
                 else -> {
                     val titleLocationQueue = titleLocationQueues[location]
-                    titleLocationQueue?.getWaitingWeightOrNull()?.let {
-                        if (it <= currentTitle.weight) return@let
-                        currentTitle.stop()
-                        // Re-queue for insertion after the new title
-                        titleLocationQueue.add(currentTitle, currentTitle.weight)
-                        dequeueNextTitle(location)
-                        return
+                    titleLocationQueue?.getWaitingWeightOrNull()?.let { waitingWeight ->
+                        if (waitingWeight > currentTitle.weight) {
+                            if (currentTitle.alive && currentTitle.endTime?.isInFuture() == true) {
+                                currentTitle.duration = currentTitle.endTime?.timeUntil() ?: Duration.ZERO
+                                if (currentTitle.duration > Duration.ZERO && !currentTitle.hasBeenRequeued) {
+                                    currentTitle.hasBeenRequeued = true
+                                    titleLocationQueue.add(currentTitle, currentTitle.weight)
+                                }
+                            }
+                            dequeueNextTitle(location)
+                            return@forEach
+                        }
                     }
                     if (currentTitle.alive) return@forEach
                     currentTitle.stop()
@@ -410,8 +416,13 @@ object TitleManager {
                 }
             }
         }
+        // Watchdog
         TitleLocation.entries.forEach {
             currentTitles[it]?.start()
+            if (currentTitles[it]?.alive == false) {
+                currentTitles[it]?.stop()
+                currentTitles[it] = null
+            }
         }
     }
 
@@ -428,21 +439,18 @@ object TitleManager {
         globalTitle.tryRenderGlobalTitle()
     }
 
+    // TODO move function inside title context class
     private fun TitleContext.tryRenderGlobalTitle() {
+        val gui = SkyHanniMod.feature.gui
+        val position = gui.titlePosition
         val guiWidth = GuiScreenUtils.scaledWindowWidth
-        val guiHeight = GuiScreenUtils.scaledWindowHeight
 
-        val globalTitleWidth = 200
-        val stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(getTitleText())
-        var factor = globalTitleWidth / stringWidth.toDouble()
-        factor = min(factor, 1.0)
-
-        val mainScalar = factor * fontSize
+        val mainScalar = position.scale * 3.0
         val subScalar = mainScalar * 0.75f
 
         GlStateManager.enableBlend()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
 
         val mainTextRenderable = Renderable.string(
             getTitleText(),
@@ -469,11 +477,20 @@ object TitleManager {
         val renderableHeight = targetRenderable.height
 
         val posX = (guiWidth - renderableWidth) / 2
-        val posY = (guiHeight - (renderableHeight * 4)) / 2
+        var posY = position.y
+        // moving the display to the bottom half of your screen is futile
+        if (posY < 0) {
+            posY = 100
+        }
+        if (posX != position.x || posY != position.y) {
+            position.set(Position(posX, posY, scale = position.scale))
+        }
 
-        GlStateManager.translate(posX.toFloat(), posY.toFloat(), 0f)
+        DrawContextUtils.translate(posX.toFloat(), posY.toFloat(), 0f)
         targetRenderable.renderXYAligned(0, 0, renderableWidth, renderableHeight)
-        GlStateManager.popMatrix()
+        DrawContextUtils.popMatrix()
+
+        GuiEditManager.add(position, "Title", targetRenderable.width, targetRenderable.height)
     }
 
     @HandleEvent
@@ -510,8 +527,8 @@ object TitleManager {
             else -> 150f
         }
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(0f, -(heightTranslation), 500f)
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate(0f, -(heightTranslation), 500f)
         Renderable.drawInsideRoundedRect(
             stringRenderable,
             ColorUtils.TRANSPARENT_COLOR,
@@ -519,7 +536,7 @@ object TitleManager {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         ).renderXYAligned(0, 0, gui.width, gui.height)
 
-        GlStateManager.translate(0f, heightTranslation, -500f)
-        GlStateManager.popMatrix()
+        DrawContextUtils.translate(0f, heightTranslation, -500f)
+        DrawContextUtils.popMatrix()
     }
 }

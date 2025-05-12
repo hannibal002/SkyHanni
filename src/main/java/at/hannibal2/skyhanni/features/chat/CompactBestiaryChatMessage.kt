@@ -13,7 +13,7 @@ object CompactBestiaryChatMessage {
     private var inBestiary = false
     private val bestiaryDescription = mutableListOf<String>()
     private var acceptMoreDescription = true
-    var command = ""
+    private var command = ""
     private var blockedLines = 0
 
     private var milestoneMessage: String? = null

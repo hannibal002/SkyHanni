@@ -15,9 +15,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
+import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import java.io.Serializable
 import java.nio.file.Path
+import java.util.Properties
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.moveTo
@@ -61,6 +63,9 @@ loom {
             )
             mixinConfig("mixins.skyhanni.json")
         }
+    }
+    if (target == ProjectTarget.MODERN) {
+        accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
     }
     mixin {
         useLegacyMixinAp.set(true)
@@ -117,6 +122,10 @@ val headlessLwjgl by configurations.creating {
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
     this.branch = "main"
+}
+
+val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
+    this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
 }
 
 tasks.runClient {
@@ -181,8 +190,8 @@ dependencies {
         modImplementation("net.fabricmc:fabric-loader:0.16.7")
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
-        modImplementation("net.fabricmc:fabric-loader:0.16.10")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
+        modImplementation("net.fabricmc:fabric-loader:0.16.13")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
 
         modLocalRuntime(libs.modmenu)
     }
@@ -240,7 +249,11 @@ dependencies {
 
 afterEvaluate {
     loom.runs.named("client") {
-        programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+        if (target == ProjectTarget.MAIN) {
+            programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+        } else if (target == ProjectTarget.MODERN) {
+            programArgs("--quickPlayMultiplayer", "hypixel.net")
+        }
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
         this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
@@ -397,11 +410,21 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
     }
 }
 
+val skipTodos by lazy {
+    val prop = Properties()
+    val file = rootProject.file(".gradle/private.properties")
+    if (file.exists()) {
+        file.inputStream().use(prop::load)
+    }
+    (prop["skyhanni.skipPreprocessTodos"] as? String)?.toBoolean() ?: false
+}
+
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
+    vars.put("TODO", if (skipTodos) 1 else 0)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {

@@ -2,16 +2,23 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+//#if TODO
 import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
+//#endif
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+//#if TODO
+import at.hannibal2.skyhanni.mixins.hooks.ChatLineData
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
+//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+//#if TODO
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+//#endif
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
@@ -31,6 +38,7 @@ import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object ChatUtils {
 
@@ -54,7 +62,12 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean = false,
     ) {
-        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
+        //#if TODO
+        val debug = LorenzUtils.debug
+        //#else
+        //$$ val debug = true
+        //#endif
+        if (debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             consoleLog("[Debug] $message")
         }
     }
@@ -276,6 +289,7 @@ object ChatUtils {
 
     private val chatGui get() = Minecraft.getMinecraft().ingameGUI.chatGUI
 
+    //#if TODO
     var chatLines: MutableList<ChatLine>
         get() = (chatGui as AccessorMixinGuiNewChat).chatLines_skyhanni
         set(value) {
@@ -287,6 +301,7 @@ object ChatUtils {
         set(value) {
             (chatGui as AccessorMixinGuiNewChat).drawnChatLines_skyhanni = value
         }
+    //#endif
 
     /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
     fun editFirstMessage(
@@ -294,8 +309,10 @@ object ChatUtils {
         reason: String,
         predicate: (ChatLine) -> Boolean,
     ) {
+        //#if TODO
         chatLines.editChatLine(component, predicate, reason)
         chatGui.refreshChat()
+        //#endif
     }
 
     /**
@@ -306,8 +323,10 @@ object ChatUtils {
         amount: Int = 1,
         predicate: (ChatLine) -> Boolean,
     ) {
+        //#if TODO
         chatLines.deleteChatLine(amount, reason, predicate)
         chatGui.refreshChat()
+        //#endif
     }
 
     private var deleteNext: Pair<String, (String) -> Boolean>? = null
@@ -401,13 +420,19 @@ object ChatUtils {
 
     //#if MC < 1.16
     val ChatLine.chatMessage get() = chatComponent.formattedText.stripHypixelMessage()
+    var ChatLine.fullComponent: IChatComponent
+        get() = (this as ChatLineData).skyHanni_fullComponent
+        set(value) {
+            (this as ChatLineData).skyHanni_fullComponent = value
+        }
+
     fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
     //#elseif MC < 1.21
     //$$ val GuiMessage<Component>.chatMessage get() = message.formattedTextCompat().stripHypixelMessage()
     //$$ fun GuiMessage<Component>.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime).ticks
     //#else
     //$$ val ChatHudLine.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
-    //$$ fun ChatHudLine.passedSinceSent() = (MinecraftClient.getInstance().inGameHud.ticks - creationTick).ticks
+    //$$ fun ChatHudLine.passedSinceSent() = ((MinecraftClient.getInstance().inGameHud.ticks - creationTick) * 50).milliseconds
     //#endif
 
     fun consoleLog(text: String) {

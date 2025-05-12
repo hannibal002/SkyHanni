@@ -26,25 +26,21 @@ object PartyCommands {
 
     private fun kickOffline() {
         if (!config.shortCommands) return
-        if (PartyApi.partyMembers.isEmpty()) return
         HypixelCommands.partyKickOffline()
     }
 
     private fun disband() {
         if (!config.shortCommands) return
-        if (PartyApi.partyMembers.isEmpty()) return
         HypixelCommands.partyDisband()
     }
 
     private fun warp() {
         if (!config.shortCommands) return
-        if (PartyApi.partyMembers.isEmpty()) return
         HypixelCommands.partyWarp()
     }
 
     private fun kick(args: Array<String>) {
         if (!config.shortCommands) return
-        if (PartyApi.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
         val kickedPlayer = args[0]
         val kickedReason = args.drop(1).joinToString(" ").trim()
@@ -64,20 +60,17 @@ object PartyCommands {
             return
         }
         if (!config.shortCommands) return
-        if (PartyApi.partyMembers.isEmpty()) return
         HypixelCommands.partyTransfer(args[0])
     }
 
     private fun promote(args: Array<String>) {
         if (!config.shortCommands) return
-        if (PartyApi.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
         HypixelCommands.partyPromote(args[0])
     }
 
     private fun reverseTransfer() {
         if (!config.reversePT.command) return
-        if (PartyApi.partyMembers.isEmpty()) return
         val prevPartyLeader = PartyApi.prevPartyLeader ?: return
 
         autoPartyTransfer(prevPartyLeader)
