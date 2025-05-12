@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GuiContainer.class)
+@Mixin(value = GuiContainer.class, priority = 499)
 public abstract class MixinGuiContainer extends GuiScreen {
 
     @Unique
@@ -65,8 +65,9 @@ public abstract class MixinGuiContainer extends GuiScreen {
         skyHanni$hook.onDrawSlotPost(slot);
     }
 
-    @Inject(method = "handleMouseClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;windowClick(IIIILnet/minecraft/entity/player/EntityPlayer;)Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    @Inject(method = "handleMouseClick", at = @At(value = "HEAD"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
+        if (slot == null) return;
         skyHanni$hook.onMouseClick(slot, slotId, clickedButton, clickType, ci);
     }
 
