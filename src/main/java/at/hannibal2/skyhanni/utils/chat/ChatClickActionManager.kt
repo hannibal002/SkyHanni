@@ -40,7 +40,7 @@ object ChatClickActionManager {
     )
 
     @HandleEvent
-    private fun onCommandRegistration(event: CommandRegistrationEvent) {
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shaction") {
             description = "Internal command for chat click actions"
             category = CommandCategory.INTERNAL
