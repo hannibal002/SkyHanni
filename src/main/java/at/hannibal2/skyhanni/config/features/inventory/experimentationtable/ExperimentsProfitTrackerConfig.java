@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.inventory.experimentationtable;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.ExperimentationMessages;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -21,10 +23,12 @@ public class ExperimentsProfitTrackerConfig {
     @FeatureToggle
     public boolean enabled = false;
 
+    //#if TODO
     @Expose
     @ConfigOption(name = "Hide Messages", desc = "Change the messages to be hidden after completing Add-on/Main experiments.")
     @ConfigEditorDraggableList
     public List<ExperimentationMessages> hideMessages = new ArrayList<>();
+    //#endif
 
     @Expose
     @ConfigOption(name = "Time displayed", desc = "Time displayed after completing an experiment.")
