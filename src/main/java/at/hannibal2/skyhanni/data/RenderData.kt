@@ -25,7 +25,7 @@ object RenderData {
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
         DrawContextUtils.translate(0f, 0f, -3f)
-        renderOverlay(event.context)
+        renderOverlay(DrawContextUtils.drawContext)
         DrawContextUtils.translate(0f, 0f, 3f)
     }
 
@@ -41,11 +41,11 @@ object RenderData {
 
         if (GuiEditManager.isInGui()) {
             DrawContextUtils.translate(0f, 0f, -3f)
-            renderOverlay(event.context)
+            renderOverlay(DrawContextUtils.drawContext)
             DrawContextUtils.translate(0f, 0f, 3f)
         }
 
-        GuiRenderEvent.ChestGuiOverlayRenderEvent(event.context).post()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
 
         DrawContextUtils.popMatrix()
     }

@@ -19,6 +19,7 @@ import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import java.io.Serializable
 import java.nio.file.Path
+import java.util.Properties
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.moveTo
@@ -234,8 +235,11 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.5")
 
     if (target.minecraftVersion == MinecraftVersion.MC189) {
-        compileOnly(libs.hypixelmodapi)
+        compileOnly(libs.hypixelmodapi.forge)
         shadowImpl(libs.hypixelmodapitweaker)
+    } else if (target == ProjectTarget.MODERN) {
+        modImplementation(libs.hypixelmodapi)
+        include(libs.hypixelmodapi.fabric)
     }
 
     // getting clock offset
@@ -409,11 +413,21 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
     }
 }
 
+val skipTodos by lazy {
+    val prop = Properties()
+    val file = rootProject.file(".gradle/private.properties")
+    if (file.exists()) {
+        file.inputStream().use(prop::load)
+    }
+    (prop["skyhanni.skipPreprocessTodos"] as? String)?.toBoolean() ?: false
+}
+
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
+    vars.put("TODO", if (skipTodos) 1 else 0)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
