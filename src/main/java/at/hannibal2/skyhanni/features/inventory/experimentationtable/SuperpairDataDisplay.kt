@@ -24,8 +24,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
-private typealias TaskType = ExperimentationTableApi.ExperimentationTaskType
-
 @SkyHanniModule
 object SuperpairDataDisplay {
 

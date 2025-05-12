@@ -21,6 +21,11 @@ public class ExperimentationTableConfig {
     public ExperimentsDryStreakConfig dryStreak = new ExperimentsDryStreakConfig();
 
     @Expose
+    @ConfigOption(name = "Addon Helpers", desc = "")
+    @Accordion
+    public ExperimentsAddonHelpersConfig addonHelpers = new ExperimentsAddonHelpersConfig();
+
+    @Expose
     @ConfigOption(name = "Superpair Data", desc = "Displays useful data while doing the Superpair experiment.")
     @ConfigEditorBoolean
     @FeatureToggle

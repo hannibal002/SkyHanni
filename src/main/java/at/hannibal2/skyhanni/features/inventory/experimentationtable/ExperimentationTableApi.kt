@@ -47,6 +47,8 @@ import net.minecraft.entity.item.EntityArmorStand
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
+typealias TaskType = ExperimentationTableApi.ExperimentationTaskType
+
 @SkyHanniModule
 object ExperimentationTableApi {
 
