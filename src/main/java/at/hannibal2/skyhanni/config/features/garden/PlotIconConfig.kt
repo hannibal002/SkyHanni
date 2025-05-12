@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.inventory.plots.GardenPlotIcon
 import at.hannibal2.skyhanni.utils.HypixelCommands.gardenDesk
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
