@@ -84,7 +84,11 @@ class CommandsConfig {
     var transferCooldown: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Transfer Cooldown Message", desc = "Sends a message in chat when the transfer cooldown ends.")
+    @ConfigOption(
+        name = "Fix AH/BZ Cooldown",
+        desc = "Waits for world-change cooldown to complete if you try to open Bazaar or Auction House."
+    )
     @ConfigEditorBoolean
-    var transferCooldownMessage: Boolean = false
+    @FeatureToggle
+    var auctionBazaarCooldown: Boolean = false
 }

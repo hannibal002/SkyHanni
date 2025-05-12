@@ -10,8 +10,19 @@ object HypixelCommands {
         send("skyblock")
     }
 
+    fun bz() {
+        send("bz")
+    }
+
     fun bazaar(searchTerm: String) {
         send("bz $searchTerm")
+    }
+
+    fun ah(player: String? = null) {
+        when (player) {
+            null -> send("ah")
+            else -> send("ah $player")
+        }
     }
 
     fun auctionSearch(searchTerm: String) {
