@@ -20,7 +20,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ErrorManager {
 

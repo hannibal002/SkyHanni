@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.toGameProfile
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import com.mojang.serialization.JsonOps
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.DyedColorComponent
@@ -26,6 +28,11 @@ object ComponentUtils {
             val display = nbtInfo.display
             if (display.color != null) {
                 stack.set(DataComponentTypes.DYED_COLOR, DyedColorComponent(display.color))
+            }
+            if (display.name != null) {
+                stack.setCustomItemName(display.name)
+            } else {
+                ErrorManager.skyHanniError("stack display name is null", "extra attributes" to nbtInfo.extraAttributes)
             }
         }
         if (nbtInfo.skullOwner != null) {

@@ -106,7 +106,7 @@ var IChatComponent.hover: IChatComponent?
         //#if MC < 1.16
         this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
         //#else
-        //$$ this.style.withHoverEvent(value?.let {  HoverEvent.ShowText(it) })
+        //$$ (this as MutableText).styled {it.withHoverEvent(HoverEvent.ShowText(value))}
         //#endif
     }
 
@@ -120,7 +120,7 @@ var IChatComponent.command: String?
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) }
         //#else
-        //$$ this.style.withClickEvent(value?.let { ClickEvent.RunCommand(it) })
+        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
         //#endif
     }
 
@@ -134,7 +134,7 @@ var IChatComponent.suggest: String?
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) }
         //#else
-        //$$ this.style.withClickEvent(value?.let { ClickEvent.SuggestCommand(it) })
+        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
         //#endif
     }
 
@@ -148,7 +148,7 @@ var IChatComponent.url: String?
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
         //#else
-        //$$ this.style.withClickEvent(value?.let { ClickEvent.OpenUrl(URI.create(it)) })
+        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value)))) }
         //#endif
     }
 

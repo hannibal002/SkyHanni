@@ -689,8 +689,21 @@ at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kt
 at/hannibal2/skyhanni/events/GuiContainerEvent.kt
 at.hannibal2.skyhanni.data.OtherInventoryData.kt
 at/hannibal2/skyhanni/events/InventoryFullyOpenedEvent.kt
-
-
+at.hannibal2.skyhanni.utils.InventoryDetector.kt
+at.hannibal2.skyhanni.events.inventory.AnvilUpdateEvent.kt
+at.hannibal2.skyhanni.features.anvil.AnvilApi.kt
+at.hannibal2.skyhanni.data.OwnInventoryData.kt
+at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent.kt
+at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent.kt
+at.hannibal2.skyhanni.api.ItemBuyApi.kt
+at.hannibal2.skyhanni.api.ReforgeApi.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuReforgeJson.kt
+at.hannibal2.skyhanni.data.FriendApi.kt
+at.hannibal2.skyhanni.data.TitleData.kt
+at.hannibal2.skyhanni.data.ToolTipData.kt
+at/hannibal2/skyhanni/events/item/ItemHoverEvent.kt
+at.hannibal2.skyhanni.utils.PlayerUtils.kt
+at.hannibal2.skyhanni.events.TitleReceivedEvent.kt
 
 
 # \.(?!kt|java|\()

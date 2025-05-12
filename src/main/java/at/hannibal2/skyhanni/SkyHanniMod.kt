@@ -11,9 +11,7 @@ import at.hannibal2.skyhanni.config.Features
 import at.hannibal2.skyhanni.config.SackData
 //#endif
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-//#if TODO
 import at.hannibal2.skyhanni.data.OtherInventoryData
-//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 //#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -80,9 +78,7 @@ object SkyHanniMod {
             if (screenTicks == 5) {
                 val title = InventoryUtils.openInventoryName()
                 MinecraftCompat.localPlayer.closeScreen()
-                //#if TODO
                 OtherInventoryData.close(title)
-                //#endif
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
                 screenToOpen = null
