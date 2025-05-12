@@ -687,8 +687,8 @@ at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent.kt
 at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kt
 at/hannibal2/skyhanni/events/GuiContainerEvent.kt
-
-
+at.hannibal2.skyhanni.data.OtherInventoryData.kt
+at/hannibal2/skyhanni/events/InventoryFullyOpenedEvent.kt
 
 
 

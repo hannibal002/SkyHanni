@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.MinecraftClient
 
+@SkyHanniModule
 object TestingModFeatures {
 
     init {

@@ -21,16 +21,21 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 //$$ import java.net.URI
 //$$ import kotlin.jvm.optionals.getOrNull
 //$$ import kotlin.math.abs
+//$$ import net.minecraft.text.TranslatableTextContent
 //#endif
 
-fun IChatComponent.unformattedTextForChatCompat(): String =
+fun IChatComponent.unformattedTextForChatCompat(): String {
 //#if MC < 1.16
-    this.unformattedTextForChat
+    return this.unformattedTextForChat
 //#elseif MC < 1.21
-//$$ this.contents
+//$$ return this.contents
 //#else
-//$$ (this.content as? PlainTextContent)?.string().orEmpty()
+//$$ if (this.content is TranslatableTextContent) {
+//$$     return (this.content as TranslatableTextContent).key.orEmpty()
+//$$ }
+//$$ return (this.content as? PlainTextContent)?.string().orEmpty()
 //#endif
+}
 
 fun IChatComponent.unformattedTextCompat(): String =
 //#if MC < 1.16
@@ -47,9 +52,9 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$     this ?: return@run ""
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
-//$$         sb.append(component.style.color?.toChatFormatting()?.toString() ?: "§r")
+//$$         sb.append(component.style.color?.toChatFormatting()?.toString() ?: "")
 //$$         sb.append(component.unformattedTextForChatCompat())
-//$$         sb.append("§r")
+//$$         //sb.append("§r")
 //$$     }
 //$$     sb.toString()
 //$$ }
