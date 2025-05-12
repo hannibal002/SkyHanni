@@ -51,7 +51,6 @@ import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
@@ -69,7 +68,6 @@ object Commands {
         usersBugFix(event)
         devTest(event)
         devDebug(event)
-        internalCommands(event)
     }
 
     private fun usersMain(event: CommandRegistrationEvent) {
@@ -437,14 +435,6 @@ object Commands {
             description = "Manually saving the config"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "manual-command") }
-        }
-    }
-
-    private fun internalCommands(event: CommandRegistrationEvent) {
-        event.register("shaction") {
-            description = "Internal command for chat click actions"
-            category = CommandCategory.INTERNAL
-            callback { ChatClickActionManager.onCommand(it) }
         }
     }
 }
