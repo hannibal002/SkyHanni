@@ -57,7 +57,7 @@ object ExperimentationTableApi {
     private const val ADDONS_OVER_DATA_SLOT = 11
     private const val SUPERPAIRS_OVER_DATA_SLOT = 13
 
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable.experimentsProfitTracker
+    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val currentExperimentData = ExperimentationDataSet()
@@ -321,11 +321,11 @@ object ExperimentationTableApi {
 
     /**
      * REGEX-TEST: §8?
-     * REGEX-TEST: §eClick any button
+     * REGEX-TEST: §eClick any button!
      */
-    val unknownSuperpairsClickPattern by patternGroup.pattern(
+    private val unknownSuperpairsClickPattern by patternGroup.pattern(
         "superpairs.unknown-click",
-        "(?:§.)+\\?|Click any button!"
+        "(?:§.)+(?:\\?|Click any button!?)"
     )
     // </editor-fold>
 
@@ -334,7 +334,7 @@ object ExperimentationTableApi {
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
     }
 
-    private fun ExperimentationMessages.isSelected() = config.hideMessages.contains(this)
+    private fun ExperimentationMessages.isSelected() = config.experimentsProfitTracker.hideMessages.contains(this)
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
@@ -458,9 +458,10 @@ object ExperimentationTableApi {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onReplaceItem(event: ReplaceItemEvent) {
+        if (!config.superpairs.clickedItemsVisible) return
         if (!inTable || currentExperimentType != TaskType.SUPERPAIRS) return
         if (superpairsSlotMap.isEmpty() || event.slot !in superpairsSlotMap.keys) return
-        if (event.originalItem.displayName.removeColor() != "?") return
+        if (!unknownSuperpairsClickPattern.matches(event.originalItem.displayName)) return
         val replacementItem = superpairsSlotMap[event.slot] ?: return
         event.replace(replacementItem)
     }
