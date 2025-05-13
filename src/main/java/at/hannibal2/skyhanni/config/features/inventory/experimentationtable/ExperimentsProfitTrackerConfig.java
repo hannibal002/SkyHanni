@@ -31,11 +31,6 @@ public class ExperimentsProfitTrackerConfig {
     //#endif
 
     @Expose
-    @ConfigOption(name = "Time displayed", desc = "Time displayed after completing an experiment.")
-    @ConfigEditorSlider(minValue = 5, maxValue = 60, minStep = 1)
-    public int timeDisplayed = 30;
-
-    @Expose
     @ConfigOption(name = "Track Used Bottles", desc = "Track thrown XP bottles while near the experimentation table.")
     @ConfigEditorBoolean
     public boolean trackUsedBottles = true;
