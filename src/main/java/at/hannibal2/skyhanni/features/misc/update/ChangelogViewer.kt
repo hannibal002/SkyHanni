@@ -139,7 +139,7 @@ object ChangelogViewer {
             specifiers = listOf<CommandArgument<CommandContext>>(
                 CommandArgument(
                     documentation = "<version> - Shows the changelog of the versions until this, " +
-                                    "or only that version if no since is specified.",
+                        "or only that version if no since is specified.",
                     prefix = "until",
                     defaultPosition = 1,
                     handler = { argument, context ->
