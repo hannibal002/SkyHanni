@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import net.minecraft.item.ItemStack
-import java.awt.Color
 
 @SkyHanniModule
 object ExperimentsAddonsHelper {
@@ -86,38 +85,6 @@ object ExperimentsAddonsHelper {
         chronomatronSequenceIndex = 0
     }
 
-    @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
-
-        if (!ExperimentationTableApi.inAddon) return
-        if (ExperimentationTableApi.inUltrasequencer && currentUltraSequencerRound >= 1) tryHighlightUltrasequencer()
-        if (ExperimentationTableApi.inChronomatron && currentChronomatronRound >= 1) tryHighlightChronomatron()
-    }
-
-    private fun tryHighlightUltrasequencer() = InventoryUtils.getItemsInOpenChest().filter {
-        it.stack.displayName.trim().isNotEmpty() && it.slotNumber in hypixelUltrasequencerData
-    }.forEach { slot ->
-        val slotIndex = hypixelUltrasequencerData.indexOf(slot.slotNumber)
-        val alphaValue = (255 / (1 + slotIndex))
-        val slotColor = Color(30, 145, 30, alphaValue)
-        slot.highlight(slotColor)
-    }
-
-    private fun tryHighlightChronomatron() {
-        val nextColor = hypixelChronomatronData.getOrNull(chronomatronSequenceIndex)
-        val nextNextColor = hypixelChronomatronData.getOrNull(chronomatronSequenceIndex + 1)
-
-        InventoryUtils.getItemsInOpenChest().filter {
-            val color = it.stack.getLorenzColorOrNull()
-            color != null && color in listOf(nextColor, nextNextColor)
-        }.forEach { slot ->
-            val alphaValue = if (slot.stack.getLorenzColorOrNull() == nextColor) 255 else 128
-            val slotColor = Color(30, 145, 30, alphaValue)
-            slot.highlight(slotColor)
-        }
-    }
-
     private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (displayName.removeColor()) {
         "Green" -> LorenzColor.DARK_GREEN
         "Lime" -> LorenzColor.GREEN
@@ -131,6 +98,41 @@ object ExperimentsAddonsHelper {
             null
         }
     }
+
+    // <editor-fold desc="Next click highlighting">
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
+
+        if (!ExperimentationTableApi.inAddon) return
+        if (ExperimentationTableApi.inUltrasequencer && currentUltraSequencerRound >= 1) tryHighlightUltrasequencer()
+        if (ExperimentationTableApi.inChronomatron && currentChronomatronRound >= 1) tryHighlightChronomatron()
+    }
+
+    private fun tryHighlightUltrasequencer() = InventoryUtils.getItemsInOpenChest().filter {
+        it.stack.displayName.trim().isNotEmpty() && it.slotNumber in hypixelUltrasequencerData &&
+            hypixelUltrasequencerData.indexOf(it.slotNumber) > (userUltrasequencerProgress.size - 1)
+    }.sortedBy {
+        hypixelUltrasequencerData.indexOf(it.slotNumber)
+    }.forEachIndexed { slotIndex, slot ->
+        val alphaValue = (255 / (1 + slotIndex))
+        val slotColor = LorenzColor.GREEN.addOpacity(alphaValue)
+        slot.highlight(slotColor)
+    }
+
+    private fun tryHighlightChronomatron() {
+        val nextColor = hypixelChronomatronData.getOrNull(userChronomatronProgress.size)
+        val nextNextColor = hypixelChronomatronData.getOrNull(userChronomatronProgress.size + 1)
+
+        InventoryUtils.getItemsInOpenChest().forEach { slot ->
+            val color = slot.stack.getLorenzColorOrNull() ?: return@forEach
+            if (color !in listOf(nextColor, nextNextColor)) return@forEach
+            val alphaValue = if (color == nextColor) 255 else 128
+            val slotColor = LorenzColor.GREEN.addOpacity(alphaValue)
+            slot.highlight(slotColor)
+        }
+    }
+    // </editor-fold>
 
     // <editor-fold desc="Slot click stuff">
     @HandleEvent
