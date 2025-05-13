@@ -7,14 +7,17 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import net.minecraft.item.ItemStack
+import java.awt.Color
 
 @SkyHanniModule
 object ExperimentsAddonsHelper {
@@ -81,6 +84,21 @@ object ExperimentsAddonsHelper {
         currentChronomatronRound = 0
         currentAddonPhase = null
         chronomatronSequenceIndex = 0
+    }
+
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!ExperimentationTableApi.inUltrasequencer) return
+        if (currentUltraSequencerRound < 1 || !config.highlightNextClick) return
+
+        InventoryUtils.getItemsInOpenChest().filter {
+            it.stack.displayName.trim().isNotEmpty() && it.slotNumber in hypixelUltrasequencerData
+        }.forEach { slot ->
+            val slotIndex = hypixelUltrasequencerData.indexOf(slot.slotNumber)
+            val alphaValue = (255 / (1 + slotIndex))
+            val slotColor = Color(30, 145, 30, alphaValue)
+            slot.highlight(slotColor)
+        }
     }
 
     private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (displayName.removeColor()) {
