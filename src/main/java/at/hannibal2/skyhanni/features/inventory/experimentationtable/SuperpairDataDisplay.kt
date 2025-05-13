@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ExperimentsJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -116,13 +117,13 @@ object SuperpairDataDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!config.superpairDisplay || !ExperimentationTableApi.inTable) return
+        if (!config.superpairs.display || !ExperimentationTableApi.inTable) return
 
         display = display.takeIfNotEmpty()
             ?: drawDisplay().takeIfNotEmpty()
             ?: return
 
-        config.superpairDisplayPosition.renderStrings(
+        config.superpairs.displayPosition.renderStrings(
             display,
             posLabel = "Superpair Experimentation Data",
         )
@@ -130,7 +131,7 @@ object SuperpairDataDisplay {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!config.superpairDisplay) return
+        if (!config.superpairs.display) return
         val currentTier = ExperimentationTableApi.currentExperimentTier ?: return
 
         val item = event.item ?: return
@@ -366,4 +367,11 @@ object SuperpairDataDisplay {
     private fun isOutOfBounds(slot: Int, experiment: ExperimentationTableApi.ExperimentationTier): Boolean = slot !in experiment.slotRange
 
     private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this.damage == other.damage
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val pathBase = "inventory.experimentationTable"
+        event.move(89, "$pathBase.superpairDisplay", "$pathBase.superpairs.display")
+        event.move(89, "$pathBase.superpairDisplayPosition", "$pathBase.superpairs.displayPosition")
+    }
 }

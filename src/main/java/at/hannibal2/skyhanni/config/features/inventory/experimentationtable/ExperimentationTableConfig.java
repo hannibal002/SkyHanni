@@ -21,41 +21,21 @@ public class ExperimentationTableConfig {
     public ExperimentsDryStreakConfig dryStreak = new ExperimentsDryStreakConfig();
 
     @Expose
-    @ConfigOption(name = "Addon Helpers", desc = "")
+    @ConfigOption(name = "Experiment Addons", desc = "")
     @Accordion
-    public ExperimentsAddonHelpersConfig addonHelpers = new ExperimentsAddonHelpersConfig();
+    public ExperimentsAddonsConfig addons = new ExperimentsAddonsConfig();
 
     @Expose
-    @ConfigOption(name = "Superpair Data", desc = "Displays useful data while doing the Superpair experiment.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean superpairDisplay = false;
+    @ConfigOption(name = "Superpairs", desc = "")
+    @Accordion
+    public ExperimentsSuperpairsConfig superpairs = new ExperimentsSuperpairsConfig();
 
     @Expose
-    @ConfigLink(owner = ExperimentationTableConfig.class, field = "superpairDisplay")
-    public Position superpairDisplayPosition = new Position(-372, 161);
-
-    @Expose
-    @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean superpairsClicksAlert = true;
-
-    @Expose
-    @ConfigOption(name = "ULTRA-RARE Book Alert", desc = "Send a chat message, title and sound when you find an ULTRA-RARE book.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean ultraRareBookAlert = false;
-
-    @Expose
-    @ConfigOption(name = "Guardian Reminder", desc = "Sends a warning when opening the Experimentation Table without a §9§lGuardian Pet §7equipped.")
+    @ConfigOption(
+        name = "Guardian Reminder",
+        desc = "Sends a warning when opening the Experimentation Table without a §9§lGuardian Pet §7equipped."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean guardianReminder = false;
-
-    @Expose
-    @ConfigOption(name = "Superpairs XP Overlay", desc = "Shows how much XP every pair is worth in superpairs.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean superpairsXPOverlay = true;
 }

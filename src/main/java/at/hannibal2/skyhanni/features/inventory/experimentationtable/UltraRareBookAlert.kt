@@ -58,7 +58,11 @@ object UltraRareBookAlert {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(59, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
+
+        val pathBase = "inventory.experimentationTable"
+        event.move(88, "$pathBase.ultraRareBookAlert", "$pathBase.superpairs.ultraRareBookAlert")
     }
 
-    private fun isEnabled() = config.ultraRareBookAlert && ExperimentationTableApi.isActive
+    private fun isEnabled() = config.superpairs.ultraRareBookAlert &&
+        ExperimentationTableApi.currentExperimentType == TaskType.SUPERPAIRS
 }

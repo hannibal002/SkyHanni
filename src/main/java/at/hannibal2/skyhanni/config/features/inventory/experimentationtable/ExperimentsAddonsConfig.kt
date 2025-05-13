@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class ExperimentsAddonHelpersConfig {
+class ExperimentsAddonsConfig {
 
     @Expose
     @ConfigOption(
@@ -21,5 +21,13 @@ class ExperimentsAddonHelpersConfig {
     )
     @ConfigEditorBoolean
     var preventMisclicks: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Max Clicks Alert",
+        desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer."
+    )
+    @ConfigEditorBoolean
+    var maxSequenceAlert: Boolean = true
 
 }

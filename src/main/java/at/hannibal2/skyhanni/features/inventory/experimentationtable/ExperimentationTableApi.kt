@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
 import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -44,6 +45,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.item.ItemStack
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -59,13 +61,17 @@ object ExperimentationTableApi {
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val currentExperimentData = ExperimentationDataSet()
+    private val superpairsSlotMap: MutableMap<Int, ItemStack> = mutableMapOf()
+    private val superpairsSlotsToRead: MutableSet<Int> = mutableSetOf()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
     val experimentationTableInventory = InventoryDetector { name -> inventoriesPattern.matches(name) }
     val inTable get() = experimentationTableInventory.isInside()
-    val isActive get() = currentExperimentData.tier != null
     val currentExperimentTier get() = currentExperimentData.tier
     val currentExperimentType get() = currentExperimentData.type
+    val inChronomatron get() = currentExperimentType == TaskType.CHRONOMATRON
+    val inUltrasequencer get() = currentExperimentType == TaskType.ULTRASEQUENCER
+    val inAddon get() = inChronomatron || inUltrasequencer
 
     private var lastExpOverHash: Int = 0
     private var currentExpOverHash: Int = 0
@@ -323,6 +329,8 @@ object ExperimentationTableApi {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
+        superpairsSlotMap.clear()
+        superpairsSlotsToRead.clear()
         if (currentExpOverHash != 0) {
             lastExpOverHash = currentExpOverHash
             currentExpOverHash = 0
@@ -416,13 +424,40 @@ object ExperimentationTableApi {
         updateTablePos()
         event.tryFireRareBookUncovered()
         event.tryUpdateCurrentActivity()
+        event.tryReadSuperpairsSlots()
         handleExpBottles(false)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!inTable || event.item?.displayName != "§cDecline") return
+        if (!inTable || event.item == null || event.slot == null) return
+        event.tryResetQueuedEvent()
+        event.tryReadUncoveredItem()
+    }
+
+    private fun GuiContainerEvent.SlotClickEvent.tryResetQueuedEvent() {
+        if (item?.displayName != "§cDecline") return
         queuedCompleteEvent = null
+    }
+
+    private fun GuiContainerEvent.SlotClickEvent.tryReadUncoveredItem() {
+        val slotNumber = slot?.slotIndex?.takeIf {
+            it !in superpairsSlotMap.keys
+        } ?: return
+        val clickedItem = item ?: return
+        if (clickedItem.displayName.trim().isEmpty()) {
+            superpairsSlotsToRead.add(slotNumber)
+            return
+        } else superpairsSlotMap[slotNumber] = clickedItem
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onReplaceItem(event: ReplaceItemEvent) {
+        if (!inTable || currentExperimentType != TaskType.SUPERPAIRS) return
+        if (superpairsSlotMap.isEmpty() || event.slot !in superpairsSlotMap.keys) return
+        if (event.originalItem.displayName.trim().isNotEmpty()) return
+        val replacementItem = superpairsSlotMap[event.slot] ?: return
+        event.replace(replacementItem)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -495,6 +530,18 @@ object ExperimentationTableApi {
         currentExperimentData.addReward(internalName, 1)
     }
 
+    private fun InventoryOpenEvent.tryReadSuperpairsSlots() {
+        if (!inTable || currentExperimentType != TaskType.SUPERPAIRS) return
+        if (superpairsSlotsToRead.isEmpty()) return
+
+        inventoryItems.filter {
+            it.key in superpairsSlotsToRead && it.value.displayName.trim().isNotEmpty()
+        }.forEach {
+            superpairsSlotMap[it.key] = it.value
+            superpairsSlotsToRead.remove(it.key)
+        }
+    }
+
     private fun InventoryOpenEvent.tryFireRareBookUncovered() {
         if (currentExperimentData.rareFoundFired) return
         for (lore in inventoryItems.map { it.value.getLore() }) {
@@ -509,20 +556,20 @@ object ExperimentationTableApi {
         }
     }
 
-    private fun InventoryOpenEvent.tryUpdateCurrentActivity() = currentTypeAndTierPattern.matchMatcher(inventoryName) {
-        if (inventoryName == "Experimentation Table") return@matchMatcher currentExperimentData.reset()
+    private fun InventoryOpenEvent.tryUpdateCurrentActivity() =
+        if (inventoryName == "Experimentation Table") currentExperimentData.reset()
+        else currentTypeAndTierPattern.matchMatcher(inventoryName) {
+            val type = ExperimentationTaskType.fromStringOrNull(group("type")) ?: return@matchMatcher
+            val tier = ExperimentationTier.byNameOrNull(group("tier")) ?: return@matchMatcher
+            if (type == currentExperimentType && tier == currentExperimentTier) return@matchMatcher
 
-        val type = ExperimentationTaskType.fromStringOrNull(group("type")) ?: return@matchMatcher
-        val tier = ExperimentationTier.byNameOrNull(group("tier")) ?: return@matchMatcher
-        if (type == currentExperimentType && tier == currentExperimentTier) return@matchMatcher
+            currentExperimentData.apply {
+                this.type = type
+                this.tier = tier
+            }
 
-        currentExperimentData.apply {
-            this.type = type
-            this.tier = tier
+            TableTaskStartedEvent(type, tier).post()
         }
-
-        TableTaskStartedEvent(type, tier).post()
-    }
 
     private fun updateTablePos() {
         storage?.tablePos = EntityUtils.getEntities<EntityArmorStand>().find {

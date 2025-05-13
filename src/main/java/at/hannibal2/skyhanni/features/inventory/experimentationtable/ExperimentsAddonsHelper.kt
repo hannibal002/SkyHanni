@@ -24,11 +24,7 @@ object ExperimentsAddonsHelper {
     private const val ROUND_STATUS_SLOT = 4
     private const val PHASE_STATUS_SLOT = 49
 
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable.addonHelpers
-    private val inChronomatron get() = ExperimentationTableApi.currentExperimentType == TaskType.CHRONOMATRON
-    private val inUltrasequencer get() = ExperimentationTableApi.currentExperimentType == TaskType.ULTRASEQUENCER
-    private val inAddon get() = inChronomatron || inUltrasequencer
-
+    private val config get() = SkyHanniMod.feature.inventory.experimentationTable.addons
     private val hypixelChronomatronData: MutableList<LorenzColor> = mutableListOf()
     private val userChronomatronProgress: MutableList<LorenzColor> = mutableListOf()
     private val hypixelUltrasequencerData: MutableList<Int> = mutableListOf()
@@ -36,9 +32,11 @@ object ExperimentsAddonsHelper {
     private val ultrasequencerDyeMap: MutableMap<Int, ItemStack> = mutableMapOf()
 
     private var currentAddonPhase: HelperPhase? = null
-    private var currentChronomatronRound: Int = 0
     private var chronomatronSequenceIndex: Int = 0
-    private var currentUltraSequencerRound: Int = 0
+    var currentChronomatronRound: Int = 0
+        private set
+    var currentUltraSequencerRound: Int = 0
+        private set
 
     // <editor-fold desc="Patterns">
     /**
@@ -102,14 +100,15 @@ object ExperimentsAddonsHelper {
     // <editor-fold desc="Slot click stuff">
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (event.slot == null || event.item == null) return
-        if (!inAddon || !config.preventMisclicks || currentAddonPhase != HelperPhase.REPLICATE) return
+        if (event.slot == null || event.item == null || !ExperimentationTableApi.inAddon) return
+        if (!config.preventMisclicks || currentAddonPhase != HelperPhase.REPLICATE) return
         event.handleChronomatronClick()
         event.handleUltrasequencerClick()
     }
 
     private fun GuiContainerEvent.SlotClickEvent.handleChronomatronClick() {
-        if (!inChronomatron || slot == null) return
+        if (!ExperimentationTableApi.inChronomatron || slot == null) return
+        if (userChronomatronProgress.size == hypixelChronomatronData.size) return
         val clickedColor = item?.getLorenzColorOrNull()?.takeIf {
             it == hypixelChronomatronData[userChronomatronProgress.size]
         } ?: return cancel()
@@ -117,7 +116,8 @@ object ExperimentsAddonsHelper {
     }
 
     private fun GuiContainerEvent.SlotClickEvent.handleUltrasequencerClick() {
-        if (!inUltrasequencer || slot == null) return
+        if (!ExperimentationTableApi.inUltrasequencer || slot == null) return
+        if (userUltrasequencerProgress.size == hypixelUltrasequencerData.size) return
         val clickedSlot = slot.slotNumber.takeIf {
             val expectedSlot = hypixelUltrasequencerData[userUltrasequencerProgress.size]
             it == expectedSlot
@@ -130,10 +130,10 @@ object ExperimentsAddonsHelper {
     // <editor-fold desc="Next click highlighting">
     @HandleEvent
     fun onReplaceItem(event: ReplaceItemEvent) {
-        if (!inAddon || !config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
+        if (!ExperimentationTableApi.inAddon || !config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
 
-        if (inChronomatron) event.replaceChronomatronItem()
-        if (inUltrasequencer) event.replaceUltrasequencerItems()
+        if (ExperimentationTableApi.inChronomatron) event.replaceChronomatronItem()
+        if (ExperimentationTableApi.inUltrasequencer) event.replaceUltrasequencerItems()
     }
 
     private fun ReplaceItemEvent.replaceChronomatronItem() {
@@ -155,13 +155,13 @@ object ExperimentsAddonsHelper {
     // <editor-fold desc="Inventory Update reading logic">
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!inAddon) return
+        if (!ExperimentationTableApi.inAddon) return
 
         val oldAddonPhase = currentAddonPhase
         currentAddonPhase = event.readPhaseOrNull() ?: return
 
-        if (inChronomatron) event.readNextChronomatron(oldAddonPhase)
-        if (inUltrasequencer) event.readUltrasequencer()
+        if (ExperimentationTableApi.inChronomatron) event.readNextChronomatron(oldAddonPhase)
+        if (ExperimentationTableApi.inUltrasequencer) event.readUltrasequencer()
     }
 
     private fun InventoryUpdatedEvent.readPhaseOrNull(): HelperPhase? {
