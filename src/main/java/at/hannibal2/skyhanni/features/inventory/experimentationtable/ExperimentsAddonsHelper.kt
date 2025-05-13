@@ -127,7 +127,7 @@ object ExperimentsAddonsHelper {
     }
     // </editor-fold>
 
-    // <editor-gold desc="Next click highlighting">
+    // <editor-fold desc="Next click highlighting">
     @HandleEvent
     fun onReplaceItem(event: ReplaceItemEvent) {
         if (!inAddon || !config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
