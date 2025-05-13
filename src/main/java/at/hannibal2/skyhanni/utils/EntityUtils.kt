@@ -25,6 +25,7 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
@@ -189,11 +190,19 @@ object EntityUtils {
         return getLorenzVec().up(0.5).canBeSeen(viewDistance)
     }
 
-    fun getEntityByID(entityId: Int) = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
+    fun getEntityByID(entityId: Int): Entity? = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
     fun Entity.cleanName() = this.name.removeColor()
+
+    // TODO use derpy() on every use case
+    val EntityLivingBase.baseMaxHealth: Int
+        //#if MC < 1.21
+        get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
+    //#else
+    //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
+    //#endif
 }

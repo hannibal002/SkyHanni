@@ -28,12 +28,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import org.lwjgl.input.Keyboard
@@ -107,9 +107,9 @@ object EstimatedItemValue {
         if (inStorage) return
 
         // render the estimated item value over NEU PV
-        GlStateManager.translate(0f, 0f, 200f)
+        DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
-        GlStateManager.translate(0f, 0f, -200f)
+        DrawContextUtils.translate(0f, 0f, -200f)
 
         renderedItems++
     }
@@ -142,6 +142,7 @@ object EstimatedItemValue {
         }
 
         try {
+            // TODO this code needs to be changed around
             config.itemPriceDataPos.renderRenderables(display, posLabel = "Estimated Item Value")
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
@@ -300,10 +301,12 @@ object EstimatedItemValue {
     fun renderInNeuStorageOverlay() {
         if (!config.enabled) return
 
+        //#if MC < 1.12
         // render the estimated item value over NEU Storage
-        GlStateManager.translate(0f, 0f, 200f)
+        DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
-        GlStateManager.translate(0f, 0f, -200f)
+        DrawContextUtils.translate(0f, 0f, -200f)
         renderedItems++
+        //#endif
     }
 }

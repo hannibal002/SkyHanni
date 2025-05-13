@@ -25,9 +25,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -128,8 +128,7 @@ object FrogMaskFeatures {
         event.move(86, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.position")
     }
 
-    // TODO nopo you should have fun with a wood compat class now
-    private val logTypes = setOf(Blocks.log, Blocks.log2)
+    private val logTypes = BlockCompat.getAllLogs()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_PARK)
     fun onBlockClick(event: BlockClickEvent) {
