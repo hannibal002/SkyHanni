@@ -260,7 +260,7 @@ object ChestValue {
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
         val mc = Minecraft.getMinecraft()
-        val spaceWidth = mc.fontRendererObj.getCharWidth(char)
+        val spaceWidth = mc.fontRendererObj.getStringWidth(char.toString())
 
         var currentString = this
         var currentLength = mc.fontRendererObj.getStringWidth(currentString)
