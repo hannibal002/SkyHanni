@@ -933,7 +933,7 @@ object ScoreboardPattern {
     val brokenPatterns by group.list(
         "broken",
         "\\s*§.§l⚡ §cRedston",
-        "\\s*§ce: §e§b0%",
+        "\\s*§ce: §e§b\\d+%",
         "\\s*Starting in: §a0 §c[\\d:]+",
         "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*",
     )

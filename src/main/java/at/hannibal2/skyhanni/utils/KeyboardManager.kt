@@ -8,6 +8,7 @@ import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 //#if MC < 1.21
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
+
 //#else
 //$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil

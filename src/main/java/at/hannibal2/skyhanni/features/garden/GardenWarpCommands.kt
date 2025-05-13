@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.features.garden.sensitivity.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -44,19 +44,19 @@ object GardenWarpCommands {
         if (message == "/barn") {
             event.cancel()
             HypixelCommands.teleportToPlot("barn")
-            LockMouseLook.autoDisable()
+            LockMouseLook.unlockMouse()
         }
 
         tpPlotPattern.matchMatcher(event.message) {
             event.cancel()
             val plotName = group("plot")
             HypixelCommands.teleportToPlot(plotName)
-            LockMouseLook.autoDisable()
+            LockMouseLook.unlockMouse()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onKeyDown(event: KeyPressEvent) {
+    fun onKeyPress(event: KeyPressEvent) {
         when (event.keyCode) {
             config.homeHotkey -> {
                 if (lastWarpTime.passedSince() < 2.seconds) return
@@ -73,7 +73,7 @@ object GardenWarpCommands {
                 if (lastWarpTime.passedSince() < 2.seconds) return
                 lastWarpTime = SimpleTimeMark.now()
 
-                LockMouseLook.autoDisable()
+                LockMouseLook.unlockMouse()
                 HypixelCommands.teleportToPlot("barn")
             }
 
