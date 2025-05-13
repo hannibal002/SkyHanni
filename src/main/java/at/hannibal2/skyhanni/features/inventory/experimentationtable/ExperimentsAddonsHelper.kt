@@ -123,7 +123,7 @@ object ExperimentsAddonsHelper {
             it == expectedSlot
         } ?: return cancel()
         userUltrasequencerProgress.add(clickedSlot)
-        makePickblock()
+        makePickblock() // Prevents a flashbang
     }
     // </editor-fold>
 
@@ -157,10 +157,10 @@ object ExperimentsAddonsHelper {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inAddon) return
 
-        val oldPhase = currentAddonPhase
+        val oldAddonPhase = currentAddonPhase
         currentAddonPhase = event.readPhaseOrNull() ?: return
 
-        if (inChronomatron) event.readNextChronomatron(oldPhase)
+        if (inChronomatron) event.readNextChronomatron(oldAddonPhase)
         if (inUltrasequencer) event.readUltrasequencer()
     }
 
@@ -179,9 +179,9 @@ object ExperimentsAddonsHelper {
     }
 
     private fun InventoryUpdatedEvent.readNextChronomatron(oldPhase: HelperPhase? = null) {
-        val oldRound = currentChronomatronRound
+        val oldChronomatronRound = currentChronomatronRound
         currentChronomatronRound = readChronomatronRoundOrNull() ?: return
-        if (currentChronomatronRound != oldRound) {
+        if (currentChronomatronRound != oldChronomatronRound) {
             chronomatronSequenceIndex = 0
             userChronomatronProgress.clear()
         }
