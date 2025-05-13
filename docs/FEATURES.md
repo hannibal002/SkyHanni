@@ -136,6 +136,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays player's Dungeon Class.
     + Shows Class Level (toggleable).
     + Added "(Dead)" text for dead teammates with customizable colors.
++ Added Color Override to Dungeon Livid Finder. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3511)
 
 </details>
 <details open><summary>
@@ -268,6 +269,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show value of all items in Sacks as GUI while not in Sacks.
 + Added Trade Value Overlay. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
     + Doesn't suppport coins.
++ Added Evolving Item time remaining in lore (Bottle of Jyrre, Dark Cacao Truffle, etc.). - Obsidian (https://github.com/hannibal002/SkyHanni/pull/3614)
 
 </details>
 <details open><summary>
@@ -754,6 +756,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Compact Jacob Claim. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3235)
     + When collecting the rewards from many farming contests at the same time at Anita.
     + Compact the Jacob Claim message, only showing full information when hovering.
++ Added Monthly Farming Weight Leaderboard option. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
 
 ### Garden Pests
 
@@ -1588,6 +1591,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Requires Cake Counter placed on Private Island.
     + Prompts you to enable this feature when placing Cake Counter.
 + Added Fruit Bowl Player Highlighter and Stats Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3394)
++ Added Frog Mask Warning. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/3449)
+    + Displays a warning when foraging in an incorrect park region while wearing a Frog Mask.
 
 </details>
 <details open><summary>

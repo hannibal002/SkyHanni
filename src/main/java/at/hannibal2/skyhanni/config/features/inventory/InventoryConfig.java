@@ -87,7 +87,7 @@ public class InventoryConfig {
     public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
 
     @Expose
-    @ConfigOption(name = "Focus Mode", desc="")
+    @ConfigOption(name = "Focus Mode", desc = "")
     @Accordion
     public FocusModeConfig focusMode = new FocusModeConfig();
 
@@ -145,7 +145,7 @@ public class InventoryConfig {
     @ConfigOption(name = "New Year Cake Tracker", desc = "")
     @Accordion
     public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
-  
+
     @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
@@ -162,6 +162,7 @@ public class InventoryConfig {
     @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
     public evolvingItemsConfig evolvingItems = new evolvingItemsConfig();
 
+    @Expose
     @ConfigOption(name = "Trade Value", desc = "Creates a trade value overlay")
     @Accordion
     public TradeConfig trade = new TradeConfig();
@@ -329,7 +330,7 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean essenceShopHelper = true;
-  
+
     @Expose
     @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
     @ConfigEditorBoolean

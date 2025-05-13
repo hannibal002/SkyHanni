@@ -2,6 +2,10 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+//#if TODO
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -18,6 +22,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object ErrorManager {
 
@@ -32,13 +37,20 @@ object ErrorManager {
         "at net.minecraftforge.fml.common.eventhandler.EventBus.post",
         "at at.hannibal2.skyhanni.mixins.hooks.NetHandlerPlayClientHookKt.onSendPacket",
         "at net.minecraft.client.main.Main.main",
+        "at.hannibal2.skyhanni.api.event.EventListeners.createZeroParameterConsumer",
+        "at.hannibal2.skyhanni.api.event.EventListeners.createSingleParameterConsumer",
     )
 
     private val replace = mapOf(
-        "at.hannibal2.skyhanni" to "SH",
-        "io.moulberry.notenoughupdates" to "NEU",
+        "at.hannibal2.skyhanni." to "SH.",
+        "io.moulberry.notenoughupdates." to "NEU.",
         "net.minecraft." to "MC.",
         "net.minecraftforge.fml." to "FML.",
+    )
+
+    private val replaceEntirely = mapOf(
+        "at.hannibal2.skyhanni.api.event.EventListeners.createZeroParameterConsumer" to "<Skyhanni event post>",
+        "at.hannibal2.skyhanni.api.event.EventListeners.createSingleParameterConsumer" to "<Skyhanni event post>",
     )
 
     private val ignored = listOf(
@@ -65,30 +77,37 @@ object ErrorManager {
 
     // this hides the whole stack trace of one error of the list of all errors in the error message
     // where the error class name is the key and the first line contains one of the entries in the list of values
-    private val skipErrorEntry = mapOf(
-        "java.lang.reflect.InvocationTargetException" to listOf(
-            "EventListeners.createZeroParameterConsumer",
-            "EventListeners.createSingleParameterConsumer",
-        ),
-    )
+    private val skipErrorEntry = emptyMap<String, List<String>>()
+//         "java.lang.reflect.InvocationTargetException" to listOf(
+//             "EventListeners.createZeroParameterConsumer",
+//             "EventListeners.createSingleParameterConsumer",
+//         ),
+//     )
 
-    fun resetCache() {
-        cache.clear()
+    //#if TODO
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestreseterrorcache") {
+            description = "Resets the cache of errors."
+            category = CommandCategory.DEVELOPER_TEST
+            callback {
+                cache.clear()
+                ChatUtils.chat("Error cache reset.")
+            }
+        }
     }
+    //#endif
+
 
     // Extra data from last thrown error
     private var cachedExtraData: String? = null
 
     // throw an error, best to not use it if not absolutely necessary
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
-        val exception = IllegalStateException(message.removeColor())
-        println("silent SkyHanni error:")
-        println("message: '$message'")
         buildExtraDataString(extraData)?.let {
-            println("extraData: \n$it")
             cachedExtraData = it
         }
-        throw exception
+        throw IllegalStateException(message.removeColor())
     }
 
     private fun copyError(errorId: String) {
@@ -287,6 +306,12 @@ object ErrorManager {
             }
             var visualText = text
             if (!fullStackTrace) {
+                for ((from, to) in replaceEntirely) {
+                    if (visualText.contains(from)) {
+                        visualText = to
+                        break
+                    }
+                }
                 for ((from, to) in replace) {
                     visualText = visualText.replace(from, to)
                 }

@@ -118,14 +118,14 @@ object DanceRoomHelper {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!config.enabled || !inRoom) return
         if ((event.soundName == "random.burp" && event.volume == 0.8f) ||
-            (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)
+            (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1f)
         ) {
             index = 0
             found = false
             countdown = null
             update()
         }
-        if (event.soundName == "note.bassattack" && event.pitch == 0.6984127f && event.volume == 1.0f && !found) {
+        if (event.soundName == "note.bassattack" && event.pitch == 0.6984127f && event.volume == 1f && !found) {
             found = true
             start(2000)
             update()

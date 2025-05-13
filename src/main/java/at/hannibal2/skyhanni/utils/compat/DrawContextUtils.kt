@@ -34,6 +34,7 @@ object DrawContextUtils {
         }
         _drawContext = context
     }
+
     fun clearContext() {
         if (renderDepth == 1) {
             _drawContext = null
@@ -41,7 +42,7 @@ object DrawContextUtils {
         } else if (renderDepth > 1) {
             renderDepth--
         } else {
-            ErrorManager.skyHanniError("Render depth is negative, something went wrong")
+            ErrorManager.logErrorStateWithData("Error rendering", "Render depth is negative, something went wrong")
         }
     }
 

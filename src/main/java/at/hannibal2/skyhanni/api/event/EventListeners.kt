@@ -2,15 +2,18 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
+//#if TODO
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+//#endif
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import java.lang.reflect.Method
 import java.util.function.Consumer
 
 typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
 
+// todo 1.21 impl needed
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
 
     private val listeners: MutableList<Listener> = mutableListOf()
@@ -70,14 +73,17 @@ class EventListeners private constructor(val name: String, private val isGeneric
             }
         }
 
-        return { _: Any -> method.invoke(instance) }
+        val runnable = ReflectionUtils.createRunnableFromMethod(instance, method)
+        return { _: Any -> runnable.run() }
     }
 
     private fun createSingleParameterConsumer(method: Method, instance: Any): (Any) -> Unit {
         require(SkyHanniEvent::class.java.isAssignableFrom(method.parameterTypes[0])) {
             "Method ${method.name} parameter must be a subclass of SkyHanniEvent."
         }
-        return { event -> method.invoke(instance, event) }
+
+        val consumer = ReflectionUtils.createConsumerFromMethod(instance, method)
+        return { event -> consumer.accept(event) }
     }
 
     private fun resolveGenericType(method: Method): Class<*> =
@@ -121,6 +127,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         init {
             cachedPredicates = buildList {
+                //#if TODO
                 if (options.onlyOnSkyblock) add { _ -> LorenzUtils.inSkyBlock }
 
                 if (options.onlyOnIsland != IslandType.ANY) {
@@ -132,6 +139,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
                     val set = options.onlyOnIslands.toSet()
                     add { _ -> inAnyIsland(set) }
                 }
+                //#endif
             }
             // These predicates cant be cached since they depend on info about the actual event
             predicates = buildList {
