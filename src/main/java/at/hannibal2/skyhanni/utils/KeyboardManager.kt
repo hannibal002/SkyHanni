@@ -1,22 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
-import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
-import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
-import at.hannibal2.skyhanni.data.model.TextInput
-import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
-import org.lwjgl.input.Mouse
+
 //#else
 //$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
