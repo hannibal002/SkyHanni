@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -23,7 +22,7 @@ import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
 
 // TODO remove this workaround once PestParticleWaypoint does work again
-@SkyHanniModule
+// @SkyHanniModule
 object PestParticleLine {
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 

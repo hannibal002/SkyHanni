@@ -89,7 +89,11 @@ object HoppityRabbitTheFishChecker {
     }
 
     private fun Int.isInventoryClosure(): Boolean =
+        //#if MC < 1.21
         this == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || this == Keyboard.KEY_ESCAPE
+    //#else
+    //$$ MinecraftClient.getInstance().options.inventoryKey.matchesKey(this, this) || this == GLFW.GLFW_KEY_ESCAPE
+    //#endif
 
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
