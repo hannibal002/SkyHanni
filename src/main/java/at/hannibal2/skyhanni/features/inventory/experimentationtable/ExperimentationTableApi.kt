@@ -439,13 +439,12 @@ object ExperimentationTableApi {
     }
 
     private fun GuiContainerEvent.SlotClickEvent.tryReadUncoveredItem() {
-        val slotNumber = slot?.slotIndex?.takeIf {
+        val slotNumber = slot?.slotNumber?.takeIf {
             it !in superpairsSlotMap.keys
         } ?: return
         val clickedItem = item ?: return
-        if (clickedItem.displayName.trim().isEmpty()) {
+        if (clickedItem.displayName.removeColor() == "?") {
             superpairsSlotsToRead.add(slotNumber)
-            return
         } else superpairsSlotMap[slotNumber] = clickedItem
     }
 
