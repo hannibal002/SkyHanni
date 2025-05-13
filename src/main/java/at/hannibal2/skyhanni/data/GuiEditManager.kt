@@ -3,15 +3,21 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+//#if TODO
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
+//#endif
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+//#endif
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuItems
+//#if TODO
 import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
+//#endif
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -28,6 +34,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object GuiEditManager {
 
@@ -39,6 +46,7 @@ object GuiEditManager {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
+        //#if TODO
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
         if (event.keyCode == Keyboard.KEY_RETURN) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
@@ -60,6 +68,7 @@ object GuiEditManager {
         lastHotkeyPressed = SimpleTimeMark.now()
 
         openGuiPositionEditor(hotkeyReminder = false)
+        //#endif
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -90,6 +99,7 @@ object GuiEditManager {
 
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
+        //#if TODO
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values.toList(),
             2,
@@ -103,10 +113,12 @@ object GuiEditManager {
                     " §7- §e2. Click that key while the GUI element is visible.",
             )
         }
+        //#endif
     }
 
     @JvmStatic
     fun renderLast(context: DrawContext) {
+        //#if TODO
         if (!isInGui()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
 
@@ -120,9 +132,12 @@ object GuiEditManager {
         context.matrices.popMatrix()
 
         context.matrices.translate(0f, 0f, -200f)
+        //#endif
     }
 
+    //#if TODO
     fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor
+    //#endif
 
     fun Position.getDummySize(random: Boolean = false): Vector2i {
         if (random) return Vector2i(5, 5)

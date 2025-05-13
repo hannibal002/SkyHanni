@@ -708,6 +708,23 @@ at.hannibal2.skyhanni.events.TitleReceivedEvent.kt
 at.hannibal2.skyhanni.test.DebugCommand.kt
 at.hannibal2.skyhanni.test.SkyBlockIslandTest.kt
 at.hannibal2.skyhanni.utils.ComputerEnvDebug.kt
-
+at.hannibal2.skyhanni.utils.RenderUtils.kt
+at.hannibal2.skyhanni.events.GuiRenderItemEvent.kt
+at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent.kt
+at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent.kt
+at.hannibal2.skyhanni.features.misc.TpsCounter.kt
+at.hannibal2.skyhanni.utils.GuiRenderUtils.kt
+at.hannibal2.skyhanni.data.GuiEditManager.kt
+at.hannibal2.skyhanni.utils.ItemBlink.kt
+at.hannibal2.skyhanni.events.GuiPositionMovedEvent.kt
+at.hannibal2.skyhanni.data.FixedRateTimerManager.kt
+at.hannibal2.skyhanni.data.RenderData.kt
+at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent.kt
+at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent.kt
+at.hannibal2.skyhanni.events.NeuRenderEvent.kt
+at.hannibal2.skyhanni.events.GuiKeyPressEvent.kt
+at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent.kt
+at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent.kt
+at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat.kt
 
 # \.(?!kt|java|\()

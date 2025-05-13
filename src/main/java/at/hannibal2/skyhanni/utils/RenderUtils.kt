@@ -4,15 +4,19 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
+//#if TODO
 import at.hannibal2.skyhanni.data.model.Graph
+//#endif
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
+//#endif
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
@@ -23,12 +27,16 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
+//#if TODO
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+//#endif
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
+//#if TODO
 import net.minecraft.client.renderer.GLAllocation
+//#endif
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.WorldRenderer
@@ -73,9 +81,11 @@ object RenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
+    //#if TODO
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+    //#endif
 
     //#if MC < 1.8.9
     /**
@@ -99,6 +109,7 @@ object RenderUtils {
         }
     //#endif
 
+    //#if TODO
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
     }
@@ -432,6 +443,7 @@ object RenderUtils {
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
         return lastValue + (currentValue - lastValue) * multiplier
     }
+    //#endif
 
     fun Position.transform(): Pair<Int, Int> {
         DrawContextUtils.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
@@ -483,6 +495,7 @@ object RenderUtils {
         GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
 
+    //#if TODO
     fun Position.renderRenderables(
         renderables: List<Renderable>,
         extraSpace: Int = 0,
@@ -1648,4 +1661,5 @@ object RenderUtils {
     }
 
     fun translate(vec: LorenzVec) = GlStateManager.translate(vec.x, vec.y, vec.z)
+    //#endif
 }
