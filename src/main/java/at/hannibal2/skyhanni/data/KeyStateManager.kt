@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data
 
+// On 1.21 we post these events inside mixins
+//#if MC < 1.21
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyHeldEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -15,7 +17,6 @@ import org.lwjgl.input.Mouse
 
 @SkyHanniModule
 object KeyStateManager {
-    //#if MC < 1.16
     // inventory check is not needed, as forge only send events when not in a gui
     private fun shouldTrigger(): Boolean = !NeuItems.neuHasFocus()
 
@@ -80,8 +81,5 @@ object KeyStateManager {
             }
         }
     }
-
-    //#else
-    //$$ // todo use fabric event or whatnot
-    //#endif
 }
+//#endif
