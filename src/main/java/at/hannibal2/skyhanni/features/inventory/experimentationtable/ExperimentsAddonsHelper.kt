@@ -2,20 +2,17 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsAddonsHelper.getLorenzColorOrNull
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import net.minecraft.item.ItemStack
 
@@ -23,19 +20,25 @@ import net.minecraft.item.ItemStack
 object ExperimentsAddonsHelper {
 
     private enum class HelperPhase { READ, REPLICATE }
+
     private const val ROUND_STATUS_SLOT = 4
     private const val PHASE_STATUS_SLOT = 49
+
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.addonHelpers
-    private val addonsTypes = listOf(TaskType.CHRONOMATRON, TaskType.ULTRASEQUENCER)
+    private val inChronomatron get() = ExperimentationTableApi.currentExperimentType == TaskType.CHRONOMATRON
+    private val inUltrasequencer get() = ExperimentationTableApi.currentExperimentType == TaskType.ULTRASEQUENCER
+    private val inAddon get() = inChronomatron || inUltrasequencer
 
-    private val socChronomatron: MutableList<LorenzColor> = mutableListOf()
-    private val userChronomatron: MutableList<LorenzColor> = mutableListOf()
+    private val hypixelChronomatronData: MutableList<LorenzColor> = mutableListOf()
+    private val userChronomatronProgress: MutableList<LorenzColor> = mutableListOf()
+    private val hypixelUltrasequencerData: MutableList<Int> = mutableListOf()
+    private val userUltrasequencerProgress: MutableList<Int> = mutableListOf()
+    private val ultrasequencerDyeMap: MutableMap<Int, ItemStack> = mutableMapOf()
 
-    private var currentPhase: HelperPhase? = null
-    private var currentRound: Int = 0
-    private var lastClickedUserSlot: Int = 0
-
+    private var currentAddonPhase: HelperPhase? = null
+    private var currentChronomatronRound: Int = 0
     private var chronomatronSequenceIndex: Int = 0
+    private var currentUltraSequencerRound: Int = 0
 
     // <editor-fold desc="Patterns">
     /**
@@ -71,84 +74,94 @@ object ExperimentsAddonsHelper {
     )
     // </editor-fold>
 
-    private fun reset() {
-        socChronomatron.clear()
-        userChronomatron.clear()
-        //socUltrasequencer.clear()
-        currentRound = 0
-        currentPhase = null
+    @HandleEvent(InventoryCloseEvent::class)
+    fun resetAddonsData() {
+        hypixelChronomatronData.clear()
+        userChronomatronProgress.clear()
+        hypixelUltrasequencerData.clear()
+        userUltrasequencerProgress.clear()
+        currentChronomatronRound = 0
+        currentAddonPhase = null
         chronomatronSequenceIndex = 0
     }
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (ExperimentationTableApi.currentExperimentType != TaskType.CHRONOMATRON) return
-
-        Position(-500, 300).renderStrings(
-            buildList {
-                add("Chronomatron Colors")
-                addAll(
-                    socChronomatron.map { it.toString() }
-                )
-            },
-            posLabel = "Chronomatron Colors"
-        )
-
-        Position(-300, 300).renderStrings(
-            buildList {
-                add("User Chronomatron Colors")
-                addAll(
-                    userChronomatron.map { it.toString() }
-                )
-            },
-            posLabel = "User Chronomatron Colors"
-        )
+    private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (displayName.removeColor()) {
+        "Green" -> LorenzColor.DARK_GREEN
+        "Lime" -> LorenzColor.GREEN
+        "Pink" -> LorenzColor.LIGHT_PURPLE
+        "Cyan" -> LorenzColor.DARK_AQUA
+        "Orange" -> LorenzColor.GOLD
+        "Purple" -> LorenzColor.DARK_PURPLE
+        else -> try {
+            LorenzColor.valueOf(displayName.removeColor().uppercase())
+        } catch (exception: IllegalArgumentException) {
+            null
+        }
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        reset()
-    }
-
+    // <editor-fold desc="Slot click stuff">
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (ExperimentationTableApi.currentExperimentType !in addonsTypes) return
-        if (currentPhase != HelperPhase.REPLICATE) return
-        if (event.item == null) return
-
+        if (event.slot == null || event.item == null) return
+        if (!inAddon || !config.preventMisclicks || currentAddonPhase != HelperPhase.REPLICATE) return
         event.handleChronomatronClick()
+        event.handleUltrasequencerClick()
     }
 
     private fun GuiContainerEvent.SlotClickEvent.handleChronomatronClick() {
+        if (!inChronomatron || slot == null) return
         val clickedColor = item?.getLorenzColorOrNull()?.takeIf {
-            it ==  socChronomatron[userChronomatron.size]
+            it == hypixelChronomatronData[userChronomatronProgress.size]
         } ?: return cancel()
-        userChronomatron.add(clickedColor)
+        userChronomatronProgress.add(clickedColor)
     }
 
+    private fun GuiContainerEvent.SlotClickEvent.handleUltrasequencerClick() {
+        if (!inUltrasequencer || slot == null) return
+        val clickedSlot = slot.slotNumber.takeIf {
+            val expectedSlot = hypixelUltrasequencerData[userUltrasequencerProgress.size]
+            it == expectedSlot
+        } ?: return cancel()
+        userUltrasequencerProgress.add(clickedSlot)
+        makePickblock()
+    }
+    // </editor-fold>
+
+    // <editor-gold desc="Next click highlighting">
+    @HandleEvent
+    fun onReplaceItem(event: ReplaceItemEvent) {
+        if (!inAddon || !config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
+
+        if (inChronomatron) event.replaceChronomatronItem()
+        if (inUltrasequencer) event.replaceUltrasequencerItems()
+    }
+
+    private fun ReplaceItemEvent.replaceChronomatronItem() {
+        val nextClickColor = hypixelChronomatronData.getOrNull(userChronomatronProgress.size) ?: return
+        originalItem.getLorenzColorOrNull()?.takeIf { it == nextClickColor } ?: return
+        val newItem = originalItem.copy()
+        newItem.addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
+        replace(newItem)
+    }
+
+    private fun ReplaceItemEvent.replaceUltrasequencerItems() {
+        val newItem = ultrasequencerDyeMap[
+            hypixelUltrasequencerData.indexOfFirst { it == slot } + 1
+        ] ?: return
+        replace(newItem)
+    }
+    // </editor-fold>
+
+    // <editor-fold desc="Inventory Update reading logic">
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (ExperimentationTableApi.currentExperimentType !in addonsTypes) return
+        if (!inAddon) return
 
-        val oldPhase = currentPhase
-        currentPhase = event.readPhaseOrNull() ?: return
+        val oldPhase = currentAddonPhase
+        currentAddonPhase = event.readPhaseOrNull() ?: return
 
-        val oldRound = currentRound
-        currentRound = event.readRoundOrNull() ?: return
-        if (currentRound != oldRound) {
-            chronomatronSequenceIndex = 0
-            userChronomatron.clear()
-        }
-
-        event.readAddonData(oldPhase)
-    }
-
-    private fun InventoryUpdatedEvent.readRoundOrNull(): Int? {
-        val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.displayName ?: return null
-        roundItemPattern.matchMatcher(roundItemName) {
-            return group("round").formatIntOrNull()
-        }
-        return null
+        if (inChronomatron) event.readNextChronomatron(oldPhase)
+        if (inUltrasequencer) event.readUltrasequencer()
     }
 
     private fun InventoryUpdatedEvent.readPhaseOrNull(): HelperPhase? {
@@ -160,52 +173,66 @@ object ExperimentsAddonsHelper {
         }
     }
 
-    private fun InventoryUpdatedEvent.readAddonData(oldPhase: HelperPhase? = null) {
-        when (ExperimentationTableApi.currentExperimentType) {
-            TaskType.CHRONOMATRON -> readNextChronomatron(oldPhase)
-            TaskType.ULTRASEQUENCER -> readUltrasequencer()
-            else -> return
-        }
+    private fun InventoryUpdatedEvent.readChronomatronRoundOrNull(): Int? {
+        val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.displayName ?: return null
+        return roundItemPattern.matchGroup(roundItemName, "round")?.formatIntOrNull()
     }
 
     private fun InventoryUpdatedEvent.readNextChronomatron(oldPhase: HelperPhase? = null) {
-        val shouldReadLastReplicate = oldPhase == HelperPhase.READ || socChronomatron.size < currentRound
-        if (currentPhase == HelperPhase.REPLICATE && !shouldReadLastReplicate) return
+        val oldRound = currentChronomatronRound
+        currentChronomatronRound = readChronomatronRoundOrNull() ?: return
+        if (currentChronomatronRound != oldRound) {
+            chronomatronSequenceIndex = 0
+            userChronomatronProgress.clear()
+        }
 
+        val shouldReadLastReplicate = oldPhase == HelperPhase.READ || hypixelChronomatronData.size < currentChronomatronRound
         val isReadingReady = oldPhase == null || oldPhase == HelperPhase.READ
-        if (currentPhase == HelperPhase.READ && !isReadingReady) return
+        val shouldEarlyReturn = when (currentAddonPhase) {
+            HelperPhase.REPLICATE -> !shouldReadLastReplicate
+            HelperPhase.READ -> !isReadingReady
+            else -> true
+        }
+        if (shouldEarlyReturn) return
 
-        val highlightedItem = inventoryItems.values.firstOrNull {
+        val clickedColor = inventoryItems.values.firstOrNull {
             nextChronomatronItemPattern.matches(it.item.getIdentifierString())
+        }?.getLorenzColorOrNull()?.takeIf { itemColor ->
+            val expectedColor = hypixelChronomatronData.getOrNull(chronomatronSequenceIndex)
+            expectedColor == null || itemColor == expectedColor
         } ?: return
 
-        val color = highlightedItem.getLorenzColorOrNull() ?: return
-
-        val expectedIndexColor = if (socChronomatron.size < chronomatronSequenceIndex + 1) null
-        else socChronomatron[chronomatronSequenceIndex]
-        if (expectedIndexColor != null && expectedIndexColor != color) return
-
-        // Only record if we're exactly at the next slot
-        if (chronomatronSequenceIndex == socChronomatron.size) socChronomatron.add(color)
+        // Only record if we're exactly at the next slot, otherwise increment the index
+        if (chronomatronSequenceIndex == hypixelChronomatronData.size) hypixelChronomatronData.add(clickedColor)
         else chronomatronSequenceIndex++
     }
 
-    private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (displayName.removeColor()) {
-        "Green" -> at.hannibal2.skyhanni.utils.LorenzColor.DARK_GREEN
-        "Lime" -> at.hannibal2.skyhanni.utils.LorenzColor.GREEN
-        "Pink" -> at.hannibal2.skyhanni.utils.LorenzColor.LIGHT_PURPLE
-        "Cyan" -> at.hannibal2.skyhanni.utils.LorenzColor.DARK_AQUA
-        "Orange" -> at.hannibal2.skyhanni.utils.LorenzColor.GOLD
-        "Purple" -> at.hannibal2.skyhanni.utils.LorenzColor.DARK_PURPLE
-        else -> try {
-            LorenzColor.valueOf(displayName.removeColor().uppercase())
-        } catch (exception: IllegalArgumentException) {
-            null
-        }
-    }
+    private data class UltraSequencerSlot(
+        val sequenceNumber: Int,
+        val slotIndex: Int,
+        val itemStack: ItemStack,
+    )
 
     private fun InventoryUpdatedEvent.readUltrasequencer() {
+        if (currentAddonPhase != HelperPhase.READ) return
 
+        val orderedUltrasequencerSlots = inventoryItems.filter {
+            it.value.displayName.trim().isNotEmpty()
+        }.mapNotNull { (slot, stack) ->
+            val sequenceNumber = stack.displayName.removeColor().toIntOrNull() ?: return@mapNotNull null
+            currentUltraSequencerRound = maxOf(currentUltraSequencerRound, sequenceNumber)
+            if (sequenceNumber !in ultrasequencerDyeMap) ultrasequencerDyeMap[sequenceNumber] = stack
+            UltraSequencerSlot(
+                sequenceNumber = sequenceNumber,
+                slotIndex = slot,
+                itemStack = stack,
+            )
+        }.sortedBy { it.sequenceNumber }
+
+        if (hypixelUltrasequencerData.size == currentUltraSequencerRound) return
+        hypixelUltrasequencerData.clear()
+        userUltrasequencerProgress.clear()
+        hypixelUltrasequencerData.addAll(orderedUltrasequencerSlots.map { it.slotIndex })
     }
-
+    // </editor-fold>
 }
