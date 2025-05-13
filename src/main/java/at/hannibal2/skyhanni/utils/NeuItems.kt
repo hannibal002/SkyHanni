@@ -65,7 +65,9 @@ object NeuItems {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        readAllNeuItems()
+        DelayedRun.onThread.execute {
+            readAllNeuItems()
+        }
     }
 
     private fun readAllNeuItems() {
