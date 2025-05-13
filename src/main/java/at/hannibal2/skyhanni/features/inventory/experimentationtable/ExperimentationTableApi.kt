@@ -420,8 +420,6 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
-
-        updateTablePos()
         event.tryFireRareBookUncovered()
         event.tryUpdateCurrentActivity()
         event.tryReadSuperpairsSlots()
@@ -455,7 +453,7 @@ object ExperimentationTableApi {
     fun onReplaceItem(event: ReplaceItemEvent) {
         if (!inTable || currentExperimentType != TaskType.SUPERPAIRS) return
         if (superpairsSlotMap.isEmpty() || event.slot !in superpairsSlotMap.keys) return
-        if (event.originalItem.displayName.trim().isNotEmpty()) return
+        if (event.originalItem.displayName.removeColor() != "?") return
         val replacementItem = superpairsSlotMap[event.slot] ?: return
         event.replace(replacementItem)
     }
@@ -463,7 +461,16 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!inTable) return
+        updateTablePosition()
         event.tryProcessExperimentOver()
+    }
+
+    private fun updateTablePosition() {
+        val storage = storage ?: return
+        val tableEntity = EntityUtils.getEntities<EntityArmorStand>().find {
+            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+        } ?: return
+        storage.tablePos = tableEntity.getLorenzVec()
     }
 
     private fun InventoryOpenEvent.tryProcessExperimentOver() {
@@ -535,7 +542,7 @@ object ExperimentationTableApi {
         if (superpairsSlotsToRead.isEmpty()) return
 
         inventoryItems.filter {
-            it.key in superpairsSlotsToRead && it.value.displayName.trim().isNotEmpty()
+            it.key in superpairsSlotsToRead && it.value.displayName.removeColor() != "?"
         }.forEach {
             superpairsSlotMap[it.key] = it.value
             superpairsSlotsToRead.remove(it.key)
@@ -570,12 +577,6 @@ object ExperimentationTableApi {
 
             TableTaskStartedEvent(type, tier).post()
         }
-
-    private fun updateTablePos() {
-        storage?.tablePos = EntityUtils.getEntities<EntityArmorStand>().find {
-            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
-        }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
-    }
 
     fun hasGuardianPet(): Boolean = guardianPetNamePattern.matches(PetApi.currentPet)
 }

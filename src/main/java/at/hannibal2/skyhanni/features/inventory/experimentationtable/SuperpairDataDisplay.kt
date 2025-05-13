@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
+// TODO: Split reading into ExperimentationSuperpairApi, leaving display to just use the data
 @SkyHanniModule
 object SuperpairDataDisplay {
 
