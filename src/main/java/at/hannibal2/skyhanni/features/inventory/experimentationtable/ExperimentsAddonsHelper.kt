@@ -88,14 +88,31 @@ object ExperimentsAddonsHelper {
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!ExperimentationTableApi.inUltrasequencer) return
-        if (currentUltraSequencerRound < 1 || !config.highlightNextClick) return
+        if (!config.highlightNextClick || currentAddonPhase != HelperPhase.REPLICATE) return
+
+        if (!ExperimentationTableApi.inAddon) return
+        if (ExperimentationTableApi.inUltrasequencer && currentUltraSequencerRound >= 1) tryHighlightUltrasequencer()
+        if (ExperimentationTableApi.inChronomatron && currentChronomatronRound >= 1) tryHighlightChronomatron()
+    }
+
+    private fun tryHighlightUltrasequencer() = InventoryUtils.getItemsInOpenChest().filter {
+        it.stack.displayName.trim().isNotEmpty() && it.slotNumber in hypixelUltrasequencerData
+    }.forEach { slot ->
+        val slotIndex = hypixelUltrasequencerData.indexOf(slot.slotNumber)
+        val alphaValue = (255 / (1 + slotIndex))
+        val slotColor = Color(30, 145, 30, alphaValue)
+        slot.highlight(slotColor)
+    }
+
+    private fun tryHighlightChronomatron() {
+        val nextColor = hypixelChronomatronData.getOrNull(chronomatronSequenceIndex)
+        val nextNextColor = hypixelChronomatronData.getOrNull(chronomatronSequenceIndex + 1)
 
         InventoryUtils.getItemsInOpenChest().filter {
-            it.stack.displayName.trim().isNotEmpty() && it.slotNumber in hypixelUltrasequencerData
+            val color = it.stack.getLorenzColorOrNull()
+            color != null && color in listOf(nextColor, nextNextColor)
         }.forEach { slot ->
-            val slotIndex = hypixelUltrasequencerData.indexOf(slot.slotNumber)
-            val alphaValue = (255 / (1 + slotIndex))
+            val alphaValue = if (slot.stack.getLorenzColorOrNull() == nextColor) 255 else 128
             val slotColor = Color(30, 145, 30, alphaValue)
             slot.highlight(slotColor)
         }
