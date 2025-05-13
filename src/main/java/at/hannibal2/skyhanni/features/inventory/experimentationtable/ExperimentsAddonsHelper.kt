@@ -131,6 +131,7 @@ object ExperimentsAddonsHelper {
             it == hypixelChronomatronData[userChronomatronProgress.size]
         } ?: return cancel()
         userChronomatronProgress.add(clickedColor)
+        makePickblock()
     }
 
     private fun GuiContainerEvent.SlotClickEvent.handleUltrasequencerClick() {
