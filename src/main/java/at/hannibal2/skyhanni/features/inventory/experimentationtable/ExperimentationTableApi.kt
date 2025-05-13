@@ -318,6 +318,15 @@ object ExperimentationTableApi {
         "inventory.experiment-over",
         "Experiment [Oo]ver|Superpairs Rewards",
     )
+
+    /**
+     * REGEX-TEST: §8?
+     * REGEX-TEST: §eClick any button
+     */
+    val unknownSuperpairsClickPattern by patternGroup.pattern(
+        "superpairs.unknown-click",
+        "(?:§.)+\\?|Click any button!"
+    )
     // </editor-fold>
 
     fun inDistanceToTable(max: Double): Boolean {
@@ -443,9 +452,8 @@ object ExperimentationTableApi {
             it !in superpairsSlotMap.keys
         } ?: return
         val clickedItem = item ?: return
-        if (clickedItem.displayName.removeColor() == "?") {
-            superpairsSlotsToRead.add(slotNumber)
-        } else superpairsSlotMap[slotNumber] = clickedItem
+        if (unknownSuperpairsClickPattern.matches(clickedItem.displayName)) superpairsSlotsToRead.add(slotNumber)
+        else superpairsSlotMap[slotNumber] = clickedItem
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
