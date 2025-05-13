@@ -138,6 +138,7 @@ class Mob(
         }
     }
 
+    // TODO add support for moulconfig.ChromaColour, and eventually removed awt.Color support
     fun highlight(color: Color, condition: () -> Boolean) {
         highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
         this.condition = condition

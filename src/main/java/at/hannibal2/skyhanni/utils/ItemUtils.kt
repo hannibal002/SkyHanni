@@ -613,6 +613,8 @@ object ItemUtils {
     val NeuInternalName.repoItemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
+    val NeuInternalName.repoItemNameCompact get() = repoItemName.replace("Enchanted", "Ench").replace("Mushroom", "Mush")
+
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
 

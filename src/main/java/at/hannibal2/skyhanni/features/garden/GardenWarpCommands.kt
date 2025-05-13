@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.features.misc.LockMouseLook
+import at.hannibal2.skyhanni.features.garden.sensitivity.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -41,14 +41,14 @@ object GardenWarpCommands {
         if (message == "/barn") {
             event.cancel()
             HypixelCommands.teleportToPlot("barn")
-            LockMouseLook.autoDisable()
+            LockMouseLook.unlockMouse()
         }
 
         tpPlotPattern.matchMatcher(event.message) {
             event.cancel()
             val plotName = group("plot")
             HypixelCommands.teleportToPlot(plotName)
-            LockMouseLook.autoDisable()
+            LockMouseLook.unlockMouse()
         }
     }
 
@@ -63,7 +63,7 @@ object GardenWarpCommands {
         Keybinding(
             keyCodeProvider = { config.barnHotkey },
             functionToExecute = {
-                LockMouseLook.autoDisable()
+                LockMouseLook.unlockMouse()
                 HypixelCommands.teleportToPlot("barn")
             },
             cooldown = 2.seconds,

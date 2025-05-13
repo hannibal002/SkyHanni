@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.value
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
 import kotlin.time.Duration.Companion.seconds
@@ -68,7 +69,7 @@ object ReplaceRomanNumerals {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled()) return
 
-        val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
+        val lore = event.getHoverEvent().value().formattedText.split("\n").toMutableList()
         lore.replaceAll { it.tryReplace() }
 
         val chatComponentText = lore.joinToString("\n").asComponent()
