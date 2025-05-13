@@ -23,7 +23,7 @@ object SuperpairsClicksAlert {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!config.addons.maxSequenceAlert) return
-        if (!ExperimentationTableApi.inAddon) return
+        if (!event.inventoryName.endsWith("Stakes")) return
 
         // player may have drank Metaphysical Serum which reduces clicks needed by up to 3, so need to parse it
         for (i in 24 downTo 20) {
