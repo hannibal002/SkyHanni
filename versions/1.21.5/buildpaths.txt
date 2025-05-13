@@ -704,6 +704,9 @@ at.hannibal2.skyhanni.data.ToolTipData.kt
 at/hannibal2/skyhanni/events/item/ItemHoverEvent.kt
 at.hannibal2.skyhanni.utils.PlayerUtils.kt
 at.hannibal2.skyhanni.events.TitleReceivedEvent.kt
+at.hannibal2.skyhanni.test.DebugCommand.kt
+at.hannibal2.skyhanni.test.SkyBlockIslandTest.kt
+at.hannibal2.skyhanni.utils.ComputerEnvDebug.kt
 
 
 # \.(?!kt|java|\()
