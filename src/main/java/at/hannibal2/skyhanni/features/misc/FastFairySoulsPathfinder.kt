@@ -83,6 +83,7 @@ object FastFairySoulsPathfinder {
         var foundButNotClickedSoul: LorenzVec? = null,
     ) {
         var disabled = false
+        var debugState: String? = null
 
         fun foundNearby() {
             if (disabled) return
@@ -114,7 +115,7 @@ object FastFairySoulsPathfinder {
             if (route.isEmpty()) {
                 val message = "§e[SkyHanni] Found all §5$found Fairy Souls §ein ${LorenzUtils.skyBlockIsland.displayName}!"
                 IslandGraphs.overrideChatMessage(message)
-                allFound()
+                allFound("found last soul of ${LorenzUtils.skyBlockIsland}")
             } else {
                 pathTo(route.first())
             }
@@ -144,9 +145,10 @@ object FastFairySoulsPathfinder {
             )
         }
 
-        fun allFound() {
+        fun allFound(state: String) {
             disabled = true
             localFoundSouls().addAll(route)
+            debugState = state
         }
 
         private fun isDataEnabled() = data?.let { !it.disabled } ?: false
@@ -196,7 +198,6 @@ object FastFairySoulsPathfinder {
             if (island.isInIsland()) data?.checkHaveAll(have)
             else {
                 totalFound[island] = have
-                ChatUtils.debug("set ${island.name} to $have")
             }
         }
     }
@@ -204,8 +205,7 @@ object FastFairySoulsPathfinder {
     private fun Data.checkHaveAll(have: Int): Boolean {
         val haveAll = have > 0 && have == total
         if (haveAll) {
-            ChatUtils.debug("found all souls according to hypixel")
-            allFound()
+            allFound("already found all souls on ${LorenzUtils.skyBlockIsland} according to quests inventory")
         }
         return haveAll
     }
@@ -218,16 +218,27 @@ object FastFairySoulsPathfinder {
 
     private fun reload() {
         val graph = IslandGraphs.currentIslandGraph ?: run {
-            ChatUtils.debug("island graph is empty")
-            data = createEmptyData()
+            data = createEmptyData().also {
+                it.debugState = "island graph is empty"
+            }
             return
         }
         val foundSouls = localFoundSouls()
         val allSouls = getTargetNodes(graph.nodes)
         val missingSouls = allSouls.filter { it.position !in foundSouls }
         if (missingSouls.isEmpty()) {
-            ChatUtils.debug("missingSouls is empty")
-            data = createEmptyData()
+
+            val island = LorenzUtils.skyBlockIsland
+            data = if (foundSouls.isEmpty()) {
+                createEmptyData().also {
+                    it.debugState = "There are no fairy souls in the graph network of $island"
+                }
+            } else {
+                val size = foundSouls.size
+                Data(found = size, total = size, route = emptyList<LorenzVec>().toMutableList(), allSouls = foundSouls).also {
+                    it.debugState = "found all souls on $island"
+                }
+            }
             return
         }
 
@@ -287,11 +298,14 @@ object FastFairySoulsPathfinder {
 
         event.addData {
             data?.apply {
+                debugState?.let {
+                    add(it)
+                    add("")
+                }
                 add("found: $found")
                 add("total: $total")
                 add("route: ${route.size}")
                 add("foundButNotClickedSoul: $foundButNotClickedSoul")
-                add(": $")
             } ?: run {
                 add("data is null")
             }
@@ -315,15 +329,17 @@ object FastFairySoulsPathfinder {
     private fun onResetCommand() {
         if (isDisabledCommand()) return
         localFoundSouls().clear()
-        totalFound[LorenzUtils.skyBlockIsland] = 0
-        ChatUtils.chat("Reset found Fairy Souls on ${LorenzUtils.skyBlockIsland.displayName}.")
+        val island = LorenzUtils.skyBlockIsland
+        totalFound[island] = 0
+        ChatUtils.chat("Reset found Fairy Souls on ${island.displayName}.")
         reload()
     }
 
     private fun onFoundAllCommand() {
         if (isDisabledCommand()) return
-        ChatUtils.chat("Marked all Fairy Souls as found on ${LorenzUtils.skyBlockIsland.displayName}.")
-        data?.allFound()
+        val island = LorenzUtils.skyBlockIsland
+        ChatUtils.chat("Marked all Fairy Souls as found on ${island.displayName}.")
+        data?.allFound("manually set all souls in $island as found via command")
         reload()
     }
 
