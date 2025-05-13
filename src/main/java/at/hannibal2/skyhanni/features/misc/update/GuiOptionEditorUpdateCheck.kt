@@ -31,10 +31,10 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
         button.width = button.getWidth(context)
-        button.render(context,getButtonPosition(adjustedWidth), 10)
+        button.render(context, getButtonPosition(adjustedWidth), 10)
 
         if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
-            changelog.render(context,getChangelogPosition(width), 30)
+            changelog.render(context, getChangelogPosition(width), 30)
         }
 
         val widthRemaining = width - button.width - 10
