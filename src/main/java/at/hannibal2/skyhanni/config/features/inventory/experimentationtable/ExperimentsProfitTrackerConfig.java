@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -29,11 +28,6 @@ public class ExperimentsProfitTrackerConfig {
     @ConfigEditorDraggableList
     public List<ExperimentationMessages> hideMessages = new ArrayList<>();
     //#endif
-
-    @Expose
-    @ConfigOption(name = "Time displayed", desc = "Time displayed after completing an experiment.")
-    @ConfigEditorSlider(minValue = 5, maxValue = 60, minStep = 1)
-    public int timeDisplayed = 30;
 
     @Expose
     @ConfigOption(name = "Track Time Spent", desc = "Track time spent doing addons and experiments.")
