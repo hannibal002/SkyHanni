@@ -323,10 +323,11 @@ object ExperimentationTableApi {
      * REGEX-TEST: §8?
      * REGEX-TEST: §eClick any button!
      * REGEX-TEST: §bClick a second button!
+     * REGEX-TEST: §dNext button is instantly rewarded!
      */
     private val unknownSuperpairsClickPattern by patternGroup.pattern(
         "superpairs.unknown-click",
-        "(?:§.)+(?:\\?|Click a(?: seco)?n[dy] button!?)"
+        "(?:§.)+(?:\\?|(?:Click a(?: seco)?n[dy]|Next) button(?: is instantly rewarded)?!?)"
     )
     // </editor-fold>
 
