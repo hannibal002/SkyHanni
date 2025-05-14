@@ -457,7 +457,7 @@ object CollectionUtils {
     fun MutableList<String>.insertLineAfter(pattern: Pattern, content: String) {
         val iter = this.listIterator()
         while (iter.hasNext()) {
-            val line = iter.next().removeColor()
+            val line = iter.next()
             if (pattern.matcher(line).find()) {
                 iter.add(content)
             }

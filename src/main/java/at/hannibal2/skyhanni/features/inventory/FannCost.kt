@@ -2,109 +2,134 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.insertLineAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
+import kotlin.math.max
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
 
 @SkyHanniModule
 object FannCost {
 
+    enum class FannTrainingMode(private val displayName: String) {
+        DAY_COUNT("Amount of Days"),
+        UNTIL_LEVEL("Until Specific Level"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    enum class FannTrainingType(private val displayName: String) {
+        FREE("Free"),
+        LIGHT("Light"),
+        MODERATE("Moderate"),
+        EXPERT("Expert"),
+        ULTRA("Ultra"),
+        TURBO("Turbo!"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    data class FannData(
+        var trainingMode: FannTrainingMode = FannTrainingMode.DAY_COUNT,
+        var trainingType: FannTrainingType = FannTrainingType.FREE,
+        var coinCost: Double = 0.0,
+        var bitCost: Double = 0.0,
+        var expEarned: Double? = null,
+        var expDaily: Double? = null,
+        var duration: Duration = Duration.ZERO,
+    ) : ResettableStorageSet()
+
+    private const val TRAINING_DURATION_SLOT_NUM = 15
+    private const val BEGIN_TRAINING_SLOT_NUM = 22
+    private const val USER_INPUT_SLOT_NUM = 24
+    private const val TRAINING_TYPE_SLOT_NUM = 33
+
     private val config get() = SkyHanniMod.feature.inventory.fannCost
-    private val showCoins get() = config.coinsPerXP
-    private val showBits get() = config.xpPerBit
-    private var trainingMode: TrainingMode = TrainingMode.DAY_COUNT
-
     private val patternGroup = RepoPattern.group("fann.inventory")
+    private val currentFannData: FannData = FannData()
+    private val generatedTooltips: MutableMap<Pattern, String> = mutableMapOf()
+    private val trainingSlotInventoryDetector = InventoryDetector {
+        name -> name.contains("Training Slot")
+    }
+
+    private var lastStartTrainingLoreHash: Int = 0
 
     /**
-     * REGEX-TEST: Training Slot 1
-     * REGEX-TEST: Training Slot 2
-     * REGEX-TEST: Training Slot 3
-     */
-    private val trainingSlotInventoryPattern by patternGroup.pattern(
-        "training",
-        "Training Slot [1-3]",
-    )
-
-    /**
-     * REGEX-TEST: §aBegin Training
-     */
-    private val anvilPattern by patternGroup.pattern(
-        "anvil",
-        "§aBegin Training",
-    )
-
-    /**
-     * REGEX-TEST: Will earn a total of 1,000,000 EXP.
-     * REGEX-TEST: Will earn a total of 2 EXP
-     * REGEX-TEST: Will earn a total of 1,000 EXP
+     * REGEX-TEST: §7§8Will earn a total of 55,000 EXP
+     * REGEX-TEST: §7§8Will earn a total of 550,000 EXP
      */
     private val expEarnedPattern by patternGroup.pattern(
         "exp.total",
-        "Will earn a total of (?<expEarned>.*) EXP\\.?",
+        "(?:§.)+Will earn a total of (?<expEarned>.*) EXP\\.?",
     )
 
     /**
-     * REGEX-TEST: EXP Per Day: 1,000
-     * REGEX-TEST: EXP Per Day: 1,230,000 (+3.4%)
-     * REGEX-TEST: EXP Per Day: 1,623,000 (+9.1%)
-     * REGEX-TEST: EXP Per Day: 1
+     * REGEX-TEST: §7EXP Per Day: §b1,000
+     * REGEX-TEST: §7EXP Per Day: §b1,230,000 §8(+3.4%)
+     * REGEX-TEST: §7EXP Per Day: §b1,623,000 §8(+9.1%)
+     * REGEX-TEST: §7EXP Per Day: §b55,000 §8(+10%)
      */
-    private val dailyExpPattern by patternGroup.pattern(
+    private val expDailyPattern by patternGroup.pattern(
         "exp.daily",
-        "EXP Per Day: (?<expDaily>\\d[\\d,]*)",
+        "(?:§.)+EXP Per Day: (?:§.)+(?<expDaily>\\d[\\d,]*)(?: (?:§.)+\\(\\+(?<extraPercent>[\\d.]+)%\\))?",
     )
 
     /**
-     * REGEX-TEST: Will take: 1d 0h 0m 0s
-     * REGEX-TEST: Will take: 3d 11h 10m 35s
-     * REGEX-TEST: Will take: 0d 0h 0m 1s
-     * REGEX-TEST: Will take: 493d 19h 49m 59s
+     * REGEX-TEST: §7Will take: §e0d 0h 10m 29s
+     * REGEX-TEST: §7Will take: §e44d 6h 14m 40s
+     * REGEX-TEST: §7Will take: §e442d 14h 26m 31s
      */
     private val durationPattern by patternGroup.pattern(
         "training.duration.pattern",
-        "Will take: (?<time>.*)",
+        "(?:§.)+Will take: (?:§.)+(?<time>.*)",
     )
 
     /**
-     * REGEX-TEST: 6,749,742 Coins
-     * REGEX-TEST: 13,492,398.8 Coins
-     * REGEX-TEST: 1,000,000.3 Coins (1% off)
-     * REGEX-TEST: 12,345,678 Coins (5% off)
+     * REGEX-TEST: §622,795.5 Coins §8(5% off)
+     * REGEX-TEST: §613,492,398.8 Coins
+     * REGEX-TEST: §61,000,000.3 Coins §8(1% off)
+     * REGEX-TEST: §612,345,678 Coins §8(5% off)
      */
     private val coinsPattern by patternGroup.pattern(
         "coin",
-        "(?<coin>\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Coins(?: \\([1-5]% off\\))?",
+        "(?:§.)+(?<coins>[^ ]+) Coins(?: (?:§.)+\\((?<percentOff>[\\d.]+)% off\\))?",
     )
 
     /**
-     * REGEX-TEST: 5,024.3 Bits
-     * REGEX-TEST: 1,000 Bits
-     * REGEX-TEST: 139 Bits
+     * REGEX-TEST: §b5,024.3 Bits
+     * REGEX-TEST: §b1,000 Bits
+     * REGEX-TEST: §b139 Bits
      */
     private val bitsPattern by patternGroup.pattern(
         "bits",
-        "(?<bit>\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Bits",
+        "(?:§.)+(?<bits>[^ ]+) Bits",
     )
 
+
     /**
-     * REGEX-TEST: User Input
+     * REGEX-TEST: §b▶ Amount of Days
+     * REGEX-TEST: §b▶ Until Specific Level
      */
-    private val userInputPattern by patternGroup.pattern(
-        "slot24.name.input",
-        "User Input",
+    private val trainingModeLorePattern by patternGroup.pattern(
+        "lore.training-mode",
+        "(?:§.)+▶ (?<selection>.*)"
     )
 
     /**
@@ -115,109 +140,107 @@ object FannCost {
      * REGEX-TEST: Type: Ultra
      * REGEX-TEST: Type: Turbo!
      */
-    private val trainingTypePattern by patternGroup.pattern(
-        "training.type",
-        "Type: (?<type>.*)",
+    private val trainingTypeLorePattern by patternGroup.pattern(
+        "lore.training-type",
+        "(?:§.)+▶ (?<type>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §b▶ 1 Day
+     * REGEX-TEST: §b▶ 5 Days
+     * REGEX-TEST: §b▶ 20 Days
+     */
+    private val dayUserInputLorePattern by patternGroup.pattern(
+        "lore.day-user-input",
+        "(?:§.)+▶ (?<days>\\d+) Days?"
     )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onFannAnvilTooltip(event: ToolTipEvent) {
-        if (!trainingSlotInventoryPattern.matches(InventoryUtils.openInventoryName())) return
-        if (!anvilPattern.matches(event.itemStack.displayName)) return
-        val tooltip = event.toolTip
+        if (!config.coinsPerXP && !config.xpPerBit) return
+        if (currentFannData.trainingType == FannTrainingType.FREE) return
 
-        val trainingType = tooltip.getTrainingType() ?: return
-        ChatUtils.debug("Training Type: $trainingType")
-        if (trainingType == TrainingType.FREE) return
-        if (!showCoins || !showBits) return
-
-        when (trainingMode) {
-            TrainingMode.DAY_COUNT -> {
-                val totalExp = tooltip.getExpEarned() ?: return
-                val coinPerExp = tooltip.getCoins() / totalExp
-                val xpPerBit = totalExp / tooltip.getBits()
-
-                tooltip.insertLineAfter(coinsPattern, "§6 = Coins/XP: ${coinPerExp.roundTo(2)}")
-                tooltip.insertLineAfter(bitsPattern, "§b = XP/Bit: ${xpPerBit.roundTo(2)}")
-            }
-
-            TrainingMode.UNTIL_LEVEL -> {
-                val dailyExp = tooltip.getDailyExp() ?: return
-                val duration = tooltip.getDuration() ?: return
-                val totalExp = dailyExp * duration
-                val coinPerExp = tooltip.getCoins() / totalExp
-                val xpPerBit = totalExp / tooltip.getBits()
-
-                tooltip.insertLineAfter(coinsPattern, "§6 = Coins/XP: ${coinPerExp.roundTo(2)}")
-                tooltip.insertLineAfter(bitsPattern, "§b = XP/Bit: ${xpPerBit.roundTo(2)}")
-            }
+        generatedTooltips.forEach { (pattern, insertionTip) ->
+            event.toolTip.insertLineAfter(pattern, insertionTip)
         }
+    }
+
+    private fun FannData.generateNewTooltips(): List<Pair<Pattern, String>> {
+        val expGained = when (trainingMode) {
+            FannTrainingMode.DAY_COUNT -> expEarned
+            FannTrainingMode.UNTIL_LEVEL -> expDaily?.times(duration.toDouble(DurationUnit.DAYS))
+        } ?: return emptyList()
+
+        val coinPerExp = coinCost / expGained
+        val xpPerBit = expGained / max(1.0, bitCost)
+
+        return listOf(
+            coinsPattern to "§7 = §6${coinPerExp.roundTo(2)} Coins§7/§bXP",
+            bitsPattern to "§7 = §b${xpPerBit.roundTo(2)} XP§7/§bBit"
+        )
+    }
+
+    private fun List<String>.getGroupDouble(
+        pattern: Pattern,
+        groupName: String
+    ): Double? = pattern.firstMatcher(this) {
+        group(groupName).formatDouble()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!trainingSlotInventoryPattern.matches(InventoryUtils.openInventoryName().removeColor())) return
-        val slot24 = event.inventoryItems[24] ?: return
-
-        val name = slot24.displayName.removeColor()
-        trainingMode = if (userInputPattern.matches(name)) {
-            TrainingMode.DAY_COUNT
-        } else {
-            TrainingMode.UNTIL_LEVEL
+        if (!trainingSlotInventoryDetector.isInside()) {
+            currentFannData.reset()
+            generatedTooltips.clear()
+            return
         }
-    }
 
-
-    private fun <T> Pattern.read(lore: List<String>, name: String, func: (String) -> T): T? {
-        for (line in lore) {
-            val linePlain = line.removeColor()
-            this.matchMatcher(linePlain) {
-                group(name)?.let { return func(it) }
-            }
+        val beginTrainingLore = event.inventoryItems[BEGIN_TRAINING_SLOT_NUM]?.getLore()?.takeIf {
+            it.isNotEmpty() && it.hashCode() != lastStartTrainingLoreHash
+        } ?: run {
+            ChatUtils.chat("No begin training")
+            return
         }
-        return null
-    }
+        lastStartTrainingLoreHash = beginTrainingLore.hashCode()
+        val coins = beginTrainingLore.getGroupDouble(coinsPattern, "coins") ?: 0.0
+        val bits = beginTrainingLore.getGroupDouble(bitsPattern, "bits") ?: 0.0
+        val expEarned = beginTrainingLore.getGroupDouble(expEarnedPattern, "expEarned")
+        val expDaily = beginTrainingLore.getGroupDouble(expDailyPattern, "expDaily")
+        val duration = durationPattern.firstMatcher(beginTrainingLore) {
+            TimeUtils.getDuration(group("time"))
+        } ?: dayUserInputLorePattern.firstMatcher(
+            event.inventoryItems[USER_INPUT_SLOT_NUM]?.getLore().orEmpty()
+        ) { group("days").formatInt().days } ?: Duration.ZERO
 
-    private fun List<String>.getCoins(): Double {
-        return coinsPattern.read(this, "coin") { it.formatDouble() } ?: 0.0
-    }
-
-    // In case of Bits not found, return 1 so the division is not by zero
-    private fun List<String>.getBits(): Double {
-        return bitsPattern.read(this, "bit") { it.formatDouble() } ?: 1.0
-    }
-
-    private fun List<String>.getExpEarned(): Double? {
-        return expEarnedPattern.read(this, "expEarned") { it.formatDouble() }
-    }
-
-    private fun List<String>.getDailyExp(): Double? {
-        return dailyExpPattern.read(this, "expDaily") { it.formatDouble() }
-    }
-
-    private fun List<String>.getTrainingType(): TrainingType? {
-        return trainingTypePattern.read(this, "type") { typestr ->
-            TrainingType.entries.firstOrNull { it.type == typestr }
+        val trainingDurationSlot = event.inventoryItems[TRAINING_DURATION_SLOT_NUM] ?: return
+        val trainingMode = trainingModeLorePattern.firstMatcher(trainingDurationSlot.getLore()) {
+            FannTrainingMode.entries.firstOrNull { it.toString() == group("selection") }
+        } ?: run {
+            ChatUtils.chat("No training mode")
+            return
         }
-    }
 
-    private fun List<String>.getDuration(): Double? {
-        return durationPattern.read(this, "time") {
-            TimeUtils.getDuration(it).toDouble(DurationUnit.DAYS)
+        val trainingTypeSlot = event.inventoryItems[TRAINING_TYPE_SLOT_NUM] ?: return
+        val trainingType = trainingTypeLorePattern.firstMatcher(trainingTypeSlot.getLore()) {
+            FannTrainingType.entries.firstOrNull { it.toString() == group("type") }
+        } ?: run {
+            ChatUtils.chat("No training type")
+            return
         }
-    }
 
-    private enum class TrainingMode {
-        DAY_COUNT,
-        UNTIL_LEVEL,
-    }
-
-    private enum class TrainingType(val type: String) {
-        FREE("Free"),
-        LIGHT("Light"),
-        MODERATE("Moderate"),
-        EXPERT("Expert"),
-        ULTRA("Ultra"),
-        TURBO("Turbo!"),
+        currentFannData.apply {
+            this.trainingMode = trainingMode
+            this.trainingType = trainingType
+            this.coinCost = coins
+            this.bitCost = bits
+            this.expEarned = expEarned
+            this.expDaily = expDaily
+            this.duration = duration
+        }
+        ChatUtils.chat("Set currentFannData to:\n$currentFannData")
+        generatedTooltips.clear()
+        currentFannData.generateNewTooltips().forEach {
+            generatedTooltips.add(it)
+        }
     }
 }
