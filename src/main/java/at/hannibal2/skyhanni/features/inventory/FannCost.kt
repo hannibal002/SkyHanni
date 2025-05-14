@@ -131,12 +131,12 @@ object FannCost {
     )
 
     /**
-     * REGEX-TEST: Type: Free
-     * REGEX-TEST: Type: Light
-     * REGEX-TEST: Type: Moderate
-     * REGEX-TEST: Type: Expert
-     * REGEX-TEST: Type: Ultra
-     * REGEX-TEST: Type: Turbo!
+     * REGEX-TEST: §f▶ Free
+     * REGEX-TEST: §a▶ Light
+     * REGEX-TEST: §9▶ Moderate
+     * REGEX-TEST: §5▶ Expert
+     * REGEX-TEST: §6▶ Ultra
+     * REGEX-TEST: §d▶ Turbo!
      */
     private val trainingTypeLorePattern by patternGroup.pattern(
         "lore.training-type",
