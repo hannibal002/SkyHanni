@@ -751,5 +751,12 @@ at/hannibal2/skyhanni/data/MayorData.kt
 at/hannibal2/skyhanni/data/ElectionApi.kt
 at/hannibal2/skyhanni/data/jsonobjects/other/MayorJson.kt
 at.hannibal2.skyhanni.features.fame.ReminderUtils.kt
+at.hannibal2.skyhanni.features.dungeon.DungeonBossMessages.kt
+at.hannibal2.skyhanni.features.dungeon.DungeonChatFilter.kt
+at.hannibal2.skyhanni.features.dungeon.DungeonDeathCounter.kt
+at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay.kt
+at.hannibal2.skyhanni.features.commands.HelpCommand.kt
+at.hannibal2.skyhanni.features.chat.ChatHistoryGui.kt
+at/hannibal2/skyhanni/features/gui/TabWidgetDisplay.kt
 
 # \.(?!kt|java|\()
