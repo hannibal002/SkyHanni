@@ -326,7 +326,7 @@ object ExperimentationTableApi {
      */
     private val unknownSuperpairsClickPattern by patternGroup.pattern(
         "superpairs.unknown-click",
-        "(?:§.)+(?:\\?|Click a ?(seco)?n[dy] button!?)"
+        "(?:§.)+(?:\\?|Click a(?: seco)?n[dy] button!?)"
     )
     // </editor-fold>
 
