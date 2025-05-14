@@ -8,12 +8,10 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import java.text.SimpleDateFormat
 import kotlin.time.Duration.Companion.days
@@ -26,13 +24,13 @@ object TimeFeatures {
     private val winterConfig get() = SkyHanniMod.feature.event.winter
 
     private val startOfNextYear by RecalculatingValue(1.seconds) {
-        SkyBlockTime(year = SkyBlockTime.now().year + 1).asTimeMark()
+        SkyBlockTime(year = SkyBlockTime.now().year + 1).toTimeMark()
     }
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock && !OutsideSBFeature.REAL_TIME.isSelected()) return
+        if (!SkyBlockUtils.inSkyBlock && !OutsideSBFeature.REAL_TIME.isSelected()) return
         if (config.realTime) {
             val timeFormat = if (config.realTimeFormatToggle) {
                 // 12 h format
@@ -45,7 +43,7 @@ object TimeFeatures {
             config.realTimePosition.renderString(currentTime, posLabel = "Real Time")
         }
 
-        if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
+        if (winterConfig.islandCloseTime && IslandType.WINTER.isCurrent()) {
             if (WinterApi.isDecember()) return
             val timeTillNextYear = startOfNextYear.timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days

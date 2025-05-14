@@ -28,6 +28,10 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$    onDrawScreen(mouseX, mouseY, delta)
     //$$    DrawContextUtils.clearContext()
     //$$ }
+    //$$
+    //$$ override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, deltaTicks: Float) {
+    //$$         this.renderDarkening(context)
+    //$$     }
     //#endif
 
     open fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {}
@@ -96,7 +100,15 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         onHandleMouseInput()
     }
     //#else
-    //$$ //TODO this is gone on 1.21
+    //$$ override fun mouseMoved(mouseX: Double, mouseY: Double) {
+    //$$     onHandleMouseInput()
+    //$$     super.mouseMoved(mouseX, mouseY)
+    //$$ }
+    //$$
+    //$$ override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalAmount: Double, verticalAmount: Double): Boolean {
+    //$$     onHandleMouseInput()
+    //$$     return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)
+    //$$ }
     //#endif
 
     open fun onHandleMouseInput() {}
@@ -133,7 +145,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         //#if MC < 1.21
         drawDefaultBackground()
         //#else
-        //$$ renderBackground(DrawContextUtils.drawContext, mouseX, mouseY, partialTicks)
+        //$$ renderDarkening(DrawContextUtils.drawContext)
         //#endif
     }
 }

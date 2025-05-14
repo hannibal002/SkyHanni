@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
-//#endif
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -46,7 +44,6 @@ object GuiEditManager {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        //#if TODO
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
         if (event.keyCode == Keyboard.KEY_RETURN) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
@@ -60,7 +57,9 @@ object GuiEditManager {
         if (isInNeuPv) return
         guiScreen?.let {
             if (it !is GuiInventory && it !is GuiChest && it !is GuiEditSign) return
+            //#if TODO
             if (it is GuiEditSign && !it.isGardenSign()) return
+            //#endif
         }
 
         if (lastHotkeyPressed.passedSince() < 500.milliseconds) return
@@ -68,7 +67,6 @@ object GuiEditManager {
         lastHotkeyPressed = SimpleTimeMark.now()
 
         openGuiPositionEditor(hotkeyReminder = false)
-        //#endif
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -99,7 +97,6 @@ object GuiEditManager {
 
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
-        //#if TODO
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values.toList(),
             2,
@@ -113,7 +110,6 @@ object GuiEditManager {
                     " §7- §e2. Click that key while the GUI element is visible.",
             )
         }
-        //#endif
     }
 
     @JvmStatic
@@ -135,9 +131,7 @@ object GuiEditManager {
         //#endif
     }
 
-    //#if TODO
     fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor
-    //#endif
 
     fun Position.getDummySize(random: Boolean = false): Vector2i {
         if (random) return Vector2i(5, 5)

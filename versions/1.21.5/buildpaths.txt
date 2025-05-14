@@ -726,5 +726,11 @@ at.hannibal2.skyhanni.events.GuiKeyPressEvent.kt
 at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent.kt
 at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent.kt
 at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat.kt
+at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor.kt
+at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
+at.hannibal2.skyhanni.mixins.transformers.MixinKeyboard.java
+at.hannibal2.skyhanni.data.WinterApi.kt
+at.hannibal2.skyhanni.features.misc.TimeFeatures.kt
+
 
 # \.(?!kt|java|\()
