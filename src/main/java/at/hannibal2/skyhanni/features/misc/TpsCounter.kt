@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object TpsCounter {
 
