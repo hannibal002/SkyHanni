@@ -81,8 +81,9 @@ object ExperimentsAddonsHelper {
         hypixelUltrasequencerData.clear()
         userUltrasequencerProgress.clear()
         currentChronomatronRound = 0
-        currentAddonPhase = null
+        currentUltraSequencerRound = 0
         chronomatronSequenceIndex = 0
+        currentAddonPhase = null
     }
 
     private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (displayName.removeColor()) {
