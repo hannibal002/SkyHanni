@@ -19,7 +19,9 @@ import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 //#if TODO
 import at.hannibal2.skyhanni.features.bingo.BingoApi
+//#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+//#if TODO
 import at.hannibal2.skyhanni.features.rift.RiftApi
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -269,11 +271,10 @@ object HypixelData {
             playerAmountPattern,
             playerAmountGuestingPattern,
         )
-        //#if TODO
+
         if (DungeonApi.inDungeon()) {
             playerPatternList.add(dungeonPartyAmountPattern)
         }
-        //#endif
 
         out@ for (pattern in playerPatternList) {
             for (line in TabListData.getTabList()) {

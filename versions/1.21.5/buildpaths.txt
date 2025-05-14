@@ -731,6 +731,25 @@ at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.MixinKeyboard.java
 at.hannibal2.skyhanni.data.WinterApi.kt
 at.hannibal2.skyhanni.features.misc.TimeFeatures.kt
-
+at.hannibal2.skyhanni.features.dungeon.DungeonApi.kt
+at.hannibal2.skyhanni.data.ClickType.kt
+at.hannibal2.skyhanni.events.BlockClickEvent.kt
+at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent.kt
+at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent.kt
+at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent.kt
+at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent.kt
+at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent.kt
+at.hannibal2.skyhanni.events.WorldClickEvent.kt
+at.hannibal2.skyhanni.features.dungeon.DungeonFloor.kt
+at.hannibal2.skyhanni.utils.BlockUtils.kt
+at.hannibal2.skyhanni.utils.SkullTextureHolder.kt
+at.hannibal2.skyhanni.utils.compat.BlockCompat.kt
+at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent.kt
+at.hannibal2.skyhanni.events.ReceiveParticleEvent.kt
+at.hannibal2.skyhanni.utils.render.FrustumUtils.kt
+at/hannibal2/skyhanni/data/MayorData.kt
+at/hannibal2/skyhanni/data/ElectionApi.kt
+at/hannibal2/skyhanni/data/jsonobjects/other/MayorJson.kt
+at.hannibal2.skyhanni.features.fame.ReminderUtils.kt
 
 # \.(?!kt|java|\()
