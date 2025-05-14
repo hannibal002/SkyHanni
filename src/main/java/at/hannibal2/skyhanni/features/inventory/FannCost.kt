@@ -65,9 +65,7 @@ object FannCost {
     private val patternGroup = RepoPattern.group("fann.inventory")
     private val currentFannData: FannData = FannData()
     private val generatedTooltips: MutableMap<Pattern, String> = mutableMapOf()
-    private val trainingSlotInventoryDetector = InventoryDetector {
-        name -> name.contains("Training Slot")
-    }
+    private val trainingSlotInventoryDetector = InventoryDetector { name -> name.contains("Training Slot") }
 
     private var lastStartTrainingLoreHash: Int = 0
 

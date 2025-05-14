@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.collection
 
 import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
