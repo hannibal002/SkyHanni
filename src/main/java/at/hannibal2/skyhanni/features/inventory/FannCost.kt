@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.storage.ResettableStorageSet
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -195,10 +194,7 @@ object FannCost {
 
         val beginTrainingLore = event.inventoryItems[BEGIN_TRAINING_SLOT_NUM]?.getLore()?.takeIf {
             it.isNotEmpty() && it.hashCode() != lastStartTrainingLoreHash
-        } ?: run {
-            ChatUtils.chat("No begin training")
-            return
-        }
+        } ?: return
         lastStartTrainingLoreHash = beginTrainingLore.hashCode()
         val coins = beginTrainingLore.getGroupDouble(coinsPattern, "coins") ?: 0.0
         val bits = beginTrainingLore.getGroupDouble(bitsPattern, "bits") ?: 0.0
@@ -213,18 +209,12 @@ object FannCost {
         val trainingDurationSlot = event.inventoryItems[TRAINING_DURATION_SLOT_NUM] ?: return
         val trainingMode = trainingModeLorePattern.firstMatcher(trainingDurationSlot.getLore()) {
             FannTrainingMode.entries.firstOrNull { it.toString() == group("selection") }
-        } ?: run {
-            ChatUtils.chat("No training mode")
-            return
-        }
+        } ?: return
 
         val trainingTypeSlot = event.inventoryItems[TRAINING_TYPE_SLOT_NUM] ?: return
         val trainingType = trainingTypeLorePattern.firstMatcher(trainingTypeSlot.getLore()) {
             FannTrainingType.entries.firstOrNull { it.toString() == group("type") }
-        } ?: run {
-            ChatUtils.chat("No training type")
-            return
-        }
+        } ?: return
 
         currentFannData.apply {
             this.trainingMode = trainingMode
@@ -235,7 +225,6 @@ object FannCost {
             this.expDaily = expDaily
             this.duration = duration
         }
-        ChatUtils.chat("Set currentFannData to:\n$currentFannData")
         generatedTooltips.clear()
         currentFannData.generateNewTooltips().forEach {
             generatedTooltips.add(it)
