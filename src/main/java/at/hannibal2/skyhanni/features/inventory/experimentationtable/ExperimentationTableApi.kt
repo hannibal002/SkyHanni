@@ -552,7 +552,7 @@ object ExperimentationTableApi {
         if (superpairsSlotsToRead.isEmpty()) return
 
         inventoryItems.filter {
-            it.key in superpairsSlotsToRead && it.value.displayName.removeColor() != "?"
+            it.key in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(it.value.displayName)
         }.forEach {
             superpairsSlotMap[it.key] = it.value
             superpairsSlotsToRead.remove(it.key)
