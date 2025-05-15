@@ -75,10 +75,6 @@ object RenderUtils {
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
 
-    //#if MC < 1.8.9
-    /**
-     * Used for some debugging purposes.
-     */
     val absoluteTranslation
         get() = run {
             matrixBuffer.clear()
@@ -95,7 +91,6 @@ object RenderUtils {
 
             Triple(xTranslate, yTranslate, zTranslate)
         }
-    //#endif
 
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
@@ -523,7 +518,7 @@ object RenderUtils {
     }
 
     // totally not modified Autumn Client's TargetStrafe
-    fun drawCircle(entity: Entity, partialTicks: Float, rad: Double, color: Color) {
+    fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
 
@@ -907,7 +902,7 @@ object RenderUtils {
         renderText(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
     }
 
-    private fun renderText(
+    private fun SkyHanniRenderWorldEvent.renderText(
         location: LorenzVec,
         text: String,
         scale: Double,

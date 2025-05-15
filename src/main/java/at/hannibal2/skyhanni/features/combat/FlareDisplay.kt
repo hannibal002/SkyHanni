@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawCircle
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
@@ -193,7 +193,7 @@ object FlareDisplay {
                 }
 
                 FlareConfig.OutlineType.CIRCLE -> {
-                    RenderUtils.drawCircle(entity, event.partialTicks, 40.0, color)
+                    event.drawCircle(entity, 40.0, color)
                 }
 
                 else -> {}
