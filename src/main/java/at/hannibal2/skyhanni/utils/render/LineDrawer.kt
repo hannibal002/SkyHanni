@@ -131,7 +131,7 @@ class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator
 
             GlStateManager.pushMatrix()
             val inverseView = RenderUtils.getViewerPos(partialTicks)
-            RenderUtils.translate(inverseView.negated())
+            WorldRenderUtils.translate(inverseView.negated())
 
             draws.invoke(LineDrawer(Tessellator.getInstance(), inverseView))
 

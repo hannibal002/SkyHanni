@@ -287,12 +287,9 @@ net.minecraft.world.entity.Entity setCustomName() setCustomNameTag()
 net.minecraft.world.entity.Entity tickCount ticksExisted
 net.minecraft.world.entity.Entity xOld prevPosX
 net.minecraft.world.entity.Entity xRot rotationPitch
-net.minecraft.world.entity.Entity xo posX
 net.minecraft.world.entity.Entity yOld prevPosY
 net.minecraft.world.entity.Entity yRot rotationYaw
-net.minecraft.world.entity.Entity yo posY
 net.minecraft.world.entity.Entity zOld prevPosZ
-net.minecraft.world.entity.Entity zo posZ
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
