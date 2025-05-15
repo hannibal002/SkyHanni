@@ -23,12 +23,6 @@ object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
-    /**
-     * Taken from NotEnoughUpdates under Creative Commons Attribution-NonCommercial 3.0
-     * https://github.com/Moulberry/NotEnoughUpdates/blob/master/LICENSE
-     * @author Moulberry
-     * @author Mojang
-     */
     private fun SkyHanniRenderWorldEvent.renderBeaconBeam(
         x: Double,
         y: Double,
@@ -156,9 +150,6 @@ object WorldRenderUtils {
         TODO()
     }
 
-    /**
-     * @author Mojang
-     */
     private fun SkyHanniRenderWorldEvent.drawNametag(str: String, color: Color?) {
         TODO()
     }
@@ -172,7 +163,6 @@ object WorldRenderUtils {
         drawCircle(entity, rad, color)
     }
 
-    // modified from Autumn Client's TargetStrafe
     fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
         TODO()
     }
