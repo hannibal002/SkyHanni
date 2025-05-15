@@ -495,8 +495,7 @@ object WorldRenderUtils {
         return exactLocation(player) + add
     }
 
-    private fun Color.bindColor() =
-        ModernGlStateManager.color(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
+    private fun Color.bindColor(): Unit = TODO()
 
     private fun bindCamera() {
         TODO()
