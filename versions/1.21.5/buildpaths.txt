@@ -761,5 +761,12 @@ at/hannibal2/skyhanni/features/gui/TabWidgetDisplay.kt
 at.hannibal2.skyhanni.utils.SoundUtils.kt
 at.hannibal2.skyhanni.features.chat.ChatSoundResponse.kt
 at.hannibal2.skyhanni.events.item.ItemHoverEvent.kt
+at.hannibal2.skyhanni.utils.LorenzDebug.kt
+at.hannibal2.skyhanni.data.MinecraftData.kt
+at.hannibal2.skyhanni.events.ItemInHandChangeEvent.kt
+at.hannibal2.skyhanni.events.PlaySoundEvent.kt
+at.hannibal2.skyhanni.events.minecraft.ServerTickEvent.kt
+
+
 
 # \.(?!kt|java|\()
