@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -62,6 +63,7 @@ object GhostTracker {
 
     private val isMaxBestiary get() = currentBestiaryKills >= MAX_BESTIARY_KILLS
     private var allowedDrops = setOf<NeuInternalName>()
+    private var allowedSackDrops = setOf<NeuInternalName>()
 
     // TODO: in the future get from neu bestiary data
     private const val MAX_BESTIARY_KILLS = 100_000
@@ -211,6 +213,21 @@ object GhostTracker {
     }
 
     @HandleEvent
+    fun onSackChange(event: SackChangeEvent) {
+        if (!inArea || !ProfileStorageData.loaded) return
+
+        val allowedChanges = event.sackChanges.filter {
+            it.internalName in allowedSackDrops && it.delta > 0
+        }
+
+        tracker.modify { storage ->
+            allowedChanges.forEach { sackChange ->
+                storage.addItem(sackChange.internalName, sackChange.delta, false)
+            }
+        }
+    }
+
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
 
@@ -231,7 +248,7 @@ object GhostTracker {
         itemDropPattern.matchMatcher(event.message) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val mf = group("mf").formatInt()
-            if (!isAllowedItem(internalName)) return
+            if (internalName !in allowedDrops) return
 
             tracker.addItem(internalName, 1, false)
             tracker.modify {
@@ -298,7 +315,9 @@ object GhostTracker {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedDrops = event.getConstant<GhostDropsJson>("GhostDrops").ghostDrops
+        val ghostDropsConstant = event.getConstant<GhostDropsJson>("GhostDrops")
+        allowedDrops = ghostDropsConstant.ghostDrops
+        allowedSackDrops = ghostDropsConstant.sacksDrops
     }
 
     @HandleEvent
@@ -313,8 +332,6 @@ object GhostTracker {
             tracker.firstUpdate()
         }
     }
-
-    private fun isAllowedItem(internalName: NeuInternalName): Boolean = internalName in allowedDrops
 
     private fun getAverageMagicFind(mf: Long, kills: Long) =
         if (mf == 0L || kills == 0L) 0.0 else mf / (kills).toDouble()
