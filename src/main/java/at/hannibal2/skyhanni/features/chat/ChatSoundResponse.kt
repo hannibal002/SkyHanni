@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 @SkyHanniModule
 object ChatSoundResponse {
@@ -39,16 +40,22 @@ object ChatSoundResponse {
 private const val START_PATTERN = "(?:^|^.* )(?: |§.)*(?i)"
 private const val END_PATTERN = "(?: |§.|!|\\?|\\.)*(?:\$| .*\$)"
 
-enum class SoundResponseTypes(soundLocation: String, triggersOn: List<String>) {
-    CAT("mob.cat.meow", listOf("meow")),
-    DOG("mob.wolf.bark", listOf("bark", "arf", "woof")),
-    SHEEP("mob.sheep.say", listOf("baa+h*")),
-    COW("mob.cow.say", listOf("moo+")),
-    PIG("mob.pig.say", listOf("oink")),
-    CHICKEN("mob.chicken.say", listOf("cluck")),
+enum class SoundResponseTypes(legacySoundLocation: String, modernSoundLocation: String, triggersOn: List<String>) {
+    CAT("mob.cat.meow", "entity.cat.ambient", listOf("meow")),
+    DOG("mob.wolf.bark", "entity.wolf.ambient", listOf("bark", "arf", "woof")),
+    SHEEP("mob.sheep.say", "entity.sheep.ambient", listOf("baa+h*")),
+    COW("mob.cow.say", "entity.cow.ambient", listOf("moo+")),
+    PIG("mob.pig.say", "entity.pig.ambient", listOf("oink")),
+    CHICKEN("mob.chicken.say", "entity.chicken.ambient", listOf("cluck")),
     ;
 
-    val sound by lazy { SoundUtils.createSound(soundLocation, 1f) }
+    val sound by lazy {
+        if (PlatformUtils.MC_VERSION == "1.8.9") {
+            SoundUtils.createSound(legacySoundLocation, 1f)
+        } else {
+            SoundUtils.createSound(modernSoundLocation, 1f)
+        }
+    }
 
     // creates a pattern that looks for if the message contains any of the triggerOn strings but as a full word
     val pattern by RepoPattern.pattern(
