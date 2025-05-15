@@ -43,6 +43,8 @@ object ErrorManager {
         "io.moulberry.notenoughupdates." to "NEU.",
         "net.minecraft." to "MC.",
         "net.minecraftforge.fml." to "FML.",
+        "knot//" to "",
+        "java.base/" to "",
     )
 
     private val replaceEntirely = mapOf(
@@ -89,6 +91,13 @@ object ErrorManager {
             simpleCallback {
                 cache.clear()
                 ChatUtils.chat("Error cache reset.")
+            }
+        }
+        event.registerBrigadier("shthrowerror") {
+            description = "Throws an error to test error manager."
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback {
+                logErrorWithData(NullPointerException(), "Manually triggered error!")
             }
         }
     }
