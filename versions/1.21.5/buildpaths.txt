@@ -758,5 +758,8 @@ at.hannibal2.skyhanni.features.dungeon.DungeonMilestonesDisplay.kt
 at.hannibal2.skyhanni.features.commands.HelpCommand.kt
 at.hannibal2.skyhanni.features.chat.ChatHistoryGui.kt
 at/hannibal2/skyhanni/features/gui/TabWidgetDisplay.kt
+at.hannibal2.skyhanni.utils.SoundUtils.kt
+at.hannibal2.skyhanni.features.chat.ChatSoundResponse.kt
+at.hannibal2.skyhanni.events.item.ItemHoverEvent.kt
 
 # \.(?!kt|java|\()

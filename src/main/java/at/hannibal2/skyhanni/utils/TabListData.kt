@@ -32,7 +32,6 @@ import net.minecraft.world.WorldSettings
 //$$ import net.minecraft.world.GameType
 //#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object TabListData {
     private var tablistCache = emptyList<String>()

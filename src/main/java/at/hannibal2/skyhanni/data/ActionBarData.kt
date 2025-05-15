@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import kotlinx.coroutines.launch
 import net.minecraft.util.IChatComponent
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ActionBarData {
     private var actionBar = ""

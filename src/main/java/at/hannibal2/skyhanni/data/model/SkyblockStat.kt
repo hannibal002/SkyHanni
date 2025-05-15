@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 //#if TODO
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 //#endif
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -194,7 +194,6 @@ enum class SkyblockStat(
             }
         }
 
-        //#if TODO
         @HandleEvent(onlyOnSkyblock = true)
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             onSkyblockMenu(event)
@@ -221,7 +220,6 @@ enum class SkyblockStat(
                 assignEntry(list, StatSourceType.STATS_MENU) { it.menuPattern }
             }
         }
-        //#endif
 
         @HandleEvent
         fun onTabList(event: WidgetUpdateEvent) {
