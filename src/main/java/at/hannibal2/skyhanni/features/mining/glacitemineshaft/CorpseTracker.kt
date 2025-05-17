@@ -21,8 +21,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
-import at.hannibal2.skyhanni.utils.collection.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.collection.enumMapOf
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -160,8 +160,10 @@ object CorpseTracker {
     }
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && (
-            IslandType.MINESHAFT.isInIsland() ||
-                (!config.onlyInMineshaft && MiningApi.inGlacialTunnels())
-            )
+        LorenzUtils.inSkyBlock &&
+            config.enabled &&
+            (
+                IslandType.MINESHAFT.isInIsland() ||
+                    (!config.onlyInMineshaft && MiningApi.inGlacialTunnels())
+                )
 }
