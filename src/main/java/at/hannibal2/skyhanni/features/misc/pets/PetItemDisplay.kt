@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHeldPetItem
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
@@ -18,8 +18,8 @@ object PetItemDisplay {
         val stack = event.stack?.takeIf { it.stackSize == 1 } ?: return
         if (config.petItemDisplay.isEmpty()) return
 
-        val petItem = stack.getPetItem() ?: return
-        val icon = config.petItemDisplay.firstOrNull { it.item == petItem }?.icon ?: return
+        val petItem = stack.getHeldPetItem() ?: return
+        val icon = config.petItemDisplay.firstOrNull { it.item == petItem.asString() }?.icon ?: return
 
         val width = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(icon) * config.petItemDisplayScale).toInt()
         val x = event.x + 22 - width

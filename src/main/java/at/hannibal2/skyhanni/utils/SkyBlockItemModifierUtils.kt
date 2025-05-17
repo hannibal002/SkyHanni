@@ -14,11 +14,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
+import com.google.gson.annotations.Expose
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import java.util.Locale
+import java.util.UUID
 
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
@@ -70,21 +72,35 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
-    fun ItemStack.getPetExp() = getPetInfo()?.get("exp")?.asDouble
+    data class PetInfo(
+        @Expose val type: String,
+        @Expose val active: Boolean,
+        @Expose val exp: Double,
+        @Expose val tier: LorenzRarity,
+        @Expose val hideInfo: Boolean = false,
+        @Expose val heldItem: NeuInternalName? = null,
+        @Expose val candyUsed: Int = 0,
+        @Expose val skin: NeuInternalName? = null,
+        @Expose val uuid: UUID,
+        @Expose val uniqueId: String,
+        @Expose val hideRightClick: Boolean,
+        @Expose val noMove: Boolean,
+    )
+
+    fun ItemStack.getPetExp() = getPetInfo()?.exp
 
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
         if (data.petCandies == -1) {
-            data.petCandies = getPetInfo()?.get("candyUsed")?.asInt
+            data.petCandies = getPetInfo()?.candyUsed
         }
         return data.petCandies
     }
 
-    // TODO use NeuInternalName here
-    fun ItemStack.getPetItem(): String? {
+    fun ItemStack.getHeldPetItem(): NeuInternalName? {
         val data = cachedData
-        if (data.heldItem == "") {
-            data.heldItem = getPetInfo()?.get("heldItem")?.asString
+        if (data.heldItem == NeuInternalName.NONE) {
+            data.heldItem = getPetInfo()?.heldItem
         }
         return data.heldItem
     }
@@ -105,8 +121,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
 
-    private fun ItemStack.getPetInfo() =
-        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)
+    fun ItemStack.getPetInfo(): PetInfo? =
+        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), PetInfo::class.java)
 
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData

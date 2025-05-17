@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
-import at.hannibal2.skyhanni.api.CurrentPetApi
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData

@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.api.CurrentPetApi
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.PetData.Companion.internalNameToPetName
-import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetSkinJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -17,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import net.minecraft.item.ItemStack
@@ -29,7 +29,7 @@ object PetUtils {
     val petSkins = mutableMapOf<String, MutableMap<String, NeuPetSkinJson>>()
 
     private var baseXpLevelReqs: List<Int> = listOf()
-    private var customXpLevelReqs: Map<String, NEUPetData>? = null
+    private var customXpLevelReqs: Map<String, NeuPetData>? = null
 
     // <editor-fold desc="Patterns">
     /**
@@ -155,28 +155,29 @@ object PetUtils {
         return xpList.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
     }
 
-    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int? {
-        val (petName, rarity) = internalNameToPetName(petInternalName) ?: return null
+    fun internalNameToPetName(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
+        val (name, rarityStr) = internalName.asString().split(";")
+        val rarity = LorenzRarity.getById(rarityStr.toInt()) ?: return null
+        return Pair(name, rarity)
+    }
+
+    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int {
+        val (petName, rarity) = internalNameToPetName(petInternalName) ?: return 0
         return xpToLevel(totalXp, rarity, petName)
     }
 
-    private fun xpToLevel(totalXp: Double, rarity: LorenzRarity, petName: String): Int? {
+    private fun xpToLevel(totalXp: Double, rarity: LorenzRarity, petName: String): Int {
+        var xp = totalXp.takeIf { it > 0 } ?: return 0
         val newPetName = petName.toInternalName().toString()
-
-        val rarityOffset = getRarityOffset(rarity, newPetName) ?: return null
-        if (totalXp < 0) return null
-
+        val rarityOffset = getRarityOffset(rarity, newPetName) ?: return 0
         val xpList = baseXpLevelReqs + getCustomLeveling(newPetName)
 
-        var xp = totalXp
         var level = 0
         for (i in 0 + rarityOffset until xpList.size) {
             val xpReq = xpList[i]
-            if (xp >= xpReq) {
+            while (xp >= xpReq) {
                 xp -= xpReq
                 level++
-            } else {
-                break
             }
         }
 
@@ -223,7 +224,7 @@ object PetUtils {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.getConstant<NEUPetsJson>("pets")
+        val data = event.getConstant<NeuPetsJson>("pets")
         baseXpLevelReqs = data.petLevels
         customXpLevelReqs = data.customPetLeveling
 

@@ -32,10 +32,14 @@ object ProfileStorageData {
     var sackProfiles: SackData.ProfileSpecific? = null
     private var hypixelDataLoaded = false
 
+    private var petPlayers: PetDataStorage.PlayerSpecific? = null
+    var petProfiles: PetDataStorage.ProfileSpecific? = null
+
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val petPlayers = petPlayers
         val profileName = event.name
         if (playerSpecific == null) {
             DelayedRun.runDelayed(10.seconds) {
@@ -46,8 +50,11 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
+        if (petPlayers == null) {
+            ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
+        }
 
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        loadProfileSpecific(playerSpecific, sackPlayers, petPlayers, profileName)
         ConfigLoadEvent.post()
     }
 
@@ -55,6 +62,7 @@ object ProfileStorageData {
         println("workaroundIn10SecondsProfileStorage")
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val petPlayers = petPlayers
 
         if (playerSpecific == null) {
             ErrorManager.skyHanniError(
@@ -68,7 +76,11 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        if (petPlayers == null) {
+            ErrorManager.skyHanniError("petPlayers is null in ProfileJoinEvent!")
+        }
+
+        loadProfileSpecific(playerSpecific, sackPlayers, petPlayers, profileName)
         ConfigLoadEvent.post()
     }
 
@@ -111,12 +123,14 @@ object ProfileStorageData {
 
     private fun loadProfileSpecific(
         playerSpecific: PlayerSpecificStorage,
-        sackProfile: SackData.PlayerSpecific,
+        sackPlayer: SackData.PlayerSpecific,
+        petPlayer: PetDataStorage.PlayerSpecific,
         profileName: String,
     ) {
         noTabListTime = SimpleTimeMark.farPast()
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
-        sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
+        sackProfiles = sackPlayer.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
+        petProfiles = petPlayer.profiles.getOrPut(profileName) { PetDataStorage.ProfileSpecific() }
         loaded = true
         ConfigLoadEvent.post()
     }
@@ -126,6 +140,7 @@ object ProfileStorageData {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
+        petPlayers = SkyHanniMod.petData.players.getOrPut(playerUuid) { PetDataStorage.PlayerSpecific() }
         ConfigLoadEvent.post()
     }
 

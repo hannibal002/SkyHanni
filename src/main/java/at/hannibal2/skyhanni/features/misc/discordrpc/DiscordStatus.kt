@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 // SkyblockAddons code, adapted for SkyHanni with some additions and fixes
 
-import at.hannibal2.skyhanni.api.CurrentPetApi
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getTierForCropCount
