@@ -24,12 +24,12 @@ import at.hannibal2.skyhanni.utils.SignUtils
 import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import kotlin.time.Duration.Companion.seconds
 
@@ -39,7 +39,7 @@ object FarmingSettingsAPI {
     private val config get() = GardenApi.config.farmingSettings
 
     private var sneakingSince = SimpleTimeMark.farFuture()
-    private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
+    private val sneaking get() = MinecraftCompat.localPlayer.isSneaking
 
     private var lastToolSwitch = SimpleTimeMark.farPast()
     private var lastWarnTime = SimpleTimeMark.farPast()
@@ -171,7 +171,7 @@ object FarmingSettingsAPI {
 
         if (WarningType.WHEN_USING.isSelected()) sendWarnings(WarningType.WHEN_USING)
 
-        if (Minecraft.getMinecraft().thePlayer.onGround && !GardenApi.onBarnPlot) {
+        if (MinecraftCompat.localPlayer.onGround && !GardenApi.onBarnPlot) {
             if (WarningType.WHEN_FARMING.isSelected() && GardenApi.isCurrentlyFarming()) sendWarnings(WarningType.WHEN_FARMING)
             if (WarningType.WHEN_WALKING.isSelected()) sendWarnings(WarningType.WHEN_WALKING)
         }
@@ -257,7 +257,7 @@ object FarmingSettingsAPI {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick() {
         if (!isEnabled()) return
-        val player = Minecraft.getMinecraft().thePlayer
+        val player = MinecraftCompat.localPlayer
 
         currentSpeed = (player.capabilities.walkSpeed * 1000).toInt()
         currentYaw = LocationUtils.calculatePlayerYaw().roundTo(2)

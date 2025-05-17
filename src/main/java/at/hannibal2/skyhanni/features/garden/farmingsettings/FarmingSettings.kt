@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farmingsettings
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
@@ -42,9 +43,9 @@ object FarmingSettings {
         )
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenApi.inGarden() || GardenApi.hideExtraGuis() || (!config.warning && !config.showOnHUD)) return
+        if (GardenApi.hideExtraGuis() || (!config.warning && !config.showOnHUD)) return
 
         if (config.showOnHUD) config.pos.renderRenderable(FarmingSettingsAPI.createStatus(), posLabel = "Garden Optimal Settings")
         if (config.warning && config.warningTypes.isNotEmpty()) FarmingSettingsAPI.handleWarning()
