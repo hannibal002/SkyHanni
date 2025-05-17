@@ -15,10 +15,10 @@ public class AreaPathfinderConfig {
     @ConfigOption(name = "Enabled", desc = "While in your invenotry, show all areas of the island. Click on an area to display the path to this area.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Show Always", desc = "Show the list always, not only while inside the inventory.")
+    @ConfigOption(name = "Show Always", desc = "Show the list always, also while outside of an inventory.")
     @ConfigEditorBoolean
     public boolean showAlways = false;
 

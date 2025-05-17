@@ -90,17 +90,17 @@ public class MoneyPerHourConfig {
         NPC_PRICE("§eNPC Price", 2),
         ;
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        CustomFormatEntry(String str, int legacyId) {
-            this.str = str;
+        CustomFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        CustomFormatEntry(String str) {
-            this(str, -1);
+        CustomFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -110,7 +110,7 @@ public class MoneyPerHourConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -158,5 +158,5 @@ public class MoneyPerHourConfig {
 
     @Expose
     @ConfigLink(owner = MoneyPerHourConfig.class, field = "display")
-    public Position pos = new Position(-330, 170, false, true);
+    public Position pos = new Position(-330, 170);
 }

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
+import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.data.PurseApi
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
@@ -33,13 +33,13 @@ enum class ChunkedStatsLine(
     private val configLine: String,
 ) {
     PURSE(
-        displayPair = { "§6${formatNumber(PurseAPI.currentPurse)}" },
-        showWhen = { !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && ScoreboardElementPurse.showWhen() },
+        displayPair = { "§6${formatNumber(PurseApi.currentPurse)}" },
+        showWhen = { !(hideEmptyLines && PurseApi.currentPurse.toInt() == 0) && ScoreboardElementPurse.showWhen() },
         showIsland = { ScoreboardElementPurse.showIsland() },
         configLine = "§6Purse",
     ),
     MOTES(
-        displayPair = { "§b${getMotes()}" },
+        displayPair = { "§d${getMotes()}" },
         showWhen = { !(hideEmptyLines && getMotes() == "0") && ScoreboardElementMotes.showWhen() },
         showIsland = { ScoreboardElementMotes.showIsland() },
         configLine = "§dMotes",
@@ -75,8 +75,8 @@ enum class ChunkedStatsLine(
         configLine = "§cHeat",
     ),
     COLD(
-        displayPair = { "§b${MiningAPI.cold}❄" },
-        showWhen = { !(hideEmptyLines && MiningAPI.cold == 0) && ScoreboardElementCold.showWhen() },
+        displayPair = { "§b${MiningApi.cold}❄" },
+        showWhen = { !(hideEmptyLines && MiningApi.cold == 0) && ScoreboardElementCold.showWhen() },
         showIsland = { ScoreboardElementCold.showIsland() },
         configLine = "§bCold",
     ),
@@ -105,7 +105,7 @@ enum class ChunkedStatsLine(
         fun shouldShowChunkedStats() = currentIslandStats.any { it.showWhen() }
 
         fun showChunkedStatsIsland(): Boolean {
-            currentIslandStats = chunkedConfig.chunkedStats.filter { it.showIsland() }
+            currentIslandStats = displayConfig.chunkedStats.chunkedStats.filter { it.showIsland() }
             return currentIslandStats.isNotEmpty()
         }
     }

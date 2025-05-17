@@ -2,32 +2,38 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.value
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
 import java.util.NavigableMap
+import java.util.NavigableSet
 import java.util.UUID
-import java.util.function.Predicate
 import java.util.regex.Matcher
+//#if FORGE
+import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
+//#else
+//$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
+//#endif
 
+// todo 1.21 impl needed
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
-    private val stringColorPattern = "§[0123456789abcdef].*".toPattern()
     private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
     private val minecraftColorCodesPattern = "(?i)(§[0-9a-fklmnor])+".toPattern()
     private val lettersAndNumbersPattern = "(§.)|[^a-zA-Z0-9 ]".toPattern()
@@ -131,6 +137,12 @@ object StringUtils {
         return map.subMap(prefix, true, lastKey, false)
     }
 
+    fun subMapOfStringsStartingWith(prefix: String, map: NavigableSet<String>): NavigableSet<String> {
+        if ("" == prefix) return map
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
+        return map.subSet(prefix, true, lastKey, false)
+    }
+
     fun nextLexicographicallyStringWithSameLength(input: String): String {
         val lastCharPosition = input.length - 1
         val inputWithoutLastChar = input.substring(0, lastCharPosition)
@@ -147,7 +159,7 @@ object StringUtils {
             split[1].removeColor()
         } else {
             split[0].removeColor()
-        }
+        }.removeSuffix("'s")
     }
 
     fun String.cleanPlayerName(displayName: Boolean = false): String {
@@ -156,22 +168,10 @@ object StringUtils {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
+
         } else {
             internalCleanPlayerName()
         }
-    }
-
-    fun getColor(string: String, default: Int, darker: Boolean = true): Int {
-        val matcher = stringColorPattern.matcher(string)
-        if (matcher.matches()) {
-            val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
-            return if (darker) {
-                colorInt.darkenColor()
-            } else {
-                "ff${Integer.toHexString(colorInt)}".toLong(radix = 16).toInt()
-            }
-        }
-        return default
     }
 
     fun String.substringBeforeLastOrNull(needle: String): String? {
@@ -180,39 +180,21 @@ object StringUtils {
         return this.substring(0, index)
     }
 
-    fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
+    fun encodeBase64(input: String): String = Base64.getEncoder().encodeToString(input.toByteArray())
 
     fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
-
-    fun addFormat(text: String, format: String): String {
-        if (text.length < 2) return text
-
-        val rawText = text.substring(2)
-        return if (rawText == text.removeColor()) {
-            val originalColor = text.substring(0, 2)
-            "$originalColor$format$rawText"
-        } else {
-            "$format$text"
-        }
-    }
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
     fun Double.removeUnusedDecimal() = if (this % 1 == 0.0) this.toInt().toString() else this.toString()
 
-    fun String.splitLines(width: Int): String = GuiUtilRenderComponents.splitText(
-        ChatComponentText(this),
+    //#if FORGE
+    fun String.splitLines(width: Int): String = ForgeFontRenderer(Minecraft.getMinecraft().fontRendererObj).splitText(
+        //#else
+        //$$ fun String.splitLines(width: Int): String = ModernFontRenderer(MinecraftClient.getInstance().textRenderer).splitText(
+        //#endif
+        this,
         width,
-        Minecraft.getMinecraft().fontRendererObj,
-        false,
-        false,
-    ).joinToString("\n") {
-        val text = it.formattedText
-        val formatCode = Regex("(?:§[a-f0-9l-or]|\\s)*")
-        formatCode.matchAt(text, 0)?.let { matcher ->
-            val codes = matcher.value.replace("\\s".toRegex(), "")
-            codes + text.removeRange(matcher.range)
-        } ?: text
-    }
+    ).joinToString("\n") { it.removePrefix("§r") }
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
@@ -228,6 +210,8 @@ object StringUtils {
         val allButLast = this.subList(0, lastIndex).joinToString("$delimiterColor, ")
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
+
+    fun String.pluralize(number: Int) = pluralize(number, this)
 
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
@@ -259,8 +243,9 @@ object StringUtils {
         return builder.toString()
     }
 
-    fun String.capAtMinecraftLength(limit: Int) =
-        capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
+    fun String.capAtMinecraftLength(limit: Int) = capAtLength(limit) {
+        Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.toString())
+    }
 
     private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
         var i = 0
@@ -268,36 +253,6 @@ object StringUtils {
             i += lengthJudger(it)
             i < limit
         }
-    }
-
-    // recursively goes through the chat component until an action is completed
-    fun modifyFirstChatComponent(chatComponent: IChatComponent, action: Predicate<IChatComponent>): Boolean {
-        if (action.test(chatComponent)) {
-            return true
-        }
-        for (sibling in chatComponent.siblings) {
-            if (modifyFirstChatComponent(sibling, action)) {
-                return true
-            }
-        }
-        return false
-    }
-
-    // replaces a word without breaking any chat components
-    fun replaceFirstChatText(chatComponent: IChatComponent, toReplace: String, replacement: String): IChatComponent {
-        modifyFirstChatComponent(chatComponent) { component ->
-            if (component is ChatComponentText) {
-                component as AccessorChatComponentText
-                val componentText = component.text_skyhanni()
-                if (componentText.contains(toReplace)) {
-                    component.setText_skyhanni(componentText.replace(toReplace, replacement))
-                    return@modifyFirstChatComponent true
-                }
-                return@modifyFirstChatComponent false
-            }
-            return@modifyFirstChatComponent false
-        }
-        return chatComponent
     }
 
     fun String.getPlayerNameFromChatMessage(): String? = matchPlayerChatMessage(this)?.group("username")
@@ -344,10 +299,10 @@ object StringUtils {
     fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
 
     fun replaceIfNeeded(
-        original: ChatComponentText,
+        original: IChatComponent,
         newText: String,
-    ): ChatComponentText? {
-        return replaceIfNeeded(original, ChatComponentText(newText))
+    ): IChatComponent? {
+        return replaceIfNeeded(original, newText.asComponent())
     }
 
     private val colorMap = EnumChatFormatting.entries.associateBy { it.toString()[1] }
@@ -359,12 +314,12 @@ object StringUtils {
         class ChatIterator(var component: IChatComponent) {
             var queue = mutableListOf<IChatComponent>()
             var idx = 0
-            var colorOverride = ChatStyle()
+            var colorOverride = defaultStyleConstructor
             fun next(): Pair<Char, ChatStyle>? {
                 while (true) {
                     while (idx >= component.unformattedTextForChat.length) {
                         queue.addAll(0, component.siblings)
-                        colorOverride = ChatStyle()
+                        colorOverride = defaultStyleConstructor
                         component = queue.removeFirstOrNull() ?: return null
                     }
                     val char = component.unformattedTextForChat[idx++]
@@ -393,7 +348,7 @@ object StringUtils {
                             }
 
                             else -> {
-                                colorOverride = ChatStyle().setColor(formatting)
+                                colorOverride = defaultStyleConstructor.setColor(formatting)
                             }
                         }
                     } else {
@@ -422,9 +377,9 @@ object StringUtils {
     }
 
     private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
-        val clickEvent = message.chatStyle.chatClickEvent
+        val clickEvent = message.command
         if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent?.value == clickEvent.value) {
+            if (foundCommands.size == 1 && foundCommands[0].command == clickEvent) {
                 return
             }
             foundCommands.add(message)
@@ -445,9 +400,10 @@ object StringUtils {
 
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
-        chatComponent = ChatComponentText(new)
-        if (clickEvents.size == 1) chatComponent.chatStyle.chatClickEvent = clickEvents.first()
-        if (hoverEvents.size == 1) chatComponent.chatStyle.chatHoverEvent = hoverEvents.first()
+        chatComponent = new.asComponent()
+        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value()
+        if (hoverEvents.size == 1) chatComponent.hover = hoverEvents.first().value()
+
     }
 
     private fun IChatComponent.findAllEvents(
@@ -459,10 +415,14 @@ object StringUtils {
         val clickEvent = chatStyle.chatClickEvent
         val hoverEvent = chatStyle.chatHoverEvent
 
-        if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
+        if (clickEvent?.action != null && clickEvents.none { it.value() == clickEvent.value() }) {
             clickEvents.add(clickEvent)
         }
-        if (hoverEvent?.action != null && hoverEvents.none { it.value == hoverEvent.value }) {
+
+        if (hoverEvent?.action != null && hoverEvents.none {
+                it.value() == hoverEvent.value()
+            }
+        ) {
             hoverEvents.add(hoverEvent)
         }
     }
@@ -493,25 +453,29 @@ object StringUtils {
         return message
     }
 
+    //#if TODO
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
-        val text = ChatComponentText(this)
-        text.chatStyle = original.sampleStyleAtStart()
-        return text
+        return asComponent { chatStyle = original.sampleStyleAtStart() }
     }
+    //#endif
 
     fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
-        val text = ChatComponentText(this)
-        text.chatStyle = original.chatStyle
-        return text
+        return asComponent { chatStyle = original.chatStyle }
     }
-
-    fun String.toCleanChatComponent(): IChatComponent = ChatComponentText(this)
 
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 
-    fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    fun String.width(): Int {
+        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    }
+
+    private val vowels = "aeiouAEIOU".toSet()
+
+    fun Char.isVowel(): Boolean = this in vowels
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
+
+    fun String.splitCamelCase() = this.replace("([a-z])([A-Z])".toRegex(), "$1 $2")
 
     fun String.isValidUuid(): Boolean {
         return try {
@@ -533,5 +497,39 @@ object StringUtils {
         val firstColor = getFirstColorCode()
         val clean = removeColor()
         return "§$firstColor§m$clean"
+    }
+
+    fun getListOfStringsMatchingLastWord(words: Array<String>, args: Collection<String>): List<String> {
+        val lastWord = words.lastOrNull() ?: return emptyList()
+        val matches = args.filter { it.startsWith(lastWord, ignoreCase = true) }
+        return matches
+    }
+
+    // Just fully yoinked this one from the font renderer thx dinner bone
+    fun getFormatFromString(text: String): String {
+        val length = text.length
+        var string = ""
+        var i = -1
+
+        while ((text.indexOf(167.toChar(), i + 1).also { i = it }) != -1) {
+            if (i < length - 1) {
+                val c0 = text[i + 1]
+                if (isFormatColor(c0)) {
+                    string = "§$c0"
+                } else if (isFormatSpecial(c0)) {
+                    string = "$string§$c0"
+                }
+            }
+        }
+
+        return string
+    }
+
+    private fun isFormatColor(colorChar: Char): Boolean {
+        return colorChar in '0'..'9' || colorChar in 'a'..'f' || colorChar in 'A'..'F'
+    }
+
+    private fun isFormatSpecial(formatChar: Char): Boolean {
+        return formatChar in 'k'..'o' || formatChar in 'K'..'O' || formatChar in "rR"
     }
 }

@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.events
 
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.utils.EntityUtils
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItemFrame
 
-class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) :
-    LorenzEvent() {
+class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) : SkyHanniEvent() {
 
     /**
      * The phase of the event (see [Type]
@@ -92,7 +92,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
      * Used for on-the-fly generation of entities. Driven by event handlers in a decentralized fashion
      */
     private fun computeAndCacheEntitiesToChooseFrom() {
-        val entities: List<Entity> = Minecraft.getMinecraft().theWorld.getLoadedEntityList()
+        val entities: List<Entity> = EntityUtils.getAllEntities().toList()
         // Only render outlines around non-null entities within the camera frustum
         entitiesToChooseFrom = HashSet(entities.size)
         // Only consider entities that aren't invisible armorstands to increase FPS significantly

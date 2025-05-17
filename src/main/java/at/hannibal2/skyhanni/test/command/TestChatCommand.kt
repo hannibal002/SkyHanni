@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
-import net.minecraft.util.ChatComponentText
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.util.IChatComponent
 
 object TestChatCommand {
@@ -47,12 +47,12 @@ object TestChatCommand {
 
     private fun extracted(isComplex: Boolean, text: String, isSilent: Boolean, isSilentAll: Boolean) {
         val component = if (isComplex) try {
-            IChatComponent.Serializer.jsonToComponent(text) ?: ChatComponentText("")
+            IChatComponent.Serializer.jsonToComponent(text) ?: "".asComponent()
         } catch (ex: Exception) {
             ChatUtils.userError("Please provide a valid JSON chat component (either in the command or via -clipboard)")
             return
         }
-        else ChatComponentText(text.replace("&", "§"))
+        else text.replace("&", "§").asComponent()
 
         println("component unformatted: ${component.unformattedText}")
         println("${component.unformattedTextForChat} ${component.chatStyle} ${component.siblings}")
@@ -66,8 +66,8 @@ object TestChatCommand {
 
     private fun test(componentText: IChatComponent, isHidden: Boolean) {
         val message = componentText.formattedText.stripHypixelMessage()
-        val event = LorenzChatEvent(message, componentText)
-        event.postAndCatch() // TODO don't use deprecated function
+        val event = SkyHanniChatEvent(message, componentText)
+        event.post()
 
         if (event.blockedReason != "") {
             if (!isHidden) ChatUtils.chat("§cChat blocked: ${event.blockedReason}")

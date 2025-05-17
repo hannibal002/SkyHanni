@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData;
 import at.hannibal2.skyhanni.utils.CachedItemData;
+import at.hannibal2.skyhanni.utils.compat.DrawContext;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,6 +28,6 @@ public class MixinItemStack implements ItemStackCachedData {
     @Inject(method = "getTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/event/ForgeEventFactory;onItemTooltip(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/player/EntityPlayer;Ljava/util/List;Z)Lnet/minecraftforge/event/entity/player/ItemTooltipEvent;", shift = At.Shift.BEFORE, remap = false), locals = LocalCapture.CAPTURE_FAILHARD)
     public void getTooltip(EntityPlayer playerIn, boolean advanced, CallbackInfoReturnable<List<String>> cir, List<String> list) {
         ItemStack stack = (ItemStack) (Object) this;
-        ToolTipData.onHover(stack, list);
+        ToolTipData.onHover(new DrawContext(), stack, list);
     }
 }

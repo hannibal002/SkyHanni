@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.api.event.HandleEvent
+//#if TODO
 import at.hannibal2.skyhanni.config.ConfigManager
+//#endif
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
+//#if TODO
 import at.hannibal2.skyhanni.data.repo.RepoManager
+//#endif
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,15 +19,18 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import net.minecraft.launchwrapper.Launch
-import net.minecraftforge.fml.common.FMLCommonHandler
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
 import java.util.TreeMap
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
+//#if FORGE
+import net.minecraft.launchwrapper.Launch
+import net.minecraftforge.fml.common.FMLCommonHandler
+//#endif
 
+// todo 1.21 impl needed
 /**
  * Manages [RepoPattern]s.
  */
@@ -45,7 +50,7 @@ object RepoPatternManager {
     private val remotePattern: NavigableMap<String, String>
         get() = TreeMap(
             if (localLoading) mapOf()
-            else regexes?.regexes.orEmpty()
+            else regexes?.regexes.orEmpty(),
         )
 
     /**
@@ -61,7 +66,12 @@ object RepoPatternManager {
 
     private var wasPreInitialized = false
 
-    private val insideTest = Launch.blackboard == null
+    private val insideTest =
+        //#if FORGE
+        Launch.blackboard == null
+    //#else
+    //$$ false
+    //#endif
 
     var inTestDuplicateUsage = true
 
@@ -74,18 +84,21 @@ object RepoPatternManager {
             }
         }
 
+    //#if TODO
     private val localLoading: Boolean
         get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.usingBackupRepo
+    //#else
+    //$$ private val localLoading: Boolean
+    //$$      get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
+    //#endif
 
     private val logger = LogManager.getLogger("SkyHanni")
 
     /**
-     * Crash if in a development environment, or if inside a guarded event handler.
+     * Crash if in a development environment.
      */
-    fun crash(reason: String) {
-        if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) {
-            throw RuntimeException(reason)
-        }
+    private fun crash(reason: String) {
+        if (PlatformUtils.isDevEnvironment) throw RuntimeException(reason)
     }
 
     /**
@@ -102,7 +115,7 @@ object RepoPatternManager {
                         crash(
                             "Non unique access to regex at \"$key\". " +
                                 "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
-                                "tried to use at ${owner.ownerClass} / ${owner.property}"
+                                "tried to use at ${owner.ownerClass} / ${owner.property}",
                         )
                 } else {
                     exclusivity[key] = owner
@@ -239,14 +252,14 @@ object RepoPatternManager {
         setDefaultPatterns()
     }
 
-    private val keyShape = Pattern.compile("^(?:[a-z0-9]+\\.)*[a-z0-9]+$")
+    private val keyShape = Pattern.compile("^(?:[a-z0-9]+[.-])*[a-z0-9]+$")
 
     /**
      * Verify that a key has a valid shape or throw otherwise.
      */
     fun verifyKeyShape(key: String) {
         require(keyShape.matches(key)) {
-            "pattern key: \"$key\" failed shape requirements. Make sure your key only includes lowercase letters, numbers and dots."
+            "pattern key: \"$key\" failed shape requirements. Make sure your key only includes lowercase letters, numbers, dots and dashes."
         }
     }
 
@@ -254,6 +267,7 @@ object RepoPatternManager {
      * Dump all regexes labeled with the label into the file.
      */
     fun dump(sourceLabel: String, file: File) {
+        //#if TODO
         val data =
             ConfigManager.gson.toJson(
                 RepoPatternDump(
@@ -263,11 +277,14 @@ object RepoPatternManager {
             )
         file.parentFile.mkdirs()
         file.writeText(data)
+        //#endif
     }
 
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
         wasPreInitialized = true
+        // no reason to do this on 1.21
+        //#if FORGE
         val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
         if (dumpDirective.isNullOrBlank()) return
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
@@ -276,6 +293,7 @@ object RepoPatternManager {
             logger.info("Exiting after dumping RepoPattern regex patterns to $path")
             FMLCommonHandler.instance().exitJava(0, false)
         }
+        //#endif
     }
 
     fun of(key: String, fallback: String, parentKeyHolder: RepoPatternKeyOwner? = null): RepoPattern {

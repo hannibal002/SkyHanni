@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ActiveBeaconEffect {
@@ -58,12 +57,12 @@ object ActiveBeaconEffect {
         slot = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         val slot = slot ?: return
 
-        event.gui.inventorySlots.getSlot(slot) highlight LorenzColor.GREEN
+        event.container.getSlot(slot).highlight(LorenzColor.GREEN)
     }
 
     fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.highlightActiveBeaconEffect

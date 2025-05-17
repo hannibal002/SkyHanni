@@ -1,13 +1,13 @@
-
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * RenderDisplayHelper determines when to render displays based on
@@ -21,10 +21,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  * @property onRender This is getting called when the render should happen.
  */
 class RenderDisplayHelper(
-    private val inventory: InventoryDetector = noInventory,
+    private val inventory: InventoryDetector = NO_INVENTORY,
     private val outsideInventory: Boolean = false,
     private val inOwnInventory: Boolean = false,
     private val condition: () -> Boolean,
+    private val onlyOnIsland: IslandType? = null,
     private val onRender: () -> Unit,
 ) {
 
@@ -33,31 +34,36 @@ class RenderDisplayHelper(
         allDisplays.add(this)
     }
 
+    private fun renderIn(inOwnInventory: Boolean): Boolean {
+        return (this.inOwnInventory && inOwnInventory) || inventory.isInside()
+    }
+
     @SkyHanniModule
     companion object {
-        private val noInventory = InventoryDetector { false }
+        val NO_INVENTORY = InventoryDetector { false }
         private val allDisplays = mutableListOf<RenderDisplayHelper>()
         private var currentlyVisibleDisplays = emptyList<RenderDisplayHelper>()
 
-        @SubscribeEvent
-        fun onTick(event: LorenzTickEvent) {
+        @HandleEvent
+        fun onTick() {
             currentlyVisibleDisplays = allDisplays.filter { it.checkCondition() }
         }
 
-        @SubscribeEvent
-        fun onRenderDisplay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        @HandleEvent
+        fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
             val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
             for (display in currentlyVisibleDisplays) {
-                if ((display.inOwnInventory && isInOwnInventory) || display.inventory.isInside()) {
+                if (display.renderIn(isInOwnInventory)) {
                     display.render()
                 }
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+            val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
             for (display in currentlyVisibleDisplays) {
-                if (display.outsideInventory) {
+                if (display.outsideInventory && !display.renderIn(isInOwnInventory)) {
                     display.render()
                 }
             }
@@ -65,15 +71,19 @@ class RenderDisplayHelper(
     }
 
     private fun checkCondition(): Boolean = try {
-        condition()
+        condition() && checkIslandCondition()
     } catch (e: Exception) {
         ErrorManager.logErrorWithData(e, "Failed to check render display condition")
         false
     }
 
-    private fun render() = try {
-        onRender()
-    } catch (e: Exception) {
-        ErrorManager.logErrorWithData(e, "Failed to render a display")
+    private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isInIsland()
+
+    private fun render() {
+        try {
+            onRender()
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Failed to render a display")
+        }
     }
 }

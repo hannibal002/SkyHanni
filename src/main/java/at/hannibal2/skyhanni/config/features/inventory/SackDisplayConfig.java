@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.utils.ItemPriceSource;
+//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -12,6 +14,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
+// todo 1.21 impl needed
 public class SackDisplayConfig {
 
     @Expose
@@ -38,27 +41,29 @@ public class SackDisplayConfig {
     @ConfigEditorDropdown
     public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
 
+    //#if TODO
     @Expose
     @ConfigOption(name = "Alignment", desc = "Change the alignment for numbers and money.")
     @ConfigEditorDropdown
     public RenderUtils.HorizontalAlignment alignment = RenderUtils.HorizontalAlignment.LEFT;
+    //#endif
 
     public enum NumberFormatEntry implements HasLegacyId {
         DEFAULT("Default", 0),
         FORMATTED("Formatted", 1),
         UNFORMATTED("Unformatted", 2);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        NumberFormatEntry(String str, int legacyId) {
-            this.str = str;
+        NumberFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        NumberFormatEntry(String str) {
-            this(str, -1);
+        NumberFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -68,7 +73,7 @@ public class SackDisplayConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -86,22 +91,22 @@ public class SackDisplayConfig {
     public SortingTypeEntry sortingType = SortingTypeEntry.DESC_STORED;
 
     public enum SortingTypeEntry implements HasLegacyId {
-        DESC_STORED("Descending (Stored)", 0),
-        ASC_STORED("Ascending (Stored)", 1),
-        DESC_PRICE("Descending (Price)", 2),
-        ASC_PRICE("Ascending (Price)", 3);
+        DESC_STORED("Stored Descending", 0),
+        ASC_STORED("Stored Ascending", 1),
+        DESC_PRICE("Price Descending", 2),
+        ASC_PRICE("Price Ascending", 3);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        SortingTypeEntry(String str, int legacyId) {
-            this.str = str;
+        SortingTypeEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        SortingTypeEntry(String str) {
-            this(str, -1);
+        SortingTypeEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -111,7 +116,7 @@ public class SackDisplayConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -146,17 +151,17 @@ public class SackDisplayConfig {
         FORMATTED("Formatted", 0),
         UNFORMATTED("Unformatted", 1);
 
-        private final String str;
+        private final String displayName;
         private final int legacyId;
 
-        PriceFormatEntry(String str, int legacyId) {
-            this.str = str;
+        PriceFormatEntry(String displayName, int legacyId) {
+            this.displayName = displayName;
             this.legacyId = legacyId;
         }
 
         // Constructor if new enum elements are added post-migration
-        PriceFormatEntry(String str) {
-            this(str, -1);
+        PriceFormatEntry(String displayName) {
+            this(displayName, -1);
         }
 
         @Override
@@ -166,7 +171,7 @@ public class SackDisplayConfig {
 
         @Override
         public String toString() {
-            return str;
+            return displayName;
         }
     }
 
@@ -177,5 +182,5 @@ public class SackDisplayConfig {
 
     @Expose
     @ConfigLink(owner = SackDisplayConfig.class, field = "enabled")
-    public Position position = new Position(144, 139, false, true);
+    public Position position = new Position(144, 139);
 }

@@ -1,23 +1,21 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GeyserFishing {
@@ -28,7 +26,7 @@ object GeyserFishing {
     private var geyser: LorenzVec? = null
     private var geyserBox: AxisAlignedBB? = null
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!shouldProcessParticles()) return
         with(event) {
@@ -42,32 +40,31 @@ object GeyserFishing {
             potentialGeyser.x + 2, 118.0 - 0.09, potentialGeyser.z + 2,
         )
 
-        if (config.hideParticles && FishingAPI.bobber != null) {
+        if (config.hideParticles && FishingApi.bobber != null) {
             hideGeyserParticles(event)
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         geyser = null
         geyserBox = null
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.drawBox) return
         val geyserBox = geyserBox ?: return
         val geyser = geyser ?: return
         if (geyser.distanceToPlayerIgnoreY() > 96) return
-        if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (config.onlyWithRod && !FishingAPI.holdingLavaRod) return
+        if (config.onlyWithRod && !FishingApi.holdingLavaRod) return
 
         val color = config.boxColor.toSpecialColor()
-        event.drawFilledBoundingBoxNea(geyserBox, color)
+        event.drawFilledBoundingBox(geyserBox, color)
     }
 
     private fun hideGeyserParticles(event: ReceiveParticleEvent) {
-        val bobber = FishingAPI.bobber ?: return
+        val bobber = FishingApi.bobber ?: return
         val geyser = geyser ?: return
 
         if (bobber.distanceTo(event.location) < 3 && bobber.distanceTo(geyser) < 3) {
@@ -76,5 +73,5 @@ object GeyserFishing {
     }
 
     private fun shouldProcessParticles() =
-        IslandType.CRIMSON_ISLE.isInIsland() && LorenzUtils.skyBlockArea == "Blazing Volcano" && (config.hideParticles || config.drawBox)
+        IslandType.CRIMSON_ISLE.isInIsland() && IslandAreas.currentAreaName == "Blazing Volcano" && (config.hideParticles || config.drawBox)
 }

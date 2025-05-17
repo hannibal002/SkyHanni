@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
@@ -10,18 +11,16 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Reading normal chat events, and splitting them up into many different player chat events, with all available extra information
@@ -47,7 +46,7 @@ object PlayerChatManager {
      */
     private val partyPattern by patternGroup.pattern(
         "party",
-        "§9Party §8> (?<author>[^:]*)§f: (?<message>.*)"
+        "§9Party §8> (?<author>[^:]*)§f: (?<message>.*)",
     )
 
     /**
@@ -55,7 +54,7 @@ object PlayerChatManager {
      */
     private val coopPattern by patternGroup.pattern(
         "coop",
-        "§bCo-op > (?<author>[^:]+)§f: (?<message>.*)"
+        "§bCo-op > (?<author>[^:]+)§f: (?<message>.*)",
     )
 
     /**
@@ -79,7 +78,7 @@ object PlayerChatManager {
      */
     private val privateMessagePattern by patternGroup.pattern(
         "privatemessage",
-        "^(?!From stash: )(?<direction>From|To) (?<author>[^:]*): (?<message>.*)"
+        "^(?!From stash: )(?<direction>From|To) (?<author>[^:]*): (?<message>.*)",
     )
 
     /**
@@ -90,11 +89,13 @@ object PlayerChatManager {
      * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 is friends with a §8[§7[Lvl 100] §dEnderman§8]
      * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 has §8[§6Heroic Aspect of the Void§8]
      * REGEX-TEST: §8[§b209§8] §b[MVP§d+§b] lrg89§f§7 is holding §8[§5Heroic Aspect of the Void§8]
+     * REGEX-TEST: §8[§2179§8] §r§b[MVP§c+§b] Frogthink§f §7♲§7 is holding §r§8[§dBlessed Melon Dicer 3.0§8]
+     * REGEX-TEST: §8[§2164§8] §6§lᛝ §r§7Vinc1x§7§7 is holding §r§8[§dStellar Titanium Drill DR-X655§8]
      */
     @Suppress("MaxLineLength")
     private val itemShowPattern by patternGroup.pattern(
         "itemshow",
-        "(?:§8\\[(?<levelColor>§.)(?<level>\\d+)§8] )?(?<author>.*)§f§7 (?<action>is (?:holding|friends with a|wearing)|has) (?<itemName>.*)"
+        "(?:§8\\[(?<level>§.\\d+)§8] )?(?<author>.*)§.(?: §7♲)*?§7 (?<action>is (?:holding|friends with a|wearing)|has) (?<itemName>.*)",
     )
 
     /**
@@ -103,7 +104,7 @@ object PlayerChatManager {
      */
     private val privateIslandRankPattern by patternGroup.pattern(
         "privateislandrank",
-        "(?<prefix>.*?)(?<privateIslandRank>§.\\[(?!MVP(?:§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\]) (?<suffix>.*)"
+        "(?<prefix>.*?)(?<privateIslandRank>§.\\[(?!MVP(?:§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\]) (?<suffix>.*)",
     )
 
     /**
@@ -113,11 +114,11 @@ object PlayerChatManager {
      */
     private val privateIslandGuestPattern by patternGroup.pattern(
         "privateislandguest",
-        "(?<prefix>.*)(?<guest>§a\\[✌] )(?<suffix>.*)"
+        "(?<prefix>.*)(?<guest>§a\\[✌] )(?<suffix>.*)",
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         val chatComponent = event.chatComponent.intoSpan().stripHypixelMessage()
         coopPattern.matchStyledMatcher(chatComponent) {
             val author = groupOrThrow("author")
@@ -135,7 +136,7 @@ object PlayerChatManager {
                 groupOrThrow("author"),
                 groupOrThrow("message"),
                 group("guildRank"),
-                event.chatComponent
+                event.chatComponent,
             ).postChat(event)
             return
         }
@@ -158,7 +159,7 @@ object PlayerChatManager {
                 author,
                 itemName,
                 author + action + itemName,
-                event.chatComponent
+                event.chatComponent,
             ).postChat(event)
             return
         }
@@ -169,7 +170,7 @@ object PlayerChatManager {
         sendSystemMessage(event)
     }
 
-    private fun ComponentMatcher.isGlobalChat(event: LorenzChatEvent): Boolean {
+    private fun ComponentMatcher.isGlobalChat(event: SkyHanniChatEvent): Boolean {
         var author = groupOrThrow("author")
         val chatColor = groupOrThrow("chatColor")
         if (chatColor.length == 0 && !author.getText().removeColor().endsWith(LorenzUtils.getPlayerName())) {
@@ -184,7 +185,7 @@ object PlayerChatManager {
 
         var privateIslandRank: ComponentSpan? = null
         var privateIslandGuest: ComponentSpan? = null
-        if (IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.PRIVATE_ISLAND_GUEST.isInIsland()) {
+        if (IslandTypeTags.PRIVATE_ISLAND.inAny()) {
             privateIslandGuestPattern.matchStyledMatcher(author) {
                 privateIslandGuest = groupOrThrow("guest")
                 val prefix = groupOrThrow("prefix")
@@ -211,19 +212,19 @@ object PlayerChatManager {
         return true
     }
 
-    private fun sendSystemMessage(event: LorenzChatEvent) {
+    private fun sendSystemMessage(event: SkyHanniChatEvent) {
         with(SystemMessageEvent(event.message, event.chatComponent)) {
             post()
             event.handleChat(blockedReason, chatComponent)
         }
     }
 
-    private fun AbstractChatEvent.postChat(event: LorenzChatEvent) {
+    private fun AbstractChatEvent.postChat(event: SkyHanniChatEvent) {
         post()
         event.handleChat(blockedReason, chatComponent)
     }
 
-    private fun LorenzChatEvent.handleChat(
+    private fun SkyHanniChatEvent.handleChat(
         blockedReason: String?,
         chatComponent: IChatComponent,
     ) {

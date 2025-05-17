@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.GuessLogic
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.math.atan
 import kotlin.math.cos
@@ -25,6 +24,7 @@ import kotlin.math.sin
  */
 @SkyHanniModule
 object SoopyGuessBurrow {
+    private val config get() = SkyHanniMod.feature.event.diana
 
     private var dingIndex = 0
     private var hasDinged = false
@@ -44,8 +44,8 @@ object SoopyGuessBurrow {
     var distance: Double? = null
     private var distance2: Double? = null
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         hasDinged = false
         lastDingPitch = 0f
         firstPitch = 0f
@@ -119,22 +119,7 @@ object SoopyGuessBurrow {
             // workaround: returning if the distance is too big
             return
         }
-
-        val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
-
-        distance = distance2!!
-        val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
-        var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
-        changes = changes.map { o -> o / lineDist }
-
-        lastSoundPoint?.let {
-            guessPoint =
-                LorenzVec(
-                    it.x + changes[0] * distance!!,
-                    it.y + changes[1] * distance!!,
-                    it.z + changes[2] * distance!!
-                )
-        }
+        calcNewGuessPoint()
     }
 
     @Suppress("MaxLineLength")
@@ -146,7 +131,7 @@ object SoopyGuessBurrow {
         return LorenzVec(a, b, c)
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val type = event.type
@@ -159,130 +144,131 @@ object SoopyGuessBurrow {
                 run = true
             }
         }
-        if (run) {
-            if (locations.size < 100 && locations.isEmpty() || locations.last().distance(currLoc) != 0.0) {
-                var distMultiplier = 1.0
-                if (locations.size > 2) {
-                    val predictedDist = 0.06507 * locations.size + 0.259
-                    val lastPos = locations.last()
-                    val actualDist = currLoc.distance(lastPos)
-                    distMultiplier = actualDist / predictedDist
-                }
-                locations.add(currLoc)
-
-                if (locations.size > 5 && guessPoint != null) {
-
-                    val slopeThing = locations.zipWithNext { a, b ->
-                        atan((a.x - b.x) / (a.z - b.z))
-                    }
-
-                    val (a, b, c) = solveEquationThing(
-                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
-                        LorenzVec(
-                            slopeThing[slopeThing.size - 5],
-                            slopeThing[slopeThing.size - 3],
-                            slopeThing[slopeThing.size - 1]
-                        )
-                    )
-
-                    val pr1 = mutableListOf<LorenzVec>()
-                    val pr2 = mutableListOf<LorenzVec>()
-
-                    val start = slopeThing.size - 1
-                    val lastPos = locations[start].toDoubleArray()
-                    val lastPos2 = locations[start].toDoubleArray()
-
-                    var distCovered = 0.0
-
-                    val ySpeed = locations[locations.size - 1].x - locations[locations.size - 2].x / hypot(
-                        locations[locations.size - 1].x - locations[locations.size - 2].x,
-                        locations[locations.size - 1].z - locations[locations.size - 2].x
-                    )
-
-                    var i = start + 1
-                    while (distCovered < distance2!! && i < 10000) {
-                        val y = b / (i + a) + c
-                        val dist = distMultiplier * (0.06507 * i + 0.259)
-
-                        val xOff = dist * sin(y)
-                        val zOff = dist * cos(y)
-
-                        val density = 5
-
-                        for (o in 0..density) {
-                            lastPos[0] += xOff / density
-                            lastPos[2] += zOff / density
-
-                            lastPos[1] += ySpeed * dist / density
-                            lastPos2[1] += ySpeed * dist / density
-
-                            lastPos2[0] -= xOff / density
-                            lastPos2[2] -= zOff / density
-
-                            pr1.add(lastPos.toLorenzVec())
-                            pr2.add(lastPos2.toLorenzVec())
-
-
-                            lastSoundPoint?.let {
-                                distCovered = hypot(lastPos[0] - it.x, lastPos[2] - it.z)
-                            }
-
-                            if (distCovered > distance2!!) break
-                        }
-                        i++
-                    }
-
-                    // Why does this happen?
-                    if (pr1.isEmpty()) return
-
-                    val p1 = pr1.last()
-                    val p2 = pr2.last()
-
-
-                    guessPoint?.let {
-                        val d1 = ((p1.x - it.x).times(2 + (p1.z - it.z))).pow(2)
-                        val d2 = ((p2.x - it.x).times(2 + (p2.z - it.z))).pow(2)
-
-                        val finalLocation = if (d1 < d2) {
-                            LorenzVec(floor(p1.x), 255.0, floor(p1.z))
-                        } else {
-                            LorenzVec(floor(p2.x), 255.0, floor(p2.z))
-                        }
-                        BurrowGuessEvent(finalLocation).post()
-                    }
-                }
+        if (!run) return
+        if (locations.size < 100 && locations.isEmpty() || locations.last().distance(currLoc) != 0.0) {
+            var distMultiplier = 1.0
+            if (locations.size > 2) {
+                val predictedDist = 0.06507 * locations.size + 0.259
+                val lastPos = locations.last()
+                val actualDist = currLoc.distance(lastPos)
+                distMultiplier = actualDist / predictedDist
             }
+            locations.add(currLoc)
 
-            if (lastParticlePoint == null) {
-                firstParticlePoint = currLoc.clone()
-            }
+            if (locations.size > 5 && guessPoint != null) {
 
-            lastParticlePoint2 = lastParticlePoint
-            lastParticlePoint = particlePoint
+                val slopeThing = locations.zipWithNext { a, b ->
+                    atan((a.x - b.x) / (a.z - b.z))
+                }
 
-            particlePoint = currLoc.clone()
-
-            if (lastParticlePoint2 == null || firstParticlePoint == null || distance2 == null || lastSoundPoint == null) return
-
-            val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
-
-            distance = distance2!!
-
-            val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
-
-            var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
-            changes = changes.map { o -> o / lineDist }
-
-            lastParticlePoint?.let {
-                guessPoint =
+                val (a, b, c) = solveEquationThing(
+                    LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
                     LorenzVec(
-                        it.x + changes[0] * distance!!,
-                        it.y + changes[1] * distance!!,
-                        it.z + changes[2] * distance!!
-                    )
+                        slopeThing[slopeThing.size - 5],
+                        slopeThing[slopeThing.size - 3],
+                        slopeThing[slopeThing.size - 1],
+                    ),
+                )
+
+                val pr1 = mutableListOf<LorenzVec>()
+                val pr2 = mutableListOf<LorenzVec>()
+
+                val start = slopeThing.size - 1
+                val lastPos = locations[start].toDoubleArray()
+                val lastPos2 = locations[start].toDoubleArray()
+
+                var distCovered = 0.0
+
+                val ySpeed = locations[locations.size - 1].x - locations[locations.size - 2].x / hypot(
+                    locations[locations.size - 1].x - locations[locations.size - 2].x,
+                    locations[locations.size - 1].z - locations[locations.size - 2].x,
+                )
+
+                var i = start + 1
+                while (distCovered < distance2!! && i < 10000) {
+                    val y = b / (i + a) + c
+                    val dist = distMultiplier * (0.06507 * i + 0.259)
+
+                    val xOff = dist * sin(y)
+                    val zOff = dist * cos(y)
+
+                    val density = 5
+
+                    for (o in 0..density) {
+                        lastPos[0] += xOff / density
+                        lastPos[2] += zOff / density
+
+                        lastPos[1] += ySpeed * dist / density
+                        lastPos2[1] += ySpeed * dist / density
+
+                        lastPos2[0] -= xOff / density
+                        lastPos2[2] -= zOff / density
+
+                        pr1.add(lastPos.toLorenzVec())
+                        pr2.add(lastPos2.toLorenzVec())
+
+
+                        lastSoundPoint?.let {
+                            distCovered = hypot(lastPos[0] - it.x, lastPos[2] - it.z)
+                        }
+
+                        if (distCovered > distance2!!) break
+                    }
+                    i++
+                }
+
+                // Why does this happen?
+                if (pr1.isEmpty()) return
+
+                val p1 = pr1.last()
+                val p2 = pr2.last()
+
+
+                guessPoint?.let {
+                    val d1 = ((p1.x - it.x).times(2 + (p1.z - it.z))).pow(2)
+                    val d2 = ((p2.x - it.x).times(2 + (p2.z - it.z))).pow(2)
+
+                    val finalLocation = if (d1 < d2) {
+                        LorenzVec(floor(p1.x), 255.0, floor(p1.z))
+                    } else {
+                        LorenzVec(floor(p2.x), 255.0, floor(p2.z))
+                    }
+                    BurrowGuessEvent(finalLocation, precise = false, new = false).post()
+                }
             }
+        }
+
+        if (lastParticlePoint == null) {
+            firstParticlePoint = currLoc.clone()
+        }
+
+        lastParticlePoint2 = lastParticlePoint
+        lastParticlePoint = particlePoint
+
+        particlePoint = currLoc.clone()
+
+        if (lastParticlePoint2 == null || firstParticlePoint == null || distance2 == null || lastSoundPoint == null) return
+
+        calcNewGuessPoint()
+    }
+
+    private fun calcNewGuessPoint() {
+        val lineDist = lastParticlePoint2?.distance(particlePoint!!)!!
+        distance = distance2!!
+
+        val changesHelp = particlePoint?.let { it - lastParticlePoint2!! }!!
+        var changes = listOf(changesHelp.x, changesHelp.y, changesHelp.z)
+        changes = changes.map { o -> o / lineDist }
+
+        lastParticlePoint?.let {
+            guessPoint =
+                LorenzVec(
+                    it.x + changes[0] * distance!!,
+                    it.y + changes[1] * distance!!,
+                    it.z + changes[2] * distance!!,
+                )
         }
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && SkyHanniMod.feature.event.diana.burrowsSoopyGuess
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.guess && config.guessLogic == GuessLogic.SOOPY_GUESS
 }

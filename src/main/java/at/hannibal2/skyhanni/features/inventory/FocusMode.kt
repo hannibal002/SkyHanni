@@ -3,20 +3,17 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 
 @SkyHanniModule
 object FocusMode {
@@ -26,8 +23,8 @@ object FocusMode {
     private var active = false
     private var inAuctionHouse = false
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onLorenzToolTip(event: LorenzToolTipEvent) {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onTooltip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (event.toolTip.isEmpty()) return
         if (config.hideMenuItems) {
@@ -62,11 +59,11 @@ object FocusMode {
         }
     }
 
-    @SubscribeEvent
-    fun onLorenzTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
         if (config.alwaysEnabled) return
-        if (!config.toggleKey.isKeyClicked()) return
+        if (event.keyCode != config.toggleKey) return
         active = !active
     }
 

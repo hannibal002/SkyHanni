@@ -1,25 +1,22 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraft.entity.Entity
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.entity.EntityLivingBase
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,12 +43,16 @@ object EntityMovementData {
         val startTime: SimpleTimeMark = SimpleTimeMark.now()
     }
 
-    private val entityLocation = mutableMapOf<Entity, LorenzVec>()
+    private val entityLocation = mutableMapOf<EntityLivingBase, LorenzVec>()
 
-    fun addToTrack(entity: Entity) {
+    fun addToTrack(entity: EntityLivingBase) {
         if (entity !in entityLocation) {
             entityLocation[entity] = entity.getLorenzVec()
         }
+    }
+
+    fun addToTrack(mob: Mob) {
+        addToTrack(mob.baseEntity)
     }
 
     @HandleEvent
@@ -88,10 +89,9 @@ object EntityMovementData {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        addToTrack(Minecraft.getMinecraft().thePlayer)
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick() {
+        addToTrack(MinecraftCompat.localPlayer)
 
         for (entity in entityLocation.keys) {
             if (entity.isDead) continue
@@ -106,17 +106,16 @@ object EntityMovementData {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!warpingPattern.matches(event.message)) return
         DelayedRun.runNextTick {
             SkyHanniWarpEvent.post()
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         entityLocation.clear()
     }
 }

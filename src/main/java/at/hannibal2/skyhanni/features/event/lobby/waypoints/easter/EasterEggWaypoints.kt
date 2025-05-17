@@ -1,18 +1,19 @@
 package at.hannibal2.skyhanni.features.event.lobby.waypoints.easter
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object EasterEggWaypoints {
@@ -21,8 +22,8 @@ object EasterEggWaypoints {
     private var closest: EasterEgg? = null
     private var isEgg: Boolean = false
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isEgg) return
 
@@ -41,26 +42,40 @@ object EasterEggWaypoints {
         }
     }
 
-    @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!config.allWaypoints && !config.allEntranceWaypoints) return
-        if (!isEnabled()) return
+    var active = false
 
-        isEgg = checkScoreboardEasterSpecific()
+    private fun isActive(): Boolean = isEnabled() && config.allWaypoints || config.allEntranceWaypoints
 
-        if (isEgg) {
-            if (config.onlyClosest) {
-                if (closest == null) {
-                    val notFoundEggs = EasterEgg.entries.filter { !it.found }
-                    if (notFoundEggs.isEmpty()) return
-                    closest = notFoundEggs.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
-                }
-            }
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
+        active = isActive()
+        if (!active) return
+
+        val isCurrentlyEgg = checkScoreboardEasterSpecific()
+        if (isCurrentlyEgg && !isEgg) {
+            IslandGraphs.loadLobby("MAIN_LOBBY")
         }
+        isEgg = isCurrentlyEgg
+
+
+        if (!isEgg) return
+        if (!config.onlyClosest) return
+        if (closest != null) return
+        val notFoundEggs = EasterEgg.entries.filter { !it.found }
+        if (notFoundEggs.isEmpty()) return
+        val nextEgg = notFoundEggs.minByOrNull { it.waypoint.distanceSqToPlayer() } ?: error("next easter egg is null")
+        closest = nextEgg
+
+        IslandGraphs.pathFind(
+            nextEgg.waypoint,
+            "§dNext Egg",
+            LorenzColor.LIGHT_PURPLE.toColor(),
+            condition = { active && isEgg },
+        )
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!isEgg) return
 

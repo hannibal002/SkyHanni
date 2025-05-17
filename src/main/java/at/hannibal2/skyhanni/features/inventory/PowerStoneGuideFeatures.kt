@@ -5,23 +5,22 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 
 @SkyHanniModule
 object PowerStoneGuideFeatures {
 
-    private val missing = mutableMapOf<Int, NEUInternalName>()
+    private val missing = mutableMapOf<Int, NeuInternalName>()
     private var inInventory = false
 
     @HandleEvent
@@ -35,7 +34,7 @@ object PowerStoneGuideFeatures {
             val lore = item.getLore()
             if (lore.contains("§7Learned: §cNot Yet ✖")) {
                 val rawName = lore.nextAfter("§7Power stone:") ?: continue
-                val name = NEUInternalName.fromItemName(rawName)
+                val name = NeuInternalName.fromItemName(rawName)
                 missing[slot] = name
             }
         }
@@ -46,17 +45,17 @@ object PowerStoneGuideFeatures {
         inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
 
-        event.gui.inventorySlots.inventorySlots
+        event.container.inventorySlots
             .filter { missing.containsKey(it.slotNumber) }
-            .forEach { it highlight LorenzColor.RED }
+            .forEach { it.highlight(LorenzColor.RED) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
@@ -65,8 +64,8 @@ object PowerStoneGuideFeatures {
         BazaarApi.searchForBazaarItem(internalName, 9)
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
 

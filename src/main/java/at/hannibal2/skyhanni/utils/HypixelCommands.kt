@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
 object HypixelCommands {
     fun skyblock() {
@@ -22,16 +22,25 @@ object HypixelCommands {
         send("playtime")
     }
 
+    fun skyblockMenu() {
+        send("sbmenu")
+    }
+
     fun skills() {
         send("skills")
     }
 
-    fun viewRecipe(itemName: String) {
-        send("viewrecipe $itemName")
+    fun viewRecipe(itemId: NeuInternalName, page: Int = 1) {
+        send("viewrecipe ${itemId.skyblockCommandId} $page")
     }
 
     fun recipe(itemName: String) {
         send("recipe $itemName")
+    }
+
+    // opens the crafting table
+    fun craft() {
+        send("craft")
     }
 
     fun npcOption(npc: String, answer: String) {
@@ -63,7 +72,7 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        GetFromSackAPI.getFromSack(itemName.toInternalName(), amount)
+        GetFromSackApi.getFromSack(itemName.toInternalName(), amount)
     }
 
     fun widget() {
@@ -110,6 +119,10 @@ object HypixelCommands {
         send("ec $position")
     }
 
+    fun partyAccept(player: String) {
+        send("party accept $player")
+    }
+
     fun partyWarp() {
         send("party warp")
     }
@@ -140,6 +153,10 @@ object HypixelCommands {
 
     fun partyChat(message: String) {
         send("pc $message")
+    }
+
+    fun partyInvite(player: String) {
+        send("party $player")
     }
 
     fun allChat(message: String) {

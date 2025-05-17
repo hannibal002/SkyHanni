@@ -3,18 +3,17 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CarryTrackerJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
@@ -23,10 +22,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * TODO more carry features
@@ -82,7 +80,7 @@ object CarryTracker {
         carry.done++
         if (carry.done == carry.requested) {
             ChatUtils.chat("Carry done for ${customer.name}!")
-            LorenzUtils.sendTitle("§eCarry done!", 3.seconds)
+            TitleManager.sendTitle("§eCarry done!")
         }
         update()
     }
@@ -90,9 +88,8 @@ object CarryTracker {
     // TODO create trade event with player name, coins and items
     private var lastTradedPlayer: String? = null
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent) {
         tradeCompletedPattern.matchMatcher(event.message) {
             lastTradedPlayer = group("name").cleanPlayerName()
         }
@@ -100,8 +97,10 @@ object CarryTracker {
         rawNamePattern.matchMatcher(event.message) {
             val player = lastTradedPlayer ?: return
             val coinsGained = group("coins").formatDouble()
-            getCustomer(player).alreadyPaid += coinsGained
-            update()
+            getCustomerOrNull(player)?.let {
+                it.alreadyPaid += coinsGained
+                update()
+            }
         }
     }
 
@@ -111,9 +110,8 @@ object CarryTracker {
         slayerNames = data.slayerNames.mapKeys { SlayerType.valueOf(it.key) }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
 
         config.carryPosition.renderRenderables(display, posLabel = "Carry Tracker")
     }
@@ -142,7 +140,7 @@ object CarryTracker {
         }
         if (args[0] == "remove") {
             val customerName = args[1]
-            val customer = customers.find { it.name.equals(customerName, true) } ?: run {
+            val customer = getCustomerOrNull(customerName) ?: run {
                 ChatUtils.userError("Customer not found: §b$customerName")
                 return
             }
@@ -159,18 +157,7 @@ object CarryTracker {
         val amountRequested = amount.formatIntOrUserError() ?: return
         val newCarry = Carry(carryType, amountRequested)
 
-        val customer = customers.find { it.name.equals(customerName, true) }
-        if (customer == null) {
-            if (amountRequested < 1) {
-                ChatUtils.userError("Carry amount requested must be positive!")
-                return
-            }
-
-            getCustomer(customerName).carries.add(newCarry)
-            update()
-            ChatUtils.chat("Started carry: §b$customerName §8x$amountRequested ${newCarry.type}")
-            return
-        }
+        val customer = getCustomer(customerName)
         val carries = customer.carries
         for (carry in carries.toList()) {
             if (newCarry.type != carry.type) continue
@@ -187,6 +174,14 @@ object CarryTracker {
             ChatUtils.chat("Updated carry: §b$customerName §8x$newAmountRequested ${newCarry.type}")
             return
         }
+
+        if (amountRequested < 1) {
+            ChatUtils.userError("Carry amount requested must be positive!")
+            return
+        }
+        customer.carries.add(newCarry)
+        update()
+        ChatUtils.chat("Started carry: §b$customerName §8x$amountRequested ${newCarry.type}")
     }
 
     private fun getCarryType(rawType: String): CarryType? = carryTypes.getOrPut(rawType) {
@@ -205,11 +200,12 @@ object CarryTracker {
         ChatUtils.chat("Set carry price for $carryType §eto §6${price.shortFormat()} coins.")
     }
 
-    private fun getCustomer(customerName: String): Customer = customers.find {
+    private fun getCustomerOrNull(customerName: String): Customer? = customers.find {
         it.name.equals(customerName, ignoreCase = true)
-    } ?: Customer(customerName).also {
-        customers.add(it)
     }
+
+    private fun getCustomer(customerName: String): Customer =
+        getCustomerOrNull(customerName) ?: Customer(customerName).also { customers.add(it) }
 
     private fun createDisplay(
         carry: Carry,
@@ -226,8 +222,8 @@ object CarryTracker {
         }
         val cost = formatCost(type.pricePer?.let { it * requested })
         val text = "$color$done§8/$color$requested $cost"
-        return Renderable.clickAndHover(
-            Renderable.string("  $type $text"),
+        return Renderable.clickable(
+            "  $type $text",
             tips = buildList<String> {
                 add("§b${customer.name}' $type §cCarry")
                 add("")
@@ -247,7 +243,7 @@ object CarryTracker {
                 add("§eClick to send current progress in the party chat!")
                 add("§eControl-click to remove this carry!")
             },
-            onClick = {
+            onLeftClick = {
                 if (KeyboardManager.isModifierKeyDown()) {
                     carries.remove(carry)
                     update()
@@ -286,8 +282,8 @@ object CarryTracker {
         val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
         val missingFormat = formatCost(totalCost - customer.alreadyPaid)
         add(
-            Renderable.clickAndHover(
-                Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
+            Renderable.clickable(
+                "§b$customerName $paidFormat§8/$totalCostFormat",
                 tips = listOf(
                     "§7Carries for §b$customerName",
                     "",
@@ -297,7 +293,7 @@ object CarryTracker {
                     "",
                     "§eClick to send missing coins in party chat!",
                 ),
-                onClick = {
+                onLeftClick = {
                     HypixelCommands.partyChat(
                         "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
                     )

@@ -3,30 +3,33 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboardJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.ElitePlayerWeightJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtils
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -35,23 +38,29 @@ import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.min
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FarmingWeightDisplay {
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (GardenAPI.hideExtraGuis()) return
-        val shouldShow = apiError || (config.ignoreLow || weight >= 200)
-        if (isEnabled() && shouldShow) {
-            config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
-        }
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { shouldShowDisplay() && isEnabled() },
+            onRender = {
+                config.pos.renderRenderables(display, posLabel = "Farming Weight Display")
+            },
+        )
     }
+
+    private fun shouldShowDisplay(): Boolean =
+        !GardenApi.hideExtraGuis() && (apiError || (config.ignoreLow || weight >= 200))
 
     @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
@@ -59,8 +68,8 @@ object FarmingWeightDisplay {
         weightPerSecond = -1.0
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange() {
         // We want to try to connect to the api again after a world switch.
         resetData()
     }
@@ -70,13 +79,15 @@ object FarmingWeightDisplay {
         display = emptyList()
         profileId = ""
         weight = -1.0
+        apiWeight = 0.0
+        shWeightDiff = 0.0
 
         nextPlayers.clear()
         rankGoal = -1
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         update()
@@ -105,7 +116,32 @@ object FarmingWeightDisplay {
         event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
     }
 
-    private val config get() = GardenAPI.config.eliteFarmingWeights
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        if (!isEtaEnabled()) return
+        if (lastupdate.passedSince() < 10.seconds) return
+
+        ConditionalUtils.onToggle(config.eliteLBType) {
+            // Reset api weight as different lb type will have a different score
+            apiWeight = 0.0
+            onConfigChanged()
+        }
+
+        ConditionalUtils.onToggle(config.useEtaGoalRank, config.etaGoalRank) {
+            onConfigChanged()
+        }
+    }
+
+    private fun onConfigChanged() {
+        localCounter.clear()
+        rankGoal = -1
+        getRankGoal()
+        loadLeaderboardIfAble()
+        lastupdate = SimpleTimeMark.now()
+    }
+
+    private val config get() = GardenApi.config.eliteFarmingWeights
+    private val storage get() = GardenApi.storage?.farmingWeight
     private val localCounter = mutableMapOf<CropType, Long>()
 
     private var display = emptyList<Renderable>()
@@ -120,6 +156,15 @@ object FarmingWeightDisplay {
     private var isLoadingWeight = false
     private var isLoadingLeaderboard = false
     private var rankGoal = -1
+    private var minAmount = 0.0
+    private var lastupdate: SimpleTimeMark = SimpleTimeMark.farPast()
+
+    // Used to get the difference in weight to subtract for monthly lb
+    // Caused by various inaccuracies, including pest calc
+    private var shWeightDiff = 0.0
+    private var apiWeight = 0.0
+    // Calculated weight number to display
+    private val displayWeight get() = localWeight + weight - shWeightDiff
 
     private val nextPlayers = mutableListOf<UpcomingLeaderboardPlayer>()
     private val nextPlayer get() = nextPlayers.firstOrNull()
@@ -133,27 +178,17 @@ object FarmingWeightDisplay {
 
     private val errorMessage by lazy {
         listOf(
-            Renderable.clickAndHover(
-                "§cFarming Weight error: Cannot load",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-            Renderable.clickAndHover(
-                "§cdata from Elite Farmers!",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-            Renderable.clickAndHover(
-                "§eRejoin the garden or",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-            Renderable.clickAndHover(
-                "§eclick here to fix it.",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-        )
+            "§cFarming Weight error: Cannot load",
+            "§cdata from Elite Farmers!",
+            "§eRejoin the garden or",
+            "§eclick here to fix it.",
+        ).map {
+            Renderable.clickable(
+                it,
+                tips = listOf("§eClick here to reload the data right now!"),
+                onLeftClick = ::resetData,
+            )
+        }
     }
 
     private var lastOpenWebsite = SimpleTimeMark.farPast()
@@ -171,7 +206,7 @@ object FarmingWeightDisplay {
 
                 isLoadingWeight = true
                 if (display.isEmpty()) {
-                    display = Renderable.singeltonString("§6Farming Weight§7: §eLoading..")
+                    display = listOf(RenderableString("§6${lbName()}§7: §eLoading.."))
                 }
                 SkyHanniMod.coroutineScope.launch {
                     loadWeight(localProfile)
@@ -188,10 +223,10 @@ object FarmingWeightDisplay {
 
         val list = mutableListOf<Renderable>()
         list.add(
-            Renderable.clickAndHover(
-                "§6Farming Weight§7: $weight$leaderboard",
-                listOf("§eClick to open your Farming Profile."),
-                onClick = { openWebsite(LorenzUtils.getPlayerName()) },
+            Renderable.clickable(
+                "§6${lbName()}§7: $weight$leaderboard",
+                tips = listOf("§eClick to open your Farming Profile."),
+                onLeftClick = { openWebsite(LorenzUtils.getPlayerName()) },
             ),
         )
 
@@ -228,8 +263,7 @@ object FarmingWeightDisplay {
             }
         }
 
-        val totalWeight = (localWeight + weight)
-        return "§e" + totalWeight.roundTo(2).addSeparators()
+        return "§e" + displayWeight.roundTo(2).addSeparators()
     }
 
     private fun getRankGoal(): Int {
@@ -237,14 +271,14 @@ object FarmingWeightDisplay {
         var goal = 10000
 
         // Check that the provided string is valid
-        val parsed = value.toIntOrNull() ?: 0
+        val parsed = value.get().toIntOrNull() ?: 0
         if (parsed < 1 || parsed > goal) {
             ChatUtils.chatAndOpenConfig(
                 "Invalid Farming Weight Overtake Goal! Click here to edit the Overtake Goal config value " +
                     "to a valid number [1-10000] to use this feature!",
-                GardenAPI.config.eliteFarmingWeights::etaGoalRank,
+                config::etaGoalRank,
             )
-            config.etaGoalRank = goal.toString()
+            config.etaGoalRank.set(goal.toString())
         } else {
             goal = parsed
         }
@@ -259,22 +293,26 @@ object FarmingWeightDisplay {
 
     private fun getETA(): Renderable? {
         if (weight < 0) return null
+        val nextPlayer = nextPlayer
 
-        val nextPlayer = nextPlayer ?: return Renderable.clickAndHover(
-            "§cWaiting for leaderboard update...",
-            listOf("§eClick here to load new data right now!"),
-            onClick = ::resetData,
-        )
-        val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
-        var nextName =
-            if (showRankGoal) "#$rankGoal" else nextPlayer.name
+        if (nextPlayer == null && weight > minAmount) {
+            return Renderable.clickable(
+                "§cWaiting for leaderboard update...",
+                tips = listOf("§eClick here to load new data right now!"),
+                onLeftClick = ::loadLeaderboardIfAble,
+            )
+        }
+        val nextWeight = nextPlayer?.weight ?: minAmount
+        var nextName = nextPlayer?.name ?: "$nextWeight Weight"
 
-        val totalWeight = (localWeight + weight)
-        var weightUntilOvertake = nextPlayer.weight - totalWeight
+        val showRankGoal = (leaderboardPosition == -1 || leaderboardPosition > rankGoal) && config.useEtaGoalRank.get()
+        nextName = if (showRankGoal) "#$rankGoal" else nextName
+
+        var weightUntilOvertake = nextWeight - displayWeight
 
         if (weightUntilOvertake < 0) {
             if (weightPerSecond > 0) {
-                farmingChatMessage("You passed §b$nextName §ein the Farming Weight Leaderboard!")
+                farmingChatMessage("You passed §b$nextName §ein the §6${lbName()} §eLeaderboard!")
             }
 
             // Lower leaderboard position
@@ -283,23 +321,22 @@ object FarmingWeightDisplay {
             } else {
                 leaderboardPosition--
             }
-            GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
-                leaderboardPosition
+            storage?.lastFarmingWeightLeaderboard = leaderboardPosition
 
             // Remove passed player to present the next one
             nextPlayers.removeFirst()
 
             // Display waiting message if nextPlayers list is empty
             // Update values to next player
-            nextName = nextPlayer.name
-            weightUntilOvertake = nextPlayer.weight - totalWeight
+            nextName = nextPlayer?.name ?: "Loading..."
+            weightUntilOvertake = nextWeight - displayWeight
         }
 
-        if (nextPlayer.weight == 0.0) {
-            return Renderable.clickAndHover(
+        if (nextWeight == 0.0) {
+            return Renderable.clickable(
                 "§cRejoin the garden to show ETA!",
-                listOf("Click here to calculate the data right now!"),
-                onClick = ::resetData,
+                tips = listOf("Click here to calculate the data right now!"),
+                onLeftClick = ::loadLeaderboardIfAble,
             )
         }
 
@@ -312,8 +349,8 @@ object FarmingWeightDisplay {
                     "Error calculating Farming ETA duration",
                     "weightPerSecond" to weightPerSecond,
                     "weightUntilOvertake" to weightUntilOvertake,
-                    "totalWeight" to totalWeight,
-                    "nextPlayer.weight" to nextPlayer.weight,
+                    "totalWeight" to displayWeight,
+                    "nextWeight" to nextWeight,
                 )
                 return null
             }
@@ -321,15 +358,16 @@ object FarmingWeightDisplay {
             " §7(§b$format§7)"
         } else ""
 
-        val weightFormat = weightUntilOvertake.roundTo(2).addSeparators()
+        // Adding 0.0 here to eliminate "-0"
+        val weightFormat = (weightUntilOvertake.roundTo(2) + 0.0).addSeparators()
         val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
         return if (showRankGoal) {
             Renderable.string(text)
         } else {
-            Renderable.clickAndHover(
+            Renderable.clickable(
                 text,
-                listOf("§eClick to open the Farming Profile of §b$nextName."),
-                onClick = { openWebsite(nextName) },
+                tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
+                onLeftClick = { openWebsite(nextName) },
             )
         }
     }
@@ -362,10 +400,11 @@ object FarmingWeightDisplay {
     }
 
     private fun isEnabled() = config.display && (outsideEnabled() || inGardenEnabled())
-    private fun outsideEnabled() = OutsideSbFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
-    private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenAPI.inGarden()) || config.showOutsideGarden
+    private fun outsideEnabled() = OutsideSBFeature.FARMING_WEIGHT.isSelected() && !LorenzUtils.inSkyBlock
+    private fun inGardenEnabled() = (LorenzUtils.inSkyBlock && GardenApi.inGarden()) || config.showOutsideGarden
 
     private fun isEtaEnabled() = config.overtakeETA
+    private fun isMonthlyLB() = config.eliteLBType.get() == EliteFarmingWeightConfig.EliteFarmingWeightLBType.MONTHLY
 
     fun addCrop(crop: CropType, addedCounter: Int) {
         // Prevent div-by-0 errors
@@ -403,16 +442,14 @@ object FarmingWeightDisplay {
             if (wasNotLoaded && config.showLbChange) {
                 checkOffScreenLeaderboardChanges()
             }
-            GardenAPI.storage?.farmingWeight?.lastFarmingWeightLeaderboard =
-                leaderboardPosition
+            storage?.lastFarmingWeightLeaderboard = leaderboardPosition
             lastLeaderboardUpdate = SimpleTimeMark.now()
             isLoadingLeaderboard = false
         }
     }
 
     private fun checkOffScreenLeaderboardChanges() {
-        val profileSpecific = ProfileStorageData.profileSpecific ?: return
-        val oldPosition = profileSpecific.garden.farmingWeight.lastFarmingWeightLeaderboard
+        val oldPosition = storage?.lastFarmingWeightLeaderboard ?: return
 
         if (oldPosition <= 0) return
         if (leaderboardPosition <= 0) return
@@ -430,30 +467,67 @@ object FarmingWeightDisplay {
     private fun showLbChange(direction: String, oldPosition: Int) {
         farmingChatMessage(
             "§7Since your last visit to the §aGarden§7, " +
-                "you have $direction §7on the §dFarming Leaderboard§7. " +
+                "you have $direction §7on the §d${lbName()} Leaderboard§7. " +
                 "§7(§e#${oldPosition.addSeparators()} §7-> §e#${leaderboardPosition.addSeparators()}§7)",
         )
     }
 
+    private fun lbName() = "${if (isMonthlyLB()) "Monthly " else ""}Farming Weight"
+
     private fun loadLeaderboardPosition(): Int {
         val uuid = LorenzUtils.getPlayerUuid()
 
-        val includeUpcoming = if (isEtaEnabled()) "?includeUpcoming=true" else ""
-        val goalRank = getRankGoal() + 1 // API returns upcoming players as if you were at this rank already
-        val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
+        // Fetch more upcoming players when the difference between ranks is expected to be tiny
+        val upcomingPlayersParam = when {
+            !isEnabled() -> ""
+            leaderboardPosition > 10_000 -> "?upcoming=50"
+            leaderboardPosition > 5_000 -> "?upcoming=30"
+            leaderboardPosition > 1_000 -> "?upcoming=20"
+            else -> "?upcoming=10"
+        }
+        // Tell the API to get upcoming players from our local rank (for when new data isn't fetched), or fallback to the
+        // provided eta goal rank from the config
+        val atRank = when {
+            !isEtaEnabled() -> null
+            config.useEtaGoalRank.get() && leaderboardPosition != -1 -> min(getRankGoal() + 1, leaderboardPosition)
+            config.useEtaGoalRank.get() -> getRankGoal() + 1
+            leaderboardPosition != -1 -> leaderboardPosition
+            else -> null
+        }
+        val lbType = if (isMonthlyLB()) "-monthly" else ""
+        val atRankParam = if (atRank != null) "&atRank=$atRank" else ""
 
-        val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-        val apiResponse = APIUtils.getJSONResponse(url)
+        val url = "https://api.elitebot.dev/leaderboard/farmingweight$lbType/" +
+            "$uuid/$profileId$upcomingPlayersParam$atRankParam"
+        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Leaderboard")
 
         try {
             val apiData = toEliteLeaderboardJson(apiResponse).data
+            val newData = apiWeight < apiData.amount
+
+            minAmount = apiData.minAmount
+
+            if (newData) {
+                shWeightDiff = weight - apiData.amount
+                apiWeight = apiData.amount
+            }
+
+            // Reset weight diff if not a monthly leaderboard
+            if (apiData.initialAmount == 0.0) {
+                shWeightDiff = 0.0
+            }
 
             if (isEtaEnabled()) {
                 nextPlayers.clear()
-                apiData.upcomingPlayers.forEach { nextPlayers.add(it) }
+                apiData.upcomingPlayers.forEach {
+                    if (it.weight > displayWeight) {
+                        nextPlayers.add(it)
+                    }
+                }
             }
 
-            return apiData.rank
+            // Keep local rank if new data wasn't returned
+            return if (newData) apiData.rank else leaderboardPosition
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error getting weight leaderboard position",
@@ -473,12 +547,11 @@ object FarmingWeightDisplay {
     private fun loadWeight(localProfile: String) {
         val uuid = LorenzUtils.getPlayerUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
-        val apiResponse = APIUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elite Farming Weight")
 
         var error: Throwable? = null
 
         try {
-
             val apiData = eliteWeightApiGson.fromJson<ElitePlayerWeightJson>(apiResponse)
 
             val selectedProfileId = apiData.selectedProfileId
@@ -545,7 +618,7 @@ object FarmingWeightDisplay {
         return cropWeight[this] ?: backupCropWeights[this] ?: error("Crop $this not in backupFactors!")
     }
 
-    fun lookUpCommand(it: Array<String>) {
+    private fun lookUpCommand(it: Array<String>) {
         val name = if (it.size == 1) it[0] else LorenzUtils.getPlayerName()
         openWebsite(name, ignoreCooldown = true)
     }
@@ -569,7 +642,7 @@ object FarmingWeightDisplay {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
         val url = "https://api.elitebot.dev/weights/all"
-        val apiResponse = APIUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Weight")
 
         try {
             val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
@@ -591,15 +664,24 @@ object FarmingWeightDisplay {
     private val backupCropWeights by lazy {
         mapOf(
             CropType.WHEAT to 100_000.0,
-            CropType.CARROT to 302_061.86,
-            CropType.POTATO to 300_000.0,
-            CropType.SUGAR_CANE to 200_000.0,
-            CropType.NETHER_WART to 250_000.0,
-            CropType.PUMPKIN to 98_284.71,
-            CropType.MELON to 485_308.47,
-            CropType.MUSHROOM to 90_178.06,
-            CropType.COCOA_BEANS to 267_174.04,
-            CropType.CACTUS to 177_254.45,
+            CropType.CARROT to 300_000.0,
+            CropType.POTATO to 298_328.17,
+            CropType.SUGAR_CANE to 198_885.45,
+            CropType.NETHER_WART to 248_606.81,
+            CropType.PUMPKIN to 99_236.12,
+            CropType.MELON to 488_435.88,
+            CropType.MUSHROOM to 90_944.27,
+            CropType.COCOA_BEANS to 276_733.75,
+            CropType.CACTUS to 178_730.65,
         )
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shfarmingprofile") {
+            description = "Look up the farming profile from yourself or another player on elitebot.dev"
+            category = CommandCategory.USERS_ACTIVE
+            callback { lookUpCommand(it) }
+        }
     }
 }

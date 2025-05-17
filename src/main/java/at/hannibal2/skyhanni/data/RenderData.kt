@@ -1,73 +1,60 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object RenderData {
 
-    @SubscribeEvent
-    fun onRenderOverlay(event: RenderGameOverlayEvent.Pre) {
+    @HandleEvent
+    fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
-        if (!canRender()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
-        GlStateManager.translate(0f, 0f, -3f)
-        GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
-        GlStateManager.translate(0f, 0f, 3f)
+        DrawContextUtils.translate(0f, 0f, -3f)
+        renderOverlay(DrawContextUtils.drawContext)
+        DrawContextUtils.translate(0f, 0f, 3f)
     }
 
-    @SubscribeEvent
-    fun onBackgroundDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
-        if (!canRender()) return
+    @HandleEvent
+    fun onBackgroundDraw(event: DrawBackgroundEvent) {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
         GlStateManager.enableDepth()
 
         if (GuiEditManager.isInGui()) {
-            GlStateManager.translate(0f, 0f, -3f)
-            GuiRenderEvent.GuiOverlayRenderEvent().postAndCatch()
-            GlStateManager.translate(0f, 0f, 3f)
+            DrawContextUtils.translate(0f, 0f, -3f)
+            renderOverlay(DrawContextUtils.drawContext)
+            DrawContextUtils.translate(0f, 0f, 3f)
         }
 
-        GuiRenderEvent.ChestGuiOverlayRenderEvent().postAndCatch()
+        GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
 
-        GlStateManager.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
-    private fun canRender(): Boolean = Minecraft.getMinecraft()?.renderManager?.fontRenderer != null
+    var outsideInventory = false
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
-        if (!SkyHanniDebugsAndTests.globalRender) return
-        LorenzRenderWorldEvent(event.partialTicks).postAndCatch()
-    }
-
-    // TODO find better spot for this
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(17, "chroma.chromaDirection") { element ->
-            ConfigUtils.migrateIntToEnum(element, ChromaConfig.Direction::class.java)
-        }
+    fun renderOverlay(context: DrawContext) {
+        outsideInventory = true
+        GuiRenderEvent.GuiOverlayRenderEvent(context).post()
+        outsideInventory = false
     }
 }

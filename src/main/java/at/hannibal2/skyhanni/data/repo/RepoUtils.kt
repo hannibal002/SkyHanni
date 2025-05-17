@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.repo
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.Gson
 import java.io.BufferedReader
@@ -14,6 +13,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.zip.ZipInputStream
 
+// todo 1.21 impl needed
 object RepoUtils {
 
     fun recursiveDelete(file: File) {
@@ -107,12 +107,9 @@ object RepoUtils {
     }
 
     @JvmStatic
-    fun updateRepo() {
-        SkyHanniMod.repo.updateRepo()
-    }
-
-    @JvmStatic
     fun resetRepoLocation() {
-        SkyHanniMod.repo.resetRepositoryLocation(manual = true)
+        //#if TODO
+        RepoManager.resetRepositoryLocation(manual = true)
+        //#endif
     }
 }

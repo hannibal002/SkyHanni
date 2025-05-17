@@ -14,8 +14,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HighlightPlaceableNpcs {
@@ -29,11 +27,11 @@ object HighlightPlaceableNpcs {
         "location",
         "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]",
     )
-    private val clickToSetPattern by RepoPattern.pattern(
+    private val clickToSetPattern by patternGroup.pattern(
         "clicktoset",
         "§7§eClick to set the location of this NPC!",
     )
-    private val clickToSpawnPattern by RepoPattern.pattern(
+    private val clickToSpawnPattern by patternGroup.pattern(
         "clicktospawn",
         "§elocation!",
     )
@@ -64,12 +62,12 @@ object HighlightPlaceableNpcs {
         highlightedItems = emptyList()
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled() || !inInventory) return
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotIndex in highlightedItems) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
         }
     }

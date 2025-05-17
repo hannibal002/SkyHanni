@@ -1,11 +1,24 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+//#if MC == 1.8.9
+import net.minecraftforge.fml.client.FMLClientHandler
+import net.minecraftforge.fml.common.Loader
+//#endif
+import java.lang.management.ManagementFactory
+import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ComputerEnvDebug {
@@ -15,6 +28,11 @@ object ComputerEnvDebug {
         os(event)
         java(event)
         launcher(event)
+        ram(event)
+        uptime(event)
+        //#if MC == 1.8.9
+        performanceMods(event)
+        //#endif
     }
 
     private fun launcher(event: DebugDataCollectEvent) {
@@ -58,7 +76,7 @@ object ComputerEnvDebug {
         if (firstStack.contains("org.multimc.EntryPoint.main")) {
             return Pair("MultiMC", false)
         }
-        if (firstStack.contains("net.digitalingot.vendor.")) {
+        if (firstStack.contains("net.digitalingot.vendor.") || firstStack.contains("net.digitalingot.rustextension.")) {
             return Pair("Feather Client", true)
         }
         return Pair(null, true)
@@ -82,7 +100,11 @@ object ComputerEnvDebug {
             group("update").toIntOrNull()?.let {
                 val devEnvironment = PlatformUtils.isDevEnvironment
                 if (it < 300 && !devEnvironment) {
-                    event.addData("Old update: $it")
+                    event.addData {
+                        add("Old java version: $it")
+                        add("Update to a newer version if you have performance issues.")
+                        add("For more infos: https://github.com/hannibal002/SkyHanni/blob/beta/docs/update_java.md")
+                    }
                 } else {
                     if (devEnvironment) {
                         event.addIrrelevant("Update version: $it (dev env)")
@@ -93,7 +115,7 @@ object ComputerEnvDebug {
                 return
             }
         }
-        event.addData("Unknwon java version: '$version'")
+        event.addData("Unknown java version: '$version'")
     }
 
     private fun os(event: DebugDataCollectEvent) {
@@ -106,7 +128,136 @@ object ComputerEnvDebug {
                 add("Exact name: $exactName")
             }
         } else {
-            event.addData("Unknwon OS: '$exactName'")
+            event.addData("Unknown OS: '$exactName'")
+        }
+    }
+
+    private fun ram(event: DebugDataCollectEvent) {
+        event.title("Computer RAM")
+        val runtime = Runtime.getRuntime()
+
+        val text = mutableListOf<String>()
+
+        // Retrieve memory values in bytes
+        val totalMemory = runtime.totalMemory() // Total memory currently allocated to JVM
+        val maxMemory = runtime.maxMemory() // Maximum memory JVM can use
+        val freeMemory = runtime.freeMemory() // Free memory within currently allocated memory
+        val usedMemory = totalMemory - freeMemory // Memory currently in use
+
+        // Calculate percentages
+        val allocatedPercentage = (totalMemory.toDouble() / maxMemory * 100).toInt() // Allocated percentage
+        val usedPercentage = (usedMemory.toDouble() / maxMemory * 100).toInt() // Used percentage
+
+        // Convert memory values to GB for readability
+        val totalMemoryGB = totalMemory.toDouble() / (1024 * 1024 * 1024)
+        val maxMemoryGB = maxMemory.toDouble() / (1024 * 1024 * 1024)
+        val usedMemoryGB = usedMemory.toDouble() / (1024 * 1024 * 1024)
+
+        // Clear the console (optional, for better readability)
+        text.add("Minecraft Memory: $usedPercentage% ${usedMemoryGB.formatGB()}/${maxMemoryGB.formatGB()} GB")
+        text.add("Minecraft Allocated: $allocatedPercentage% ${totalMemoryGB.formatGB()} GB")
+
+        // Get total system memory using OS-specific APIs
+        val osBean = ManagementFactory.getOperatingSystemMXBean()
+        val totalPhysicalMemory = (osBean as com.sun.management.OperatingSystemMXBean).totalPhysicalMemorySize
+        val freePhysicalMemory = osBean.freePhysicalMemorySize
+        val usedPhysicalMemory = totalPhysicalMemory - freePhysicalMemory
+
+        // Convert system memory to GB
+        val totalPhysicalGB = totalPhysicalMemory.toDouble() / (1024 * 1024 * 1024)
+        val usedPhysicalGB = usedPhysicalMemory.toDouble() / (1024 * 1024 * 1024)
+        val usedPhysicalPercentage = (usedPhysicalMemory.toDouble() / totalPhysicalMemory * 100).roundToInt()
+
+        // System Memory Usage
+        text.add("System Memory: $usedPhysicalPercentage% ${usedPhysicalGB.formatGB()}/${totalPhysicalGB.formatGB()} GB")
+
+        var important = false
+        if (maxMemoryGB < 3.5) {
+            text.add("")
+            text.add(
+                "Minecraft has less than 3.5 GB of RAM! Change this to 4-6 GB! " +
+                    "(Currently at ${maxMemoryGB.formatGB()} GB RAM)",
+            )
+            important = true
+        } else if (maxMemoryGB > 6) {
+            text.add("")
+            text.add(
+                "Minecraft has more than 6 GB of RAM! Change this to 4-6 GB! " +
+                    "(Currently at ${maxMemoryGB.formatGB()} GB RAM)",
+            )
+            important = true
+        }
+        if (usedPhysicalPercentage > 90) {
+            text.add("")
+            text.add(
+                "The computer uses more than 90% of system memory. Maybe close background apps! " +
+                    "($usedPhysicalPercentage% used)",
+            )
+            important = true
+        }
+
+        if (important) {
+            event.addData(text)
+        } else {
+            event.addIrrelevant(text)
+        }
+    }
+
+    private fun Double.formatGB(): String {
+        return roundTo(1).addSeparators()
+    }
+
+    private fun uptime(event: DebugDataCollectEvent) {
+        event.title("Minecraft Uptime")
+        val uptime = getUptime()
+        val info = "The game is running for ${uptime.format()}"
+        if (uptime > 5.hours) {
+            event.addData {
+                add("The game runs for more than 5 hours, memory leaks may accumulate to dangerous levels.")
+                add(info)
+            }
+        } else {
+            event.addIrrelevant(info)
+        }
+    }
+
+    private fun getUptime() = ManagementFactory.getRuntimeMXBean().uptime.milliseconds
+
+    //#if MC == 1.8.9
+    private fun performanceMods(event: DebugDataCollectEvent) {
+        if (PlatformUtils.isDevEnvironment) return
+        val hasOptifine = FMLClientHandler.instance().hasOptifine()
+        val hasPatcher = Loader.isModLoaded("patcher")
+        event.title("Performance Mods")
+        if (!hasOptifine || !hasPatcher) {
+            event.addData {
+                add("Optifine is ${if (hasOptifine) "" else "not"} installed")
+                add("Patcher is ${if (hasPatcher) "" else "not"} installed")
+                add("These mods greatly improve performance and are almost required to play 1.8.9 Minecraft")
+                if (!hasOptifine) {
+                    add("https://optifine.net/downloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar")
+                }
+                if (!hasPatcher) {
+                    add("https://modrinth.com/mod/patcher")
+                }
+            }
+        } else {
+            event.addIrrelevant {
+                add("Optifine and Patcher are installed")
+            }
+        }
+    }
+    //#endif
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shuptime") {
+            description = "Shows the time since the start of minecraft"
+            category = CommandCategory.USERS_RESET
+            callback {
+                val uptime = getUptime()
+                ChatUtils.chat("Minecraft is running for §b${uptime.format()}§e.")
+            }
         }
     }
 }

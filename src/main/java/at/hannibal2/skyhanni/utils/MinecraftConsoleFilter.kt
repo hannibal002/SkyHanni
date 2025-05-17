@@ -124,35 +124,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
             }
         }
 
-        if (thrown != null && filterConfig.filterScoreboardErrors) {
-            val cause = thrown.cause
-            if (cause != null && cause.stackTrace.isNotEmpty()) {
-                val first = cause.stackTrace[0]
-                val firstName = first.toString()
-                if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
-                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)" ||
-                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:240)"
-                ) {
-                    filterConsole("NullPointerException at Scoreboard.removeTeam")
-                    return Filter.Result.DENY
-                }
-                if (firstName == "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)") {
-                    filterConsole("IllegalArgumentException at Scoreboard.createTeam")
-                    return Filter.Result.DENY
-                }
-                if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
-                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)" ||
-                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:186)"
-                ) {
-                    filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
-                    return Filter.Result.DENY
-                }
-            }
-            if (thrown.toString().contains(" java.lang.IllegalArgumentException: A team with the name '")) {
-                filterConsole("IllegalArgumentException because scoreboard team already exists")
-                return Filter.Result.DENY
-            }
-        }
+        if (filterScoreboardErrors(event)) return Filter.Result.DENY
 
         if (!config.printUnfilteredDebugs) return Filter.Result.ACCEPT
         if (!config.printUnfilteredDebugsOutsideSkyBlock && !LorenzUtils.inSkyBlock) return Filter.Result.ACCEPT
@@ -192,18 +164,52 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         return Filter.Result.ACCEPT
     }
 
+    private fun filterScoreboardErrors(event: LogEvent?): Boolean {
+        val thrown = event?.thrown
+        if (thrown != null && filterConfig.filterScoreboardErrors) {
+            val cause = thrown.cause
+            if (cause != null && cause.stackTrace.isNotEmpty()) {
+                val first = cause.stackTrace[0]
+                val firstName = first.toString()
+                if (firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:229)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:262)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeTeam(Scoreboard.java:240)"
+                ) {
+                    filterConsole("NullPointerException at Scoreboard.removeTeam")
+                    return true
+                }
+                if (firstName == "net.minecraft.scoreboard.Scoreboard.createTeam(Scoreboard.java:218)") {
+                    filterConsole("IllegalArgumentException at Scoreboard.createTeam")
+                    return true
+                }
+                if (firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:179)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:198)" ||
+                    firstName == "net.minecraft.scoreboard.Scoreboard.removeObjective(Scoreboard.java:186)"
+                ) {
+                    filterConsole("IllegalArgumentException at Scoreboard.removeObjective")
+                    return true
+                }
+            }
+            if (thrown.toString().contains(" java.lang.IllegalArgumentException: A team with the name '")) {
+                filterConsole("IllegalArgumentException because scoreboard team already exists")
+                return true
+            }
+        }
+        return false
+    }
+
     private fun debug(text: String) {
         if (config.logUnfilteredFile) {
             loggerUnfiltered.log(text)
         } else {
-            LorenzUtils.consoleLog(text)
+            ChatUtils.consoleLog(text)
         }
     }
 
     private fun filterConsole(message: String) {
         loggerFiltered.log(message)
         if (config.printFilteredReason) {
-            LorenzUtils.consoleLog("filtered console: $message")
+            ChatUtils.consoleLog("filtered console: $message")
         }
     }
 
@@ -244,7 +250,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         event.move(
             3,
             "dev.printUnfilteredDebugsOutsideSkyBlock",
-            "dev.minecraftConsoles.printUnfilteredDebugsOutsideSkyBlock"
+            "dev.minecraftConsoles.printUnfilteredDebugsOutsideSkyBlock",
         )
         event.move(3, "dev.printFilteredReason", "dev.minecraftConsoles.printFilteredReason")
         event.move(3, "dev.filterChat", "dev.minecraftConsoles.consoleFilter.filterChat")
@@ -253,12 +259,12 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         event.move(
             3,
             "dev.filterParticleVillagerHappy",
-            "dev.minecraftConsoles.consoleFilter.filterParticleVillagerHappy"
+            "dev.minecraftConsoles.consoleFilter.filterParticleVillagerHappy",
         )
         event.move(
             3,
             "dev.filterAmsHelperTransformer",
-            "dev.minecraftConsoles.consoleFilter.filterAmsHelperTransformer"
+            "dev.minecraftConsoles.consoleFilter.filterAmsHelperTransformer",
         )
         event.move(3, "dev.filterAsmHelperApplying", "dev.minecraftConsoles.consoleFilter.filterAsmHelperApplying")
         event.move(3, "dev.filterBiomeIdBounds", "dev.minecraftConsoles.consoleFilter.filterBiomeIdBounds")

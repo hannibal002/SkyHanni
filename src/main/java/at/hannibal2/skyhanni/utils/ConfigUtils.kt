@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.EventHandler
+//#if TODO
 import at.hannibal2.skyhanni.config.ConfigGuiManager
+//#endif
 import at.hannibal2.skyhanni.config.HasLegacyId
-import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.jvm.javaField
 
+// todo 1.21 impl needed
 object ConfigUtils {
 
     /**
@@ -84,12 +85,11 @@ object ConfigUtils {
     }
 
     fun KMutableProperty0<*>.jumpToEditor() {
+        //#if TODO
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
+        //#endif
 
-        // TODO create utils function "crashIfInDevEnv"
-        if (LorenzEvent.isInGuardedEventHandler || EventHandler.isInEventHandler) {
-            throw Error("can not jump to editor $name")
-        }
+        ErrorManager.crashInDevEnv("Can not open config $name")
         ErrorManager.logErrorStateWithData(
             "Can not open the config",
             "error while trying to jump to an editor element",
