@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.collection.enumMapOf
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
-import java.util.EnumMap
 
 @SkyHanniModule
 object DragonProfitTracker {
@@ -73,7 +73,7 @@ object DragonProfitTracker {
         }
 
         @Expose
-        var dragonKills: MutableMap<DragonType, Long> = EnumMap(DragonType::class.java)
+        var dragonKills: MutableMap<DragonType, Long> = enumMapOf<DragonType, Long>()
 
         @Expose
         var eyesPlaced: Long = 0

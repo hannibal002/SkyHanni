@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.toEnumSet
 import com.google.gson.reflect.TypeToken
 import java.util.EnumSet
 
@@ -13,16 +14,14 @@ class IslandTypeTag internal constructor(name: String, private val types: EnumSe
 
     internal constructor(name: String, vararg types: Any) : this(
         name,
-        EnumSet.copyOf(
-            types.flatMap {
-                when (it) {
-                    is IslandTypeTag -> it.types
-                    is IslandType -> listOf(it)
-                    is String -> listOf(IslandType.getByName(it))
-                    else -> error("Invalid type: $it")
-                }
-            },
-        ),
+        types.flatMap {
+            when (it) {
+                is IslandTypeTag -> it.types
+                is IslandType -> listOf(it)
+                is String -> listOf(IslandType.getByName(it))
+                else -> error("Invalid type: $it")
+            }
+        }.toEnumSet(),
     )
 
     init {

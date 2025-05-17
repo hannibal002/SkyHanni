@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.collection.enumMapOf
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -42,7 +43,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.JsonPrimitive
 import com.google.gson.annotations.Expose
 import com.google.gson.reflect.TypeToken
-import java.util.EnumMap
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
 
@@ -125,10 +125,10 @@ object PestProfitTracker {
         var totalPestsKills = 0L
 
         @Expose
-        var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java)
+        var pestKills: MutableMap<PestType, Long> = enumMapOf<PestType, Long>()
 
         @Expose
-        var spraysUsed: MutableMap<SprayType, Long> = EnumMap(SprayType::class.java)
+        var spraysUsed: MutableMap<SprayType, Long> = enumMapOf<SprayType, Long>()
     }
 
     private fun SprayType.addSprayUsed() = tracker.modify { it.spraysUsed.addOrPut(this, 1) }

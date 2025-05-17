@@ -252,6 +252,7 @@ object CollectionUtils {
 
     fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
+    @Deprecated("Use enumMapOf function of EnumMapUtils, simply remove 'CollectionUtils' from the import")
     inline fun <reified K : Enum<K>, V> enumMapOf(): EnumMap<K, V> {
         return EnumMap<K, V>(K::class.java)
     }
