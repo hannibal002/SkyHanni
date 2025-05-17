@@ -3,27 +3,26 @@ package at.hannibal2.skyhanni.features.garden.farmingsettings
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
+import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils.isMousematSign
-import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SignUtils.isMousematSign
+import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FarmingSettings {
 
-    private val config get() = GardenAPI.config.farmingSettings
+    private val config get() = GardenApi.config.farmingSettings
 
     private var display = listOf<Renderable>()
 
-    @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
+    @HandleEvent
+    fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (!isShortcutGUIEnabled()) return
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign() && !gui.isMousematSign()) return
@@ -31,8 +30,8 @@ object FarmingSettings {
         display = FarmingSettingsAPI.createDisplay(gui)
     }
 
-    @SubscribeEvent
-    fun onGuiRender(event: DrawScreenEvent.Post) {
+    @HandleEvent
+    fun onGuiRender(event: ScreenDrawnEvent) {
         if (!isShortcutGUIEnabled()) return
         val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign() && !gui.isMousematSign()) return
@@ -43,15 +42,15 @@ object FarmingSettings {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!GardenAPI.inGarden() || GardenAPI.hideExtraGuis() || (!config.warning && !config.showOnHUD)) return
+        if (!GardenApi.inGarden() || GardenApi.hideExtraGuis() || (!config.warning && !config.showOnHUD)) return
 
         if (config.showOnHUD) config.pos.renderRenderable(FarmingSettingsAPI.createStatus(), posLabel = "Garden Optimal Settings")
         if (config.warning && config.warningTypes.isNotEmpty()) FarmingSettingsAPI.handleWarning()
     }
 
-    private fun isShortcutGUIEnabled() = GardenAPI.inGarden() && config.shortcutGUI
+    private fun isShortcutGUIEnabled() = GardenApi.inGarden() && config.shortcutGUI
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -73,18 +72,18 @@ object FarmingSettings {
 
         event.move(14, "garden.optimalSpeeds.enabled", "garden.optimalSpeeds.showOnHUD")
 
-        event.move(67, "garden.optimalSpeeds.signEnabled", "garden.farmingSettings.shortcutGUI")
-        event.move(67, "garden.optimalSpeeds.compactRancherGui", "garden.farmingSettings.compactShortcutGUI")
-        event.move(67, "garden.optimalSpeeds.customSpeed", "garden.farmingSettings.customSettings")
-        event.move(67, "garden.optimalSpeeds.customSpeed.wheat", "garden.farmingSettings.customSettings.wheat.speed")
-        event.move(67, "garden.optimalSpeeds.customSpeed.carrot", "garden.farmingSettings.customSettings.carrot.speed")
-        event.move(67, "garden.optimalSpeeds.customSpeed.potato", "garden.farmingSettings.customSettings.potato.speed")
-        event.move(67, "garden.optimalSpeeds.customSpeed.netherWart", "garden.farmingSettings.customSettings.netherWart.speed")
-        event.move(67, "garden.optimalSpeeds.customSpeed.pumpkin", "garden.farmingSettings.customSettings.pumpkin.speed")
-        event.move(67, "garden.optimalSpeeds.customSpeed.melon", "garden.farmingSettings.customSettings.melon.speed")
-        event.move(67, "garden.optimalSpeeds.customSpeed.cocoaBeans", "garden.farmingSettings.customSettings.cocoaBeans.speed")
-        event.move(67, "garden.optimalSpeeds.customSpeed.sugarCane", "garden.farmingSettings.customSettings.sugarCane.speed")
-        event.move(67, "garden.optimalSpeeds.customSpeed.cactus", "garden.farmingSettings.customSettings.cactus.speed")
-        event.move(67, "garden.optimalSpeeds.customSpeed.mushroom", "garden.farmingSettings.customSettings.mushroom.speed")
+        event.move(88, "garden.optimalSpeeds.signEnabled", "garden.farmingSettings.shortcutGUI")
+        event.move(88, "garden.optimalSpeeds.compactRancherGui", "garden.farmingSettings.compactShortcutGUI")
+        event.move(88, "garden.optimalSpeeds.customSpeed", "garden.farmingSettings.customSettings")
+        event.move(88, "garden.optimalSpeeds.customSpeed.wheat", "garden.farmingSettings.customSettings.wheat.speed")
+        event.move(88, "garden.optimalSpeeds.customSpeed.carrot", "garden.farmingSettings.customSettings.carrot.speed")
+        event.move(88, "garden.optimalSpeeds.customSpeed.potato", "garden.farmingSettings.customSettings.potato.speed")
+        event.move(88, "garden.optimalSpeeds.customSpeed.netherWart", "garden.farmingSettings.customSettings.netherWart.speed")
+        event.move(88, "garden.optimalSpeeds.customSpeed.pumpkin", "garden.farmingSettings.customSettings.pumpkin.speed")
+        event.move(88, "garden.optimalSpeeds.customSpeed.melon", "garden.farmingSettings.customSettings.melon.speed")
+        event.move(88, "garden.optimalSpeeds.customSpeed.cocoaBeans", "garden.farmingSettings.customSettings.cocoaBeans.speed")
+        event.move(88, "garden.optimalSpeeds.customSpeed.sugarCane", "garden.farmingSettings.customSettings.sugarCane.speed")
+        event.move(88, "garden.optimalSpeeds.customSpeed.cactus", "garden.farmingSettings.customSettings.cactus.speed")
+        event.move(88, "garden.optimalSpeeds.customSpeed.mushroom", "garden.farmingSettings.customSettings.mushroom.speed")
     }
 }

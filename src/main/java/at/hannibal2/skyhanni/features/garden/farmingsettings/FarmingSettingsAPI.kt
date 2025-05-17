@@ -2,10 +2,11 @@ package at.hannibal2.skyhanni.features.garden.farmingsettings
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.farmingsettings.FarmingSettingsConfig.WarningType
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
@@ -15,32 +16,32 @@ import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SignUtils
+import at.hannibal2.skyhanni.utils.SignUtils.isRancherSign
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FarmingSettingsAPI {
 
-    private val config get() = GardenAPI.config.farmingSettings
-    private val configCustomSettings get() = config.customSettings
+    private val config get() = GardenApi.config.farmingSettings
 
     private var sneakingSince = SimpleTimeMark.farFuture()
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
 
     private var lastToolSwitch = SimpleTimeMark.farPast()
-    private val recentlySwitchedTool get() = lastToolSwitch.passedSince() < 1.5.seconds
-
     private var lastWarnTime = SimpleTimeMark.farPast()
 
     private val rancherBoots = "RANCHERS_BOOTS".toInternalName()
@@ -64,10 +65,6 @@ object FarmingSettingsAPI {
 
     private var cropType: CropType? = null
 
-    private val optimalSpeed get() = cropType?.getOptimalSettings()?.speed
-    private val optimalYaw get() = cropType?.getOptimalSettings()?.yaw
-    private val optimalPitch get() = cropType?.getOptimalSettings()?.pitch
-
     private data class CropSettings(val speed: Int, val yaw: Float, val pitch: Float)
     private data class CropPropertys(val speed: Property<Float>, val yaw: Property<Float>, val pitch: Property<Float>)
 
@@ -80,55 +77,59 @@ object FarmingSettingsAPI {
                 { if (isRancher) it.second.speed to 0 else it.second.yaw to it.second.pitch },
                 { it.first },
             ).map { (settings, crops) ->
-                val color = if (cropType in crops) LorenzColor.GOLD else LorenzColor.WHITE
                 val label = if (isRancher) "${settings.first}" else "${settings.first}°/${settings.second}°"
 
-                Renderable.link(
-                    Renderable.horizontalContainer(
-                        listOf(
-                            Renderable.horizontalContainer(crops.map { Renderable.itemStack(it.icon) }),
-                            Renderable.string("${color.getChatColor()} - $label"),
-                        ),
-                        spacing = 2,
-                    ),
-                    underlineColor = color.toColor(),
+                buildCropLink(
+                    HorizontalContainerRenderable(crops.map { Renderable.itemStack(it.icon) }),
+                    label,
+                    isSelected = cropType in crops,
                     onClick = {
-                        LorenzUtils.setTextIntoSign("${settings.first}")
-                        if (!isRancher) LorenzUtils.setTextIntoSign("${settings.second}", line = 3)
+                        SignUtils.setTextIntoSign("${settings.first}")
+                        if (!isRancher) SignUtils.setTextIntoSign("${settings.second}", line = 3)
                     },
                 )
             }
         } else {
             crops.map { (crop, settings) ->
-                val color = if (cropType == crop) LorenzColor.GOLD else LorenzColor.WHITE
-                val label = if (isRancher) "${settings.speed}" else "${settings.yaw}°/${settings.pitch}°"
+                val label = crop.cropName + if (isRancher) "${settings.speed}" else "${settings.yaw}°/${settings.pitch}°"
 
-                Renderable.link(
-                    Renderable.horizontalContainer(
-                        listOf(
-                            Renderable.itemStack(crop.icon),
-                            Renderable.string("${color.getChatColor()}${crop.cropName} - $label"),
-                        ),
-                        spacing = 2,
-                    ),
-                    underlineColor = color.toColor(),
+                buildCropLink(
+                    Renderable.itemStack(crop.icon), label, isSelected = cropType == crop,
                     onClick = {
-                        LorenzUtils.setTextIntoSign(
+                        SignUtils.setTextIntoSign(
                             if (isRancher) "${settings.speed}" else "${settings.yaw}",
                         )
-                        if (!isRancher) LorenzUtils.setTextIntoSign("${settings.pitch}", line = 3)
+                        if (!isRancher) SignUtils.setTextIntoSign("${settings.pitch}", line = 3)
                     },
                 )
             }
         }
     }
 
-    fun createStatus(): Renderable? {
-        if (!GardenAPI.hasFarmingToolInHand() && !isHolding(rancherBoots) && !isHolding(mousemat)) return null
+    private fun buildCropLink(
+        iconRenderable: Renderable,
+        label: String,
+        isSelected: Boolean,
+        onClick: () -> Unit,
+    ): Renderable {
+        val color = if (isSelected) LorenzColor.GOLD else LorenzColor.WHITE
+        return Renderable.link(
+            HorizontalContainerRenderable(
+                listOf(
+                    iconRenderable,
+                    RenderableString("${color.getChatColor()} - $label"),
+                ),
+                spacing = 2,
+            ),
+            onLeftClick = onClick,
+            underlineColor = color.toColor(),
+        )
+    }
 
-        val optimalSpeed = optimalSpeed ?: return null
-        val optimalYaw = optimalYaw ?: return null
-        val optimalPitch = optimalPitch ?: return null
+    fun createStatus(): Renderable? {
+        if (!GardenApi.hasFarmingToolInHand() && !isHolding(rancherBoots) && !isHolding(mousemat)) return null
+
+        val (optimalSpeed, optimalYaw, optimalPitch) = cropType?.getOptimalSettings() ?: return null
 
         val recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
         val recentlyStartedSneaking = sneaking && sneakingSince.passedSince() < 5.seconds
@@ -139,12 +140,13 @@ object FarmingSettingsAPI {
             if (recentlySwitchedTool) "7" else if (optimalPitch != currentPitch) "c" else "a",
         )
 
-        return Renderable.verticalContainer(
+        return VerticalContainerRenderable(
             listOf(
                 buildStatusString("Speed", speedColor, optimalSpeed, currentSpeed),
                 buildStatusString("Yaw", yawColor, optimalYaw, currentYaw),
                 buildStatusString("Pitch", pitchColor, optimalPitch, currentPitch),
             ),
+            0, RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP,
         )
     }
 
@@ -160,7 +162,7 @@ object FarmingSettingsAPI {
             if (sneaking) statusString += " §7[Sneaking]"
             statusString += "§f)"
         }
-        return Renderable.string(statusString)
+        return RenderableString(statusString)
     }
 
     fun handleWarning() {
@@ -169,16 +171,14 @@ object FarmingSettingsAPI {
 
         if (WarningType.WHEN_USING.isSelected()) sendWarnings(WarningType.WHEN_USING)
 
-        if (Minecraft.getMinecraft().thePlayer.onGround && !GardenAPI.onBarnPlot) {
-            if (WarningType.WHEN_FARMING.isSelected() && GardenAPI.isCurrentlyFarming()) sendWarnings(WarningType.WHEN_FARMING)
+        if (Minecraft.getMinecraft().thePlayer.onGround && !GardenApi.onBarnPlot) {
+            if (WarningType.WHEN_FARMING.isSelected() && GardenApi.isCurrentlyFarming()) sendWarnings(WarningType.WHEN_FARMING)
             if (WarningType.WHEN_WALKING.isSelected()) sendWarnings(WarningType.WHEN_WALKING)
         }
     }
 
     private fun sendWarnings(type: WarningType) {
-        val optimalSpeed = optimalSpeed ?: return
-        val optimalYaw = optimalYaw ?: return
-        val optimalPitch = optimalPitch ?: return
+        val (optimalSpeed, optimalYaw, optimalPitch) = cropType?.getOptimalSettings() ?: return
 
         val speedWarn = optimalSpeed != currentSpeed
         val yawWarn = optimalYaw != currentYaw
@@ -186,17 +186,17 @@ object FarmingSettingsAPI {
 
         if (type == WarningType.WHEN_USING) {
             if (speedWarn && isWearingRanchers()) {
-                LorenzUtils.sendTitle("§cWrong Speed! Fix it in chat.", 3.seconds)
+                TitleManager.sendTitle("§cWrong Speed! Fix it in chat.", duration = 3.seconds)
                 warn("speed", currentSpeed, optimalSpeed, true)
             }
 
             if (isHolding(mousemat)) {
-                LorenzUtils.sendTitle("§cWrong Settings!", 3.seconds)
+                TitleManager.sendTitle("§cWrong Settings!", duration = 3.seconds)
                 if (yawWarn) warn("yaw", currentYaw, optimalYaw, true)
                 if (pitchWarn) warn("pitch", currentPitch, optimalPitch, true)
             }
         } else {
-            LorenzUtils.sendTitle("§cWrong Settings!", 3.seconds)
+            TitleManager.sendTitle("§cWrong Settings!", duration = 3.seconds)
 
             val mousematPresent = InventoryUtils.getItemsInOwnInventory().any { it.getInternalNameOrNull() == mousemat }
 
@@ -221,7 +221,7 @@ object FarmingSettingsAPI {
             }
 
             val actionName =
-                "change the $type${if (type in listOf("yaw", "pitch") && !isHolding(mousemat)) "(must hold Squeaky Mousemat)" else ""}"
+                "change the $type${if (type in listOf("yaw", "pitch") && !isHolding(mousemat)) " (must hold Squeaky Mousemat)" else ""}"
 
             ChatUtils.clickToActionOrDisable(
                 text,
@@ -250,12 +250,12 @@ object FarmingSettingsAPI {
 
     private fun isWearingRanchers() = InventoryUtils.getBoots()?.getInternalNameOrNull() == rancherBoots
 
-    private fun isHolding(internalName: NEUInternalName) = InventoryUtils.getItemInHand()?.getInternalNameOrNull() == internalName
+    private fun isHolding(internalName: NeuInternalName) = InventoryUtils.getItemInHand()?.getInternalNameOrNull() == internalName
 
     private fun WarningType.isSelected(): Boolean = config.warningTypes.contains(this)
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTick() {
         if (!isEnabled()) return
         val player = Minecraft.getMinecraft().thePlayer
 
@@ -287,7 +287,7 @@ object FarmingSettingsAPI {
         )
     }
 
-    private fun CropType.getConfig(): CropPropertys = with(configCustomSettings) {
+    private fun CropType.getConfig(): CropPropertys = with(config.customSettings) {
         when (this@getConfig) {
             CropType.WHEAT -> CropPropertys(wheat.speed, wheat.yaw, wheat.pitch)
             CropType.CARROT -> CropPropertys(carrot.speed, carrot.yaw, carrot.pitch)
@@ -302,5 +302,5 @@ object FarmingSettingsAPI {
         }
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && (config.showOnHUD || config.warning || config.shortcutGUI)
+    private fun isEnabled() = GardenApi.inGarden() && (config.showOnHUD || config.warning || config.shortcutGUI)
 }
