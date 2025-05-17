@@ -114,6 +114,8 @@ at.hannibal2.skyhanni.utils.compat.DrawContextUtils.kt
 at.hannibal2.skyhanni.events.SecondPassedEvent.kt
 at.hannibal2.skyhanni.api.event.GeneratedEventPrimaryFunctionNames.kt
 at.hannibal2.skyhanni.utils.collection.CollectionUtils.kt
+at.hannibal2.skyhanni.utils.collection.EnumSetUtils.kt
+at.hannibal2.skyhanni.utils.collection.EnumMapUtils.kt
 at.hannibal2.skyhanni.utils.ColorUtils.kt
 at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent.kt
 at.hannibal2.skyhanni.utils.ExtendedChatColor.kt
