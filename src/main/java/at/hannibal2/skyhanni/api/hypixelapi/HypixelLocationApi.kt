@@ -57,8 +57,6 @@ object HypixelLocationApi {
     val inLimbo get() = serverId == "limbo"
     val inLobby get() = serverType == LobbyType.MAIN
 
-    // TODO reenable the setting once the hypixel mod api works fine
-//     val config get() = SkyHanniMod.feature.dev.hypixelModApi
     val config get() = SkyHanniMod.feature.dev.hypixelModApi
 
     private val logger = LorenzLogger("debug/hypixel_api")

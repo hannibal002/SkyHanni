@@ -133,7 +133,7 @@ class DevConfig {
         desc = "Use the Hypixel Mod API for better location data.\n" +
             "§cNote: this setting may be disabled remotely, and will only work on beta versions.")
     @ConfigEditorBoolean
-    var hypixelModApi: Boolean = false // TODO: should this be defalt on or off?
+    var hypixelModApi: Boolean = false // should this be default on or off?
 
     @Expose
     @ConfigOption(name = "Hypixel Ping API", desc = "Use the Hypixel Mod API for calculating the ping.")
