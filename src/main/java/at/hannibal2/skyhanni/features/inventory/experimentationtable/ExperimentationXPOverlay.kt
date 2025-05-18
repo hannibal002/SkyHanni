@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.ExperimentationTableApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
@@ -16,7 +17,7 @@ import net.minecraft.client.Minecraft
 object ExperimentationXPOverlay {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.superpairs
 
-    private val patternGroup = RepoPattern.group("enchanting.experiments")
+    private val patternGroup = RepoPattern.Companion.group("enchanting.experiments")
 
     /**
      * REGEX-TEST: §331k Enchanting Exp

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.experimentationtable
+package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.events.experiments.TableRareUncoverEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskCompletedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
 import at.hannibal2.skyhanni.events.experiments.TableXPBottleUsedEvent
-import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -45,7 +44,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.item.ItemStack
+import kotlin.collections.iterator
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -61,8 +60,6 @@ object ExperimentationTableApi {
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
     private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val currentExperimentData = ExperimentationDataSet()
-    private val superpairsSlotMap: MutableMap<Int, ItemStack> = mutableMapOf()
-    private val superpairsSlotsToRead: MutableSet<Int> = mutableSetOf()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
     val experimentationTableInventory = InventoryDetector { name -> inventoriesPattern.matches(name) }
@@ -318,17 +315,6 @@ object ExperimentationTableApi {
         "inventory.experiment-over",
         "Experiment [Oo]ver|Superpairs Rewards",
     )
-
-    /**
-     * REGEX-TEST: §8?
-     * REGEX-TEST: §eClick any button!
-     * REGEX-TEST: §bClick a second button!
-     * REGEX-TEST: §dNext button is instantly rewarded!
-     */
-    private val unknownSuperpairsClickPattern by patternGroup.pattern(
-        "superpairs.unknown-click",
-        "(?:§.)+(?:\\?|(?:Click a(?: seco)?n[dy]|Next) button(?: is instantly rewarded)?!?)"
-    )
     // </editor-fold>
 
     fun inDistanceToTable(max: Double): Boolean {
@@ -340,8 +326,6 @@ object ExperimentationTableApi {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryClose() {
-        superpairsSlotMap.clear()
-        superpairsSlotsToRead.clear()
         if (currentExpOverHash != 0) {
             lastExpOverHash = currentExpOverHash
             currentExpOverHash = 0
@@ -433,7 +417,6 @@ object ExperimentationTableApi {
         if (!inTable) return
         event.tryFireRareBookUncovered()
         event.tryUpdateCurrentActivity()
-        event.tryReadSuperpairsSlots()
         handleExpBottles(false)
     }
 
@@ -441,31 +424,11 @@ object ExperimentationTableApi {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inTable || event.item == null || event.slot == null) return
         event.tryResetQueuedEvent()
-        event.tryReadUncoveredItem()
     }
 
     private fun GuiContainerEvent.SlotClickEvent.tryResetQueuedEvent() {
         if (item?.displayName != "§cDecline") return
         queuedCompleteEvent = null
-    }
-
-    private fun GuiContainerEvent.SlotClickEvent.tryReadUncoveredItem() {
-        val slotNumber = slot?.slotNumber?.takeIf {
-            it !in superpairsSlotMap.keys
-        } ?: return
-        val clickedItem = item ?: return
-        if (unknownSuperpairsClickPattern.matches(clickedItem.displayName)) superpairsSlotsToRead.add(slotNumber)
-        else superpairsSlotMap[slotNumber] = clickedItem
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onReplaceItem(event: ReplaceItemEvent) {
-        if (!config.superpairs.clickedItemsVisible) return
-        if (!inTable || currentExperimentType != TaskType.SUPERPAIRS) return
-        if (superpairsSlotMap.isEmpty() || event.slot !in superpairsSlotMap.keys) return
-        if (!unknownSuperpairsClickPattern.matches(event.originalItem.displayName)) return
-        val replacementItem = superpairsSlotMap[event.slot] ?: return
-        event.replace(replacementItem)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -545,18 +508,6 @@ object ExperimentationTableApi {
             return
         }
         currentExperimentData.addReward(internalName, 1)
-    }
-
-    private fun InventoryOpenEvent.tryReadSuperpairsSlots() {
-        if (!inTable || currentExperimentType != TaskType.SUPERPAIRS) return
-        if (superpairsSlotsToRead.isEmpty()) return
-
-        inventoryItems.filter {
-            it.key in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(it.value.displayName)
-        }.forEach {
-            superpairsSlotMap[it.key] = it.value
-            superpairsSlotsToRead.remove(it.key)
-        }
     }
 
     private fun InventoryOpenEvent.tryFireRareBookUncovered() {
