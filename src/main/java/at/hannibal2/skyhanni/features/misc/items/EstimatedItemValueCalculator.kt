@@ -58,6 +58,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMithrilInfusion
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPolarvoidBookCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPowerScroll
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRodUpgrades
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getRune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSilexCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
@@ -126,6 +127,7 @@ object EstimatedItemValueCalculator {
         // dynamic
         ::addAbilityScrolls,
         ::addDrillUpgrades,
+        ::addRodUpgrades,
         ::addGemstoneSlotUnlockCost,
         ::addGemstones,
         ::addEnchantments,
@@ -639,6 +641,17 @@ object EstimatedItemValueCalculator {
         val (totalPrice, names) = getTotalAndNames(drillUpgrades)
         if (names.isNotEmpty()) {
             list.add("§7Drill upgrades: " + totalPrice.formatCoin())
+            list += names
+        }
+        return totalPrice
+    }
+
+    private fun addRodUpgrades(stack: ItemStack, list: MutableList<String>): Double {
+        val rodUpgrades = stack.getRodUpgrades() ?: return 0.0
+
+        val (totalPrice, names) = getTotalAndNames(rodUpgrades)
+        if (names.isNotEmpty()) {
+            list.add("§7Rod upgrades: " + totalPrice.formatCoin())
             list += names
         }
         return totalPrice

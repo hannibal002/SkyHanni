@@ -31,6 +31,8 @@ object SkyBlockItemModifierUtils {
 
     private val drillPartTypes = listOf("drill_part_upgrade_module", "drill_part_engine", "drill_part_fuel_tank")
 
+    private val rodPartTypes = listOf("hook", "sinker", "line")
+
     fun ItemStack.getHotPotatoCount() = getAttributeInt("hot_potato_count")
 
     fun ItemStack.getFarmingForDummiesCount() = getAttributeInt("farming_for_dummies_count")
@@ -119,6 +121,17 @@ object SkyBlockItemModifierUtils {
             if (attributes in drillPartTypes) {
                 val upgradeItem = it.getString(attributes)
                 list.add(upgradeItem.uppercase().toInternalName())
+            }
+        }
+        list
+    }
+
+    fun ItemStack.getRodUpgrades() = getExtraAttributes()?.let {
+        val list = mutableListOf<NeuInternalName>()
+        for (attribute in it.keySet) {
+            if (attribute in rodPartTypes) {
+                val part = it.getCompoundTag(attribute).getString("part")
+                list.add(part.uppercase().toInternalName())
             }
         }
         list
