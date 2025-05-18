@@ -254,6 +254,7 @@ object ExperimentsAddonsHelper {
 
     private fun InventoryUpdatedEvent.readUltrasequencer() {
         if (currentAddonPhase != HelperPhase.READ) return
+        hypixelUltrasequencerData.clear()
 
         val orderedUltrasequencerSlots = inventoryItems.filter {
             it.value.displayName.trim().isNotEmpty()
@@ -268,8 +269,6 @@ object ExperimentsAddonsHelper {
             )
         }.sortedBy { it.sequenceNumber }
 
-        if (hypixelUltrasequencerData.size == currentUltraSequencerRound) return
-        hypixelUltrasequencerData.clear()
         userUltrasequencerProgress.clear()
         hypixelUltrasequencerData.addAll(orderedUltrasequencerSlots.map { it.slotIndex })
     }
