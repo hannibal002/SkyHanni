@@ -18,7 +18,7 @@ object CurrentPetApi {
             ProfileStorageData.petProfiles?.pets?.firstOrNull { it.uuid == currentUuid }
         }
 
-    fun isCurrentPet(petName: String): Boolean = currentPet?.cleanName?.contains(petName) ?: false
+    fun isCurrentPet(petName: String): Boolean = currentPet?.coloredName?.contains(petName) ?: false
 
     // <editor-fold desc="Patterns">
     // </editor-fold>

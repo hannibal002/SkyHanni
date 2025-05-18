@@ -178,5 +178,5 @@ object ExperimentationTableApi {
         }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
     }
 
-    fun guardianPetActive(): Boolean = CurrentPetApi.currentPet?.cleanName == "Guardian"
+    fun guardianPetActive(): Boolean = CurrentPetApi.currentPet?.coloredName == "Guardian"
 }

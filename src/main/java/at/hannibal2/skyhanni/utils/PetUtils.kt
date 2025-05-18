@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -26,7 +25,7 @@ object PetUtils {
     private val patternGroup = RepoPattern.group("misc.pet")
     private const val FORGE_BACK_SLOT = 48
     // Map of Pet Name to a Map of Skin Name to NeuPetSkinJson
-    val petSkins = mutableMapOf<String, MutableMap<String, NeuPetSkinJson>>()
+    val petSkins = mutableMapOf<String, MutableList<NeuPetSkinJson>>()
 
     private var baseXpLevelReqs: List<Int> = listOf()
     private var customXpLevelReqs: Map<String, NeuPetData>? = null
@@ -112,12 +111,6 @@ object PetUtils {
         return null
     }
 
-    fun rarityByColorGroup(color: String): LorenzRarity = LorenzRarity.getByColorCode(color[0])
-        ?: ErrorManager.skyHanniError(
-            "Unknown rarity",
-            Pair("rarity", color),
-        )
-
     private fun levelToXPCommand(input: Array<String>) {
         if (input.size < 3) {
             ChatUtils.userError("Usage: /shcalcpetxp <level> <rarity> <pet>")
@@ -154,6 +147,16 @@ object PetUtils {
 
         return xpList.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
     }
+
+    fun petNameToInternalName(name: String): NeuInternalName? {
+        val rarity = LorenzRarity.getByColorCode(
+            name.substring(1, 2)[0]
+        ) ?: return null
+        return petNameAndRarityToInternalName(name.substring(2), rarity)
+    }
+
+    fun petNameAndRarityToInternalName(name: String, rarity: LorenzRarity): NeuInternalName =
+        "${name.removeColor()};${rarity.id}".toInternalName()
 
     fun internalNameToPetName(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
         val (name, rarityStr) = internalName.asString().split(";")
@@ -231,13 +234,11 @@ object PetUtils {
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
             petSkinNamePattern.matchMatcher(rawInternalName) {
                 val petName = group("pet") ?: return@matchMatcher
-                // Skin name can be empty, see PET_SKIN_ENDERMAN, PET_SKIN_RABBIT, etc.
-                val skinName = groupOrNull("skin").orEmpty()
 
                 // Use GSON to reflect the JSON into a NeuPetSkinJson object
                 val petItemData = Gson().fromJson(jsonObject, NeuPetSkinJson::class.java)
 
-                petSkins.getOrPut(petName) { mutableMapOf() }[skinName] = petItemData
+                petSkins.getOrPut(petName) { mutableListOf() }.add(petItemData)
             }
         }
     }
