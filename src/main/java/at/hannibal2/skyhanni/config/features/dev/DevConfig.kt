@@ -131,7 +131,8 @@ class DevConfig {
     @ConfigOption(
         name = "Use Hypixel Mod API",
         desc = "Use the Hypixel Mod API for better location data.\n" +
-            "§cNote: this setting may be disabled remotely, and will only work on beta versions.")
+            "§cNote: this setting may be disabled remotely, and will only work on beta versions."
+    )
     @ConfigEditorBoolean
     var hypixelModApi: Boolean = false // should this be default on or off?
 
