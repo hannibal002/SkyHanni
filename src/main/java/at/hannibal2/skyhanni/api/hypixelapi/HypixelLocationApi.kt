@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledFeaturesJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.gson.annotations.Expose
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.LobbyType
 import net.hypixel.data.type.ServerType
@@ -209,18 +209,16 @@ object HypixelLocationApi {
 
     private fun dataToString(pair: Pair<String, Any?>) = "${pair.first}: ${pair.second}"
 
-    private data class HypixelModApiJson(
-        @Expose val enabled: Boolean = false,
-    )
-
     var isModApiDetection: Boolean = false
         get() = field && config && SkyHanniMod.isBetaVersion
         private set
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val constant = event.getConstantOrDefault<HypixelModApiJson>("HypixelModApi") { HypixelModApiJson() }
-        isModApiDetection = constant.enabled
+        val constant = event.getConstantOrNull<DisabledFeaturesJson>("DisabledFeatures")
+            ?: DisabledFeaturesJson()
+        val isDisabled = constant.features["hypixel_mod_api"] ?: false
+        isModApiDetection = !isDisabled
     }
 
 }

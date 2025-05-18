@@ -134,7 +134,7 @@ class DevConfig {
             "§cNote: this setting may be disabled remotely, and will only work on beta versions."
     )
     @ConfigEditorBoolean
-    var hypixelModApi: Boolean = false // should this be default on or off?
+    var hypixelModApi: Boolean = false
 
     @Expose
     @ConfigOption(name = "Hypixel Ping API", desc = "Use the Hypixel Mod API for calculating the ping.")
