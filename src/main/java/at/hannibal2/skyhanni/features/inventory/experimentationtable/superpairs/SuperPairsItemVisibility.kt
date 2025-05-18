@@ -57,7 +57,7 @@ object SuperPairsItemVisibility {
     }
 
     @HandleEvent
-    private fun InventoryOpenEvent.tryReadSuperpairsSlots() {
+    fun InventoryOpenEvent.tryReadSuperpairsSlots() {
         if (!ExperimentationTableApi.inTable || ExperimentationTableApi.currentExperimentType != TaskType.SUPERPAIRS) return
         if (superpairsSlotsToRead.isEmpty()) return
 
