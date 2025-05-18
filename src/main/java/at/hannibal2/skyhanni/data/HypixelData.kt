@@ -44,6 +44,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HypixelData {
 
+    private val isModApiDetection get() = HypixelLocationApi.isModApiDetection
+
     private val patternGroup = RepoPattern.group("data.hypixeldata")
 
     // TODO add regex tests
@@ -203,7 +205,6 @@ object HypixelData {
 
         TabWidget.SERVER.matchMatcherFirstLine {
             serverId = group("serverid")
-            HypixelLocationApi.checkEquals()
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
             lastSuccessfulServerIdFetchType = "tab list"
             failedServerIdFetchCounter = 0
@@ -213,7 +214,6 @@ object HypixelData {
         serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             val serverType = if (group("servertype") == "M") "mega" else "mini"
             serverId = "$serverType${group("serverid")}"
-            HypixelLocationApi.checkEquals()
             lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
             lastSuccessfulServerIdFetchType = "scoreboard"
             failedServerIdFetchCounter = 0
@@ -421,15 +421,15 @@ object HypixelData {
         val nowOnHypixel = LorenzUtils.onHypixel
         when {
             !wasOnHypixel && nowOnHypixel -> {
-                HypixelJoinEvent.post()
+                if (!isModApiDetection) HypixelJoinEvent.post()
                 RepoManager.displayRepoStatus(true)
             }
             wasOnHypixel && !nowOnHypixel -> {
                 if (skyBlock) {
                     skyBlock = false
-                    SkyBlockLeaveEvent.post()
+                    if (!isModApiDetection) SkyBlockLeaveEvent.post()
                 }
-                HypixelLeaveEvent.post()
+                if (!isModApiDetection) HypixelLeaveEvent.post()
             }
         }
 
@@ -443,13 +443,12 @@ object HypixelData {
             checkCurrentServerId()
         } else {
             if (!skyBlock) {
-                SkyBlockLeaveEvent.post()
+                if (!isModApiDetection) SkyBlockLeaveEvent.post()
             }
         }
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
-        HypixelLocationApi.checkEquals()
     }
 
     private fun sendLocraw() {
@@ -464,7 +463,7 @@ object HypixelData {
         val oldIsland = skyBlockIsland
         if (oldIsland != IslandType.NONE) {
             skyBlockIsland = IslandType.NONE
-            IslandChangeEvent(IslandType.NONE, oldIsland)
+            if (!isModApiDetection) IslandChangeEvent(IslandType.NONE, oldIsland)
         }
     }
 
@@ -523,7 +522,6 @@ object HypixelData {
         }
 
         hypixelLive = hypixel && !hypixelAlpha
-        HypixelLocationApi.checkEquals()
     }
 
     private fun checkSidebar() {
@@ -570,8 +568,7 @@ object HypixelData {
         if (skyBlockIsland != newIsland) {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland
-            IslandChangeEvent(newIsland, oldIsland).post()
-            HypixelLocationApi.checkEquals()
+            if (!isModApiDetection) IslandChangeEvent(newIsland, oldIsland).post()
 
             if (newIsland == IslandType.UNKNOWN) {
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")

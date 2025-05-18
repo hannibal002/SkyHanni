@@ -127,11 +127,13 @@ class DevConfig {
     @ConfigEditorBoolean
     var numberFormatOverride: Boolean = false
 
-    // TODO reenable the setting once the hypixel mod api works fine
-//     @Expose
-//     @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
-//     @ConfigEditorBoolean
-//     var hypixelModApi: Boolean = true
+    @Expose
+    @ConfigOption(
+        name = "Use Hypixel Mod API",
+        desc = "Use the Hypixel Mod API for better location data.\n" +
+            "§cNote: this setting may be disabled remotely, and will only work on beta versions.")
+    @ConfigEditorBoolean
+    var hypixelModApi: Boolean = false // TODO: should this be defalt on or off?
 
     @Expose
     @ConfigOption(name = "Hypixel Ping API", desc = "Use the Hypixel Mod API for calculating the ping.")

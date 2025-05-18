@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.misc.IslandAreas
@@ -11,18 +12,40 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 object SkyBlockUtils {
 
-    val onHypixel get() = HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
+    private val isModApiDetection get() = HypixelLocationApi.isModApiDetection
 
-    val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
+    val onHypixel: Boolean
+        get() {
+            val inHypixel = if (isModApiDetection) HypixelLocationApi.inHypixel else HypixelData.connectedToHypixel
+            return inHypixel && MinecraftCompat.localPlayerExists
+        }
 
-    val inSkyBlock get() = onHypixel && HypixelData.skyBlock
+    val isOnAlphaServer: Boolean
+        get() {
+            val inAlpha = if (isModApiDetection) HypixelLocationApi.inAlpha else HypixelData.hypixelAlpha
+            return onHypixel && inAlpha
+        }
 
-    val inHypixelLobby get() = onHypixel && HypixelData.inLobby
+    val inSkyBlock: Boolean
+        get() {
+            val inSkyblock = if (isModApiDetection) HypixelLocationApi.inSkyblock else HypixelData.skyBlock
+            return onHypixel && inSkyblock
+        }
+
+    val inHypixelLobby: Boolean
+        get() {
+            val inLobby = if (isModApiDetection) HypixelLocationApi.inLobby else HypixelData.inLobby
+            return onHypixel && inLobby
+        }
 
     /**
      * Consider using [IslandType.isInIsland] instead
      */
-    val currentIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
+    val currentIsland: IslandType
+        get() {
+            val island = if (isModApiDetection) HypixelLocationApi.island else HypixelData.skyBlockIsland
+            return SkyBlockIslandTest.testIsland ?: island
+        }
 
     // almost always prefer this over scoreboardArea
     val graphArea get() = if (inSkyBlock) IslandAreas.currentArea else null

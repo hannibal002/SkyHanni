@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
@@ -25,22 +24,22 @@ import net.minecraft.entity.SharedMonsterAttributes
 object LorenzUtils {
 
     @Deprecated("moved", ReplaceWith("SkyBlockUtils.onHypixel"))
-    val onHypixel get() = HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
+    val onHypixel get() = SkyBlockUtils.onHypixel
 
     @Deprecated("moved", ReplaceWith("SkyBlockUtils.isOnAlphaServer"))
-    val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
+    val isOnAlphaServer get() = SkyBlockUtils.isOnAlphaServer
 
     @Deprecated("moved", ReplaceWith("SkyBlockUtils.inSkyBlock"))
-    val inSkyBlock get() = onHypixel && HypixelData.skyBlock
+    val inSkyBlock get() = SkyBlockUtils.inSkyBlock
 
     @Deprecated("moved", ReplaceWith("SkyBlockUtils.inHypixelLobby"))
-    val inHypixelLobby get() = onHypixel && HypixelData.inLobby
+    val inHypixelLobby get() = SkyBlockUtils.inHypixelLobby
 
     /**
      * Consider using [IslandType.isInIsland] instead
      */
     @Deprecated("moved", ReplaceWith("SkyBlockUtils.currentIsland"))
-    val skyBlockIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
+    val skyBlockIsland get() = SkyBlockUtils.currentIsland
 
     @Deprecated("Scoreboard data is updating delayed while moving, dont use.", ReplaceWith("SkyBlockUtils.graphArea"))
     val skyBlockArea get() = scoreboardArea

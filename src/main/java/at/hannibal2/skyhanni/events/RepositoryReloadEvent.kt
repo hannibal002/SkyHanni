@@ -24,4 +24,15 @@ class RepositoryReloadEvent(val repoLocation: File, val gson: Gson) : SkyHanniEv
     } catch (e: Exception) {
         throw RepoError("Repo parsing error while trying to read constant '$constant'", e)
     }
+
+    inline fun <reified T : Any> getConstantOrDefault(
+        constant: String,
+        type: Type? = null,
+        gson: Gson = this.gson,
+        default: () -> T,
+    ): T = try {
+        getConstant(constant, type, gson)
+    } catch (e: Exception) {
+        default()
+    }
 }
