@@ -73,8 +73,11 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
 
                 // Check if the function's parameter is a SkyHanniEvent or its subtype
                 // TODO fix it for K2 mode instead of leaving the function (the try catch)
-                val isEvent = try{function.valueParameters.firstOrNull()?.type()?.supertypes()
-                    ?.any { it.fqName?.asString() == skyhanniEvent }}catch (e: Throwable){return} ?: false
+                val isEvent = try {
+                    function.valueParameters.firstOrNull()?.type()?.supertypes()?.any { it.fqName?.asString() == skyhanniEvent }
+                } catch (e: Throwable) {
+                    return
+                } ?: false
 
                 // Find the annotation entry
                 val annotationEntry = function.annotationEntries
