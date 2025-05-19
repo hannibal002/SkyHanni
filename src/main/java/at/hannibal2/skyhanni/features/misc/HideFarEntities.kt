@@ -65,6 +65,7 @@ object HideFarEntities {
     private fun updateNeverHide() {
         val list = mutableSetOf<Entity>()
         val allEntities = EntityUtils.getAllEntities()
+
         if (DungeonApi.inDungeon()) {
             list += allEntities.filter { it is EntityWither || it is EntityDragon }
             list += DungeonMobManager.starredVisibleMobs.map { it.baseEntity }
@@ -83,10 +84,10 @@ object HideFarEntities {
             list += allEntities.filter { it is EntityGhast || it is EntityGolem }
         }
 
-        for (member in PartyApi.partyMembers) {
-            list += allEntities.filter { it is EntityOtherPlayerMP || it.name in PartyApi.partyMembers }
-        }
+        // Always show boss bar
+        list += allEntities.filter { it is EntityWither && it.entityId < 0 }
 
+        list += allEntities.filter { it is EntityOtherPlayerMP || it.name in PartyApi.partyMembers }
         list += DamageIndicatorManager.getAllMobs()
         list += AreaMiniBossFeatures.currentMobs.map { it.baseEntity }
 
@@ -97,8 +98,6 @@ object HideFarEntities {
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         val entity = event.entity
-        // Always show boss bar
-        if (entity is EntityWither && entity.entityId < 0) return
         if (entity.entityId in ignored) {
             event.cancel()
         }
