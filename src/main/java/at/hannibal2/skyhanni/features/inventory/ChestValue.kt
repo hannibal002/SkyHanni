@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -124,10 +125,11 @@ object ChestValue {
             if (total < config.hideBelow) continue
             val textAmount = " §7x${amount.addSeparators()}:"
             val width = Minecraft.getMinecraft().fontRendererObj.getStringWidth(textAmount)
-            val name = "${stack.repoItemName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
+            val displayName = stack.repoItemNameCompact
+            val name = "${displayName.reduceStringLength((config.nameLength - width), ' ')} $textAmount"
             val price = "§6${(total).formatPrice()}"
             val text = if (config.alignedDisplay) "$name $price"
-            else "${stack.repoItemName} §7x$amount: §6${total.formatPrice()}"
+            else "$displayName §7x$amount: §6${total.formatPrice()}"
 
             addLine {
                 val renderable = Renderable.hoverTips(
