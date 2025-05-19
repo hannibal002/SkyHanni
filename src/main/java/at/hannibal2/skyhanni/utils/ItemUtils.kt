@@ -626,6 +626,7 @@ object ItemUtils {
 
     val NeuInternalName.repoItemNameCompact get() = compactItemNameCache.getOrPut(this) { getRepoCompactName() }
 
+    // TODO hey a repo might actually be useful
     private fun NeuInternalName.getRepoCompactName() = repoItemName
         .replace("Enchanted", "Ench")
         .replace("Mushroom", "Mush")
