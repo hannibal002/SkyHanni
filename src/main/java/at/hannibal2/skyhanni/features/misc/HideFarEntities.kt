@@ -90,7 +90,7 @@ object HideFarEntities {
         // Always show boss bar
         list += allEntities.filter { it is EntityWither && it.entityId < 0 }
 
-        list += allEntities.filter { it is EntityOtherPlayerMP || it.name in PartyApi.partyMembers }
+        list += allEntities.filter { it is EntityOtherPlayerMP && it.name in PartyApi.partyMembers }
         list += DamageIndicatorManager.getAllMobs()
         list += AreaMiniBossFeatures.currentMobs.map { it.baseEntity }
 
