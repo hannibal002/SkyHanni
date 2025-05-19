@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
@@ -80,6 +81,10 @@ object HideFarEntities {
         if (IslandType.DWARVEN_MINES.isCurrent()) {
             // powder ghast & golem defender (from goblin raid event)
             list += allEntities.filter { it is EntityGhast || it is EntityGolem }
+        }
+
+        for (member in PartyApi.partyMembers) {
+            list += allEntities.filter { it is EntityOtherPlayerMP || it.name in PartyApi.partyMembers }
         }
 
         list += DamageIndicatorManager.getAllMobs()
