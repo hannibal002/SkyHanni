@@ -67,12 +67,14 @@ object HideFarEntities {
         val allEntities = EntityUtils.getAllEntities()
 
         if (DungeonApi.inDungeon()) {
+            list += allEntities.filter { it.name == "Mort" }
             list += allEntities.filter { it is EntityWither || it is EntityDragon }
             list += DungeonMobManager.starredVisibleMobs.map { it.baseEntity }
             // other party members
             list += allEntities.filter { it is EntityOtherPlayerMP && !it.isNpc() }
         }
         if (KuudraApi.inKuudra) {
+            list += allEntities.filter { it.name == "Elle" }
             // other party members
             list += allEntities.filter { it is EntityOtherPlayerMP && !it.isNpc() }
         }
