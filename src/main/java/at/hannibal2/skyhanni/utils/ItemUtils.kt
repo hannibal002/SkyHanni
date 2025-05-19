@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -72,6 +73,7 @@ import kotlin.time.Duration.Companion.seconds
 //#endif
 
 @SkyHanniModule
+@Suppress("LargeClass")
 object ItemUtils {
 
     private val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
@@ -127,8 +129,8 @@ object ItemUtils {
 
     fun NeuInternalName.getRawBaseStats(): Map<String, Int> = itemBaseStatsRaw[this].orEmpty()
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(SkyHanniMod.feature.misc.replaceRomanNumerals) {
             itemNameCache.clear()
             compactItemNameCache.clear()
@@ -680,6 +682,7 @@ object ItemUtils {
     val NeuInternalName.readableInternalName: String
         get() = asString().replace("_", " ").lowercase()
 
+    @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
@@ -877,7 +880,7 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
-        if (!LorenzUtils.debug && !PlatformUtils.isDevEnvironment) return
+        if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()
