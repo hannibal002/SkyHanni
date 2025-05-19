@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -68,14 +69,14 @@ object HideFarEntities {
         val allEntities = EntityUtils.getAllEntities()
 
         if (DungeonApi.inDungeon()) {
-            list += allEntities.filter { it.name == "Mort" }
+            list += allEntities.filter { it.mob?.name == "Mort" }
             list += allEntities.filter { it is EntityWither || it is EntityDragon }
             list += DungeonMobManager.starredVisibleMobs.map { it.baseEntity }
             // other party members
             list += allEntities.filter { it is EntityOtherPlayerMP && !it.isNpc() }
         }
         if (KuudraApi.inKuudra) {
-            list += allEntities.filter { it.name == "Elle" }
+            list += allEntities.filter { it.mob?.name == "Elle" }
             // other party members
             list += allEntities.filter { it is EntityOtherPlayerMP && !it.isNpc() }
         }
