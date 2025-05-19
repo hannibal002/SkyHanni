@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 //#endif
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.util.function.Consumer
 
 typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
@@ -28,7 +29,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
     }
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
-        require(method.isAccessible) {
+        require(Modifier.isPublic(method.modifiers)) {
             "Method ${method.name} in ${instance.javaClass.name} must be accessible. Make sure to set it to public."
         }
         val name = buildListenerName(method)
