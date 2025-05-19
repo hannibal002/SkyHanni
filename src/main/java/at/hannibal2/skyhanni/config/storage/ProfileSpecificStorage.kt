@@ -37,6 +37,9 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
+import at.hannibal2.skyhanni.features.inventory.shoppinglist.CategoryTemplate
+import at.hannibal2.skyhanni.features.inventory.shoppinglist.CategoryTemplate.Companion.toCategoryTemplate
+import at.hannibal2.skyhanni.features.inventory.shoppinglist.ShoppingListCategory
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
@@ -642,6 +645,17 @@ class ProfileSpecificStorage {
 
         @Expose
         var currentSlot: Int? = null
+    }
+
+    @Expose
+    var shoppingList: ShoppingListStorage = ShoppingListStorage()
+
+    class ShoppingListStorage {
+        @Expose
+        var categories: MutableList<CategoryTemplate> = mutableListOf()
+
+        @Expose
+        var items: CategoryTemplate = ShoppingListCategory("Items").toCategoryTemplate()
     }
 
     // - mining

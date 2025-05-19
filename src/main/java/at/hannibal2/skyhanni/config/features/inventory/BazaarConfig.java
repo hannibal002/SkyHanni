@@ -54,18 +54,4 @@ public class BazaarConfig {
     @Expose
     @ConfigLink(owner = BazaarConfig.class, field = "maxPurseItems")
     public Position maxPurseItemsPosition = new Position(346, 90, true, false);
-
-    @Expose
-    @ConfigOption(
-        name = "Craft Materials Bazaar",
-        desc = "In the crafting view, offer a shopping list of required materials for the craft along with a shortcut for purchasing them from the Bazaar or Auction House."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    // TODO rename and move
-    public boolean craftMaterialsFromBazaar = false;
-
-    @Expose
-    @ConfigLink(owner = BazaarConfig.class, field = "craftMaterialsFromBazaar")
-    public Position craftMaterialsFromBazaarPosition = new Position(50, 50, true, false);
 }

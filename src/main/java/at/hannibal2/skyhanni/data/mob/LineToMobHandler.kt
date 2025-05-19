@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.render.LineDrawer
 import java.awt.Color
 
 @SkyHanniModule
@@ -44,7 +44,7 @@ object LineToMobHandler {
         if (lines.isEmpty()) return
 
         val playerLocation = event.exactPlayerEyeLocation()
-        RenderUtils.LineDrawer.draw3D(event.partialTicks) {
+        LineDrawer.draw3D(event.partialTicks) {
             for ((mob, settings) in lines) {
                 if (!settings.condition() || !mob.canBeSeen()) continue
                 draw3DLine(mob.centerCords, playerLocation, settings.color, settings.width, settings.depth)

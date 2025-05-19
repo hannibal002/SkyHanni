@@ -18,7 +18,9 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.renderOnScreen
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.getKeyName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -76,6 +78,7 @@ interface Renderable {
      */
     fun render(posX: Int, posY: Int)
 
+    @Suppress("LargeClass")
     companion object {
 
         val logger = LorenzLogger("debug/renderable")
@@ -166,6 +169,33 @@ interface Renderable {
             onHover: () -> Unit = {},
         ) = clickable(RenderableString(text), onAnyClick, bypassChecks, condition, tips, onHover)
 
+        fun clickableWithModifiers(
+            text: String,
+            onAnyClick: Map<ClickTypeWithModifiers, () -> Unit>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            tips: List<Any>? = null,
+            onHover: () -> Unit = {},
+        ) = clickableWithModifiers(string(text), onAnyClick, bypassChecks, condition, tips, onHover)
+
+        fun clickableWithModifiers(
+            render: Renderable,
+            onAnyClick: Map<ClickTypeWithModifiers, () -> Unit>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            tips: List<Any>? = null,
+            onHover: () -> Unit = {},
+        ) = multiClickableWithModifiers(
+            tips?.let {
+                hoverTips(render, it, bypassChecks = bypassChecks, onHover = onHover)
+            } ?: onHover.takeIf { it != {} }?.let {
+                hoverable(render, render, bypassChecks = bypassChecks, onHover = onHover)
+            } ?: render,
+            onAnyClick,
+            bypassChecks,
+            condition,
+        )
+
         fun clickable(
             render: Renderable,
             /**
@@ -225,6 +255,76 @@ interface Renderable {
                 if (!processed) nonStandardClick()
             }
         }
+
+        data class ClickTypeWithModifiers(
+            val clickType: Int,
+            val modifiers: Set<Int> = emptySet(),
+        ) {
+            override fun toString(): String {
+                return "ClickTypeWithModifiers(clickType=${getKeyName(clickType)}, modifiers=${modifiers.map { getKeyName(it) }})"
+            }
+        }
+
+        private fun multiClickableWithModifiers(
+            render: Renderable,
+            onAnyClick: Map<ClickTypeWithModifiers, () -> Unit>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            nonStandardClick: () -> Unit = {},
+        ): Renderable {
+
+            val sortedOnAnyClick = onAnyClick.toSortedMap { o1: ClickTypeWithModifiers, o2: ClickTypeWithModifiers ->
+                val modifierSizeComparison = o2.modifiers.sum().compareTo(o1.modifiers.sum())
+                if (modifierSizeComparison != 0) {
+                    modifierSizeComparison
+                } else {
+                    o1.clickType.compareTo(o2.clickType) // This ensures that ClickType is also considered
+                }
+            }
+
+            val orderedOnAnyClick: Map<Int, Map<ClickTypeWithModifiers, () -> Unit>> = sortedOnAnyClick.entries
+                .groupBy { entry -> entry.key.clickType }
+                .mapValues { entry -> entry.value.associate { it.key to it.value } }
+
+            val allRelevantModifiers: List<Int> = sortedOnAnyClick.keys.flatMap { it.modifiers }
+
+            return object : Renderable {
+                override val width = render.width
+                override val height = render.height
+                override val horizontalAlign = render.horizontalAlign
+                override val verticalAlign = render.verticalAlign
+
+                override fun render(posX: Int, posY: Int) {
+                    if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                        handleClickChecks()
+                    }
+                    render.render(posX, posY)
+                }
+
+                private fun handleClickChecks() {
+                    var processed = false
+
+                    val allPressedKeys = allRelevantModifiers.associateWith { it.isKeyHeld() }
+
+                    for ((clickType, value) in orderedOnAnyClick) {
+                        if (clickType.isKeyClicked() != true) continue
+
+                        for ((key, onKeyClicked) in value) {
+                            if (key.modifiers.isEmpty() || key.modifiers.all { allPressedKeys[it] == true }) {
+                                onKeyClicked()
+                                processed = true
+                                break
+                            }
+                        }
+                        if (processed) {
+                            break
+                        }
+                    }
+                    if (!processed) nonStandardClick()
+                }
+            }
+        }
+
 
         fun clickableAndScrollable(
             render: Renderable,
