@@ -59,8 +59,8 @@ class DamageIndicatorConfig {
     enum class BossCategory(private val displayName: String) {
         NETHER_MINI_BOSSES("§bNether Mini Bosses"),
         VANQUISHER("§bVanquisher"),
-        ENDERSTONE_PROTECTOR("§bEndstone Protector (not tested)"),
-        ENDER_DRAGON("§bEnder Dragon (not finished)"),
+        ENDERSTONE_PROTECTOR("§bEndstone Protector"),
+        ENDER_DRAGON("§bEnder Dragon"),
         REVENANT_HORROR("§bRevenant Horror"),
         TARANTULA_BROODFATHER("§bTarantula Broodfather"),
         SVEN_PACKMASTER("§bSven Packmaster"),

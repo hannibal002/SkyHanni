@@ -33,6 +33,11 @@
 
 + Improved Crystal Hollows Names in Nucleus Core to show the other three area names sooner. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3923)
 
+#### Farming Islands
+
++ Added option to disable the Trevor Ready title. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3947)
++ Removed Warp To Trapper cooldown after dialogue. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3947)
+
 #### Misc
 
 + Improved performance slightly when Island Area feature is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3912)
@@ -55,6 +60,7 @@
 + Fixed missing items in Organic Matter Overlay. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3938)
 + Fixed Pest Particle Waypoints. - Empa (https://github.com/hannibal002/SkyHanni/pull/3924)
     + This replaces the Pest Particle Line feature, which was supposed to be a temporary fix when Pest Particle Waypoints was broken.
++ Fixed Custom Scoreboard error when visiting a garden. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3948)
 
 #### Chat
 
@@ -64,6 +70,7 @@
 
 + Fixed Craft Room Holographic Helper requiring NEU to be installed. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3894)
 + Fixed Sun Gecko Helper sometimes not showing up. - Luna (https://github.com/hannibal002/SkyHanni/pull/3920)
++ Fixed Blood Ichor line sometimes not displaying during Rift Slayer. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3976)
 
 #### Inventory
 
@@ -78,6 +85,10 @@
 
 + Fixed other particles interfering with hotspot guesses. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3913)
 
+#### Hoppity
+
++ Fixed incorrect order for Unclaimed Eggs when set to Meal Order. - Luna (https://github.com/hannibal002/SkyHanni/pull/3958)
+
 #### Misc
 
 + Fixed Hide Autopet Messages incorrectly hiding manual pet summon/despawn messages. - Luna (https://github.com/hannibal002/SkyHanni/pull/3895)
@@ -87,6 +98,10 @@
 + Fixed Item Profit Trackers not using NPC price for some items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3917)
 + Fixed Trevor Mob detection for non-English languages. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3555)
 + Fixed Trevor Trapper triggering on invisible mobs or while blinded. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3555)
++ Fixed conflicts with other mods blocking inventory-click detection. - nopo (https://github.com/hannibal002/SkyHanni/pull/3964)
+    + Notably `Cancelled Buy Order Clipboard` with Enchanted Books, and `Visitor Accept` clicks when Skytils’ `Middle Click GUI Items` is enabled.
++ Fixed rare error when loading items from NEU Repo. - nopo (https://github.com/hannibal002/SkyHanni/pull/3968)
++ Fixed rare rendering crash. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3949)
 
 ### Technical Details
 
@@ -112,6 +127,16 @@
 + Removed unnecessary float decimals. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3929)
 + Renamed a lot of `pos` to `position` in configs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3790)
 + Used `DrawContext` for rendering strings and renderables. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3687)
++ Added `//#if TODO` preprocessor instruction. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3951)
++ Added IslandTypeTags. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2241)
++ Added Shiny Pig to Mob Detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2104)
++ Created `SkyBlockUtils`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3946)
++ Deprecated `LorenzUtils`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3946)
++ Extracted QuadDrawer and LineDrawer into separate classes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3950)
++ Fixed detekt false-flagging file-wide suppressions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3973)
++ Got the game launching with the config and events on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3939)
++ K2 mode & live plugins no longer error. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3935)
+    + The errors are just silents, so the someone should fix them.
 
 ## Version 3.0.0
 
