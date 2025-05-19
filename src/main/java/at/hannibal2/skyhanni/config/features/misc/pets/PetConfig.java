@@ -23,7 +23,7 @@ public class PetConfig {
 
     @Expose
     @ConfigLink(owner = PetConfig.class, field = "display")
-    public Position displayPos = new Position(-330, -15, false, true);
+    public Position displayPos = new Position(-330, -15);
 
     @Expose
     @ConfigOption(name = "Pet Experience Tooltip", desc = "")

@@ -19,11 +19,12 @@ object ItemBuyApi {
         }
     }
 
-    fun NeuInternalName.createBuyTip() = listOf(
-        when {
-            isBazaarItem() -> "§eClick to search for $repoItemName §ein Bazaar!"
-            isAuctionHouseItem() -> "§eClick to search for $repoItemName §ein Auction House!"
-            else -> "§cCould not find $repoItemName §eon AH or BZ!"
-        },
-    )
+    fun NeuInternalName.createBuyTipLine(additionalAction: String = "") = when {
+        isBazaarItem() -> "§e${additionalAction}Click to search for $repoItemName §ein Bazaar!"
+        isAuctionHouseItem() -> "§e${additionalAction}Click to search for $repoItemName §ein Auction House!"
+        else -> "§cCould not find $repoItemName §eon AH or BZ!"
+    }
+
+    fun NeuInternalName.createBuyTip() = listOf(createBuyTipLine())
+
 }
