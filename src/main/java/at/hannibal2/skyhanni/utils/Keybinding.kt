@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.minecraft.KeyReleaseEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import net.minecraft.client.Minecraft
 import kotlin.reflect.KClass
 import kotlin.time.Duration
@@ -74,8 +73,8 @@ class Keybinding(
     fun isActive() = active
 
     private fun checkIsActive(): Boolean {
-        if (onlyOnIsland != IslandType.ANY && !onlyOnIsland.isInIsland()) return false
-        if (onlyOnIslands.isNotEmpty() && !onlyOnIslands.any { it.isInIsland() }) return false
+        if (onlyOnIsland != IslandType.ANY && !onlyOnIsland.isCurrent()) return false
+        if (onlyOnIslands.isNotEmpty() && !onlyOnIslands.any { it.isCurrent() }) return false
         return checkCondition()
     }
 
