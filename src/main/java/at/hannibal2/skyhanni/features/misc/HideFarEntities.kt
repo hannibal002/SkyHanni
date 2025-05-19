@@ -53,6 +53,7 @@ object HideFarEntities {
      * golden/diamond golbins (mining islands)
      * beach ball (great and normal, from year of the seal)
      * worms/scatha in dwarven mines
+     * dungeon wither+blood key
      *
      * add to damage indicator:
      * jerries (from jerry mayor event)
