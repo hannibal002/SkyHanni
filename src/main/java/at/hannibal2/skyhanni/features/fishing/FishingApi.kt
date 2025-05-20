@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
+import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
@@ -31,6 +35,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FishingApi {
@@ -58,6 +63,10 @@ object FishingApi {
     private val waterBlocks = buildList { addWaters() }
 
     var lastCastTime = SimpleTimeMark.farPast()
+        private set
+    var lastReelTime = SimpleTimeMark.farPast()
+        private set
+    var lastCatchSound = SimpleTimeMark.farPast()
         private set
     var holdingRod = false
         private set
@@ -109,6 +118,7 @@ object FishingApi {
 
         val bobber = bobber ?: return
         if (bobber.isDead) {
+            if (lastReelTime.passedSince() < .5.seconds && lastCatchSound.passedSince() < .5.seconds) FishingCatchEvent.post()
             resetBobber()
         } else {
             if (!bobberHasTouchedLiquid) {
@@ -122,6 +132,19 @@ object FishingApi {
                 FishingBobberInLiquidEvent(bobber, isWater).post()
             }
         }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (!holdingRod) return
+        if (event.soundName == "random.orb" && event.volume == .5F) lastCatchSound = SimpleTimeMark.now()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onClick(event: WorldClickEvent) {
+        if (event.clickType != ClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
+        if (lastReelTime.passedSince() < .3.seconds) return
+        lastReelTime = SimpleTimeMark.now()
     }
 
     fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
