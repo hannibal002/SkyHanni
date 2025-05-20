@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
+import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -267,6 +268,11 @@ object FishingProfitTracker {
 
     @HandleEvent
     fun onCatch(event: FishingCatchEvent) {
+        addCatch()
+    }
+
+    @HandleEvent
+    fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         addCatch()
     }
 
