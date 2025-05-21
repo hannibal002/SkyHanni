@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.getEventEndMark
@@ -33,7 +32,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -110,9 +108,10 @@ object HoppityLiveDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         reCheckInventoryState()
-        recheckHashClear(event)
+        if (!currentTimerActive) return
+        lastKnownStatHash = 0
     }
 
     @HandleEvent
@@ -125,7 +124,7 @@ object HoppityLiveDisplay {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: KeyPressEvent) {
         reCheckInventoryState()
         if (!liveDisplayConfig.enabled) return
@@ -138,7 +137,7 @@ object HoppityLiveDisplay {
         lastToggleMark = SimpleTimeMark.now()
     }
 
-    @HandleEvent(GuiRenderEvent::class)
+    @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
     fun onRenderOverlay() {
         if (!liveDisplayEnabled()) return
 
@@ -165,8 +164,7 @@ object HoppityLiveDisplay {
         val isEggLocatorEnabled = !liveDisplayConfig.mustHoldEggLocator || InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
         val isInventoryEnabled = liveDisplayConfig.specificInventories.isEmpty() || inMatchingInventory()
 
-        return LorenzUtils.inSkyBlock &&
-            !isToggledOff &&
+        return !isToggledOff &&
             isEnabled &&
             isIslandEnabled &&
             isEventEnabled &&
@@ -197,12 +195,6 @@ object HoppityLiveDisplay {
 
     private fun isInInventory(): Boolean =
         Minecraft.getMinecraft().currentScreen is GuiInventory || Minecraft.getMinecraft().currentScreen is GuiChest
-
-    private fun recheckHashClear(event: SecondPassedEvent) {
-        if (!currentTimerActive) return
-        if (!event.repeatSeconds(liveDisplayConfig.refreshFrequency)) return
-        lastKnownStatHash = 0
-    }
 
     private fun HoppityEventStats.buildMealEggHover(statYear: Int): List<String> = buildList {
         val spawnedEggs: Map<HoppityEggType, Int> = getSpawnedEggCounts(statYear).takeIfNotEmpty() ?: return@buildList

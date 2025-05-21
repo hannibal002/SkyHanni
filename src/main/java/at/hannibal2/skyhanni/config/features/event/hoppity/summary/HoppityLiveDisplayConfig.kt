@@ -72,16 +72,7 @@ class HoppityLiveDisplayConfig {
         desc = "Hovering over number of meal eggs found will show a tooltip of which eggs were found how many times."
     )
     @ConfigEditorBoolean
-    var mealEggHover: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Refresh Frequency",
-        desc = "How often the display will forcefully refresh.\n" +
-            "This will mainly affect how quickly timers count/update."
-    )
-    @ConfigEditorSlider(minValue = 1f, maxValue = 60f, minStep = 1f)
-    var refreshFrequency: Int = 1
+    var mealEggHover: Boolean = true
 
     @Expose
     @ConfigOption(name = "Card Toggle Keybind", desc = "Toggle the GUI element with this keybind.")
