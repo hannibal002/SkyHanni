@@ -578,15 +578,22 @@ object HoppityEventSummary {
         )
         else -> {
             val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSBYear(year).toMillis()
-            val currentCompleteCycles = (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() / 2
-            val (hourNow, isAltDay) = SkyBlockTime.now().let {
-                it.hour to it.isAlternateDay()
-            }
+            val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
+            val fullDays = (milliDifference / SKYBLOCK_DAY_MILLIS).toInt()
+            val remainderDays = fullDays % 2
+            val now = SkyBlockTime.now()
+            val isAltDayToday = now.isAlternateDay()
+            val isAltDayRemainder = remainderDays == 1 && !isAltDayToday
 
             HoppityEggType.resettingEntries.associateWith { eggType ->
-                currentCompleteCycles +
-                    if (isAltDay == eggType.altDay && hourNow >= eggType.resetsAt) 1
-                    else 0
+                var count = fullDays / 2
+
+                // +1 if that extra full day spawned this egg
+                if (remainderDays == 1 && isAltDayRemainder == eggType.altDay) count += 1
+                // +1 if _today_ has already passed this egg’s reset time
+                if (!pastEvent && isAltDayToday == eggType.altDay && now.hour >= eggType.resetsAt) count += 1
+
+                count
             }
         }
     }.also { yearSpawnCache[year] = it }
