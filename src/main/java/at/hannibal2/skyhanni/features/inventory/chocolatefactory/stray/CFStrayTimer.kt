@@ -13,14 +13,16 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isInventoryClosure
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -28,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CFStrayTimer {
 
-    private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs.strayTimer
+    private val config get() = SkyHanniMod.feature.event.hoppityEggs.strayTimer
     private var timer: Duration = Duration.ZERO
     private var lastTimerSubtraction: SimpleTimeMark? = SimpleTimeMark.farPast()
     private var lastPingTime = SimpleTimeMark.farPast()
@@ -48,7 +50,6 @@ object CFStrayTimer {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (!isEnabled()) return
         timer = Duration.ZERO
         lastTimerSubtraction = null
     }
@@ -64,7 +65,6 @@ object CFStrayTimer {
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!isEnabled()) return
         // Reset the timer when the inventory is closed prematurely
         timer = 30.seconds
         lastTimerSubtraction = null
@@ -72,11 +72,11 @@ object CFStrayTimer {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled() || !CFApi.inChocolateFactory) return
+        if (!isEnabled()) return
         lastTimerSubtraction = lastTimerSubtraction?.takeIfInitialized()?.let {
             timer -= it.passedSince()
             if (timer < Duration.ZERO) timer = Duration.ZERO
-            else if (timer < eventConfig.dingForTimer.seconds && lastPingTime.passedSince() > 1.seconds) {
+            else if (timer < config.dingForTimer.seconds && lastPingTime.passedSince() > 1.seconds) {
                 SoundUtils.playPlingSound()
                 lastPingTime = SimpleTimeMark.now()
             }
@@ -86,8 +86,8 @@ object CFStrayTimer {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled() || !CFApi.inChocolateFactory) return
-        eventConfig.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
+        if (!isEnabled()) return
+        config.strayTimerPosition.renderRenderable(getTimerRenderable(), posLabel = "Stray Timer")
     }
 
     @HandleEvent
@@ -97,18 +97,18 @@ object CFStrayTimer {
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isEnabled() || !eventConfig.blockClosing) return
+        if (!isEnabled() || !config.blockClosing) return
         if (event.slotId in destructiveSlots) {
             event.cancel()
             preventCloseTitle()
         }
     }
 
-    private fun getTimerRenderable(): Renderable = Renderable.verticalContainer(
+    private fun getTimerRenderable(): Renderable = VerticalContainerRenderable(
         listOf(
             "§eStray Timer",
             "§b${String.format(Locale.US, "%.2f", timer.inPartialSeconds)}s"
-        ).map { Renderable.string(it) }
+        ).map { RenderableString(it) }
     )
 
     private fun preventCloseTitle() {
@@ -123,11 +123,11 @@ object CFStrayTimer {
 
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int): Boolean {
-        if (!eventConfig.blockClosing) return true
-        val shouldContinue = !isInventoryClosure(keycode) || !isEnabled() || !CFApi.inChocolateFactory
-        if (!shouldContinue) preventCloseTitle()
-        return shouldContinue
+        if (!isInventoryClosure(keycode)) return true
+        if (!config.blockClosing || !isEnabled()) return true
+        preventCloseTitle()
+        return false
     }
 
-    private fun isEnabled() = eventConfig.enabled && timer > Duration.ZERO
+    private fun isEnabled() = config.enabled && InventoryUtils.openInventoryName() == "Chocolate Factory" && timer > Duration.ZERO
 }
