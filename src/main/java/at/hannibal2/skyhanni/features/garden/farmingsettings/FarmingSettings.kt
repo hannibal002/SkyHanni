@@ -39,7 +39,7 @@ object FarmingSettings {
 
         config.signPosition.renderRenderables(
             display,
-            posLabel = "Optimal Settings Overlay",
+            posLabel = "Optimal Farming Settings Overlay",
         )
     }
 
