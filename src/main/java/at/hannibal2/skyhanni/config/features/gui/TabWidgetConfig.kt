@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.PositionList
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.gui.TabWidgetDisplay
 //#endif
 import com.google.gson.annotations.Expose
@@ -34,7 +34,7 @@ class TabWidgetConfig {
     @ConfigEditorInfoText
     var text2: String? = null
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Widgets", desc = "")
     @ConfigEditorDraggableList

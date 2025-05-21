@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.test.command
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
@@ -84,7 +84,7 @@ object ErrorManager {
 //         ),
 //     )
 
-    //#if MC < 1.21
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shtestreseterrorcache") {

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 //#endif
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -127,7 +127,7 @@ object ConfigUpdaterMigrator {
                 return
             }
             movesPerformed++
-            //#if MC < 1.21
+            //#if TODO
             if (np == listOf("#player", "personalBest")) LimboTimeTracker.workaroundMigration(oldElem.asInt)
             //#endif
             newParentElement.add(np.last(), transform(oldElem.shDeepCopy()))

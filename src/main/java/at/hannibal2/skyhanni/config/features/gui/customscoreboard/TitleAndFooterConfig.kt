@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils
 //#endif
 import com.google.gson.annotations.Expose
@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 // todo 1.21 impl needed
 class TitleAndFooterConfig {
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Title Alignment", desc = "Align the title in the scoreboard.")
     @ConfigEditorDropdown
@@ -38,7 +38,7 @@ class TitleAndFooterConfig {
     @ConfigEditorBoolean
     var useCustomTitleOutsideSkyBlock: Boolean = false
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Footer Alignment", desc = "Align the footer in the scoreboard.")
     @ConfigEditorDropdown

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 //#endif
 import at.hannibal2.skyhanni.config.HasLegacyId
@@ -85,7 +85,7 @@ object ConfigUtils {
     }
 
     fun KMutableProperty0<*>.jumpToEditor() {
-        //#if MC < 1.21
+        //#if TODO
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
         //#endif
 

@@ -108,7 +108,7 @@ object RepoUtils {
 
     @JvmStatic
     fun resetRepoLocation() {
-        //#if MC < 1.21
+        //#if TODO
         RepoManager.resetRepositoryLocation(manual = true)
         //#endif
     }

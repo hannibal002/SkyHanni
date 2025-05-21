@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFStats.CFStat
 //#endif
 import com.google.gson.annotations.Expose
@@ -28,7 +28,7 @@ class CFConfig {
     @FeatureToggle
     var statsDisplay: Boolean = true
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(
         name = "Stats List",

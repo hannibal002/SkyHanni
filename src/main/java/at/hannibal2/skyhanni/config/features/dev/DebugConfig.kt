@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.data.ElectionCandidate
 //#endif
 import com.google.gson.annotations.Expose
@@ -169,7 +169,7 @@ class DebugConfig {
     @ConfigEditorBoolean
     val powderMessages: Boolean = false
 
-    //#if MC < 1.21
+    //#if TODO
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown

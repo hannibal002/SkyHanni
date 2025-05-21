@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-//#if MC < 1.21
+//#if TODO
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatCurrentTime
 //#endif
 import java.io.File
@@ -67,7 +67,7 @@ class LorenzLogger(filePath: String) {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        //#if MC < 1.21
+        //#if TODO
         if (!hasDone && LorenzUtils.onHypixel) {
             //#else
             //$$  if (!hasDone ) {
