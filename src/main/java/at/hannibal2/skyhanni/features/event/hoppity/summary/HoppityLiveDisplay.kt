@@ -71,9 +71,9 @@ object HoppityLiveDisplay {
         "(?:\\(\\d*\\/\\d*\\) )?Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
     )
 
-    private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
+    private val config get() = eventConfig.eventSummary.liveDisplay
     private val storage get() = ProfileStorageData.profileSpecific
-    private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val currentSbYear get() = SkyBlockTime.now().year
 
     private data class RenderableOverrideOperation(
@@ -87,7 +87,7 @@ object HoppityLiveDisplay {
         buildMap<HoppityStat, (RenderableOverrideOperation) -> Renderable> {
             put(HoppityStat.MEAL_EGGS_FOUND) { (_, baseRenderable, stats, year) ->
                 val hoverTips = stats.buildMealEggHover(year).map { it.partyModeReplace() }
-                if (!liveDisplayConfig.mealEggHover || hoverTips.isEmpty()) baseRenderable
+                if (!config.mealEggHover || hoverTips.isEmpty()) baseRenderable
                 else Renderable.hoverTips(baseRenderable, hoverTips)
             }
         }
@@ -116,7 +116,7 @@ object HoppityLiveDisplay {
 
     @HandleEvent
     fun onConfigLoad() {
-        config.eventSummary.statDisplayList.afterChange {
+        eventConfig.eventSummary.statDisplayList.afterChange {
             lastKnownStatHash = 0
         }
         CFApi.config.partyMode.afterChange {
@@ -127,8 +127,8 @@ object HoppityLiveDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onKeyPress(event: KeyPressEvent) {
         reCheckInventoryState()
-        if (!liveDisplayConfig.enabled) return
-        if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
+        if (!config.enabled) return
+        if (config.toggleKeybind == Keyboard.KEY_NONE || config.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
         if (Minecraft.getMinecraft().currentScreen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
@@ -149,20 +149,19 @@ object HoppityLiveDisplay {
             displayCardRenderables = buildDisplayRenderables(stats, HoppityEventSummary.statYear)
         }
 
-        config.eventSummary.liveDisplayPosition.renderRenderables(
+        eventConfig.eventSummary.liveDisplayPosition.renderRenderables(
             displayCardRenderables,
             posLabel = "Hoppity's Hunt Stats",
         )
     }
 
     private fun liveDisplayEnabled(): Boolean {
-        val storage = storage ?: return false
-        val isToggledOff = storage.hoppityStatLiveDisplayToggledOff
-        val isEnabled = liveDisplayConfig.enabled
-        val isIslandEnabled = !liveDisplayConfig.onlyHoppityIslands || HoppityApi.onHoppityIsland()
-        val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityApi.isHoppityEvent()
-        val isEggLocatorEnabled = !liveDisplayConfig.mustHoldEggLocator || InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
-        val isInventoryEnabled = liveDisplayConfig.specificInventories.isEmpty() || inMatchingInventory()
+        val isToggledOff = storage?.hoppityStatLiveDisplayToggledOff ?: true
+        val isEnabled = config.enabled
+        val isIslandEnabled = !config.onlyHoppityIslands || HoppityApi.onHoppityIsland()
+        val isEventEnabled = !config.onlyDuringEvent || HoppityApi.isHoppityEvent()
+        val isEggLocatorEnabled = !config.mustHoldEggLocator || InventoryUtils.itemInHandId == HoppityEggLocator.locatorItem
+        val isInventoryEnabled = config.specificInventories.isEmpty() || inMatchingInventory()
 
         return !isToggledOff &&
             isEnabled &&
@@ -173,7 +172,7 @@ object HoppityLiveDisplay {
     }
 
     private fun inMatchingInventory(): Boolean {
-        val setting = liveDisplayConfig.specificInventories
+        val setting = config.specificInventories
         val currentScreen = Minecraft.getMinecraft().currentScreen
             ?: return HoppityLiveDisplayInventoryType.NO_INVENTORY in setting
 
@@ -259,9 +258,9 @@ object HoppityLiveDisplay {
             val isPastEvent = HoppityEventSummary.statYear < currentSbYear || (HoppityEventSummary.statYear == currentSbYear && !isHoppity)
 
             val configMatches = when {
-                isCurrentEvent -> liveDisplayConfig.dateTimeDisplay.contains(DTType.CURRENT)
-                isPastEvent -> liveDisplayConfig.dateTimeDisplay.contains(DTType.PAST_EVENTS)
-                else -> liveDisplayConfig.dateTimeDisplay.contains(DTType.NEXT_EVENT)
+                isCurrentEvent -> config.dateTimeDisplay.contains(DTType.CURRENT)
+                isPastEvent -> config.dateTimeDisplay.contains(DTType.PAST_EVENTS)
+                else -> config.dateTimeDisplay.contains(DTType.NEXT_EVENT)
             }
             if (!configMatches) return@buildList
 
@@ -299,8 +298,8 @@ object HoppityLiveDisplay {
         val storage = storage ?: return null
         val statsStorage = storage.hoppityEventStats
 
-        val isNextEventEnabled = liveDisplayConfig.dateTimeDisplay.contains(DTType.NEXT_EVENT)
-        val isAllTimeEnabled = liveDisplayConfig.showAllTime
+        val isNextEventEnabled = config.dateTimeDisplay.contains(DTType.NEXT_EVENT)
+        val isAllTimeEnabled = config.showAllTime
 
         val isAllTime = currentStatYear == Int.MAX_VALUE
         val nextYear = currentSbYear + 1
