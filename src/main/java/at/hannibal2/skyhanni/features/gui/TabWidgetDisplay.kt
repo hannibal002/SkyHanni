@@ -30,7 +30,6 @@ enum class TabWidgetDisplay(
     BESTIARY(null, TabWidget.BESTIARY),
     DRAGON("Dragon Fight Info", TabWidget.DRAGON),
     PROTECTOR("Protector State", TabWidget.PROTECTOR),
-    EYES("Eyes placed", TabWidget.EYES_PLACED),
     SHEN_RIFT("Shen's Auction inside the Rift", TabWidget.RIFT_SHEN),
     MINION("Minion Info", TabWidget.MINION),
     COLLECTION(null, TabWidget.COLLECTION),
@@ -46,7 +45,8 @@ enum class TabWidgetDisplay(
         TabWidget.INTEREST,
         TabWidget.SOULFLOW,
         TabWidget.FAIRY_SOULS,
-    )
+    ),
+    EYES("Eyes placed", TabWidget.EYES_PLACED)
     ;
 
     val position get() = config.displayPositions[ordinal]
