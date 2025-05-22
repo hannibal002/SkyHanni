@@ -40,9 +40,9 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.distribute
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.WrappedStringRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable

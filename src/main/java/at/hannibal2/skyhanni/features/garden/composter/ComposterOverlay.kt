@@ -56,8 +56,8 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.math.ceil
 import kotlin.math.floor
