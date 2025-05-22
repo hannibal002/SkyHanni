@@ -111,9 +111,31 @@ object PetUtils {
         return null
     }
 
+    private fun xpToLevelCommand(input: Array<String>) {
+        if (input.size < 3) {
+            ChatUtils.userError("Usage: /shpetlevel <xp> <rarity> <pet>")
+            return
+        }
+
+        val xp = input[0].toDoubleOrNull()
+        if (xp == null) {
+            ChatUtils.userError("Invalid xp '${input[0]}'.")
+            return
+        }
+        val rarity = LorenzRarity.getByName(input[1])
+        if (rarity == null) {
+            ChatUtils.userError("Invalid rarity '${input[1]}'.")
+            return
+        }
+
+        val petName = input.slice(2..<input.size).joinToString(" ")
+        val level: Int = xpToLevel(xp, rarity, petName)
+        ChatUtils.chat(level.addSeparators())
+    }
+
     private fun levelToXPCommand(input: Array<String>) {
         if (input.size < 3) {
-            ChatUtils.userError("Usage: /shcalcpetxp <level> <rarity> <pet>")
+            ChatUtils.userError("Usage: /shpetxp <level> <rarity> <pet>")
             return
         }
 
@@ -134,7 +156,6 @@ object PetUtils {
             return
         }
         ChatUtils.chat(xp.addSeparators())
-        return
     }
 
     fun levelToXp(level: Int, rarity: LorenzRarity, petName: String): Double? {
@@ -158,14 +179,14 @@ object PetUtils {
     fun petNameAndRarityToInternalName(name: String, rarity: LorenzRarity): NeuInternalName =
         "${name.removeColor()};${rarity.id}".toInternalName()
 
-    fun internalNameToPetName(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
+    fun internalNameToPetWithRarity(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
         val (name, rarityStr) = internalName.asString().split(";")
         val rarity = LorenzRarity.getById(rarityStr.toInt()) ?: return null
         return Pair(name, rarity)
     }
 
     fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int {
-        val (petName, rarity) = internalNameToPetName(petInternalName) ?: return 0
+        val (petName, rarity) = internalNameToPetWithRarity(petInternalName) ?: return 0
         return xpToLevel(totalXp, rarity, petName)
     }
 
@@ -178,10 +199,10 @@ object PetUtils {
         var level = 0
         for (i in 0 + rarityOffset until xpList.size) {
             val xpReq = xpList[i]
-            while (xp >= xpReq) {
+            if (xp >= xpReq) {
                 xp -= xpReq
                 level++
-            }
+            } else break
         }
 
         return level
@@ -253,6 +274,12 @@ object PetUtils {
             description = "Calculates the pet xp from a given level and rarity."
             category = CommandCategory.DEVELOPER_TEST
             callback { levelToXPCommand(it) }
+        }
+
+        event.register("shpetlevel") {
+            description = "Calculates the pet level from a given xp and rarity."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { xpToLevelCommand(it) }
         }
     }
 }

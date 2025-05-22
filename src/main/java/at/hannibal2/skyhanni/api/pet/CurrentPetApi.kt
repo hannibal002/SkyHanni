@@ -13,9 +13,9 @@ object CurrentPetApi {
 
     var nonUuidPetOverride: PetData? = null
     val currentPet: PetData?
-        get() = nonUuidPetOverride ?: ProfileStorageData.profileSpecific?.currentPetUuid?.let { currentUuid ->
+        get() = ProfileStorageData.profileSpecific?.currentPetUuid?.let { currentUuid ->
             ProfileStorageData.petProfiles?.pets?.firstOrNull { it.uuid == currentUuid }
-        }
+        } ?: nonUuidPetOverride
 
     fun isCurrentPet(petName: String): Boolean = currentPet?.coloredName?.contains(petName) ?: false
 
@@ -42,6 +42,7 @@ object CurrentPetApi {
             add("petItem: '${currentPet?.heldItemInternalName ?: ""}'")
             add("petLevel: '${currentPet?.level ?: 0}'")
             add("petXP: '${currentPet?.exp ?: 0.0}'")
+            add("petUUID: '${currentPet?.uuid ?: ""}'")
         }
     }
 }
