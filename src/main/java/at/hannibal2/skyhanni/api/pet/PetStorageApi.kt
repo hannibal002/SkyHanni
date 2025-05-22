@@ -231,11 +231,13 @@ object PetStorageApi {
         if (!mainPetMenuNamePattern.matches(InventoryUtils.openInventoryName())) return
         val clickedItem = event.item ?: return
         val petInfo = clickedItem.getPetInfo() ?: return
-        when (event.clickType) {
-            GuiContainerEvent.ClickType.RIGHT -> ProfileStorageData.petProfiles?.pets?.removeIf {
-                it.uuid == petInfo.uuid
+        when (event.clickedButton) {
+            1 -> { // Right click
+                ProfileStorageData.petProfiles?.pets?.removeIf {
+                    it.uuid == petInfo.uuid
+                }
             }
-            GuiContainerEvent.ClickType.NORMAL -> {
+            0 -> { // Left click
                 if (KeyboardManager.isShiftKeyDown()) return
                 ProfileStorageData.profileSpecific?.currentPetUuid = petInfo.uuid
             }

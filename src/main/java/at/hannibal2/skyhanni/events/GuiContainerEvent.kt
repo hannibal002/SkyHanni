@@ -88,7 +88,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
 
     enum class ClickType(val id: Int) {
         NORMAL(0),
-        RIGHT(1),
+        SHIFT(1),
         HOTBAR(2),
         MIDDLE(3),
         DROP(4),

@@ -69,7 +69,7 @@ object VisitorRewardWarning {
         }
 
         // all but shift click types work for accepting visitor
-        if (KeyboardManager.isShiftKeyDown()) return
+        if (event.clickType == GuiContainerEvent.ClickType.SHIFT) return
         if (isRefuseSlot) {
             VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.REFUSED, "refused")
             // fallback if tab list is disabled
