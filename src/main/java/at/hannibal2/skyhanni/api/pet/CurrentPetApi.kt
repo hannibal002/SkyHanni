@@ -4,12 +4,25 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object CurrentPetApi {
     val patternGroup = RepoPattern.Companion.group("misc.pet")
+
+    /**
+     * REGEX-TEST: §aYou summoned your §r§dRabbit§r§9 ✦§r§a!
+     * REGEX-TEST: §aYou summoned your §r§6Golden Dragon§r§a!
+     */
+    private val chatSummonPattern by patternGroup.pattern(
+        "chat.summon",
+        "§aYou summoned your §r§(?<rarity>.)(?<pet>[^§]+)(?:§r(?<skin>§. ✦))?§r§a!"
+    )
 
     var nonUuidPetOverride: PetData? = null
     val currentPet: PetData?
@@ -26,6 +39,23 @@ object CurrentPetApi {
         }
         nonUuidPetOverride = null
         ProfileStorageData.profileSpecific?.currentPetUuid = petData.uuid
+    }
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
+        chatSummonPattern.matchMatcher(event.message) {
+            val petName = group("pet")
+            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return
+            val skinTag = groupOrNull("skin")?.replace(" ", "")
+
+            val resolvedPet = PetStorageApi.resolvePetDataOrNull(
+                uncoloredPetName = petName,
+                rarity = rarity,
+                skinTag = skinTag,
+            )?.takeIf { it.uuid != null } ?: return
+
+            ProfileStorageData.profileSpecific?.currentPetUuid = resolvedPet.uuid
+        }
     }
 
     @HandleEvent

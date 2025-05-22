@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -173,8 +172,6 @@ object PetStorageApi {
                 heldItem = petHeldItem,
                 exp = petExp,
             )
-
-            ChatUtils.chat("Resolved: \n$resolvedPet")
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
@@ -363,7 +360,7 @@ object PetStorageApi {
         val petData = resolvePetDataOrNull(
             uncoloredPetName = name.removeColor(),
             rarity = rarity,
-            skinTag = skinTag,
+            heldItem = heldItem,
             level = level,
             exp = exp,
             expErrorFactor = expErrorFactor,
@@ -403,7 +400,7 @@ object PetStorageApi {
         return newPetData
     }
 
-    private fun resolvePetDataOrNull(
+    fun resolvePetDataOrNull(
         uncoloredPetName: String,
         rarity: LorenzRarity? = null,
         heldItem: NeuInternalName? = null,
