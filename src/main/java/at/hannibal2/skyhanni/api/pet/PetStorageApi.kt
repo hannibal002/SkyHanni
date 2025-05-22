@@ -254,7 +254,7 @@ object PetStorageApi {
             val petInfo = item.getPetInfo() ?: return@mapNotNull null
             PetData(
                 petInternalName = item.getInternalName(),
-                skinInternalName = petInfo.skin,
+                skinInternalName = petInfo.properSkinItem,
                 heldItemInternalName = petInfo.heldItem,
                 exp = petInfo.exp,
                 uuid = petInfo.uuid,
@@ -284,7 +284,7 @@ object PetStorageApi {
 
         val data = PetData(
             petInternalName = currentPetItem.getInternalName(),
-            skinInternalName = petInfo.skin,
+            skinInternalName = petInfo.properSkinItem,
             heldItemInternalName = petInfo.heldItem,
             exp = petInfo.exp,
             uuid = petInfo.uuid,

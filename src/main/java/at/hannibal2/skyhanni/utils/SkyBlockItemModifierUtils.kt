@@ -84,7 +84,12 @@ object SkyBlockItemModifierUtils {
         @Expose val uniqueId: String,
         @Expose val hideRightClick: Boolean,
         @Expose val noMove: Boolean,
-    )
+    ) {
+        val properSkinItem get() = skin?.let {
+            if (it.asString().startsWith("PET_SKIN_")) it
+            else "PET_SKIN_${it.asString()}".toInternalName()
+        }
+    }
 
     fun ItemStack.getPetExp() = getPetInfo()?.exp
 
