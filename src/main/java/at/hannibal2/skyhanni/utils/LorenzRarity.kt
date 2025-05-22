@@ -47,15 +47,6 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
         return rarityBelow
     }
 
-    fun getCleanName(): String {
-        val wordArray = rawName.split("_").toTypedArray()
-        val returnList = mutableListOf<String>()
-        for (word in wordArray) {
-            returnList.add(word.firstLetterUppercase())
-        }
-        return returnList.joinToString(" ")
-    }
-
     fun isAtLeast(other: LorenzRarity): Boolean = this.ordinal >= other.ordinal
 
     companion object {
