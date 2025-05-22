@@ -3,8 +3,11 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
+//#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
@@ -39,6 +42,7 @@ private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder 
     } else this
 }
 
+// todo 1.21 impl needed
 class ConfigManager {
     companion object {
 
@@ -107,6 +111,7 @@ class ConfigManager {
         "features.misc.MiscConfig.collectionCounterPos",
         "features.misc.MiscConfig.carryPosition",
         "features.misc.MiscConfig.lockedMouseDisplay",
+        "features.gui.GuiConfig.titlePosition",
 
         // debug features
         "features.dev.DebugConfig.trackSoundPosition",
@@ -259,11 +264,16 @@ private fun getBackupFile(file: File): File {
 
 enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
     FEATURES("config", Features::class.java, SkyHanniMod::feature),
+    //#if TODO
     SACKS("sacks", SackData::class.java, SkyHanniMod::sackData),
+    //#endif
     FRIENDS("friends", FriendsJson::class.java, SkyHanniMod::friendsData),
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
+    //#if TODO
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
+    //#endif
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
+    PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData)
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

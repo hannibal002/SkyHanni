@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.render.EntityRenderLayersEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi.partyModeReplace
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -49,7 +49,7 @@ object HoppityEggDisplayManager {
 
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        GlStateManager.color(1.0f, 1.0f, 1.0f, config.playerOpacity / 100f)
+        GlStateManager.color(1f, 1f, 1f, config.playerOpacity / 100f)
     }
 
     @HandleEvent
@@ -84,7 +84,7 @@ object HoppityEggDisplayManager {
                     !it.isClaimed() // Or eggs that have not been claimed
             }.let { entries ->
                 if (unclaimedEggsConfig.displayOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil }
-                else entries
+                else entries.sortedWith(compareBy<HoppityEggType> { it.altDay }.thenBy { it.resetsAt })
             }.forEach {
                 val (color, timeFormat) = if (it.hasRemainingSpawns()) {
                     it.mealColor to it.timeUntil.format()

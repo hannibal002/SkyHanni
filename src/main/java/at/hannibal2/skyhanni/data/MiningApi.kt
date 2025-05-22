@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -20,7 +22,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -147,6 +148,8 @@ object MiningApi {
     var currentAreaOreBlocks = setOf<OreBlock>()
         private set
 
+    val blockStrengths = mutableMapOf<OreBlock, Int>()
+
     private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
     var cold: Int = 0
@@ -174,20 +177,17 @@ object MiningApi {
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(IslandAreas.currentAreaName)
 
-    fun inCustomMiningIsland() = inAnyIsland(
-        IslandType.DWARVEN_MINES,
-        IslandType.MINESHAFT,
-        IslandType.CRYSTAL_HOLLOWS,
-        IslandType.THE_END,
-        IslandType.CRIMSON_ISLE,
-        IslandType.SPIDER_DEN,
-    )
+    @Deprecated("Use IslandTypeTags.CUSTOM_MINING.inAny() instead", ReplaceWith("IslandTypeTags.CUSTOM_MINING.inAny()"))
+    fun inCustomMiningIsland() = IslandTypeTags.CUSTOM_MINING.inAny()
 
-    fun inAdvancedMiningIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.CRYSTAL_HOLLOWS, IslandType.MINESHAFT)
+    @Deprecated("Use IslandTypeTags.ADVANCED_MINING.inAny() instead", ReplaceWith("IslandTypeTags.ADVANCED_MINING.inAny()"))
+    fun inAdvancedMiningIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
 
-    fun inMiningIsland() = inAdvancedMiningIsland() || inAnyIsland(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS)
+    @Deprecated("Use IslandTypeTags.MINING.inAny() instead", ReplaceWith("IslandTypeTags.MINING.inAny()"))
+    fun inMiningIsland() = IslandTypeTags.MINING.inAny()
 
-    fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
+    @Deprecated("Use IslandTypeTags.IS_COLD.inAny() instead", ReplaceWith("IslandTypeTags.IS_COLD.inAny()"))
+    fun inColdIsland() = IslandTypeTags.IS_COLD.inAny()
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
@@ -491,5 +491,16 @@ object MiningApi {
         inSpidersDen = IslandType.SPIDER_DEN.isInIsland()
 
         currentAreaOreBlocks = OreBlock.entries.filter { it.checkArea() }.toSet()
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val repo = event.getConstant<MiningJson>("Mining")
+
+        blockStrengths.clear()
+        repo.blockStrengths.forEach { (key, value) ->
+            val ore = OreBlock.getByNameOrNull(key) ?: return@forEach
+            blockStrengths[ore] = value
+        }
     }
 }

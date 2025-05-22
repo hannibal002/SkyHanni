@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -29,6 +28,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 
 @SkyHanniModule
@@ -76,8 +76,9 @@ object CorpseTracker {
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
-        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
-        with(tracker) { event.addItemFromEvent() }
+        if (isEnabled() && event.source == ItemAddManager.Source.COMMAND) {
+            with(tracker) { event.addItemFromEvent() }
+        }
     }
 
     @HandleEvent
@@ -108,7 +109,7 @@ object CorpseTracker {
             applicableKeys.forEach { keyData ->
                 keyData.key?.let { key ->
                     val keyName = key.repoItemName
-                    val price = key.getPrice()
+                    val price = SkyHanniTracker.getPricePer(key)
                     val count = bucketData.corpsesLooted[keyData] ?: 0
                     val totalPrice = price * count
                     if (totalPrice > 0) {
@@ -158,7 +159,7 @@ object CorpseTracker {
         }
     }
 
-    fun isEnabled() =
+    private fun isEnabled() =
         LorenzUtils.inSkyBlock && config.enabled && (
             IslandType.MINESHAFT.isInIsland() ||
                 (!config.onlyInMineshaft && MiningApi.inGlacialTunnels())

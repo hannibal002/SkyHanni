@@ -15,19 +15,19 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.shader.CircleShader
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
-import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
+import at.hannibal2.skyhanni.utils.render.LineDrawer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -37,6 +37,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
+import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
@@ -73,7 +74,6 @@ object RenderUtils {
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
-    private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
 
     //#if MC < 1.8.9
@@ -102,8 +102,13 @@ object RenderUtils {
         highlight(color.toColor())
     }
 
+    // TODO eventually removed awt.Color support, we should only use moulconfig.ChromaColour or LorenzColor
     fun Slot.highlight(color: Color) {
         highlight(color, xDisplayPosition, yDisplayPosition)
+    }
+
+    fun Slot.highlight(color: ChromaColour) {
+        highlight(color.toColor())
     }
 
     fun RenderGuiItemOverlayEvent.highlight(color: LorenzColor) {
@@ -117,11 +122,11 @@ object RenderUtils {
     fun highlight(color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
         // TODO don't use z
-        GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        Gui.drawRect(x, y, x + 16, y + 16, color.rgb)
-        GlStateManager.popMatrix()
+        DrawContextUtils.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
+        DrawContextUtils.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
     }
@@ -145,13 +150,13 @@ object RenderUtils {
     fun drawBorder(color: Color, x: Int, y: Int) {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
-        GlStateManager.pushMatrix()
-        GlStateManager.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
-        Gui.drawRect(x, y, x + 1, y + 16, color.rgb)
-        Gui.drawRect(x, y, x + 16, y + 1, color.rgb)
-        Gui.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
-        Gui.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
-        GlStateManager.popMatrix()
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        GuiRenderUtils.drawRect(x, y, x + 1, y + 16, color.rgb)
+        GuiRenderUtils.drawRect(x, y, x + 16, y + 1, color.rgb)
+        GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
+        GuiRenderUtils.drawRect(x + 15, y, x + 16, y + 16, color.rgb)
+        DrawContextUtils.popMatrix()
         GlStateManager.enableDepth()
         GlStateManager.enableLighting()
     }
@@ -227,8 +232,8 @@ object RenderUtils {
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
         Minecraft.getMinecraft().textureManager.bindTexture(beaconBeam)
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0f)
-        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0f)
+        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497f)
+        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497f)
         GlStateManager.disableLighting()
         GlStateManager.enableCull()
         GlStateManager.enableTexture2D()
@@ -255,22 +260,22 @@ object RenderUtils {
         val d14 = -1.0 + d1
         val d15 = height.toDouble() * 2.5 + d14
         worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR)
-        worldRenderer.pos(x + d4, y + topOffset, z + d5).tex(1.0, d15).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d4, y + bottomOffset, z + d5).tex(1.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d6, y + bottomOffset, z + d7).tex(0.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d6, y + topOffset, z + d7).tex(0.0, d15).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d10, y + topOffset, z + d11).tex(1.0, d15).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d10, y + bottomOffset, z + d11).tex(1.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d8, y + bottomOffset, z + d9).tex(0.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d8, y + topOffset, z + d9).tex(0.0, d15).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d6, y + topOffset, z + d7).tex(1.0, d15).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d6, y + bottomOffset, z + d7).tex(1.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d10, y + bottomOffset, z + d11).tex(0.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d10, y + topOffset, z + d11).tex(0.0, d15).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d8, y + topOffset, z + d9).tex(1.0, d15).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d8, y + bottomOffset, z + d9).tex(1.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d4, y + bottomOffset, z + d5).tex(0.0, d14).color(r, g, b, 1.0f).endVertex()
-        worldRenderer.pos(x + d4, y + topOffset, z + d5).tex(0.0, d15).color(r, g, b, 1.0f).endVertex()
+        worldRenderer.pos(x + d4, y + topOffset, z + d5).tex(1.0, d15).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d4, y + bottomOffset, z + d5).tex(1.0, d14).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d6, y + bottomOffset, z + d7).tex(0.0, d14).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d6, y + topOffset, z + d7).tex(0.0, d15).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d10, y + topOffset, z + d11).tex(1.0, d15).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d10, y + bottomOffset, z + d11).tex(1.0, d14).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d8, y + bottomOffset, z + d9).tex(0.0, d14).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d8, y + topOffset, z + d9).tex(0.0, d15).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d6, y + topOffset, z + d7).tex(1.0, d15).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d6, y + bottomOffset, z + d7).tex(1.0, d14).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d10, y + bottomOffset, z + d11).tex(0.0, d14).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d10, y + topOffset, z + d11).tex(0.0, d15).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d8, y + topOffset, z + d9).tex(1.0, d15).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d8, y + bottomOffset, z + d9).tex(1.0, d14).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d4, y + bottomOffset, z + d5).tex(0.0, d14).color(r, g, b, 1f).endVertex()
+        worldRenderer.pos(x + d4, y + topOffset, z + d5).tex(0.0, d15).color(r, g, b, 1f).endVertex()
         tessellator.draw()
         GlStateManager.disableCull()
         val d12 = -1.0 + d1
@@ -323,7 +328,7 @@ object RenderUtils {
                 x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize,
             ).expandBlock(),
             color,
-            if (inverseAlphaScale) (1.0f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
+            if (inverseAlphaScale) (1f - 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha)
             else (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(minimumAlpha),
             renderRelativeToCamera = true,
         )
@@ -367,11 +372,11 @@ object RenderUtils {
         GlStateManager.translate(x, y, z)
         GlStateManager.translate(0f, viewer.eyeHeight, 0f)
         drawNametag(text, color)
-        GlStateManager.rotate(-renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
+        GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.translate(0f, -0.25f, 0f)
-        GlStateManager.rotate(-renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
-        GlStateManager.rotate(renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        GlStateManager.rotate(-renderManager.playerViewX, 1f, 0f, 0f)
+        GlStateManager.rotate(renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
 
@@ -385,17 +390,17 @@ object RenderUtils {
     /**
      * @author Mojang
      */
-    fun drawNametag(str: String, color: Color?) {
+    private fun SkyHanniRenderWorldEvent.drawNametag(str: String, color: Color?) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         val f1 = 0.02666667f
         GlStateManager.pushMatrix()
-        GL11.glNormal3f(0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(-Minecraft.getMinecraft().renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
+        GL11.glNormal3f(0f, 1f, 0f)
+        GlStateManager.rotate(-Minecraft.getMinecraft().renderManager.playerViewY, 0f, 1f, 0f)
         GlStateManager.rotate(
             Minecraft.getMinecraft().renderManager.playerViewX,
-            1.0f,
-            0.0f,
-            0.0f,
+            1f,
+            0f,
+            0f,
         )
         GlStateManager.scale(-f1, -f1, f1)
         GlStateManager.disableLighting()
@@ -408,10 +413,10 @@ object RenderUtils {
         val j = fontRenderer.getStringWidth(str) / 2
         GlStateManager.disableTexture2D()
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR)
-        worldrenderer.pos((-j - 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
-        worldrenderer.pos((-j - 1).toDouble(), (8 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
-        worldrenderer.pos((j + 1).toDouble(), (8 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
-        worldrenderer.pos((j + 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0.0f, 0.0f, 0.0f, 0.25f).endVertex()
+        worldrenderer.pos((-j - 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
+        worldrenderer.pos((-j - 1).toDouble(), (8 + i).toDouble(), 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
+        worldrenderer.pos((j + 1).toDouble(), (8 + i).toDouble(), 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
+        worldrenderer.pos((j + 1).toDouble(), (-1 + i).toDouble(), 0.0).color(0f, 0f, 0f, 0.25f).endVertex()
         tessellator.draw()
         GlStateManager.enableTexture2D()
         val colorCode = color?.rgb ?: 553648127
@@ -419,7 +424,7 @@ object RenderUtils {
         GlStateManager.depthMask(true)
         fontRenderer.drawString(str, -j, i, -1)
         GlStateManager.enableBlend()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.popMatrix()
     }
 
@@ -428,8 +433,8 @@ object RenderUtils {
     }
 
     fun Position.transform(): Pair<Int, Int> {
-        GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
-        GlStateManager.scale(effectiveScale, effectiveScale, 1F)
+        DrawContextUtils.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
+        DrawContextUtils.scale(effectiveScale, effectiveScale, 1F)
         val x = ((GuiScreenUtils.mouseX - getAbsX()) / effectiveScale).toInt()
         val y = ((GuiScreenUtils.mouseY - getAbsY()) / effectiveScale).toInt()
         return x to y
@@ -443,26 +448,23 @@ object RenderUtils {
 
     private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int {
         val display = "§f$string"
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
         transform()
-        val minecraft = Minecraft.getMinecraft()
-        val renderer = minecraft.renderManager.fontRenderer
+        val fr = Minecraft.getMinecraft().fontRendererObj
 
-        GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
+        DrawContextUtils.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
 
         if (centered) {
-            val strLen: Int = renderer.getStringWidth(string)
+            val strLen: Int = fr.getStringWidth(string)
             val x2 = offsetX - strLen / 2f
-            GL11.glTranslatef(x2, 0f, 0f)
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
-            GL11.glTranslatef(-x2, 0f, 0f)
+            GuiRenderUtils.drawString(display, x2, 0f, 0)
         } else {
-            renderer.drawStringWithShadow(display, 0f, 0f, 0)
+            GuiRenderUtils.drawString(display, 0f, 0f, 0)
         }
 
-        GlStateManager.popMatrix()
+        DrawContextUtils.popMatrix()
 
-        return renderer.getStringWidth(display)
+        return fr.getStringWidth(display)
     }
 
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
@@ -490,16 +492,16 @@ object RenderUtils {
         var longestY = 0
         val longestX = renderables.maxOf { it.width }
         for (line in renderables) {
-            GlStateManager.pushMatrix()
+            DrawContextUtils.pushMatrix()
             val (x, y) = transform()
-            GlStateManager.translate(0f, longestY.toFloat(), 0F)
+            DrawContextUtils.translate(0f, longestY.toFloat(), 0F)
             Renderable.withMousePosition(x, y) {
                 line.renderXAligned(0, longestY, longestX)
             }
 
             longestY += line.height + extraSpace + 2
 
-            GlStateManager.popMatrix()
+            DrawContextUtils.popMatrix()
         }
         if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
@@ -509,20 +511,22 @@ object RenderUtils {
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
+        // cause crashes and errors on purpose
+        DrawContextUtils.drawContext
         if (renderable == null) return
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
             renderable.render(0, 0)
         }
-        GlStateManager.popMatrix()
+        DrawContextUtils.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
     // totally not modified Autumn Client's TargetStrafe
     fun drawCircle(entity: Entity, partialTicks: Float, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
-        GL11.glNormal3f(0.0f, 1.0f, 0.0f)
+        GL11.glNormal3f(0f, 1f, 0f)
 
         GlStateManager.enableDepth()
         GlStateManager.enableBlend()
@@ -566,7 +570,7 @@ object RenderUtils {
         GlStateManager.enableTexture2D()
         GlStateManager.enableDepth()
         GlStateManager.disableBlend()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.popMatrix()
     }
 
@@ -648,7 +652,7 @@ object RenderUtils {
         GlStateManager.enableTexture2D()
         GlStateManager.enableCull()
         GlStateManager.disableBlend()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        GlStateManager.color(1f, 1f, 1f, 1f)
         if (!depth) {
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GlStateManager.depthMask(true)
@@ -664,7 +668,7 @@ object RenderUtils {
         height: Float,
     ) {
         GlStateManager.pushMatrix()
-        GL11.glNormal3f(0.0f, 1.0f, 0.0f)
+        GL11.glNormal3f(0f, 1f, 0f)
 
         GlStateManager.enableDepth()
         GlStateManager.enableBlend()
@@ -696,7 +700,7 @@ object RenderUtils {
         GlStateManager.enableTexture2D()
         GlStateManager.enableDepth()
         GlStateManager.disableBlend()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.popMatrix()
     }
 
@@ -716,7 +720,7 @@ object RenderUtils {
         radius: Float,
     ) {
         GlStateManager.pushMatrix()
-        GL11.glNormal3f(0.0f, 1.0f, 0.0f)
+        GL11.glNormal3f(0f, 1f, 0f)
 
         GlStateManager.enableDepth()
         GlStateManager.enableBlend()
@@ -768,7 +772,7 @@ object RenderUtils {
         GlStateManager.enableTexture2D()
         GlStateManager.enableDepth()
         GlStateManager.disableBlend()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.popMatrix()
     }
 
@@ -788,7 +792,7 @@ object RenderUtils {
         radius: Float,
     ) {
         GlStateManager.pushMatrix()
-        GL11.glNormal3f(0.0f, 1.0f, 0.0f)
+        GL11.glNormal3f(0f, 1f, 0f)
 
         GlStateManager.disableTexture2D()
         color.bindColor()
@@ -838,7 +842,7 @@ object RenderUtils {
         tessellator.draw()
 
         GlStateManager.enableTexture2D()
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
+        GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.popMatrix()
     }
 
@@ -930,8 +934,8 @@ object RenderUtils {
             location.z - renderManager.viewerPosZ,
         )
         GlStateManager.color(1f, 1f, 1f, 0.5f)
-        GlStateManager.rotate(-renderManager.playerViewY, 0.0f, 1.0f, 0.0f)
-        GlStateManager.rotate(renderManager.playerViewX, 1.0f, 0.0f, 0.0f)
+        GlStateManager.rotate(-renderManager.playerViewY, 0f, 1f, 0f)
+        GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-scale / 25, -scale / 25, scale / 25)
         val stringWidth = fontRenderer.getStringWidth(text)
         if (shadow) {
@@ -1114,183 +1118,6 @@ object RenderUtils {
         }
     }
 
-    class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator, val inverseView: LorenzVec) {
-
-        val worldRenderer = tessellator.worldRenderer
-
-        fun drawPath(path: List<LorenzVec>, color: Color, lineWidth: Int, depth: Boolean, bezierPoint: Double = 1.0) {
-            if (bezierPoint < 0) {
-                path.zipWithNext().forEach {
-                    draw3DLine(it.first, it.second, color, lineWidth, depth)
-                }
-            } else {
-                val pathLines = path.zipWithNext()
-                pathLines.forEachIndexed { index, pathLine ->
-                    val reduce = pathLine.second.minus(pathLine.first).normalize().times(bezierPoint)
-                    draw3DLine(
-                        if (index != 0) pathLine.first + reduce else pathLine.first,
-                        if (index != pathLines.lastIndex) pathLine.second - reduce else pathLine.second,
-                        color,
-                        lineWidth,
-                        depth,
-                    )
-                }
-                path.zipWithNext3().forEach {
-                    val p1 = it.second.minus(it.second.minus(it.first).normalize().times(bezierPoint))
-                    val p3 = it.second.minus(it.second.minus(it.third).normalize().times(bezierPoint))
-                    val p2 = it.second
-                    drawBezier2(p1, p2, p3, color, lineWidth, depth)
-                }
-            }
-        }
-
-        fun drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-            for ((p1, p2) in location.edges) {
-                draw3DLine(p1, p2, color, lineWidth, depth)
-            }
-        }
-
-        fun drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
-            // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
-            for ((p1, p2) in axisAlignedBB.calculateEdges()) {
-                draw3DLine(p1, p2, color, lineWidth, depth)
-            }
-        }
-
-        fun draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-            GL11.glLineWidth(lineWidth.toFloat())
-            if (!depth) {
-                GL11.glDisable(GL11.GL_DEPTH_TEST)
-                GlStateManager.depthMask(false)
-            }
-            GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-            worldRenderer.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION)
-            worldRenderer.pos(p1.x, p1.y, p1.z).endVertex()
-            worldRenderer.pos(p2.x, p2.y, p2.z).endVertex()
-            tessellator.draw()
-            if (!depth) {
-                GL11.glEnable(GL11.GL_DEPTH_TEST)
-                GlStateManager.depthMask(true)
-            }
-        }
-
-        fun drawBezier2(
-            p1: LorenzVec,
-            p2: LorenzVec,
-            p3: LorenzVec,
-            color: Color,
-            lineWidth: Int,
-            depth: Boolean,
-            segments: Int = 30,
-        ) {
-            GL11.glLineWidth(lineWidth.toFloat())
-            if (!depth) {
-                GL11.glDisable(GL11.GL_DEPTH_TEST)
-                GlStateManager.depthMask(false)
-            }
-            GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f)
-            val ctrlPoints = p1.toFloatArray() + p2.toFloatArray() + p3.toFloatArray()
-            bezier2Buffer.clear()
-            ctrlPoints.forEach {
-                bezier2Buffer.put(it)
-            }
-            bezier2Buffer.flip()
-            GL11.glMap1f(
-                GL11.GL_MAP1_VERTEX_3,
-                0.0f,
-                1.0f,
-                3,
-                3,
-                bezier2Buffer,
-            )
-
-            GL11.glEnable(GL11.GL_MAP1_VERTEX_3)
-
-            GL11.glBegin(GL11.GL_LINE_STRIP)
-            for (i in 0..segments) {
-                GL11.glEvalCoord1f(i.toFloat() / segments.toFloat())
-            }
-            GL11.glEnd()
-            if (!depth) {
-                GL11.glEnable(GL11.GL_DEPTH_TEST)
-                GlStateManager.depthMask(true)
-            }
-        }
-
-        companion object {
-            inline fun draw3D(
-                partialTicks: Float = 0F,
-                crossinline draws: LineDrawer.() -> Unit,
-            ) {
-
-                GlStateManager.enableBlend()
-                GlStateManager.disableLighting()
-                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-                GlStateManager.disableTexture2D()
-                GlStateManager.disableCull()
-                GlStateManager.disableAlpha()
-
-                GlStateManager.pushMatrix()
-                val inverseView = getViewerPos(partialTicks)
-                translate(inverseView.negated())
-
-                draws.invoke(LineDrawer(Tessellator.getInstance(), inverseView))
-
-                GlStateManager.popMatrix()
-
-                GlStateManager.enableAlpha()
-                GlStateManager.enableTexture2D()
-                GlStateManager.enableCull()
-                GlStateManager.disableBlend()
-                GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
-            }
-        }
-    }
-
-    class QuadDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
-        val worldRenderer = tessellator.worldRenderer
-        inline fun draw(
-            middlePoint: LorenzVec,
-            sidePoint1: LorenzVec,
-            sidePoint2: LorenzVec,
-            c: Color,
-        ) {
-            GlStateManager.color(c.red / 255f, c.green / 255f, c.blue / 255f, c.alpha / 255f)
-            worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
-            worldRenderer.pos(sidePoint1).endVertex()
-            worldRenderer.pos(middlePoint).endVertex()
-            worldRenderer.pos(sidePoint2).endVertex()
-            worldRenderer.pos(sidePoint1 + sidePoint2 - middlePoint).endVertex()
-            tessellator.draw()
-        }
-
-        companion object {
-            inline fun draw3D(
-                partialTicks: Float = 0F,
-                crossinline quads: QuadDrawer.() -> Unit,
-            ) {
-
-                GlStateManager.enableBlend()
-                GlStateManager.disableLighting()
-                GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-                GlStateManager.disableTexture2D()
-                GlStateManager.disableCull()
-
-                GlStateManager.pushMatrix()
-                translate(getViewerPos(partialTicks).negated())
-                getViewerPos(partialTicks)
-
-                quads.invoke(QuadDrawer(Tessellator.getInstance()))
-
-                GlStateManager.popMatrix()
-
-                GlStateManager.enableTexture2D()
-                GlStateManager.enableCull()
-                GlStateManager.disableBlend()
-            }
-        }
-    }
-
     fun SkyHanniRenderWorldEvent.drawFilledBoundingBox(
         aabb: AxisAlignedBB,
         c: Color,
@@ -1451,7 +1278,7 @@ object RenderUtils {
         text: String,
         scale: Float,
     ) {
-        RenderUtils.drawSlotText(xPos, yPos, text, scale)
+        drawSlotText0(xPos, yPos, text, scale)
     }
 
     fun GuiContainerEvent.ForegroundDrawnEvent.drawSlotText(
@@ -1460,10 +1287,10 @@ object RenderUtils {
         text: String,
         scale: Float,
     ) {
-        RenderUtils.drawSlotText(xPos, yPos, text, scale)
+        drawSlotText0(xPos, yPos, text, scale)
     }
 
-    private fun drawSlotText(
+    private fun drawSlotText0(
         xPos: Int,
         yPos: Int,
         text: String,
@@ -1475,15 +1302,15 @@ object RenderUtils {
         GlStateManager.disableDepth()
         GlStateManager.disableBlend()
 
-        GlStateManager.pushMatrix()
-        GlStateManager.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 0f)
-        GlStateManager.scale(scale, scale, 1f)
-        fontRenderer.drawStringWithShadow(text, 0f, 0f, 16777215)
+        DrawContextUtils.pushMatrix()
+        DrawContextUtils.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 0f)
+        DrawContextUtils.scale(scale, scale, 1f)
+        GuiRenderUtils.drawString(text, 0f, 0f, 16777215)
 
         val reverseScale = 1 / scale
 
-        GlStateManager.scale(reverseScale, reverseScale, 1f)
-        GlStateManager.popMatrix()
+        DrawContextUtils.scale(reverseScale, reverseScale, 1f)
+        DrawContextUtils.popMatrix()
 
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
@@ -1502,14 +1329,24 @@ object RenderUtils {
      * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
      * It is best kept at its default.
      */
-    fun drawRoundTexturedRect(x: Int, y: Int, width: Int, height: Int, filter: Int, radius: Int = 10, smoothness: Int = 1) {
+    fun drawRoundTexturedRect(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        filter: Int,
+        radius: Int = 10,
+        smoothness: Int = 1,
+        texture: ResourceLocation,
+        alpha: Float = 1f,
+    ) {
         // if radius is 0 then just draw a normal textured rect
         if (radius <= 0) {
-            GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
+            GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
             return
         }
 
-        val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
+        val scaleFactor = GuiScreenUtils.scaleFactor
         val widthIn = width * scaleFactor
         val heightIn = height * scaleFactor
         val xIn = x * scaleFactor
@@ -1521,13 +1358,13 @@ object RenderUtils {
         RoundedTextureShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedTextureShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
 
-        GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
+        GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
 
         ShaderManager.disableShader()
-        GlStateManager.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     /**
@@ -1544,7 +1381,7 @@ object RenderUtils {
      * It is best kept at its default.
      */
     fun drawRoundRect(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Int = 1) {
-        val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
+        val scaleFactor = GuiScreenUtils.scaleFactor
         val widthIn = width * scaleFactor
         val heightIn = height * scaleFactor
         val xIn = x * scaleFactor
@@ -1556,13 +1393,13 @@ object RenderUtils {
         RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
 
-        Gui.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
+        GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
 
         ShaderManager.disableShader()
-        GlStateManager.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     /**
@@ -1590,7 +1427,7 @@ object RenderUtils {
         radius: Int = 10,
         blur: Float = 0.7f,
     ) {
-        val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
+        val scaleFactor = GuiScreenUtils.scaleFactor
         val widthIn = width * scaleFactor
         val heightIn = height * scaleFactor
         val xIn = x * scaleFactor

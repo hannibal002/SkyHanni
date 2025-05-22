@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
-import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BESTIARY_LEVEL
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EVOLVING_ITEMS
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.KUUDRA_KEY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.LARVA_HOOK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.MASTER_SKULL_TIER
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKYBLOCK_LEVEL
-import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.TIME_POCKET_ITEMS
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -271,7 +271,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (TIME_POCKET_ITEMS.isSelected()) {
+        if (EVOLVING_ITEMS.isSelected()) {
             item.getSecondsHeld()?.let { seconds ->
                 return "§a${(seconds / 3600)}"
             }
@@ -348,6 +348,9 @@ object ItemDisplayOverlayFeatures {
         event.transform(70, "inventory.itemNumberAsStackSize") { element ->
             migrateTimePocketItems(element)
         }
+        event.transform(86, "inventory.itemNumberAsStackSize") { element ->
+            fixRenamedConfigElement(element, "TIME_POCKET_ITEMS", "EVOLVING_ITEMS")
+        }
     }
 
     private fun fixRemovedConfigElement(data: JsonElement): JsonElement {
@@ -355,6 +358,19 @@ object ItemDisplayOverlayFeatures {
         val newList = JsonArray()
         for (element in data.asJsonArray) {
             if (element.asString == "REMOVED") continue
+            newList.add(element)
+        }
+        return newList
+    }
+
+    private fun fixRenamedConfigElement(data: JsonElement, oldName: String, newName: String): JsonElement {
+        if (!data.isJsonArray) return data
+        val newList = JsonArray()
+        for (element in data.asJsonArray) {
+            if (element.asString == oldName) {
+                newList.add(JsonPrimitive(newName))
+                continue
+            }
             newList.add(element)
         }
         return newList

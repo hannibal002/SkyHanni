@@ -7,9 +7,10 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHeldPetItem
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import net.minecraft.item.ItemStack
@@ -18,6 +19,9 @@ import kotlin.math.floor
 object FFStats {
 
     private val farmingBoots = setOf("RANCHERS_BOOTS", "FARMER_BOOTS")
+    private val GREEN_BANDANA_ITEM = "GREEN_BANDANA".toInternalName()
+    private val YELLOW_BANDANA_ITEM = "YELLOW_BANDANA".toInternalName()
+    private val MINOS_RELIC_ITEM = "MINOS_RELIC".toInternalName()
 
     var cakeExpireTime
         get() = GardenApi.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
@@ -37,10 +41,10 @@ object FFStats {
     var totalBaseFF = mapOf<FFTypes, Double>()
 
     fun loadFFData() {
-        equipmentTotalFF = FarmingItems.equip.getFFData()
+        equipmentTotalFF = FarmingItemType.equip.getFFData()
 
-        armorTotalFF = FarmingItems.armor.getFFData()
-        usingSpeedBoots = FarmingItems.BOOTS.getItem().getInternalName().asString() in farmingBoots
+        armorTotalFF = FarmingItemType.armor.getFFData()
+        usingSpeedBoots = FarmingItemType.BOOTS.getItem().getInternalName().asString() in farmingBoots
 
         baseFF = getGenericFF()
 
@@ -128,10 +132,10 @@ object FFStats {
     fun getPetFFData(item: ItemStack?): Map<FFTypes, Double> = buildMap {
         val gardenLvl = GardenApi.getGardenLevel(overflow = false)
         this[FFTypes.BASE] = getPetFF(item)
-        this[FFTypes.PET_ITEM] = when (item?.getPetItem()) {
-            "GREEN_BANDANA" -> 4.0 * gardenLvl
-            "YELLOW_BANDANA" -> 30.0
-            "MINOS_RELIC" -> (this[FFTypes.BASE] ?: 0.0) * .33
+        this[FFTypes.PET_ITEM] = when (item?.getHeldPetItem()) {
+            GREEN_BANDANA_ITEM -> 4.0 * gardenLvl
+            YELLOW_BANDANA_ITEM -> 30.0
+            MINOS_RELIC_ITEM -> (this[FFTypes.BASE] ?: 0.0) * .33
             else -> 0.0
         }
         this[FFTypes.TOTAL] = this.values.sum()
@@ -153,16 +157,16 @@ object FFStats {
     }
 
     fun getTotalFF() {
-        currentPetItem = FarmingItems.currentPet.getItem().getPetItem().toString()
+        currentPetItem = FarmingItemType.currentPet.getItem().getHeldPetItem().toString()
 
         totalBaseFF = combineFFData(
-            baseFF, armorTotalFF, equipmentTotalFF, FarmingItems.currentPet.getFFData(),
+            baseFF, armorTotalFF, equipmentTotalFF, FarmingItemType.currentPet.getFFData(),
         )
 
-        FFGuideGUI.updateDisplay()
+        FFGuideGui.updateDisplay()
     }
 
-    private fun List<FarmingItems>.getFFData(): Map<FFTypes, Double> = combineFFData(this.map { it.getFFData() })
+    private fun List<FarmingItemType>.getFFData(): Map<FFTypes, Double> = combineFFData(this.map { it.getFFData() })
 
     private fun combineFFData(vararg value: Map<FFTypes, Double>) = combineFFData(value.toList())
     private fun combineFFData(value: List<Map<FFTypes, Double>>) =

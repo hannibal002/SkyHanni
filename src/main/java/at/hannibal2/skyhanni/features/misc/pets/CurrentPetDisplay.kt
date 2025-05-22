@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -24,7 +24,7 @@ object CurrentPetDisplay {
         val currentPet = CurrentPetApi.currentPet ?: return
         val displayName = currentPet.getUserFriendlyName(includeLevel = true)
         val itemStack = currentPet.getItemStackOrNull() ?: return
-        val rarityColor = currentPet.rarity?.color ?: return
+        val rarityColor = currentPet.rarity.color
 
         val nameRender = Renderable.string(displayName, color = rarityColor.toColor())
         val circle = Renderable.CircularRenderable(

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
-import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -178,5 +178,5 @@ object ExperimentationTableApi {
         }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
     }
 
-    fun guardianPetActive(): Boolean = CurrentPetApi.currentPet?.cleanName == "Guardian"
+    fun guardianPetActive(): Boolean = CurrentPetApi.currentPet?.coloredName == "Guardian"
 }

@@ -7,9 +7,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -34,7 +34,7 @@ object LimboTimeTracker {
     private var inFakeLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
-    private var userLuck: Float = 0.0F
+    private var userLuck: Float = 0f
     private const val USER_LUCK_MULTIPLIER = 0.000810185F
     private const val FIRE_MULTIPLIER = 1.01F
     private var onFire = false

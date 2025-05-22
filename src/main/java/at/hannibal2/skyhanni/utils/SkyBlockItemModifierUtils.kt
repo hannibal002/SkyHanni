@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -12,17 +13,21 @@ import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.gson.JsonObject
+import com.google.gson.annotations.Expose
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ResourceLocation
 import java.util.Locale
+import java.util.UUID
+
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.item.Items
 //#endif
 
+@Suppress("TooManyFunctions")
 object SkyBlockItemModifierUtils {
 
     fun ItemStack.getCoinsOfAvarice() = getAttributeLong("collected_coins")
@@ -66,21 +71,40 @@ object SkyBlockItemModifierUtils {
 
     private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
-    fun ItemStack.getPetExp() = getPetInfo()?.get("exp")?.asDouble
+    data class PetInfo(
+        @Expose val type: String,
+        @Expose val active: Boolean,
+        @Expose val exp: Double,
+        @Expose val tier: LorenzRarity,
+        @Expose val hideInfo: Boolean = false,
+        @Expose val heldItem: NeuInternalName? = null,
+        @Expose val candyUsed: Int = 0,
+        @Expose val skin: NeuInternalName? = null,
+        @Expose val uuid: UUID,
+        @Expose val uniqueId: String,
+        @Expose val hideRightClick: Boolean,
+        @Expose val noMove: Boolean,
+    ) {
+        val properSkinItem get() = skin?.let {
+            if (it.asString().startsWith("PET_SKIN_")) it
+            else "PET_SKIN_${it.asString()}".toInternalName()
+        }
+    }
+
+    fun ItemStack.getPetExp() = getPetInfo()?.exp
 
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
         if (data.petCandies == -1) {
-            data.petCandies = getPetInfo()?.get("candyUsed")?.asInt
+            data.petCandies = getPetInfo()?.candyUsed
         }
         return data.petCandies
     }
 
-    // TODO use NeuInternalName here
-    fun ItemStack.getPetItem(): String? {
+    fun ItemStack.getHeldPetItem(): NeuInternalName? {
         val data = cachedData
-        if (data.heldItem == "") {
-            data.heldItem = getPetInfo()?.get("heldItem")?.asString
+        if (data.heldItem == NeuInternalName.NONE) {
+            data.heldItem = getPetInfo()?.heldItem
         }
         return data.heldItem
     }
@@ -101,8 +125,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.wasRiftTransferred(): Boolean = getAttributeBoolean("rift_transferred")
 
-    private fun ItemStack.getPetInfo() =
-        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), JsonObject::class.java)
+    fun ItemStack.getPetInfo(): PetInfo? =
+        ConfigManager.gson.fromJson(getExtraAttributes()?.getString("petInfo"), PetInfo::class.java)
 
     @Suppress("CAST_NEVER_SUCCEEDS")
     inline val ItemStack.cachedData: CachedItemData get() = (this as ItemStackCachedData).skyhanni_cachedData
@@ -164,7 +188,7 @@ object SkyBlockItemModifierUtils {
     }
 
     fun ItemStack.getAttributes() = getExtraAttributes()
-        ?.takeIf { it.hasKey("attributes", 10) }
+        ?.takeIf { it.containsCompound("attributes") }
         ?.getCompoundTag("attributes")
         ?.let { attr ->
             attr.keySet.map {
@@ -203,7 +227,7 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
-    fun ItemStack.getSecondsHeld() = when (getItemId()) {
+    fun ItemStack.getSecondsHeld() = when (getItemId()) { // TODO move item IDs and attribute tags to repo
         "NEW_BOTTLE_OF_JYRRE" -> getAttributeInt("bottle_of_jyrre_seconds")
         "DARK_CACAO_TRUFFLE", "MOBY_DUCK" -> getAttributeInt("seconds_held")
         "DISCRITE" -> getAttributeInt("rift_discrite_seconds")
@@ -249,7 +273,7 @@ object SkyBlockItemModifierUtils {
     }
     //#else
     //$$ fun isVanillaItem(itemId: String): Boolean {
-    //$$     Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
+    //$$     return Registries.ITEM.get(Identifier.of(itemId)) != Items.AIR
     //$$ }
     //#endif
 
