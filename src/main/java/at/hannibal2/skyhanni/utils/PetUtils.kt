@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
@@ -185,6 +185,10 @@ object PetUtils {
         }
 
         return level
+    }
+
+    fun getMaxLevel(petName: String): Int {
+        return customXpLevelReqs?.get(petName)?.maxLevel ?: 100
     }
 
     private fun isValidLevel(level: Int, petName: String): Boolean {

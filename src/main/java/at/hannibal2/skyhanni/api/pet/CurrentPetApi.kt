@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.api.pet
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -10,32 +9,24 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object CurrentPetApi {
-    private val config get() = SkyHanniMod.feature.misc.pets
     val patternGroup = RepoPattern.Companion.group("misc.pet")
 
+    var nonUuidPetOverride: PetData? = null
     val currentPet: PetData?
-        get() = ProfileStorageData.profileSpecific?.currentPetUuid?.let { currentUuid ->
+        get() = nonUuidPetOverride ?: ProfileStorageData.profileSpecific?.currentPetUuid?.let { currentUuid ->
             ProfileStorageData.petProfiles?.pets?.firstOrNull { it.uuid == currentUuid }
         }
 
     fun isCurrentPet(petName: String): Boolean = currentPet?.coloredName?.contains(petName) ?: false
 
-    // <editor-fold desc="Patterns">
-    // </editor-fold>
-
-    // <editor-fold desc="Helpers">
-    // </editor-fold>
-
-    // <editor-fold desc="Pet Data Extractors (Widget)">
-    // </editor-fold>
-
-    // <editor-fold desc="Pet Data Extractors (AutoPet)">
-    // </editor-fold>
-
-    // <editor-fold desc="Pet Data Extractors (Selected Pet)">
-    // </editor-fold>
-
-    // <editor-fold desc="Event Handlers">
+    fun assertFoundCurrentData(petData: PetData) {
+        if (petData.uuid == null) {
+            nonUuidPetOverride = petData
+            return
+        }
+        nonUuidPetOverride = null
+        ProfileStorageData.profileSpecific?.currentPetUuid = petData.uuid
+    }
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
@@ -52,5 +43,4 @@ object CurrentPetApi {
             add("petXP: '${currentPet?.exp ?: 0.0}'")
         }
     }
-    // </editor-fold>
 }

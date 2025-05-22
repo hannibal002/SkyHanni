@@ -44,7 +44,7 @@ data class PetData(
         includeLevel: Boolean = true,
         includeSkinTag: Boolean = true,
     ) = buildString {
-        if (includeLevel) append("§7[Lvl ${level}] ")
+        if (includeLevel) append("§7[Lvl $level] ")
         append(coloredName)
         if (includeSkinTag) append(" $skinTag")
     }
