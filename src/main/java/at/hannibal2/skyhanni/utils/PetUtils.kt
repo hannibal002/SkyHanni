@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import net.minecraft.item.ItemStack
@@ -112,7 +113,7 @@ object PetUtils {
         return null
     }
 
-    fun getPetItemInternalNameOrNull(displayName: String) = petItemResolution[displayName]
+    fun getPetItemInternalNameOrNull(displayName: String) = petItemResolution[displayName.removeResets()]
 
     private fun xpToLevelCommand(input: Array<String>) {
         if (input.size < 3) {

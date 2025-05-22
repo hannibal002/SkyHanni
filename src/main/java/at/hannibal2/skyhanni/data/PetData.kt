@@ -48,6 +48,6 @@ data class PetData(
     ) = buildString {
         if (includeLevel) append("§7[Lvl $level] ")
         append(coloredName)
-        if (includeSkinTag) append(" $skinTag")
+        if (includeSkinTag && skinTag != null) append(" $skinTag")
     }
 }

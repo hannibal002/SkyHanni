@@ -155,18 +155,14 @@ object PetStorageApi {
             val level = group("level").toInt()
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return@firstMatcher false
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                val internalName = PetUtils.getPetItemInternalNameOrNull(line.trim()) ?: return@firstNotNullOfOrNull null
-                ChatUtils.chat("Resolved '$line§r' to '$internalName'")
-                internalName
+                PetUtils.getPetItemInternalNameOrNull(line.trim())
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) {
+                val currentLevelXp = PetUtils.levelToXp(level, rarity, petName) ?: return@firstMatcher null
                 when (groupOrNull("max")) {
-                    null -> {
-                        val currentLevelXp = PetUtils.levelToXp(level, rarity, petName) ?: return@firstMatcher null
-                        currentLevelXp + group("current").formatDouble()
-                    }
-                    else -> null
+                    null -> currentLevelXp + group("current").formatDouble()
+                    else -> currentLevelXp
                 }
             }
 
@@ -177,6 +173,8 @@ object PetStorageApi {
                 heldItem = petHeldItem,
                 exp = petExp,
             )
+
+            ChatUtils.chat("Resolved: \n$resolvedPet")
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
@@ -207,7 +205,7 @@ object PetStorageApi {
             }?.split("\n") ?: return
 
             val petHeldItem = autoPetHoverHeldItemPattern.firstMatcher(hoverInfo) {
-                NeuInternalName.fromItemNameOrNull(group("item"))
+                PetUtils.getPetItemInternalNameOrNull(group("item"))
             }
 
             val resolvedPet = resolvePetOrInsert(
@@ -421,6 +419,6 @@ object PetStorageApi {
         { heldItem == null || it.heldItemInternalName == heldItem },
         { skinTag == null || it.skinTag == skinTag },
         { level == null || it.level == level },
-        { exp == null || abs((it.exp ?: 0.0) - exp) < exp * expErrorFactor }
+        { exp == null || abs((it.exp ?: 0.0) - exp) < (exp * expErrorFactor) }
     )
 }
