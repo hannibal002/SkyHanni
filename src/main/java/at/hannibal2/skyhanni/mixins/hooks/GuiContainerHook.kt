@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -67,6 +68,7 @@ class GuiContainerHook(guiAny: Any) {
 
     fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
         val item = gui.inventorySlots?.inventory?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
+        ChatUtils.chat("Clicked $clickedButton, $clickType, $slotId")
         if (SlotClickEvent(gui, gui.inventorySlots, item, slot, slotId, clickedButton, ClickType.getTypeById(clickType)).post()
         ) ci.cancel()
     }

@@ -6,14 +6,17 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -220,6 +223,25 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!mainPetMenuNamePattern.matches(InventoryUtils.openInventoryName())) return
+        val clickedItem = event.item ?: return
+        val petInfo = clickedItem.getPetInfo() ?: return
+        when (event.clickedButton) {
+            1 -> { // Right click
+                ProfileStorageData.petProfiles?.pets?.removeIf {
+                    it.uuid == petInfo.uuid
+                }
+            }
+            0 -> { // Left click
+                if (KeyboardManager.isShiftKeyDown()) return
+                ProfileStorageData.profileSpecific?.currentPetUuid = petInfo.uuid
+            }
+            else -> return
         }
     }
 
