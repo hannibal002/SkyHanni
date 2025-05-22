@@ -7,9 +7,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.PetUtils
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
 import java.util.UUID
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 class PetDataStorage {
     @Expose
@@ -33,10 +36,13 @@ data class PetData(
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
-    private val basePetStack = petInternalName.getItemStack()
-    val rarity: LorenzRarity = basePetStack.getItemRarityOrCommon()
-    val coloredName: String = basePetStack.displayName
-    val cleanName: String = coloredName.removeColor()
+    private val internalNameSplits = PetUtils.internalNameToPetWithRarity(petInternalName)
+        ?: Pair("???", LorenzRarity.COMMON)
+    val rarity = internalNameSplits.second
+    val cleanName = internalNameSplits.first.replace("_", " ").split(" ").joinToString(" ") {
+        it.firstLetterUppercase()
+    }
+    val coloredName: String = "${rarity.chatColorCode}$cleanName"
 
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
