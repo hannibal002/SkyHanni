@@ -2,35 +2,25 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetSkinJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
-import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object PetUtils {
-    private val patternGroup = RepoPattern.group("misc.pet")
-    private const val FORGE_BACK_SLOT = 48
     // Map of Pet Name to a Map of Skin Name to NeuPetSkinJson
     val petSkins = mutableMapOf<String, MutableList<NeuPetSkinJson>>()
 
     private var baseXpLevelReqs: List<Int> = listOf()
     private var customXpLevelReqs: Map<String, NeuPetData>? = null
-    private var petItemResolution: Map<String, NeuInternalName> = mapOf()
+    var petItemResolution: Map<String, NeuInternalName> = mapOf()
+        private set
 
     // <editor-fold desc="Patterns">
     /**
@@ -43,34 +33,12 @@ object PetUtils {
     )
 
     /**
-     * REGEX-TEST: Pets (1/3)
-     * REGEX-TEST: Pets
-     * REGEX-TEST: Pets (1/4)
-     * REGEX-TEST: Pets (1/2)
-     */
-    private val petMenuPattern by patternGroup.pattern(
-        "menu.title",
-        "Pets(?: \\(\\d+/\\d+\\) )?",
-    )
-
-    /**
      * REGEX-TEST: §7[Lvl 1➡200] §6Golden Dragon
      * REGEX-TEST: §7[Lvl {LVL}] §6Golden Dragon
      */
     private val neuRepoPetItemNamePattern by CurrentPetApi.patternGroup.pattern(
         "item.name.neu.format",
         "(?:§f§f)?§7\\[Lvl (?:1➡(?:100|200)|\\{LVL})] (?<name>.*)",
-    )
-
-    /**
-     * REGEX-TEST: §7To Select Process (Slot #2)
-     * REGEX-TEST: §7To Select Process (Slot #4)
-     * REGEX-TEST: §7To Select Process (Slot #7)
-     * REGEX-TEST: §7To Select Process
-     */
-    private val forgeBackMenuPattern by CurrentPetApi.patternGroup.pattern(
-        "menu.forge.goback",
-        "§7To Select Process(?: \\(Slot #\\d\\))?",
     )
 
     /**
@@ -93,15 +61,6 @@ object PetUtils {
     // </editor-fold>
 
     // <editor-fold desc="Helpers">
-    fun isPetMenu(inventoryTitle: String, inventoryItems: Map<Int, ItemStack>): Boolean {
-        if (!petMenuPattern.matches(inventoryTitle)) return false
-
-        // Otherwise make sure they're not in the Forge menu looking at pets
-        return inventoryItems[FORGE_BACK_SLOT]?.getLore().orEmpty().none {
-            forgeBackMenuPattern.matches(it)
-        }
-    }
-
     fun getCleanName(nameWithLevel: String): String? {
         petItemNamePattern.matchMatcher(nameWithLevel) {
             return group("name")
@@ -113,76 +72,6 @@ object PetUtils {
         return null
     }
 
-    fun getPetItemInternalNameOrNull(displayName: String) = petItemResolution[displayName.removeResets()]
-
-    private fun xpToLevelCommand(input: Array<String>) {
-        if (input.size < 3) {
-            ChatUtils.userError("Usage: /shpetlevel <xp> <rarity> <pet>")
-            return
-        }
-
-        val xp = input[0].toDoubleOrNull()
-        if (xp == null) {
-            ChatUtils.userError("Invalid xp '${input[0]}'.")
-            return
-        }
-        val rarity = LorenzRarity.getByName(input[1])
-        if (rarity == null) {
-            ChatUtils.userError("Invalid rarity '${input[1]}'.")
-            return
-        }
-
-        val petName = input.slice(2..<input.size).joinToString(" ")
-        val level: Int = xpToLevel(xp, rarity, petName)
-        ChatUtils.chat(level.addSeparators())
-    }
-
-    private fun levelToXPCommand(input: Array<String>) {
-        if (input.size < 3) {
-            ChatUtils.userError("Usage: /shpetxp <level> <rarity> <pet>")
-            return
-        }
-
-        val level = input[0].toIntOrNull()
-        if (level == null) {
-            ChatUtils.userError("Invalid level '${input[0]}'.")
-            return
-        }
-        val rarity = LorenzRarity.getByName(input[1])
-        if (rarity == null) {
-            ChatUtils.userError("Invalid rarity '${input[1]}'.")
-            return
-        }
-
-        val petName = input.slice(2..<input.size).joinToString(" ")
-        val xp: Double = levelToXp(level, rarity, petName) ?: run {
-            ChatUtils.userError("Invalid level or rarity.")
-            return
-        }
-        ChatUtils.chat(xp.addSeparators())
-    }
-
-    fun levelToXp(level: Int, rarity: LorenzRarity, petName: String): Double? {
-        val newPetName = petName.toInternalName().asString()
-
-        val rarityOffset = getRarityOffset(rarity, newPetName) ?: return null
-        if (level < 0 || level >= getMaxLevel(petName)) return null
-
-        val xpList = baseXpLevelReqs + getCustomLeveling(newPetName)
-
-        return xpList.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
-    }
-
-    fun petNameToInternalName(name: String): NeuInternalName? {
-        val rarity = LorenzRarity.getByColorCode(
-            name.substring(1, 2)[0]
-        ) ?: return null
-        return petNameAndRarityToInternalName(name.substring(2), rarity)
-    }
-
-    fun petNameAndRarityToInternalName(name: String, rarity: LorenzRarity): NeuInternalName =
-        "${name.removeColor()};${rarity.id}".toInternalName()
-
     fun internalNameToPetWithRarity(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
         val parts = internalName.asString().split(";")
         if (parts.size < 2) return null
@@ -192,16 +81,21 @@ object PetUtils {
         return name to rarity
     }
 
-    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int {
-        val (petName, rarity) = internalNameToPetWithRarity(petInternalName) ?: return 0
-        return xpToLevel(totalXp, rarity, petName)
+    fun petWithRarityToInternalName(petName: String, rarity: LorenzRarity) =
+        "${petName.uppercase().replace(" ", "_")};${rarity.id}".toInternalName()
+
+    fun levelToXp(level: Int, petInternalName: NeuInternalName): Double? {
+        val rarityOffset = getRarityOffset(petInternalName) ?: return null
+        if (level < 0 || level >= getMaxLevel(petInternalName)) return null
+        return getFullLevelingTree(petInternalName)
+            .slice(0 + rarityOffset..<level + rarityOffset - 1)
+            .sumOf { it.toDouble() }
     }
 
-    private fun xpToLevel(totalXp: Double, rarity: LorenzRarity, petName: String): Int {
+    fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int {
         var xp = totalXp.takeIf { it > 0 } ?: return 0
-        val newPetName = petName.toInternalName().toString()
-        val rarityOffset = getRarityOffset(rarity, newPetName) ?: return 0
-        val xpList = baseXpLevelReqs + getCustomLeveling(newPetName)
+        val rarityOffset = getRarityOffset(petInternalName) ?: return 0
+        val xpList = getFullLevelingTree(petInternalName)
 
         var level = 1
         for (i in 0 + rarityOffset until xpList.size) {
@@ -215,35 +109,32 @@ object PetUtils {
         return level
     }
 
-    fun getMaxLevel(petName: String): Int {
-        return customXpLevelReqs?.get(petName)?.maxLevel ?: 100
+    fun getMaxLevel(petInternalName: NeuInternalName): Int {
+        val properPetName = petInternalName.asString().split(";").first()
+        return customXpLevelReqs?.get(properPetName)?.maxLevel ?: 100
     }
 
-    private fun getCustomLeveling(petName: String): List<Int> {
-        return customXpLevelReqs?.get(petName)?.petLevels.orEmpty()
+    private fun getFullLevelingTree(petInternalName: NeuInternalName): List<Int> {
+        val properPetName = petInternalName.asString().split(";").first()
+        return baseXpLevelReqs + customXpLevelReqs?.get(properPetName)?.petLevels.orEmpty()
     }
 
-    private fun getRarityOffset(rarity: LorenzRarity, petName: String): Int? {
+    private fun getRarityOffset(petInternalName: NeuInternalName): Int? {
         val petsData = customXpLevelReqs ?: run {
             ErrorManager.skyHanniError("NEUPetsData is null")
         }
-
-        return if (petName in petsData.keys) {
-            val petData = petsData[petName]
+        val (properPetName, rarity) = internalNameToPetWithRarity(petInternalName) ?: return null
+        return if (properPetName in petsData.keys) {
+            val petData = petsData[properPetName]
             petData?.rarityOffset?.get(rarity)
-        } else {
-            when (rarity) {
-                LorenzRarity.COMMON -> 0
-                LorenzRarity.UNCOMMON -> 6
-                LorenzRarity.RARE -> 11
-                LorenzRarity.EPIC -> 16
-                LorenzRarity.LEGENDARY -> 20
-                LorenzRarity.MYTHIC -> 20
-                else -> {
-                    ChatUtils.userError("Invalid Rarity \"${rarity.name}\"")
-                    null
-                }
-            }
+        } else when (rarity) {
+            LorenzRarity.COMMON -> 0
+            LorenzRarity.UNCOMMON -> 6
+            LorenzRarity.RARE -> 11
+            LorenzRarity.EPIC -> 16
+            LorenzRarity.LEGENDARY -> 20
+            LorenzRarity.MYTHIC -> 20
+            else -> ErrorManager.skyHanniError("Unknown pet rarity $rarity")
         }
     }
     // </editor-fold>
@@ -258,27 +149,9 @@ object PetUtils {
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
             petSkinNamePattern.matchMatcher(rawInternalName) {
                 val petName = group("pet") ?: return@matchMatcher
-
-                // Use GSON to reflect the JSON into a NeuPetSkinJson object
                 val petItemData = Gson().fromJson(jsonObject, NeuPetSkinJson::class.java)
-
                 petSkins.getOrPut(petName) { mutableListOf() }.add(petItemData)
             }
-        }
-    }
-
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shpetxp") {
-            description = "Calculates the pet xp from a given level and rarity."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { levelToXPCommand(it) }
-        }
-
-        event.register("shpetlevel") {
-            description = "Calculates the pet level from a given xp and rarity."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { xpToLevelCommand(it) }
         }
     }
 }

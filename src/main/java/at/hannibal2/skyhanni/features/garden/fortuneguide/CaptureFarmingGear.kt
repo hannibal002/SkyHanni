@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -22,9 +24,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.PetUtils.isPetMenu
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -37,8 +39,20 @@ import kotlin.time.Duration.Companion.days
 @SkyHanniModule
 object CaptureFarmingGear {
     private val outdatedItems get() = GardenApi.storage?.fortune?.outdatedItems
-
     private val patternGroup = RepoPattern.group("garden.fortuneguide.capture")
+    private const val FORGE_BACK_SLOT = 48
+
+    // <editor-fold desc="Patterns">
+    /**
+     * REGEX-TEST: §7To Select Process (Slot #2)
+     * REGEX-TEST: §7To Select Process (Slot #4)
+     * REGEX-TEST: §7To Select Process (Slot #7)
+     * REGEX-TEST: §7To Select Process
+     */
+    private val forgeBackMenuPattern by CurrentPetApi.patternGroup.pattern(
+        "menu.forge.goback",
+        "§7To Select Process(?: \\(Slot #\\d\\))?",
+    )
 
     /**
      * REGEX-TEST: SKILL LEVEL UP Farming 1 ➜ 2
@@ -116,6 +130,7 @@ object CaptureFarmingGear {
         "uniquevisitors.tierprogress",
         ".* §e(?<having>.*)§6/(?<total>.*)",
     )
+    // </editor-fold>
 
     private val farmingSets = arrayListOf(
         "FERMENTO", "SQUASH", "CROPIE", "MELON", "FARM",
@@ -196,10 +211,9 @@ object CaptureFarmingGear {
         val storage = GardenApi.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
-        if (isPetMenu(event.inventoryName, event.inventoryItems)) {
-            pets(items, outdatedItems)
-            return
-        }
+
+        if (event.tryReadPets()) return
+
         when (event.inventoryName) {
             "Your Equipment and Stats" -> equipmentAndStats(items, outdatedItems)
             "Your Skills" -> skills(items, storage)
@@ -209,6 +223,14 @@ object CaptureFarmingGear {
             "Visitor Milestones" -> visitorMilestones(items)
             "Bestiary", "Bestiary ➜ Garden" -> bestiary(items, storage)
         }
+    }
+
+    private fun InventoryFullyOpenedEvent.tryReadPets(): Boolean {
+        if (!PetStorageApi.mainPetMenuNamePattern.matches(inventoryName)) return false
+        val forgeLore = inventoryItems[FORGE_BACK_SLOT]?.getLore().orEmpty()
+        if (forgeLore.any { forgeBackMenuPattern.matches(it) }) return false
+        pets(inventoryItems, outdatedItems ?: return false)
+        return true
     }
 
     private fun bestiary(
