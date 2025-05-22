@@ -50,6 +50,8 @@ open class BezierFitter(private val degree: Int) {
         return points.isEmpty()
     }
 
+    fun count() = points.size
+
     private var lastCurve: BezierCurve? = null
     fun fit(): BezierCurve? {
         // A Degree n polynomial can be solved with n+1 unique points
