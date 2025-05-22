@@ -184,9 +184,12 @@ object PetUtils {
         "${name.removeColor()};${rarity.id}".toInternalName()
 
     fun internalNameToPetWithRarity(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
-        val (name, rarityStr) = internalName.asString().split(";")
-        val rarity = LorenzRarity.getById(rarityStr.toInt()) ?: return null
-        return Pair(name, rarity)
+        val parts = internalName.asString().split(";")
+        if (parts.size < 2) return null
+        val name = parts[0].takeIf { it.isNotBlank() } ?: return null
+        val rarityId = parts[1].toIntOrNull() ?: return null
+        val rarity = LorenzRarity.getById(rarityId) ?: return null
+        return name to rarity
     }
 
     fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int {
