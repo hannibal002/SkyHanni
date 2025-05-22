@@ -196,7 +196,7 @@ object PetUtils {
         val rarityOffset = getRarityOffset(rarity, newPetName) ?: return 0
         val xpList = baseXpLevelReqs + getCustomLeveling(newPetName)
 
-        var level = 0
+        var level = 1
         for (i in 0 + rarityOffset until xpList.size) {
             val xpReq = xpList[i]
             if (xp >= xpReq) {
