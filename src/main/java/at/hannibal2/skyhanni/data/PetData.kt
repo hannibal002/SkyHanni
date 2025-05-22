@@ -47,16 +47,16 @@ data class PetData(
 
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
-    val levelProgressionPercentage: Double? = when {
-        exp == null -> null
-        level <= PetUtils.getMaxLevel(cleanInternalName) -> {
-            val currentLevelXp = levelToXp(level, rarity, cleanInternalName) ?: 0.0
-            val nextLevelXp = levelToXp(level + 1, rarity, cleanName) ?: 0.0
+    val levelProgressionPercentage: Double = when {
+        exp == null || exp == 0.0 -> 0.0
+        PetUtils.getMaxLevel(petInternalName) <= level -> 100.0
+        else -> {
+            val currentLevelXp = levelToXp(level, petInternalName) ?: 0.0
+            val nextLevelXp = levelToXp(level + 1, petInternalName) ?: 0.0
             val xpDifference = nextLevelXp - currentLevelXp
             val xpProgress = (exp ?: 0.0) - currentLevelXp
             xpProgress / xpDifference * 100
         }
-        else -> 100.0
     }
 
     fun getUserFriendlyName(

@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import java.awt.Color
 
 @SkyHanniModule
@@ -26,7 +28,7 @@ object CurrentPetDisplay {
         val itemStack = currentPet.getItemStackOrNull() ?: return
         val rarityColor = currentPet.rarity.color
 
-        val nameRender = Renderable.string(displayName, color = rarityColor.toColor())
+        val nameRender = RenderableString(displayName, color = rarityColor.toColor())
         val circle = Renderable.CircularRenderable(
             rarityColor.toColor(),
             20,
@@ -37,12 +39,12 @@ object CurrentPetDisplay {
                 border = if (config.levelRing) Renderable.CircularRenderable(
                     backgroundColor = Color.cyan,
                     radius = 29,
-                    filledPercentage = currentPet.levelProgressionPercentage ?: 0.0
+                    filledPercentage = currentPet.levelProgressionPercentage
                 ) else null
             )
         )
 
-        val container = Renderable.verticalContainer(
+        val container = VerticalContainerRenderable(
             listOf(nameRender, circle),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         )
