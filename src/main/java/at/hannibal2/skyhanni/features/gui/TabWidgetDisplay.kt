@@ -46,7 +46,7 @@ enum class TabWidgetDisplay(
         TabWidget.SOULFLOW,
         TabWidget.FAIRY_SOULS,
     ),
-    EYES("Eyes placed", TabWidget.EYES_PLACED)
+    EYES("Eyes placed", TabWidget.EYES_PLACED),
     ;
 
     val position get() = config.displayPositions[ordinal]
