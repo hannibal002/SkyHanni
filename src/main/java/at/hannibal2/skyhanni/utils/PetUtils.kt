@@ -29,6 +29,7 @@ object PetUtils {
 
     private var baseXpLevelReqs: List<Int> = listOf()
     private var customXpLevelReqs: Map<String, NeuPetData>? = null
+    private var petItemResolution: Map<String, NeuInternalName> = mapOf()
 
     // <editor-fold desc="Patterns">
     /**
@@ -110,6 +111,8 @@ object PetUtils {
 
         return null
     }
+
+    fun getPetItemInternalNameOrNull(displayName: String) = petItemResolution[displayName]
 
     private fun xpToLevelCommand(input: Array<String>) {
         if (input.size < 3) {
@@ -255,6 +258,7 @@ object PetUtils {
         val data = event.getConstant<NeuPetsJson>("pets")
         baseXpLevelReqs = data.petLevels
         customXpLevelReqs = data.customPetLeveling
+        petItemResolution = data.petItemDisplayNameToInternalName
 
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
             petSkinNamePattern.matchMatcher(rawInternalName) {

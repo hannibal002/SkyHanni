@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -154,7 +155,9 @@ object PetStorageApi {
             val level = group("level").toInt()
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return@firstMatcher false
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                NeuInternalName.fromItemNameOrNull(line)
+                val internalName = PetUtils.getPetItemInternalNameOrNull(line.trim()) ?: return@firstNotNullOfOrNull null
+                ChatUtils.chat("Resolved '$line§r' to '$internalName'")
+                internalName
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) {
