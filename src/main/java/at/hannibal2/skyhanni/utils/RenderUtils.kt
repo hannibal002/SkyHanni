@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -1485,18 +1486,18 @@ object RenderUtils {
 
         CircleShader.scaleFactor = scaleFactor.toFloat()
         CircleShader.radius = radiusIn.toFloat()
-        CircleShader.smoothness = smoothness.toFloat()
+        CircleShader.smoothness = smoothness
         CircleShader.centerPos = floatArrayOf((xIn + radiusIn).toFloat(), (yIn + radiusIn).toFloat())
         CircleShader.angle1 = angle1 - Math.PI.toFloat()
         CircleShader.angle2 = angle2 - Math.PI.toFloat()
 
-        GlStateManager.pushMatrix()
+        DrawContextUtils.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
 
-        Gui.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, color.rgb)
+        GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, color.rgb)
 
         ShaderManager.disableShader()
-        GlStateManager.popMatrix()
+        DrawContextUtils.popMatrix()
     }
 
     fun getAlpha(): Float {
