@@ -34,13 +34,12 @@ data class PetData(
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
-    private val internalNameSplits: Pair<String, LorenzRarity> by lazy {
-        PetUtils.internalNameToPetWithRarity(petInternalName)
-            ?: ("???" to LorenzRarity.COMMON)
-    }
+    val internalNameSplits: Pair<String, LorenzRarity> =
+        PetUtils.internalNameToPetWithRarity(petInternalName) ?: ("???" to LorenzRarity.COMMON)
+
     val rarity = internalNameSplits.second
     val cleanInternalName = internalNameSplits.first
-    val cleanName get() = cleanInternalName
+    val cleanName = cleanInternalName
         .replace("_", " ")
         .split(" ")
         .joinToString(" ") { it.firstLetterUppercase() }
@@ -48,7 +47,6 @@ data class PetData(
 
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
-
     val levelProgressionPercentage: Double? = when {
         exp == null -> null
         level <= PetUtils.getMaxLevel(cleanInternalName) -> {

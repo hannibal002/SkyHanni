@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstUniqueByOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -78,6 +77,7 @@ object PetStorageApi {
      * REGEX-TEST:  §r§e33,915§r§6/§r§e179.7k XP §r§6(18.9%)
      * REGEX-TEST:  §r§e2,877.5§r§6/§r§e9.7k XP §r§6(29.7%)
      * REGEX-TEST:  §r§e931,886.2§r§6/§r§e1.4M XP §r§6(67.2%)
+     * REGEX-TEST:  §r§e251,016.4§r§6/§r§e561.7k XP §r§6(44.7%)
      * REGEX-TEST:  §r§b§lMAX LEVEL
      */
     @Suppress("MaxLineLength")
@@ -161,20 +161,19 @@ object PetStorageApi {
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) {
+                val isMaxed = groupOrNull("max") != null
                 val currentLevelXp = PetUtils.levelToXp(level, rarity, petName) ?: return@firstMatcher null
-                when (groupOrNull("max")) {
-                    null -> currentLevelXp + group("current").formatDouble()
-                    else -> currentLevelXp
-                }
+                val additionalXp = if (isMaxed) 0.0 else group("current").formatDouble()
+                currentLevelXp + additionalXp
             }
 
-            val resolvedPet = resolvePetOrInsert(
+            val resolvedPet = resolvePetDataOrNull(
                 name = petName,
                 rarity = rarity,
                 level = level,
                 heldItem = petHeldItem,
                 exp = petExp,
-            )
+            ) ?: return@firstMatcher false
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
@@ -183,6 +182,7 @@ object PetStorageApi {
                 heldItemInternalName = petHeldItem ?: heldItemInternalName
             }
 
+            ChatUtils.chat("Asserting that we found:\n$resolvedPet")
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
         }
     }
@@ -208,13 +208,13 @@ object PetStorageApi {
                 PetUtils.getPetItemInternalNameOrNull(group("item"))
             }
 
-            val resolvedPet = resolvePetOrInsert(
+            val resolvedPet = resolvePetDataOrNull(
                 name = petName,
                 rarity = rarity,
                 heldItem = petHeldItem,
                 skinTag = petSkinTag,
                 level = level,
-            )
+            ) ?: return
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
@@ -351,13 +351,13 @@ object PetStorageApi {
                 }
             }
 
-            val resolvedPet = resolvePetOrInsert(
+            val resolvedPet = resolvePetDataOrNull(
                 name = petName,
                 skinTag = petSkinTag,
                 rarity = rarity,
                 level = level,
                 exp = petExp,
-            )
+            ) ?: return
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
@@ -369,61 +369,8 @@ object PetStorageApi {
         }
     }
 
-    private fun resolvePetOrInsert(
-        name: String,
-        rarity: LorenzRarity? = null,
-        heldItem: NeuInternalName? = null,
-        skinTag: String? = null,
-        level: Int? = null,
-        exp: Double? = null,
-        // How far off the exp can be before it's excluded from resolution - 1% default
-        expErrorFactor: Double = 0.01,
-    ): PetData {
-        val petData = resolvePetDataOrNull(
-            uncoloredPetName = name.removeColor(),
-            rarity = rarity,
-            heldItem = heldItem,
-            level = level,
-            exp = exp,
-            expErrorFactor = expErrorFactor,
-        )
-        if (petData != null) return petData
-
-        val profilePets = ProfileStorageData.petProfiles?.pets
-            ?: ErrorManager.skyHanniError("Profile data not loaded in PetStorageApi")
-
-        val petInternalName = if (rarity != null) {
-            PetUtils.petNameAndRarityToInternalName(name.removeColor(), rarity)
-        } else PetUtils.petNameToInternalName(name)
-
-        if (petInternalName == null) {
-            ErrorManager.skyHanniError("Internal name could not be found for $name")
-        }
-
-        val petSkinInternalName: NeuInternalName? = skinTag?.let { skinTagProp ->
-            val petBasicName = petInternalName.asString().replace(Regex(";\\d+"), "")
-            val skins = PetUtils.petSkins[petBasicName]?.takeIfNotEmpty() ?: return@let null
-
-            val filteredSkins = skins.filter { skinItem ->
-                skinItem.displayName.substring(0, 2) + "✦" == skinTagProp
-            }
-
-            return@let if (filteredSkins.size != 1) null
-            else filteredSkins.first().internalName
-        }
-
-        val newPetData = PetData(
-            petInternalName = petInternalName,
-            skinInternalName = petSkinInternalName,
-            heldItemInternalName = heldItem,
-            exp = exp,
-        )
-        profilePets.add(newPetData)
-        return newPetData
-    }
-
     fun resolvePetDataOrNull(
-        uncoloredPetName: String,
+        name: String,
         rarity: LorenzRarity? = null,
         heldItem: NeuInternalName? = null,
         skinTag: String? = null,
@@ -433,7 +380,7 @@ object PetStorageApi {
     ): PetData? = ProfileStorageData.petProfiles?.pets?.filter {
         it.uuid != null
     }?.takeIfNotEmpty()?.firstUniqueByOrNull(
-        { it.cleanName == uncoloredPetName },
+        { it.cleanName == name },
         { rarity == null || it.rarity == rarity },
         { heldItem == null || it.heldItemInternalName == heldItem },
         { skinTag == null || it.skinTag == skinTag },
