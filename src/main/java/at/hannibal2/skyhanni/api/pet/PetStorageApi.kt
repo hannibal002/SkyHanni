@@ -158,11 +158,10 @@ object PetStorageApi {
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) {
-                val current = group("current").formatDouble()
                 when (groupOrNull("max")) {
                     null -> {
                         val currentLevelXp = PetUtils.levelToXp(level, rarity, petName) ?: return@firstMatcher null
-                        currentLevelXp + current
+                        currentLevelXp + group("current").formatDouble()
                     }
                     else -> null
                 }
