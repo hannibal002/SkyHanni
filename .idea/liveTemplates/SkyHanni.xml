@@ -1,5 +1,4 @@
 <templateSet group="SkyHanni">
-
     <template name="configBool" value="@Expose&#10;@ConfigOption(name = &quot;$Name$&quot;, desc = &quot;$Desc$.&quot;)&#10;@ConfigEditorBoolean&#10;var $internalName$: Boolean = $default$" description="boolean config value" toReformat="false" toShortenFQNames="true">
         <variable name="Name" expression="" defaultValue="" alwaysStopAt="true" />
         <variable name="Desc" expression="" defaultValue="" alwaysStopAt="true" />
@@ -96,9 +95,19 @@
         </context>
     </template>
 
+    <template name="configText" value="@Expose&#10;@ConfigOption(name = &quot;$Name$&quot;, desc = &quot;$Desc$.&quot;)&#10;@ConfigEditorText&#10;var $internalName$: String = $DefaultText$" description="text config value" toReformat="false" toShortenFQNames="true">
+        <variable name="Name" expression="" defaultValue="" alwaysStopAt="true" />
+        <variable name="Desc" expression="" defaultValue="" alwaysStopAt="true" />
+        <variable name="DefaultText" expression="" defaultValue="" alwaysStopAt="true" />
+        <variable name="internalName" expression="camelCase(Name)" defaultValue="" alwaysStopAt="false" />
+        <context>
+            <option name="KOTLIN_CLASS" value="true" />
+        </context>
+    </template>
+
     <template name="eFun" value="@HandleEvent&#10;fun on$EventPre$(event: $Event$) {&#10;    // TODO&#10;}" description="event handler receiver" toReformat="true" toShortenFQNames="true">
         <variable name="Event" expression="completeSmart()" defaultValue="" alwaysStopAt="true" />
-        <variable name="EventPre" expression="capitalize(regularExpression(Event,&quot;SkyHanni|Event|\\.&quot;,&quot;&quot;))" defaultValue="" alwaysStopAt="false" />
+        <variable name="EventPre" expression="capitalize(regularExpression(Event, &quot;SkyHanni|Event|\\.|&lt;.*?&gt;&quot;, &quot;&quot;))" defaultValue="" alwaysStopAt="false" />
         <context>
             <option name="KOTLIN_OBJECT_DECLARATION" value="true" />
             <option name="KOTLIN_STATEMENT" value="true" />
