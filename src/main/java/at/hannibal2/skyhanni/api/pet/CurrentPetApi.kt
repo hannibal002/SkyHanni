@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -30,6 +31,7 @@ object CurrentPetApi {
             ProfileStorageData.petProfiles?.pets?.firstOrNull { it.uuid == currentUuid }
         } ?: nonUuidPetOverride
 
+    fun isCurrentPet(petInternalName: NeuInternalName) = currentPet?.petInternalName == petInternalName
     fun isCurrentPet(petName: String): Boolean = currentPet?.coloredName?.contains(petName) ?: false
 
     fun assertFoundCurrentData(petData: PetData) {
