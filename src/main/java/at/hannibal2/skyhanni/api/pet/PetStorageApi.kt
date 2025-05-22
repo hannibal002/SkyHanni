@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstUniqueByOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -54,7 +55,7 @@ object PetStorageApi {
      * REGEX-TEST: Pets: "a"
      * REGEX-TEST: Pets: "e" (1/2)
      */
-    private val mainPetMenuNamePattern by patternGroup.pattern(
+    val mainPetMenuNamePattern by patternGroup.pattern(
         "menu.gui.name",
         "Pets(?:: \"(?<search>.*)\")?(?: \\((?<currentpage>\\d+)\\/(?<maxpage>\\d+)\\))? ?"
     )
@@ -78,6 +79,7 @@ object PetStorageApi {
      * REGEX-TEST:  §r§e2,877.5§r§6/§r§e9.7k XP §r§6(29.7%)
      * REGEX-TEST:  §r§e931,886.2§r§6/§r§e1.4M XP §r§6(67.2%)
      * REGEX-TEST:  §r§e251,016.4§r§6/§r§e561.7k XP §r§6(44.7%)
+     * REGEX-TEST:  §r§e3,138.4§r§6/§r§e9.7k XP §r§6(32.4%)
      * REGEX-TEST:  §r§b§lMAX LEVEL
      */
     @Suppress("MaxLineLength")
@@ -157,12 +159,13 @@ object PetStorageApi {
             val level = group("level").toInt()
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return@firstMatcher false
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                PetUtils.getPetItemInternalNameOrNull(line.trim())
+                PetUtils.petItemResolution[line.trim().removeResets()]
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) {
                 val isMaxed = groupOrNull("max") != null
-                val currentLevelXp = PetUtils.levelToXp(level, rarity, petName) ?: return@firstMatcher null
+                val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
+                val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: return@firstMatcher null
                 val additionalXp = if (isMaxed) 0.0 else group("current").formatDouble()
                 currentLevelXp + additionalXp
             }
@@ -205,7 +208,7 @@ object PetStorageApi {
             }?.split("\n") ?: return
 
             val petHeldItem = autoPetHoverHeldItemPattern.firstMatcher(hoverInfo) {
-                PetUtils.getPetItemInternalNameOrNull(group("item"))
+                PetUtils.petItemResolution[group("item").removeResets()]
             }
 
             val resolvedPet = resolvePetDataOrNull(
@@ -330,12 +333,13 @@ object PetStorageApi {
         petMenuSelectedPetNamePattern.firstMatcher(currentPetItemLore) {
             val petName = groupOrNull("pet") ?: return@firstMatcher false
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return@firstMatcher false
+            val petInternalname = PetUtils.petWithRarityToInternalName(petName, rarity)
             val petSkin = getPetSkinOrNull(petName)
             val petSkinTag = groupOrNull("skin")
 
             val level = petMenuSelectedPetProgressPattern.firstMatcher(currentPetItemLore) {
                 when (groupOrNull("next")) {
-                    null -> PetUtils.getMaxLevel(petName)
+                    null -> PetUtils.getMaxLevel(petInternalname)
                     else -> group("next").formatInt()
                 }
             } ?: return@firstMatcher false
@@ -345,7 +349,7 @@ object PetStorageApi {
                 when (groupOrNull("next")) {
                     null -> currentValue
                     else -> {
-                        val currentLevelXp = PetUtils.levelToXp(level, rarity, petName) ?: 0.0
+                        val currentLevelXp = PetUtils.levelToXp(level, petInternalname) ?: 0.0
                         currentLevelXp + currentValue
                     }
                 }
