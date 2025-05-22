@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -24,35 +26,31 @@ object CurrentPetApi {
         "§aYou summoned your §r§(?<rarity>.)(?<pet>[^§]+)(?:§r(?<skin>§. ✦))?§r§a!"
     )
 
-    var nonUuidPetOverride: PetData? = null
     val currentPet: PetData?
         get() = ProfileStorageData.profileSpecific?.currentPetUuid?.let { currentUuid ->
             ProfileStorageData.petProfiles?.pets?.firstOrNull { it.uuid == currentUuid }
-        } ?: nonUuidPetOverride
+        }
 
+    fun isCurrentPet(petInternalName: NeuInternalName) = currentPet?.petInternalName == petInternalName
     fun isCurrentPet(petName: String): Boolean = currentPet?.coloredName?.contains(petName) ?: false
 
     fun assertFoundCurrentData(petData: PetData) {
         if (petData.uuid == null) {
-            nonUuidPetOverride = petData
-            return
+            ErrorManager.skyHanniError("Tried to assert a non-UUID having pet!")
         }
-        nonUuidPetOverride = null
         ProfileStorageData.profileSpecific?.currentPetUuid = petData.uuid
     }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         chatSummonPattern.matchMatcher(event.message) {
-            val petName = group("pet")
-            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return
-            val skinTag = groupOrNull("skin")?.replace(" ", "")
-
             val resolvedPet = PetStorageApi.resolvePetDataOrNull(
-                uncoloredPetName = petName,
-                rarity = rarity,
-                skinTag = skinTag,
-            )?.takeIf { it.uuid != null } ?: return
+                name = group("pet"),
+                rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return,
+                skinTag = groupOrNull("skin")?.replace(" ", ""),
+            )?.takeIf {
+                it.uuid != null
+            } ?: return
 
             ProfileStorageData.profileSpecific?.currentPetUuid = resolvedPet.uuid
         }
