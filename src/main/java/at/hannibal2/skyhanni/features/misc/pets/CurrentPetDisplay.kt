@@ -77,17 +77,17 @@ object CurrentPetDisplay {
         return when {
             VElement.RARITY_BACKGROUND !in enabledVisuals -> baseItemRenderable
             else -> Renderable.CircularRenderable(
-                itemRenderable = baseItemRenderable,
+                renderable = baseItemRenderable,
                 rarity.color.toColor(),
                 20,
                 border = Renderable.CircularRenderable(
-                    itemRenderable = null,
+                    renderable = null,
                     Color.GRAY,
                     26,
                     border = when {
                         VElement.XP_RING !in enabledVisuals -> null
                         else -> Renderable.CircularRenderable(
-                            itemRenderable = null,
+                            renderable = null,
                             backgroundColor = Color.cyan,
                             radius = 29,
                             filledPercentage = levelProgressionPercentage
