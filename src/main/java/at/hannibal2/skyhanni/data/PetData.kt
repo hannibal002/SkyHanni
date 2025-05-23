@@ -35,8 +35,9 @@ data class PetData(
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
-    val internalNameSplits = PetUtils.internalNameToPetWithRarity(petInternalName)
-        ?: Pair("???", LorenzRarity.COMMON)
+    val internalNameSplits: Pair<String, LorenzRarity> =
+        PetUtils.internalNameToPetWithRarity(petInternalName)
+            ?: ("???" to LorenzRarity.COMMON)
 
     val rarity = internalNameSplits.second
     val cleanInternalName = internalNameSplits.first
