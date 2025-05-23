@@ -12,11 +12,11 @@ import java.util.UUID
 
 class PetDataStorage {
     @Expose
-    var players: MutableMap<UUID, PlayerSpecific> = mutableMapOf()
+    val players: MutableMap<UUID, PlayerSpecific> = mutableMapOf()
 
     class PlayerSpecific {
         @Expose
-        var profiles: MutableMap<String, ProfileSpecific> = mutableMapOf()
+        val profiles: MutableMap<String, ProfileSpecific> = mutableMapOf()
     }
 
     class ProfileSpecific {
@@ -34,7 +34,8 @@ data class PetData(
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
     val internalNameSplits: Pair<String, LorenzRarity> =
-        PetUtils.internalNameToPetWithRarity(petInternalName) ?: ("???" to LorenzRarity.COMMON)
+        PetUtils.internalNameToPetWithRarity(petInternalName)
+            ?: ("???" to LorenzRarity.COMMON)
 
     val rarity = internalNameSplits.second
     val cleanInternalName = internalNameSplits.first

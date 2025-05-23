@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object CurrentPetApi {
-    val patternGroup = RepoPattern.Companion.group("misc.pet")
+    val patternGroup = RepoPattern.group("misc.pet")
 
     /**
      * REGEX-TEST: §aYou summoned your §r§dRabbit§r§9 ✦§r§a!
@@ -37,7 +37,7 @@ object CurrentPetApi {
     fun isCurrentPetOrHigherRarity(petInternalName: NeuInternalName): Boolean {
         val (properPetName, startingRarity) = PetUtils.internalNameToPetWithRarity(petInternalName) ?: return false
         val currentPet = currentPet ?: return false
-        return currentPet.cleanInternalName == properPetName && currentPet.rarity.id >= startingRarity.id
+        return currentPet.cleanInternalName == properPetName && currentPet.rarity >= startingRarity
     }
 
     fun assertFoundCurrentData(petData: PetData) {

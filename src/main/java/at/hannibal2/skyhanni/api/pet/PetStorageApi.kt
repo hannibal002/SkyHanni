@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -42,6 +43,7 @@ import kotlin.math.abs
 object PetStorageApi {
 
     private val config get() = SkyHanniMod.feature.misc.pets
+    private val petStorage get() = ProfileStorageData.petProfiles?.pets
     private val patternGroup = RepoPattern.group("misc.pet.storage")
     private const val PET_MENU_CURRENT_PET_SLOT = 4
     private const val SB_MENU_CURRENT_PET_SLOT = 30
@@ -150,6 +152,11 @@ object PetStorageApi {
         }?.takeIf { it.size == 1 }?.first()
     }
 
+    private fun saveConfig() = SkyHanniMod.configManager.saveConfig(
+        ConfigFileType.PETS,
+        "saving-data"
+    )
+
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
@@ -162,11 +169,12 @@ object PetStorageApi {
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) {
-                val isMaxed = groupOrNull("max") != null
+                // We don't know XP if it's just "MAX LEVEL"
+                if (groupOrNull("max") != null) return@firstMatcher null
                 val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
                 val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: return@firstMatcher null
-                val additionalXp = if (isMaxed) 0.0 else group("current").formatDouble()
-                currentLevelXp + additionalXp
+                val readXpGroup = groupOrNull("current")?.formatDoubleOrNull() ?: 0.0
+                currentLevelXp + readXpGroup
             }
 
             val resolvedPet = resolvePetDataOrNull(
@@ -179,12 +187,13 @@ object PetStorageApi {
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
-                exp = petExp ?: exp
+                exp = petExp?.takeIf { it > (exp ?: 0.0) } ?: exp
                 skinInternalName = getPetSkinOrNull(petName)?.internalName ?: skinInternalName
                 heldItemInternalName = petHeldItem ?: heldItemInternalName
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
+            saveConfig()
         }
     }
 
@@ -224,6 +233,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
+            saveConfig()
         }
     }
 
@@ -254,18 +264,8 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readPetsMenuItems() {
-        val (currentPage, maxPage) = mainPetMenuNamePattern.matchMatcher(inventoryName) {
-            val currentPageGroup = groupOrNull("currentpage")
-            when (currentPageGroup) {
-                null -> Pair(0, 0)
-                else -> Pair(
-                    currentPageGroup.formatInt(),
-                    group("maxpage").formatInt()
-                )
-            }
-        } ?: return
-
-        val profilePets = ProfileStorageData.petProfiles?.pets ?: return
+        if (!mainPetMenuNamePattern.matches(inventoryName)) return
+        val petStorage = petStorage ?: return
 
         val petItems = inventoryItems.filter { (slotNumber, stack) ->
             slotNumber.isPetStackLocation() && stack.getInternalNameOrNull() != null
@@ -283,21 +283,17 @@ object PetStorageApi {
         }.forEach { data ->
             // Because this inventory is the "source of truth", if we come across the same UUID
             // we should always replace the data in-place
-            profilePets.indexOfFirstOrNull { it.uuid == data.uuid }?.let {
-                profilePets[it] = data
-            } ?: profilePets.add(data)
+            petStorage.indexOfFirstOrNull { it.uuid == data.uuid }?.let {
+                petStorage[it] = data
+            } ?: petStorage.add(data)
         }
 
-        if (currentPage == maxPage) {
-            // Strip away any pet data that don't have a UUID associated
-            profilePets.removeIf { it.uuid == null }
-        }
-
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+        saveConfig()
     }
 
     private fun InventoryFullyOpenedEvent.readEquipmentPetData() {
         if (inventoryName != "Your Equipment and Stats") return
+        val petStorage = petStorage ?: return
         val currentPetItem = inventoryItems[EQUIP_MENU_CURRENT_PET_SLOT]?.takeIf {
             it.displayName != "§7Empty Pet Slot"
         } ?: return
@@ -311,12 +307,12 @@ object PetStorageApi {
             uuid = petInfo.uuid,
         )
 
-        val profilePets = ProfileStorageData.petProfiles?.pets ?: return
-        profilePets.indexOfFirstOrNull { it.uuid == petInfo.uuid }?.let {
-            profilePets[it] = data
-        } ?: profilePets.add(data)
+        petStorage.indexOfFirstOrNull { it.uuid == petInfo.uuid }?.let {
+            petStorage[it] = data
+        } ?: petStorage.add(data)
 
         CurrentPetApi.assertFoundCurrentData(data)
+        saveConfig()
     }
 
     private fun InventoryFullyOpenedEvent.readSelectedPetData() {
@@ -363,11 +359,12 @@ object PetStorageApi {
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
-                exp = petExp ?: exp
+                exp = petExp?.takeIf { it > (exp ?: 0.0) } ?: exp
                 skinInternalName = petSkin?.internalName ?: skinInternalName
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
+            saveConfig()
         }
     }
 
@@ -379,7 +376,7 @@ object PetStorageApi {
         level: Int? = null,
         exp: Double? = null,
         expErrorFactor: Double = 0.01,
-    ): PetData? = ProfileStorageData.petProfiles?.pets?.filter {
+    ): PetData? = petStorage?.filter {
         it.uuid != null
     }?.takeIfNotEmpty()?.firstUniqueByOrNull(
         { it.cleanName == name },

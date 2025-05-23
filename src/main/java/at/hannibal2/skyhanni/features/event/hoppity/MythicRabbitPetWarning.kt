@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
 object MythicRabbitPetWarning {
-    private val MYTHIC_RABBIT_INTERNAL_NAME = "RABBIT;5".toInternalName()
+    private val MYTHIC_RABBIT = "RABBIT;5".toInternalName()
     private var lastCheck = SimpleTimeMark.farPast()
 
     fun check() {
@@ -22,7 +22,7 @@ object MythicRabbitPetWarning {
         }
     }
 
-    fun correctPet() = CurrentPetApi.isCurrentPet(MYTHIC_RABBIT_INTERNAL_NAME)
+    fun correctPet() = CurrentPetApi.isCurrentPet(MYTHIC_RABBIT)
 
     private fun warn() {
         ChatUtils.chat("Use a §dMythic Rabbit Pet §efor more chocolate!")
