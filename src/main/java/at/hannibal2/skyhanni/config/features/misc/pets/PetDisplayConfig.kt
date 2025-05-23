@@ -30,7 +30,7 @@ class PetDisplayConfig {
 
     @Expose
     @ConfigLink(owner = PetDisplayConfig::class, field = "enabled")
-    val position: Position = Position(-330, -15)
+    val position: Position = Position(200, 200)
 
     @Expose
     @ConfigOption(name = "Visual Elements", desc = "")

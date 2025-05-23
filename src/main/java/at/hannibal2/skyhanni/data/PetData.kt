@@ -34,16 +34,14 @@ data class PetData(
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
-    val internalNameSplits: Pair<String, LorenzRarity> =
-        PetUtils.internalNameToPetWithRarity(petInternalName) ?: ("???" to LorenzRarity.COMMON)
-
-    val rarity = internalNameSplits.second
-    val cleanInternalName = internalNameSplits.first
+    val rarity = LorenzRarity.getById(petInternalName.asString().split(";")[1].toInt())
+        ?: LorenzRarity.COMMON
+    val cleanInternalName = petInternalName.asString().split(";")[0]
     val cleanName = cleanInternalName
         .replace("_", " ")
         .split(" ")
         .joinToString(" ") { it.firstLetterUppercase() }
-    val coloredName: String = "${rarity.chatColorCode}$cleanName"
+    val coloredName = "${rarity.chatColorCode}$cleanName"
 
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }

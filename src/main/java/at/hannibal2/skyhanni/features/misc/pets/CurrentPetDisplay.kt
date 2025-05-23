@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -126,6 +127,9 @@ object CurrentPetDisplay {
     )
 
     private fun PetData.buildRenderable(): Renderable? {
+        lastPetHash = this.hashCode().takeIf { it != lastPetHash } ?: return petOverlay
+        CurrentPetApi.currentPet ?: return null
+
         val itemRenderable = buildItemRenderableOrNull()
         val textRenderable = buildTextRenderableOrNull()
 
@@ -145,14 +149,10 @@ object CurrentPetDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (RiftApi.inRift() || !config.enabled) return
-
-        lastPetHash = (CurrentPetApi.currentPet?.hashCode() ?: 0).takeIf { it != lastPetHash } ?: return
-        val currentPet = CurrentPetApi.currentPet ?: run {
-            petOverlay = null
-            return
+        petOverlay = CurrentPetApi.currentPet?.buildRenderable()
+        petOverlay?.let {
+            config.position.renderRenderable(it, posLabel = "Current Pet")
         }
-        petOverlay = currentPet.buildRenderable()
-        config.position.renderRenderable(petOverlay, posLabel = "Current Pet")
     }
 
     @HandleEvent
