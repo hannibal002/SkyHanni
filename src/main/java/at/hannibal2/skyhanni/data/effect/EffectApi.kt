@@ -219,7 +219,7 @@ object EffectApi {
         try {
             val duration = TimeUtils.getDuration(durationString.split("§f")[1])
             EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$this'")
         }
     }
