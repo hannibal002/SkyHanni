@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import java.awt.Color
 
-private typealias VElement = PetDisplayConfig.VisualPetDisplayConfig.VisualElement
-private typealias TElement = PetDisplayConfig.TextPetDisplayConfig.TextElement
+typealias VElement = PetDisplayConfig.VisualPetDisplayConfig.VisualElement
+typealias TElement = PetDisplayConfig.TextPetDisplayConfig.TextElement
 
 @SkyHanniModule
 object CurrentPetDisplay {

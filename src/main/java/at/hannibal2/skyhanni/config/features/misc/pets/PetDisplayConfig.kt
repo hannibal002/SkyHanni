@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.DependentDisplayManager
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.features.misc.pets.TElement
+import at.hannibal2.skyhanni.features.misc.pets.VElement
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils
 import com.google.gson.annotations.Expose
@@ -44,7 +46,13 @@ class PetDisplayConfig {
                 "§eItems that are gray are dependent on the items in red."
         )
         @ConfigEditorDraggableList
-        val enabledVisuals: Property<MutableList<VisualElement>> = Property.of(mutableListOf())
+        val enabledVisuals: Property<MutableList<VisualElement>> = Property.of(
+            mutableListOf(
+                VElement.ITEM_STACK,
+                VElement.RARITY_BACKGROUND,
+                VElement.XP_RING,
+            )
+        )
 
         enum class VisualElement(
             val displayName: String,
@@ -131,7 +139,15 @@ class PetDisplayConfig {
                 "§eItems that are gray are dependent on the items in red."
         )
         @ConfigEditorDraggableList
-        val enabledTexts: Property<MutableList<TextElement>> = Property.of(mutableListOf())
+        val enabledTexts: Property<MutableList<TextElement>> = Property.of(
+            mutableListOf(
+                TElement.PET_NAME,
+                TElement.PET_LEVEL,
+                TElement.SKIN_SYMBOL,
+                TElement.NEXT_LEVEL_PROGRESS,
+                TElement.HELD_ITEM,
+            )
+        )
 
         enum class TextElement(
             val displayName: String,
@@ -147,6 +163,7 @@ class PetDisplayConfig {
                 dependentOn = setOf(PET_NAME),
             ),
             NEXT_LEVEL_PROGRESS("Next Level Progress"),
+            OVERFLOW_XP("Overflow XP"),
             TOTAL_XP("Total XP"),
             HELD_ITEM("Held Item"),
             ;
