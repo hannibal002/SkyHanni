@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -185,7 +184,6 @@ object PetStorageApi {
                 heldItemInternalName = petHeldItem ?: heldItemInternalName
             }
 
-            ChatUtils.chat("Asserting that we found:\n$resolvedPet")
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
         }
     }
