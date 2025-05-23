@@ -29,11 +29,11 @@ class PetDataStorage {
 
 @KSerializable
 data class PetData(
-    @Expose var petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
+    @Expose val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
     @Expose var heldItemInternalName: NeuInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
-    @Expose var uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
+    @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
     val internalNameSplits = PetUtils.internalNameToPetWithRarity(petInternalName)
         ?: Pair("???", LorenzRarity.COMMON)

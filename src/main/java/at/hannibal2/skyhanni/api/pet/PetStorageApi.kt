@@ -244,9 +244,7 @@ object PetStorageApi {
         val petInfo = clickedItem.getPetInfo() ?: return
         when (event.clickedButton) {
             1 -> { // Right click
-                petStorage?.removeIf {
-                    it.uuid == petInfo.uuid
-                }
+                petStorage?.removeIf { it.uuid == petInfo.uuid }
             }
             0 -> { // Left click
                 if (KeyboardManager.isShiftKeyDown()) return
@@ -268,11 +266,9 @@ object PetStorageApi {
         if (!mainPetMenuNamePattern.matches(inventoryName)) return
         val petStorage = petStorage ?: return
 
-        val petItems = inventoryItems.filter { (slotNumber, stack) ->
+        inventoryItems.filter { (slotNumber, stack) ->
             slotNumber.isPetStackLocation() && stack.getInternalNameOrNull() != null
-        }
-
-        petItems.mapNotNull { (_, item) ->
+        }.mapNotNull { (_, item) ->
             val petInfo = item.getPetInfo() ?: return@mapNotNull null
             PetData(
                 petInternalName = item.getInternalName(),
