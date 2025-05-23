@@ -43,7 +43,7 @@ data class PetData(
         .replace("_", " ")
         .split(" ")
         .joinToString(" ") { it.firstLetterUppercase() }
-    val coloredName: String = "${rarity.chatColorCode}$cleanName"
+    val coloredName = "${rarity.chatColorCode}$cleanName"
 
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
