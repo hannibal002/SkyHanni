@@ -37,7 +37,7 @@ object CurrentPetApi {
     fun isCurrentPetOrHigherRarity(petInternalName: NeuInternalName): Boolean {
         val (properPetName, startingRarity) = PetUtils.internalNameToPetWithRarity(petInternalName) ?: return false
         val currentPet = currentPet ?: return false
-        return currentPet.cleanInternalName == properPetName && currentPet.rarity.id >= startingRarity.id
+        return currentPet.cleanInternalName == properPetName && currentPet.rarity >= startingRarity
     }
 
     fun assertFoundCurrentData(petData: PetData) {

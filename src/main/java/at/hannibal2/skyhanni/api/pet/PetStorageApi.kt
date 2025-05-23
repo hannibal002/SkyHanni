@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -46,6 +47,7 @@ object PetStorageApi {
     private const val PET_MENU_CURRENT_PET_SLOT = 4
     private const val SB_MENU_CURRENT_PET_SLOT = 30
     private const val EQUIP_MENU_CURRENT_PET_SLOT = 47
+    private var localPetStorage: MutableList<PetData> = mutableListOf()
 
     // <editor-fold desc="Patterns">
     /**
@@ -150,6 +152,16 @@ object PetStorageApi {
         }?.takeIf { it.size == 1 }?.first()
     }
 
+    private fun saveConfig() {
+        ProfileStorageData.petProfiles?.pets = localPetStorage
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+    }
+
+    @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
+    fun onProfileJoin() {
+        localPetStorage = ProfileStorageData.petProfiles?.pets ?: return
+    }
+
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
@@ -185,6 +197,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
+            saveConfig()
         }
     }
 
@@ -224,6 +237,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
+            saveConfig()
         }
     }
 
@@ -234,7 +248,7 @@ object PetStorageApi {
         val petInfo = clickedItem.getPetInfo() ?: return
         when (event.clickedButton) {
             1 -> { // Right click
-                ProfileStorageData.petProfiles?.pets?.removeIf {
+                localPetStorage.removeIf {
                     it.uuid == petInfo.uuid
                 }
             }
@@ -244,6 +258,7 @@ object PetStorageApi {
             }
             else -> return
         }
+        saveConfig()
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
@@ -254,19 +269,7 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readPetsMenuItems() {
-        val (currentPage, maxPage) = mainPetMenuNamePattern.matchMatcher(inventoryName) {
-            val currentPageGroup = groupOrNull("currentpage")
-            when (currentPageGroup) {
-                null -> Pair(0, 0)
-                else -> Pair(
-                    currentPageGroup.formatInt(),
-                    group("maxpage").formatInt()
-                )
-            }
-        } ?: return
-
-        val profilePets = ProfileStorageData.petProfiles?.pets ?: return
-
+        if (!mainPetMenuNamePattern.matches(inventoryName)) return
         val petItems = inventoryItems.filter { (slotNumber, stack) ->
             slotNumber.isPetStackLocation() && stack.getInternalNameOrNull() != null
         }
@@ -283,17 +286,12 @@ object PetStorageApi {
         }.forEach { data ->
             // Because this inventory is the "source of truth", if we come across the same UUID
             // we should always replace the data in-place
-            profilePets.indexOfFirstOrNull { it.uuid == data.uuid }?.let {
-                profilePets[it] = data
-            } ?: profilePets.add(data)
+            localPetStorage.indexOfFirstOrNull { it.uuid == data.uuid }?.let {
+                localPetStorage[it] = data
+            } ?: localPetStorage.add(data)
         }
 
-        if (currentPage == maxPage) {
-            // Strip away any pet data that don't have a UUID associated
-            profilePets.removeIf { it.uuid == null }
-        }
-
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
+        saveConfig()
     }
 
     private fun InventoryFullyOpenedEvent.readEquipmentPetData() {
@@ -311,12 +309,12 @@ object PetStorageApi {
             uuid = petInfo.uuid,
         )
 
-        val profilePets = ProfileStorageData.petProfiles?.pets ?: return
-        profilePets.indexOfFirstOrNull { it.uuid == petInfo.uuid }?.let {
-            profilePets[it] = data
-        } ?: profilePets.add(data)
+        localPetStorage.indexOfFirstOrNull { it.uuid == petInfo.uuid }?.let {
+            localPetStorage[it] = data
+        } ?: localPetStorage.add(data)
 
         CurrentPetApi.assertFoundCurrentData(data)
+        saveConfig()
     }
 
     private fun InventoryFullyOpenedEvent.readSelectedPetData() {
@@ -368,6 +366,7 @@ object PetStorageApi {
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
+            saveConfig()
         }
     }
 
@@ -379,9 +378,9 @@ object PetStorageApi {
         level: Int? = null,
         exp: Double? = null,
         expErrorFactor: Double = 0.01,
-    ): PetData? = ProfileStorageData.petProfiles?.pets?.filter {
+    ): PetData? = localPetStorage.filter {
         it.uuid != null
-    }?.takeIfNotEmpty()?.firstUniqueByOrNull(
+    }.takeIfNotEmpty()?.firstUniqueByOrNull(
         { it.cleanName == name },
         { rarity == null || it.rarity == rarity },
         { heldItem == null || it.heldItemInternalName == heldItem },

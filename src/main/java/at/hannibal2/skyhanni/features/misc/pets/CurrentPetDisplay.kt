@@ -111,7 +111,7 @@ object CurrentPetDisplay {
                     }
                     TElement.NEXT_LEVEL_PROGRESS, TElement.OVERFLOW_XP, TElement.TOTAL_XP -> {
                         // Todo
-                        ""
+                        null
                     }
                 }
             }.map {
@@ -139,8 +139,8 @@ object CurrentPetDisplay {
                 TLO.BOTTOM, TLO.RIGHT -> listOf(itemRenderable, textRenderable)
             }
             when (textLocation) {
-                TLO.TOP, TLO.BOTTOM -> VerticalContainerRenderable(orderedList)
-                TLO.LEFT, TLO.RIGHT -> HorizontalContainerRenderable(orderedList)
+                TLO.TOP, TLO.BOTTOM -> VerticalContainerRenderable(orderedList, spacing = 2)
+                TLO.LEFT, TLO.RIGHT -> HorizontalContainerRenderable(orderedList, spacing = 2)
             }
         } else listOf(textRenderable, itemRenderable).firstOrNull { it != null }
     }
