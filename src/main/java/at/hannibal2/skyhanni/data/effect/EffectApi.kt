@@ -160,7 +160,7 @@ object EffectApi {
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
-            "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain." -> {
+            "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain." -> {
                 effect = NonGodPotEffect.GOBLIN
                 changeType = EffectDurationChangeType.SET
                 duration = 20.minutes
@@ -187,38 +187,48 @@ object EffectApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
-        for (line in event.footer.split("\n")) {
-            val effect = line.getNonGodPotEffectOrNull() ?: continue
-            godPotTabPattern.matchMatcher(line) {
-                profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
-            }
-            val durationString = line.substring(effect.tabListName.length)
-            try {
-                val duration = TimeUtils.getDuration(durationString.split("§f")[1])
-                EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
-            } catch (e: IndexOutOfBoundsException) {
-                ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
-            }
-        }
+        for (line in event.footer.split("\n")) line.readEffectFromTab()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PESTS)) return
+        event.readPestRepellent()
+        event.readEffects()
+    }
 
-        event.lines.firstNotNullOfOrNull {
-            repellentPattern.matchMatcher(it) {
-                // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
-                val time = group("time")?.toIntOrNull() ?: return@matchMatcher
-                val tier = group("tier")
-                val duration = time.toDuration(DurationUnit.SECONDS)
-                val propTier = when (tier) {
-                    "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
-                    "REGULAR" -> NonGodPotEffect.PEST_REPELLENT
-                    else -> return@matchMatcher
-                }
-                EffectDurationChangeEvent(propTier, EffectDurationChangeType.SET, duration).post()
+    private fun WidgetUpdateEvent.readEffects() {
+        if (!isWidget(TabWidget.ACTIVE_EFFECTS)) return
+        for (line in lines) line.readEffectFromTab()
+    }
+
+    private fun String.readEffectFromTab() {
+        val effect = getNonGodPotEffectOrNull() ?: return
+        godPotTabPattern.matchMatcher(this) {
+            profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
+        }
+        val durationString = this.substring(effect.tabListName.length)
+        try {
+            val duration = TimeUtils.getDuration(durationString.split("§f")[1])
+            EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
+        } catch(e: Exception) {
+            ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$this'")
+        }
+    }
+
+    private fun WidgetUpdateEvent.readPestRepellent() {
+        if (!isWidget(TabWidget.PESTS)) return
+
+        repellentPattern.firstMatcher(lines) {
+            // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
+            val time = group("time")?.toIntOrNull() ?: return@firstMatcher
+            val tier = group("tier")
+            val duration = time.toDuration(DurationUnit.SECONDS)
+            val propTier = when (tier) {
+                "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
+                "REGULAR" -> NonGodPotEffect.PEST_REPELLENT
+                else -> return@firstMatcher
             }
+            EffectDurationChangeEvent(propTier, EffectDurationChangeType.SET, duration).post()
         }
     }
 
