@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGui
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
@@ -35,12 +34,11 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
@@ -55,14 +53,15 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object GardenApi {
 
+    private val RARE_MOOSHROOM_COW_PET_ITEM = "MOOSHROOM_COW;2".toInternalName()
+
     var toolInHand: String? = null
     var itemInHand: ItemStack? = null
     var cropInHand: CropType? = null
     var pestCooldownEndTime = SimpleTimeMark.farPast()
     var lastCropBrokenTime = SimpleTimeMark.farPast()
     val mushroomCowPet
-        get() = CurrentPetApi.isCurrentPet("Mooshroom Cow") &&
-            FarmingItemType.MOOSHROOM_COW.getItemOrNull()?.let { it.getItemRarityOrNull()?.isAtLeast(LorenzRarity.RARE) } ?: false
+        get() = CurrentPetApi.isCurrentPetOrHigherRarity(RARE_MOOSHROOM_COW_PET_ITEM)
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val storage get() = ProfileStorageData.profileSpecific?.garden

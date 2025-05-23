@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -33,6 +34,11 @@ object CurrentPetApi {
 
     fun isCurrentPet(petInternalName: NeuInternalName) = currentPet?.petInternalName == petInternalName
     fun isCurrentPet(petName: String): Boolean = currentPet?.coloredName?.contains(petName) ?: false
+    fun isCurrentPetOrHigherRarity(petInternalName: NeuInternalName): Boolean {
+        val (properPetName, startingRarity) = PetUtils.internalNameToPetWithRarity(petInternalName) ?: return false
+        val currentPet = currentPet ?: return false
+        return currentPet.cleanInternalName == properPetName && currentPet.rarity.id >= startingRarity.id
+    }
 
     fun assertFoundCurrentData(petData: PetData) {
         if (petData.uuid == null) {
