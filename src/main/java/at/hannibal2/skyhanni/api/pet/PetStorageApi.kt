@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -157,8 +158,8 @@ object PetStorageApi {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
     }
 
-    @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
-    fun onProfileJoin() {
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         localPetStorage = ProfileStorageData.petProfiles?.pets ?: return
     }
 
