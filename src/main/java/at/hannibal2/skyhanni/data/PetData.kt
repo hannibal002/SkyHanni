@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -27,6 +28,7 @@ class PetDataStorage {
     }
 }
 
+@KSerializable
 data class PetData(
     @Expose var petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
@@ -47,7 +49,7 @@ data class PetData(
 
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
-    val levelProgressionPercentage: Double = when {
+    val levelProgressionPercentage: Double get() = when {
         exp == null || exp == 0.0 -> 0.0
         PetUtils.getMaxLevel(petInternalName) <= level -> 100.0
         else -> {

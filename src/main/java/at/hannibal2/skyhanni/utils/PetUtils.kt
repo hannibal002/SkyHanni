@@ -116,7 +116,9 @@ object PetUtils {
 
     private fun getFullLevelingTree(petInternalName: NeuInternalName): List<Int> {
         val properPetName = petInternalName.asString().split(";").first()
-        return baseXpLevelReqs + customXpLevelReqs?.get(properPetName)?.petLevels.orEmpty()
+        val customLevels = customXpLevelReqs?.get(properPetName)?.petLevels.orEmpty()
+        ChatUtils.chat("customLevels for $properPetName is ${customLevels.size} level(s)")
+        return baseXpLevelReqs + customLevels
     }
 
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {

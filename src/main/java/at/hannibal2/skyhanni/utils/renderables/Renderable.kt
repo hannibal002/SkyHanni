@@ -1558,7 +1558,7 @@ interface Renderable {
     }
 
     class CircularRenderable(
-        private val content: Renderable?,
+        private val itemRenderable: ItemStackRenderable?,
         private val backgroundColor: Color,
         private val radius: Int,
         private val border: CircularRenderable? = null,
@@ -1585,10 +1585,10 @@ interface Renderable {
                 drawFilledCircle(diffRadius, diffRadius, radius, backgroundColor)
             }
 
-            content?.let {
-                val contentX = totalRadius - (it.width / 2)
-                val contentY = totalRadius - (it.height / 2)
-                it.render(contentX, contentY)
+            itemRenderable?.let {
+                val itemX = totalRadius - (it.width / 2)
+                val itemY = totalRadius - (it.height / 2)
+                it.render(itemX, itemY)
             }
         }
 

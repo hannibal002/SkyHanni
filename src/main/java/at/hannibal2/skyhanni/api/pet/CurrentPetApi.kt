@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object CurrentPetApi {
-    val patternGroup = RepoPattern.Companion.group("misc.pet")
+    val patternGroup = RepoPattern.group("misc.pet")
 
     /**
      * REGEX-TEST: §aYou summoned your §r§dRabbit§r§9 ✦§r§a!

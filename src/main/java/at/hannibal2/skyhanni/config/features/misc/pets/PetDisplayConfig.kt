@@ -82,7 +82,7 @@ class PetDisplayConfig {
                 "§eItem Stack must be enabled above."
         )
         @ConfigEditorBoolean
-        var skinAnimation: Boolean = true
+        val skinAnimation: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
@@ -91,7 +91,7 @@ class PetDisplayConfig {
                 "§eItem Stack must be enabled above."
         )
         @ConfigEditorDropdown
-        var spinDirection: Property<SpinDirection> = Property.of(SpinDirection.NONE)
+        val spinDirection: Property<SpinDirection> = Property.of(SpinDirection.NONE)
 
         enum class SpinDirection(private val displayName: String) {
             NONE("No Spinning"),
@@ -109,7 +109,7 @@ class PetDisplayConfig {
                 "§eItem Stack and §eItem Spin must be enabled above."
         )
         @ConfigEditorSlider(minValue = 0.5f, maxValue = 10f, minStep = 0.5f)
-        var spinFrequency: Property<Double> = Property.of(2.0)
+        val spinFrequency: Property<Double> = Property.of(2.0)
 
         @Expose
         @ConfigOption(
@@ -118,7 +118,7 @@ class PetDisplayConfig {
                 "§ePet Item must be enabled above."
         )
         @ConfigEditorSlider(minValue = 0.1f, maxValue = 2.0f, minStep = 0.05f)
-        var petItemScale: Property<Float> = Property.of(0.7f)
+        val petItemScale: Property<Float> = Property.of(0.7f)
 
         @SkyHanniModule
         companion object {
@@ -189,7 +189,7 @@ class PetDisplayConfig {
                 "§eUnformatted: §72,240/2,200"
         )
         @ConfigEditorDropdown
-        var xpFormat: NumberFormatEntry = NumberFormatEntry.DEFAULT
+        var xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
 
         enum class NumberFormatEntry(
             private val displayName: String,
@@ -209,7 +209,7 @@ class PetDisplayConfig {
                 "§eOnly has any effect if one or more Visual Elements are enabled."
         )
         @ConfigEditorDropdown
-        var textLocation: Property<TextLocationOption> = Property.of(TLO.RIGHT)
+        val textLocation: Property<TextLocationOption> = Property.of(TLO.RIGHT)
 
         enum class TextLocationOption(private val displayName: String) {
             TOP("Top"),
@@ -227,7 +227,7 @@ class PetDisplayConfig {
             desc = "How text elements will align vertically.",
         )
         @ConfigEditorDropdown
-        var verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER
+        val verticalAlign: Property<RenderUtils.VerticalAlignment> = Property.of(RenderUtils.VerticalAlignment.CENTER)
 
         @Expose
         @ConfigOption(
@@ -235,7 +235,7 @@ class PetDisplayConfig {
             desc = "How text elements will align horizontally.",
         )
         @ConfigEditorDropdown
-        var horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
+        val horizontalAlign: Property<RenderUtils.HorizontalAlignment> = Property.of(RenderUtils.HorizontalAlignment.LEFT)
 
         @SkyHanniModule
         companion object {

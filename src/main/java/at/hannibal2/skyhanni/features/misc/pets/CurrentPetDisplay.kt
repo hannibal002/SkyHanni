@@ -36,6 +36,7 @@ object CurrentPetDisplay {
     private var rotationContext: Vec3 = Vec3(0.0, 0.0, 0.0)
     private var lastPetHash: Int = 0
     private var petOverlay: Renderable? = null
+    private var currentSpinningRenderable: AnimatedItemStackRenderable? = null
 
     private fun PetData.buildItemRenderableOrNull(): Renderable? {
         val enabledVisuals = config.visual.enabledVisuals.get()
@@ -47,7 +48,7 @@ object CurrentPetDisplay {
             spinDirection != SDirection.NONE -> {
                 val multiplier = if (spinDirection == SDirection.CLOCKWISE) -1 else 1
                 val degreesPerSecond = (360 / config.visual.spinFrequency.get()) * multiplier
-                AnimatedItemStackRenderable(
+                currentSpinningRenderable = AnimatedItemStackRenderable(
                     itemStack,
                     rotation = ItemStackRotationDefinition(
                         axis = EnumFacing.Axis.Y,
@@ -55,24 +56,29 @@ object CurrentPetDisplay {
                     ),
                     initialRotation = rotationContext
                 )
+                currentSpinningRenderable
             }
-            else -> ItemStackRenderable(itemStack)
+            else -> {
+                rotationContext = currentSpinningRenderable?.currentRotation ?: rotationContext
+                currentSpinningRenderable = null
+                ItemStackRenderable(itemStack)
+            }
         }
 
         val augmentedRenderable = when {
             VElement.RARITY_BACKGROUND !in enabledVisuals -> baseItemRenderable
             else -> Renderable.CircularRenderable(
-                baseItemRenderable,
+                itemRenderable = baseItemRenderable,
                 rarity.color.toColor(),
                 20,
                 border = Renderable.CircularRenderable(
-                    content = null,
+                    itemRenderable = null,
                     Color.GRAY,
                     26,
                     border = when {
                         VElement.XP_RING !in enabledVisuals -> null
                         else -> Renderable.CircularRenderable(
-                            content = null,
+                            itemRenderable = null,
                             backgroundColor = Color.cyan,
                             radius = 29,
                             filledPercentage = levelProgressionPercentage
@@ -117,12 +123,12 @@ object CurrentPetDisplay {
             }.map {
                 RenderableString(
                     it,
-                    horizontalAlign = config.text.horizontalAlign
+                    horizontalAlign = config.text.horizontalAlign.get()
                 )
             }.forEach { add(it) }
         },
-        horizontalAlign = config.text.horizontalAlign,
-        verticalAlign = config.text.verticalAlign,
+        horizontalAlign = config.text.horizontalAlign.get(),
+        verticalAlign = config.text.verticalAlign.get(),
     )
 
     private fun PetData.buildRenderable(): Renderable? {
