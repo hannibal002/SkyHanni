@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.util.Vec3
+import java.nio.FloatBuffer
+
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
 //#endif
@@ -58,6 +60,18 @@ object DrawContextUtils {
         drawContext.matrices.translate(vec)
     }
 
+    fun rotate(angle: Float, x: Double, y: Double, z: Double) {
+        drawContext.matrices.rotate(angle, x, y, z)
+    }
+
+    fun rotate(angle: Float, x: Float, y: Float, z: Float) {
+        drawContext.matrices.rotate(angle, x, y, z)
+    }
+
+    fun rotate(angle: Float, vec: Vec3) {
+        drawContext.matrices.rotate(angle, vec)
+    }
+
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)
     }
@@ -68,5 +82,17 @@ object DrawContextUtils {
 
     fun popMatrix() {
         drawContext.matrices.popMatrix()
+    }
+
+    fun getFloat(pName: Int, params: FloatBuffer) {
+        drawContext.matrices.getFloat(pName, params)
+    }
+
+    fun loadIdentity() {
+        drawContext.matrices.loadIdentity()
+    }
+
+    fun multMatrix(matrix: FloatBuffer) {
+        drawContext.matrices.multMatrix(matrix)
     }
 }

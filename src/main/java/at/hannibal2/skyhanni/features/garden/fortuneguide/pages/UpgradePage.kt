@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.guide.GuideScrollPage
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import java.text.DecimalFormat
 
 class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
@@ -63,7 +64,7 @@ class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: 
             )
         )
         add(
-            Renderable.itemStackWithTip(
+            ItemStackRenderable(
                 requiredItem.getItemStack(),
                 8.0 / 9.0,
                 verticalAlign = VerticalAlignment.CENTER
