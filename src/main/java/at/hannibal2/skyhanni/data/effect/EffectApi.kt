@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -124,18 +125,23 @@ object EffectApi {
         val changeType: EffectDurationChangeType?
         val duration: Duration?
 
-        when (event.message) {
+        val modifiedMessage = event.message.replace(
+            " Press TAB or type /effects to view your active effects!",
+            ""
+        )
+
+        when (modifiedMessage) {
             "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!" -> {
                 effect = NonGodPotEffect.SMOLDERING
-                changeType = EffectDurationChangeType.SET
+                changeType = EffectDurationChangeType.ADD // These stack when you consume them
                 duration = 1.hours
             }
-            "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!" -> {
+            "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f!" -> {
                 effect = NonGodPotEffect.GLOWY
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
-            "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!" -> {
+            "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f!" -> {
                 effect = NonGodPotEffect.WISP
                 changeType = EffectDurationChangeType.SET
                 duration = 5.minutes
@@ -145,7 +151,7 @@ object EffectApi {
                 changeType = EffectDurationChangeType.SET
                 duration = 24.hours
             }
-            "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!" -> {
+            "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f!" -> {
                 effect = NonGodPotEffect.HARVEST_HARBINGER
                 changeType = EffectDurationChangeType.SET
                 duration = 25.minutes
@@ -170,7 +176,7 @@ object EffectApi {
                 changeType = EffectDurationChangeType.REMOVE
                 duration = null
             }
-            "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f! Press TAB or type /effects to view your active effects!" -> {
+            "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f!" -> {
                 effect = NonGodPotEffect.DOUCE_PLUIE_DE_STINKY_CHEESE
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
@@ -182,7 +188,7 @@ object EffectApi {
     }
 
     private fun String.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        "$this§r".startsWith(it.tabListName)
+        "${this.trim()}§r".startsWith(it.tabListName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -198,7 +204,10 @@ object EffectApi {
 
     private fun WidgetUpdateEvent.readEffects() {
         if (!isWidget(TabWidget.ACTIVE_EFFECTS)) return
-        for (line in lines) line.readEffectFromTab()
+        val reformattedLines = lines.map {
+            it.removeResets().trim()
+        }
+        for (line in reformattedLines) line.readEffectFromTab()
     }
 
     private fun String.readEffectFromTab() {
@@ -206,7 +215,7 @@ object EffectApi {
         godPotTabPattern.matchMatcher(this) {
             profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
         }
-        val durationString = this.substring(effect.tabListName.length)
+        val durationString = this.substring(effect.tabListName.length).replace(": ", "")
         try {
             val duration = TimeUtils.getDuration(durationString.split("§f")[1])
             EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
