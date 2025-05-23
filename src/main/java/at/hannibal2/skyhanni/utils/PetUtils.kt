@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
+//#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetSkinJson
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule

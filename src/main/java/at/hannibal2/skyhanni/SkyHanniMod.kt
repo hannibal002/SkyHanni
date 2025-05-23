@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.config.Features
 //#if TODO
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.data.OtherInventoryData
-//#endif
 import at.hannibal2.skyhanni.data.PetDataStorage
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 //#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson

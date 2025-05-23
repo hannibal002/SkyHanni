@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import com.google.gson.annotations.Expose
 import java.util.UUID
 
+// todo 1.21 impl needed
 class PetDataStorage {
     @Expose
     val players: MutableMap<UUID, PlayerSpecific> = mutableMapOf()
@@ -33,7 +34,7 @@ data class PetData(
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
-    val internalNameSplits: Pair<String, LorenzRarity> =
+    private val internalNameSplits: Pair<String, LorenzRarity> =
         PetUtils.internalNameToPetWithRarity(petInternalName)
             ?: ("???" to LorenzRarity.COMMON)
 

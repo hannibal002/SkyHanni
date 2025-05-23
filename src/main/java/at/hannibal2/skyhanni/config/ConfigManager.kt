@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.config
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+//#if TODO
 import at.hannibal2.skyhanni.data.PetDataStorage
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 //#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
