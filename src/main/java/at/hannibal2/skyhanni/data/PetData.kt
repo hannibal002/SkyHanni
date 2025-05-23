@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.PetUtils
-import at.hannibal2.skyhanni.utils.PetUtils.levelToXp
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
@@ -24,7 +23,7 @@ class PetDataStorage {
 
     class ProfileSpecific {
         @Expose
-        var pets: MutableList<PetData> = mutableListOf()
+        val pets: MutableList<PetData> = mutableListOf()
     }
 }
 
@@ -53,12 +52,21 @@ data class PetData(
         exp == null || exp == 0.0 -> 0.0
         PetUtils.getMaxLevel(petInternalName) <= level -> 100.0
         else -> {
-            val currentLevelXp = levelToXp(level, petInternalName) ?: 0.0
-            val nextLevelXp = levelToXp(level + 1, petInternalName) ?: 0.0
             val xpDifference = nextLevelXp - currentLevelXp
             val xpProgress = (exp ?: 0.0) - currentLevelXp
             xpProgress / xpDifference * 100
         }
+    }
+    val currentLevelXp get() = PetUtils.levelToXp(level, petInternalName) ?: 0.0
+    val nextLevelXp get() = PetUtils.levelToXp(level + 1, petInternalName) ?: 0.0
+
+    val overflowXp get() = when {
+        level == PetUtils.getMaxLevel(petInternalName) -> {
+            val currentTotalXp = exp ?: 0.0
+            val levelXp = PetUtils.levelToXp(level, petInternalName) ?: 0.0
+            (currentTotalXp - levelXp).takeIf { it >= 0.0 } ?: 0.0
+        }
+        else -> 0.0
     }
 
     fun getUserFriendlyName(

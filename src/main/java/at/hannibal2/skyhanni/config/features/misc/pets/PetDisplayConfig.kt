@@ -26,7 +26,7 @@ class PetDisplayConfig {
     @ConfigOption(name = "Enabled", desc = "Show a GUI element for the currently active pet.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    val enabled: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigLink(owner = PetDisplayConfig::class, field = "enabled")
@@ -47,7 +47,7 @@ class PetDisplayConfig {
         @ConfigEditorDraggableList
         val enabledVisuals: Property<MutableList<VisualElement>> = Property.of(
             mutableListOf(
-                VElement.ITEM_STACK,
+                VElement.PET_ICON,
                 VElement.RARITY_BACKGROUND,
                 VElement.XP_RING,
             )
@@ -57,18 +57,14 @@ class PetDisplayConfig {
             val displayName: String,
             val dependentOn: Collection<VisualElement> = emptySet()
         ) {
-            ITEM_STACK("Item Stack"),
+            PET_ICON("Pet Icon"),
             RARITY_BACKGROUND(
                 displayName = "Rarity Background",
-                dependentOn = setOf(ITEM_STACK),
+                dependentOn = setOf(PET_ICON),
             ),
             XP_RING(
                 displayName = "Xp Ring",
-                dependentOn = setOf(ITEM_STACK, RARITY_BACKGROUND),
-            ),
-            PET_HELD_ITEM(
-                displayName = "Pet Held Item",
-                dependentOn = setOf(ITEM_STACK),
+                dependentOn = setOf(PET_ICON, RARITY_BACKGROUND),
             ),
             ;
 
@@ -78,17 +74,17 @@ class PetDisplayConfig {
         @Expose
         @ConfigOption(
             name = "Skin Animation",
-            desc = "If your pet has an animated skin, display the animated skin for the item.\n" +
-                "§eItem Stack must be enabled above."
+            desc = "If your pet has an animated skin, display the animated skin for the icon.\n" +
+                "§ePet Icon must be enabled above."
         )
         @ConfigEditorBoolean
         val skinAnimation: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
-            name = "Item Spin",
-            desc = "Spin the active pet item in place.\n" +
-                "§eItem Stack must be enabled above."
+            name = "Icon Spin",
+            desc = "Spin the pet icon in place.\n" +
+                "§ePet Icon must be enabled above."
         )
         @ConfigEditorDropdown
         val spinDirection: Property<SpinDirection> = Property.of(SpinDirection.NONE)
@@ -106,19 +102,10 @@ class PetDisplayConfig {
         @ConfigOption(
             name = "Spin Speed",
             desc = "How long in seconds it should take for one spin to complete.\n" +
-                "§eItem Stack and §eItem Spin must be enabled above."
+                "§ePet Icon and §eIcon Spin must be enabled above."
         )
         @ConfigEditorSlider(minValue = 0.5f, maxValue = 10f, minStep = 0.5f)
         val spinFrequency: Property<Double> = Property.of(2.0)
-
-        @Expose
-        @ConfigOption(
-            name = "Held Item Scale",
-            desc = "How large the pet's held item should be. Default: 0.7\n" +
-                "§ePet Item must be enabled above."
-        )
-        @ConfigEditorSlider(minValue = 0.1f, maxValue = 2.0f, minStep = 0.05f)
-        val petItemScale: Property<Float> = Property.of(0.7f)
 
         @SkyHanniModule
         companion object {
@@ -172,6 +159,11 @@ class PetDisplayConfig {
             ),
 
             NEXT_LEVEL_PROGRESS("Next Level Progress"),
+            NEXT_LEVEL_PERCENTAGE(
+                displayName = "Next Level Percentage",
+                dependentOn = setOf(NEXT_LEVEL_PROGRESS),
+            ),
+
             OVERFLOW_XP("Overflow XP"),
             TOTAL_XP("Total XP"),
             HELD_ITEM("Held Item"),
@@ -182,6 +174,14 @@ class PetDisplayConfig {
 
         @Expose
         @ConfigOption(
+            name = "Text Labels",
+            desc = "Show labels before each text line explaining what data it is."
+        )
+        @ConfigEditorBoolean
+        val textLabels: Property<Boolean> = Property.of(true)
+
+        @Expose
+        @ConfigOption(
             name = "XP Format",
             desc = "Either show default, formatted, or unformatted numbers.\n" +
                 "§eDefault: §72,240/2.2k\n" +
@@ -189,7 +189,7 @@ class PetDisplayConfig {
                 "§eUnformatted: §72,240/2,200"
         )
         @ConfigEditorDropdown
-        var xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
+        val xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
 
         enum class NumberFormatEntry(
             private val displayName: String,

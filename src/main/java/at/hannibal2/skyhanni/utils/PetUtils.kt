@@ -86,7 +86,7 @@ object PetUtils {
 
     fun levelToXp(level: Int, petInternalName: NeuInternalName): Double? {
         val rarityOffset = getRarityOffset(petInternalName) ?: return null
-        if (level < 0 || level >= getMaxLevel(petInternalName)) return null
+        if (level < 0 || level > getMaxLevel(petInternalName)) return null
         return getFullLevelingTree(petInternalName)
             .slice(0 + rarityOffset..<level + rarityOffset - 1)
             .sumOf { it.toDouble() }
@@ -116,20 +116,13 @@ object PetUtils {
 
     private fun getFullLevelingTree(petInternalName: NeuInternalName): List<Int> {
         val properPetName = petInternalName.asString().split(";").first()
-        val customLevels = customXpLevelReqs?.get(properPetName)?.petLevels.orEmpty()
-        ChatUtils.chat("customLevels for $properPetName is ${customLevels.size} level(s)")
-        return baseXpLevelReqs + customLevels
+        return baseXpLevelReqs + customXpLevelReqs?.get(properPetName)?.petLevels.orEmpty()
     }
 
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {
-        val petsData = customXpLevelReqs ?: run {
-            ErrorManager.skyHanniError("NEUPetsData is null")
-        }
+        val petsData = customXpLevelReqs ?: return null
         val (properPetName, rarity) = internalNameToPetWithRarity(petInternalName) ?: return null
-        return if (properPetName in petsData.keys) {
-            val petData = petsData[properPetName]
-            petData?.rarityOffset?.get(rarity)
-        } else when (rarity) {
+        return petsData[properPetName]?.rarityOffset?.get(rarity) ?: when (rarity) {
             LorenzRarity.COMMON -> 0
             LorenzRarity.UNCOMMON -> 6
             LorenzRarity.RARE -> 11

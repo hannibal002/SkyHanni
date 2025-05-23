@@ -6,10 +6,8 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,6 +19,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -44,11 +43,11 @@ import kotlin.math.abs
 object PetStorageApi {
 
     private val config get() = SkyHanniMod.feature.misc.pets
+    private val petStorage get() = ProfileStorageData.petProfiles?.pets
     private val patternGroup = RepoPattern.group("misc.pet.storage")
     private const val PET_MENU_CURRENT_PET_SLOT = 4
     private const val SB_MENU_CURRENT_PET_SLOT = 30
     private const val EQUIP_MENU_CURRENT_PET_SLOT = 47
-    private var localPetStorage: MutableList<PetData> = mutableListOf()
 
     // <editor-fold desc="Patterns">
     /**
@@ -154,13 +153,7 @@ object PetStorageApi {
     }
 
     private fun saveConfig() {
-        ProfileStorageData.petProfiles?.pets = localPetStorage
         SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
-    }
-
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        localPetStorage = ProfileStorageData.petProfiles?.pets ?: return
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
@@ -175,11 +168,13 @@ object PetStorageApi {
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) {
-                val isMaxed = groupOrNull("max") != null
+                // We don't know XP if it's just "MAX LEVEL"
+                if (groupOrNull("max") != null) return@firstMatcher null
+
                 val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
                 val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: return@firstMatcher null
-                val additionalXp = if (isMaxed) 0.0 else group("current").formatDouble()
-                currentLevelXp + additionalXp
+                val readXpGroup = groupOrNull("current")?.formatDoubleOrNull() ?: 0.0
+                currentLevelXp + readXpGroup
             }
 
             val resolvedPet = resolvePetDataOrNull(
@@ -192,7 +187,7 @@ object PetStorageApi {
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
-                exp = petExp ?: exp
+                exp = petExp?.takeIf { it > (exp ?: 0.0) } ?: exp
                 skinInternalName = getPetSkinOrNull(petName)?.internalName ?: skinInternalName
                 heldItemInternalName = petHeldItem ?: heldItemInternalName
             }
@@ -249,7 +244,7 @@ object PetStorageApi {
         val petInfo = clickedItem.getPetInfo() ?: return
         when (event.clickedButton) {
             1 -> { // Right click
-                localPetStorage.removeIf {
+                petStorage?.removeIf {
                     it.uuid == petInfo.uuid
                 }
             }
@@ -274,6 +269,7 @@ object PetStorageApi {
         val petItems = inventoryItems.filter { (slotNumber, stack) ->
             slotNumber.isPetStackLocation() && stack.getInternalNameOrNull() != null
         }
+        val petStorage = petStorage ?: return
 
         petItems.mapNotNull { (_, item) ->
             val petInfo = item.getPetInfo() ?: return@mapNotNull null
@@ -287,9 +283,9 @@ object PetStorageApi {
         }.forEach { data ->
             // Because this inventory is the "source of truth", if we come across the same UUID
             // we should always replace the data in-place
-            localPetStorage.indexOfFirstOrNull { it.uuid == data.uuid }?.let {
-                localPetStorage[it] = data
-            } ?: localPetStorage.add(data)
+            petStorage.indexOfFirstOrNull { it.uuid == data.uuid }?.let {
+                petStorage[it] = data
+            } ?: petStorage.add(data)
         }
 
         saveConfig()
@@ -310,9 +306,10 @@ object PetStorageApi {
             uuid = petInfo.uuid,
         )
 
-        localPetStorage.indexOfFirstOrNull { it.uuid == petInfo.uuid }?.let {
-            localPetStorage[it] = data
-        } ?: localPetStorage.add(data)
+        val petStorage = petStorage ?: return
+        petStorage.indexOfFirstOrNull { it.uuid == petInfo.uuid }?.let {
+            petStorage[it] = data
+        } ?: petStorage.add(data)
 
         CurrentPetApi.assertFoundCurrentData(data)
         saveConfig()
@@ -362,7 +359,7 @@ object PetStorageApi {
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
-                exp = petExp ?: exp
+                exp = petExp?.takeIf { it > (exp ?: 0.0) } ?: exp
                 skinInternalName = petSkin?.internalName ?: skinInternalName
             }
 
@@ -379,9 +376,9 @@ object PetStorageApi {
         level: Int? = null,
         exp: Double? = null,
         expErrorFactor: Double = 0.01,
-    ): PetData? = localPetStorage.filter {
+    ): PetData? = petStorage?.filter {
         it.uuid != null
-    }.takeIfNotEmpty()?.firstUniqueByOrNull(
+    }?.takeIfNotEmpty()?.firstUniqueByOrNull(
         { it.cleanName == name },
         { rarity == null || it.rarity == rarity },
         { heldItem == null || it.heldItemInternalName == heldItem },
