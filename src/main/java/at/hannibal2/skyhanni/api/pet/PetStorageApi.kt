@@ -152,9 +152,10 @@ object PetStorageApi {
         }?.takeIf { it.size == 1 }?.first()
     }
 
-    private fun saveConfig() {
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.PETS, "saving-data")
-    }
+    private fun saveConfig() = SkyHanniMod.configManager.saveConfig(
+        ConfigFileType.PETS,
+        "saving-data"
+    )
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
@@ -170,7 +171,6 @@ object PetStorageApi {
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) {
                 // We don't know XP if it's just "MAX LEVEL"
                 if (groupOrNull("max") != null) return@firstMatcher null
-
                 val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
                 val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: return@firstMatcher null
                 val readXpGroup = groupOrNull("current")?.formatDoubleOrNull() ?: 0.0
@@ -266,10 +266,11 @@ object PetStorageApi {
 
     private fun InventoryFullyOpenedEvent.readPetsMenuItems() {
         if (!mainPetMenuNamePattern.matches(inventoryName)) return
+        val petStorage = petStorage ?: return
+
         val petItems = inventoryItems.filter { (slotNumber, stack) ->
             slotNumber.isPetStackLocation() && stack.getInternalNameOrNull() != null
         }
-        val petStorage = petStorage ?: return
 
         petItems.mapNotNull { (_, item) ->
             val petInfo = item.getPetInfo() ?: return@mapNotNull null
@@ -293,6 +294,7 @@ object PetStorageApi {
 
     private fun InventoryFullyOpenedEvent.readEquipmentPetData() {
         if (inventoryName != "Your Equipment and Stats") return
+        val petStorage = petStorage ?: return
         val currentPetItem = inventoryItems[EQUIP_MENU_CURRENT_PET_SLOT]?.takeIf {
             it.displayName != "§7Empty Pet Slot"
         } ?: return
@@ -306,7 +308,6 @@ object PetStorageApi {
             uuid = petInfo.uuid,
         )
 
-        val petStorage = petStorage ?: return
         petStorage.indexOfFirstOrNull { it.uuid == petInfo.uuid }?.let {
             petStorage[it] = data
         } ?: petStorage.add(data)
