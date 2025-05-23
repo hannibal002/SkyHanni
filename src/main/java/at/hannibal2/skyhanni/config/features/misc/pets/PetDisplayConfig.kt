@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.DependentDisplayManager
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.misc.pets.TElement
+import at.hannibal2.skyhanni.features.misc.pets.TLO
 import at.hannibal2.skyhanni.features.misc.pets.VElement
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -19,8 +20,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import kotlin.collections.emptySet
-
-private typealias TLO = PetDisplayConfig.TextPetDisplayConfig.TextLocationOption
 
 class PetDisplayConfig {
     @Expose
@@ -105,6 +104,15 @@ class PetDisplayConfig {
 
         @Expose
         @ConfigOption(
+            name = "Spin Speed",
+            desc = "How long in seconds it should take for one spin to complete.\n" +
+                "§eItem Stack and §eItem Spin must be enabled above."
+        )
+        @ConfigEditorSlider(minValue = 0.5f, maxValue = 10f, minStep = 0.5f)
+        var spinFrequency: Property<Double> = Property.of(2.0)
+
+        @Expose
+        @ConfigOption(
             name = "Held Item Scale",
             desc = "How large the pet's held item should be. Default: 0.7\n" +
                 "§ePet Item must be enabled above."
@@ -162,6 +170,7 @@ class PetDisplayConfig {
                 displayName = "Skin Symbol",
                 dependentOn = setOf(PET_NAME),
             ),
+
             NEXT_LEVEL_PROGRESS("Next Level Progress"),
             OVERFLOW_XP("Overflow XP"),
             TOTAL_XP("Total XP"),
@@ -187,7 +196,7 @@ class PetDisplayConfig {
         ) {
             DEFAULT("Default"),
             FORMATTED("Formatted"),
-            UNFORMATTED("UnFormatted"),
+            UNFORMATTED("Unformatted"),
             ;
 
             override fun toString() = displayName
@@ -199,6 +208,7 @@ class PetDisplayConfig {
             desc = "Where the text will be placed, relative to the Visual Elements above.\n" +
                 "§eOnly has any effect if one or more Visual Elements are enabled."
         )
+        @ConfigEditorDropdown
         var textLocation: Property<TextLocationOption> = Property.of(TLO.RIGHT)
 
         enum class TextLocationOption(private val displayName: String) {
@@ -225,7 +235,7 @@ class PetDisplayConfig {
             desc = "How text elements will align horizontally.",
         )
         @ConfigEditorDropdown
-        var horizontalAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
+        var horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
 
         @SkyHanniModule
         companion object {
@@ -240,13 +250,4 @@ class PetDisplayConfig {
             fun onConfigLoad() = manager.onConfigLoad()
         }
     }
-
-    @Expose
-    @ConfigOption(
-        name = "Transparent Second Pet",
-        desc = "Keep the last equipped pet in the background at this transparency. Set to 0 to disable." +
-            "Second display will mirror the above configuration."
-    )
-    @ConfigEditorSlider(minValue = 0f, maxValue = 40f, minStep = 1f)
-    var secondPetTransparency: Property<Int> = Property.of(0)
 }

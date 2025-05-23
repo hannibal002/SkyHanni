@@ -57,6 +57,7 @@ class AnimatedItemStackRenderable(
     override val horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     override val highlight: Boolean = false,
+    initialRotation: Vec3? = null,
 ) : ItemStackRenderable(
     item,
     scale,
@@ -71,7 +72,8 @@ class AnimatedItemStackRenderable(
     private var lastTime = SimpleTimeMark.now()
     private val startTime = SimpleTimeMark.now()
 
-    private var currentRotation: Vec3 = Vec3(0.0, 0.0, 0.0)
+    var currentRotation: Vec3 = initialRotation ?: Vec3(0.0, 0.0, 0.0)
+        private set
     private fun generateNextRotation(deltaTime: Double): Vec3 = Vec3(
         currentRotation.xCoord + when (rotation.axis) {
             Axis.X -> rotation.rotationSpeed * deltaTime
