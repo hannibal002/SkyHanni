@@ -180,8 +180,8 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
-        - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
-        - If you can improve the existing feature in a meaningful way.
+    - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
+    - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
