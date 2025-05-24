@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -26,7 +27,8 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
-open class SkyHanniItemTracker<Data : ItemTrackerData>(
+open class
+SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
@@ -71,7 +73,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
     ): String {
         val item = items[this] ?: error("Item not found for $this")
-        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.repoItemName
+        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.repoItemNameCompact
     }
 
     open fun drawItems(
