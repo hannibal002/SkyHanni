@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
+import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
+import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -255,7 +257,6 @@ object FishingProfitTracker {
         }
 
         tracker.addItem(internalName, amount, command)
-        addCatch()
     }
 
     private fun isAllowedItem(internalName: NeuInternalName) = itemCategories.any { internalName in it.value }
@@ -263,6 +264,16 @@ object FishingProfitTracker {
     @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
         tracker.firstUpdate()
+    }
+
+    @HandleEvent
+    fun onCatch(event: FishingCatchEvent) {
+        addCatch()
+    }
+
+    @HandleEvent
+    fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
+        addCatch()
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.inKuudraFight
