@@ -112,20 +112,22 @@ object CurrentPetDisplay {
                         val totalXp = exp?.takeIf { totalXp -> totalXp > 0.0 } ?: return@mapNotNull null
                         "§b$totalXp"
                     }
-                    TElement.NEXT_LEVEL_PROGRESS -> {
+                    TElement.NEXT_LEVEL -> {
                         if (level == PetUtils.getMaxLevel(petInternalName)) return@mapNotNull null
 
                         val currentExp = exp ?: 0.0
                         val currentXpOverLevel = currentExp - currentLevelXp
+                        val neededXp = nextLevelXp - currentLevelXp
                         val percentageFormat = if (TElement.NEXT_LEVEL_PERCENTAGE in enabledTexts) {
                             " §7- §e${levelProgressionPercentage.shortFormat()}"
                         } else ""
-                        formatExpPairByConfigOption(currentXpOverLevel, nextLevelXp) + percentageFormat
+                        formatExpPairByConfigOption(currentXpOverLevel, neededXp) + percentageFormat
                     }
                 }
             }.map { (textElement, textElementFormat) ->
                 val labelFormat = if (config.text.textLabels.get()) {
                     when (textElement) {
+                        // These are "parts" of other elements, so they themselves don't have labels.
                         TElement.PET_LEVEL,
                         TElement.SKIN_SYMBOL,
                         TElement.NEXT_LEVEL_PERCENTAGE,
@@ -168,16 +170,15 @@ object CurrentPetDisplay {
         val textRenderable = buildTextRenderableOrNull()
 
         return if (itemRenderable != null && textRenderable != null) {
-            val textLocation = config.text.textLocation.get()
+            // Technically nullable in the JVM
+            val textLocation = config.text.textLocation.get() ?: return null
             val orderedList = when (textLocation) {
                 TLO.TOP, TLO.LEFT -> listOf(textRenderable, itemRenderable)
                 TLO.BOTTOM, TLO.RIGHT -> listOf(itemRenderable, textRenderable)
-                else -> listOf()
             }
             when (textLocation) {
                 TLO.TOP, TLO.BOTTOM -> VerticalContainerRenderable(orderedList, spacing = 2)
                 TLO.LEFT, TLO.RIGHT -> HorizontalContainerRenderable(orderedList, spacing = 2)
-                else -> return null
             }
         } else listOf(textRenderable, itemRenderable).firstOrNull { it != null }
     }

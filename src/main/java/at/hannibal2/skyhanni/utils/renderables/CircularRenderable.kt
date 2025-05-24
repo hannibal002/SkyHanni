@@ -21,11 +21,7 @@ open class CircularRenderable(
     override val horizontalAlign = horizontalAlignment
     override val verticalAlign = verticalAlignment
 
-    override fun render(posX: Int, posY: Int) {
-        renderCircle(posX, posY)
-    }
-
-    private fun renderCircle(posX: Int, posY: Int) = when {
+    override fun render(posX: Int, posY: Int) = when {
         filledPercentage < 100.0 -> {
             val baseAngle = Math.PI.toFloat() * 3f / 2f
             val endAngle = (baseAngle + ((100.0 - filledPercentage) / 50.0 * Math.PI).toFloat()).mod(2f * Math.PI.toFloat())
@@ -34,7 +30,6 @@ open class CircularRenderable(
         }
         else -> drawFilledCircle(0, 0, radius, backgroundColor)
     }
-
 }
 
 class CircularContainerRenderable(

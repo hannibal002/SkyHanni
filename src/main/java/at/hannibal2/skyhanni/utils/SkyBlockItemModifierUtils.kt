@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -84,7 +85,12 @@ object SkyBlockItemModifierUtils {
         @Expose val uniqueId: String,
         @Expose val hideRightClick: Boolean,
         @Expose val noMove: Boolean,
+        @Expose val extraData: JsonObject? = null,
     ) {
+        fun getSkinVariantIndex() = extraData?.entrySet()?.firstOrNull {
+            it.key.startsWith("favorite_")
+        }?.value?.asJsonPrimitive?.asNumber?.toInt()
+
         val properSkinItem get() = skin?.let {
             if (it.asString().startsWith("PET_SKIN_")) it
             else "PET_SKIN_${it.asString()}".toInternalName()

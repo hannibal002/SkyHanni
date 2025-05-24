@@ -72,6 +72,7 @@ object CurrentPetApi {
         event.addIrrelevant {
             add("petName: '${currentPet?.petInternalName ?: ""}'")
             add("petSkin: '${currentPet?.skinInternalName ?: ""}'")
+            add("petSkinVariantIndex: '${currentPet?.skinVariantIndex}'")
             add("petRarity: '${currentPet?.rarity?.rawName.orEmpty()}'")
             add("petItem: '${currentPet?.heldItemInternalName ?: ""}'")
             add("petLevel: '${currentPet?.level ?: 0}'")

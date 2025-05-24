@@ -139,7 +139,7 @@ class PetDisplayConfig {
                 TElement.PET_NAME,
                 TElement.PET_LEVEL,
                 TElement.SKIN_SYMBOL,
-                TElement.NEXT_LEVEL_PROGRESS,
+                TElement.NEXT_LEVEL,
                 TElement.HELD_ITEM,
             )
         )
@@ -158,10 +158,10 @@ class PetDisplayConfig {
                 dependentOn = setOf(PET_NAME),
             ),
 
-            NEXT_LEVEL_PROGRESS("Next Level Progress"),
+            NEXT_LEVEL("Next Level"),
             NEXT_LEVEL_PERCENTAGE(
                 displayName = "Next Level Percentage",
-                dependentOn = setOf(NEXT_LEVEL_PROGRESS),
+                dependentOn = setOf(NEXT_LEVEL),
             ),
 
             OVERFLOW_XP("Overflow XP"),

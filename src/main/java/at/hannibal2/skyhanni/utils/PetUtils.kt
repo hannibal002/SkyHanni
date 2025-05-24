@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 //#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetSkinJson
@@ -12,7 +15,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import com.google.gson.Gson
 
 @SkyHanniModule
 object PetUtils {
@@ -23,6 +25,9 @@ object PetUtils {
     private var customXpLevelReqs: Map<String, NeuPetData>? = null
     var petItemResolution: Map<String, NeuInternalName> = mapOf()
         private set
+    var animatedPetSkins: Map<String, AnimatedSkinJson> = mapOf()
+        private set
+    private val petSkinVariantIndexMap: MutableMap<NeuInternalName, MutableMap<Int, String>> = mutableMapOf()
 
     // <editor-fold desc="Patterns">
     /**
@@ -134,21 +139,65 @@ object PetUtils {
             else -> ErrorManager.skyHanniError("Unknown pet rarity $rarity")
         }
     }
+
+    fun getSkinVariantIdentifier(skinInternalName: NeuInternalName, variantIndex: Int): String? =
+        petSkinVariantIndexMap[skinInternalName]?.get(variantIndex)
     // </editor-fold>
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.getConstant<NeuPetsJson>("pets")
-        baseXpLevelReqs = data.petLevels
-        customXpLevelReqs = data.customPetLeveling
-        petItemResolution = data.petItemDisplayNameToInternalName
+        val petData = event.getConstant<NeuPetsJson>("pets")
+        baseXpLevelReqs = petData.petLevels
+        customXpLevelReqs = petData.customPetLeveling
+        petItemResolution = petData.petItemDisplayNameToInternalName
 
+        val rawPetSkinInternalNames = mutableSetOf<String>()
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
             petSkinNamePattern.matchMatcher(rawInternalName) {
                 val petName = group("pet") ?: return@matchMatcher
-                val petItemData = Gson().fromJson(jsonObject, NeuPetSkinJson::class.java)
+                val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuPetSkinJson::class.java)
+                rawPetSkinInternalNames.add(rawInternalName)
                 petSkins.getOrPut(petName) { mutableListOf() }.add(petItemData)
             }
+        }
+
+        val baseResolverCache: MutableMap<NeuInternalName, String> = mutableMapOf()
+        fun tryResolveIdentifier(fullSkinIdentifier: String): Pair<NeuInternalName, String>? {
+            // Cached lookup
+            baseResolverCache.entries.forEach { (skinInternalName, lookupKey) ->
+                if (fullSkinIdentifier.startsWith(lookupKey))
+                    return Pair(skinInternalName, fullSkinIdentifier.replace(lookupKey, ""))
+            }
+            val identifierSplits = fullSkinIdentifier.split("_")
+            var splitsToJoin = identifierSplits.size + 1
+            while (splitsToJoin-- > 0) {
+                val filteredSplits = identifierSplits.subList(0, splitsToJoin)
+                val joinedSplits = filteredSplits.joinToString("_")
+                if (joinedSplits in rawPetSkinInternalNames) {
+                    // Skin is the joined splits, variant is the non-used splits
+                    val variant = identifierSplits.subList(splitsToJoin, identifierSplits.size).joinToString("_")
+                    val skinInternalName = joinedSplits.toInternalName()
+                    baseResolverCache[skinInternalName] = "${joinedSplits}_"
+                    return Pair(joinedSplits.toInternalName(), variant)
+                }
+            }
+            return null
+        }
+
+        val loadedVariants: MutableMap<NeuInternalName, MutableMap<String, AnimatedSkinJson>> = mutableMapOf()
+        val skinData = event.getConstant<NeuAnimatedSkullsJson>("animatedskulls")
+        animatedPetSkins = skinData.skins
+        // Because hypixel stores which variant of the skin you've selected as an index (int/double) in the
+        // extraData of the pet info, we have to make sure we map these skins in the correct order
+        skinData.skins.filterKeys { it.startsWith("PET_SKIN_") }.forEach { (identifier, skin) ->
+            val (skinInternalName, variant) = tryResolveIdentifier(identifier) ?: return@forEach
+
+            val variantMap = loadedVariants.getOrPut(skinInternalName) { mutableMapOf() }
+            val variantIndex = variantMap.size
+            variantMap[variant] = skin
+
+            val variantIndexMap = petSkinVariantIndexMap.getOrPut(skinInternalName) { mutableMapOf() }
+            variantIndexMap[variantIndex] = variant
         }
     }
 }

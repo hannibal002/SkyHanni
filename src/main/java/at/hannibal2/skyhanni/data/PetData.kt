@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -32,6 +34,7 @@ class PetDataStorage {
 data class PetData(
     @Expose val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
+    @Expose var skinVariantIndex: Int = -1, // Used for pet skins that have variants, otherwise unused
     @Expose var heldItemInternalName: NeuInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
@@ -80,6 +83,23 @@ data class PetData(
         if (includeSkinTag && skinTag != null) append(" $skinTag")
     }
 
-    fun getItemStackOrNull(): ItemStack? = skinInternalName?.getItemStack()
-        ?: petInternalName.getItemStackOrNull()
+    private fun getAnimatedJsonOrNull(): AnimatedSkinJson? {
+        if (skinVariantIndex == -1) return null
+        val skinInternalName = skinInternalName ?: return null
+        val variantIdentifier = PetUtils.getSkinVariantIdentifier(skinInternalName, skinVariantIndex)
+        val fullSkinIdentifier = "${skinInternalName.asString()}_$variantIdentifier"
+        return PetUtils.animatedPetSkins[fullSkinIdentifier]
+    }
+
+    private fun getSkinItemStackOrNull(frameIndex: Int = 0): ItemStack? {
+        val skinInternalName = skinInternalName ?: return null
+        val baseItemStack = skinInternalName.getItemStackOrNull() ?: return null
+        val animatedSkinJson = getAnimatedJsonOrNull()?.takeIf { it.textures.any() } ?: return baseItemStack
+        val boundedFrameIndex = frameIndex.takeIf { it > 0 && it < animatedSkinJson.textures.size } ?: 0
+        val (uuid, texture) = animatedSkinJson.textures[boundedFrameIndex].split(":")
+        return ItemUtils.createSkull("Pet Skin", uuid, texture)
+    }
+
+    fun getItemStackOrNull(frameIndex: Int = 0): ItemStack? =
+        getSkinItemStackOrNull(frameIndex) ?: petInternalName.getItemStackOrNull()
 }
