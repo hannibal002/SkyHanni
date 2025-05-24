@@ -98,5 +98,5 @@ abstract class CacheMap<K : Any, V : Any> : MutableMap<K, V> {
             return this
         }
     }
-    
+
 }
