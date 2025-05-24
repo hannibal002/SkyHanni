@@ -106,6 +106,8 @@ object DamageIndicatorManager {
             }
     }
 
+    fun getAllMobs(): Collection<EntityLivingBase> = data.values.map { it.entity }
+
     fun getNearestDistanceTo(location: LorenzVec): Double {
         return data.values
             .map { it.entity.getLorenzVec() }
