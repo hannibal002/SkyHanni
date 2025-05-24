@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
@@ -15,6 +14,7 @@ import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
+import at.hannibal2.skyhanni.data.model.TextInput
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import org.lwjgl.input.Mouse
@@ -141,6 +141,8 @@ object KeyboardManager {
     and in renderable calls have time to react first, and lock this key press event properly
      */
 
+    // On 1.21 we post these events inside mixins
+    //#if MC < 1.21
     private fun postKeyPressEvent(keyCode: Int) {
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
@@ -161,6 +163,7 @@ object KeyboardManager {
             KeyUpEvent(keyCode).post()
         }
     }
+    //#endif
 
     fun KeyBinding.isActive(): Boolean {
         //#if MC < 1.16
