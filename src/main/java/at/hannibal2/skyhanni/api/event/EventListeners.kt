@@ -30,7 +30,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
         require(Modifier.isPublic(method.modifiers)) {
-            "Method ${method.name} in ${instance.javaClass.name} must be accessible. Make sure to set it to public."
+            "Method ${method.name}() in ${instance.javaClass.name} is not public. Make sure to set it to public."
         }
         val name = buildListenerName(method)
         val eventConsumer = when (method.parameterCount) {
