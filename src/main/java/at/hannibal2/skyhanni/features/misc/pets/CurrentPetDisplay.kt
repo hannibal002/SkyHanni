@@ -36,8 +36,6 @@ typealias NFE = PetDisplayConfig.TextPetDisplayConfig.NumberFormatEntry
 @SkyHanniModule
 object CurrentPetDisplay {
 
-    private const val BASE_ITEM_SCALE = 1.7
-
     private val config get() = SkyHanniMod.feature.misc.pets.display
     private var lastPetHash: Int = 0
     private var petOverlay: Renderable? = null
@@ -54,7 +52,7 @@ object CurrentPetDisplay {
                 val degreesPerSecond = (360 / config.visual.spinFrequency.get()) * multiplier
                 AnimatedItemStackRenderable(
                     itemStack,
-                    scale = BASE_ITEM_SCALE,
+                    scale = config.visual.iconScale.get(),
                     rotation = ItemStackRotationDefinition(
                         axis = EnumFacing.Axis.Y,
                         rotationSpeed = degreesPerSecond,
@@ -63,7 +61,7 @@ object CurrentPetDisplay {
             }
             else -> ItemStackRenderable(
                 itemStack,
-                scale = BASE_ITEM_SCALE,
+                scale = config.visual.iconScale.get(),
             )
         }
         if (VElement.RARITY_BACKGROUND !in enabledVisuals) return baseItemRenderable
@@ -189,9 +187,10 @@ object CurrentPetDisplay {
             config.enabled,
 
             config.visual.enabledVisuals,
+            config.visual.iconScale,
+            config.visual.skinAnimation,
             config.visual.spinDirection,
             config.visual.spinFrequency,
-            config.visual.skinAnimation,
 
             config.text.enabledTexts,
             config.text.textLabels,
