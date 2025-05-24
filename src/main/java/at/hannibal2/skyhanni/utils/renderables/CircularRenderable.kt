@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledCircle
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import java.awt.Color
+import kotlin.math.max
 
 open class CircularRenderable(
     private val backgroundColor: Color,
@@ -36,27 +37,18 @@ open class CircularRenderable(
 class CircularContainerRenderable(
     private val renderable: Renderable,
     backgroundColor: Color,
-    private val radius: Int,
     filledPercentage: Double = 100.0,
     unfilledColor: Color = Color.LIGHT_GRAY,
-    /**
-     * Indicates if the renderable should be centered in the circle, or use the padding property.
-     * If set to true, containerPadding is unused.
-     */
-    private val centered: Boolean = false,
-    /**
-     * How much vertical and horizontal padding should there be from the top left before the renderable renders.
-     * Only applies when centered is false.
-     */
-    private val containerPadding: Float = 2.0f,
-) : CircularRenderable(backgroundColor, radius, filledPercentage, unfilledColor) {
+    edgePadding: Int = 2,
+) : CircularRenderable(
+    backgroundColor,
+    max(renderable.width, renderable.height) + edgePadding,
+    filledPercentage,
+    unfilledColor
+) {
+    private val radius = max(renderable.width, renderable.height) + edgePadding
     override fun render(posX: Int, posY: Int) {
         drawCircle(posX, posY)
-        val translationX = if (centered) (radius - renderable.width / 2f) else containerPadding
-        val translationY = if (centered) (radius - renderable.height / 2f) else containerPadding
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(posX + translationX, posY + translationY, 0f)
-        renderable.render(0, 0)
-        DrawContextUtils.popMatrix()
+        renderable.renderXYAligned(0, 0, radius, radius)
     }
 }

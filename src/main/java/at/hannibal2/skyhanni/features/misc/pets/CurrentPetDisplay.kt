@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.misc.pets.PetDisplayConfig
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -73,22 +74,19 @@ object CurrentPetDisplay {
         val rarityBackgroundRenderable = CircularContainerRenderable(
             baseItemRenderable,
             rarity.color.toColor(),
-            18,
-            centered = true,
+            edgePadding = 4,
         )
         val borderedRarityBackgroundRenderable = CircularContainerRenderable(
             rarityBackgroundRenderable,
             Color.GRAY,
-            24,
-            centered = true,
+            edgePadding = 3,
         )
         if (VElement.XP_RING !in enabledVisuals) return borderedRarityBackgroundRenderable
         val xpRingCompleteRenderable = CircularContainerRenderable(
             borderedRarityBackgroundRenderable,
             Color.cyan,
-            radius = 27,
-            centered = true,
             filledPercentage = levelProgressionPercentage,
+            edgePadding = 1,
         )
         return xpRingCompleteRenderable
     }
@@ -220,12 +218,12 @@ object CurrentPetDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent) {
+        Position(100, 100).renderRenderable(seedRenderable, posLabel = "Seed")
         if (RiftApi.inRift() || !config.enabled.get()) return
         petOverlay = CurrentPetApi.currentPet?.buildRenderable()
         petOverlay?.let {
             config.position.renderRenderable(it, posLabel = "Current Pet")
         }
-        seedRenderable.render(100, 100)
     }
 
     @HandleEvent
