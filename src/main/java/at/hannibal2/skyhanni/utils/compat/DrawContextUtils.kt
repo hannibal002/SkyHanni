@@ -64,24 +64,48 @@ object DrawContextUtils {
         drawContext.matrices.rotate(angle, x, y, z)
     }
 
-    fun rotate(angle: Float, x: Float, y: Float, z: Float) {
-        drawContext.matrices.rotate(angle, x, y, z)
-    }
-
-    fun rotate(angle: Float, vec: Vec3) {
-        drawContext.matrices.rotate(angle, vec)
-    }
-
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)
     }
 
+    @Deprecated("Use pushPop instead")
     fun pushMatrix() {
         drawContext.matrices.pushMatrix()
     }
 
+    @Deprecated("Use pushPop instead")
     fun popMatrix() {
         drawContext.matrices.popMatrix()
+    }
+
+    /**
+     * Push and pop the matrix stack, run the action in between.
+     */
+    @Suppress("deprecation")
+    inline fun pushPop(action: () -> Unit) {
+        pushMatrix()
+        action()
+        popMatrix()
+    }
+
+    /**
+     * Run operations inside a DrawContext translation
+     */
+    inline fun translated(x: Number = 0, y: Number = 0, z: Number = 0, action: () -> Unit) {
+        // TODO: when fully modern, use pushPop instead
+        translate(x.toFloat(), y.toFloat(), z.toFloat())
+        action()
+        translate(-x.toFloat(), -y.toFloat(), -z.toFloat())
+    }
+
+    /**
+     * Run operations inside a DrawContext scale
+     */
+    inline fun scaled(x: Number = 1, y: Number = 1, z: Number = 1, action: () -> Unit) {
+        // TODO: when fully modern, use pushPop instead
+        scale(x.toFloat(), y.toFloat(), z.toFloat())
+        action()
+        scale(1 / x.toFloat(), 1 / y.toFloat(), 1 / z.toFloat())
     }
 
     fun getFloat(pName: Int, params: FloatBuffer) {
