@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class HideFarEntitiesConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Hide all entities from rendering except the nearest ones.")
+    @ConfigOption(name = "Enabled", desc = "Hide all unnecessary entities from rendering except the nearest ones.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
@@ -22,14 +22,4 @@ class HideFarEntitiesConfig {
     @ConfigOption(name = "Max Amount", desc = "Not showing more than this amount of nearest entities.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 150f, minStep = 1f)
     var maxAmount: Int = 30
-
-    @Expose
-    @ConfigOption(name = "Exclude Garden", desc = "Disable this feature while in the Garden.")
-    @ConfigEditorBoolean
-    var excludeGarden: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Exclude Dungeon", desc = "Disable this feature while in Dungeon.")
-    @ConfigEditorBoolean
-    var excludeDungeon: Boolean = false
 }

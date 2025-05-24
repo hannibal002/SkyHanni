@@ -84,7 +84,7 @@ object FarmingLaneFeatures {
                     " §7(${movementState.label}§7)"
                 } else ""
                 add("§7Time remaining: $color$format$suffix")
-                if (MovementSpeedDisplay.usingSoulsandSpeed) {
+                if (MovementSpeedDisplay.usingSoulsandSpeed && config.distanceSoulSandWarning) {
                     add("§7Using inaccurate soul sand speed!")
                 }
             }
