@@ -58,10 +58,9 @@ object HelpCommand {
     }
 
     private fun showPage(page: Int, search: String, commands: List<CommandData>, dispatcher: CommandDispatcher<Any?>) {
-        val filtered = commands.filter {
-            it.name.contains(search, ignoreCase = true) ||
-                it.aliases.any { alias -> alias.contains(search, ignoreCase = true) } ||
-                it.descriptor.contains(search, ignoreCase = true)
+        val filtered = commands.filter { cmd ->
+            cmd.getAllNames().any { it.contains(search, ignoreCase = true) } ||
+                cmd.descriptor.contains(search, ignoreCase = true)
         }
 
         val title = if (search.isBlank()) "SkyHanni Commands" else "SkyHanni Commands Matching: \"$search\""
@@ -86,7 +85,7 @@ object HelpCommand {
             page = 1
             search = args.joinToString(" ")
         }
-        showPage(page, search, commands.sortedWith(compareBy({ it.category.ordinal }, { it.name })), dispatcher)
+        showPage(page, search, commands, dispatcher)
     }
 
     @HandleEvent
