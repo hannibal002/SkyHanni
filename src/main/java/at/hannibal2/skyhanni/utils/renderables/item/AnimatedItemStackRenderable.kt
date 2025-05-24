@@ -20,9 +20,9 @@ import kotlin.math.sin
  * @param bounceSpeed How many pixels the item should move per second.
  */
 data class ItemStackBounceDefinition(
-    val upwardBounce: Int,
-    val downwardBounce: Int,
-    val bounceSpeed: Double = 0.5,
+    val upwardBounce: Int = 0,
+    val downwardBounce: Int = 0,
+    val bounceSpeed: Double = 0.0,
 )
 
 /**
@@ -36,20 +36,14 @@ data class ItemStackBounceDefinition(
  * @param rotationSpeed How many degrees the item should rotate per second.
  */
 data class ItemStackRotationDefinition(
-    val axis: Axis,
-    val rotationSpeed: Double,
+    val axis: Axis = Axis.Y,
+    val rotationSpeed: Double = 0.0,
 )
 
 class AnimatedItemStackRenderable(
     item: ItemStack,
-    private val rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(
-        axis = Axis.Y,
-        rotationSpeed = 0.0,
-    ),
-    private val bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(
-        upwardBounce = 0,
-        downwardBounce = 0,
-    ),
+    private val rotation: ItemStackRotationDefinition = ItemStackRotationDefinition(),
+    private val bounce: ItemStackBounceDefinition = ItemStackBounceDefinition(),
     scale: Double = NeuItems.ITEM_FONT_SIZE,
     xSpacing: Int = 2,
     ySpacing: Int = 1,
@@ -87,22 +81,28 @@ class AnimatedItemStackRenderable(
         },
     )
 
-    override fun render(posX: Int, posY: Int) {
+    private fun ItemStackBounceDefinition.calculateBounce(): Double {
+        if (bounceSpeed == 0.0 || (upwardBounce == 0 && downwardBounce == 0)) return 0.0
+
         val t = (SimpleTimeMark.now() - startTime).inPartialSeconds
         // time to go up _and_ down once (seconds):
-        val period = (bounce.upwardBounce + bounce.downwardBounce) * 2 / bounce.bounceSpeed
+        val period = (upwardBounce + downwardBounce) * 2 / bounceSpeed
         // angle from 0 → 2π over one full cycle
         val theta = (t % period) / period * (2 * Math.PI)
         // build an asymmetric sine:
         //   maps -1..1  →  -downwardBounce...upwardBounce
-        val amplitude = bounce.upwardBounce + bounce.downwardBounce
+        val amplitude = upwardBounce + downwardBounce
         val offset = sin(theta) * (amplitude / 2)
-        val rest = (bounce.upwardBounce - bounce.downwardBounce) / 2
-        val currentOffsetY = offset + rest
+        val rest = (upwardBounce - downwardBounce) / 2
+        return offset + rest
+    }
+
+    override fun render(posX: Int, posY: Int) {
 
         val dt = (SimpleTimeMark.now() - lastTime).inPartialSeconds
         lastTime = SimpleTimeMark.now()
         currentRotation = generateNextRotation(dt)
+        val currentOffsetY = bounce.calculateBounce()
 
         stack.renderOnScreen(
             x = (posX + (xSpacing / 2f)),
