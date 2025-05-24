@@ -39,11 +39,11 @@ abstract class CacheMap<K : Any, V : Any> : MutableMap<K, V> {
 
     override fun clear() = cache.invalidateAll()
 
-    override val keys: MutableSet<K> = getMap().keys
+    override val keys: MutableSet<K> get() = getMap().keys
 
     override val values: MutableCollection<V> get() = getMap().values
 
-    override val entries: MutableSet<MutableMap.MutableEntry<K, V>> = getMap().entries
+    override val entries: MutableSet<MutableMap.MutableEntry<K, V>> get() = getMap().entries
 
     @Deprecated("", ReplaceWith("get(key)"))
     fun getOrNull(key: K): V? = get(key)

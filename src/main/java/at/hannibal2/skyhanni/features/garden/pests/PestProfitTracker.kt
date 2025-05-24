@@ -77,7 +77,7 @@ object PestProfitTracker {
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
-    private val lastPestKillTimes: TimeLimitedCache<PestType, SimpleTimeMark> = TimeLimitedCache(15.seconds)
+    private val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
     private val tracker = SkyHanniBucketedItemTracker(
         "Pest Profit Tracker",
         { BucketData() },
