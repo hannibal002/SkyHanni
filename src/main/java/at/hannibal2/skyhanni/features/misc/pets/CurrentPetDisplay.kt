@@ -71,24 +71,25 @@ object CurrentPetDisplay {
                 scale = BASE_ITEM_SCALE,
             )
         }
+        baseItemRenderable.renderBounds(Color.RED)
         if (VElement.RARITY_BACKGROUND !in enabledVisuals) return baseItemRenderable
         val rarityBackgroundRenderable = CircularContainerRenderable(
             baseItemRenderable,
             rarity.color.toColor(),
             padding = 4,
-        ).renderBounds(Color.RED)
+        )
         val borderedRarityBackgroundRenderable = CircularContainerRenderable(
             rarityBackgroundRenderable,
             Color.GRAY,
             padding = 6,
-        ).renderBounds(Color.GREEN)
+        )
         if (VElement.XP_RING !in enabledVisuals) return borderedRarityBackgroundRenderable
         val xpRingCompleteRenderable = CircularContainerRenderable(
             borderedRarityBackgroundRenderable,
             Color.cyan,
             filledPercentage = levelProgressionPercentage,
             padding = 2,
-        ).renderBounds(Color.BLUE)
+        )
         return xpRingCompleteRenderable
     }
 
