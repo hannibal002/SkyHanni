@@ -39,21 +39,17 @@ object SummoningSoulsName {
     private fun check() {
         for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (entity in souls) continue
+            if (!entity.wearingSkullTexture(SUMMONING_SOUL_TEXTURE)) continue
+            
+            val soulLocation = entity.getLorenzVec()
 
-            if (entity.hasSkullTexture(SUMMONING_SOUL_TEXTURE)) {
-                val soulLocation = entity.getLorenzVec()
-
-                val map = mutableMapOf<Int, Double>()
-                for ((mob, loc) in mobsLastLocation) {
-                    val distance = loc.distance(soulLocation)
-                    map[mob] = distance
-                }
-
-                val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
-                if (nearestMob != null) {
-                    souls[entity] = mobsName[nearestMob] ?: continue
-                }
+            val map = mutableMapOf<Int, Double>()
+            for ((mob, loc) in mobsLastLocation) {
+                val distance = loc.distance(soulLocation)
+                map[mob] = distance
             }
+            val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
+            if (nearestMob != null) souls[entity] = mobsName[nearestMob] ?: continue
         }
 
         for (entity in EntityUtils.getEntities<EntityLiving>()) {
