@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.garden.MoneyPerHourConfig.CustomFormatEntry
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -43,11 +42,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemS
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.line
-import at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackBounceDefinition
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
 import kotlinx.coroutines.launch
-import net.minecraft.util.EnumFacing
 
 @SkyHanniModule
 object CropMoneyDisplay {
@@ -73,21 +68,8 @@ object CropMoneyDisplay {
         display = null
     }
 
-    private val spinningRenderable by lazy {
-        AnimatedItemStackRenderable(
-            BOX_OF_SEEDS,
-            scale = 5.0,
-            rotation = ItemStackRotationDefinition(
-                axis = EnumFacing.Axis.Y,
-                rotationSpeed = 30.0,
-            )
-        )
-    }
-
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        spinningRenderable.render(100, 100)
-        Position(300, 300).renderRenderable(spinningRenderable, "Seeds")
         if (!isEnabled()) return
 
         if (!GardenApi.hideExtraGuis()) {
