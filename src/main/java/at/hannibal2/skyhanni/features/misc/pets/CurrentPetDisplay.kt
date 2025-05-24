@@ -109,8 +109,8 @@ object CurrentPetDisplay {
                     }
                     TElement.HELD_ITEM -> heldItemInternalName?.repoItemName ?: return@mapNotNull null
                     TElement.OVERFLOW_XP -> {
-                        ChatUtils.chat("overflowXp: $overflowXp")
-                        val overflowXp = overflowXp.takeIf { overflow -> overflow > 0.0 } ?: return@mapNotNull null
+                        // 1000.0 to account for double rounding errors between Hypixel's stored data, and our calculation
+                        val overflowXp = overflowXp.takeIf { overflow -> overflow > 1000.0 } ?: return@mapNotNull null
                         val overflowFormat = overflowXp.formatExpByConfigOption()
                         "§7+§b$overflowFormat"
                     }
