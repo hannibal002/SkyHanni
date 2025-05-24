@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.CircularContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
@@ -40,6 +41,8 @@ typealias NFE = PetDisplayConfig.TextPetDisplayConfig.NumberFormatEntry
 @SkyHanniModule
 object CurrentPetDisplay {
 
+    private const val BASE_ITEM_SCALE = 1.7
+
     private val config get() = SkyHanniMod.feature.misc.pets.display
     private var lastPetHash: Int = 0
     private var petOverlay: Renderable? = null
@@ -56,38 +59,36 @@ object CurrentPetDisplay {
                 val degreesPerSecond = (360 / config.visual.spinFrequency.get()) * multiplier
                 AnimatedItemStackRenderable(
                     itemStack,
-                    scale = 1.9,
+                    scale = BASE_ITEM_SCALE,
                     rotation = ItemStackRotationDefinition(
                         axis = EnumFacing.Axis.Y,
                         rotationSpeed = degreesPerSecond,
                     ),
                 )
             }
-            else -> {
-                ItemStackRenderable(
-                    itemStack,
-                    scale = 1.9,
-                )
-            }
+            else -> ItemStackRenderable(
+                itemStack,
+                scale = BASE_ITEM_SCALE,
+            )
         }
         if (VElement.RARITY_BACKGROUND !in enabledVisuals) return baseItemRenderable
         val rarityBackgroundRenderable = CircularContainerRenderable(
             baseItemRenderable,
             rarity.color.toColor(),
-            edgePadding = 4,
-        )
+            padding = 4,
+        ).renderBounds(Color.RED)
         val borderedRarityBackgroundRenderable = CircularContainerRenderable(
             rarityBackgroundRenderable,
             Color.GRAY,
-            edgePadding = 3,
-        )
+            padding = 6,
+        ).renderBounds(Color.GREEN)
         if (VElement.XP_RING !in enabledVisuals) return borderedRarityBackgroundRenderable
         val xpRingCompleteRenderable = CircularContainerRenderable(
             borderedRarityBackgroundRenderable,
             Color.cyan,
             filledPercentage = levelProgressionPercentage,
-            edgePadding = 1,
-        )
+            padding = 2,
+        ).renderBounds(Color.BLUE)
         return xpRingCompleteRenderable
     }
 
