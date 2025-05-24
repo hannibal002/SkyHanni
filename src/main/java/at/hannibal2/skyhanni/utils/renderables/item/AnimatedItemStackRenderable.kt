@@ -105,8 +105,8 @@ class AnimatedItemStackRenderable(
         currentRotation = generateNextRotation(dt)
 
         stack.renderOnScreen(
-            x = (posX + (xSpacing / 2f)),
-            y = (posY + currentOffsetY).toFloat(),
+            x = (0 + (xSpacing / 2f)),
+            y = (0 + currentOffsetY).toFloat(),
             scaleMultiplier = scale,
             rescaleSkulls = rescaleSkulls,
             rotationDegrees = currentRotation

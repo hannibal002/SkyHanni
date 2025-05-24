@@ -28,8 +28,8 @@ open class ItemStackRenderable(
 
     override fun render(posX: Int, posY: Int) {
         stack.renderOnScreen(
-            x = posX + xSpacing / 2f,
-            y = posY.toFloat(),
+            x = 0 + (xSpacing / 2f),
+            y = 0f,
             scaleMultiplier = scale,
             rescaleSkulls
         )

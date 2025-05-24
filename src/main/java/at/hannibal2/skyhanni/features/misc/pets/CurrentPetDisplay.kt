@@ -71,7 +71,6 @@ object CurrentPetDisplay {
                 scale = BASE_ITEM_SCALE,
             )
         }
-        baseItemRenderable.renderBounds(Color.RED)
         if (VElement.RARITY_BACKGROUND !in enabledVisuals) return baseItemRenderable
         val rarityBackgroundRenderable = CircularContainerRenderable(
             baseItemRenderable,
