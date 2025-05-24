@@ -35,8 +35,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         modify { data ->
             bucket = data.selectedBucket ?: run {
                 ChatUtils.userError(
-                    "No bucket selected for §b$name§c.\n" +
-                        "Select one in the §b$name §cGUI, then try again."
+                    "No bucket selected for §b$name§c.\n§cSelect one in the §b$name §cGUI, then try again.",
                 )
                 cancel()
                 return@modify
