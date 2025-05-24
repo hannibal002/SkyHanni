@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 object ItemNameResolver {
     private val itemNameCache = mutableMapOf<String, NeuInternalName>() // item name -> internal name
 
+    @Suppress("ReturnCount", "CyclomaticComplexMethod")
     internal fun getInternalNameOrNull(itemName: String): NeuInternalName? {
         val lowercase = itemName.lowercase()
         itemNameCache[lowercase]?.let {
@@ -89,12 +90,8 @@ object ItemNameResolver {
         if (rarityLocation !in expectedRarityLocations) return null
         val petName = splits.filterIndexed { index, _ -> index != rarityLocation }.joinToString("_").uppercase()
         val petRarity = LorenzRarity.getByName(splits[rarityLocation]) ?: return null
-        val structuralInternalName = "$petName;${petRarity.id}"
-        val internalName = structuralInternalName.toInternalName()
-        internalName.getItemStackOrNull()?.let {
-            return internalName
-        }
-        return null
+        val internalName = "$petName;${petRarity.id}".toInternalName()
+        return internalName.takeIf { it.getItemStackOrNull() != null }
     }
 
     private fun resolveEnchantmentByCleanName(itemName: String): NeuInternalName? {
@@ -146,8 +143,8 @@ object ItemNameResolver {
         return NeuItems.allItemsCache.filter { it.key.removeColor() == removeColor }.values.firstOrNull()
     }
 
-    @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    @HandleEvent(NeuRepositoryReloadEvent::class)
+    fun onNeuRepoReload() {
         itemNameCache.clear()
     }
 }
