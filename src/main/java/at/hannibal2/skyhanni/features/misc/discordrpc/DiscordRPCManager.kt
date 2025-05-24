@@ -62,7 +62,7 @@ object DiscordRPCManager {
                 updateDebugStatus("Starting...")
                 startTimestamp = System.currentTimeMillis()
                 client = KDiscordIPC(APPLICATION_ID.toString())
-                client?.setup(fromCommand)
+                setup(fromCommand)
             } catch (e: Throwable) {
                 updateDebugStatus("Unexpected error: ${e.message}", error = true)
                 ErrorManager.logErrorWithData(e, "Discord RPC has thrown an unexpected error while trying to start")
@@ -81,10 +81,8 @@ object DiscordRPCManager {
         }
     }
 
-    private suspend fun KDiscordIPC.setup(fromCommand: Boolean) {
-
+    private suspend fun setup(fromCommand: Boolean) {
         try {
-
             client?.on<ReadyEvent> { onReady() }
             client?.on<DisconnectedEvent> { onIPCDisconnect() }
             client?.on<ErrorEvent> { onError(data) }
@@ -112,8 +110,8 @@ object DiscordRPCManager {
 
     private fun isConnected() = client?.connected == true
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
             if (isConnected()) {
                 coroutineScope.launch {
@@ -167,13 +165,13 @@ object DiscordRPCManager {
                     largeImage = discordIconKey,
                     largeText = location
                 ),
-                buttons = if (!buttons.isEmpty()) buttons else null
+                buttons = buttons.ifEmpty { null }
             )
         )
     }
 
 
-    fun onReady() {
+    private fun onReady() {
         updateDebugStatus("Discord RPC Ready.")
     }
 
@@ -187,12 +185,12 @@ object DiscordRPCManager {
         }
     }
 
-    fun onIPCDisconnect() {
+    private fun onIPCDisconnect() {
         updateDebugStatus("Discord RPC disconnected.")
         this.client = null
     }
 
-    fun onError(data: ErrorEventData) {
+    private fun onError(data: ErrorEventData) {
         updateDebugStatus("Discord RPC Errored. Error code ${data.code}: ${data.message}", true)
     }
 
@@ -224,8 +222,8 @@ object DiscordRPCManager {
         }
     }
 
-    @HandleEvent
-    fun onDisconnect(event: ClientDisconnectEvent) {
+    @HandleEvent(ClientDisconnectEvent::class)
+    fun onDisconnect() {
         stop()
     }
 
@@ -276,8 +274,8 @@ object DiscordRPCManager {
     }
 
     // Events that change things in DiscordStatus
-    @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
+    @HandleEvent(KeyPressEvent::class)
+    fun onKeyPress() {
         if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
         beenAfkFor = SimpleTimeMark.now()
     }
