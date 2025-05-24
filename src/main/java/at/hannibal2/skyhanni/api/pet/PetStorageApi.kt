@@ -142,12 +142,13 @@ object PetStorageApi {
     )
     // </editor-fold>
 
-    private fun Int.isPetStackLocation() = this > 9 && this < 44 &&
+    private fun Int.isPetStackLocation() = this in 10..43 &&
         this % 9 != 0 && (this + 1) % 9 != 0
 
-    private fun Matcher.getPetSkinOrNull(name: String) = groupOrNull("skin")?.let { skin ->
+    private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName) = groupOrNull("skin")?.let { skin ->
         val skinColor = skin.substring(0, 2)
-        PetUtils.petSkins[name.uppercase().replace(" ", "_")]?.filter {
+        val properPetName = petInternalName.asString().split(";").first()
+        PetUtils.petSkins[properPetName]?.filter {
             it.displayName.startsWith(skinColor)
         }?.takeIf { it.size == 1 }?.first()
     }
@@ -168,11 +169,11 @@ object PetStorageApi {
                 PetUtils.petItemResolution[line.trim().removeResets()]
             }
 
-            val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) {
+            val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{
                 // We don't know XP if it's just "MAX LEVEL"
-                if (groupOrNull("max") != null) return@firstMatcher null
+                if (groupOrNull("max") != null) return@expFirstMatcher null
                 val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
-                val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: return@firstMatcher null
+                val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: return@expFirstMatcher null
                 val readXpGroup = groupOrNull("current")?.formatDoubleOrNull() ?: 0.0
                 currentLevelXp + readXpGroup
             }
@@ -188,7 +189,7 @@ object PetStorageApi {
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
                 exp = petExp?.takeIf { it > (exp ?: 0.0) } ?: exp
-                skinInternalName = getPetSkinOrNull(petName)?.internalName ?: skinInternalName
+                skinInternalName = getPetSkinOrNull(petInternalName)?.internalName ?: skinInternalName
                 heldItemInternalName = petHeldItem ?: heldItemInternalName
             }
 
@@ -207,7 +208,8 @@ object PetStorageApi {
             val petName = groupOrNull("pet") ?: return
             val level = group("level").toInt()
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return
-            val petSkin = getPetSkinOrNull(petName)
+            val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
+            val petSkin = getPetSkinOrNull(petInternalName)
             val petSkinTag = groupOrNull("skin")
 
             val hoverInfo = event.chatComponent.hover?.siblings?.joinToString {
@@ -242,13 +244,20 @@ object PetStorageApi {
         if (!mainPetMenuNamePattern.matches(InventoryUtils.openInventoryName())) return
         val clickedItem = event.item ?: return
         val petInfo = clickedItem.getPetInfo() ?: return
+        val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         when (event.clickedButton) {
-            1 -> { // Right click
+            1 -> { // Right click - remove pet from menu
                 petStorage?.removeIf { it.uuid == petInfo.uuid }
+                if (currentPetUuid == petInfo.uuid) {
+                    ProfileStorageData.profileSpecific?.currentPetUuid = null
+                }
             }
-            0 -> { // Left click
+            0 -> { // Left click - if not a shift click, summon/un-summon pet
                 if (KeyboardManager.isShiftKeyDown()) return
-                ProfileStorageData.profileSpecific?.currentPetUuid = petInfo.uuid
+                ProfileStorageData.profileSpecific?.currentPetUuid = when (currentPetUuid) {
+                    petInfo.uuid -> null
+                    else -> petInfo.uuid
+                }
             }
             else -> return
         }
@@ -325,7 +334,7 @@ object PetStorageApi {
             val petName = groupOrNull("pet") ?: return@firstMatcher false
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return@firstMatcher false
             val petInternalname = PetUtils.petWithRarityToInternalName(petName, rarity)
-            val petSkin = getPetSkinOrNull(petName)
+            val petSkin = getPetSkinOrNull(petInternalname)
             val petSkinTag = groupOrNull("skin")
 
             val level = petMenuSelectedPetProgressPattern.firstMatcher(currentPetItemLore) {

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 //#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetSkinJson
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import com.google.gson.Gson
 
 @SkyHanniModule
 object PetUtils {
@@ -138,15 +138,15 @@ object PetUtils {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.getConstant<NeuPetsJson>("pets")
-        baseXpLevelReqs = data.petLevels
-        customXpLevelReqs = data.customPetLeveling
-        petItemResolution = data.petItemDisplayNameToInternalName
+        val petData = event.getConstant<NeuPetsJson>("pets")
+        baseXpLevelReqs = petData.petLevels
+        customXpLevelReqs = petData.customPetLeveling
+        petItemResolution = petData.petItemDisplayNameToInternalName
 
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
             petSkinNamePattern.matchMatcher(rawInternalName) {
                 val petName = group("pet") ?: return@matchMatcher
-                val petItemData = Gson().fromJson(jsonObject, NeuPetSkinJson::class.java)
+                val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuPetSkinJson::class.java)
                 petSkins.getOrPut(petName) { mutableListOf() }.add(petItemData)
             }
         }
