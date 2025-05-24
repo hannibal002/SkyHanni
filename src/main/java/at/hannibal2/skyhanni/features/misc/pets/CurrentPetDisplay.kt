@@ -12,11 +12,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.renderables.CircularContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
@@ -25,7 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.Vec3
 import java.awt.Color
 
 typealias VElement = PetDisplayConfig.VisualPetDisplayConfig.VisualElement
@@ -38,10 +40,8 @@ typealias NFE = PetDisplayConfig.TextPetDisplayConfig.NumberFormatEntry
 object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.display
-    private var rotationContext: Vec3 = Vec3(0.0, 0.0, 0.0)
     private var lastPetHash: Int = 0
     private var petOverlay: Renderable? = null
-    private var currentSpinningRenderable: AnimatedItemStackRenderable? = null
 
     private fun PetData.buildItemRenderableOrNull(): Renderable? {
         val enabledVisuals = config.visual.enabledVisuals.get()
@@ -49,53 +49,48 @@ object CurrentPetDisplay {
         val itemStack = getItemStackOrNull() ?: return null
         val spinDirection = config.visual.spinDirection.get()
 
-        val baseItemRenderable = when {
+        val baseItemRenderable: ItemStackRenderable = when {
             spinDirection != SDirection.NONE -> {
                 val multiplier = if (spinDirection == SDirection.CLOCKWISE) -1 else 1
                 val degreesPerSecond = (360 / config.visual.spinFrequency.get()) * multiplier
-                currentSpinningRenderable = AnimatedItemStackRenderable(
+                AnimatedItemStackRenderable(
                     itemStack,
                     scale = 1.9,
                     rotation = ItemStackRotationDefinition(
                         axis = EnumFacing.Axis.Y,
                         rotationSpeed = degreesPerSecond,
                     ),
-                    initialRotation = rotationContext
                 )
-                currentSpinningRenderable
             }
             else -> {
-                rotationContext = currentSpinningRenderable?.currentRotation ?: rotationContext
-                currentSpinningRenderable = null
                 ItemStackRenderable(
                     itemStack,
                     scale = 1.9,
                 )
             }
         }
-
-        return when {
-            VElement.RARITY_BACKGROUND !in enabledVisuals -> baseItemRenderable
-            else -> Renderable.CircularRenderable(
-                renderable = baseItemRenderable,
-                rarity.color.toColor(),
-                20,
-                border = Renderable.CircularRenderable(
-                    renderable = null,
-                    Color.GRAY,
-                    26,
-                    border = when {
-                        VElement.XP_RING !in enabledVisuals -> null
-                        else -> Renderable.CircularRenderable(
-                            renderable = null,
-                            backgroundColor = Color.cyan,
-                            radius = 29,
-                            filledPercentage = levelProgressionPercentage
-                        )
-                    }
-                )
-            )
-        }
+        if (VElement.RARITY_BACKGROUND !in enabledVisuals) return baseItemRenderable
+        val rarityBackgroundRenderable = CircularContainerRenderable(
+            baseItemRenderable,
+            rarity.color.toColor(),
+            18,
+            centered = true,
+        )
+        val borderedRarityBackgroundRenderable = CircularContainerRenderable(
+            rarityBackgroundRenderable,
+            Color.GRAY,
+            24,
+            centered = true,
+        )
+        if (VElement.XP_RING !in enabledVisuals) return borderedRarityBackgroundRenderable
+        val xpRingCompleteRenderable = CircularContainerRenderable(
+            borderedRarityBackgroundRenderable,
+            Color.cyan,
+            radius = 27,
+            centered = true,
+            filledPercentage = levelProgressionPercentage,
+        )
+        return xpRingCompleteRenderable
     }
 
     private fun PetData.buildTextRenderableOrNull(): Renderable? = VerticalContainerRenderable(
@@ -158,6 +153,7 @@ object CurrentPetDisplay {
     private fun Double.formatExpByConfigOption() = when (config.text.xpFormat.get()) {
         NFE.DEFAULT, NFE.UNFORMATTED -> toInt().addSeparators()
         NFE.FORMATTED -> toInt().shortFormat()
+        else -> ""
     }
 
     private fun formatExpPairByConfigOption(
@@ -167,6 +163,7 @@ object CurrentPetDisplay {
         NFE.DEFAULT -> "§b${firstExp.toInt().addSeparators()}§9/§b${secondExp.toInt().shortFormat()}"
         NFE.FORMATTED -> "§b${firstExp.toInt().shortFormat()}§9/§b${secondExp.toInt().shortFormat()}"
         NFE.UNFORMATTED -> "§b${firstExp.toInt().addSeparators()}§9/§b${secondExp.toInt().addSeparators()}"
+        else -> ""
     }
 
     private fun PetData.buildRenderable(): Renderable? {
@@ -181,10 +178,12 @@ object CurrentPetDisplay {
             val orderedList = when (textLocation) {
                 TLO.TOP, TLO.LEFT -> listOf(textRenderable, itemRenderable)
                 TLO.BOTTOM, TLO.RIGHT -> listOf(itemRenderable, textRenderable)
+                else -> listOf()
             }
             when (textLocation) {
                 TLO.TOP, TLO.BOTTOM -> VerticalContainerRenderable(orderedList, spacing = 2)
                 TLO.LEFT, TLO.RIGHT -> HorizontalContainerRenderable(orderedList, spacing = 2)
+                else -> return null
             }
         } else listOf(textRenderable, itemRenderable).firstOrNull { it != null }
     }
@@ -208,6 +207,17 @@ object CurrentPetDisplay {
         ) { lastPetHash = 0 }
     }
 
+    private val seedRenderable by lazy {
+        AnimatedItemStackRenderable(
+            "BOX_OF_SEEDS".toInternalName().getItemStack(),
+            scale = 1.9,
+            rotation = ItemStackRotationDefinition(
+                axis = EnumFacing.Axis.Y,
+                rotationSpeed = 10.0,
+            ),
+        )
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (RiftApi.inRift() || !config.enabled.get()) return
@@ -215,6 +225,7 @@ object CurrentPetDisplay {
         petOverlay?.let {
             config.position.renderRenderable(it, posLabel = "Current Pet")
         }
+        seedRenderable.render(100, 100)
     }
 
     @HandleEvent

@@ -1556,41 +1556,4 @@ interface Renderable {
             }
         }
     }
-
-    class CircularRenderable(
-        private val renderable: Renderable?,
-        private val backgroundColor: Color,
-        private val radius: Int,
-        private val border: CircularRenderable? = null,
-        private val filledPercentage: Double = 100.0,
-        private val unfilledColor: Color = Color.LIGHT_GRAY,
-    ) : Renderable {
-        private val totalRadius: Int = max(radius, border?.totalRadius ?: 0)
-        private val diffRadius: Int = totalRadius - radius
-
-        override val width: Int = totalRadius * 2
-        override val height: Int = totalRadius * 2
-        override val horizontalAlign = HorizontalAlignment.LEFT
-        override val verticalAlign = VerticalAlignment.TOP
-
-        override fun render(posX: Int, posY: Int) {
-            border?.render(posX, posY)
-
-            if (filledPercentage < 100.0) {
-                val baseAngle = Math.PI.toFloat() * 3f / 2f
-                val endAngle = (baseAngle + ((100.0 - filledPercentage) / 50.0 * Math.PI).toFloat()).mod(2f * Math.PI.toFloat())
-                drawFilledCircle(diffRadius, diffRadius, radius, backgroundColor, angle1 = baseAngle, angle2 = endAngle)
-                drawFilledCircle(diffRadius, diffRadius, radius, unfilledColor, angle1 = endAngle, angle2 = baseAngle)
-            } else {
-                drawFilledCircle(diffRadius, diffRadius, radius, backgroundColor)
-            }
-
-            renderable?.let {
-                val itemX = totalRadius - (it.width / 2)
-                val itemY = totalRadius - (it.height / 2)
-                it.render(itemX, itemY)
-            }
-        }
-
-    }
 }
