@@ -31,9 +31,14 @@ public class CompactTabListConfig {
     public boolean hideAdverts = false;
 
     @Expose
-    @ConfigOption(name = "Hide Fire Sale Adverts", desc = "Hide fire sales from the tablist")
+    @ConfigOption(name = "Hide Fire Sale Adverts", desc = "Hide fire sales from the tablist.")
     @ConfigEditorBoolean
     public boolean hideFiresales = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Tab Background", desc = "Hides the main background in tab.")
+    @ConfigEditorBoolean
+    public boolean hideTabBackground = false;
 
     @Expose
     @ConfigOption(name = "Advanced Player List", desc = "")

@@ -55,7 +55,7 @@ object ItemNameResolver {
                         "topaz" -> '✧'
                         "onyx" -> '☠'
                         "sapphire" -> '✎'
-                        "aquamarine" -> 'α'
+                        "aquamarine" -> '☂'
                         "jasper" -> '❁'
                         else -> ' '
                     }

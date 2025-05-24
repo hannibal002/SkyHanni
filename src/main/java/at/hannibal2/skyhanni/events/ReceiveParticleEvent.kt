@@ -21,11 +21,11 @@ class ReceiveParticleEvent(
     override fun toString(): String {
         return "ReceiveParticleEvent(type='$type', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=${
             offset.roundTo(
-                1
+                2
             )
         }, longDistance=$longDistance, particleArgs=${particleArgs.contentToString()}, distanceToPlayer=${
             distanceToPlayer.roundTo(
-                1
+                2
             )
         })"
     }

@@ -103,7 +103,7 @@ object ArachneSpawnTimer {
 
         val location = event.location.roundTo(2)
         if (arachneAltarLocation.distance(location) > 30) return
-        if (event.type == EnumParticleTypes.REDSTONE && event.speed == 1.0f) {
+        if (event.type == EnumParticleTypes.REDSTONE && event.speed == 1f) {
             particleCounter += 1
         }
     }

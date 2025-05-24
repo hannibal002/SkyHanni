@@ -149,6 +149,10 @@ Internal changes that do not impact the end user. Examples include:
 - Preparations for modern Minecraft versions
 - Documentation changes to markdown files, e.g., in `/docs` or this file.
 
+Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
+We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
+everything else can go in the normal PR description (What area). 
+
 #### Removed Features
 
 Features that have merged with existing features (in the config) or have become obsolete (e.g., if Hypixel implements them on the server
@@ -176,8 +180,8 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
-        - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
-        - If you can improve the existing feature in a meaningful way.
+    - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
+    - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
@@ -407,6 +411,10 @@ If you want to compile more files, you can add them to this file or if you want 
 If you want to run 1.21 simply run the `Minecraft Client 1.21` configuration in intellij. This will compile the 1.21 version and run it.
 Again, this will only use the files specified in `versions/<version>/buildpaths.txt`.
 
+You may notice some `//#if TODO` comments in the code, these are preprocessor comments that we are using to signify that we need to make 
+this functionality work again on 1.21. If for whatever reason you want the preprocessor to ignore these comments, you can add 
+`skyhanni.skipPreprocessTodos=true` to your `.gradle/private.properties` file. This will make the preprocessor ignore all `//#if TODO` comments.
+
 ### Improving mappings
 
 The different project versions are set up in such a way that each version depends on a slightly older version from which it is then adapted.
@@ -570,6 +578,10 @@ The actual versions being worked with here are not actually semantically compare
 You can also check if you are on Forge using the `FORGE` variable. It is set to either 1 or 0. Similarly, there is also a `JAVA` variable to
 check the Java version this Minecraft version is on. For the `FORGE` variable there is an implicit `!= 0` to check added if you just check
 for the variable using `#if FORGE`.
+
+We also have a `#if TODO` directive. This is a special directive that is used to mark code that needs to be changed on modern versions. 
+Anything within this directive will only compile on 1.8 and otherwise will be commented out. This is useful for marking code that needs to 
+be changed in the future, but you don't want to do it right now.
 
 #### Helpers
 

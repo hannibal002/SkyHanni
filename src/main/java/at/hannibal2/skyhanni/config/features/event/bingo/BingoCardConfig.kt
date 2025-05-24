@@ -49,7 +49,7 @@ class BingoCardConfig {
 
     @Expose
     @ConfigLink(owner = BingoCardConfig::class, field = "enabled")
-    var bingoCardPos: Position = Position(10, 10, false, true)
+    var bingoCardPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(

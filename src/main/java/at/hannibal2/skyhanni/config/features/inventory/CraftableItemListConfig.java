@@ -35,5 +35,5 @@ public class CraftableItemListConfig {
 
     @Expose
     @ConfigLink(owner = CraftableItemListConfig.class, field = "enabled")
-    public Position position = new Position(144, 139, false, true);
+    public Position position = new Position(144, 139);
 }
