@@ -37,6 +37,7 @@ import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FishingApi {
     enum class RodPart {
@@ -118,20 +119,20 @@ object FishingApi {
 
         val bobber = bobber ?: return
         if (bobber.isDead) {
-            if (lastReelTime.passedSince() < .5.seconds && lastCatchSound.passedSince() < .5.seconds) FishingCatchEvent.post()
+            if (lastReelTime.passedSince() < 0.5.seconds && lastCatchSound.passedSince() < 0.5.seconds) FishingCatchEvent.post()
             resetBobber()
-        } else {
-            if (!bobberHasTouchedLiquid) {
-                val isWater = when {
-                    bobber.isInLava && holdingLavaRod -> false
-                    bobber.isInWater && holdingWaterRod -> true
-                    else -> return
-                }
-
-                bobberHasTouchedLiquid = true
-                FishingBobberInLiquidEvent(bobber, isWater).post()
-            }
+            return
         }
+
+        if (bobberHasTouchedLiquid) return
+        val isWater = when {
+            bobber.isInLava && holdingLavaRod -> false
+            bobber.isInWater && holdingWaterRod -> true
+            else -> return
+        }
+
+        bobberHasTouchedLiquid = true
+        FishingBobberInLiquidEvent(bobber, isWater).post()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -195,28 +196,34 @@ object FishingApi {
         (IsFishingDetection.isFishing || (checkRodInHand && holdingRod)) && !DungeonApi.inDungeon()
 
     fun seaCreatureCount(entity: EntityArmorStand): Int {
+        if (countIsZero(entity)) return 0
+
+        return when (entity.name) {
+            "Sea Emperor", "Rider of the Deep" -> 2
+
+            else -> 1
+        }
+    }
+
+    private val frostyNpcLocation = LorenzVec(-1.5, 76.0, 92.5)
+
+    private fun countIsZero(entity: EntityArmorStand): Boolean {
         val name = entity.name
         // a dragon, will always be fought
-        if (name == "Reindrake") return 0
+        if (name == "Reindrake") return true
 
         // a npc shop
-        if (name == "§5Frosty the Snow Blaster") return 0
+        if (name == "§5Frosty the Snow Blaster") return true
 
         if (name == "Frosty") {
-            val npcLocation = LorenzVec(-1.5, 76.0, 92.5)
-            if (entity.getLorenzVec().distance(npcLocation) < 1) {
-                return 0
+            if (entity.getLorenzVec().distance(frostyNpcLocation) < 1) {
+                return true
             }
         }
 
         val isSummonedSoul = name.contains("'")
         val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
-        if (!hasFishingMobName || isSummonedSoul) return 0
-
-        if (name == "Sea Emperor" || name == "Rider of the Deep") {
-            return 2
-        }
-        return 1
+        return !hasFishingMobName || isSummonedSoul
     }
 
     private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
