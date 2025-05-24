@@ -275,7 +275,9 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     JACOB_CONTESTS("jacob_contests", JacobContestsJson::class.java, SkyHanniMod::jacobContestsData),
     //#endif
     VISUAL_WORDS("visual_words", VisualWordsJson::class.java, SkyHanniMod::visualWordsData),
-    PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData)
+    //#if TODO
+    PETS("pets", PetDataStorage::class.java, SkyHanniMod::petData),
+    //#endif
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
