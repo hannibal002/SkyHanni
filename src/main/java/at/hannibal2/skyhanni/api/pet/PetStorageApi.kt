@@ -244,16 +244,20 @@ object PetStorageApi {
         if (!mainPetMenuNamePattern.matches(InventoryUtils.openInventoryName())) return
         val clickedItem = event.item ?: return
         val petInfo = clickedItem.getPetInfo() ?: return
+        val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         when (event.clickedButton) {
-            1 -> { // Right click
+            1 -> { // Right click - remove pet from menu
                 petStorage?.removeIf { it.uuid == petInfo.uuid }
-                if (ProfileStorageData.profileSpecific?.currentPetUuid == petInfo.uuid) {
+                if (currentPetUuid == petInfo.uuid) {
                     ProfileStorageData.profileSpecific?.currentPetUuid = null
                 }
             }
-            0 -> { // Left click
+            0 -> { // Left click - if not a shift click, summon/un-summon pet
                 if (KeyboardManager.isShiftKeyDown()) return
-                ProfileStorageData.profileSpecific?.currentPetUuid = petInfo.uuid
+                ProfileStorageData.profileSpecific?.currentPetUuid = when (currentPetUuid) {
+                    petInfo.uuid -> null
+                    else -> petInfo.uuid
+                }
             }
             else -> return
         }
