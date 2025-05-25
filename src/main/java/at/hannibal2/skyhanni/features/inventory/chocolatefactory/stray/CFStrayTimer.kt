@@ -65,6 +65,7 @@ object CFStrayTimer {
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        if (timer == Duration.ZERO) return
         // Reset the timer when the inventory is closed prematurely
         timer = 30.seconds
         lastTimerSubtraction = null
