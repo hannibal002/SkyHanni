@@ -151,7 +151,7 @@ object PetStorageApi {
         this % 9 != 0 && (this + 1) % 9 != 0
 
     private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName): NeuItemJson? {
-        val skin =groupOrNull("skin") ?: groupOrNull("altskin") ?: return null
+        val skin = groupOrNull("skin") ?: groupOrNull("altskin") ?: return null
         val skinColor = skin.substring(0, 2)
         val properPetName = petInternalName.asString().split(";").first()
         return PetUtils.petSkins[properPetName]?.filter {
