@@ -66,11 +66,12 @@ object CurrentPetDisplay {
             rarity.color.toColor(),
             padding = 4,
         )
-        val borderedRarityBackgroundRenderable = CircularContainerRenderable(
+        val separatorRingEnabled = VElement.XP_RING in enabledVisuals && VElement.SEPARATOR_RING in enabledVisuals
+        val borderedRarityBackgroundRenderable = if (separatorRingEnabled) CircularContainerRenderable(
             rarityBackgroundRenderable,
             Color.GRAY,
             padding = 6,
-        )
+        ) else rarityBackgroundRenderable
         if (VElement.XP_RING !in enabledVisuals) return borderedRarityBackgroundRenderable
         val xpRingCompleteRenderable = CircularContainerRenderable(
             borderedRarityBackgroundRenderable,

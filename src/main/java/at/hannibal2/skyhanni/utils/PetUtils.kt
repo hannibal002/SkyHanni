@@ -142,6 +142,16 @@ object PetUtils {
 
     fun getSkinVariantIdentifier(skinInternalName: NeuInternalName, variantIndex: Int): String? =
         petSkinVariantIndexMap[skinInternalName]?.get(variantIndex)
+
+    private val nextTierCache: MutableMap<NeuInternalName, Boolean> = mutableMapOf()
+    fun NeuInternalName.hasValidNextTier() = nextTierCache.getOrPut(this) {
+        if (!this.isPet) return@getOrPut false
+        val (properPetName, rarity) = internalNameToPetWithRarity(this)
+            ?: return@getOrPut false
+        val rarityAbove = rarity.oneAbove() ?: return@getOrPut false
+        val tierAboveInternalName = petWithRarityToInternalName(properPetName, rarityAbove)
+        tierAboveInternalName.isKnownItem()
+    }
     // </editor-fold>
 
     @HandleEvent

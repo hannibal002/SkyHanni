@@ -66,6 +66,10 @@ class PetDisplayConfig {
                 displayName = "Xp Ring",
                 dependentOn = setOf(PET_ICON, RARITY_BACKGROUND),
             ),
+            SEPARATOR_RING(
+                displayName = "Separator Ring",
+                dependentOn = setOf(RARITY_BACKGROUND, XP_RING),
+            )
             ;
 
             override fun toString() = manager.displayName(this)

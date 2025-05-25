@@ -95,7 +95,7 @@ class NeuInternalName private constructor(private val internalName: String) {
             else -> internalName
         }
 
-    private val isPet: Boolean
+    val isPet: Boolean
         get() = getItemStackOrNull()?.getPetExp() != null
 
     private val isEnchantedBook: Boolean
