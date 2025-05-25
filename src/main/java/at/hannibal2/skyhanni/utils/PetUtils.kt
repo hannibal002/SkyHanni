@@ -70,9 +70,13 @@ object PetUtils {
         "PET_SKIN_(?<pet>[A-Z])_?(?<skin>[A-Z_]+)?"
     )
 
+    /**
+     * REGEX-TEST: §7§eRight-click to add this pet to
+     * REGEX-TEST: §7§eRight-click to add this pet to your
+     */
     private val neuPetLorePattern by CurrentPetApi.patternGroup.pattern(
         "neu.pet.lore",
-        "§7§eRight-click to add this pet to your"
+        "§7§eRight-click to add this pet to(?: your)?"
     )
     // </editor-fold>
 
@@ -183,6 +187,5 @@ object PetUtils {
             }
         }
         petInternalNames = rawPetInternalNames
-        ChatUtils.chat("Set petInternalNames to: $petInternalNames")
     }
 }

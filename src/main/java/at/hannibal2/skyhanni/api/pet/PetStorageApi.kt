@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -169,10 +168,7 @@ object PetStorageApi {
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
                 val trimmed = line.trim().removeResets()
                 PetUtils.petItemResolution[trimmed]
-                    ?: NeuInternalName.fromItemNameOrNull(trimmed)?.takeIf {
-                        ChatUtils.chat("${it.asString()} - isPet? ${it.isPet}")
-                        !it.isPet
-                    }
+                    ?: NeuInternalName.fromItemNameOrNull(trimmed)?.takeIf { !it.isPet }
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{
