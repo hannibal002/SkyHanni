@@ -88,7 +88,7 @@ object PetStorageApi {
     @Suppress("MaxLineLength")
     private val petTabWidgetXpPattern by patternGroup.pattern(
         "tab.xp",
-        " (?:§.)+(?<max>MAX LEVEL|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:§.|\\/)*(?<next>[\\d,.kM]*) XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)"
+        " (?:§.)+(?:(<max>MAX LEVEL)|(?:\\+(?:§.)+)?(?<current>[\\d,.kM]+)(?:§.|\\/)*(?<next>[\\d,.kM]*) XP(?: (?:§.)+\\((?<percentage>[\\d.]+)%\\))?)"
     )
 
     /**
@@ -256,16 +256,16 @@ object PetStorageApi {
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         when (event.clickedButton) {
             1 -> { // Right click - remove pet from menu
-                petStorage?.removeIf { it.uuid == petInfo.uuid }
-                if (currentPetUuid == petInfo.uuid) {
+                petStorage?.removeIf { it.uuid == petInfo.uniqueId }
+                if (currentPetUuid == petInfo.uniqueId) {
                     ProfileStorageData.profileSpecific?.currentPetUuid = null
                 }
             }
             0 -> { // Left click - if not a shift click, summon/un-summon pet
                 if (KeyboardManager.isShiftKeyDown()) return
                 ProfileStorageData.profileSpecific?.currentPetUuid = when (currentPetUuid) {
-                    petInfo.uuid -> null
-                    else -> petInfo.uuid
+                    petInfo.uniqueId -> null
+                    else -> petInfo.uniqueId
                 }
             }
             else -> return
@@ -293,7 +293,7 @@ object PetStorageApi {
                 skinInternalName = petInfo.properSkinItem,
                 heldItemInternalName = petInfo.heldItem,
                 exp = petInfo.exp,
-                uuid = petInfo.uuid,
+                uuid = petInfo.uniqueId,
             )
         }.forEach { data ->
             // Because this inventory is the "source of truth", if we come across the same UUID
@@ -319,10 +319,10 @@ object PetStorageApi {
             skinInternalName = petInfo.properSkinItem,
             heldItemInternalName = petInfo.heldItem,
             exp = petInfo.exp,
-            uuid = petInfo.uuid,
+            uuid = petInfo.uniqueId,
         )
 
-        petStorage.indexOfFirstOrNull { it.uuid == petInfo.uuid }?.let {
+        petStorage.indexOfFirstOrNull { it.uuid == petInfo.uniqueId }?.let {
             petStorage[it] = data
         } ?: petStorage.add(data)
 
@@ -349,7 +349,7 @@ object PetStorageApi {
             val level = petMenuSelectedPetProgressPattern.firstMatcher(currentPetItemLore) {
                 when (groupOrNull("next")) {
                     null -> PetUtils.getMaxLevel(petInternalname)
-                    else -> group("next").formatInt()
+                    else -> (group("next").formatInt() -1)
                 }
             } ?: return@firstMatcher false
 
