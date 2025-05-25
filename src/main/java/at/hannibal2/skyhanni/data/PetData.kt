@@ -36,8 +36,13 @@ class PetDataStorage {
 }
 
 @KSerializable
+@Suppress("DEPRECATION")
 data class PetData(
-    @Expose private val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
+    @Deprecated(
+        "This does not reflect Tier Boost, use fauxInternalName instead.",
+        replaceWith = ReplaceWith("fauxInternalName")
+    )
+    @Expose val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
     @Expose var skinVariantIndex: Int? = null, // Used for pet skins that have variants, otherwise unused
     @Expose var heldItemInternalName: NeuInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
