@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
@@ -94,7 +96,7 @@ object PetUtils {
         return null
     }
 
-    fun internalNameToPetWithRarity(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
+    fun internalNameToProperPetWithRarity(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
         val parts = internalName.asString().split(";")
         if (parts.size < 2) return null
         val name = parts[0].takeIf { it.isNotBlank() } ?: return null
@@ -115,8 +117,8 @@ object PetUtils {
     }
 
     fun xpToLevel(totalXp: Double, petInternalName: NeuInternalName): Int {
-        var xp = totalXp.takeIf { it > 0 } ?: return 0
-        val rarityOffset = getRarityOffset(petInternalName) ?: return 0
+        var xp = totalXp.takeIf { it > 0 } ?: return 1
+        val rarityOffset = getRarityOffset(petInternalName) ?: return 1
         val xpList = getFullLevelingTree(petInternalName)
 
         var level = 1
@@ -143,7 +145,7 @@ object PetUtils {
 
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {
         val petsData = customXpLevelReqs ?: return null
-        val (properPetName, rarity) = internalNameToPetWithRarity(petInternalName) ?: return null
+        val (properPetName, rarity) = internalNameToProperPetWithRarity(petInternalName) ?: return null
         return petsData[properPetName]?.rarityOffset?.get(rarity) ?: when (rarity) {
             LorenzRarity.COMMON -> 0
             LorenzRarity.UNCOMMON -> 6
@@ -158,7 +160,7 @@ object PetUtils {
     private val nextTierCache: MutableMap<NeuInternalName, Boolean> = mutableMapOf()
     fun NeuInternalName.hasValidHigherTier() = nextTierCache.getOrPut(this) {
         if (!this.isPet) return@getOrPut false
-        val (properPetName, rarity) = internalNameToPetWithRarity(this)
+        val (properPetName, rarity) = internalNameToProperPetWithRarity(this)
             ?: return@getOrPut false
         val rarityAbove = rarity.oneAbove() ?: return@getOrPut false
         val tierAboveInternalName = petWithRarityToInternalName(properPetName, rarityAbove)
@@ -190,5 +192,17 @@ object PetUtils {
             }
         }
         petInternalNames = rawPetInternalNames
+        nextTierCache.clear()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtesthashigher") {
+            description = "Test has higher tier"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback {
+                ChatUtils.chat("${it[0].toInternalName().hasValidHigherTier()}")
+            }
+        }
     }
 }

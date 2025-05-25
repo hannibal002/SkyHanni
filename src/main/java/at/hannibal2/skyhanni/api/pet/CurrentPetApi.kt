@@ -35,9 +35,9 @@ object CurrentPetApi {
     fun isCurrentPet(petInternalName: NeuInternalName) = currentPet?.petInternalName == petInternalName
     fun isCurrentPet(petName: String): Boolean = currentPet?.coloredName?.contains(petName) ?: false
     fun isCurrentPetOrHigherRarity(petInternalName: NeuInternalName): Boolean {
-        val (properPetName, startingRarity) = PetUtils.internalNameToPetWithRarity(petInternalName) ?: return false
         val currentPet = currentPet ?: return false
-        return currentPet.cleanInternalName == properPetName && currentPet.rarity >= startingRarity
+        val (properPetName, startingRarity) = PetUtils.internalNameToProperPetWithRarity(petInternalName) ?: return false
+        return currentPet.inFamily(properPetName) && currentPet.rarity >= startingRarity
     }
 
     fun assertFoundCurrentData(petData: PetData) {
