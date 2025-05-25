@@ -169,7 +169,7 @@ object PetUtils {
                     return Pair(skinInternalName, fullSkinIdentifier.replace(lookupKey, ""))
             }
             val identifierSplits = fullSkinIdentifier.split("_")
-            var splitsToJoin = identifierSplits.size + 1
+            var splitsToJoin = identifierSplits.size + 2
             while (splitsToJoin-- > 0) {
                 val filteredSplits = identifierSplits.subList(0, splitsToJoin)
                 val joinedSplits = filteredSplits.joinToString("_")
