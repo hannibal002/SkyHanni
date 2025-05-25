@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object SummoningSoulsName {
 
-    const SUMMONING_SOUL_TEXTURE = "ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81YWY0MDM1ZWMwZGMxNjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ=="
+    const SUMMONING_SOUL_TEXTURE by lazy { SkullTextureHolder.getTexture("SUMMONING_SOUL") }
     val souls = mutableMapOf<EntityArmorStand, String>()
     val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
     val mobsName = TimeLimitedCache<Int, String>(6.minutes)
