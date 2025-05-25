@@ -37,14 +37,20 @@ class PetDataStorage {
 
 @KSerializable
 data class PetData(
-    @Expose val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
+    @Expose private val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
     @Expose var skinVariantIndex: Int? = null, // Used for pet skins that have variants, otherwise unused
     @Expose var heldItemInternalName: NeuInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
+    /**
+     * Interpolated version of internal name that actually represents the state of the pet.
+     * This is needed because of tier boosts.
+     */
+    val fauxInternalName get() = "$properPetName;${rarity.id}".toInternalName()
     private val isItemTierBoosted get() = heldItemInternalName == TIER_BOOST && petInternalName.hasValidHigherTier()
+
     private val internalNameSplits: Pair<String, LorenzRarity> =
         PetUtils.internalNameToProperPetWithRarity(petInternalName)
             ?: ("???" to LorenzRarity.COMMON)
@@ -57,33 +63,34 @@ data class PetData(
             .joinToString(" ") {
                 it.firstLetterUppercase()
             }
-    val coloredName get() = "${rarity.chatColorCode}$cleanName"
 
+    val coloredName get() = "${rarity.chatColorCode}$cleanName"
     val rarity: LorenzRarity get() = specifiedRarity.oneAbove().takeIf { isItemTierBoosted } ?: specifiedRarity
-    val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
+    val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, fauxInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
     val levelProgressionPercentage: Double get() = when {
         exp == null || exp == 0.0 -> 0.0
-        PetUtils.getMaxLevel(petInternalName) <= level -> 100.0
+        PetUtils.getMaxLevel(fauxInternalName) <= level -> 100.0
         else -> {
             val xpDifference = nextLevelXp - currentLevelXp
             val xpProgress = (exp ?: 0.0) - currentLevelXp
             xpProgress / xpDifference * 100
         }
     }
-    val currentLevelXp get() = PetUtils.levelToXp(level, petInternalName) ?: 0.0
-    val nextLevelXp get() = PetUtils.levelToXp(level + 1, petInternalName) ?: 0.0
 
+    val currentLevelXp get() = PetUtils.levelToXp(level, fauxInternalName) ?: 0.0
+    val nextLevelXp get() = PetUtils.levelToXp(level + 1, fauxInternalName) ?: 0.0
     val overflowXp get() = when {
-        level == PetUtils.getMaxLevel(petInternalName) -> {
+        level == PetUtils.getMaxLevel(fauxInternalName) -> {
             val currentTotalXp = exp ?: 0.0
-            val levelXp = PetUtils.levelToXp(level, petInternalName) ?: 0.0
+            val levelXp = PetUtils.levelToXp(level, fauxInternalName) ?: 0.0
             (currentTotalXp - levelXp).takeIf { it >= 0.0 } ?: 0.0
         }
         else -> 0.0
     }
 
     fun inFamily(properPetName: String) = (properPetName == this.properPetName)
+
     fun getUserFriendlyName(
         includeLevel: Boolean = true,
         includeSkinTag: Boolean = true,
@@ -93,10 +100,8 @@ data class PetData(
         if (includeSkinTag && skinTag != null) append(" $skinTag")
     }
 
-    private fun String.buildTextureItemStack(): ItemStack {
-        val (uuid, texture) = this.split(":")
-        return ItemUtils.createSkull("Pet Skin", uuid, texture)
-    }
+    fun getItemStackOrNull(frameIndex: Int = 0): ItemStack? =
+        getSkinItemStackOrNull(frameIndex) ?: petInternalName.getItemStackOrNull()
 
     fun getAnimatedItemStackSequence(firstFrameOnly: Boolean = false): List<ItemStackAnimationFrame>? {
         val baseStack = getSkinItemStackOrNull(0) ?: run {
@@ -113,6 +118,11 @@ data class PetData(
                 ticks = animationJson.ticks,
             )
         }
+    }
+
+    private fun String.buildTextureItemStack(): ItemStack {
+        val (uuid, texture) = this.split(":")
+        return ItemUtils.createSkull("Pet Skin", uuid, texture)
     }
 
     private fun getAnimatedJsonOrNull(): AnimatedSkinJson? {
@@ -135,9 +145,6 @@ data class PetData(
         val boundedFrameIndex = frameIndex.takeIf { it > 0 && it < animatedSkinJson.textures.size } ?: 0
         return animatedSkinJson.textures[boundedFrameIndex].buildTextureItemStack()
     }
-
-    fun getItemStackOrNull(frameIndex: Int = 0): ItemStack? =
-        getSkinItemStackOrNull(frameIndex) ?: petInternalName.getItemStackOrNull()
 
     companion object {
         private val TIER_BOOST = "PET_ITEM_TIER_BOOST".toInternalName()

@@ -21,11 +21,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 
 @SkyHanniModule
 object PetUtils {
-    // Map of Pet Name to a Map of Skin Name to NeuItemJson
+    // Map of Proper Pet Name to the skins that pet can have
     val petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
 
-    private var baseXpLevelReqs: List<Int> = listOf()
-    private var customXpLevelReqs: Map<String, NeuPetData>? = null
+    private var basePetLeveling: List<Int> = listOf()
+    private var customPetLeveling: Map<String, NeuPetData>? = null
+
     var petInternalNames: Set<NeuInternalName> = setOf()
         private set
     var petItemResolution: Map<String, NeuInternalName> = mapOf()
@@ -137,16 +138,16 @@ object PetUtils {
 
     fun getMaxLevel(petInternalName: NeuInternalName): Int {
         val properPetName = petInternalName.asString().split(";").first()
-        return customXpLevelReqs?.get(properPetName)?.maxLevel ?: 100
+        return customPetLeveling?.get(properPetName)?.maxLevel ?: 100
     }
 
     private fun getFullLevelingTree(petInternalName: NeuInternalName): List<Int> {
         val properPetName = petInternalName.asString().split(";").first()
-        return baseXpLevelReqs + customXpLevelReqs?.get(properPetName)?.petLevels.orEmpty()
+        return basePetLeveling + customPetLeveling?.get(properPetName)?.petLevels.orEmpty()
     }
 
     private fun getRarityOffset(petInternalName: NeuInternalName): Int? {
-        val petsData = customXpLevelReqs ?: return null
+        val petsData = customPetLeveling ?: return null
         val (properPetName, rarity) = internalNameToProperPetWithRarity(petInternalName) ?: return null
         return petsData[properPetName]?.rarityOffset?.get(rarity) ?: when (rarity) {
             LorenzRarity.COMMON -> 0
@@ -173,9 +174,9 @@ object PetUtils {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val petData = event.getConstant<NeuPetsJson>("pets")
-        baseXpLevelReqs = petData.petLevels
-        customXpLevelReqs = petData.customPetLeveling
-        petItemResolution = petData.petItemDisplayNameToInternalName
+        basePetLeveling = petData.basePetLeveling
+        customPetLeveling = petData.customPetLeveling
+        petItemResolution = petData.petItemResolution
         displayNameMap = petData.displayNameMap
 
         val skinData = event.getConstant<NeuAnimatedSkullsJson>("animatedskulls")
@@ -187,8 +188,8 @@ object PetUtils {
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
             val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuItemJson::class.java)
             petSkinNamePattern.matchMatcher(rawInternalName) {
-                val petName = group("pet") ?: return@matchMatcher
-                petSkins.getOrPut(petName) { mutableListOf() }.add(petItemData)
+                val properPetName = group("pet") ?: return@matchMatcher
+                petSkins.getOrPut(properPetName) { mutableListOf() }.add(petItemData)
             }
             neuPetLorePattern.firstMatcher(petItemData.lore) {
                 rawPetInternalNames.add(rawInternalName.toInternalName())

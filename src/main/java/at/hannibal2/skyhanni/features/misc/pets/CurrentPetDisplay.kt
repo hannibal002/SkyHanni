@@ -107,7 +107,7 @@ object CurrentPetDisplay {
                         "§b${totalXp.formatExpByConfigOption()}"
                     }
                     TElement.NEXT_LEVEL -> {
-                        if (level == PetUtils.getMaxLevel(petInternalName)) return@mapNotNull null
+                        if (level >= PetUtils.getMaxLevel(fauxInternalName)) return@mapNotNull null
 
                         val currentExp = exp ?: 0.0
                         val currentXpOverLevel = currentExp - currentLevelXp
