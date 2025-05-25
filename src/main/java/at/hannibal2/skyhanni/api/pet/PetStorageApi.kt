@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -168,7 +169,10 @@ object PetStorageApi {
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
                 val trimmed = line.trim().removeResets()
                 PetUtils.petItemResolution[trimmed]
-                    ?: NeuInternalName.fromItemNameOrNull(trimmed)?.takeIf { !it.isPet }
+                    ?: NeuInternalName.fromItemNameOrNull(trimmed)?.takeIf {
+                        ChatUtils.chat("${it.asString()} - isPet? ${it.isPet}")
+                        !it.isPet
+                    }
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{
@@ -249,16 +253,16 @@ object PetStorageApi {
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         when (event.clickedButton) {
             1 -> { // Right click - remove pet from menu
-                petStorage?.removeIf { it.uuid == petInfo.uuid }
-                if (currentPetUuid == petInfo.uuid) {
+                petStorage?.removeIf { it.uuid == petInfo.uniqueId }
+                if (currentPetUuid == petInfo.uniqueId) {
                     ProfileStorageData.profileSpecific?.currentPetUuid = null
                 }
             }
             0 -> { // Left click - if not a shift click, summon/un-summon pet
                 if (KeyboardManager.isShiftKeyDown()) return
                 ProfileStorageData.profileSpecific?.currentPetUuid = when (currentPetUuid) {
-                    petInfo.uuid -> null
-                    else -> petInfo.uuid
+                    petInfo.uniqueId -> null
+                    else -> petInfo.uniqueId
                 }
             }
             else -> return
@@ -317,7 +321,7 @@ object PetStorageApi {
             skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
         )
 
-        petStorage.indexOfFirstOrNull { it.uuid == petInfo.uuid }?.let {
+        petStorage.indexOfFirstOrNull { it.uuid == petInfo.uniqueId }?.let {
             petStorage[it] = data
         } ?: petStorage.add(data)
 

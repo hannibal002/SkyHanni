@@ -81,6 +81,7 @@ object SkyBlockItemModifierUtils {
         @Expose val heldItem: NeuInternalName? = null,
         @Expose val candyUsed: Int = 0,
         @Expose val skin: NeuInternalName? = null,
+        @Deprecated("Some pets do not have uuids, use uniqueId instead", replaceWith = ReplaceWith("uniqueId"))
         @Expose val uuid: UUID,
         @Expose val uniqueId: UUID,
         @Expose val hideRightClick: Boolean,

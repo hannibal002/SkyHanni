@@ -183,5 +183,6 @@ object PetUtils {
             }
         }
         petInternalNames = rawPetInternalNames
+        ChatUtils.chat("Set petInternalNames to: $petInternalNames")
     }
 }
