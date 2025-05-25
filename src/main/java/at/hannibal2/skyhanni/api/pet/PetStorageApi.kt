@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -149,13 +151,11 @@ object PetStorageApi {
     private fun Int.isPetStackLocation() = this in 10..43 &&
         this % 9 != 0 && (this + 1) % 9 != 0
 
-    private fun Matcher.getSkinGroupOrNull() = groupOrNull("skin")
-        ?: groupOrNull("altskin")
-
-    private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName) = getSkinGroupOrNull()?.let { skin ->
+    private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName): NeuItemJson? {
+        val skin =groupOrNull("skin") ?: groupOrNull("altskin") ?: return null
         val skinColor = skin.substring(0, 2)
         val properPetName = petInternalName.asString().split(";").first()
-        PetUtils.petSkins[properPetName]?.filter {
+        return PetUtils.petSkins[properPetName]?.filter {
             it.displayName.startsWith(skinColor)
         }?.takeIf { it.size == 1 }?.first()
     }
@@ -349,7 +349,7 @@ object PetStorageApi {
             val level = petMenuSelectedPetProgressPattern.firstMatcher(currentPetItemLore) {
                 when (groupOrNull("next")) {
                     null -> PetUtils.getMaxLevel(petInternalname)
-                    else -> (group("next").formatInt() -1)
+                    else -> (group("next").formatInt() - 1)
                 }
             } ?: return@firstMatcher false
 
