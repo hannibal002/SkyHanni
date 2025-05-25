@@ -352,7 +352,7 @@ object PetStorageApi {
             val level = petMenuSelectedPetProgressPattern.firstMatcher(currentPetItemLore) {
                 when (groupOrNull("next")) {
                     null -> PetUtils.getMaxLevel(petInternalname)
-                    else -> group("next").formatInt()
+                    else -> (group("next").formatInt() - 1)
                 }
             } ?: return@firstMatcher false
 
