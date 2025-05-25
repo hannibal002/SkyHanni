@@ -95,7 +95,6 @@ data class PetData(
     }
 
     fun inFamily(properPetName: String) = (properPetName == this.properPetName)
-
     fun getUserFriendlyName(
         includeLevel: Boolean = true,
         includeSkinTag: Boolean = true,
