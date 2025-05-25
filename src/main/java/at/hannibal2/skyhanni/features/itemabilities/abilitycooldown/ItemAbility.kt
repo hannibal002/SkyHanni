@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.inPartialSeconds
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
 import kotlin.time.Duration

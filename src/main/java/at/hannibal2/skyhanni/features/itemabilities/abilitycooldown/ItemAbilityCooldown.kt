@@ -82,7 +82,16 @@ object ItemAbilityCooldown {
             // Necron's Blades (NECRONS_BLADE, HYPERION, SCYLLA, ASTRAEA, VALKYRIE)
             event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f -> {
                 val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
-                if(abilityScrolls.containsAll(listOf("WITHER_SHIELD_SCROLL".toInternalName(), "SHADOW_WARP_SCROLL".toInternalName(), "IMPLOSION_SCROLL".toInternalName()))){ItemAbility.WITHER_IMPACT.sound()}
+                if (abilityScrolls.containsAll(
+                        listOf(
+                            "WITHER_SHIELD_SCROLL".toInternalName(),
+                            "SHADOW_WARP_SCROLL".toInternalName(),
+                            "IMPLOSION_SCROLL".toInternalName(),
+                        ),
+                    )
+                ) {
+                    ItemAbility.WITHER_IMPACT.sound()
+                }
                 else
                 {
                     for (ability in ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand()))
