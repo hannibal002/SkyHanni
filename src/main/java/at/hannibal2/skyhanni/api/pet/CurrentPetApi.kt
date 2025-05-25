@@ -64,6 +64,7 @@ object CurrentPetApi {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
+        event.title("CurrentPetApi")
         event.addIrrelevant {
             val info = when (currentPet) {
                 null -> "no pet equipped"
