@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -162,9 +163,15 @@ object PetStorageApi {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
         petTabWidgetNamePattern.firstMatcher(event.lines) {
-            val petName = groupOrNull("pet") ?: return@firstMatcher false
+            val petName = groupOrNull("pet") ?: run {
+                ChatUtils.chat("No pet group")
+                return@firstMatcher false
+            }
             val level = group("level").toInt()
-            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return@firstMatcher false
+            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: run {
+                ChatUtils.chat("No rarity found")
+                return@firstMatcher false
+            }
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
                 PetUtils.petItemResolution[line.trim().removeResets()]
             }
@@ -178,13 +185,25 @@ object PetStorageApi {
                 currentLevelXp + readXpGroup
             }
 
+            ChatUtils.chat(
+                "Trying to resolve:\n" +
+                    "Name: $petName\n" +
+                    "Rarity: $rarity\n" +
+                    "Level: $level\n" +
+                    "Held Item: $petHeldItem\n" +
+                    "Exp: $petExp"
+            )
+
             val resolvedPet = resolvePetDataOrNull(
                 name = petName,
                 rarity = rarity,
                 level = level,
                 heldItem = petHeldItem,
                 exp = petExp,
-            ) ?: return@firstMatcher false
+            ) ?: run {
+                ChatUtils.chat("No resolved pet")
+                return@firstMatcher false
+            }
 
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
@@ -195,7 +214,7 @@ object PetStorageApi {
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet)
             saveConfig()
-        }
+        } ?: ChatUtils.chat("No match")
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
@@ -284,7 +303,7 @@ object PetStorageApi {
                 skinInternalName = petInfo.properSkinItem,
                 heldItemInternalName = petInfo.heldItem,
                 exp = petInfo.exp,
-                uuid = petInfo.uuid,
+                uuid = petInfo.uniqueId,
                 skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
             )
         }.forEach { data ->
@@ -311,7 +330,7 @@ object PetStorageApi {
             skinInternalName = petInfo.properSkinItem,
             heldItemInternalName = petInfo.heldItem,
             exp = petInfo.exp,
-            uuid = petInfo.uuid,
+            uuid = petInfo.uniqueId,
             skinVariantIndex = petInfo.getSkinVariantIndex() ?: -1,
         )
 

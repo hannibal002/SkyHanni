@@ -65,19 +65,12 @@ object CurrentPetApi {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("CurrentPetApi")
-        if (currentPet == null) {
-            event.addIrrelevant("no pet equipped")
-            return
-        }
         event.addIrrelevant {
-            add("petName: '${currentPet?.petInternalName ?: ""}'")
-            add("petSkin: '${currentPet?.skinInternalName ?: ""}'")
-            add("petSkinVariantIndex: '${currentPet?.skinVariantIndex}'")
-            add("petRarity: '${currentPet?.rarity?.rawName.orEmpty()}'")
-            add("petItem: '${currentPet?.heldItemInternalName ?: ""}'")
-            add("petLevel: '${currentPet?.level ?: 0}'")
-            add("petXP: '${currentPet?.exp ?: 0.0}'")
-            add("petUUID: '${currentPet?.uuid ?: ""}'")
+            val info = when (currentPet) {
+                null -> "no pet equipped"
+                else -> "currentPet:\n\n$currentPet"
+            }
+            add(info)
         }
     }
 }

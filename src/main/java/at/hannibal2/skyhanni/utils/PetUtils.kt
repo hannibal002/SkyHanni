@@ -150,7 +150,7 @@ object PetUtils {
             ?: return@getOrPut false
         val rarityAbove = rarity.oneAbove() ?: return@getOrPut false
         val tierAboveInternalName = petWithRarityToInternalName(properPetName, rarityAbove)
-        tierAboveInternalName.isKnownItem()
+        return@getOrPut tierAboveInternalName.isPet
     }
     // </editor-fold>
 

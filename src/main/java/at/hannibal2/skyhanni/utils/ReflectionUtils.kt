@@ -168,4 +168,12 @@ object ReflectionUtils {
             throw IllegalArgumentException("Method ${instance.javaClass.name}#${method.name} is not a valid runnable", e)
         }
     }
+
+    inline fun <reified T : Any> T.toMultilineString(): String {
+        val props = T::class.memberProperties
+        val body = props.joinToString("\n") { prop ->
+            "${prop.name}=${prop.get(this)}"
+        }
+        return "${T::class.simpleName}(\n$body\n)"
+    }
 }

@@ -9,11 +9,13 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidNextTier
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import com.google.gson.annotations.Expose
+import com.ibm.icu.util.LocalePriorityList.add
 import net.minecraft.item.ItemStack
 import java.util.UUID
 
@@ -42,7 +44,7 @@ data class PetData(
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
-    private val isItemTierBoosted get() = heldItemInternalName == TIER_BOOST
+    private val isItemTierBoosted get() = heldItemInternalName == TIER_BOOST && petInternalName.hasValidNextTier()
     private val internalNameSplits: Pair<String, LorenzRarity> =
         PetUtils.internalNameToPetWithRarity(petInternalName)
             ?: ("???" to LorenzRarity.COMMON)
@@ -132,5 +134,21 @@ data class PetData(
 
     companion object {
         private val TIER_BOOST = "PET_ITEM_TIER_BOOST".toInternalName()
+    }
+
+    override fun toString() = buildString {
+        add("  coloredName: $coloredName")
+        add("  petInternalName: ${petInternalName.asString()}")
+        add("    hasValidNextTier: ${petInternalName.hasValidNextTier()}")
+        add("  skinInternalName: ${skinInternalName?.asString()}")
+        add("  skinVariantIndex: $skinVariantIndex")
+        add("    knownAnimationJson?: ${getAnimatedJsonOrNull() != null}")
+        add("  heldItemInternalName: ${heldItemInternalName?.asString()}")
+        add("  exp: ${exp?.addSeparators() ?: 0.0}")
+        add("  uuid: $uuid")
+        add("")
+        add("  isItemTierBoosted: $isItemTierBoosted")
+        add("  rarity: $rarity")
+        add("  level: $level")
     }
 }

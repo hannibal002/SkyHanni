@@ -82,7 +82,7 @@ object SkyBlockItemModifierUtils {
         @Expose val candyUsed: Int = 0,
         @Expose val skin: NeuInternalName? = null,
         @Expose val uuid: UUID,
-        @Expose val uniqueId: String,
+        @Expose val uniqueId: UUID,
         @Expose val hideRightClick: Boolean,
         @Expose val noMove: Boolean,
         @Expose val extraData: JsonObject? = null,
