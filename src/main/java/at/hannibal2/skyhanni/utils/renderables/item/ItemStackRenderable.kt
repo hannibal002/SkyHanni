@@ -19,7 +19,7 @@ open class ItemStackRenderable(
     override val verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
     open val highlight: Boolean = false,
 ) : Renderable {
-    val stack: ItemStack = item.copy().apply {
+    open val stack: ItemStack = item.copy().apply {
         if (highlight) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
     }
 

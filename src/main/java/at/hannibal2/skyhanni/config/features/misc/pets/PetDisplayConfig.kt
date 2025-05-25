@@ -114,7 +114,7 @@ class PetDisplayConfig {
                 "§ePet Icon and §eIcon Spin must be enabled above."
         )
         @ConfigEditorSlider(minValue = 0.5f, maxValue = 10f, minStep = 0.5f)
-        val spinFrequency: Property<Double> = Property.of(2.0)
+        val spinFrequency: Property<Float> = Property.of(2.0f)
 
         @SkyHanniModule
         companion object {

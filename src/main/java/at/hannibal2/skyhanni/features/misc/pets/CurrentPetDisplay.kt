@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable
-import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
 import net.minecraft.util.EnumFacing
 import java.awt.Color
@@ -43,27 +43,23 @@ object CurrentPetDisplay {
     private fun PetData.buildItemRenderableOrNull(): Renderable? {
         val enabledVisuals = config.visual.enabledVisuals.get()
         if (VElement.PET_ICON !in enabledVisuals) return null
-        val itemStack = getItemStackOrNull() ?: return null
-        val spinDirection = config.visual.spinDirection.get()
 
-        val baseItemRenderable: ItemStackRenderable = when {
-            spinDirection != SDirection.NONE -> {
-                val multiplier = if (spinDirection == SDirection.CLOCKWISE) -1 else 1
-                val degreesPerSecond = (360 / config.visual.spinFrequency.get()) * multiplier
-                AnimatedItemStackRenderable(
-                    itemStack,
-                    scale = config.visual.iconScale.get(),
-                    rotation = ItemStackRotationDefinition(
-                        axis = EnumFacing.Axis.Y,
-                        rotationSpeed = degreesPerSecond,
-                    ),
-                )
-            }
-            else -> ItemStackRenderable(
-                itemStack,
-                scale = config.visual.iconScale.get(),
-            )
-        }
+        val spinDirection = config.visual.spinDirection.get()
+        val spinFrequency = config.visual.spinFrequency.get()
+        val spinMultiplier = if (spinDirection == SDirection.CLOCKWISE) -1 else 1
+        val degreesPerSecond = if (spinDirection != SDirection.NONE) ((360 / spinFrequency) * spinMultiplier) else 0.0
+
+        val baseItemRenderable = AnimatedItemStackRenderable(
+            frames = getAnimatedItemStackSequence(
+                firstFrameOnly = !(config.visual.skinAnimation.get())
+            ) ?: listOf(ItemStackAnimationFrame(getItemStackOrNull() ?: return null)),
+            scale = config.visual.iconScale.get(),
+            rotation = ItemStackRotationDefinition(
+                axis = EnumFacing.Axis.Y,
+                rotationSpeed = degreesPerSecond.toDouble(),
+            ),
+        )
+
         if (VElement.RARITY_BACKGROUND !in enabledVisuals) return baseItemRenderable
         val rarityBackgroundRenderable = CircularContainerRenderable(
             baseItemRenderable,

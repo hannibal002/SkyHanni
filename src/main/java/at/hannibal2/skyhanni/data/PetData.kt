@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.KSerializable
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import java.util.UUID
@@ -83,6 +85,28 @@ data class PetData(
         if (includeSkinTag && skinTag != null) append(" $skinTag")
     }
 
+    private fun String.buildTextureItemStack(): ItemStack {
+        val (uuid, texture) = this.split(":")
+        return ItemUtils.createSkull("Pet Skin", uuid, texture)
+    }
+
+    fun getAnimatedItemStackSequence(firstFrameOnly: Boolean = false): List<ItemStackAnimationFrame>? {
+        val baseStack = getSkinItemStackOrNull(0) ?: run {
+            return null
+        }
+        val firstFrame = ItemStackAnimationFrame(baseStack)
+        val animationJson = getAnimatedJsonOrNull()
+        if (firstFrameOnly || animationJson == null) {
+            return listOf(firstFrame)
+        }
+        return animationJson.textures.map {
+            ItemStackAnimationFrame(
+                it.buildTextureItemStack(),
+                ticks = animationJson.ticks,
+            )
+        }
+    }
+
     private fun getAnimatedJsonOrNull(): AnimatedSkinJson? {
         if (skinVariantIndex == -1) return null
         val skinInternalName = skinInternalName ?: return null
@@ -96,8 +120,7 @@ data class PetData(
         val baseItemStack = skinInternalName.getItemStackOrNull() ?: return null
         val animatedSkinJson = getAnimatedJsonOrNull()?.takeIf { it.textures.any() } ?: return baseItemStack
         val boundedFrameIndex = frameIndex.takeIf { it > 0 && it < animatedSkinJson.textures.size } ?: 0
-        val (uuid, texture) = animatedSkinJson.textures[boundedFrameIndex].split(":")
-        return ItemUtils.createSkull("Pet Skin", uuid, texture)
+        return animatedSkinJson.textures[boundedFrameIndex].buildTextureItemStack()
     }
 
     fun getItemStackOrNull(frameIndex: Int = 0): ItemStack? =
