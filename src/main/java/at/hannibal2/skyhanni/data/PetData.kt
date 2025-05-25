@@ -121,8 +121,7 @@ data class PetData(
         ]
         val skinVariantIndex = skinVariantIndex?.takeIf { it != -1 } ?: return baseSkin
         val variantIdentifier = PetUtils.petSkinVariants[skinInternalName]?.get(skinVariantIndex) ?: return null
-        val fullSkinIdentifier = "${skinInternalName.asString()}_$variantIdentifier"
-        return PetUtils.animatedPetSkins[fullSkinIdentifier]
+        return PetUtils.animatedPetSkins[variantIdentifier]
     }
 
     private fun getSkinItemStackOrNull(frameIndex: Int = 0): ItemStack? {
