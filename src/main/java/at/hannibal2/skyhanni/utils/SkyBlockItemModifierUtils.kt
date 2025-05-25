@@ -88,7 +88,7 @@ object SkyBlockItemModifierUtils {
         @Expose val noMove: Boolean,
         @Expose val extraData: JsonObject? = null,
     ) {
-        val properSkinItem get() = "PET_SKIN_$skin".toInternalName()
+        val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
         fun getSkinVariantIndex() = skin?.let {
             extraData?.entrySet()?.firstOrNull { json ->
                 val repoVariantIndex = PetUtils.petSkinVariants.entries.indexOfFirst { it.key == properSkinItem }

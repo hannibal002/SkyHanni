@@ -45,14 +45,16 @@ data class PetData(
 
     private val specifiedRarity = internalNameSplits.second
     private val properPetName = internalNameSplits.first
-    val cleanName = properPetName
-        .replace("_", " ")
-        .split(" ")
-        .joinToString(" ") { it.firstLetterUppercase() }
+    val cleanName = PetUtils.displayNameMap[properPetName]
+        ?: properPetName
+            .replace("_", " ")
+            .split(" ")
+            .joinToString(" ") {
+                it.firstLetterUppercase()
+            }
     val coloredName get() = "${rarity.chatColorCode}$cleanName"
-
     val rarity: LorenzRarity get() = specifiedRarity.oneAbove().takeIf { isItemTierBoosted } ?: specifiedRarity
-    val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
+    val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, "$properPetName;${rarity.id}".toInternalName())
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
 
     fun inFamily(properPetName: String) = (properPetName == this.properPetName)

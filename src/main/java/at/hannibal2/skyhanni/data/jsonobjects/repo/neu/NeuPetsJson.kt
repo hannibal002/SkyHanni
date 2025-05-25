@@ -6,11 +6,11 @@ import com.google.gson.annotations.SerializedName
 
 data class NeuPetsJson(
     @Expose @SerializedName("pet_rarity_offset") val petRarityOffset: Map<String, Int>,
-    @Expose @SerializedName("pet_levels") val petLevels: List<Int>,
+    @Expose @SerializedName("pet_levels") val basePetLeveling: List<Int>,
     @Expose @SerializedName("custom_pet_leveling") val customPetLeveling: Map<String, NeuPetData>,
     @Expose @SerializedName("pet_types") val petTypes: Map<String, String>,
-    @Expose @SerializedName("id_to_display_name") val displayNameMap: Map<NeuInternalName, String>,
-    @Expose @SerializedName("pet_item_display_name_to_id") val petItemDisplayNameToInternalName: Map<String, NeuInternalName>,
+    @Expose @SerializedName("id_to_display_name") val displayNameMap: Map<String, String>,
+    @Expose @SerializedName("pet_item_display_name_to_id") val petItemResolution: Map<String, NeuInternalName>,
 )
 
 data class NeuPetData(
