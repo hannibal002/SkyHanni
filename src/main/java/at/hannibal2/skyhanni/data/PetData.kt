@@ -113,13 +113,13 @@ data class PetData(
 
     private fun getAnimatedJsonOrNull(): AnimatedSkinJson? {
         val skinInternalName = skinInternalName ?: return null
-        val skinVariantIndex = skinVariantIndex
-            ?: return PetUtils.animatedPetSkins[
-                when (skinInternalName) {
-                    FOUR_SEASONS_SKIN -> "${skinInternalName.asString()}_${SkyblockSeason.currentSeason?.name ?: "SPRING"}"
-                    else -> skinInternalName.asString()
-                }
-            ]
+        val baseSkin = PetUtils.animatedPetSkins[
+            when (skinInternalName) {
+                FOUR_SEASONS_SKIN -> "${skinInternalName.asString()}_${SkyblockSeason.currentSeason?.name ?: "SPRING"}"
+                else -> skinInternalName.asString()
+            }
+        ]
+        val skinVariantIndex = skinVariantIndex?.takeIf { it != -1 } ?: return baseSkin
         val variantIdentifier = PetUtils.petSkinVariants[skinInternalName]?.get(skinVariantIndex) ?: return null
         val fullSkinIdentifier = "${skinInternalName.asString()}_$variantIdentifier"
         return PetUtils.animatedPetSkins[fullSkinIdentifier]
