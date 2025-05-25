@@ -67,11 +67,12 @@ object PetStorageApi {
      * REGEX-TEST:  §r§7[Lvl 51] §r§fKuudra
      * REGEX-TEST:  §r§7[Lvl 100] §r§dFlying Fish
      * REGEX-TEST:  §r§7[Lvl 100] §r§6Chicken§r§5 ✦
+     * REGEX-TEST:  §r§7[Lvl 200] §r§8[§r§6122§4✦] §r§6Golden Dragon
      * REGEX-FAIL:  §r§7No pet selected
      */
     private val petTabWidgetNamePattern by patternGroup.pattern(
         "tab.name",
-        " (?:§.)+\\[Lvl (?<level>[\\d,]+)] (?:§.)+§(?<rarity>.)?(?<pet>[\\w ]+)(?:§r(?<skin>§. ✦))?"
+        " (?:§.)+\\[Lvl (?<level>[\\d,]+)] (?:(?:§.)+\\[(?:§.)+\\d+(?<altskin>§.✦)\\] )?(?:§.)+§(?<rarity>.)?(?<pet>[\\w ]+)(?:§r(?<skin>§. ✦))?"
     )
 
     /**
@@ -145,7 +146,10 @@ object PetStorageApi {
     private fun Int.isPetStackLocation() = this in 10..43 &&
         this % 9 != 0 && (this + 1) % 9 != 0
 
-    private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName) = groupOrNull("skin")?.let { skin ->
+    private fun Matcher.getSkinGroupOrNull() = groupOrNull("skin")
+            ?: groupOrNull("altskin")
+
+    private fun Matcher.getPetSkinOrNull(petInternalName: NeuInternalName) = getSkinGroupOrNull()?.let { skin ->
         val skinColor = skin.substring(0, 2)
         val properPetName = petInternalName.asString().split(";").first()
         PetUtils.petSkins[properPetName]?.filter {
