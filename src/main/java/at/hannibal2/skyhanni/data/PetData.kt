@@ -30,7 +30,12 @@ class PetDataStorage {
 }
 
 @KSerializable
+@Suppress("DEPRECATION")
 data class PetData(
+    @Deprecated(
+        "This does not reflect Tier Boost, use fauxInternalName instead.",
+        replaceWith = ReplaceWith("fauxInternalName")
+    )
     @Expose val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
     @Expose var skinVariantIndex: Int? = null, // Used for pet skins that have variants, otherwise unused
@@ -38,11 +43,16 @@ data class PetData(
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
+    /**
+     * Interpolated version of internal name that actually represents the state of the pet.
+     * This is needed because of tier boosts.
+     */
+    val fauxInternalName get() = "$properPetName;${rarity.id}".toInternalName()
     private val isItemTierBoosted get() = heldItemInternalName == TIER_BOOST && petInternalName.hasValidHigherTier()
+
     private val internalNameSplits: Pair<String, LorenzRarity> =
         PetUtils.internalNameToProperPetWithRarity(petInternalName)
             ?: ("???" to LorenzRarity.COMMON)
-
     private val specifiedRarity = internalNameSplits.second
     private val properPetName = internalNameSplits.first
     val cleanName = PetUtils.displayNameMap[properPetName]
@@ -52,9 +62,10 @@ data class PetData(
             .joinToString(" ") {
                 it.firstLetterUppercase()
             }
+
     val coloredName get() = "${rarity.chatColorCode}$cleanName"
     val rarity: LorenzRarity get() = specifiedRarity.oneAbove().takeIf { isItemTierBoosted } ?: specifiedRarity
-    val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, "$properPetName;${rarity.id}".toInternalName())
+    val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, fauxInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
 
     fun inFamily(properPetName: String) = (properPetName == this.properPetName)

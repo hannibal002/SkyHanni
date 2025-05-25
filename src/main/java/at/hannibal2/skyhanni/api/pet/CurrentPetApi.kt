@@ -32,7 +32,7 @@ object CurrentPetApi {
             ProfileStorageData.petProfiles?.pets?.firstOrNull { it.uuid == currentUuid }
         }
 
-    fun isCurrentPet(petInternalName: NeuInternalName) = currentPet?.petInternalName == petInternalName
+    fun isCurrentPet(petInternalName: NeuInternalName) = currentPet?.fauxInternalName == petInternalName
     fun isCurrentPet(petName: String): Boolean = currentPet?.coloredName?.contains(petName) ?: false
     fun isCurrentPetOrHigherRarity(petInternalName: NeuInternalName): Boolean {
         val currentPet = currentPet ?: return false

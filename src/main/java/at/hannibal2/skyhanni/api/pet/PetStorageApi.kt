@@ -197,7 +197,7 @@ object PetStorageApi {
             // Apply all the data we know for sure to the pet
             resolvedPet.apply {
                 exp = petExp?.takeIf { it > (exp ?: 0.0) } ?: exp
-                skinInternalName = getPetSkinOrNull(petInternalName)?.internalName ?: skinInternalName
+                skinInternalName = getPetSkinOrNull(fauxInternalName)?.internalName ?: skinInternalName
                 heldItemInternalName = petHeldItem ?: heldItemInternalName
             }
 
