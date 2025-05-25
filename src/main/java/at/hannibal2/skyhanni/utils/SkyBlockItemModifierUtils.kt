@@ -96,7 +96,9 @@ object SkyBlockItemModifierUtils {
         }?.value?.asJsonPrimitive?.asNumber?.toInt()
 
         val properSkinItem get() = if (skin == null) null
-            else skin.takeIf { it.startsWith("PET_SKIN_") } ?: "PET_SKIN_$skin".toInternalName()
+            else skin.toInternalName().takeIf {
+                skin.startsWith("PET_SKIN_")
+            } ?: "PET_SKIN_$skin".toInternalName()
     }
 
     fun ItemStack.getPetCandyUsed(): Int? {
