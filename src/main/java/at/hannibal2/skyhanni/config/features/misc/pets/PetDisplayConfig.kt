@@ -75,7 +75,7 @@ class PetDisplayConfig {
         @ConfigOption(
             name = "Icon Scale",
             desc = "How large the icon should be - Default is 1.7\n" +
-            "§ePet Icon must be enabled above."
+                "§ePet Icon must be enabled above."
         )
         @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.5f, minStep = 0.1f)
         val iconScale: Property<Double> = Property.of(1.7)
