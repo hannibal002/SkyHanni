@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import net.minecraft.init.Items
 
 class NeuInternalName private constructor(private val internalName: String) {

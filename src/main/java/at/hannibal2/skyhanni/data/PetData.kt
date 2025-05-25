@@ -136,6 +136,7 @@ data class PetData(
     override fun toString() = buildString {
         appendLine("  coloredName: $coloredName")
         appendLine("  petInternalName: ${petInternalName.asString()}")
+        appendLine("    isPet: ${petInternalName.isPet}")
         appendLine("    hasValidHigherTier: ${petInternalName.hasValidHigherTier()}")
         appendLine("  skinInternalName: ${skinInternalName?.asString()}")
         appendLine("  skinVariantIndex: $skinVariantIndex")
