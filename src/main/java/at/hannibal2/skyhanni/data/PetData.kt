@@ -111,9 +111,9 @@ data class PetData(
     }
 
     private fun getAnimatedJsonOrNull(): AnimatedSkinJson? {
-        val skinVariantIndex = skinVariantIndex ?: return null
         val skinInternalName = skinInternalName ?: return null
-        val variantIdentifier = PetUtils.getSkinVariantIdentifier(skinInternalName, skinVariantIndex)
+        val skinVariantIndex = skinVariantIndex ?: return PetUtils.animatedPetSkins[skinInternalName.asString()]
+        val variantIdentifier = PetUtils.petSkinVariants[skinInternalName]?.get(skinVariantIndex) ?: return null
         val fullSkinIdentifier = "${skinInternalName.asString()}_$variantIdentifier"
         return PetUtils.animatedPetSkins[fullSkinIdentifier]
     }
