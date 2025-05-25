@@ -24,13 +24,15 @@ object PetUtils {
 
     private var baseXpLevelReqs: List<Int> = listOf()
     private var customXpLevelReqs: Map<String, NeuPetData>? = null
-    var petInternalNames: Set<NeuInternalName> = emptySet()
+    var petInternalNames: Set<NeuInternalName> = setOf()
         private set
     var petItemResolution: Map<String, NeuInternalName> = mapOf()
         private set
     var animatedPetSkins: Map<String, AnimatedSkinJson> = mapOf()
         private set
     var petSkinVariants: Map<NeuInternalName, List<String>> = mapOf()
+        private set
+    var petSkinNbtNames: List<String> = listOf()
         private set
 
     // <editor-fold desc="Patterns">
@@ -174,6 +176,7 @@ object PetUtils {
         val skinData = event.getConstant<NeuAnimatedSkullsJson>("animatedskulls")
         animatedPetSkins = skinData.skins
         petSkinVariants = skinData.petSkinVariants
+        petSkinNbtNames = skinData.petSkinNbtNames
 
         val rawPetInternalNames = mutableSetOf<NeuInternalName>()
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
