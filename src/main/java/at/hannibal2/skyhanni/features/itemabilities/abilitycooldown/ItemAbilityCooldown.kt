@@ -12,6 +12,10 @@ import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.IMPLOSION_SCROLL
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.SHADOW_WARP_SCROLL
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.WITHER_IMPACT
+import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.WITHER_SHIELD_SCROLL
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -75,13 +79,19 @@ object ItemAbilityCooldown {
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         when {
-            // Hyperion
+            // Necron's Blades (NECRONS_BLADE, HYPERION, SCYLLA, ASTRAEA, VALKYRIE)
             event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f -> {
                 val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
-                if (abilityScrolls.size != 3) return
-
-                ItemAbility.HYPERION.sound()
-            }
+                if(abilityScrolls.containsAll(listOf("WITHER_SHIELD_SCROLL".toInternalName(), "SHADOW_WARP_SCROLL".toInternalName(), "IMPLOSION_SCROLL".toInternalName()))){ItemAbility.WITHER_IMPACT.sound()}
+                else
+                {
+                    for (ability in ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand()))
+                    {
+                        if (ability.equals(WITHER_SHIELD_SCROLL)){ ability.activate(null,5)}
+                        ability.sound()
+                    }
+                }
+                }
             // Fire Fury Staff
             event.soundName == "liquid.lavapop" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.FIRE_FURY_STAFF.sound()
@@ -233,6 +243,10 @@ object ItemAbilityCooldown {
         itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
         }
+        for (scrollAbility in ItemAbility.getAllAbilityScrolls(itemInHand))
+        {
+            scrollAbility.setItemClick()
+        }
     }
 
     @HandleEvent
@@ -337,6 +351,10 @@ object ItemAbilityCooldown {
         if (ability == ItemAbility.RAGNAROCK_AXE && specialColor == LorenzColor.DARK_PURPLE) {
             ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
         }
+        if (ability == ItemAbility.WITHER_SHIELD_SCROLL && specialColor == LorenzColor.DARK_PURPLE)
+        {
+            ability.activate(null, (max(10_000 * ability.getMultiplier() - 5, 0.0)).toInt())
+        }
     }
 
     @HandleEvent
@@ -428,13 +446,26 @@ object ItemAbilityCooldown {
         val itemName: String = stack.cleanName()
         val internalName = stack.getInternalName()
 
+
         val list = mutableListOf<ItemAbility>()
         for (ability in ItemAbility.entries) {
             if (ability.newVariant) {
                 if (ability.internalNames.contains(internalName)) {
                     list.add(ability)
                 }
-            } else {
+                for (scroll in stack.getAbilityScrolls()?.toList().orEmpty())
+                {
+                    if (ability.internalNames.contains(scroll)){
+                    list.add(ability)
+                    }
+                }
+                if (list.containsAll((listOf(WITHER_SHIELD_SCROLL, IMPLOSION_SCROLL, SHADOW_WARP_SCROLL))))
+                {
+                    list.clear()
+                    list.add(WITHER_IMPACT)
+                }
+            }
+            else {
                 for (name in ability.itemNames) {
                     if (itemName.contains(name)) {
                         list.add(ability)

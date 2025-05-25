@@ -7,7 +7,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.inPartialSeconds
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -25,8 +28,10 @@ enum class ItemAbility(
     private val ignoreMageCooldownReduction: Boolean = false,
 ) {
     // TODO add into repo
-
-    HYPERION(5, "SCYLLA", "VALKYRIE", "ASTRAEA", ignoreMageCooldownReduction = true),
+    WITHER_IMPACT(5, ignoreMageCooldownReduction = true),
+    WITHER_SHIELD_SCROLL(10, ignoreMageCooldownReduction = true, alternativePosition = true),
+    SHADOW_WARP_SCROLL(10),
+    IMPLOSION_SCROLL(10),
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
     GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
     GIANTS_SWORD(30),
@@ -126,6 +131,24 @@ enum class ItemAbility(
 
         fun getByInternalName(internalName: NeuInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
+        }
+        fun getAllAbilityScrolls(itemStack: ItemStack?): List<ItemAbility> {
+            val list = mutableListOf<ItemAbility>()
+            for (ability in ItemAbility.entries){
+            for (scroll in itemStack?.getAbilityScrolls().orEmpty())
+            {
+               if (ability.internalNames.contains(scroll))
+               {
+                   list.add(ability)
+               }
+            }
+                if (list.containsAll((listOf(WITHER_SHIELD_SCROLL, IMPLOSION_SCROLL, SHADOW_WARP_SCROLL))))
+                {
+                    list.clear()
+                    list.add(WITHER_IMPACT)
+                }
+            }
+            return list
         }
 
         fun ItemAbility.getMultiplier(): Double {
