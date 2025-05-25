@@ -80,7 +80,7 @@ object SkyBlockItemModifierUtils {
         @Expose val hideInfo: Boolean = false,
         @Expose val heldItem: NeuInternalName? = null,
         @Expose val candyUsed: Int = 0,
-        @Expose val skin: NeuInternalName? = null,
+        @Expose val skin: String? = null,
         @Deprecated("Some pets do not have uuids, use uniqueId instead", replaceWith = ReplaceWith("uniqueId"))
         @Expose val uuid: UUID,
         @Expose val uniqueId: UUID,
@@ -90,15 +90,13 @@ object SkyBlockItemModifierUtils {
     ) {
         fun getSkinVariantIndex() = if (skin == null) null
         else extraData?.entrySet()?.firstOrNull { json ->
-            val repoVariantIndex = PetUtils.petSkinVariants.entries.indexOfFirst { it.key == skin }
+            val repoVariantIndex = PetUtils.petSkinVariants.entries.indexOfFirst { it.key == properSkinItem }
             val expectedKey = PetUtils.petSkinNbtNames.getOrNull(repoVariantIndex) ?: return@firstOrNull false
             json.key == expectedKey
         }?.value?.asJsonPrimitive?.asNumber?.toInt()
 
-        val properSkinItem get() = skin?.let {
-            if (it.asString().startsWith("PET_SKIN_")) it
-            else "PET_SKIN_${it.asString()}".toInternalName()
-        }
+        val properSkinItem get() = if (skin == null) null
+            else skin.takeIf { it.startsWith("PET_SKIN_") } ?: "PET_SKIN_$skin".toInternalName()
     }
 
     fun ItemStack.getPetCandyUsed(): Int? {
