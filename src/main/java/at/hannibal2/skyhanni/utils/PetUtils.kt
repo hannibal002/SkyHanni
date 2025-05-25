@@ -36,6 +36,8 @@ object PetUtils {
         private set
     var petSkinNbtNames: List<String> = listOf()
         private set
+    var displayNameMap: Map<String, String> = mapOf()
+        private set
 
     // <editor-fold desc="Patterns">
     /**
@@ -174,6 +176,7 @@ object PetUtils {
         baseXpLevelReqs = petData.petLevels
         customXpLevelReqs = petData.customPetLeveling
         petItemResolution = petData.petItemDisplayNameToInternalName
+        displayNameMap = petData.displayNameMap
 
         val skinData = event.getConstant<NeuAnimatedSkullsJson>("animatedskulls")
         animatedPetSkins = skinData.skins

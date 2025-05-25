@@ -50,10 +50,13 @@ data class PetData(
             ?: ("???" to LorenzRarity.COMMON)
     private val specifiedRarity = internalNameSplits.second
     private val properPetName = internalNameSplits.first
-    val cleanName = properPetName
-        .replace("_", " ")
-        .split(" ")
-        .joinToString(" ") { it.firstLetterUppercase() }
+    val cleanName = PetUtils.displayNameMap[properPetName]
+        ?: properPetName
+            .replace("_", " ")
+            .split(" ")
+            .joinToString(" ") {
+                it.firstLetterUppercase()
+            }
     val coloredName get() = "${rarity.chatColorCode}$cleanName"
 
     val rarity: LorenzRarity get() = specifiedRarity.oneAbove().takeIf { isItemTierBoosted } ?: specifiedRarity
