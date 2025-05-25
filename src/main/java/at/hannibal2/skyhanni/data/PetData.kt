@@ -4,8 +4,11 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
+import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import com.google.gson.annotations.Expose
 import java.util.UUID
@@ -30,15 +33,17 @@ class PetDataStorage {
 data class PetData(
     @Expose val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
+    @Expose var skinVariantIndex: Int? = null, // Used for pet skins that have variants, otherwise unused
     @Expose var heldItemInternalName: NeuInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
+    private val isItemTierBoosted get() = heldItemInternalName == TIER_BOOST && petInternalName.hasValidHigherTier()
     private val internalNameSplits: Pair<String, LorenzRarity> =
         PetUtils.internalNameToPetWithRarity(petInternalName)
             ?: ("???" to LorenzRarity.COMMON)
 
-    val rarity = internalNameSplits.second
+    private val specifiedRarity = internalNameSplits.second
     val cleanInternalName = internalNameSplits.first
     val cleanName = cleanInternalName
         .replace("_", " ")
@@ -46,6 +51,7 @@ data class PetData(
         .joinToString(" ") { it.firstLetterUppercase() }
     val coloredName = "${rarity.chatColorCode}$cleanName"
 
+    val rarity: LorenzRarity get() = specifiedRarity.oneAbove().takeIf { isItemTierBoosted } ?: specifiedRarity
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
 
@@ -56,5 +62,26 @@ data class PetData(
         if (includeLevel) append("§7[Lvl $level] ")
         append(coloredName)
         if (includeSkinTag && skinTag != null) append(" $skinTag")
+    }
+
+    companion object {
+        private val TIER_BOOST = "PET_ITEM_TIER_BOOST".toInternalName()
+        private val FOUR_SEASONS_SKIN = "PET_SKIN_FOUR_SEASONS_GRIFFIN".toInternalName()
+    }
+
+    override fun toString() = buildString {
+        appendLine("  coloredName: '$coloredName§r'")
+        appendLine("  petInternalName: '${petInternalName.asString()}'")
+        appendLine("    isPet: '${petInternalName.isPet}'")
+        appendLine("    hasValidHigherTier: '${petInternalName.hasValidHigherTier()}'")
+        appendLine("  skinInternalName: '${skinInternalName?.asString()}'")
+        appendLine("  skinVariantIndex: '$skinVariantIndex'")
+        appendLine("  heldItemInternalName: '${heldItemInternalName?.asString()}'")
+        appendLine("  exp: '${exp?.addSeparators() ?: 0.0}'")
+        appendLine("  uuid: '$uuid'")
+        appendLine("")
+        appendLine("  isItemTierBoosted: '$isItemTierBoosted'")
+        appendLine("  rarity: '$rarity'")
+        appendLine("  level: '$level'")
     }
 }

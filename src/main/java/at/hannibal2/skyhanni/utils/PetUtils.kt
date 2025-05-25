@@ -3,25 +3,36 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 //#if TODO
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetSkinJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 
 @SkyHanniModule
 object PetUtils {
-    // Map of Pet Name to a Map of Skin Name to NeuPetSkinJson
-    val petSkins = mutableMapOf<String, MutableList<NeuPetSkinJson>>()
+    // Map of Pet Name to a Map of Skin Name to NeuItemJson
+    val petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
 
     private var baseXpLevelReqs: List<Int> = listOf()
     private var customXpLevelReqs: Map<String, NeuPetData>? = null
+    var petInternalNames: Set<NeuInternalName> = setOf()
+        private set
     var petItemResolution: Map<String, NeuInternalName> = mapOf()
+        private set
+    var animatedPetSkins: Map<String, AnimatedSkinJson> = mapOf()
+        private set
+    var petSkinVariants: Map<NeuInternalName, List<String>> = mapOf()
+        private set
+    var petSkinNbtNames: List<String> = listOf()
         private set
 
     // <editor-fold desc="Patterns">
@@ -57,8 +68,17 @@ object PetUtils {
      * REGEX-TEST: PET_SKIN_RABBIT_ROSE
      */
     private val petSkinNamePattern by CurrentPetApi.patternGroup.pattern(
-        "neu.pet",
+        "neu.pet.skin",
         "PET_SKIN_(?<pet>[A-Z])_?(?<skin>[A-Z_]+)?"
+    )
+
+    /**
+     * REGEX-TEST: §7§eRight-click to add this pet to
+     * REGEX-TEST: §7§eRight-click to add this pet to your
+     */
+    private val neuPetLorePattern by CurrentPetApi.patternGroup.pattern(
+        "neu.pet.lore",
+        "§7§eRight-click to add this pet to(?: your)?"
     )
     // </editor-fold>
 
@@ -134,6 +154,16 @@ object PetUtils {
             else -> ErrorManager.skyHanniError("Unknown pet rarity $rarity")
         }
     }
+
+    private val nextTierCache: MutableMap<NeuInternalName, Boolean> = mutableMapOf()
+    fun NeuInternalName.hasValidHigherTier() = nextTierCache.getOrPut(this) {
+        if (!this.isPet) return@getOrPut false
+        val (properPetName, rarity) = internalNameToPetWithRarity(this)
+            ?: return@getOrPut false
+        val rarityAbove = rarity.oneAbove() ?: return@getOrPut false
+        val tierAboveInternalName = petWithRarityToInternalName(properPetName, rarityAbove)
+        return@getOrPut tierAboveInternalName.isPet
+    }
     // </editor-fold>
 
     @HandleEvent
@@ -143,12 +173,22 @@ object PetUtils {
         customXpLevelReqs = petData.customPetLeveling
         petItemResolution = petData.petItemDisplayNameToInternalName
 
+        val skinData = event.getConstant<NeuAnimatedSkullsJson>("animatedskulls")
+        animatedPetSkins = skinData.skins
+        petSkinVariants = skinData.petSkinVariants
+        petSkinNbtNames = skinData.petSkinNbtNames
+
+        val rawPetInternalNames = mutableSetOf<NeuInternalName>()
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
+            val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuItemJson::class.java)
             petSkinNamePattern.matchMatcher(rawInternalName) {
                 val petName = group("pet") ?: return@matchMatcher
-                val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuPetSkinJson::class.java)
                 petSkins.getOrPut(petName) { mutableListOf() }.add(petItemData)
             }
+            neuPetLorePattern.firstMatcher(petItemData.lore) {
+                rawPetInternalNames.add(rawInternalName.toInternalName())
+            }
         }
+        petInternalNames = rawPetInternalNames
     }
 }

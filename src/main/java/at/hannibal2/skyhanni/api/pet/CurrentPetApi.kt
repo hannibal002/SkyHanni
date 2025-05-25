@@ -70,13 +70,11 @@ object CurrentPetApi {
             return
         }
         event.addIrrelevant {
-            add("petName: '${currentPet?.petInternalName ?: ""}'")
-            add("petSkin: '${currentPet?.skinInternalName ?: ""}'")
-            add("petRarity: '${currentPet?.rarity?.rawName.orEmpty()}'")
-            add("petItem: '${currentPet?.heldItemInternalName ?: ""}'")
-            add("petLevel: '${currentPet?.level ?: 0}'")
-            add("petXP: '${currentPet?.exp ?: 0.0}'")
-            add("petUUID: '${currentPet?.uuid ?: ""}'")
+            val info = when (currentPet) {
+                null -> "no pet equipped"
+                else -> "currentPet:\n\n$currentPet"
+            }
+            add(info)
         }
     }
 }

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.PetUtils.petItemNamePattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -79,19 +80,26 @@ object SkyBlockItemModifierUtils {
         @Expose val hideInfo: Boolean = false,
         @Expose val heldItem: NeuInternalName? = null,
         @Expose val candyUsed: Int = 0,
-        @Expose val skin: NeuInternalName? = null,
+        @Expose val skin: String? = null,
+        @Deprecated("Some pets do not have uuids, use uniqueId instead", replaceWith = ReplaceWith("uniqueId"))
         @Expose val uuid: UUID,
-        @Expose val uniqueId: String,
+        @Expose val uniqueId: UUID,
         @Expose val hideRightClick: Boolean,
         @Expose val noMove: Boolean,
+        @Expose val extraData: JsonObject? = null,
     ) {
-        val properSkinItem get() = skin?.let {
-            if (it.asString().startsWith("PET_SKIN_")) it
-            else "PET_SKIN_${it.asString()}".toInternalName()
-        }
-    }
+        fun getSkinVariantIndex() = if (skin == null) null
+        else extraData?.entrySet()?.firstOrNull { json ->
+            val repoVariantIndex = PetUtils.petSkinVariants.entries.indexOfFirst { it.key == properSkinItem }
+            val expectedKey = PetUtils.petSkinNbtNames.getOrNull(repoVariantIndex) ?: return@firstOrNull false
+            json.key == expectedKey
+        }?.value?.asJsonPrimitive?.asNumber?.toInt()
 
-    fun ItemStack.getPetExp() = getPetInfo()?.exp
+        val properSkinItem get() = if (skin == null) null
+        else skin.toInternalName().takeIf {
+            skin.startsWith("PET_SKIN_")
+        } ?: "PET_SKIN_$skin".toInternalName()
+    }
 
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
