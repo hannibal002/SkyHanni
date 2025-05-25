@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 object ItemNameResolver {
     private val itemNameCache = mutableMapOf<String, NeuInternalName>() // item name -> internal name
 
+    @Suppress("ReturnCount", "CyclomaticComplexMethod")
     internal fun getInternalNameOrNull(itemName: String): NeuInternalName? {
         val lowercase = itemName.lowercase()
         itemNameCache[lowercase]?.let {
@@ -34,6 +35,10 @@ object ItemNameResolver {
         }
 
         resolveEnchantmentByCleanName(itemName)?.let {
+            return itemNameCache.getOrPut(lowercase) { it }
+        }
+
+        resolvePetWithRarity(itemName)?.let {
             return itemNameCache.getOrPut(lowercase) { it }
         }
 
@@ -76,6 +81,17 @@ object ItemNameResolver {
 
         itemNameCache[lowercase] = internalName
         return internalName
+    }
+
+    private fun resolvePetWithRarity(itemName: String): NeuInternalName? {
+        val splits = itemName.split(" ").takeIf { it.size > 1 } ?: return null
+        val rarityLocation = splits.indexOfFirst { LorenzRarity.getByName(it) != null }
+        val expectedRarityLocations = listOf(0, splits.size - 1)
+        if (rarityLocation !in expectedRarityLocations) return null
+        val petName = splits.filterIndexed { index, _ -> index != rarityLocation }.joinToString("_").uppercase()
+        val petRarity = LorenzRarity.getByName(splits[rarityLocation]) ?: return null
+        val internalName = "$petName;${petRarity.id}".toInternalName()
+        return internalName.takeIf { it.getItemStackOrNull() != null }
     }
 
     private fun resolveEnchantmentByCleanName(itemName: String): NeuInternalName? {
@@ -127,8 +143,8 @@ object ItemNameResolver {
         return NeuItems.allItemsCache.filter { it.key.removeColor() == removeColor }.values.firstOrNull()
     }
 
-    @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    @HandleEvent(NeuRepositoryReloadEvent::class)
+    fun onNeuRepoReload() {
         itemNameCache.clear()
     }
 }

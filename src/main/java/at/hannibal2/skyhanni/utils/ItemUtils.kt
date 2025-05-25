@@ -7,9 +7,11 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -628,53 +630,24 @@ object ItemUtils {
 
     val NeuInternalName.repoItemNameCompact get() = compactItemNameCache.getOrPut(this) { getRepoCompactName() }
 
-    // TODO hey a repo might actually be useful
-    private fun NeuInternalName.getRepoCompactName() = repoItemName
-        .replace("Enchanted", "Ench")
-        .replace("Mushroom", "Mush")
-        .replace("Mooshroom", "Moosh")
-        .replace("Aquamarine Gemstone", "Aqua Gem")
-        .replace("Gemstone", "Gem")
-        .replace("Exceedingly Rare Ender Artifact Upgrade", "Ender Artifact Upgrade")
-        .replace("Perma-Jelled Garlic-Flavored Re-Heated Gummy Polar Bear", "Perma Gummy Bear")
-        .replace("Crab Hat of Celebration - 2022 Edition", "Celeb Crab Hat 22'")
-        .replace("Crab Hat of Celebration", "Celeb Crab Hat")
-        .replace("Sloth Hat of Celebration", "Celeb Sloth Hat")
-        .replace("Travel Scroll to ", "TP to ")
-        .replace("Wisp's Ice-Flavored Water I Splash Potion", "Ice Water Splash Potion")
-        .replace("Basket of Hope from the Great Potato War", "Potato War Basket")
-        .replace("Century Cake", "Cent Cake")
-        .replace("Extreme Bingo Card (Extreme Bingo #1)", "Extreme Bingo Card 1'")
-        .replace("Anniversary Balloon Hat", "Anniv Balloon Hat")
-        .replace("An Extremely Difficult Item For You To Find", "Hard To Find Item")
-        .replace("Enderman Cortex Rewriter", "Ender Cort")
-        .replace("Pocket Espresso Machine", "Pocket Esp Machine")
-        .replace(" DIAMOND", " Dia")
-        .replace(" BRONZE", " Bronze")
-        .replace(" GOLD", " Gold")
-        .replace(" SILVER", " Silver")
-        .replace(" Potion", " Pot")
-        .replace(" - Tier ", " T ")
-        .replace("Enchanting ", "Ench ")
-        .replace("Experience ", "Exp ")
-        .replace("Super Sharp 'n Stabby Steak Stake", "Super Steak Stake")
-        .replace("Obfuscated ", "Obfus ")
-        .replace("Regeneration ", "Regen ")
-        .replace("Invisibility ", "Invis ")
-        .replace("Resistance ", "Resis ")
-        .replace("Tarantula ", "Tara ")
-        .replace("Necromancer Lord  ", "Necro Lord ")
-        .replace("Personal Compactor ", "Personal Comp ")
-        .replace("Super Compactor ", "Super Comp ")
-        .replace("Protection ", "Prot ")
-        .replace("Volcanic Stonefish ", "Volc Stone")
-        .replace("Talisman", "Talis")
-        .replace("Mycelium", "Mycel")
-        .replace("Armor of Magma ", "Magma ")
-        .replace("New Year Cake Bag", "New Year Bag")
-        .replace(" Dragon Fragment", " Drag Frag")
-        .replace("Great White Shark Tooth", "GWS Tooth")
-        .replace("Bane of Arthropods", "Bane of Arthro")
+    private fun NeuInternalName.getRepoCompactName(): String {
+        var name = repoItemName
+        for ((from, to) in compactNameReplace) {
+            name = name.replace(from, to)
+        }
+        return name
+    }
+
+    private var compactNameReplace = mapOf<String, String>()
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        compactItemNameCache.clear()
+        // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
+        event.getConstant<ItemsJson>("Items").compactNames.let {
+            compactNameReplace = it
+        }
+    }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
