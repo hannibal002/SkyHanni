@@ -137,7 +137,6 @@ data class PetData(
 
     companion object {
         private val TIER_BOOST = "PET_ITEM_TIER_BOOST".toInternalName()
-        private val FOUR_SEASONS_SKIN = "PET_SKIN_FOUR_SEASONS_GRIFFIN".toInternalName()
     }
 
     override fun toString() = buildString {
