@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.PetUtils.hasValidNextTier
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import com.google.gson.annotations.Expose
-import com.ibm.icu.util.LocalePriorityList.add
 import net.minecraft.item.ItemStack
 import java.util.UUID
 
@@ -137,18 +136,18 @@ data class PetData(
     }
 
     override fun toString() = buildString {
-        add("  coloredName: $coloredName")
-        add("  petInternalName: ${petInternalName.asString()}")
-        add("    hasValidNextTier: ${petInternalName.hasValidNextTier()}")
-        add("  skinInternalName: ${skinInternalName?.asString()}")
-        add("  skinVariantIndex: $skinVariantIndex")
-        add("    knownAnimationJson?: ${getAnimatedJsonOrNull() != null}")
-        add("  heldItemInternalName: ${heldItemInternalName?.asString()}")
-        add("  exp: ${exp?.addSeparators() ?: 0.0}")
-        add("  uuid: $uuid")
-        add("")
-        add("  isItemTierBoosted: $isItemTierBoosted")
-        add("  rarity: $rarity")
-        add("  level: $level")
+        append("  coloredName: $coloredName")
+        append("  petInternalName: ${petInternalName.asString()}")
+        append("    hasValidNextTier: ${petInternalName.hasValidNextTier()}")
+        append("  skinInternalName: ${skinInternalName?.asString()}")
+        append("  skinVariantIndex: $skinVariantIndex")
+        append("    knownAnimationJson?: ${getAnimatedJsonOrNull() != null}")
+        append("  heldItemInternalName: ${heldItemInternalName?.asString()}")
+        append("  exp: ${exp?.addSeparators() ?: 0.0}")
+        append("  uuid: $uuid")
+        append("")
+        append("  isItemTierBoosted: $isItemTierBoosted")
+        append("  rarity: $rarity")
+        append("  level: $level")
     }
 }
