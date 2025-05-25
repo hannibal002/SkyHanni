@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getNameTagWith
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -22,11 +23,10 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object SummoningSoulsName {
 
-    private val SUMMONING_SOUL_TEXTURE by lazy { SkullTextureHolder.getTexture("SUMMONING_SOUL") }
-
-    private val souls = mutableMapOf<EntityArmorStand, String>()
-    private val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
-    private val mobsName = TimeLimitedCache<Int, String>(6.minutes)
+    val SUMMONING_SOUL_TEXTURE = "ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81YWY0MDM1ZWMwZGMxNjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ=="
+    val souls = mutableMapOf<EntityArmorStand, String>()
+    val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
+    val mobsName = TimeLimitedCache<Int, String>(6.minutes)
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
@@ -39,8 +39,8 @@ object SummoningSoulsName {
     private fun check() {
         for (entity in EntityUtils.getEntities<EntityArmorStand>()) {
             if (entity in souls) continue
+
             if (!entity.wearingSkullTexture(SUMMONING_SOUL_TEXTURE)) continue
-            
             val soulLocation = entity.getLorenzVec()
 
             val map = mutableMapOf<Int, Double>()
@@ -49,7 +49,9 @@ object SummoningSoulsName {
                 map[mob] = distance
             }
             val nearestMob = map.sorted().firstNotNullOfOrNull { it.key }
-            if (nearestMob != null) souls[entity] = mobsName[nearestMob] ?: continue
+            if (nearestMob != null) {
+                souls[entity] = mobsName[nearestMob] ?: continue
+            }
         }
 
         for (entity in EntityUtils.getEntities<EntityLiving>()) {
