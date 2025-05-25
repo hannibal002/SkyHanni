@@ -134,19 +134,19 @@ data class PetData(
     }
 
     override fun toString() = buildString {
-        appendLine("  coloredName: $coloredName")
-        appendLine("  petInternalName: ${petInternalName.asString()}")
-        appendLine("    isPet: ${petInternalName.isPet}")
-        appendLine("    hasValidHigherTier: ${petInternalName.hasValidHigherTier()}")
-        appendLine("  skinInternalName: ${skinInternalName?.asString()}")
-        appendLine("  skinVariantIndex: $skinVariantIndex")
-        appendLine("    knownAnimationJson?: ${getAnimatedJsonOrNull() != null}")
-        appendLine("  heldItemInternalName: ${heldItemInternalName?.asString()}")
-        appendLine("  exp: ${exp?.addSeparators() ?: 0.0}")
-        appendLine("  uuid: $uuid")
+        appendLine("  coloredName: '$coloredName§r'")
+        appendLine("  petInternalName: '${petInternalName.asString()}'")
+        appendLine("    isPet: '${petInternalName.isPet}'")
+        appendLine("    hasValidHigherTier: '${petInternalName.hasValidHigherTier()}'")
+        appendLine("  skinInternalName: '${skinInternalName?.asString()}'")
+        appendLine("  skinVariantIndex: '$skinVariantIndex'")
+        appendLine("    knownAnimationJson?: '${getAnimatedJsonOrNull() != null}'")
+        appendLine("  heldItemInternalName: '${heldItemInternalName?.asString()}'")
+        appendLine("  exp: '${exp?.addSeparators() ?: 0.0}'")
+        appendLine("  uuid: '$uuid'")
         appendLine("")
-        appendLine("  isItemTierBoosted: $isItemTierBoosted")
-        appendLine("  rarity: $rarity")
-        appendLine("  level: $level")
+        appendLine("  isItemTierBoosted: '$isItemTierBoosted'")
+        appendLine("  rarity: '$rarity'")
+        appendLine("  level: '$level'")
     }
 }
