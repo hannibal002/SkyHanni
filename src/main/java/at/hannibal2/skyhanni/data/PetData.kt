@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
+import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import com.google.gson.annotations.Expose
@@ -112,7 +113,13 @@ data class PetData(
 
     private fun getAnimatedJsonOrNull(): AnimatedSkinJson? {
         val skinInternalName = skinInternalName ?: return null
-        val skinVariantIndex = skinVariantIndex ?: return PetUtils.animatedPetSkins[skinInternalName.asString()]
+        val skinVariantIndex = skinVariantIndex
+            ?: return PetUtils.animatedPetSkins[
+                when (skinInternalName) {
+                    FOUR_SEASONS_SKIN -> "${skinInternalName.asString()}_${SkyblockSeason.currentSeason?.name ?: "SPRING"}"
+                    else -> skinInternalName.asString()
+                }
+            ]
         val variantIdentifier = PetUtils.petSkinVariants[skinInternalName]?.get(skinVariantIndex) ?: return null
         val fullSkinIdentifier = "${skinInternalName.asString()}_$variantIdentifier"
         return PetUtils.animatedPetSkins[fullSkinIdentifier]
@@ -131,6 +138,7 @@ data class PetData(
 
     companion object {
         private val TIER_BOOST = "PET_ITEM_TIER_BOOST".toInternalName()
+        private val FOUR_SEASONS_SKIN = "PET_SKIN_FOUR_SEASONS_GRIFFIN".toInternalName()
     }
 
     override fun toString() = buildString {
