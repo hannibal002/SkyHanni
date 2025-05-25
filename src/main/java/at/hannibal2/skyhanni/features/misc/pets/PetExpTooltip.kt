@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetExp
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -34,7 +35,7 @@ object PetExpTooltip {
         if (!KeyboardManager.isShiftKeyDown() && !config.showAlways) return
 
         val itemStack = event.itemStack
-        val petExperience = itemStack.getPetExp()?.roundTo(1) ?: return
+        val petExperience = itemStack.getPetInfo()?.exp?.roundTo(1) ?: return
         val name = itemStack.displayName
         try {
             val index = findIndex(event.toolTip) ?: return

@@ -97,8 +97,6 @@ object SkyBlockItemModifierUtils {
         }
     }
 
-    fun ItemStack.getPetExp() = getPetInfo()?.exp
-
     fun ItemStack.getPetCandyUsed(): Int? {
         val data = cachedData
         if (data.petCandies == -1) {

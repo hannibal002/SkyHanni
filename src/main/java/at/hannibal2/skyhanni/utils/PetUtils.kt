@@ -146,11 +146,11 @@ object PetUtils {
         petSkinVariantIndexMap[skinInternalName]?.get(variantIndex)
 
     private val nextTierCache: MutableMap<NeuInternalName, Boolean> = mutableMapOf()
-    fun NeuInternalName.hasValidLowerTier() = nextTierCache.getOrPut(this) {
+    fun NeuInternalName.hasValidHigherTier() = nextTierCache.getOrPut(this) {
         if (!this.isPet) return@getOrPut false
         val (properPetName, rarity) = internalNameToPetWithRarity(this)
             ?: return@getOrPut false
-        val rarityAbove = rarity.oneBelow() ?: return@getOrPut false
+        val rarityAbove = rarity.oneAbove() ?: return@getOrPut false
         val tierAboveInternalName = petWithRarityToInternalName(properPetName, rarityAbove)
         return@getOrPut tierAboveInternalName.isPet
     }

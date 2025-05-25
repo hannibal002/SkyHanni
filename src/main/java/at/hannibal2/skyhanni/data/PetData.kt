@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
-import at.hannibal2.skyhanni.utils.PetUtils.hasValidLowerTier
+import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import com.google.gson.annotations.Expose
@@ -43,7 +43,7 @@ data class PetData(
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
 ) {
-    private val isItemTierBoosted get() = heldItemInternalName == TIER_BOOST && petInternalName.hasValidLowerTier()
+    private val isItemTierBoosted get() = heldItemInternalName == TIER_BOOST && petInternalName.hasValidHigherTier()
     private val internalNameSplits: Pair<String, LorenzRarity> =
         PetUtils.internalNameToPetWithRarity(petInternalName)
             ?: ("???" to LorenzRarity.COMMON)
@@ -55,7 +55,7 @@ data class PetData(
         .joinToString(" ") { it.firstLetterUppercase() }
     val coloredName = "${rarity.chatColorCode}$cleanName"
 
-    val rarity: LorenzRarity get() = specifiedRarity.oneBelow().takeIf { isItemTierBoosted } ?: specifiedRarity
+    val rarity: LorenzRarity get() = specifiedRarity.oneAbove().takeIf { isItemTierBoosted } ?: specifiedRarity
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
     val levelProgressionPercentage: Double get() = when {
@@ -136,7 +136,7 @@ data class PetData(
     override fun toString() = buildString {
         appendLine("  coloredName: $coloredName")
         appendLine("  petInternalName: ${petInternalName.asString()}")
-        appendLine("    hasValidLowerTier: ${petInternalName.hasValidLowerTier()}")
+        appendLine("    hasValidHigherTier: ${petInternalName.hasValidHigherTier()}")
         appendLine("  skinInternalName: ${skinInternalName?.asString()}")
         appendLine("  skinVariantIndex: $skinVariantIndex")
         appendLine("    knownAnimationJson?: ${getAnimatedJsonOrNull() != null}")

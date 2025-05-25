@@ -173,7 +173,8 @@ object PetStorageApi {
                 return@firstMatcher false
             }
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                PetUtils.petItemResolution[line.trim().removeResets()]
+                val trimmed = line.trim().removeResets()
+                PetUtils.petItemResolution[trimmed] ?: NeuInternalName.fromItemNameOrNull(trimmed)
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{
