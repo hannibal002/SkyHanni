@@ -40,21 +40,22 @@ data class PetData(
 ) {
     private val isItemTierBoosted get() = heldItemInternalName == TIER_BOOST && petInternalName.hasValidHigherTier()
     private val internalNameSplits: Pair<String, LorenzRarity> =
-        PetUtils.internalNameToPetWithRarity(petInternalName)
+        PetUtils.internalNameToProperPetWithRarity(petInternalName)
             ?: ("???" to LorenzRarity.COMMON)
 
     private val specifiedRarity = internalNameSplits.second
-    val cleanInternalName = internalNameSplits.first
-    val cleanName = cleanInternalName
+    private val properPetName = internalNameSplits.first
+    val cleanName = properPetName
         .replace("_", " ")
         .split(" ")
         .joinToString(" ") { it.firstLetterUppercase() }
-    val coloredName = "${rarity.chatColorCode}$cleanName"
+    val coloredName get() = "${rarity.chatColorCode}$cleanName"
 
     val rarity: LorenzRarity get() = specifiedRarity.oneAbove().takeIf { isItemTierBoosted } ?: specifiedRarity
     val level: Int get() = PetUtils.xpToLevel(exp ?: 0.0, petInternalName)
     val skinTag: String? get() = skinInternalName?.getItemStack()?.getItemRarityOrNull()?.let { it.chatColorCode + "✦" }
 
+    fun inFamily(properPetName: String) = (properPetName == this.properPetName)
     fun getUserFriendlyName(
         includeLevel: Boolean = true,
         includeSkinTag: Boolean = true,
@@ -69,7 +70,7 @@ data class PetData(
     }
 
     override fun toString() = buildString {
-        appendLine("  coloredName: '$coloredName§r'")
+        appendLine("  coloredName: '$coloredName'")
         appendLine("  petInternalName: '${petInternalName.asString()}'")
         appendLine("    isPet: '${petInternalName.isPet}'")
         appendLine("    hasValidHigherTier: '${petInternalName.hasValidHigherTier()}'")
