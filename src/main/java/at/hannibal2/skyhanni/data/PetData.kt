@@ -83,9 +83,9 @@ data class PetData(
         includeLevel: Boolean = true,
         includeSkinTag: Boolean = true,
     ) = buildString {
-        if (includeLevel) appendLine("§7[Lvl $level] ")
-        appendLine(coloredName)
-        if (includeSkinTag && skinTag != null) appendLine(" $skinTag")
+        if (includeLevel) append("§7[Lvl $level] ")
+        append(coloredName)
+        if (includeSkinTag && skinTag != null) append(" $skinTag")
     }
 
     private fun String.buildTextureItemStack(): ItemStack {
