@@ -67,7 +67,7 @@ object PetStorageApi {
      * REGEX-TEST:  §r§7[Lvl 51] §r§fKuudra
      * REGEX-TEST:  §r§7[Lvl 100] §r§dFlying Fish
      * REGEX-TEST:  §r§7[Lvl 100] §r§6Chicken§r§5 ✦
-     * REGEX-TEST: §r§7[Lvl 200] §r§8[§r§6122§4✦] §r§6Golden Dragon
+     * REGEX-TEST:  §r§7[Lvl 200] §r§8[§r§6122§4✦] §r§6Golden Dragon
      * REGEX-FAIL:  §r§7No pet selected
      */
     @Suppress("MaxLineLength")
