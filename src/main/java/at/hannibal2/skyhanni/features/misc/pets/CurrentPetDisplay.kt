@@ -88,7 +88,7 @@ object CurrentPetDisplay {
             enabledTexts.mapNotNull {
                 it to when (it) {
                     // These are "parts" of other elements, so they themselves don't do anything.
-                    TElement.PET_LEVEL, TElement.SKIN_SYMBOL, TElement.NEXT_LEVEL_PERCENTAGE -> return@mapNotNull null
+                    TElement.PET_LEVEL, TElement.SKIN_SYMBOL -> return@mapNotNull null
 
                     TElement.PET_NAME -> {
                         getUserFriendlyName(
@@ -100,12 +100,11 @@ object CurrentPetDisplay {
                     TElement.OVERFLOW_XP -> {
                         // 1000.0 to account for double rounding errors between Hypixel's stored data, and our calculation
                         val overflowXp = overflowXp.takeIf { overflow -> overflow > 1000.0 } ?: return@mapNotNull null
-                        val overflowFormat = overflowXp.formatExpByConfigOption()
-                        "§7+§b$overflowFormat"
+                        "§7+§b${overflowXp.formatExpByConfigOption()}"
                     }
                     TElement.TOTAL_XP -> {
                         val totalXp = exp?.takeIf { totalXp -> totalXp > 0.0 } ?: return@mapNotNull null
-                        "§b$totalXp"
+                        "§b${totalXp.formatExpByConfigOption()}"
                     }
                     TElement.NEXT_LEVEL -> {
                         if (level == PetUtils.getMaxLevel(petInternalName)) return@mapNotNull null
@@ -113,8 +112,8 @@ object CurrentPetDisplay {
                         val currentExp = exp ?: 0.0
                         val currentXpOverLevel = currentExp - currentLevelXp
                         val neededXp = nextLevelXp - currentLevelXp
-                        val percentageFormat = if (TElement.NEXT_LEVEL_PERCENTAGE in enabledTexts) {
-                            " §7- §e${levelProgressionPercentage.shortFormat()}"
+                        val percentageFormat = if (config.text.nextLevelPercent.get()) {
+                            " §7- §e${levelProgressionPercentage.shortFormat()}%"
                         } else ""
                         formatExpPairByConfigOption(currentXpOverLevel, neededXp) + percentageFormat
                     }
@@ -123,11 +122,9 @@ object CurrentPetDisplay {
                 val labelFormat = if (config.text.textLabels.get()) {
                     when (textElement) {
                         // These are "parts" of other elements, so they themselves don't have labels.
-                        TElement.PET_LEVEL,
-                        TElement.SKIN_SYMBOL,
-                        TElement.NEXT_LEVEL_PERCENTAGE,
+                        TElement.PET_LEVEL, TElement.SKIN_SYMBOL -> ""
+                        // No label needed
                         TElement.PET_NAME -> ""
-
                         else -> "§e$textElement§7: "
                     }
                 } else ""
@@ -191,6 +188,7 @@ object CurrentPetDisplay {
 
             config.text.enabledTexts,
             config.text.textLabels,
+            config.text.nextLevelPercent,
             config.text.xpFormat,
             config.text.textLocation,
             config.text.verticalAlign,

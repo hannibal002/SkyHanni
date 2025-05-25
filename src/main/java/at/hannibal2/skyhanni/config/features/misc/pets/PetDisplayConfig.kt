@@ -172,11 +172,6 @@ class PetDisplayConfig {
             ),
 
             NEXT_LEVEL("Next Level"),
-            NEXT_LEVEL_PERCENTAGE(
-                displayName = "Next Level Percentage",
-                dependentOn = setOf(NEXT_LEVEL),
-            ),
-
             OVERFLOW_XP("Overflow XP"),
             TOTAL_XP("Total XP"),
             HELD_ITEM("Held Item"),
@@ -192,6 +187,15 @@ class PetDisplayConfig {
         )
         @ConfigEditorBoolean
         val textLabels: Property<Boolean> = Property.of(true)
+
+        @Expose
+        @ConfigOption(
+            name = "Next Level %",
+            desc = "Show a percentage after your exp progress.\n" +
+                "§eNext Level must be enabled above."
+        )
+        @ConfigEditorBoolean
+        val nextLevelPercent: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
