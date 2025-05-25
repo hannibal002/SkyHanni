@@ -23,6 +23,8 @@ object PetUtils {
 
     private var baseXpLevelReqs: List<Int> = listOf()
     private var customXpLevelReqs: Map<String, NeuPetData>? = null
+    var petItemInternalNames: Set<NeuInternalName> = emptySet()
+        private set
     var petItemResolution: Map<String, NeuInternalName> = mapOf()
         private set
     var animatedPetSkins: Map<String, AnimatedSkinJson> = mapOf()
@@ -144,11 +146,11 @@ object PetUtils {
         petSkinVariantIndexMap[skinInternalName]?.get(variantIndex)
 
     private val nextTierCache: MutableMap<NeuInternalName, Boolean> = mutableMapOf()
-    fun NeuInternalName.hasValidNextTier() = nextTierCache.getOrPut(this) {
+    fun NeuInternalName.hasValidLowerTier() = nextTierCache.getOrPut(this) {
         if (!this.isPet) return@getOrPut false
         val (properPetName, rarity) = internalNameToPetWithRarity(this)
             ?: return@getOrPut false
-        val rarityAbove = rarity.oneAbove() ?: return@getOrPut false
+        val rarityAbove = rarity.oneBelow() ?: return@getOrPut false
         val tierAboveInternalName = petWithRarityToInternalName(properPetName, rarityAbove)
         return@getOrPut tierAboveInternalName.isPet
     }
