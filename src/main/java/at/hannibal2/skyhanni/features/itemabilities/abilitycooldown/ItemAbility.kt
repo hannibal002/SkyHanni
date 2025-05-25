@@ -131,18 +131,16 @@ enum class ItemAbility(
         fun getByInternalName(internalName: NeuInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
+
         fun getAllAbilityScrolls(itemStack: ItemStack?): List<ItemAbility> {
             val list = mutableListOf<ItemAbility>()
-            for (ability in ItemAbility.entries){
-            for (scroll in itemStack?.getAbilityScrolls().orEmpty())
-            {
-               if (ability.internalNames.contains(scroll))
-               {
-                   list.add(ability)
-               }
-            }
-                if (list.containsAll((listOf(WITHER_SHIELD_SCROLL, IMPLOSION_SCROLL, SHADOW_WARP_SCROLL))))
-                {
+            for (ability in ItemAbility.entries) {
+                for (scroll in itemStack?.getAbilityScrolls().orEmpty()) {
+                    if (ability.internalNames.contains(scroll)) {
+                        list.add(ability)
+                    }
+                }
+                if (list.containsAll((listOf(WITHER_SHIELD_SCROLL, IMPLOSION_SCROLL, SHADOW_WARP_SCROLL)))) {
                     list.clear()
                     list.add(WITHER_IMPACT)
                 }

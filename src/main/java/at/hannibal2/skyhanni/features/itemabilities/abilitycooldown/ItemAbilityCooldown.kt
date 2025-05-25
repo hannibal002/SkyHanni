@@ -91,16 +91,15 @@ object ItemAbilityCooldown {
                     )
                 ) {
                     ItemAbility.WITHER_IMPACT.sound()
-                }
-                else
-                {
-                    for (ability in ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand()))
-                    {
-                        if (ability.equals(WITHER_SHIELD_SCROLL)){ ability.activate(null,5)}
+                } else {
+                    for (ability in ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())) {
+                        if (ability.equals(WITHER_SHIELD_SCROLL)) {
+                            ability.activate(null, 5)
+                        }
                         ability.sound()
                     }
                 }
-                }
+            }
             // Fire Fury Staff
             event.soundName == "liquid.lavapop" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.FIRE_FURY_STAFF.sound()
@@ -252,8 +251,7 @@ object ItemAbilityCooldown {
         itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
         }
-        for (scrollAbility in ItemAbility.getAllAbilityScrolls(itemInHand))
-        {
+        for (scrollAbility in ItemAbility.getAllAbilityScrolls(itemInHand)) {
             scrollAbility.setItemClick()
         }
     }
@@ -360,8 +358,7 @@ object ItemAbilityCooldown {
         if (ability == ItemAbility.RAGNAROCK_AXE && specialColor == LorenzColor.DARK_PURPLE) {
             ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
         }
-        if (ability == ItemAbility.WITHER_SHIELD_SCROLL && specialColor == LorenzColor.DARK_PURPLE)
-        {
+        if (ability == ItemAbility.WITHER_SHIELD_SCROLL && specialColor == LorenzColor.DARK_PURPLE) {
             ability.activate(null, (max(10_000 * ability.getMultiplier() - 5, 0.0)).toInt())
         }
     }
@@ -462,19 +459,16 @@ object ItemAbilityCooldown {
                 if (ability.internalNames.contains(internalName)) {
                     list.add(ability)
                 }
-                for (scroll in stack.getAbilityScrolls()?.toList().orEmpty())
-                {
-                    if (ability.internalNames.contains(scroll)){
-                    list.add(ability)
+                for (scroll in stack.getAbilityScrolls()?.toList().orEmpty()) {
+                    if (ability.internalNames.contains(scroll)) {
+                        list.add(ability)
                     }
                 }
-                if (list.containsAll((listOf(WITHER_SHIELD_SCROLL, IMPLOSION_SCROLL, SHADOW_WARP_SCROLL))))
-                {
+                if (list.containsAll((listOf(WITHER_SHIELD_SCROLL, IMPLOSION_SCROLL, SHADOW_WARP_SCROLL)))) {
                     list.clear()
                     list.add(WITHER_IMPACT)
                 }
-            }
-            else {
+            } else {
                 for (name in ability.itemNames) {
                     if (itemName.contains(name)) {
                         list.add(ability)
