@@ -16,6 +16,7 @@
     <ID>CyclomaticComplexMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>CyclomaticComplexMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>CyclomaticComplexMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
+    <ID>CyclomaticComplexMethod:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NeuInternalName?</ID>
     <ID>CyclomaticComplexMethod:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
     <ID>CyclomaticComplexMethod:PacketTest.kt$PacketTest$private fun Packet&lt;*&gt;.print()</ID>
     <ID>CyclomaticComplexMethod:Renderable.kt$Renderable.Companion$internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean</ID>
@@ -228,13 +229,16 @@
     <ID>ReturnCount:CrimsonMinibossRespawnTimer.kt$CrimsonMinibossRespawnTimer$private fun updateArea()</ID>
     <ID>ReturnCount:EnchantParser.kt$EnchantParser$private fun parseEnchants( loreList: MutableList&lt;String&gt;, enchants: Map&lt;String, Int&gt;, chatComponent: IChatComponent?, )</ID>
     <ID>ReturnCount:EnoughUpdatesManager.kt$EnoughUpdatesManager$private fun getPetLoreReplacements(petName: String?, tier: String?, level: Int): Map&lt;String, String&gt;</ID>
+    <ID>ReturnCount:FishingApi.kt$FishingApi$fun seaCreatureCount(entity: EntityArmorStand): Int</ID>
     <ID>ReturnCount:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun showGui(): Boolean</ID>
     <ID>ReturnCount:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>ReturnCount:GraphParkour.kt$GraphParkour$private fun graphToList(graph: Graph): List&lt;LorenzVec&gt;?</ID>
     <ID>ReturnCount:HideNotClickableItems.kt$HideNotClickableItems$private fun hideSalvage(chestName: String, stack: ItemStack): Boolean</ID>
     <ID>ReturnCount:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
+    <ID>ReturnCount:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NeuInternalName?</ID>
     <ID>ReturnCount:ItemPriceUtils.kt$ItemPriceUtils$fun NeuInternalName.getPriceOrNull( priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes: List&lt;PrimitiveRecipe&gt; = emptyList(), ): Double?</ID>
     <ID>ReturnCount:ItemResolutionQuery.kt$ItemResolutionQuery$private fun resolveContextualName(): String?</ID>
+    <ID>ReturnCount:ItemUtils.kt$ItemUtils$private fun NeuInternalName.grabItemName(): String</ID>
     <ID>ReturnCount:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
     <ID>ReturnCount:MiningEventTracker.kt$MiningEventTracker$private fun sendData(eventName: String, time: String?)</ID>
     <ID>ReturnCount:MobDetection.kt$MobDetection$private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean</ID>
@@ -280,6 +284,7 @@
     <ID>UnsafeCallOnNullableType:DefaultConfigFeatures.kt$DefaultConfigFeatures$resetSuggestionState[cat]!!</ID>
     <ID>UnsafeCallOnNullableType:DefaultConfigOptionGui.kt$DefaultConfigOptionGui$resetSuggestionState[cat]!!</ID>
     <ID>UnsafeCallOnNullableType:DicerRngDropTracker.kt$DicerRngDropTracker$event.toolItem!!</ID>
+    <ID>UnsafeCallOnNullableType:DiscordStatus.kt$ownerRegex.find(colorlessLine)!!</ID>
     <ID>UnsafeCallOnNullableType:EasterEggWaypoints.kt$EasterEggWaypoints$EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
     <ID>UnsafeCallOnNullableType:EntityMovementData.kt$EntityMovementData$entityLocation[entity]!!</ID>
     <ID>UnsafeCallOnNullableType:EntityOutlineRenderer.kt$EntityOutlineRenderer$entityRenderCache.noXrayCache!!</ID>
@@ -342,6 +347,7 @@
     <ID>UnsafeCallOnNullableType:UpdateManager.kt$UpdateManager$potentialUpdate!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalPrice!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
+    <ID>UnusedParameter:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$args: Array&lt;String&gt;</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
