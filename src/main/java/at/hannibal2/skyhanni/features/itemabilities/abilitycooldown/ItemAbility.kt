@@ -132,21 +132,24 @@ enum class ItemAbility(
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
 
-        fun getAllAbilityScrolls(itemStack: ItemStack?): List<ItemAbility> {
+        fun getAllAbilityScrolls(itemStack: ItemStack?): List<ItemAbility> = buildList {
             val list = mutableListOf<ItemAbility>()
+            val scrollAbilities = itemStack?.getAbilityScrolls().orEmpty()
             for (ability in ItemAbility.entries) {
-                for (scroll in itemStack?.getAbilityScrolls().orEmpty()) {
+                for (scroll in scrollAbilities) {
                     if (ability.internalNames.contains(scroll)) {
                         list.add(ability)
                     }
                 }
-                if (list.containsAll((listOf(WITHER_SHIELD_SCROLL, IMPLOSION_SCROLL, SHADOW_WARP_SCROLL)))) {
-                    list.clear()
-                    list.add(WITHER_IMPACT)
-                }
             }
+            if (list.size == 3) {
+                list.clear()
+                list.add(WITHER_IMPACT)
+            }
+
             return list
         }
+
 
         fun ItemAbility.getMultiplier(): Double {
             return getMageCooldownReduction() ?: 1.0

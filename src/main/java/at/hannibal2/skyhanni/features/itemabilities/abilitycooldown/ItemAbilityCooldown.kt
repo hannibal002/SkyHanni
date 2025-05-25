@@ -12,10 +12,6 @@ import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
-import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.IMPLOSION_SCROLL
-import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.SHADOW_WARP_SCROLL
-import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.WITHER_IMPACT
-import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.WITHER_SHIELD_SCROLL
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -82,18 +78,11 @@ object ItemAbilityCooldown {
             // Necron's Blades (NECRONS_BLADE, HYPERION, SCYLLA, ASTRAEA, VALKYRIE)
             event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f -> {
                 val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
-                if (abilityScrolls.containsAll(
-                        listOf(
-                            "WITHER_SHIELD_SCROLL".toInternalName(),
-                            "SHADOW_WARP_SCROLL".toInternalName(),
-                            "IMPLOSION_SCROLL".toInternalName(),
-                        ),
-                    )
-                ) {
+                if (abilityScrolls.size == 3) {
                     ItemAbility.WITHER_IMPACT.sound()
                 } else {
                     for (ability in ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())) {
-                        if (ability.equals(WITHER_SHIELD_SCROLL)) {
+                        if (ability == ItemAbility.WITHER_SHIELD_SCROLL) {
                             ability.activate(null, 5)
                         }
                         ability.sound()
@@ -352,14 +341,20 @@ object ItemAbilityCooldown {
     }
 
     private fun tryHandleNextPhase(ability: ItemAbility, specialColor: LorenzColor) {
-        if (ability == ItemAbility.GYROKINETIC_WAND_RIGHT && specialColor == LorenzColor.BLUE) {
-            ability.activate(null, 4_000)
-        }
-        if (ability == ItemAbility.RAGNAROCK_AXE && specialColor == LorenzColor.DARK_PURPLE) {
-            ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
-        }
-        if (ability == ItemAbility.WITHER_SHIELD_SCROLL && specialColor == LorenzColor.DARK_PURPLE) {
-            ability.activate(null, (max(10_000 * ability.getMultiplier() - 5, 0.0)).toInt())
+        when (ability) {
+            ItemAbility.GYROKINETIC_WAND_RIGHT -> if (specialColor == LorenzColor.BLUE) {
+                ability.activate(null, 4_00)
+            }
+
+            ItemAbility.RAGNAROCK_AXE -> if (specialColor == LorenzColor.DARK_PURPLE) {
+                ability.activate(null, max((20_000 * ability.getMultiplier()) - 13_000, 0.0).toInt())
+            }
+
+            ItemAbility.WITHER_SHIELD_SCROLL -> if (specialColor == LorenzColor.DARK_PURPLE) {
+                ability.activate(null, (max(10_000 * ability.getMultiplier() - 5, 0.0)).toInt())
+            }
+
+            else -> ability.activate(null, 0)
         }
     }
 
@@ -464,9 +459,9 @@ object ItemAbilityCooldown {
                         list.add(ability)
                     }
                 }
-                if (list.containsAll((listOf(WITHER_SHIELD_SCROLL, IMPLOSION_SCROLL, SHADOW_WARP_SCROLL)))) {
+                if (list.size == 3) {
                     list.clear()
-                    list.add(WITHER_IMPACT)
+                    list.add(ItemAbility.WITHER_IMPACT)
                 }
             } else {
                 for (name in ability.itemNames) {
