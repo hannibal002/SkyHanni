@@ -88,17 +88,14 @@ object SkyBlockItemModifierUtils {
         @Expose val noMove: Boolean,
         @Expose val extraData: JsonObject? = null,
     ) {
-        fun getSkinVariantIndex() = if (skin == null) null
-        else extraData?.entrySet()?.firstOrNull { json ->
-            val repoVariantIndex = PetUtils.petSkinVariants.entries.indexOfFirst { it.key == properSkinItem }
-            val expectedKey = PetUtils.petSkinNbtNames.getOrNull(repoVariantIndex) ?: return@firstOrNull false
-            json.key == expectedKey
-        }?.value?.asJsonPrimitive?.asNumber?.toInt()
-
-        val properSkinItem get() = if (skin == null) null
-        else skin.toInternalName().takeIf {
-                skin.startsWith("PET_SKIN_")
-        } ?: "PET_SKIN_$skin".toInternalName()
+        val properSkinItem get() = "PET_SKIN_$skin".toInternalName()
+        fun getSkinVariantIndex() = skin?.let {
+            extraData?.entrySet()?.firstOrNull { json ->
+                val repoVariantIndex = PetUtils.petSkinVariants.entries.indexOfFirst { it.key == properSkinItem }
+                val expectedKey = PetUtils.petSkinNbtNames.getOrNull(repoVariantIndex) ?: return@firstOrNull false
+                json.key == expectedKey
+            }?.value?.asJsonPrimitive?.asNumber?.toInt()
+        }
     }
 
     fun ItemStack.getPetCandyUsed(): Int? {
