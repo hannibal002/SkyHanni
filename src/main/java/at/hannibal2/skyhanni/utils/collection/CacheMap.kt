@@ -45,9 +45,6 @@ abstract class CacheMap<K : Any, V : Any> : MutableMap<K, V> {
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>> get() = getMap().entries
 
-    @Deprecated("", ReplaceWith("get(key)"))
-    fun getOrNull(key: K): V? = get(key)
-
     /**
      * Modifications to the returned map are not supported and may lead to unexpected behavior.
      * This method is intended for read-only operations such as iteration or retrieval of values.
@@ -87,15 +84,14 @@ abstract class CacheMap<K : Any, V : Any> : MutableMap<K, V> {
             return (CacheBuilder.newBuilder() as CacheBuilder<K, V>).apply(block).build()
         }
 
+        /** Sets the removal listener of the CacheBuilder to it, if not null */
         fun <K : Any, V : Any> CacheBuilder<K, V>.setRemovalListener(
-            removalListener: ((K?, V?, RemovalCause) -> Unit)? = null
+            listener: ((K?, V?, RemovalCause) -> Unit)? = null
         ): CacheBuilder<K, V> {
-            removalListener?.let { listener ->
-                removalListener { notification ->
-                    listener(notification.key, notification.value, notification.cause)
-                }
+            if (listener == null) return this
+            return removalListener { notification ->
+                listener(notification.key, notification.value, notification.cause)
             }
-            return this
         }
     }
 

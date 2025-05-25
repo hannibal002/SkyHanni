@@ -13,6 +13,6 @@ class SizeLimitedSet<T : Any>(
 
     override val cache = SizeLimitedCache<T, Unit>(
         maxSize,
-        removalListener?.toMapListener(),
+        removalListener.toMapListener(),
     )
 }

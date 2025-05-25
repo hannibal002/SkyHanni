@@ -73,7 +73,9 @@ abstract class CacheSet<T : Any> : MutableSet<T> {
             }
         }
 
-        fun <K : Any, V : Any> ((K?, RemovalCause) -> Unit).toMapListener(): ((K?, V?, RemovalCause) -> Unit)? {
+        /** Changes a set removal listener to have the signature of a map's. Useful for creating CacheSets. */
+        fun <K : Any, V : Any> ((K?, RemovalCause) -> Unit)?.toMapListener(): ((K?, V?, RemovalCause) -> Unit)? {
+            if (this == null) return null
             return { key, _, cause -> invoke(key, cause) }
         }
 

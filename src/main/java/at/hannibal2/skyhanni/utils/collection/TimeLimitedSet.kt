@@ -10,6 +10,6 @@ class TimeLimitedSet<T : Any>(
 
     override val cache = TimeLimitedCache<T, Unit>(
         expireAfterWrite,
-        removalListener?.toMapListener(),
+        removalListener.toMapListener(),
     )
 }
