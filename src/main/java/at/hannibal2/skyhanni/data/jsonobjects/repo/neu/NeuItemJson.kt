@@ -9,7 +9,7 @@ import java.io.ByteArrayInputStream
 import java.util.Base64
 
 // todo 1.21 impl needed
-data class NeuPetSkinJson(
+data class NeuItemJson(
     @Expose @SerializedName("itemid") val itemId: String,
     @Expose @SerializedName("displayname") val displayName: String,
     @Expose @SerializedName("nbttag") val nbtTagString: String,

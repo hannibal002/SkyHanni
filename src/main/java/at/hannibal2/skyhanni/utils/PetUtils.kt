@@ -7,23 +7,26 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAnimatedSkullsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetData
 //#if TODO
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetSkinJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 
 @SkyHanniModule
 object PetUtils {
-    // Map of Pet Name to a Map of Skin Name to NeuPetSkinJson
-    val petSkins = mutableMapOf<String, MutableList<NeuPetSkinJson>>()
+    // Map of Pet Name to a Map of Skin Name to NeuItemJson
+    val petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
 
     private var baseXpLevelReqs: List<Int> = listOf()
     private var customXpLevelReqs: Map<String, NeuPetData>? = null
-    var petItemInternalNames: Set<NeuInternalName> = emptySet()
+    var petInternalNames: Set<NeuInternalName> = emptySet()
+        private set
+    var petSkinInternalNames: Set<NeuInternalName> = emptySet()
         private set
     var petItemResolution: Map<String, NeuInternalName> = mapOf()
         private set
@@ -64,8 +67,13 @@ object PetUtils {
      * REGEX-TEST: PET_SKIN_RABBIT_ROSE
      */
     private val petSkinNamePattern by CurrentPetApi.patternGroup.pattern(
-        "neu.pet",
+        "neu.pet.skin",
         "PET_SKIN_(?<pet>[A-Z])_?(?<skin>[A-Z_]+)?"
+    )
+
+    private val neuPetLorePattern by CurrentPetApi.patternGroup.pattern(
+        "neu.pet.lore",
+        "§7§eRight-click to add this pet to your"
     )
     // </editor-fold>
 
@@ -163,15 +171,21 @@ object PetUtils {
         customXpLevelReqs = petData.customPetLeveling
         petItemResolution = petData.petItemDisplayNameToInternalName
 
-        val rawPetSkinInternalNames = mutableSetOf<String>()
+        val rawPetInternalNames = mutableSetOf<NeuInternalName>()
+        val rawPetSkinInternalNames = mutableSetOf<NeuInternalName>()
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
+            val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuItemJson::class.java)
             petSkinNamePattern.matchMatcher(rawInternalName) {
                 val petName = group("pet") ?: return@matchMatcher
-                val petItemData = ConfigManager.gson.fromJson(jsonObject, NeuPetSkinJson::class.java)
-                rawPetSkinInternalNames.add(rawInternalName)
+                rawPetSkinInternalNames.add(rawInternalName.toInternalName())
                 petSkins.getOrPut(petName) { mutableListOf() }.add(petItemData)
             }
+            neuPetLorePattern.firstMatcher(petItemData.lore) {
+                rawPetInternalNames.add(rawInternalName.toInternalName())
+            }
         }
+        petInternalNames = rawPetInternalNames
+        petSkinInternalNames = rawPetSkinInternalNames
 
         val baseResolverCache: MutableMap<NeuInternalName, String> = mutableMapOf()
         fun tryResolveIdentifier(fullSkinIdentifier: String): Pair<NeuInternalName, String>? {
@@ -184,13 +198,12 @@ object PetUtils {
             var splitsToJoin = identifierSplits.size + 2
             while (splitsToJoin-- > 0) {
                 val filteredSplits = identifierSplits.subList(0, splitsToJoin)
-                val joinedSplits = filteredSplits.joinToString("_")
-                if (joinedSplits in rawPetSkinInternalNames) {
+                val joinedInternalName = filteredSplits.joinToString("_").toInternalName()
+                if (joinedInternalName in rawPetSkinInternalNames) {
                     // Skin is the joined splits, variant is the non-used splits
                     val variant = identifierSplits.subList(splitsToJoin, identifierSplits.size).joinToString("_")
-                    val skinInternalName = joinedSplits.toInternalName()
-                    baseResolverCache[skinInternalName] = "${joinedSplits}_"
-                    return Pair(joinedSplits.toInternalName(), variant)
+                    baseResolverCache[joinedInternalName] = "${joinedInternalName.asString()}_"
+                    return Pair(joinedInternalName, variant)
                 }
             }
             return null

@@ -173,8 +173,7 @@ object PetStorageApi {
                 return@firstMatcher false
             }
             val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
-                val trimmed = line.trim().removeResets()
-                PetUtils.petItemResolution[trimmed] ?: NeuInternalName.fromItemNameOrNull(trimmed)
+                PetUtils.petItemResolution[line.trim().removeResets()]
             }
 
             val petExp = petTabWidgetXpPattern.firstMatcher(event.lines) expFirstMatcher@{
@@ -185,15 +184,6 @@ object PetStorageApi {
                 val readXpGroup = groupOrNull("current")?.formatDoubleOrNull() ?: 0.0
                 currentLevelXp + readXpGroup
             }
-
-            ChatUtils.chat(
-                "Trying to resolve:\n" +
-                    "Name: $petName\n" +
-                    "Rarity: $rarity\n" +
-                    "Level: $level\n" +
-                    "Held Item: $petHeldItem\n" +
-                    "Exp: $petExp"
-            )
 
             val resolvedPet = resolvePetDataOrNull(
                 name = petName,
