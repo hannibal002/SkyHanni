@@ -7,7 +7,7 @@ import java.nio.FloatBuffer
 
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
-//$$ import org.joml.Matrix4fc
+//$$ import org.joml.Matrix4f
 //$$ import org.joml.Quaternionf
 //#endif
 
