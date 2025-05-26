@@ -95,19 +95,20 @@ object HoppityEggsCompactChat {
             appendLine("§c§lHitman Summary")
             appendLine()
 
-            // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
-            val rarityMap: Map<LorenzRarity, Int> = hitmanCompactDataSets.getGroupedRarityMap()
-            getRabbitsFormat(rarityMap, "Total Hitman").forEach { appendLine(it) }
 
             hitmanCompactDataSets.filter { !it.duplicate }.takeIfNotEmpty()?.let { sets ->
+                // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
+                val rarityMap: Map<LorenzRarity, Int> = hitmanCompactDataSets.getGroupedRarityMap()
+                getRabbitsFormat(rarityMap, "Total Hitman").forEach { appendLine(it) }
                 appendLine()
+
                 // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
                 val newRarityMap: Map<LorenzRarity, Int> = sets.getGroupedRarityMap()
                 getRabbitsFormat(newRarityMap, "New").forEach { appendLine(it) }
+                appendLine()
             }
 
             hitmanCompactDataSets.filter { it.duplicate }.takeIfNotEmpty()?.let { sets ->
-                appendLine()
                 // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
                 val dupeRarityMap: Map<LorenzRarity, Int> = sets.getGroupedRarityMap()
                 getRabbitsFormat(dupeRarityMap, "Duplicate").forEach { appendLine(it) }
