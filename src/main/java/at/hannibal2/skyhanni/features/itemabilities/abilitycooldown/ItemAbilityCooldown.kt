@@ -159,8 +159,7 @@ object ItemAbilityCooldown {
                 if (event.pitch == 4.047619f && event.volume == 0.2f) {
                     ItemAbility.GOLEM_SWORD.sound()
                 }
-                if (event.pitch == 0.4920635f && event.volume == 0.5f)
-                {
+                if (event.pitch == 0.4920635f && event.volume == 0.5f) {
                     ItemAbility.STAFF_OF_THE_VOLCANO.sound()
                 }
             }
