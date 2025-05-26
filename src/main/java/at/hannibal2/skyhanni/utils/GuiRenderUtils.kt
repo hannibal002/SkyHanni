@@ -321,7 +321,6 @@ object GuiRenderUtils {
         rotationDegrees: Vec3? = null,
     ) {
         val item = checkBlinkItem()
-        //#if MC < 1.21
         val isSkull = rescaleSkulls && item.item === Items.skull
 
         val rotX = ((rotationDegrees?.xCoord ?: 0.0) % 360).toFloat()
@@ -362,6 +361,7 @@ object GuiRenderUtils {
             GL11.glEnable(GL11.GL_NORMALIZE)
             GL11.glNormal3f(0f, 0f, 1f)
 
+            //#if MC < 1.21
             RenderHelper.enableGUIStandardItemLighting()
             AdjustStandardItemLighting.adjust() // Compensate for z scaling
             try {
