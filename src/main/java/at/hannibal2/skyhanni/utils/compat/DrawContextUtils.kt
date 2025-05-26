@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.Vec3
 import java.nio.FloatBuffer
 
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
+//$$ import org.joml.Matrix4fc
+//$$ import org.joml.Quaternionf
 //#endif
 
 /**
@@ -60,12 +63,30 @@ object DrawContextUtils {
         drawContext.matrices.translate(vec)
     }
 
-    // todo need 1.21 impl
-    //#if MC < 1.21
-    fun rotate(angle: Float, x: Double, y: Double, z: Double) = drawContext.matrices.rotate(angle, x, y, z)
-    fun multMatrix(matrix: FloatBuffer) = drawContext.matrices.multMatrix(matrix)
-    fun getFloat(pName: Int, params: FloatBuffer) = drawContext.matrices.getFloat(pName, params)
-    //#endif
+    fun rotate(angle: Float, x: Number, y: Number, z: Number) {
+        //#if MC < 1.21
+        GlStateManager.rotate(angle, x.toFloat(), y.toFloat(), z.toFloat())
+        //#else
+        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, x, y, z))
+        //#endif
+    }
+
+    fun multMatrix(matrix: FloatBuffer) {
+        //#if MC < 1.21
+        GlStateManager.multMatrix(matrix)
+        //#else
+        //$$ val matrix4f = Matrix4f(matrix)
+        //$$ drawContext.matrices. multiplyPositionMatrix(matrix4f)
+        //#endif
+    }
+
+    fun getFloat(pName: Int, params: FloatBuffer) {
+        //#if MC < 1.21
+        GlStateManager.getFloat(pName, params)
+        //#else
+        //$$ params.clear()
+        //$$ drawContext.matrices.peek().getPositionMatrix().get(params)
+    }
 
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)
