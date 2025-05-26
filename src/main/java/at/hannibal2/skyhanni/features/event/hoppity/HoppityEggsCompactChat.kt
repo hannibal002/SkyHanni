@@ -97,7 +97,7 @@ object HoppityEggsCompactChat {
 
             fun StringBuilder.formatRabbits(sets: List<HoppityStateDataSet>, text: String) {
                 // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
-                getRabbitsFormat(sets.getGroupedRarityMap(), text).forEach { appendLine(it) }
+                getRabbitsFormat(sets.getGroupedRarityMap(), text) { appendLine(it) }
             }
 
             hitmanCompactDataSets.filter { !it.duplicate }.takeIfNotEmpty()?.let { sets ->

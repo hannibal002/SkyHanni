@@ -699,9 +699,7 @@ object HoppityEventSummary {
                 rarityMap = stats.rabbitsFound.mapValues(transform),
                 name = name,
                 countTriple = stats.getPairTriple(year, index),
-            ).forEach {
-                statList.addStr(it)
-            }
+            ) { statList.addStr(it) }
 
 
             put(HoppityStat.NEW_RABBITS) { statList, stats, year ->
@@ -881,21 +879,22 @@ object HoppityEventSummary {
         rarityMap: Map<LorenzRarity, Int>,
         name: String,
         countTriple: Triple<Int, Int, Int> = Triple(0, 0, 0),
-    ): List<String> {
+        action: (String) -> Unit,
+    ) {
         val (prevCount, currCount, sinceCount) = countTriple
         val rabbitsSum = rarityMap.values.sum()
-        if (rabbitsSum == 0) return emptyList()
+        if (rabbitsSum == 0) return
 
         val sinceFormat = if (sinceCount > 0) " §8+$sinceCount§7" else ""
         val countFormat = if (config.eventSummary.showCountDiff && prevCount != 0 && currCount != 0) {
             " §7($prevCount$sinceFormat -> $currCount)"
         } else ""
 
-        return mutableListOf(
+        listOf(
             "§7$name Rabbits: §f${rabbitsSum.addSeparators()}$countFormat",
             HoppityApi.hoppityRarities.joinToString(" §7-") {
                 " ${it.chatColorCode}${(rarityMap[it] ?: 0).addSeparators()}"
             },
-        )
+        ).forEach(action)
     }
 }
