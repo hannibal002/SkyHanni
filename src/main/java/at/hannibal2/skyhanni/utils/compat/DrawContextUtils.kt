@@ -60,9 +60,12 @@ object DrawContextUtils {
         drawContext.matrices.translate(vec)
     }
 
-    fun rotate(angle: Float, x: Double, y: Double, z: Double) {
-        drawContext.matrices.rotate(angle, x, y, z)
-    }
+    // todo need 1.21 impl
+    //#if MC < 1.21
+    fun rotate(angle: Float, x: Double, y: Double, z: Double) = drawContext.matrices.rotate(angle, x, y, z)
+    fun multMatrix(matrix: FloatBuffer) = drawContext.matrices.multMatrix(matrix)
+    fun getFloat(pName: Int, params: FloatBuffer) = drawContext.matrices.getFloat(pName, params)
+    //#endif
 
     fun scale(x: Float, y: Float, z: Float) {
         drawContext.matrices.scale(x, y, z)
@@ -108,15 +111,7 @@ object DrawContextUtils {
         scale(1 / x.toFloat(), 1 / y.toFloat(), 1 / z.toFloat())
     }
 
-    fun getFloat(pName: Int, params: FloatBuffer) {
-        drawContext.matrices.getFloat(pName, params)
-    }
-
     fun loadIdentity() {
         drawContext.matrices.loadIdentity()
-    }
-
-    fun multMatrix(matrix: FloatBuffer) {
-        drawContext.matrices.multMatrix(matrix)
     }
 }
