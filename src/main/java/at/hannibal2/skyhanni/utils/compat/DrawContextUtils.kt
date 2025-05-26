@@ -64,10 +64,11 @@ object DrawContextUtils {
     }
 
     fun rotate(angle: Float, x: Number, y: Number, z: Number) {
+        val (xf, yf, zf) = listOf(x, y, z).map { it.toFloat() }
         //#if MC < 1.21
-        GlStateManager.rotate(angle, x.toFloat(), y.toFloat(), z.toFloat())
+        GlStateManager.rotate(angle, xf, yf, zf)
         //#else
-        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, x, y, z))
+        //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, xf, yf, zf))
         //#endif
     }
 
