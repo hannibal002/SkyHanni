@@ -3,6 +3,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.Vec3
 import java.nio.FloatBuffer
 
+// todo needs 1.21 impl
 class MatrixStack {
 
     fun translate(x: Double, y: Double, z: Double) {
@@ -17,6 +18,7 @@ class MatrixStack {
         this.translate(vec.xCoord, vec.yCoord, vec.zCoord)
     }
 
+    //#if MC < 1.21
     fun rotate(angle: Float, x: Double, y: Double, z: Double) {
         GlStateManager.rotate(angle, x.toFloat(), y.toFloat(), z.toFloat())
     }
@@ -28,6 +30,13 @@ class MatrixStack {
     fun rotate(angle: Float, vec: Vec3) {
         this.rotate(angle, vec.xCoord, vec.yCoord, vec.zCoord)
     }
+
+    fun multMatrix(matrix: FloatBuffer) = GlStateManager.multMatrix(matrix)
+
+    fun getFloat(pName: Int, params: FloatBuffer) {
+        GlStateManager.getFloat(pName, params)
+    }
+    //#endif
 
     fun scale(x: Float, y: Float, z: Float) {
         GlStateManager.scale(x, y, z)
@@ -41,11 +50,5 @@ class MatrixStack {
         GlStateManager.popMatrix()
     }
 
-    fun getFloat(pName: Int, params: FloatBuffer) {
-        GlStateManager.getFloat(pName, params)
-    }
-
     fun loadIdentity() = GlStateManager.loadIdentity()
-
-    fun multMatrix(matrix: FloatBuffer) = GlStateManager.multMatrix(matrix)
 }
