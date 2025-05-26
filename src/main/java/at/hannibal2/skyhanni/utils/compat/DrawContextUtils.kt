@@ -86,6 +86,7 @@ object DrawContextUtils {
         //#else
         //$$ params.clear()
         //$$ drawContext.matrices.peek().getPositionMatrix().get(params)
+        //#endif
     }
 
     fun scale(x: Float, y: Float, z: Float) {
