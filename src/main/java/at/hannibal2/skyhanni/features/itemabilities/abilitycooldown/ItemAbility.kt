@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import net.minecraft.item.ItemStack
 import kotlin.math.floor
@@ -128,26 +129,17 @@ enum class ItemAbility(
 
     companion object {
 
+        val WITHER_SCROLLS = listOf(WITHER_SHIELD_SCROLL, SHADOW_WARP_SCROLL, IMPLOSION_SCROLL)
+
         fun getByInternalName(internalName: NeuInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
 
         fun getAllAbilityScrolls(itemStack: ItemStack?): List<ItemAbility> = buildList {
-            val list = mutableListOf<ItemAbility>()
-            val scrollAbilities = itemStack?.getAbilityScrolls().orEmpty()
-            for (ability in ItemAbility.entries) {
-                for (scroll in scrollAbilities) {
-                    if (ability.internalNames.contains(scroll)) {
-                        list.add(ability)
-                    }
-                }
-            }
-            if (list.size == 3) {
-                list.clear()
-                list.add(WITHER_IMPACT)
-            }
-
-            return list
+            val scrollAbilities = itemStack?.getAbilityScrolls()?.takeIfNotEmpty() ?: return@buildList
+            val scrolls = WITHER_SCROLLS.filter { ability -> ability.internalNames.any { it in scrollAbilities } }
+            if (scrolls.size == 3) add(WITHER_IMPACT)
+            else addAll(scrolls)
         }
 
 

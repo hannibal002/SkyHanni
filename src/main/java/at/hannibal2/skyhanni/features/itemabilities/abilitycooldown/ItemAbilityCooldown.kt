@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import kotlin.math.max
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -71,19 +72,18 @@ object ItemAbilityCooldown {
     private val SOS_FLARE = "SOS_FLARE".toInternalName()
     private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".toInternalName()
 
-
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         when {
             // Necron's Blades (NECRONS_BLADE, HYPERION, SCYLLA, ASTRAEA, VALKYRIE)
             event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f -> {
-                val abilityScrolls = InventoryUtils.getItemInHand()?.getAbilityScrolls() ?: return
-                if (abilityScrolls.size == 3) {
+                val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
+                if (scrolls.singleOrNull() == ItemAbility.WITHER_IMPACT) {
                     ItemAbility.WITHER_IMPACT.sound()
                 } else {
-                    for (ability in ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())) {
+                    for (ability in scrolls) {
                         if (ability == ItemAbility.WITHER_SHIELD_SCROLL) {
-                            ability.activate(null, 5)
+                            ability.activate(null, 5_000)
                         }
                         ability.sound()
                     }
@@ -343,7 +343,7 @@ object ItemAbilityCooldown {
     private fun tryHandleNextPhase(ability: ItemAbility, specialColor: LorenzColor) {
         when (ability) {
             ItemAbility.GYROKINETIC_WAND_RIGHT -> if (specialColor == LorenzColor.BLUE) {
-                ability.activate(null, 4_00)
+                ability.activate(null, 4_000)
             }
 
             ItemAbility.RAGNAROCK_AXE -> if (specialColor == LorenzColor.DARK_PURPLE) {
@@ -351,10 +351,9 @@ object ItemAbilityCooldown {
             }
 
             ItemAbility.WITHER_SHIELD_SCROLL -> if (specialColor == LorenzColor.DARK_PURPLE) {
-                ability.activate(null, (max(10_000 * ability.getMultiplier() - 5, 0.0)).toInt())
+                ability.activate(null, (max(10_000 * ability.getMultiplier() - 5_000, 0.0)).toInt())
             }
-
-            else -> ability.activate(null, 0)
+            else -> return
         }
     }
 
@@ -446,22 +445,14 @@ object ItemAbilityCooldown {
     private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
         val itemName: String = stack.cleanName()
         val internalName = stack.getInternalName()
-
+        val scrolls = ItemAbility.getAllAbilityScrolls(stack)
 
         val list = mutableListOf<ItemAbility>()
+        list.addAll(scrolls)
         for (ability in ItemAbility.entries) {
             if (ability.newVariant) {
                 if (ability.internalNames.contains(internalName)) {
                     list.add(ability)
-                }
-                for (scroll in stack.getAbilityScrolls()?.toList().orEmpty()) {
-                    if (ability.internalNames.contains(scroll)) {
-                        list.add(ability)
-                    }
-                }
-                if (list.size == 3) {
-                    list.clear()
-                    list.add(ItemAbility.WITHER_IMPACT)
                 }
             } else {
                 for (name in ability.itemNames) {
