@@ -688,35 +688,33 @@ object HoppityEventSummary {
                 }
             }
 
+            fun formatRabbits(
+                stats: HoppityEventStats,
+                transform: (Map.Entry<LorenzRarity, RabbitData>) -> Int,
+                name: String,
+                year: Int,
+                index: Int,
+                statList: MutableList<StatString>,
+            ) = getRabbitsFormat(
+                rarityMap = stats.rabbitsFound.mapValues(transform),
+                name = name,
+                countTriple = stats.getPairTriple(year, index),
+            ).forEach {
+                statList.addStr(it)
+            }
+
+
             put(HoppityStat.NEW_RABBITS) { statList, stats, year ->
-                getRabbitsFormat(
-                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.uniques },
-                    name = "Unique",
-                    countTriple = stats.getPairTriple(year, 0),
-                ).forEach {
-                    statList.addStr(it)
-                }
+                formatRabbits(stats, { it.value.uniques }, "Unique", year, index = 0, statList)
             }
 
             put(HoppityStat.DUPLICATE_RABBITS) { statList, stats, year ->
-                getRabbitsFormat(
-                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.dupes },
-                    name = "Duplicate",
-                    countTriple = stats.getPairTriple(year, 1),
-                ).forEach {
-                    statList.addStr(it)
-                }
+                formatRabbits(stats, { it.value.dupes }, "Duplicate", year, index = 1, statList)
                 statList.addExtraChocFormatLine(stats.dupeChocolateGained)
             }
 
             put(HoppityStat.STRAY_RABBITS) { statList, stats, year ->
-                getRabbitsFormat(
-                    rarityMap = stats.rabbitsFound.mapValues { m -> m.value.strays },
-                    name = "Stray",
-                    countTriple = stats.getPairTriple(year, 2),
-                ).forEach {
-                    statList.addStr(it)
-                }
+                formatRabbits(stats, { it.value.strays }, "Stray", year, index = 2, statList)
                 statList.addExtraChocFormatLine(stats.strayChocolateGained)
             }
 
