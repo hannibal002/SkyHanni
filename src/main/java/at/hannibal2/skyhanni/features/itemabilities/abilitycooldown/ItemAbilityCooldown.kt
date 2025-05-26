@@ -73,7 +73,7 @@ object ItemAbilityCooldown {
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         when {
-            // Necron's Blades (NECRONS_BLADE, HYPERION, SCYLLA, ASTRAEA, VALKYRIE)
+            // Wither Shield Sound Solo and Wither Impact
             event.soundName == "mob.zombie.remedy" && event.pitch == 0.6984127f && event.volume == 1f -> {
                 val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
                 if (scrolls.singleOrNull() == ItemAbility.WITHER_IMPACT) {
@@ -95,7 +95,7 @@ object ItemAbilityCooldown {
             event.soundName == "mob.enderdragon.growl" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.ICE_SPRAY_WAND.sound()
             }
-            // Gyrokinetic Wand & Shadow Fury
+            // Gyrokinetic Wand & Shadow Fury & Shadow Warp Scroll Solo
             event.soundName == "mob.endermen.portal" -> {
                 // Gryokinetic Wand
                 if (event.pitch == 0.61904764f && event.volume == 1f) {
@@ -104,6 +104,10 @@ object ItemAbilityCooldown {
                 // Shadow Fury
                 if (event.pitch == 1f && event.volume == 1f) {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                    val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
+                    if (scrolls.contains(ItemAbility.SHADOW_WARP_SCROLL)) {
+                        ItemAbility.SHADOW_WARP_SCROLL.sound()
+                    }
                     if (!internalName.equalsOneOf(
                             "SHADOW_FURY".toInternalName(),
                             "STARRED_SHADOW_FURY".toInternalName(),
@@ -112,6 +116,7 @@ object ItemAbilityCooldown {
 
                     ItemAbility.SHADOW_FURY.sound()
                 }
+
             }
             // Giant's Sword
             event.soundName == "random.anvil_land" && event.pitch == 0.4920635f && event.volume == 1f -> {
@@ -143,9 +148,21 @@ object ItemAbilityCooldown {
                     ItemAbility.VOODOO_DOLL_WILTED.sound()
                 }
             }
-            // Golem Sword
-            event.soundName == "random.explode" && event.pitch == 4.047619f && event.volume == 0.2f -> {
-                ItemAbility.GOLEM_SWORD.sound()
+            // Golem Sword & Implosion Solo Scroll & Staff of the Volcano
+            event.soundName == "random.explode" -> {
+                if (event.pitch == 1f && event.volume == 1f) {
+                    val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
+                    if (scrolls.contains(ItemAbility.IMPLOSION_SCROLL)) {
+                        ItemAbility.IMPLOSION_SCROLL.sound()
+                    }
+                }
+                if (event.pitch == 4.047619f && event.volume == 0.2f) {
+                    ItemAbility.GOLEM_SWORD.sound()
+                }
+                if (event.pitch == 0.4920635f && event.volume == 0.5f)
+                {
+                    ItemAbility.STAFF_OF_THE_VOLCANO.sound()
+                }
             }
             // Weird Tuba & Weirder Tuba
             event.soundName == "mob.wolf.howl" && event.volume == 0.5f -> {
@@ -175,10 +192,6 @@ object ItemAbilityCooldown {
             // Fire Freeze Staff
             event.soundName == "mob.guardian.elder.idle" && event.pitch == 2f && event.volume == 0.2f -> {
                 ItemAbility.FIRE_FREEZE_STAFF.sound()
-            }
-            // Staff of the Volcano
-            event.soundName == "random.explode" && event.pitch == 0.4920635f && event.volume == 0.5f -> {
-                ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
             // Staff of the Volcano
             event.soundName == "random.eat" && event.pitch == 1f && event.volume == 1f -> {
@@ -351,6 +364,7 @@ object ItemAbilityCooldown {
             ItemAbility.WITHER_SHIELD_SCROLL -> if (specialColor == LorenzColor.DARK_PURPLE) {
                 ability.activate(null, (max(10_000 * ability.getMultiplier() - 5_000, 0.0)).toInt())
             }
+
             else -> return
         }
     }
