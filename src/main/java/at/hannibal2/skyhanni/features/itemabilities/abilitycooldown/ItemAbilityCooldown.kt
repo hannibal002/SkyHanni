@@ -87,6 +87,13 @@ object ItemAbilityCooldown {
                     }
                 }
             }
+
+            event.soundName == "random.fizz" && event.pitch == 0.4920635f && event.volume == 1f -> {
+                val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
+                if (scrolls.contains(ItemAbility.SHADOW_WARP_SCROLL)) {
+                    ItemAbility.SHADOW_WARP_SCROLL.sound()
+                }
+            }
             // Fire Fury Staff
             event.soundName == "liquid.lavapop" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.FIRE_FURY_STAFF.sound()
@@ -95,28 +102,21 @@ object ItemAbilityCooldown {
             event.soundName == "mob.enderdragon.growl" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.ICE_SPRAY_WAND.sound()
             }
-            // Gyrokinetic Wand & Shadow Fury & Shadow Warp Scroll Solo
+            // Gyrokinetic Wand & Shadow Fury &
             event.soundName == "mob.endermen.portal" -> {
                 // Gryokinetic Wand
                 if (event.pitch == 0.61904764f && event.volume == 1f) {
                     ItemAbility.GYROKINETIC_WAND_LEFT.sound()
                 }
                 // Shadow Fury
-                if (event.pitch == 1f && event.volume == 1f) {
-                    val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
-                    val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
-                    if (scrolls.contains(ItemAbility.SHADOW_WARP_SCROLL)) {
-                        ItemAbility.SHADOW_WARP_SCROLL.sound()
-                    }
-                    if (!internalName.equalsOneOf(
-                            "SHADOW_FURY".toInternalName(),
-                            "STARRED_SHADOW_FURY".toInternalName(),
-                        )
-                    ) return
+                val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
+                if (!internalName.equalsOneOf(
+                        "SHADOW_FURY".toInternalName(),
+                        "STARRED_SHADOW_FURY".toInternalName(),
+                    )
+                ) return
 
-                    ItemAbility.SHADOW_FURY.sound()
-                }
-
+                ItemAbility.SHADOW_FURY.sound()
             }
             // Giant's Sword
             event.soundName == "random.anvil_land" && event.pitch == 0.4920635f && event.volume == 1f -> {
