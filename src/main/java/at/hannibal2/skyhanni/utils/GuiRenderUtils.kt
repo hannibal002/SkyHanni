@@ -339,8 +339,7 @@ object GuiRenderUtils {
         val halfIconY = 8f
         val halfIconZ = 100f
 
-        DrawContextUtils.pushPop {
-            DrawContextUtils.translate(translateX, translateY, -19f)
+        DrawContextUtils.translated(translateX, translateY, -19f) {
             DrawContextUtils.scale(finalScale, finalScale, 0.2f)
 
             // Rotation
