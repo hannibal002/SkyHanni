@@ -31,7 +31,7 @@ public class PartyCommandsConfig {
     @Expose
     @ConfigEditorBoolean
     @ConfigOption(name = "Party Ping Command", desc = "Sends current ping into party chat if someone types §b!ping\n" +
-        "            \"§cNote: Will not work correctly with the Hypixel Ping API turned off in Dev.\",")
+        "§cNote: Will not work correctly with the Hypixel Ping API turned off in Dev.")
     public boolean pingCommand = false;
 
     @Expose
