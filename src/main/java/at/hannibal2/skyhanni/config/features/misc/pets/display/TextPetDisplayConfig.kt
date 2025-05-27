@@ -24,16 +24,16 @@ class TextPetDisplayConfig {
         )
     )
 
-    // Todo: Change display names to examples instead of names
-    enum class TextElement(private val displayName: String, val label: String) {
-        PET_NAME("", "Pet Name"),
-        NEXT_LEVEL("","Next Level"),
-        OVERFLOW_XP("","Overflow XP"),
-        TOTAL_XP("","Total XP"),
-        HELD_ITEM("","Held Item"),
+    enum class TextElement(private val displayName: String, private val label: String = "") {
+        PET_NAME("§7[Lvl 100] §6Mithril Golem §5✦"),
+        NEXT_LEVEL("§b2,000§9/§b4,000 §7- §e50%", "Next Level"),
+        OVERFLOW_XP("§7+§b2,000,000", "Overflow XP"),
+        TOTAL_XP("§b1,250,000", "Total XP"),
+        HELD_ITEM("§9Dwarf Turtle Shelmet", "Held Item"),
         ;
 
-        override fun toString() = displayName
+        fun getFormattedLabel() = label.takeIf { it.isNotEmpty() }?.let { "§e$it§7: " }.orEmpty()
+        override fun toString() = getFormattedLabel() + displayName
     }
 
     @Expose
@@ -43,6 +43,24 @@ class TextPetDisplayConfig {
     )
     @ConfigEditorBoolean
     val textLabels: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
+        name = "Pet Level",
+        desc = "Show pet level in the pet name text.\n" +
+            "§ePet Name must be enabled above."
+    )
+    @ConfigEditorBoolean
+    val nameLevel: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
+        name = "Skin Symbol",
+        desc = "Show a symbol for pet skin in the pet name text.\n" +
+            "§ePet Name must be enabled above."
+    )
+    @ConfigEditorBoolean
+    val nameSkinSymbol: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(

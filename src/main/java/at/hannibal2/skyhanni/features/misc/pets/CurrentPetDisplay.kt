@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.EnumFacing
 
-typealias VElement = VisualPetDisplayConfig.VisualElement
 typealias TElement = TextPetDisplayConfig.TextElement
 typealias SDirection = VisualPetDisplayConfig.SpinDirection
 typealias TLO = TextPetDisplayConfig.TextLocationOption
@@ -56,8 +55,7 @@ object CurrentPetDisplay {
     }
 
     private fun PetData.buildItemRenderableOrNull(): Renderable? {
-        val enabledVisuals = config.visual.enabledVisuals.get()
-        if (VElement.PET_ICON !in enabledVisuals) return null
+        if (!config.visual.petIcon.get()) return null
 
         val spinDirection = config.visual.spinDirection.get()
         val spinFrequency = config.visual.spinFrequency.get()
@@ -75,19 +73,19 @@ object CurrentPetDisplay {
             ),
         )
 
-        if (VElement.RARITY_BACKGROUND !in enabledVisuals) return baseItemRenderable
+        if (!config.visual.rarityBackground.get()) return baseItemRenderable
         val rarityBackgroundRenderable = CircularContainerRenderable(
             baseItemRenderable,
             rarity.getRarityBackgroundColor().toColor(),
             padding = 4,
         )
-        val separatorRingEnabled = VElement.XP_RING in enabledVisuals && VElement.SEPARATOR_RING in enabledVisuals
+        val separatorRingEnabled = config.visual.xpRing.get() && config.visual.separatorRing.get()
         val borderedRarityBackgroundRenderable = if (separatorRingEnabled) CircularContainerRenderable(
             rarityBackgroundRenderable,
             customColorConfig.separatorColor.get().toColor(),
             padding = 6,
         ) else rarityBackgroundRenderable
-        if (VElement.XP_RING !in enabledVisuals) return borderedRarityBackgroundRenderable
+        if (!config.visual.xpRing.get()) return borderedRarityBackgroundRenderable
         val xpRingCompleteRenderable = CircularContainerRenderable(
             borderedRarityBackgroundRenderable,
             backgroundColor = customColorConfig.xpRing.filledColor.get().toColor(),
@@ -103,13 +101,10 @@ object CurrentPetDisplay {
             val enabledTexts = config.text.enabledTexts.get().takeIfNotEmpty() ?: return null
             enabledTexts.mapNotNull {
                 it to when (it) {
-                    TElement.PET_NAME -> {
-                        getUserFriendlyName(
-                            // Todo, need new config options for these
-                            includeLevel = TElement.PET_LEVEL in enabledTexts,
-                            includeSkinTag = TElement.SKIN_SYMBOL in enabledTexts,
-                        )
-                    }
+                    TElement.PET_NAME -> getUserFriendlyName(
+                        includeLevel = config.text.nameLevel.get(),
+                        includeSkinTag = config.text.nameSkinSymbol.get(),
+                    )
                     TElement.HELD_ITEM -> heldItemInternalName?.repoItemName ?: return@mapNotNull null
                     TElement.OVERFLOW_XP -> {
                         // 1000.0 to account for double rounding errors between Hypixel's stored data, and our calculation
@@ -133,10 +128,7 @@ object CurrentPetDisplay {
                     }
                 }
             }.map { (textElement, textElementFormat) ->
-                val labelFormat = when (textElement) {
-                    TElement.PET_NAME -> "" // No label needed
-                    else -> "§e$textElement§7: "
-                }.takeIf { config.text.textLabels.get() }.orEmpty()
+                val labelFormat = textElement.getFormattedLabel().takeIf { config.text.textLabels.get() }.orEmpty()
                 RenderableString(
                     "$labelFormat$textElementFormat",
                     horizontalAlign = config.text.horizontalAlign.get()
@@ -189,16 +181,17 @@ object CurrentPetDisplay {
         ConditionalUtils.onToggle(
             config.enabled,
 
-            config.visual.enabledVisuals,
+            config.visual.petIcon,
+            config.visual.rarityBackground,
+            config.visual.xpRing,
+            config.visual.separatorRing,
             config.visual.iconScale,
             config.visual.skinAnimation,
             config.visual.spinDirection,
             config.visual.spinFrequency,
-
             customColorConfig.separatorColor,
             customColorConfig.xpRing.filledColor,
             customColorConfig.xpRing.unfilledColor,
-
             rarityColorConfig.commonColor,
             rarityColorConfig.uncommonColor,
             rarityColorConfig.rareColor,
@@ -207,6 +200,8 @@ object CurrentPetDisplay {
             rarityColorConfig.mythicColor,
 
             config.text.enabledTexts,
+            config.text.nameLevel,
+            config.text.nameSkinSymbol,
             config.text.textLabels,
             config.text.nextLevelPercent,
             config.text.xpFormat,

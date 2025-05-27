@@ -1,44 +1,51 @@
 package at.hannibal2.skyhanni.config.features.misc.pets.display
 
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
-import java.awt.Color
 
 class VisualPetDisplayConfig {
-    // Todo, next options instead of enum of enabled visuals
     @Expose
     @ConfigOption(
-        name = "Enabled Visuals",
-        desc = "Show visuals relating to your pet in the GUI element.\n" +
-            "§eItems that are gray are dependent on the items in red."
+        name = "Pet Icon",
+        desc = "Show an icon of your current pet.\n" +
+            "§cRequired for any below options to work§7."
     )
-    @ConfigEditorDraggableList
-    val enabledVisuals: Property<MutableList<VisualElement>> = Property.of(
-        mutableListOf(
-            VisualElement.PET_ICON,
-            VisualElement.RARITY_BACKGROUND,
-            VisualElement.XP_RING,
-        )
+    @ConfigEditorBoolean
+    val petIcon: Property<Boolean> = Property.of(true)
+
+    @Expose
+    @ConfigOption(
+        name = "Background Color",
+        desc = "Display a background color of the rarity of your pet.\n" +
+            "§eDepends on Pet Icon being enabled above!"
     )
+    @ConfigEditorBoolean
+    val rarityBackground: Property<Boolean> = Property.of(true)
 
-    enum class VisualElement(private val displayName: String) {
-        PET_ICON("Pet Icon"),
-        RARITY_BACKGROUND("Rarity Background"),
-        XP_RING("Xp Ring"),
-        SEPARATOR_RING("Separator Ring")
-        ;
+    @Expose
+    @ConfigOption(
+        name = "XP Ring",
+        desc = "Display a ring showing your pet's progress to next level.\n" +
+            "§eDepends on Pet Icon & Background Color being enabled above!"
+    )
+    @ConfigEditorBoolean
+    val xpRing: Property<Boolean> = Property.of(true)
 
-        override fun toString() = displayName
-    }
+    @Expose
+    @ConfigOption(
+        name = "Separator Ring",
+        desc = "Adds a separator ring between the rarity background and the XP ring.\n" +
+            "§eDepends on Pet Icon, Background Color, & XP Ring being enabled above!"
+    )
+    @ConfigEditorBoolean
+    val separatorRing: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Color Customization", desc = "")
