@@ -31,10 +31,13 @@ import kotlin.math.min
 //#if MC < 1.21
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.OpenGlHelper
+import java.nio.FloatBuffer
+
 //#else
 //$$ import net.minecraft.client.render.RenderLayer
 //#endif
 
+// todo, some functions need 1.21 impls
 /**
  * Some functions taken from NotEnoughUpdates
  */
@@ -336,49 +339,46 @@ object GuiRenderUtils {
         val halfIconY = 8f
         val halfIconZ = 100f
 
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(translateX, translateY, -19f)
-        DrawContextUtils.scale(finalScale, finalScale, 0.2f)
+        DrawContextUtils.translated(translateX, translateY, -19f) {
+            DrawContextUtils.scale(finalScale, finalScale, 0.2f)
 
-        // Rotation
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.loadIdentity()
+            // Rotation
+            val savedMV: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+            DrawContextUtils.pushPop {
+                DrawContextUtils.loadIdentity()
 
-        DrawContextUtils.translate(halfIconX, halfIconY, halfIconZ)
-        if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
-        if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
-        if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
-        DrawContextUtils.translate(-halfIconX, -halfIconY, -halfIconZ)
+                DrawContextUtils.translate(halfIconX, halfIconY, halfIconZ)
+                if (rotX != 0f) DrawContextUtils.rotate(rotX, 1.0, 0.0, 0.0)
+                if (rotY != 0f) DrawContextUtils.rotate(rotY, 0.0, 1.0, 0.0)
+                if (rotZ != 0f) DrawContextUtils.rotate(rotZ, 0.0, 0.0, 1.0)
+                DrawContextUtils.translate(-halfIconX, -halfIconY, -halfIconZ)
 
-        val savedMV = GLAllocation.createDirectFloatBuffer(16)
-        DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
-        DrawContextUtils.popMatrix()
+                DrawContextUtils.getFloat(GL11.GL_MODELVIEW_MATRIX, savedMV)
+            }
+            DrawContextUtils.multMatrix(savedMV)
 
-        DrawContextUtils.multMatrix(savedMV)
+            GL11.glEnable(GL11.GL_NORMALIZE)
+            GL11.glNormal3f(0f, 0f, 1f)
 
-        GL11.glEnable(GL11.GL_NORMALIZE)
-        GL11.glNormal3f(0f, 0f, 1f)
-
-        //#if MC < 1.21
-        RenderHelper.enableGUIStandardItemLighting()
-        AdjustStandardItemLighting.adjust() // Compensate for z scaling
-        try {
-            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
-        } catch (e: Exception) {
-            ErrorManager.logErrorWithData(
-                e, "Error rendering item onto screen",
-                "itemName" to item.displayName,
-                "internalName" to item.getInternalNameOrNull(),
-            )
+            //#if MC < 1.21
+            RenderHelper.enableGUIStandardItemLighting()
+            AdjustStandardItemLighting.adjust() // Compensate for z scaling
+            try {
+                Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(
+                    e, "Error rendering item onto screen",
+                    "itemName" to item.displayName,
+                    "internalName" to item.getInternalNameOrNull(),
+                )
+            }
+            RenderHelper.disableStandardItemLighting()
+            GL11.glDisable(GL11.GL_NORMALIZE)
+            RenderHelper.disableStandardItemLighting()
+            //#else
+            //$$ renderItemStack(item, 0, 0)
+            //#endif
         }
-        RenderHelper.disableStandardItemLighting()
-        GL11.glDisable(GL11.GL_NORMALIZE)
-        RenderHelper.disableStandardItemLighting()
-        //#else
-        //$$ renderItemStack(item, 0, 0)
-        //#endif
-
-        DrawContextUtils.popMatrix()
     }
 
     //#if MC < 1.21
