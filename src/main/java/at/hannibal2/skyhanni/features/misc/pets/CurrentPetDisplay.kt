@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.EnumFacing
-import java.awt.Color
 
 typealias VElement = PetDisplayConfig.VisualPetDisplayConfig.VisualElement
 typealias TElement = PetDisplayConfig.TextPetDisplayConfig.TextElement

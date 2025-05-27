@@ -117,7 +117,7 @@ class PetDisplayConfig {
                         "§7Default: §#§c§0§c§0§c§0§/C0C0C0"
                 )
                 @ConfigEditorColour
-                val unfilledColor: ChromaColour = ChromaColour.fromRGB(192, 192, 192, 0 ,255)
+                val unfilledColor: ChromaColour = ChromaColour.fromRGB(192, 192, 192, 0, 255)
             }
 
             @Expose
