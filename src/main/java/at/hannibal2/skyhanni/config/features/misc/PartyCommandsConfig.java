@@ -36,7 +36,7 @@ public class PartyCommandsConfig {
 
     @Expose
     @ConfigEditorBoolean
-    @ConfigOption(name = "Party tps Command", desc = "Sends current TPS into Party Chat if someone types §b!tps")
+    @ConfigOption(name = "Party TPS Command", desc = "Sends current TPS into Party Chat if someone types §b!tps")
     public boolean tpsCommand = false;
 
     public enum TrustedUser {
