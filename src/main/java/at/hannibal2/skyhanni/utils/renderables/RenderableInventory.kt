@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.item.ItemStack
+import java.awt.Color
 import kotlin.math.ceil
 
 object RenderableInventory {
@@ -78,6 +79,7 @@ object RenderableInventory {
         items: List<ItemStack?>,
         maxRowSize: Int,
         scale: Double,
+        highlightSlots: List<Int> = emptyList(),
         horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
         verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
     ): Renderable {
@@ -89,16 +91,22 @@ object RenderableInventory {
                 val renderable = if (uv == SlotsUv.CENTER) {
                     (
                         items[index]?.let { item ->
-                            Renderable.itemStack(
+                            val ren = Renderable.itemStack(
                                 item,
                                 scale,
                                 0,
                                 0,
                                 false,
                             )
+                            if (highlightSlots.contains(index)) Renderable.drawInsideRoundedRect(
+                                ren,
+                                color = Color.GREEN,
+                                padding = 0,
+                                radius = 16 * (scale / 2).toInt(),
+                            ) else ren
                         } ?: Renderable.placeholder(
                             (16 * scale).toInt(),
-                            (16 * scale).toInt()
+                            (16 * scale).toInt(),
                         )
                         ).also { index++ }
                 } else Renderable.placeholder(0, 0)

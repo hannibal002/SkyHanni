@@ -15,7 +15,7 @@ class SkyHanniInventoryContainer(
     @Expose var items: List<ItemStack?>,
     @Expose var displayName: String = internalName,
 ) {
-    fun toRenderable(scale: Double = 1.0): Renderable =
+    fun toRenderable(scale: Double = 1.0, highlightSlots: List<Int> = listOf()): Renderable =
         VerticalContainerRenderable(
             listOf(
                 RenderableString(displayName, scale),
@@ -23,6 +23,7 @@ class SkyHanniInventoryContainer(
                     items,
                     rowSize,
                     scale,
+                    highlightSlots,
                 ),
             ),
         )

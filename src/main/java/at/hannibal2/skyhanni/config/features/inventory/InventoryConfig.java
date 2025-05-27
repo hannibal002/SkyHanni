@@ -168,6 +168,11 @@ public class InventoryConfig {
     public TradeConfig trade = new TradeConfig();
 
     @Expose
+    @ConfigOption(name = "Searchable Storage", desc = "test")
+    @Accordion
+    public SearchableStorageConfig searchableStorage = new SearchableStorageConfig();
+
+    @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
