@@ -9,8 +9,10 @@ import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils
@@ -24,6 +26,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.EnumFacing
 import java.awt.Color
 
@@ -37,8 +40,20 @@ typealias NFE = PetDisplayConfig.TextPetDisplayConfig.NumberFormatEntry
 object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.display
+    private val customColorConfig get() = config.visual.colorCustomization
+    private val rarityColorConfig get() = customColorConfig.rarityBackground
     private var lastPetHash: Int = 0
     private var petOverlay: Renderable? = null
+
+    private fun LorenzRarity.getRarityBackgroundColor(): ChromaColour = when (this) {
+        LorenzRarity.COMMON -> rarityColorConfig.commonColor
+        LorenzRarity.UNCOMMON -> rarityColorConfig.uncommonColor
+        LorenzRarity.RARE -> rarityColorConfig.rareColor
+        LorenzRarity.EPIC -> rarityColorConfig.epicColor
+        LorenzRarity.LEGENDARY -> rarityColorConfig.legendaryColor
+        LorenzRarity.MYTHIC -> rarityColorConfig.mythicColor
+        else -> this.color.toChromaColor()
+    }
 
     private fun PetData.buildItemRenderableOrNull(): Renderable? {
         val enabledVisuals = config.visual.enabledVisuals.get()
@@ -63,19 +78,20 @@ object CurrentPetDisplay {
         if (VElement.RARITY_BACKGROUND !in enabledVisuals) return baseItemRenderable
         val rarityBackgroundRenderable = CircularContainerRenderable(
             baseItemRenderable,
-            rarity.color.toColor(),
+            rarity.getRarityBackgroundColor().toColor(),
             padding = 4,
         )
         val separatorRingEnabled = VElement.XP_RING in enabledVisuals && VElement.SEPARATOR_RING in enabledVisuals
         val borderedRarityBackgroundRenderable = if (separatorRingEnabled) CircularContainerRenderable(
             rarityBackgroundRenderable,
-            Color.GRAY,
+            customColorConfig.separatorColor.toColor(),
             padding = 6,
         ) else rarityBackgroundRenderable
         if (VElement.XP_RING !in enabledVisuals) return borderedRarityBackgroundRenderable
         val xpRingCompleteRenderable = CircularContainerRenderable(
             borderedRarityBackgroundRenderable,
-            Color.cyan,
+            backgroundColor = customColorConfig.xpRing.filledColor.toColor(),
+            unfilledColor = customColorConfig.xpRing.unfilledColor.toColor(),
             filledPercentage = levelProgressionPercentage,
             padding = 2,
         )

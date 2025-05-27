@@ -9,16 +9,20 @@ import at.hannibal2.skyhanni.features.misc.pets.TElement
 import at.hannibal2.skyhanni.features.misc.pets.TLO
 import at.hannibal2.skyhanni.features.misc.pets.VElement
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
+import java.awt.Color
 import kotlin.collections.emptySet
 
 class PetDisplayConfig {
@@ -73,6 +77,103 @@ class PetDisplayConfig {
             ;
 
             override fun toString() = manager.displayName(this)
+        }
+
+        @Expose
+        @ConfigOption(name = "Color Customization", desc = "")
+        @Accordion
+        val colorCustomization: ColorCustomizationConfig = ColorCustomizationConfig()
+
+        class ColorCustomizationConfig {
+
+            @Expose
+            @ConfigOption(
+                name = "Separator Ring Color",
+                desc = "The color of the separator ring.\n" +
+                    "§7Default: §#§8§0§8§0§8§0§/#808080"
+            )
+            @ConfigEditorColour
+            val separatorColor: ChromaColour = Color.cyan.toChromaColor()
+
+            @Expose
+            @ConfigOption(name = "XP Ring", desc = "")
+            @Accordion
+            val xpRing: XpRingColorConfig = XpRingColorConfig()
+
+            class XpRingColorConfig {
+                @Expose
+                @ConfigOption(
+                    name = "Filled Ring Color",
+                    desc = "The color of the filled portion of the ring.\n" +
+                        "§7Default: §#§0§0§f§f§f§f§/00FFFF"
+                )
+                @ConfigEditorColour
+                val filledColor: ChromaColour = ChromaColour.fromRGB(0, 255, 255, 0, 255)
+
+                @Expose
+                @ConfigOption(
+                    name = "Unfilled Ring Color",
+                    desc = "The color of the unfilled portion of the ring.\n" +
+                        "§7Default: §#§c§0§c§0§c§0§/C0C0C0"
+                )
+                @ConfigEditorColour
+                val unfilledColor: ChromaColour = ChromaColour.fromRGB(192, 192, 192, 0 ,255)
+            }
+
+            @Expose
+            @ConfigOption(name = "Rarity Background", desc = "")
+            @Accordion
+            val rarityBackground: RarityColorConfig = RarityColorConfig()
+
+            class RarityColorConfig {
+                @Expose
+                @ConfigOption(
+                    name = "§fCommon §rBackground Color",
+                    desc = "§7Default: §#§f§f§f§f§f§f§/FFFFFF"
+                )
+                @ConfigEditorColour
+                val commonColor: ChromaColour = Color.BLACK.toChromaColor()
+
+                @Expose
+                @ConfigOption(
+                    name = "§aUncommon §rBackground Color",
+                    desc = "§7Default: §#§5§5§f§f§5§5§/55FF55"
+                )
+                @ConfigEditorColour
+                val uncommonColor: ChromaColour = Color.BLACK.toChromaColor()
+
+                @Expose
+                @ConfigOption(
+                    name = "§9Rare §rBackground Color",
+                    desc = "§7Default: §#§5§5§5§5§f§f§/#5555FF"
+                )
+                @ConfigEditorColour
+                val rareColor: ChromaColour = Color.BLACK.toChromaColor()
+
+                @Expose
+                @ConfigOption(
+                    name = "§5Epic §rBackground Color",
+                    desc = "§7Default: §#§a§a§0§0§a§a§/#AA00AA"
+                )
+                @ConfigEditorColour
+                val epicColor: ChromaColour = Color.BLACK.toChromaColor()
+
+                @Expose
+                @ConfigOption(
+                    name = "§6Legendary §rBackground Color",
+                    desc = "§7Default: §#§f§f§a§a§0§0§/#FFAA00"
+                )
+                @ConfigEditorColour
+                val legendaryColor: ChromaColour = Color.BLACK.toChromaColor()
+
+                @Expose
+                @ConfigOption(
+                    name = "§dMythic §rBackground Color",
+                    desc = "§7Default: §#§f§f§5§5§f§f§/#FF55FF"
+                )
+                @ConfigEditorColour
+                val mythicColor: ChromaColour = Color.BLACK.toChromaColor()
+            }
         }
 
         @Expose
