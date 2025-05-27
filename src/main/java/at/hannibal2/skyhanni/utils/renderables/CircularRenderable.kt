@@ -54,7 +54,8 @@ class CircularContainerRenderable(
     private val takenSpace = 2 * (radius - padding)
     override fun render(posX: Int, posY: Int) {
         super.render(posX, posY)
-        DrawContextUtils.translated(padding.toFloat(), padding.toFloat(), 0f) {
+        DrawContextUtils.pushPop {
+            DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
             renderable.renderXYAligned(posX + padding, posY + padding, takenSpace, takenSpace)
         }
     }
