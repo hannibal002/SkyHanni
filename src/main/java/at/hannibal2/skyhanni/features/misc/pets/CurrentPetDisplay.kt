@@ -45,12 +45,12 @@ object CurrentPetDisplay {
     private var petOverlay: Renderable? = null
 
     private fun LorenzRarity.getRarityBackgroundColor(): ChromaColour = when (this) {
-        LorenzRarity.COMMON -> rarityColorConfig.commonColor
-        LorenzRarity.UNCOMMON -> rarityColorConfig.uncommonColor
-        LorenzRarity.RARE -> rarityColorConfig.rareColor
-        LorenzRarity.EPIC -> rarityColorConfig.epicColor
-        LorenzRarity.LEGENDARY -> rarityColorConfig.legendaryColor
-        LorenzRarity.MYTHIC -> rarityColorConfig.mythicColor
+        LorenzRarity.COMMON -> rarityColorConfig.commonColor.get()
+        LorenzRarity.UNCOMMON -> rarityColorConfig.uncommonColor.get()
+        LorenzRarity.RARE -> rarityColorConfig.rareColor.get()
+        LorenzRarity.EPIC -> rarityColorConfig.epicColor.get()
+        LorenzRarity.LEGENDARY -> rarityColorConfig.legendaryColor.get()
+        LorenzRarity.MYTHIC -> rarityColorConfig.mythicColor.get()
         else -> this.color.toChromaColor()
     }
 
@@ -83,14 +83,14 @@ object CurrentPetDisplay {
         val separatorRingEnabled = VElement.XP_RING in enabledVisuals && VElement.SEPARATOR_RING in enabledVisuals
         val borderedRarityBackgroundRenderable = if (separatorRingEnabled) CircularContainerRenderable(
             rarityBackgroundRenderable,
-            customColorConfig.separatorColor.toColor(),
+            customColorConfig.separatorColor.get().toColor(),
             padding = 6,
         ) else rarityBackgroundRenderable
         if (VElement.XP_RING !in enabledVisuals) return borderedRarityBackgroundRenderable
         val xpRingCompleteRenderable = CircularContainerRenderable(
             borderedRarityBackgroundRenderable,
-            backgroundColor = customColorConfig.xpRing.filledColor.toColor(),
-            unfilledColor = customColorConfig.xpRing.unfilledColor.toColor(),
+            backgroundColor = customColorConfig.xpRing.filledColor.get().toColor(),
+            unfilledColor = customColorConfig.xpRing.unfilledColor.get().toColor(),
             filledPercentage = levelProgressionPercentage,
             padding = 2,
         )
@@ -200,6 +200,17 @@ object CurrentPetDisplay {
             config.visual.skinAnimation,
             config.visual.spinDirection,
             config.visual.spinFrequency,
+
+            customColorConfig.separatorColor,
+            customColorConfig.xpRing.filledColor,
+            customColorConfig.xpRing.unfilledColor,
+
+            rarityColorConfig.commonColor,
+            rarityColorConfig.uncommonColor,
+            rarityColorConfig.rareColor,
+            rarityColorConfig.epicColor,
+            rarityColorConfig.legendaryColor,
+            rarityColorConfig.mythicColor,
 
             config.text.enabledTexts,
             config.text.textLabels,

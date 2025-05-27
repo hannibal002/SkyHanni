@@ -93,7 +93,7 @@ class PetDisplayConfig {
                     "§7Default: §#§8§0§8§0§8§0§/#808080"
             )
             @ConfigEditorColour
-            val separatorColor: ChromaColour = Color.cyan.toChromaColor()
+            val separatorColor: Property<ChromaColour> = Property.of(Color.cyan.toChromaColor())
 
             @Expose
             @ConfigOption(name = "XP Ring", desc = "")
@@ -108,7 +108,7 @@ class PetDisplayConfig {
                         "§7Default: §#§0§0§f§f§f§f§/00FFFF"
                 )
                 @ConfigEditorColour
-                val filledColor: ChromaColour = ChromaColour.fromRGB(0, 255, 255, 0, 255)
+                val filledColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(0, 255, 255, 0, 255))
 
                 @Expose
                 @ConfigOption(
@@ -117,7 +117,7 @@ class PetDisplayConfig {
                         "§7Default: §#§c§0§c§0§c§0§/C0C0C0"
                 )
                 @ConfigEditorColour
-                val unfilledColor: ChromaColour = ChromaColour.fromRGB(192, 192, 192, 0, 255)
+                val unfilledColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(192, 192, 192, 0, 255))
             }
 
             @Expose
@@ -132,7 +132,7 @@ class PetDisplayConfig {
                     desc = "§7Default: §#§f§f§f§f§f§f§/FFFFFF"
                 )
                 @ConfigEditorColour
-                val commonColor: ChromaColour = Color.BLACK.toChromaColor()
+                val commonColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(255, 255, 255, 0, 255))
 
                 @Expose
                 @ConfigOption(
@@ -140,7 +140,7 @@ class PetDisplayConfig {
                     desc = "§7Default: §#§5§5§f§f§5§5§/55FF55"
                 )
                 @ConfigEditorColour
-                val uncommonColor: ChromaColour = Color.BLACK.toChromaColor()
+                val uncommonColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(85, 255, 85, 0, 255))
 
                 @Expose
                 @ConfigOption(
@@ -148,7 +148,7 @@ class PetDisplayConfig {
                     desc = "§7Default: §#§5§5§5§5§f§f§/#5555FF"
                 )
                 @ConfigEditorColour
-                val rareColor: ChromaColour = Color.BLACK.toChromaColor()
+                val rareColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(85, 85, 255, 0, 255))
 
                 @Expose
                 @ConfigOption(
@@ -156,7 +156,7 @@ class PetDisplayConfig {
                     desc = "§7Default: §#§a§a§0§0§a§a§/#AA00AA"
                 )
                 @ConfigEditorColour
-                val epicColor: ChromaColour = Color.BLACK.toChromaColor()
+                val epicColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(170, 0, 170, 0, 255))
 
                 @Expose
                 @ConfigOption(
@@ -164,7 +164,7 @@ class PetDisplayConfig {
                     desc = "§7Default: §#§f§f§a§a§0§0§/#FFAA00"
                 )
                 @ConfigEditorColour
-                val legendaryColor: ChromaColour = Color.BLACK.toChromaColor()
+                val legendaryColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(255, 170, 0, 0, 255))
 
                 @Expose
                 @ConfigOption(
@@ -172,7 +172,7 @@ class PetDisplayConfig {
                     desc = "§7Default: §#§f§f§5§5§f§f§/#FF55FF"
                 )
                 @ConfigEditorColour
-                val mythicColor: ChromaColour = Color.BLACK.toChromaColor()
+                val mythicColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(255, 85, 255, 0, 255))
             }
         }
 
