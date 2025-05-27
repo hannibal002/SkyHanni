@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -76,20 +75,20 @@ object CurrentPetDisplay {
         if (!config.visual.rarityBackground.get()) return baseItemRenderable
         val rarityBackgroundRenderable = CircularContainerRenderable(
             baseItemRenderable,
-            rarity.getRarityBackgroundColor().toColor(),
+            rarity.getRarityBackgroundColor(),
             padding = 4,
         )
         val separatorRingEnabled = config.visual.xpRing.get() && config.visual.separatorRing.get()
         val borderedRarityBackgroundRenderable = if (separatorRingEnabled) CircularContainerRenderable(
             rarityBackgroundRenderable,
-            customColorConfig.separatorColor.get().toColor(),
+            customColorConfig.separatorColor.get(),
             padding = 6,
         ) else rarityBackgroundRenderable
         if (!config.visual.xpRing.get()) return borderedRarityBackgroundRenderable
         val xpRingCompleteRenderable = CircularContainerRenderable(
             borderedRarityBackgroundRenderable,
-            backgroundColor = customColorConfig.xpRing.filledColor.get().toColor(),
-            unfilledColor = customColorConfig.xpRing.unfilledColor.get().toColor(),
+            backgroundColor = customColorConfig.xpRing.filledColor.get(),
+            unfilledColor = customColorConfig.xpRing.unfilledColor.get(),
             filledPercentage = levelProgressionPercentage,
             padding = 2,
         )
