@@ -185,16 +185,18 @@ object HoppityEggsManager {
         val currentYear = SkyBlockTime.now().year
         val spawnedEggs = HoppityEventSummary.getSpawnedEggCount(currentYear)
         when (spawnedEggs) {
-            279 -> sendNextHuntIn()
+            279 -> sendNextHuntIn("No more eggs will spawn this event.")
             else ->  ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
         }
         blockedReason = "hoppity_egg"
     }
 
-    private fun SkyHanniChatEvent.sendNextHuntIn() {
+    private fun SkyHanniChatEvent.sendNextHuntIn(
+        reason: String = "Hoppity's Hunt is not active."
+    ) {
         val currentYear = SkyBlockTime.now().year
         val timeUntil = SkyBlockTime(currentYear + 1).toTimeMark().timeUntil()
-        ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
+        ChatUtils.chat("§e${reason} The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
         blockedReason = "hoppity_egg"
     }
 
