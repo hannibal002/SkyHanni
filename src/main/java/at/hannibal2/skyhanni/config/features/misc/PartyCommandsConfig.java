@@ -28,6 +28,16 @@ public class PartyCommandsConfig {
     @ConfigOption(name = "Party All Invite", desc = "Automatically turn on allinvite if someone types §b!allinv")
     public boolean allInviteCommand = false;
 
+    @Expose
+    @ConfigEditorBoolean
+    @ConfigOption(name = "Party Ping Command", desc = "Sends current Ping into Party Chat if someone types §b!Ping")
+    public boolean pingCommand = false;
+
+    @Expose
+    @ConfigEditorBoolean
+    @ConfigOption(name = "Party TPS Command", desc = "Sends current TPS into Party Chat if someone types §b!TPS")
+    public boolean TPSCommand = false;
+
     public enum TrustedUser {
         BEST_FRIENDS("Best Friends"),
         FRIENDS("Friends"),

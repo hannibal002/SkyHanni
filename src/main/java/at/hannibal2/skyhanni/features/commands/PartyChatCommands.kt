@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
+import at.hannibal2.skyhanni.features.misc.CurrentPing
+import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -16,7 +18,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PartyChatCommands {
-
     private val config get() = SkyHanniMod.feature.misc.partyCommands
     private val storage get() = SkyHanniMod.feature.storage
 
@@ -55,6 +56,22 @@ object PartyChatCommands {
             executable = {
                 lastAllInvite = SimpleTimeMark.now()
                 HypixelCommands.partyAllInvite()
+            },
+        ),
+        PartyChatCommand(
+            listOf("Ping"),
+            { config.pingCommand },
+            requiresPartyLead = false,
+            executable = {
+                ChatUtils.sendMessageToServer("/pc Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds}ms")
+            },
+        ),
+        PartyChatCommand(
+            listOf("TPS"),
+            { config.TPSCommand },
+            requiresPartyLead = false,
+            executable = {
+                ChatUtils.sendMessageToServer("/pc Current TPS: ${TpsCounter.tps}")
             },
         ),
     )
