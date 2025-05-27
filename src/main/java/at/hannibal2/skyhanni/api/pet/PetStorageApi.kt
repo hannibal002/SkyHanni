@@ -201,7 +201,7 @@ object PetStorageApi {
                 heldItemInternalName = petHeldItem ?: heldItemInternalName
             }
 
-            CurrentPetApi.assertFoundCurrentData(resolvedPet)
+            CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.TAB)
             saveConfig()
         }
     }
@@ -242,7 +242,7 @@ object PetStorageApi {
                 heldItemInternalName = petHeldItem ?: heldItemInternalName
             }
 
-            CurrentPetApi.assertFoundCurrentData(resolvedPet)
+            CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.AUTOPET)
             saveConfig()
         }
     }
@@ -325,7 +325,7 @@ object PetStorageApi {
             petStorage[it] = data
         } ?: petStorage.add(data)
 
-        CurrentPetApi.assertFoundCurrentData(data)
+        CurrentPetApi.assertFoundCurrentData(data, CurrentPetApi.PetDataAssertionSource.MENU)
         saveConfig()
     }
 
@@ -377,7 +377,7 @@ object PetStorageApi {
                 skinInternalName = petSkin?.internalName ?: skinInternalName
             }
 
-            CurrentPetApi.assertFoundCurrentData(resolvedPet)
+            CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.MENU)
             saveConfig()
         }
     }

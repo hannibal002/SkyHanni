@@ -12,7 +12,10 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CurrentPetApi {
@@ -40,7 +43,21 @@ object CurrentPetApi {
         return currentPet.inFamily(properPetName) && currentPet.rarity >= startingRarity
     }
 
-    fun assertFoundCurrentData(petData: PetData) {
+    enum class PetDataAssertionSource { TAB, AUTOPET, MENU }
+    private val lastAssertion: MutableMap<PetDataAssertionSource, SimpleTimeMark> = enumMapOf()
+
+    fun assertFoundCurrentData(petData: PetData, source: PetDataAssertionSource) {
+        if (source == PetDataAssertionSource.TAB) {
+            val lastApAssertion = lastAssertion[PetDataAssertionSource.AUTOPET]
+            val cancelledByAp = lastApAssertion != null && lastApAssertion.passedSince() <= 5.seconds
+
+            val lastMenAssertion = lastAssertion[PetDataAssertionSource.MENU]
+            val cancelledByMenu = lastMenAssertion != null && lastMenAssertion.passedSince() >= 5.seconds
+
+            if (cancelledByMenu || cancelledByAp) return
+        }
+        lastAssertion[source] = SimpleTimeMark.now()
+
         if (petData.uuid == null) {
             ErrorManager.skyHanniError("Tried to assert a non-UUID having pet!")
         }
