@@ -30,19 +30,19 @@ object StorageApi {
 
     val accessStorage: Map<String, SkyHanniInventoryContainer> get() = storage
 
-    var currentStorage : SkyHanniInventoryContainer? = null
-    private set
+    var currentStorage: SkyHanniInventoryContainer? = null
+        private set
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         enderchestPattern.matchMatcher(event.inventoryName) {
             val page = group("page").toInt()
-            handleRead("Ender Chest $page",event.inventoryItemsWithNull.values)
+            handleRead("Ender Chest $page", event.inventoryItemsWithNull.values)
             return
         }
         backpackPattern.matchMatcher(event.inventoryName) {
             val page = group("page").toInt()
-            handleRead("Backpack $page",event.inventoryItemsWithNull.values)
+            handleRead("Backpack $page", event.inventoryItemsWithNull.values)
             return
         }
     }
@@ -51,13 +51,13 @@ object StorageApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiContainerSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if(currentStorage == null) return
+        if (currentStorage == null) return
         shouldReCheck = true
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
-        if(!shouldReCheck) return
+        if (!shouldReCheck) return
         currentStorage?.items = InventoryUtils.getItemsInOpenChestWithNull().map { it.stack }.drop(9)
         shouldReCheck = false
     }
@@ -78,9 +78,9 @@ object StorageApi {
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Storage Data")
-        if(storage.isEmpty()){
+        if (storage.isEmpty()) {
             event.addIrrelevant("Empty")
-        }else {
+        } else {
             event.addIrrelevant(storage.values.sortedBy { it.internalName }.map { it.getDebug() + listOf("") }.flatten())
         }
     }

@@ -646,7 +646,7 @@ class ProfileSpecificStorage {
     }
 
     @Expose
-    val storage : MutableMap<String,SkyHanniInventoryContainer> = mutableMapOf()
+    val storage: MutableMap<String, SkyHanniInventoryContainer> = mutableMapOf()
 
     // - mining
     @Expose
