@@ -12,6 +12,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.item.ItemStack
 
+// Todo: Merge this with SuperpairDataDisplay
+//  Store slots over there
+//  Have the rendered text of superpairdatadisplay highlight the slots the items are in
 @SkyHanniModule
 object SuperPairsItemVisibility {
 

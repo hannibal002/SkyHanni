@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// Changed priority to fix compatibity issues with e.g. Skytils' Middle click GUI Items feature
 @Mixin(value = GuiContainer.class, priority = 499)
 public abstract class MixinGuiContainer extends GuiScreen {
 
