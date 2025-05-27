@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.misc.pets.PetDisplayConfig
+import at.hannibal2.skyhanni.config.features.misc.pets.display.TextPetDisplayConfig
+import at.hannibal2.skyhanni.config.features.misc.pets.display.VisualPetDisplayConfig
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -29,11 +30,11 @@ import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.EnumFacing
 
-typealias VElement = PetDisplayConfig.VisualPetDisplayConfig.VisualElement
-typealias TElement = PetDisplayConfig.TextPetDisplayConfig.TextElement
-typealias SDirection = PetDisplayConfig.VisualPetDisplayConfig.SpinDirection
-typealias TLO = PetDisplayConfig.TextPetDisplayConfig.TextLocationOption
-typealias NFE = PetDisplayConfig.TextPetDisplayConfig.NumberFormatEntry
+typealias VElement = VisualPetDisplayConfig.VisualElement
+typealias TElement = TextPetDisplayConfig.TextElement
+typealias SDirection = VisualPetDisplayConfig.SpinDirection
+typealias TLO = TextPetDisplayConfig.TextLocationOption
+typealias NFE = TextPetDisplayConfig.NumberFormatEntry
 
 @SkyHanniModule
 object CurrentPetDisplay {
@@ -102,11 +103,9 @@ object CurrentPetDisplay {
             val enabledTexts = config.text.enabledTexts.get().takeIfNotEmpty() ?: return null
             enabledTexts.mapNotNull {
                 it to when (it) {
-                    // These are "parts" of other elements, so they themselves don't do anything.
-                    TElement.PET_LEVEL, TElement.SKIN_SYMBOL -> return@mapNotNull null
-
                     TElement.PET_NAME -> {
                         getUserFriendlyName(
+                            // Todo, need new config options for these
                             includeLevel = TElement.PET_LEVEL in enabledTexts,
                             includeSkinTag = TElement.SKIN_SYMBOL in enabledTexts,
                         )
@@ -134,15 +133,10 @@ object CurrentPetDisplay {
                     }
                 }
             }.map { (textElement, textElementFormat) ->
-                val labelFormat = if (config.text.textLabels.get()) {
-                    when (textElement) {
-                        // These are "parts" of other elements, so they themselves don't have labels.
-                        TElement.PET_LEVEL, TElement.SKIN_SYMBOL -> ""
-                        // No label needed
-                        TElement.PET_NAME -> ""
-                        else -> "§e$textElement§7: "
-                    }
-                } else ""
+                val labelFormat = when (textElement) {
+                    TElement.PET_NAME -> "" // No label needed
+                    else -> "§e$textElement§7: "
+                }.takeIf { config.text.textLabels.get() }.orEmpty()
                 RenderableString(
                     "$labelFormat$textElementFormat",
                     horizontalAlign = config.text.horizontalAlign.get()

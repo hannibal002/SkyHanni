@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc.pets
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.features.misc.pets.display.PetDisplayConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
