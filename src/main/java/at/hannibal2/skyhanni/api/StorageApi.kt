@@ -21,12 +21,16 @@ object StorageApi {
     /**
      * REGEX-TEST: Ender Chest (1/9)
      */
-    private val enderchestPattern by RepoPattern.pattern("storage.enderchest", "Ender Chest \\((?<page>\\d)/\\d\\)")
+    private val enderchestPattern by RepoPattern.pattern("storage.enderchest", "Ender Chest \\((?<page>\\d+)/\\d+\\)")
 
     /**
      * REGEX-TEST: Jumbo Backpack§r (Slot #2)
      */
     private val backpackPattern by RepoPattern.pattern("storage.backpack", ".* Backpack§r \\(Slot #(?<page>\\d+)\\)")
+    /**
+     * REGEX-TEST: Rift Storage (1/9)
+     */
+    private val riftStoragePattern by RepoPattern.pattern("storage.rift", "Rift Storage \\((?<page>\\d+)/\\d+\\)")
 
     val accessStorage: Map<String, SkyHanniInventoryContainer> get() = storage
 
@@ -43,6 +47,11 @@ object StorageApi {
         backpackPattern.matchMatcher(event.inventoryName) {
             val page = group("page").toInt()
             handleRead("Backpack $page", event.inventoryItemsWithNull.values)
+            return
+        }
+        riftStoragePattern.matchMatcher(event.inventoryName) {
+            val page = group("page").toInt()
+            handleRead("Rift Storage $page", event.inventoryItemsWithNull.values)
             return
         }
     }
