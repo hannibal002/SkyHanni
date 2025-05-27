@@ -59,19 +59,19 @@ object PartyChatCommands {
             },
         ),
         PartyChatCommand(
-            listOf("Ping"),
-            { config.pingCommand },
+            listOf("ping"),
+            { config.pingCommand && CurrentPing.isEnabled() },
             requiresPartyLead = false,
             executable = {
-                ChatUtils.sendMessageToServer("/pc Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds}ms")
+                HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds}ms")
             },
         ),
         PartyChatCommand(
-            listOf("TPS"),
-            { config.TPSCommand },
+            listOf("tps"),
+            { config.tpsCommand },
             requiresPartyLead = false,
             executable = {
-                ChatUtils.sendMessageToServer("/pc Current TPS: ${TpsCounter.tps}")
+                HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}")
             },
         ),
     )

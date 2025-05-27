@@ -60,5 +60,5 @@ object CurrentPing {
         }
     }
 
-    private fun isEnabled() = config.hypixelPingApi
+    fun isEnabled() = config.hypixelPingApi
 }
