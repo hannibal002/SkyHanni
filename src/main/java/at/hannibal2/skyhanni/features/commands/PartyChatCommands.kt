@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -61,9 +62,20 @@ object PartyChatCommands {
         ),
         PartyChatCommand(
             listOf("ping"),
-            { config.pingCommand && CurrentPing.isEnabled() },
+            { config.pingCommand },
             requiresPartyLead = false,
             executable = {
+                if (!CurrentPing.isEnabled()) {
+                    ChatUtils.clickableChat(
+                        "Hypixel Ping Api is disabled, ping command won't work!",
+                        prefixColor = "§c",
+                        onClick = {
+                            CurrentPing.config::hypixelPingApi.jumpToEditor()
+                        },
+                        hover = "§eClick to find setting in the config!"
+                    )
+                    return@PartyChatCommand
+                }
                 HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms")
             },
         ),
