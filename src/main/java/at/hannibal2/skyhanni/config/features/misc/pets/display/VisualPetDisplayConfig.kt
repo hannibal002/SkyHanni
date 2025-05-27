@@ -73,7 +73,7 @@ class VisualPetDisplayConfig {
             @ConfigOption(
                 name = "Filled Ring Color",
                 desc = "The color of the filled portion of the ring.\n" +
-                    "§7Default: §#§0§0§f§f§f§f§/00FFFF"
+                    "§7Default: §#§0§0§f§f§f§f§/#00FFFF"
             )
             @ConfigEditorColour
             val filledColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(0, 255, 255, 0, 255))
@@ -82,7 +82,7 @@ class VisualPetDisplayConfig {
             @ConfigOption(
                 name = "Unfilled Ring Color",
                 desc = "The color of the unfilled portion of the ring.\n" +
-                    "§7Default: §#§c§0§c§0§c§0§/C0C0C0"
+                    "§7Default: §#§c§0§c§0§c§0§/#C0C0C0"
             )
             @ConfigEditorColour
             val unfilledColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(192, 192, 192, 0, 255))
@@ -96,23 +96,23 @@ class VisualPetDisplayConfig {
         class RarityColorConfig {
             @Expose
             @ConfigOption(
-                name = "§fCommon §rBackground Color",
-                desc = "§7Default: §#§f§f§f§f§f§f§/FFFFFF"
+                name = "§fCommon §rColor",
+                desc = "§7Default: §#§f§f§f§f§f§f§/#FFFFFF"
             )
             @ConfigEditorColour
             val commonColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(255, 255, 255, 0, 255))
 
             @Expose
             @ConfigOption(
-                name = "§aUncommon §rBackground Color",
-                desc = "§7Default: §#§5§5§f§f§5§5§/55FF55"
+                name = "§aUncommon §rColor",
+                desc = "§7Default: §#§5§5§f§f§5§5§/#55FF55"
             )
             @ConfigEditorColour
             val uncommonColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(85, 255, 85, 0, 255))
 
             @Expose
             @ConfigOption(
-                name = "§9Rare §rBackground Color",
+                name = "§9Rare §rColor",
                 desc = "§7Default: §#§5§5§5§5§f§f§/#5555FF"
             )
             @ConfigEditorColour
@@ -120,7 +120,7 @@ class VisualPetDisplayConfig {
 
             @Expose
             @ConfigOption(
-                name = "§5Epic §rBackground Color",
+                name = "§5Epic §rColor",
                 desc = "§7Default: §#§a§a§0§0§a§a§/#AA00AA"
             )
             @ConfigEditorColour
@@ -128,7 +128,7 @@ class VisualPetDisplayConfig {
 
             @Expose
             @ConfigOption(
-                name = "§6Legendary §rBackground Color",
+                name = "§6Legendary §rColor",
                 desc = "§7Default: §#§f§f§a§a§0§0§/#FFAA00"
             )
             @ConfigEditorColour
@@ -136,7 +136,7 @@ class VisualPetDisplayConfig {
 
             @Expose
             @ConfigOption(
-                name = "§dMythic §rBackground Color",
+                name = "§dMythic §rColor",
                 desc = "§7Default: §#§f§f§5§5§f§f§/#FF55FF"
             )
             @ConfigEditorColour
