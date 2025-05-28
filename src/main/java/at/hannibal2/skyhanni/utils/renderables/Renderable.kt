@@ -2,15 +2,19 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
+//#if TODO
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
+//#endif
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
+//#if TODO
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+//#endif
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -32,20 +36,24 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
+//#if TODO
 import at.hannibal2.skyhanni.utils.guide.GuideGui
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
+//#endif
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
+//#if TODO
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+//#endif
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
+//#if TODO
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+//#endif
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
@@ -54,6 +62,7 @@ import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.max
 
+// todo 1.21 impl needed
 @Suppress("TooManyFunctions")
 interface Renderable {
 
@@ -99,6 +108,7 @@ interface Renderable {
             else -> null
         }
 
+        //#if TODO
         fun link(text: String, bypassChecks: Boolean = false, onLeftClick: () -> Unit): Renderable =
             link(RenderableString(text), onLeftClick, bypassChecks = bypassChecks)
 
@@ -400,6 +410,7 @@ interface Renderable {
                 }
             }
         }
+        //#endif
 
         /** Bottom Layer must be bigger then the top layer */
         fun doubleLayered(
@@ -423,6 +434,7 @@ interface Renderable {
             }
         }
 
+        //#if TODO
         fun itemStackWithTip(
             item: ItemStack,
             scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -444,6 +456,7 @@ interface Renderable {
             item.getTooltipCompat(false),
             stack = item,
         )
+        //#endif
 
         fun itemStack(
             item: ItemStack,
@@ -468,6 +481,7 @@ interface Renderable {
             }
         }
 
+        //#if TODO
         fun Renderable.darken(amount: Float = 1f) = object : Renderable {
             override val width = this@darken.width
             override val height = this@darken.height
@@ -481,6 +495,7 @@ interface Renderable {
                 ShaderManager.disableShader()
             }
         }
+        //#endif
 
         @Deprecated(
             "Use RenderableString instead",
@@ -531,6 +546,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) { }
         }
 
+        //#if TODO
         fun searchableTable(
             content: Map<List<Renderable>, String>,
             textInput: TextInput,
@@ -869,6 +885,7 @@ interface Renderable {
                 DrawContextUtils.translate(-(xOffset - posX).toFloat(), 0f, 0f)
             }
         }
+        //#endif
 
         fun fixedSizeColumn(
             content: Renderable,
@@ -927,6 +944,7 @@ interface Renderable {
             verticalAlign,
         )
 
+        //#if TODO
         fun scrollList(
             list: List<Renderable>,
             height: Int,
@@ -1097,6 +1115,7 @@ interface Renderable {
 
             DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
         }
+        //#endif
 
         fun filterList(content: Map<Renderable, String?>, textBox: String) =
             filterListBase(content, textBox, RenderableString("§cNo search results!"))
@@ -1115,6 +1134,7 @@ interface Renderable {
             return set
         }
 
+        //#if TODO
         fun searchableScrollable(
             table: Map<List<Renderable>, String>,
             key: Int,
@@ -1572,5 +1592,6 @@ interface Renderable {
                 DrawContextUtils.translate(0f, 0f, -100f)
             }
         }
+        //#endif
     }
 }

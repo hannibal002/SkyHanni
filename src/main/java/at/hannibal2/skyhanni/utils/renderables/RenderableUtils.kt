@@ -11,17 +11,22 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
+//#if TODO
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+//#endif
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+//#if TODO
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
+//#endif
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.reflect.KMutableProperty0
 
+// todo 1.21 impl needed
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
@@ -177,6 +182,7 @@ internal object RenderableUtils {
         DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
 
+    //#if TODO
     inline fun <T> MutableList<Searchable>.addNullableButton(
         label: String,
         current: T?,
@@ -401,15 +407,18 @@ internal object RenderableUtils {
         }
         return Renderable.table(outerList, xPadding = 5, yPadding = padding)
     }
+    //#endif
 }
 
 fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() -> Unit) {
     add(HorizontalContainerRenderable(buildList { builderAction() }))
 }
 
+//#if TODO
 fun MutableList<Renderable>.addLine(tips: List<String>, builderAction: MutableList<Renderable>.() -> Unit) {
     add(hoverTips(HorizontalContainerRenderable(buildList { builderAction() }, 0), tips = tips))
 }
+//#endif
 
 internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
     override val width = content.width

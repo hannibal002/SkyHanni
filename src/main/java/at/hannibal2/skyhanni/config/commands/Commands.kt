@@ -40,16 +40,11 @@ import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
-import at.hannibal2.skyhanni.test.command.CopyActionBarCommand
-import at.hannibal2.skyhanni.test.command.CopyBossbarCommand
 import at.hannibal2.skyhanni.test.command.CopyItemCommand
-import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand
-import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
@@ -340,31 +335,6 @@ object Commands {
             description = "Copies the player location as LorenzVec format to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
             callback { SkyHanniDebugsAndTests.copyLocation(it) }
-        }
-        event.register("shcopyentities") {
-            description = "Copies entities in the specified radius around the player to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyNearbyEntitiesCommand.command(it) }
-        }
-        event.register("shcopytablist") {
-            description = "Copies the tab list data to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { TabListData.copyCommand(it) }
-        }
-        event.register("shcopyactionbar") {
-            description = "Copies the action bar to the clipboard, including formatting codes"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyActionBarCommand.command(it) }
-        }
-        event.register("shcopyscoreboard") {
-            description = "Copies the scoreboard data to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyScoreboardCommand.command(it) }
-        }
-        event.register("shcopybossbar") {
-            description = "Copies the name of the bossbar to the clipboard, including formatting codes"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyBossbarCommand.command(it) }
         }
         event.register("shcopyitem") {
             description = "Copies information about the item in hand to the clipboard"

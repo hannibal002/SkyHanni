@@ -767,6 +767,21 @@ at.hannibal2.skyhanni.events.ItemInHandChangeEvent.kt
 at.hannibal2.skyhanni.events.PlaySoundEvent.kt
 at.hannibal2.skyhanni.events.minecraft.ServerTickEvent.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson.kt
+at.hannibal2.skyhanni.utils.renderables.StringRenderable.kt
+at.hannibal2.skyhanni.utils.renderables.RenderableUtils.kt
+at.hannibal2.skyhanni.utils.renderables.Renderable.kt
+at.hannibal2.skyhanni.utils.DisplayTableEntry.kt
+at/hannibal2/skyhanni/utils/renderables/container/ContainerRenderable.kt
+at/hannibal2/skyhanni/utils/renderables/ScrollInput.kt
+at.hannibal2.skyhanni.features.inventory.ItemPickupLog.kt
+at.hannibal2.skyhanni.events.PurseChangeEvent.kt
+at.hannibal2.skyhanni.data.PurseApi.kt
+at.hannibal2.skyhanni.test.command.CopyScoreboardCommand.kt
+at.hannibal2.skyhanni.test.command.CopyActionBarCommand.kt
+at.hannibal2.skyhanni.test.command.CopyBossbarCommand.kt
+at.hannibal2.skyhanni.data.BossbarData.kt
+at.hannibal2.skyhanni.events.BossbarUpdateEvent.kt
+
 
 
 # \.(?!kt|java|\()

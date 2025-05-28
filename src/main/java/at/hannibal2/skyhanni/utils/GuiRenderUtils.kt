@@ -341,9 +341,9 @@ object GuiRenderUtils {
 
         DrawContextUtils.translate(translateX, translateY, -19f)
         DrawContextUtils.scale(finalScale, finalScale, 0.2f)
+        //#if MC < 1.21
         GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
 
-        //#if MC < 1.21
         RenderHelper.enableGUIStandardItemLighting()
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
 

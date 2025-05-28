@@ -27,8 +27,10 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 //#if TODO
 import at.hannibal2.skyhanni.utils.render.LineDrawer
+//#endif
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+//#if TODO
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 //#endif
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -493,7 +495,6 @@ object RenderUtils {
         GuiEditManager.add(this, posLabel, longestX, offsetY)
     }
 
-    //#if TODO
     fun Position.renderRenderables(
         renderables: List<Renderable>,
         extraSpace: Int = 0,
@@ -535,6 +536,7 @@ object RenderUtils {
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
+    //#if TODO
     // totally not modified Autumn Client's TargetStrafe
     fun drawCircle(entity: Entity, partialTicks: Float, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
