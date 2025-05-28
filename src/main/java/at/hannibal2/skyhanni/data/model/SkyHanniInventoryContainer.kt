@@ -15,8 +15,8 @@ class SkyHanniInventoryContainer(
     @Expose val rowSize: Int,
     @Expose var items: List<ItemStack?>,
     @Expose var displayName: String = internalName,
-    @Expose val primaryCords : LorenzVec? = null,
-    @Expose val secondaryCords : LorenzVec? = null,
+    @Expose val primaryCords: LorenzVec? = null,
+    @Expose val secondaryCords: LorenzVec? = null,
 ) {
     fun toRenderable(scale: Double = 1.0): Renderable =
         VerticalContainerRenderable(

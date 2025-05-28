@@ -358,7 +358,7 @@ object CollectionUtils {
         }
     }
 
-    fun <K, V> MutableMap<K, V>.removeIf(predicate: (K,V) -> Boolean) {
+    fun <K, V> MutableMap<K, V>.removeIf(predicate: (K, V) -> Boolean) {
         val iterator = this.entries.iterator()
         while (iterator.hasNext()) {
             val next = iterator.next()
