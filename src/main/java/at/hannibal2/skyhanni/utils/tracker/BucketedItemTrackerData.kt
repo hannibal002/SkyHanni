@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
+import kotlin.reflect.KClass
 
-abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
+abstract class BucketedItemTrackerData<E : Enum<E>>(clazz: KClass<E>) : ItemTrackerData() {
 
     @Deprecated("Use getBucketItems(bucket) instead", ReplaceWith("getBucketItems(bucket)"))
     override fun getDescription(timesGained: Long): List<String> =
@@ -60,25 +59,11 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
         }
     }
 
-    val selectableBuckets get() = buckets.filter { it.isBucketSelectable() }
+    private val buckets: Array<E> = clazz.java.enumConstants
+    val selectableBuckets: List<E> = buckets.filter { it.isBucketSelectable() }
 
-    private val buckets: Array<E> by lazy {
-        @Suppress("UNCHECKED_CAST")
-        selectedBucket?.javaClass?.enumConstants
-            ?: (this.javaClass.genericSuperclass as? ParameterizedTypeImpl)?.actualTypeArguments?.firstOrNull()?.let { type ->
-                (type as? Class<E>)?.enumConstants
-            } ?: throwBucketInitError()
-    }
-
-    private val scrollValues: Map<E?, ScrollValue> by lazy {
-        buckets.associateWith { ScrollValue() } + (null to ScrollValue())
-    }
-
-    private fun throwBucketInitError(): Nothing = ErrorManager.skyHanniError(
-        "Unable to retrieve enum constants for E in BucketedItemTrackerData",
-        "selectedBucket" to selectedBucket,
-        "dataClass" to this.javaClass.superclass.name,
-    )
+    private val scrollValues: Map<E?, ScrollValue> = buckets.associateWith { ScrollValue() } + (null to ScrollValue())
+    val selectedScrollValue: ScrollValue get() = scrollValues[selectedBucket] ?: ScrollValue()
 
     @Expose
     var selectedBucket: E? = null
@@ -87,7 +72,6 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
     val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = mutableMapOf()
 
     private val E.items get() = bucketedItems[this] ?: mutableMapOf()
-    val selectedScrollValue: ScrollValue get() = scrollValues[selectedBucket] ?: throwBucketInitError()
     val selectedBucketItems get() = selectedBucket?.items ?: flattenBucketsItems()
 
     private fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =

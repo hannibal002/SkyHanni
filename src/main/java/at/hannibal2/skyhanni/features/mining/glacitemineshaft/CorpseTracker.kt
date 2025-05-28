@@ -42,7 +42,7 @@ object CorpseTracker {
         { drawDisplay(it) },
     )
 
-    class BucketData : BucketedItemTrackerData<CorpseType>() {
+    class BucketData : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
         override fun resetItems() {
             corpsesLooted = enumMapOf()
         }
