@@ -152,7 +152,7 @@ object HypixelCommands {
     }
 
     fun partyChat(message: String, prefix: Boolean = false) {
-        when(prefix) {
+        when (prefix) {
             false -> send("pc $message")
             true -> send("pc [Skyhanni] $message")
         }
