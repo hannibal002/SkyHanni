@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
-import at.hannibal2.skyhanni.data.model.SkyHanniInventoryContainer
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
@@ -644,9 +643,6 @@ class ProfileSpecificStorage {
         @Expose
         var currentSlot: Int? = null
     }
-
-    @Expose
-    val storage: MutableMap<String, SkyHanniInventoryContainer> = mutableMapOf()
 
     // - mining
     @Expose

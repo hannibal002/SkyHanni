@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
+import at.hannibal2.skyhanni.config.StorageData
 //#if TODO
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -113,6 +114,7 @@ object SkyHanniMod {
     //#if TODO
     lateinit var sackData: SackData
     //#endif
+    lateinit var storageData: StorageData
     lateinit var friendsData: FriendsJson
     lateinit var knownFeaturesData: KnownFeaturesJson
     //#if TODO

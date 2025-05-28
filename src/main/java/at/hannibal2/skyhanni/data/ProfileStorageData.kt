@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.SackData
+import at.hannibal2.skyhanni.config.StorageData
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -32,10 +33,14 @@ object ProfileStorageData {
     var sackProfiles: SackData.ProfileSpecific? = null
     private var hypixelDataLoaded = false
 
+    private var storagePlayer: StorageData.PlayerSpecific? = null
+    var storageProfiles: StorageData.ProfileSpecific? = null
+
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val storagePlayer = storagePlayer
         val profileName = event.name
         if (playerSpecific == null) {
             DelayedRun.runDelayed(10.seconds) {
@@ -46,8 +51,11 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
+        if (storagePlayer == null) {
+            ErrorManager.skyHanniError("storagePlayer is null in ProfileJoinEvent!")
+        }
 
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, profileName)
         ConfigLoadEvent.post()
     }
 
@@ -55,6 +63,7 @@ object ProfileStorageData {
         println("workaroundIn10SecondsProfileStorage")
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
+        val storagePlayer = storagePlayer
 
         if (playerSpecific == null) {
             ErrorManager.skyHanniError(
@@ -68,7 +77,11 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        if (storagePlayer == null) {
+            ErrorManager.skyHanniError("storagePlayer is null in ProfileJoinEvent!")
+        }
+
+        loadProfileSpecific(playerSpecific, sackPlayers, storagePlayer, profileName)
         ConfigLoadEvent.post()
     }
 
@@ -112,11 +125,13 @@ object ProfileStorageData {
     private fun loadProfileSpecific(
         playerSpecific: PlayerSpecificStorage,
         sackProfile: SackData.PlayerSpecific,
+        storagePlayer: StorageData.PlayerSpecific,
         profileName: String,
     ) {
         noTabListTime = SimpleTimeMark.farPast()
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
+        storageProfiles = storagePlayer.profiles.getOrPut(profileName) { StorageData.ProfileSpecific() }
         loaded = true
         ConfigLoadEvent.post()
     }
@@ -126,6 +141,7 @@ object ProfileStorageData {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
+        storagePlayer = SkyHanniMod.storageData.players.getOrPut(playerUuid) { StorageData.PlayerSpecific() }
         ConfigLoadEvent.post()
     }
 
