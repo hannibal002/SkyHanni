@@ -92,7 +92,7 @@ object GetFromSackApi {
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
             // TODO find a better workaround
-            ChatUtils.sendMessageToServer("/gfs ${item.internalName.asString().replace('-', ':')} ${item.amount}")
+            HypixelCommands.getFromSacks(item.internalName.asString().replace('-', ':'), item.amount)
             lastTimeOfCommand = ChatUtils.getTimeWhenNewlyQueuedMessageGetsExecuted()
         }
     }

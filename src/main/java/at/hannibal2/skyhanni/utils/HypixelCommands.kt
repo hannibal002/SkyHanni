@@ -72,7 +72,7 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        GetFromSackApi.getFromSack(itemName.toInternalName(), amount)
+        send("gfs $itemName $amount")
     }
 
     fun widget() {
