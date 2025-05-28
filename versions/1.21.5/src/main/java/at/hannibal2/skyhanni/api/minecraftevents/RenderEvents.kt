@@ -46,8 +46,6 @@ object RenderEvents {
 
         // BlockOverlayRenderEvent
 
-        // DrawBackgroundEvent
-
         // GuiActionPerformedEvent
 
         // InitializeGuiEvent

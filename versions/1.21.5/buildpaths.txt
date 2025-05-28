@@ -781,7 +781,11 @@ at.hannibal2.skyhanni.test.command.CopyActionBarCommand.kt
 at.hannibal2.skyhanni.test.command.CopyBossbarCommand.kt
 at.hannibal2.skyhanni.data.BossbarData.kt
 at.hannibal2.skyhanni.events.BossbarUpdateEvent.kt
-
-
+at.hannibal2.skyhanni.data.model.TextInput.kt
+at.hannibal2.skyhanni.utils.renderables.SearchTextInput.kt
+at.hannibal2.skyhanni.utils.renderables.Searchable.kt
+at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.kt
+at.hannibal2.skyhanni.mixins.transformers.MixinHandledScreen.java
+at.hannibal2.skyhanni.events.minecraft.KeyTypedEvent.kt
 
 # \.(?!kt|java|\()

@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 //#endif
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
-//#if TODO
 import at.hannibal2.skyhanni.data.model.TextInput
+//#if TODO
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
@@ -309,6 +309,7 @@ interface Renderable {
                 }
             }
         }
+        //#endif
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
             val guiScreen = Minecraft.getMinecraft().currentScreen.takeIf { it != null } ?: return false
@@ -320,8 +321,15 @@ interface Renderable {
 
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
-                ToolTipData.lastSlot == null || GuiData.preDrawEventCancelled
+            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign
+                //#if TODO
+                && guiScreen !is GuideGui<*>
+                //#endif
+                ) {
+                ToolTipData.lastSlot == null
+                    //#if TODO
+                    || GuiData.preDrawEventCancelled
+                    //#endif
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 
@@ -366,6 +374,7 @@ interface Renderable {
             return result
         }
 
+        //#if TODO
         fun underlined(renderable: Renderable, color: Color = Color.WHITE) = object : Renderable {
             override val width: Int
                 get() = renderable.width
@@ -546,7 +555,6 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) { }
         }
 
-        //#if TODO
         fun searchableTable(
             content: Map<List<Renderable>, String>,
             textInput: TextInput,
@@ -732,7 +740,6 @@ interface Renderable {
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
                     textInput.makeActive()
-                    textInput.handle()
                     val yOff: Int = if (shouldRenderTopElseBottom) 0 else content.height + ySpacing
                     if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && (-99).isKeyClicked()) {
                         textInput.clear()
@@ -757,6 +764,7 @@ interface Renderable {
 
         }
 
+        //#if TODO
         fun progressBar(
             percent: Double,
             startColor: Color = Color(255, 0, 0),
@@ -944,7 +952,6 @@ interface Renderable {
             verticalAlign,
         )
 
-        //#if TODO
         fun scrollList(
             list: List<Renderable>,
             height: Int,
@@ -1115,7 +1122,6 @@ interface Renderable {
 
             DrawContextUtils.translate(0f, -renderY.toFloat(), 0f)
         }
-        //#endif
 
         fun filterList(content: Map<Renderable, String?>, textBox: String) =
             filterListBase(content, textBox, RenderableString("§cNo search results!"))
