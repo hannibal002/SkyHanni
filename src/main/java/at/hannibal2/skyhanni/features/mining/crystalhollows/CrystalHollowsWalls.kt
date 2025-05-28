@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.inflateBlock
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.QuadDrawer
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 
@@ -96,23 +97,23 @@ object CrystalHollowsWalls {
         }
     }
 
-    private fun drawGoblin(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawGoblin(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
         drawArea(true, false, Area.JUNGLE.color, Area.PRECURSOR.color)
     }
 
-    private fun drawJungle(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawJungle(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
         drawArea(true, true, Area.GOBLIN.color, Area.MITHRIL.color)
     }
 
-    private fun drawPrecursor(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawPrecursor(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
         drawArea(false, false, Area.MITHRIL.color, Area.GOBLIN.color)
     }
 
-    private fun drawMithril(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawMithril(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
         drawArea(false, true, Area.PRECURSOR.color, Area.JUNGLE.color)
     }
 
-    private fun drawHeat(event: SkyHanniRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+    private fun drawHeat(event: SkyHanniRenderWorldEvent) = QuadDrawer.draw3D(event.partialTicks) {
         val heatHeight = HEAT_HEIGHT.shiftNY()
         draw(
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.minZ),
@@ -133,7 +134,7 @@ object CrystalHollowsWalls {
         val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) =
             nucleusBBInflate.getCornersAtHeight(nucleusBBInflate.maxY)
 
-        RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
+        QuadDrawer.draw3D(event.partialTicks) {
             draw(
                 southEastCorner,
                 southWestCorner,
@@ -191,7 +192,7 @@ object CrystalHollowsWalls {
         }
     }
 
-    private fun RenderUtils.QuadDrawer.drawArea(
+    private fun QuadDrawer.drawArea(
         isMinXElseMaxX: Boolean,
         isMinZElseMaxZ: Boolean,
         color1: Color,
@@ -248,7 +249,7 @@ object CrystalHollowsWalls {
         )
     }
 
-    private fun RenderUtils.QuadDrawer.drawHeatAreaForHeat(
+    private fun QuadDrawer.drawHeatAreaForHeat(
         isMinXElseMaxX: Boolean,
         isMinZElseMaxZ: Boolean,
         color: Color,
@@ -264,7 +265,7 @@ object CrystalHollowsWalls {
         z = if (isMinZElseMaxZ) MIN_Z else MAX_Z,
     )
 
-    private fun RenderUtils.QuadDrawer.drawHeatArea(
+    private fun QuadDrawer.drawHeatArea(
         color: Color,
         heatHeight: Double,
         nucleusX: Double,

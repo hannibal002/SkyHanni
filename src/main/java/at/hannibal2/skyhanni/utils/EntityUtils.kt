@@ -190,11 +190,11 @@ object EntityUtils {
     }?.asSequence()?.filterNotNull().orEmpty()
     //#endif
 
-    fun Entity.canBeSeen(viewDistance: Number = 150.0): Boolean {
+    fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
         if (isDead) return false
         // TODO add cache that only updates e.g. 10 times a second
         if (!FrustumUtils.isVisible(entityBoundingBox)) return false
-        return getLorenzVec().up(0.5).canBeSeen(viewDistance)
+        return getLorenzVec().up(vecYOffset).canBeSeen(viewDistance)
     }
 
     fun getEntityByID(entityId: Int): Entity? = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
