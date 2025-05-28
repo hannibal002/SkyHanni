@@ -19,14 +19,14 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -41,17 +41,20 @@ val purseRegex = Regex("""(?:Purse|Piggy): ([\d,]+)[\d.]*""")
 val motesRegex = Regex("""Motes: ([\d,]+)""")
 val bitsRegex = Regex("""Bits: ([\d|,]+)[\d|.]*""")
 
-private fun getVisitingName(): String {
-    val tabData = TabListData.getTabList()
-    val ownerRegex = Regex(".*Owner: (\\w+).*")
-    for (line in tabData) {
-        val colorlessLine = line.removeColor()
-        if (ownerRegex.matches(colorlessLine)) {
-            return ownerRegex.find(colorlessLine)!!.groupValues[1]
-        }
-    }
-    return "Someone"
-}
+// There is no consistent way to get the full username of the owner of an island you are visiting (as far as I know)
+// so this will be removed until/unless they add it back
+//
+// private fun getVisitingName(): String {
+//     val tabData = TabListData.getTabList()
+//     val ownerRegex = Regex(".*Owner: (\\w+).*")
+//     for (line in tabData) {
+//         val colorlessLine = line.removeColor()
+//         if (ownerRegex.matches(colorlessLine)) {
+//             return ownerRegex.find(colorlessLine)!!.groupValues[1]
+//         }
+//     }
+//     return "Someone"
+// }
 
 var beenAfkFor = SimpleTimeMark.now()
 
@@ -88,12 +91,13 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     LOCATION(
         {
-            var location = LorenzUtils.skyBlockArea ?: "invalid"
-            val island = LorenzUtils.skyBlockIsland
+            // graphArea kept giving me no_area on my private island
+            var location = SkyBlockUtils.scoreboardArea ?: "invalid"
+            val island = SkyBlockUtils.currentIsland
 
             if (location == "Your Island") location = "Private Island"
             lastKnownDisplayStrings[LOCATION] = when (island) {
-                IslandType.PRIVATE_ISLAND_GUEST -> "${getVisitingName()}'s Island"
+                IslandType.PRIVATE_ISLAND_GUEST -> "Visiting an Island"
 
                 IslandType.GARDEN -> {
                     if (location.startsWith("Plot: ")) "Personal Garden ($location)" // Personal Garden (Plot: 8)
@@ -102,11 +106,11 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
                 IslandType.GARDEN_GUEST -> {
                     // Ensure getVisitingName() is used to generate the full string
-                    if (location.startsWith("Plot: ")) "${getVisitingName()}'s Garden ($location)"
-                    else "${getVisitingName()}'s Garden"
+                    if (location.startsWith("Plot: ")) "Visiting a Garden ($location)"
+                    else "Visiting a Garden"
                 }
 
-                else -> location.takeIf { it != "None" && it != "invalid" }
+                else -> location.takeIf { it != "None" && it != "invalid" && it != "no_area" }
                     ?: lastKnownDisplayStrings[LOCATION].orEmpty()
             }
 
@@ -182,14 +186,14 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     PROFILE(
         {
-            val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
+            val sbLevel = AdvancedPlayerList.tabPlayerData[PlayerUtils.getName()]?.sbLevel?.toString() ?: "?"
             var profile = "SkyBlock Level: [$sbLevel] on "
 
             profile += when {
 
-                LorenzUtils.isIronmanProfile -> "♲"
-                LorenzUtils.isBingoProfile -> "Ⓑ"
-                LorenzUtils.isStrandedProfile -> "☀"
+                SkyBlockUtils.isIronmanProfile -> "♲"
+                SkyBlockUtils.isBingoProfile -> "Ⓑ"
+                SkyBlockUtils.isStrandedProfile -> "☀"
                 else -> ""
             }
 

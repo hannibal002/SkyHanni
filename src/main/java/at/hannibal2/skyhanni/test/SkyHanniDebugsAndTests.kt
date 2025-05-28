@@ -41,7 +41,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -54,6 +53,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -65,6 +65,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import java.io.File
+import java.time.LocalDate
+import java.time.Month
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -73,6 +75,7 @@ object SkyHanniDebugsAndTests {
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
+    @Suppress("MemberVisibilityCanBePrivate")
     var displayList = emptyList<Renderable>()
 
     var globalRender = true
@@ -94,6 +97,20 @@ object SkyHanniDebugsAndTests {
     private fun print(text: String) {
         LorenzDebug.log(text)
     }
+
+    private var previousApril = false
+
+    val isAprilFoolsDay: Boolean
+        get() {
+            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
+            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
+            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
+            val result = (!never && (always || itsTime))
+            previousApril = result
+            return result
+        }
+
+    val enabled get() = SkyBlockUtils.onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
     private var testLocation: LorenzVec? = null
 
@@ -133,10 +150,12 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    @Suppress("EmptyFunctionBlock")
+    @Suppress("UNUSED_PARAMETER")
     private fun asyncTest(args: Array<String>) {
+        ChatUtils.chat("§fTest successful!")
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun findNullConfig(args: Array<String>) {
         println("start null finder")
         findNull(SkyHanniMod.feature, "config")
@@ -300,8 +319,8 @@ object SkyHanniDebugsAndTests {
     }
 
     fun whereAmI() {
-        if (LorenzUtils.inSkyBlock) {
-            ChatUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
+        if (SkyBlockUtils.inSkyBlock) {
+            ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
             return
         }
         ChatUtils.chat("§eYou are not in Skyblock.")
@@ -369,8 +388,8 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    @HandleEvent
-    fun onKeybind(event: GuiKeyPressEvent) {
+    @HandleEvent(GuiKeyPressEvent::class)
+    fun onKeybind() {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
         val focussedSlot = slotUnderCursor() ?: return
         val stack = focussedSlot.stack ?: return
@@ -465,14 +484,13 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @HandleEvent
+    @HandleEvent(SkyHanniChatEvent::class)
     @Suppress("EmptyFunctionBlock")
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat() {
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    @Suppress("ConstantConditionIf")
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
+    fun onRenderOverlay() {
         if (Minecraft.getMinecraft().gameSettings.showDebugInfo) {
             if (debugConfig.currentAreaDebug) {
                 config.debugLocationPos.renderString(
