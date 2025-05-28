@@ -44,7 +44,7 @@ object DragonProfitTracker {
         { drawDisplay(it) },
     )
 
-    class BucketData : BucketedItemTrackerData<DragonType>() {
+    class BucketData : BucketedItemTrackerData<DragonType>(DragonType::class) {
         override fun getCoinName(bucket: DragonType?, item: TrackedItem) = "<no coins>"
         override fun getCoinDescription(bucket: DragonType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
