@@ -23,7 +23,7 @@ object CurrentPing {
     private var waitingForPacket = false
     var averagePing = Duration.ZERO
         private set
-    val config get() = SkyHanniMod.feature.dev
+    private val config get() = SkyHanniMod.feature.dev
 
     @Suppress("UNUSED_PARAMETER")
     fun onPingPacket(packet: ClientboundPingPacket) {
@@ -60,5 +60,5 @@ object CurrentPing {
         }
     }
 
-    fun isEnabled() = config.hypixelPingApi
+    private fun isEnabled() = config.hypixelPingApi
 }

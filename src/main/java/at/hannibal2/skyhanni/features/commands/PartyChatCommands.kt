@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -23,12 +22,13 @@ import kotlin.time.Duration.Companion.seconds
 object PartyChatCommands {
     private val config get() = SkyHanniMod.feature.misc.partyCommands
     private val storage get() = SkyHanniMod.feature.storage
+    private val devConfig get() = SkyHanniMod.feature.dev
 
     data class PartyChatCommand(
         val names: List<String>,
         val isEnabled: () -> Boolean,
-        val requiresPartyLead: Boolean,
-        val worksOnSelf: Boolean,
+        val requiresPartyLead: Boolean = true,
+        val triggerableBySelf: Boolean = true,
         val executable: (PartyChatEvent) -> Unit,
     )
 
@@ -39,8 +39,7 @@ object PartyChatCommands {
         PartyChatCommand(
             listOf("pt", "ptme", "transfer"),
             { config.transferCommand },
-            requiresPartyLead = true,
-            worksOnSelf = false,
+            triggerableBySelf = false,
             executable = {
                 HypixelCommands.partyTransfer(it.cleanedAuthor)
             },
@@ -48,47 +47,38 @@ object PartyChatCommands {
         PartyChatCommand(
             listOf("pw", "warp", "warpus"),
             { config.warpCommand && lastWarp.passedSince() > 5.seconds },
-            requiresPartyLead = true,
-            worksOnSelf = true,
             executable = {
                 lastWarp = SimpleTimeMark.now()
-                DelayedRun.runNextTick {
-                    HypixelCommands.partyWarp()
-                }
+                HypixelCommands.partyWarp()
             },
         ),
         PartyChatCommand(
             listOf("allinv", "allinvite"),
             { config.allInviteCommand && lastAllInvite.passedSince() > 2.seconds },
-            requiresPartyLead = true,
-            worksOnSelf = true,
             executable = {
                 lastAllInvite = SimpleTimeMark.now()
-                DelayedRun.runNextTick {
-                    HypixelCommands.partyAllInvite()
-                }
+                HypixelCommands.partyAllInvite()
             },
         ),
         PartyChatCommand(
             listOf("ping"),
             { config.pingCommand },
             requiresPartyLead = false,
-            worksOnSelf = true,
             executable = {
-                if (!CurrentPing.isEnabled()) {
+
+                if (!devConfig.hypixelPingApi) {
+
                     ChatUtils.clickableChat(
                         "Hypixel Ping Api is disabled, ping command won't work!",
                         prefixColor = "§c",
                         onClick = {
-                            CurrentPing.config::hypixelPingApi.jumpToEditor()
+                            devConfig::hypixelPingApi.jumpToEditor()
                         },
                         hover = "§eClick to find setting in the config!",
                     )
                     return@PartyChatCommand
                 }
-                DelayedRun.runNextTick {
-                    HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms")
-                }
+                HypixelCommands.partyChat("Current Ping: ${CurrentPing.averagePing.inWholeMilliseconds.addSeparators()}ms", true)
 
             },
         ),
@@ -96,10 +86,11 @@ object PartyChatCommands {
             listOf("tps"),
             { config.tpsCommand },
             requiresPartyLead = false,
-            worksOnSelf = true,
             executable = {
-                DelayedRun.runNextTick {
-                    HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}")
+                if (TpsCounter.tps != null) {
+                    HypixelCommands.partyChat("Current TPS: ${TpsCounter.tps}", true)
+                } else {
+                    ChatUtils.chat("TPS Command Sent too early to calculate TPS", true)
                 }
             },
         ),
@@ -135,7 +126,7 @@ object PartyChatCommands {
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
         val name = event.cleanedAuthor
-        if (name == LorenzUtils.getPlayerName() && !command.worksOnSelf) return
+        if (name == LorenzUtils.getPlayerName() && !command.triggerableBySelf) return
         if (!command.isEnabled()) return
         if (command.requiresPartyLead && PartyApi.partyLeader != LorenzUtils.getPlayerName()) return
         if (isBlockedUser(name)) {
