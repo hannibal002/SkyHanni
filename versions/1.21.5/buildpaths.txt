@@ -766,7 +766,7 @@ at.hannibal2.skyhanni.data.MinecraftData.kt
 at.hannibal2.skyhanni.events.ItemInHandChangeEvent.kt
 at.hannibal2.skyhanni.events.PlaySoundEvent.kt
 at.hannibal2.skyhanni.events.minecraft.ServerTickEvent.kt
-
+at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson.kt
 
 
 # \.(?!kt|java|\()

@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetApi
 //#if TODO
 import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 //#endif
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -22,7 +22,9 @@ import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -619,9 +621,11 @@ object ItemUtils {
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.repoItemNameCompact: String
         get() {
+            //#if TODO
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
             }
+            //#endif
             return getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
         }
 
