@@ -32,7 +32,9 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.Locat
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
+//#endif
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 //#endif
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
@@ -434,6 +436,7 @@ class ProfileSpecificStorage {
     // - fame
     @Expose
     var communityShopProfileUpgrade: CommunityShopUpgrade? = null
+    //#endif
 
     // - fishing
     @Expose
@@ -443,10 +446,11 @@ class ProfileSpecificStorage {
         @Expose
         var fishingProfitTracker: FishingProfitTracker.Data = FishingProfitTracker.Data()
 
+        //#if TODO
         @Expose
         var seaCreatureTracker: SeaCreatureTracker.Data = SeaCreatureTracker.Data()
+        //#endif
     }
-    //#endif
 
     // - garden
     @Expose
