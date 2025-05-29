@@ -71,8 +71,9 @@ object HypixelCommands {
         send("sethome")
     }
 
-    fun getFromSacks(itemName: String, amount: Int) {
-        send("gfs $itemName $amount")
+    @Deprecated("do not send /gfs commands manually to hypixel. use GetFromSackApi.")
+    fun getFromSacks(internalName: NeuInternalName, amount: Int) {
+        GetFromSackApi.getFromSack(internalName, amount)
     }
 
     fun widget() {
