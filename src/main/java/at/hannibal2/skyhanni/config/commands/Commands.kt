@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
-import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
@@ -205,11 +204,6 @@ object Commands {
     }
 
     private fun usersBugFix(event: CommandRegistrationEvent) {
-        event.register("shupdaterepo") {
-            description = "Download the SkyHanni repo again"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { RepoManager.updateRepo() }
-        }
         event.register("shfixminions") {
             description = "Removed bugged minion locations from your private island"
             category = CommandCategory.USERS_BUG_FIX
@@ -229,11 +223,6 @@ object Commands {
             description = "Toggles if the specified crops effect is active from carrolyn"
             category = CommandCategory.USERS_BUG_FIX
             callback { CaptureFarmingGear.handelCarrolyn(it) }
-        }
-        event.register("shrepostatus") {
-            description = "Shows the status of all the mods constants"
-            category = CommandCategory.USERS_BUG_FIX
-            callback { RepoManager.displayRepoStatus(false) }
         }
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."
@@ -349,11 +338,6 @@ object Commands {
             description = "Unused test command."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.testCommand(it) }
-        }
-        event.register("shreloadlocalrepo") {
-            description = "Reloading the local repo data"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { RepoManager.reloadLocalRepo() }
         }
         event.register("shrepopatterns") {
             description = "See where regexes are loaded from"

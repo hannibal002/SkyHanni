@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -428,6 +431,25 @@ object RepoManager {
             println("Successfully switched to backup repo")
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Failed to switch to backup repo")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shupdaterepo") {
+            description = "Download the SkyHanni repo again"
+            category = CommandCategory.USERS_BUG_FIX
+            simpleCallback { updateRepo() }
+        }
+        event.registerBrigadier("shrepostatus") {
+            description = "Shows the status of all the mods constants"
+            category = CommandCategory.USERS_BUG_FIX
+            simpleCallback { displayRepoStatus(false) }
+        }
+        event.registerBrigadier("shreloadlocalrepo") {
+            description = "Reloading the local repo data"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { reloadLocalRepo() }
         }
     }
 }

@@ -193,11 +193,7 @@ object FishingApi {
     }
 
     fun isFishing(checkRodInHand: Boolean = true) =
-        //#if TODO
         (IsFishingDetection.isFishing || (checkRodInHand && holdingRod)) && !DungeonApi.inDungeon()
-    //#else
-    //$$ false
-    //#endif
 
     fun seaCreatureCount(entity: EntityArmorStand): Int {
         if (countIsZero(entity)) return 0
