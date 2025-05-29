@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.effect
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -115,7 +116,6 @@ object EffectApi {
 
     // Todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
-    @Suppress("MaxLineLength")
     fun onChat(event: SkyHanniChatEvent) {
         hotChocolateMixinConsumePattern.matchMatcher(event.message) {
             val durationAdded = TimeUtils.getDuration(group("time"))
@@ -203,12 +203,7 @@ object EffectApi {
         footerLines.readNonGodPotEffects()
     }
 
-    @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        event.readPestRepellent()
-        event.readEffects()
-    }
-
+    @HandleEvent(onlyOnSkyblock = true)
     private fun WidgetUpdateEvent.readEffects() {
         if (!isWidget(TabWidget.ACTIVE_EFFECTS)) return
         godPotTabPattern.firstMatcher(lines) {
@@ -229,6 +224,7 @@ object EffectApi {
         }
     }
 
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     private fun WidgetUpdateEvent.readPestRepellent() {
         if (!isWidget(TabWidget.PESTS)) return
 
