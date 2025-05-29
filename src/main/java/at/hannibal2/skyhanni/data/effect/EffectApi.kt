@@ -204,7 +204,7 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun WidgetUpdateEvent.readEffects() {
+    fun WidgetUpdateEvent.readEffects() {
         if (!isWidget(TabWidget.ACTIVE_EFFECTS)) return
         godPotTabPattern.firstMatcher(lines) {
             profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
@@ -225,7 +225,7 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    private fun WidgetUpdateEvent.readPestRepellent() {
+    fun WidgetUpdateEvent.readPestRepellent() {
         if (!isWidget(TabWidget.PESTS)) return
 
         repellentPattern.firstMatcher(lines) {
