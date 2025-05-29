@@ -42,7 +42,7 @@ object CorpseTracker {
         { drawDisplay(it) },
     )
 
-    class BucketData : BucketedItemTrackerData<CorpseType>() {
+    class BucketData : BucketedItemTrackerData<CorpseType>(CorpseType::class) {
         override fun resetItems() {
             corpsesLooted = enumMapOf()
         }
@@ -87,7 +87,7 @@ object CorpseTracker {
         for ((itemName, amount) in event.loot) {
             if (itemName.removeColor().trim() == "Glacite Powder") continue
             NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
-                tracker.addItem(event.corpseType, item, amount, message = false)
+                tracker.addItem(event.corpseType, item, amount, command = false, message = false)
             }
         }
     }
