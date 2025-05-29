@@ -94,14 +94,14 @@ object SackApi {
      * REGEX-TEST: §f❤ Rough Ruby Gemstone
      * REGEX-TEST: §f❂ Rough Opal Gemstone
      * REGEX-TEST: §f☠ Rough Onyx Gemstone
-     * REGEX-TEST: §fα Rough Aquamarine Gemstone
+     * REGEX-TEST: §f☂ Rough Aquamarine Gemstone
      * REGEX-TEST: §a☘ Flawed Citrine Gemstone
      * REGEX-TEST: §9☘ Fine Peridot Gemstone
      * REGEX-TEST: §eTopaz Gemstones
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name",
-        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂α] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
+        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂☂] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**
