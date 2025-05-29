@@ -120,11 +120,11 @@ open class TextInput {
 
         @HandleEvent
         fun handleTextInput(event: KeyDownEvent) {
-           //#if TODO
+            //#if TODO
 
             //#else
             //$$ return
-           //#endif
+            //#endif
             val keyCode = event.keyCode
             if (KeyboardManager.isCopyingKeysDown()) {
                 OSUtils.copyToClipboard(textBox)
