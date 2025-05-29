@@ -17,7 +17,7 @@ class TestLegacyColorFormat {
             .append(Text.literal("+").withColor(Formatting.LIGHT_PURPLE))
             .append(Text.literal("] lrg89").withColor(Formatting.AQUA))
             .append(Text.literal(": test").withColor(Formatting.WHITE))
-        Assertions.assertEquals("§r§8[§r§9302§r§8] §r§6♫ §r§b[MVP§r§d+§r§b] lrg89§r§f: test§r", text.formattedTextCompat())
+        Assertions.assertEquals("§r§8[§r§9302§r§8] §r§6♫ §r§b[MVP§r§d+§r§b] lrg89§r§f: test", text.formattedTextCompat())
     }
 
 }

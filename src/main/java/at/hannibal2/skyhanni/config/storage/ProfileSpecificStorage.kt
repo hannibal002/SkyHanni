@@ -34,9 +34,7 @@ import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureT
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 //#endif
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
-//#if TODO
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
-//#endif
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 //#if TODO
 import at.hannibal2.skyhanni.features.garden.CropAccessory
@@ -446,10 +444,8 @@ class ProfileSpecificStorage {
         @Expose
         var fishingProfitTracker: FishingProfitTracker.Data = FishingProfitTracker.Data()
 
-        //#if TODO
         @Expose
         var seaCreatureTracker: SeaCreatureTracker.Data = SeaCreatureTracker.Data()
-        //#endif
     }
 
     // - garden

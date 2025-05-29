@@ -852,7 +852,7 @@ at.hannibal2.skyhanni.events.RenderItemTooltipEvent.kt
 at/hannibal2/skyhanni/mixins/hooks/GuiScreenHook.kt
 at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson.kt
-
+at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker.kt
 
 
 # \.(?!kt|java|\()
