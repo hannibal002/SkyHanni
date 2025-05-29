@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
 object HypixelCommands {
     fun skyblock() {
