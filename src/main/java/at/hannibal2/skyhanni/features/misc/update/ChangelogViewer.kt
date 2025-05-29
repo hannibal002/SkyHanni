@@ -57,7 +57,11 @@ object ChangelogViewer {
             )
             return
         }
-        getChangelog(currentVersion, targetVersion)
+        startVersion = currentVersion
+        endVersion = targetVersion
+        if (!cache.containsKeys(startVersion, endVersion)) {
+            SkyHanniMod.coroutineScope.launch { getChangelog() }
+        }
         openChangelog()
     }
 
@@ -65,76 +69,77 @@ object ChangelogViewer {
         if (Minecraft.getMinecraft().currentScreen !is ChangeLogViewerScreen) SkyHanniMod.screenToOpen = ChangeLogViewerScreen()
     }
 
-    private fun getChangelog(currentVersion: ModVersion, targetVersion: ModVersion) {
-        startVersion = currentVersion
-        endVersion = targetVersion
-        if (cache.containsKeys(startVersion, endVersion)) return
-        SkyHanniMod.coroutineScope.launch {
-            try {
-                val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
-                val data = mutableListOf<ChangelogJson>()
-                var pageNumber = 1
-                while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
-                    val jsonObject = withContext(dispatcher) {
-                        ApiUtils.getJSONResponseAsElement(
-                            url + pageNumber, apiName = "github",
-                        )
-                    }
-                    val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
-                    data.addAll(page)
-                    pageNumber++
+    private suspend fun getChangelog() {
+        try {
+            val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
+            val data = mutableListOf<ChangelogJson>()
+            var pageNumber = 1
+            while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
+                val jsonObject = withContext(dispatcher) {
+                    ApiUtils.getJSONResponseAsElement(
+                        url + pageNumber, apiName = "github",
+                    )
                 }
-                val neededData = data.filter {
-                    val sub = ModVersion.fromString(it.tagName)
-                    sub.isInBetween(startVersion, endVersion)
-                }
-                neededData.forEach { entry ->
-                    var headline = 0
-                    val basic = entry.body.replace("[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), "") // Remove GitHub link
-                        .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
-                        .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
-                        .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
-                        .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b§l$1") // Color contributors
-                        .replace("\\[(.+?)\\]\\(.+?\\)".toRegex(), "$1") // Random Links
-                        .replace("`", "\"") // Fix Code Blocks to look better
-                        .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
-                    cache[ModVersion.fromString(entry.tagName)] = basic.replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
-
-                        fun String.help(s: String): String =
-                            toRegex().find(basic.subSequence(0, it.range.first).reversed())?.groups?.get(s)?.value?.reversed().orEmpty()
-
-                        val format = "\n|(?<format>[kmolnrKMOLNR]§)".help("format")
-                        val color = "\n|(?<color>[0-9a-fA-F]§)".help("color")
-                        val content = it.groups["content"]?.value.orEmpty()
-                        "§l$content§r$format$color"
-                    } // Bolding markdown
-                        .replace("\\s*\r\n$".toRegex(), "") // Remove trailing empty Lines
-                        .split("\r\n") // Split at newlines
-                        .map { it.trimEnd() } // Remove trailing empty stuff
-                        .groupBy {
-                            if (it.startsWith("§l§9")) {
-                                headline++
-                            }
-                            headline
-                        }
-                        // Change §a to §c if in removed
-                        .mapKeys { it.value.firstOrNull().orEmpty() }.toMutableMap().also { map ->
-                            val key = "§l§9Removed Features"
-                            val subgroup = map[key] ?: return@also
-                            map[key] = subgroup.map {
-                                it.replace("§a", "§c")
-                            }
-                        }.toMap()
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Changelog Loading Failed")
+                val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
+                data.addAll(page)
+                pageNumber++
             }
+            val neededData = data.filter {
+                val sub = ModVersion.fromString(it.tagName)
+                sub.isInBetween(startVersion, endVersion)
+            }
+            neededData.forEach { entry ->
+                cache[ModVersion.fromString(entry.tagName)] = formatData(formatSttring(getBasic(entry.body)))
+            }
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Changelog Loading Failed")
         }
     }
 
+    private fun formatData(text: String): Map<String, List<String>> {
+        var headline = 0
+        return text // Bolding markdown
+            .replace("\\s*\r\n$".toRegex(), "") // Remove trailing empty Lines
+            .split("\r\n") // Split at newlines
+            .map { it.trimEnd() } // Remove trailing empty stuff
+            .groupBy {
+                if (it.startsWith("§l§9")) {
+                    headline++
+                }
+                headline
+            }
+            // Change §a to §c if in removed
+            .mapKeys { it.value.firstOrNull().orEmpty() }.toMutableMap().also { map ->
+                val key = "§l§9Removed Features"
+                val subgroup = map[key] ?: return@also
+                map[key] = subgroup.map {
+                    it.replace("§a", "§c")
+                }
+            }
+    }
+
+    private fun formatSttring(basic: String): String = basic.replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
+        fun String.help(s: String): String =
+            toRegex().find(basic.subSequence(0, it.range.first).reversed())?.groups?.get(s)?.value?.reversed().orEmpty()
+
+        val format = "\n|(?<format>[kmolnrKMOLNR]§)".help("format")
+        val color = "\n|(?<color>[0-9a-fA-F]§)".help("color")
+        val content = it.groups["content"]?.value.orEmpty()
+        "§l$content§r$format$color"
+    }
+
+    private fun getBasic(body: String): String = body.replace("[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), "") // Remove GitHub link
+        .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
+        .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
+        .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
+        .replace("(- [^-\r\n]*\r\n)".toRegex(), "§b§l$1") // Color contributors
+        .replace("\\[(.+?)\\]\\(.+?\\)".toRegex(), "$1") // Random Links
+        .replace("`", "\"") // Fix Code Blocks to look better
+        .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerComplex<CommandContext>("shchangelog") {
+        event.registerComplex("shchangelog") {
             description = "Shows the specified changelog. No arguments shows the latest changelog."
             category = CommandCategory.USERS_ACTIVE
             context = { CommandContext() }
