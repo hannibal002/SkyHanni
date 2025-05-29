@@ -52,7 +52,10 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$     this ?: return@run ""
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
-//$$         sb.append(component.style.chatStyle())
+//$$         val chatStyle = component.style.chatStyle()
+//$$         if ((sb.contains("§") && sb.toString() != "§r") || chatStyle != "§f") {
+//$$             sb.append(chatStyle)
+//$$         }
 //$$         sb.append(component.unformattedTextForChatCompat())
 //$$         sb.append("§r")
 //$$     }

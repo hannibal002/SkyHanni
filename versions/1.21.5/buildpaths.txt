@@ -820,8 +820,8 @@ at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker.kt
 at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker.kt
 at.hannibal2.skyhanni.events.mining.FossilExcavationEvent.kt
 at.hannibal2.skyhanni.features.inventory.caketracker.CakeTracker.kt
-
-
+at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson.kt
 
 
 # \.(?!kt|java|\()

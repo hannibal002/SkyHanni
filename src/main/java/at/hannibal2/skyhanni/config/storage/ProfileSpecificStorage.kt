@@ -71,8 +71,8 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 //#if TODO
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
-import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 //#endif
+import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -863,11 +863,9 @@ class ProfileSpecificStorage {
         var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
     }
 
-    //#if TODO
     // - slayer
     @Expose
     var slayerProfitData: MutableMap<String, SlayerProfitTracker.Data> = mutableMapOf()
-    //#endif
 
     @Expose
     var slayerRngMeter: MutableMap<String, SlayerRngMeterStorage> = mutableMapOf()

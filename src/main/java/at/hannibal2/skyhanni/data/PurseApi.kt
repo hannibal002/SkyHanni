@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object PurseApi {
     private val patternGroup = RepoPattern.group("data.purse")
@@ -76,11 +75,9 @@ object PurseApi {
             }
             return PurseChangeCause.GAIN_UNKNOWN
         } else {
-            //#if TODO
             if (SlayerApi.questStartTime.passedSince() < 1.5.seconds) {
                 return PurseChangeCause.LOSE_SLAYER_QUEST_STARTED
             }
-            //#endif
 
             if (diff == -6_666_666.0 || diff == -666_666.0) {
                 return PurseChangeCause.LOSE_DICE_ROLL_COST
