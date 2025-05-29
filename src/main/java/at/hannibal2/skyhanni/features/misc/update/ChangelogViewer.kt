@@ -99,10 +99,12 @@ object ChangelogViewer {
                         .replace("`", "\"") // Fix Code Blocks to look better
                         .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
                     cache[ModVersion.fromString(entry.tagName)] = basic.replace("\\*\\*(?<content>.*?)\\*\\*".toRegex()) {
-                        val format = "\n|(?<format>[kmolnrKMOLNR]§)".toRegex()
-                            .find(basic.subSequence(0, it.range.start).reversed())?.groups["format"]?.value?.reversed().orEmpty()
-                        val color = "\n|(?<color>[0-9a-fA-F]§)".toRegex()
-                            .find(basic.subSequence(0, it.range.start).reversed())?.groups["color"]?.value?.reversed().orEmpty()
+
+                        fun String.help(s: String): String =
+                            toRegex().find(basic.subSequence(0, it.range.first).reversed())?.groups?.get(s)?.value?.reversed().orEmpty()
+
+                        val format = "\n|(?<format>[kmolnrKMOLNR]§)".help("format")
+                        val color = "\n|(?<color>[0-9a-fA-F]§)".help("color")
                         val content = it.groups["content"]?.value.orEmpty()
                         "§l$content§r$format$color"
                     } // Bolding markdown
