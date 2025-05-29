@@ -76,11 +76,10 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         fun isInside(width: Int, height: Int, def: GuiElementButton): Boolean {
             val inX = (mouseX - width - x) in (0..def.width)
             val inY = (mouseY - height - y) in (0..def.height)
-            return inX && inY
+            return MouseCompat.getEventButtonState() && inX && inY
         }
 
-        val adjustedWidth = width - 20
-        if (MouseCompat.getEventButtonState() && isInside(getButtonPosition(adjustedWidth), height = 10, button)) {
+        if (isInside(getButtonPosition(width - 20), height = 10, button)) {
             when (UpdateManager.updateState) {
                 UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
                 UpdateManager.UpdateState.QUEUED -> {}
@@ -89,17 +88,17 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             }
             return true
         }
-        if (!MouseCompat.getEventButtonState() || !isInside(getChangelogPosition(width), height = 30, changelog)) return false
-        if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) return true
-        val version = UpdateManager.getNextVersion() ?: run {
-            ErrorManager.logErrorStateWithData(
-                "Can't get Changelog because of internal error",
-                "UpdateManger.getNextVersion is null even though updateState is != NONE",
-                "state" to UpdateManager.updateState,
-            )
-            return true
-        }
-        ChangelogViewer.showChangelog(currentVersion, version)
+        if (!isInside(getChangelogPosition(width), height = 30, changelog)) return false
+
+        if (UpdateManager.updateState != UpdateManager.UpdateState.NONE)
+            UpdateManager.getNextVersion()
+                ?.let { ChangelogViewer.showChangelog(currentVersion, it) }
+                ?: ErrorManager.logErrorStateWithData(
+                    "Can't get Changelog because of internal error",
+                    "UpdateManager.getNextVersion is null even though updateState is != NONE",
+                    "state" to UpdateManager.updateState
+                )
+
         return true
     }
 
