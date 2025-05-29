@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.dungeon.SpiritLeapConfig
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -165,7 +166,7 @@ object DungeonSpiritLeapOverlay {
             DungeonApi.DungeonClass.BERSERK -> config.berserkClassColor
             DungeonApi.DungeonClass.TANK -> config.tankClassColor
             DungeonApi.DungeonClass.HEALER -> config.healerClassColor
-            else -> config.defaultColor
+            else -> SpiritLeapConfig.DEFAULT_COLOR
         }
     }
 
