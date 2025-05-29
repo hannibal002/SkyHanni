@@ -7,6 +7,9 @@
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$Array&lt;Float&gt;</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x, y, z)</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
+    <ID>ChainWrapping:Renderable.kt$Renderable.Companion$&amp;&amp;</ID>
+    <ID>ChainWrapping:Renderable.kt$Renderable.Companion$||</ID>
+    <ID>CustomImportOrdering:InventoryUtils.kt$import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks import at.hannibal2.skyhanni.events.GuiContainerEvent //#endif import at.hannibal2.skyhanni.test.command.ErrorManager //#if TODO import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory //#endif import at.hannibal2.skyhanni.utils.compat.InventoryCompat.filterNotNullOrEmpty import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull import at.hannibal2.skyhanni.utils.compat.InventoryCompat import at.hannibal2.skyhanni.utils.compat.InventoryCompat.convertEmptyToNull import at.hannibal2.skyhanni.utils.compat.MinecraftCompat import at.hannibal2.skyhanni.utils.compat.normalizeAsArray import at.hannibal2.skyhanni.utils.compat.slotUnderCursor import at.hannibal2.skyhanni.utils.system.PlatformUtils import io.github.moulberry.notenoughupdates.NotEnoughUpdates import net.minecraft.client.Minecraft import net.minecraft.client.gui.inventory.GuiChest import net.minecraft.client.gui.inventory.GuiContainer import net.minecraft.client.gui.inventory.GuiInventory import net.minecraft.client.player.inventory.ContainerLocalMenu import net.minecraft.client.resources.I18n import net.minecraft.entity.player.InventoryPlayer import net.minecraft.inventory.ContainerChest import net.minecraft.inventory.IInventory import net.minecraft.inventory.Slot import net.minecraft.item.ItemStack import kotlin.time.Duration.Companion.seconds</ID>
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
     <ID>CyclomaticComplexMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:DungeonHideItems.kt$DungeonHideItems$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onCheckRender(event: CheckRenderEntityEvent&lt;Entity&gt;)</ID>
@@ -16,7 +19,6 @@
     <ID>CyclomaticComplexMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>CyclomaticComplexMethod:ItemAbilityCooldown.kt$ItemAbilityCooldown$@HandleEvent fun onPlaySound(event: PlaySoundEvent)</ID>
     <ID>CyclomaticComplexMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
-    <ID>CyclomaticComplexMethod:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NeuInternalName?</ID>
     <ID>CyclomaticComplexMethod:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
     <ID>CyclomaticComplexMethod:PacketTest.kt$PacketTest$private fun Packet&lt;*&gt;.print()</ID>
     <ID>CyclomaticComplexMethod:Renderable.kt$Renderable.Companion$internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean</ID>
@@ -25,6 +27,8 @@
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:VampireSlayerFeatures.kt$VampireSlayerFeatures$private fun EntityOtherPlayerMP.process()</ID>
     <ID>CyclomaticComplexMethod:VisualWordGui.kt$VisualWordGui$override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float)</ID>
+    <ID>Indentation:Renderable.kt$Renderable.Companion$ </ID>
+    <ID>Indentation:SlayerApi.kt$SlayerApi$ </ID>
     <ID>InjectDispatcher:ClipboardUtils.kt$ClipboardUtils$IO</ID>
     <ID>InjectDispatcher:SkyHanniMod.kt$SkyHanniMod$IO</ID>
     <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
@@ -54,7 +58,6 @@
     <ID>MemberNameEqualsClassName:PestSpawn.kt$PestSpawn$private fun pestSpawn(amount: Int, plotNames: List&lt;String&gt;, unknownAmount: Boolean)</ID>
     <ID>MemberNameEqualsClassName:Shimmy.kt$Shimmy.Companion$private fun shimmy(source: Any?, fieldName: String): Any?</ID>
     <ID>MemberNameEqualsClassName:TestBingo.kt$TestBingo$var testBingo = false</ID>
-    <ID>NoNameShadowing:BucketedItemTrackerData.kt$BucketedItemTrackerData${ it.hidden = !it.hidden }</ID>
     <ID>NoNameShadowing:ContributorManager.kt$ContributorManager${ it.isAllowed() }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Name").value(it) }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
@@ -67,26 +70,16 @@
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>PreprocessingImportOrdering:AlignmentConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:InventoryUtils.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:BroodmotherSpawnAlertConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:ChunkedStatsConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:EventsConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:InquisitorSoundConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:HypixelCommands.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:LaneSwitchSoundSettings.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:LowHealthAlertSoundConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:RepositoryConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:SkyHanniMod.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:TitleAndFooterConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:AlignmentConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:BroodmotherSpawnAlertConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:ChunkedStatsConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:EventsConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:InquisitorSoundConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:InventoryUtils.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:LaneSwitchSoundSettings.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:LowHealthAlertSoundConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:RepositoryConfig.kt$//#if TODO</ID>
-    <ID>PreprocessingImportOrdering:SkyHanniMod.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:PlayerSpecificStorage.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:ProfileSpecificStorage.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:TitleAndFooterConfig.kt$//#if TODO</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:BazaarCancelledBuyOrderClipboard.kt$BazaarCancelledBuyOrderClipboard$by patternGroup.pattern( "cancelledmessage", "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?&lt;coins&gt;.*) coins §r§7from cancelling Buy Order!", )</ID>
@@ -241,16 +234,13 @@
     <ID>ReturnCount:CrimsonMinibossRespawnTimer.kt$CrimsonMinibossRespawnTimer$private fun updateArea()</ID>
     <ID>ReturnCount:EnchantParser.kt$EnchantParser$private fun parseEnchants( loreList: MutableList&lt;String&gt;, enchants: Map&lt;String, Int&gt;, chatComponent: IChatComponent?, )</ID>
     <ID>ReturnCount:EnoughUpdatesManager.kt$EnoughUpdatesManager$private fun getPetLoreReplacements(petName: String?, tier: String?, level: Int): Map&lt;String, String&gt;</ID>
-    <ID>ReturnCount:FishingApi.kt$FishingApi$fun seaCreatureCount(entity: EntityArmorStand): Int</ID>
     <ID>ReturnCount:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun showGui(): Boolean</ID>
     <ID>ReturnCount:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>ReturnCount:GraphParkour.kt$GraphParkour$private fun graphToList(graph: Graph): List&lt;LorenzVec&gt;?</ID>
     <ID>ReturnCount:HideNotClickableItems.kt$HideNotClickableItems$private fun hideSalvage(chestName: String, stack: ItemStack): Boolean</ID>
     <ID>ReturnCount:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
-    <ID>ReturnCount:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NeuInternalName?</ID>
     <ID>ReturnCount:ItemPriceUtils.kt$ItemPriceUtils$fun NeuInternalName.getPriceOrNull( priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes: List&lt;PrimitiveRecipe&gt; = emptyList(), ): Double?</ID>
     <ID>ReturnCount:ItemResolutionQuery.kt$ItemResolutionQuery$private fun resolveContextualName(): String?</ID>
-    <ID>ReturnCount:ItemUtils.kt$ItemUtils$private fun NeuInternalName.grabItemName(): String</ID>
     <ID>ReturnCount:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
     <ID>ReturnCount:MiningEventTracker.kt$MiningEventTracker$private fun sendData(eventName: String, time: String?)</ID>
     <ID>ReturnCount:MobDetection.kt$MobDetection$private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean</ID>
@@ -280,9 +270,7 @@
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
-    <ID>TooManyFunctions:SkyHanniTracker.kt$SkyHanniTracker&lt;Data : TrackerData&gt;</ID>
     <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
-    <ID>UnsafeCallOnNullableType:BucketedItemTrackerData.kt$BucketedItemTrackerData$it.value[internalName]?.hidden!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Double::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Float::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt$CollectionUtils$this.merge(key, number, Int::plus)!!</ID>
@@ -296,7 +284,6 @@
     <ID>UnsafeCallOnNullableType:DefaultConfigFeatures.kt$DefaultConfigFeatures$resetSuggestionState[cat]!!</ID>
     <ID>UnsafeCallOnNullableType:DefaultConfigOptionGui.kt$DefaultConfigOptionGui$resetSuggestionState[cat]!!</ID>
     <ID>UnsafeCallOnNullableType:DicerRngDropTracker.kt$DicerRngDropTracker$event.toolItem!!</ID>
-    <ID>UnsafeCallOnNullableType:DiscordStatus.kt$ownerRegex.find(colorlessLine)!!</ID>
     <ID>UnsafeCallOnNullableType:EasterEggWaypoints.kt$EasterEggWaypoints$EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
     <ID>UnsafeCallOnNullableType:EntityMovementData.kt$EntityMovementData$entityLocation[entity]!!</ID>
     <ID>UnsafeCallOnNullableType:EntityOutlineRenderer.kt$EntityOutlineRenderer$entityRenderCache.noXrayCache!!</ID>
@@ -359,7 +346,6 @@
     <ID>UnsafeCallOnNullableType:UpdateManager.kt$UpdateManager$potentialUpdate!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalPrice!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt$VisitorRewardWarning$visitor.totalReward!!</ID>
-    <ID>UnusedParameter:SkyHanniDebugsAndTests.kt$SkyHanniDebugsAndTests$args: Array&lt;String&gt;</ID>
     <ID>UseIsNullOrEmpty:ItemUtils.kt$ItemUtils$name == null || name.isEmpty()</ID>
     <ID>VarCouldBeVal:IslandAreas.kt$IslandAreas$var suffix = ""</ID>
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>

@@ -34,8 +34,9 @@ object MinecraftData {
                         //#else
                         //$$ packet.sound.value().id.toString(),
                         //#endif
-                        LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume
-                ).post()) {
+                        LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume,
+                    ).post()
+                ) {
                     event.cancel()
                 }
             }

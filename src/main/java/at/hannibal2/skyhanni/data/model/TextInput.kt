@@ -71,7 +71,7 @@ open class TextInput {
 
         fun activate(instance: TextInput) {
             activeInstance = instance
-            //timeSinceKeyEvent = Keyboard.getEventNanoseconds()
+            // timeSinceKeyEvent = Keyboard.getEventNanoseconds()
         }
 
         fun disable() {
@@ -97,7 +97,7 @@ open class TextInput {
             }
         }
 
-        //private var timeSinceKeyEvent = 0L
+        // private var timeSinceKeyEvent = 0L
 
         private var carriage
             get() = activeInstance?.carriage
@@ -156,8 +156,8 @@ open class TextInput {
                 return
             }
 
-            //if (timeSinceKeyEvent == Keyboard.getEventNanoseconds()) return
-            //timeSinceKeyEvent = Keyboard.getEventNanoseconds()
+            // if (timeSinceKeyEvent == Keyboard.getEventNanoseconds()) return
+            // timeSinceKeyEvent = Keyboard.getEventNanoseconds()
             val char = event.keyCode.toChar()
 
             textBox = when (char) {

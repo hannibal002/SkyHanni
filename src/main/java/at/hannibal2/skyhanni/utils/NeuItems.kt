@@ -104,7 +104,8 @@ object NeuItems {
             try {
                 allInternalNames[rawInternalName] = internalName
             } catch (e: NullPointerException) {
-                ErrorManager.skyHanniError("Error loading items from repo",
+                ErrorManager.skyHanniError(
+                    "Error loading items from repo",
                     "internal name" to rawInternalName,
                     "name" to name,
                     //#if MC > 1.21

@@ -86,10 +86,10 @@ import kotlin.time.Duration
 // put everything under its respective feature, the order of the features is the same as in the folder structure
 class ProfileSpecificStorage {
     // api
-   //#if TODO
+    //#if TODO
     @Expose
     var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
-   //#endif
+    //#endif
 
     @Expose
     var totalSkyBlockXP: Int? = null
@@ -100,10 +100,10 @@ class ProfileSpecificStorage {
     var ghostStorage: GhostStorage = GhostStorage()
 
     class GhostStorage {
-      //#if TODO
+        //#if TODO
         @Expose
         var ghostTracker: GhostTracker.Data = GhostTracker.Data()
-      //#endif
+        //#endif
 
         @Expose
         var bestiaryKills: Long = 0L
@@ -156,13 +156,13 @@ class ProfileSpecificStorage {
         //#endif
     }
 
-   //#if TODO
+    //#if TODO
     @Expose
     var enderNodeTracker: EnderNodeTracker.Data = EnderNodeTracker.Data()
 
     @Expose
     var dragonProfitTracker: DragonProfitTracker.BucketData = DragonProfitTracker.BucketData()
-   //#endif
+    //#endif
 
     // - event
     // -- carnival
@@ -295,10 +295,10 @@ class ProfileSpecificStorage {
         @Expose
         var rabbitCounts: MutableMap<String, Int> = mutableMapOf()
 
-       //#if TODO
+        //#if TODO
         @Expose
         var locationRabbitRequirements: MutableMap<String, LocationRabbit> = mutableMapOf()
-       //#endif
+        //#endif
 
         @Expose
         var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>> = enumMapOf()
@@ -549,10 +549,10 @@ class ProfileSpecificStorage {
             @Expose
             var gemstonePowder: Long = 0
 
-           //#if TODO
+            //#if TODO
             @Expose
             var rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
-           //#endif
+            //#endif
         }
 
         @Expose
@@ -563,15 +563,15 @@ class ProfileSpecificStorage {
             var plotList: MutableMap<Int, NeuInternalName> = mutableMapOf()
         }
 
-       //#if TODO
+        //#if TODO
         @Expose
         var plotData: MutableMap<Int, PlotData> = mutableMapOf()
-       //#endif
+        //#endif
 
         @Expose
         var scoreboardPests: Int = 0
 
-       //#if TODO
+        //#if TODO
         @Expose
         var cropStartLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
 
@@ -580,7 +580,7 @@ class ProfileSpecificStorage {
 
         @Expose
         var farmingLanes: MutableMap<CropType, FarmingLane> = enumMapOf()
-       //#endif
+        //#endif
 
         @Expose
         var fortune: Fortune = Fortune()
@@ -609,13 +609,13 @@ class ProfileSpecificStorage {
             @Expose
             var cakeExpiring: SimpleTimeMark? = null
 
-           //#if TODO
+            //#if TODO
             @Expose
             var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
 
             @Expose
             var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
-           //#endif
+            //#endif
         }
 
         @Expose
@@ -679,10 +679,10 @@ class ProfileSpecificStorage {
             var xpSince: Int = 0
         }
 
-       //#if TODO
+        //#if TODO
         @Expose
         var experimentsProfitTracker: ExperimentsProfitTracker.Data = ExperimentsProfitTracker.Data()
-       //#endif
+        //#endif
     }
 
     @Expose
@@ -751,13 +751,13 @@ class ProfileSpecificStorage {
             @Expose
             var mineshaftTotalCount: Int = 0
 
-           //#if TODO
+            //#if TODO
             @Expose
             var blocksBroken: MutableList<PityData> = mutableListOf()
 
             @Expose
             var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
-           //#endif
+            //#endif
         }
 
         //#if TODO

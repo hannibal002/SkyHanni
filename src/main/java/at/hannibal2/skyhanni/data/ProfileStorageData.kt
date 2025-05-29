@@ -34,6 +34,7 @@ object ProfileStorageData {
     //#if TODO
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
+
     //#endif
     private var hypixelDataLoaded = false
 
@@ -56,11 +57,13 @@ object ProfileStorageData {
         }
         //#endif
 
-        loadProfileSpecific(playerSpecific,
+        loadProfileSpecific(
+            playerSpecific,
             //#if TODO
             sackPlayers,
             //#endif
-            profileName)
+            profileName,
+        )
         ConfigLoadEvent.post()
     }
 
@@ -85,11 +88,13 @@ object ProfileStorageData {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
         //#endif
-        loadProfileSpecific(playerSpecific,
+        loadProfileSpecific(
+            playerSpecific,
             //#if TODO
             sackPlayers,
             //#endif
-            profileName)
+            profileName,
+        )
         ConfigLoadEvent.post()
     }
 

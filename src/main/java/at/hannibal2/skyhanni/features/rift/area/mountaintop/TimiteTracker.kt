@@ -49,11 +49,11 @@ object TimiteTracker {
         override fun getCoinDescription(item: TrackedItem): List<String> = emptyList()
 
         override fun getCustomPricePer(internalName: NeuInternalName): Double {
-           //#if TODO
+            //#if TODO
             return internalName.getItemStack().motesNpcPrice() ?: 0.0
             //#else
             //$$ return 17.0
-           //#endif
+            //#endif
         }
 
         fun getTime(): Int = this.items[TIMITE]?.let {
@@ -125,9 +125,9 @@ object TimiteTracker {
     }
 
     private fun isEnabled() =
-       //#if TODO
+        //#if TODO
         RiftApi.inMountainTop() &&
-       //#endif
+            //#endif
             config.tracker &&
             (!config.onlyShowWhileHolding || InventoryUtils.itemInHandId in timiteItems)
 

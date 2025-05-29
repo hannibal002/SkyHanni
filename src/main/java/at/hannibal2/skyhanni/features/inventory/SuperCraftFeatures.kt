@@ -36,11 +36,11 @@ object SuperCraftFeatures {
         val (internalName, amount) = craftedPattern.matchMatcher(event.message) {
             NeuInternalName.fromItemName(group("item")) to (group("amount")?.formatInt() ?: 1)
         } ?: return
-       //#if TODO
+        //#if TODO
         if (!SackApi.sackListInternalNames.contains(internalName.asString())) return
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(PrimitiveItemStack(internalName, amount))
         }
-       //#endif
+        //#endif
     }
 }

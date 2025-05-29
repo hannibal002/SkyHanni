@@ -122,7 +122,7 @@ interface Renderable {
             onLeftClick,
             bypassChecks,
             highlightsOnHoverSlots = highlightsOnHoverSlots,
-            condition
+            condition,
         )
 
         fun link(
@@ -326,12 +326,12 @@ interface Renderable {
             val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign
                 //#if TODO
                 && guiScreen !is GuideGui<*>
-                //#endif
-                ) {
+            //#endif
+            ) {
                 ToolTipData.lastSlot == null
                     //#if TODO
                     || GuiData.preDrawEventCancelled
-                    //#endif
+                //#endif
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 
@@ -554,7 +554,7 @@ interface Renderable {
             override val horizontalAlign = HorizontalAlignment.LEFT
             override val verticalAlign = VerticalAlignment.TOP
 
-            override fun render(posX: Int, posY: Int) { }
+            override fun render(posX: Int, posY: Int) {}
         }
 
         fun searchableTable(
