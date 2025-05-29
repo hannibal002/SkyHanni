@@ -103,7 +103,7 @@ object EffectApi {
      * REGEX-TEST:  §r§aSmoldering Polarization I§r§f: 58s
      * REGEX-TEST:  §r§bWisp's Ice-Flavored Water I§r§f: 29m
      * REGEX-TEST:      §2Mushed Glowy Tonic I §r§f43m
-     * REGEX-TEST: &r&r&bWisp's Ice-Flavored Water I&r&r&r &r&f10m&r
+     * REGEX-TEST: §r§r§bWisp's Ice-Flavored Water I§r§r§r §r§f10m§r
      */
     private val tabEffectPattern by RepoPattern.pattern(
         "tab.effects",
