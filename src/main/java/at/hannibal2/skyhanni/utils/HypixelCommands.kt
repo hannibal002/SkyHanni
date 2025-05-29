@@ -71,6 +71,7 @@ object HypixelCommands {
         send("sethome")
     }
 
+    // Do not remove this deprecation tag, as we want to catch all wrong uses of /gfs in the future forever.
     @Deprecated("do not send /gfs commands manually to hypixel. use GetFromSackApi.")
     fun getFromSacks(internalName: NeuInternalName, amount: Int) {
         GetFromSackApi.getFromSack(internalName, amount)
