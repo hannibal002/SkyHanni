@@ -819,7 +819,7 @@ at.hannibal2.skyhanni.features.gifting.IsGiftingDetection.kt
 at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker.kt
 at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker.kt
 at.hannibal2.skyhanni.events.mining.FossilExcavationEvent.kt
-
+at.hannibal2.skyhanni.features.inventory.caketracker.CakeTracker.kt
 
 
 

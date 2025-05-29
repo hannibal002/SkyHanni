@@ -743,7 +743,7 @@ interface Renderable {
                     onHover(textInput)
                     textInput.makeActive()
                     val yOff: Int = if (shouldRenderTopElseBottom) 0 else content.height + ySpacing
-                    if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && (-99).isKeyClicked()) {
+                    if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && RIGHT_MOUSE.isKeyClicked()) {
                         textInput.clear()
                     }
                 } else {
