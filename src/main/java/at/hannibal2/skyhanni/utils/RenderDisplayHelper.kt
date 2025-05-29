@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 
@@ -77,7 +76,7 @@ class RenderDisplayHelper(
         false
     }
 
-    private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isInIsland()
+    private fun checkIslandCondition(): Boolean = onlyOnIsland == null || onlyOnIsland.isCurrent()
 
     private fun render() {
         try {

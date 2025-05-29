@@ -71,7 +71,9 @@ object RenderableTooltips {
         }
 
         GlStateManager.disableRescaleNormal()
+        //#if TODO
         RenderHelper.disableStandardItemLighting()
+        //#endif
         GlStateManager.enableDepth()
 
         val zLevel = 400f
@@ -92,7 +94,9 @@ object RenderableTooltips {
 
         DrawContextUtils.translate(-tooltipX.toFloat() + 1, -tooltipY.toFloat() + 1 + yTranslateSum.toFloat(), -zLevel)
         GlStateManager.enableLighting()
+        //#if TODO
         RenderHelper.enableStandardItemLighting()
+        //#endif
         GlStateManager.enableRescaleNormal()
         GlStateManager.disableLighting()
     }

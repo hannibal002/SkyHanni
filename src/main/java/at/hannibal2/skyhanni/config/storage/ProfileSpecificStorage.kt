@@ -1,19 +1,30 @@
 package at.hannibal2.skyhanni.config.storage
 
+//#if TODO
 import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
+//#endif
 import at.hannibal2.skyhanni.data.IslandType
+//#if TODO
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
+//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
+//#if TODO
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
+//#endif
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+//#if TODO
 import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
+//#endif
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
+//#if TODO
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.generateMaxChestAsList
+//#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
+//#if TODO
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
@@ -23,7 +34,9 @@ import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureT
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
+//#endif
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
@@ -48,9 +61,12 @@ import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+//#endif
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
+//#if TODO
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
+//#endif
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -66,8 +82,10 @@ import kotlin.time.Duration
 // put everything under its respective feature, the order of the features is the same as in the folder structure
 class ProfileSpecificStorage {
     // api
+   //#if TODO
     @Expose
     var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
+   //#endif
 
     @Expose
     var totalSkyBlockXP: Int? = null
@@ -78,8 +96,10 @@ class ProfileSpecificStorage {
     var ghostStorage: GhostStorage = GhostStorage()
 
     class GhostStorage {
+      //#if TODO
         @Expose
         var ghostTracker: GhostTracker.Data = GhostTracker.Data()
+      //#endif
 
         @Expose
         var bestiaryKills: Long = 0L
@@ -108,6 +128,7 @@ class ProfileSpecificStorage {
         @Expose
         var bosses: MutableMap<DungeonFloor, Int> = enumMapOf()
 
+        //#if TODO
         @Expose
         var runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
 
@@ -128,13 +149,16 @@ class ProfileSpecificStorage {
             @Expose
             var kismetUsed: Boolean? = null
         }
+        //#endif
     }
 
+   //#if TODO
     @Expose
     var enderNodeTracker: EnderNodeTracker.Data = EnderNodeTracker.Data()
 
     @Expose
     var dragonProfitTracker: DragonProfitTracker.BucketData = DragonProfitTracker.BucketData()
+   //#endif
 
     // - event
     // -- carnival
@@ -148,14 +172,17 @@ class ProfileSpecificStorage {
         @Expose
         var carnivalYear: Int = 0
 
+        //#if TODO
         @Expose
         var goals: MutableMap<CarnivalGoal, Boolean> = enumMapOf()
+        //#endif
 
         // - shop name -> (item name, tier)
         @Expose
         var carnivalShopProgress: MutableMap<String, Map<String, Int>> = mutableMapOf()
     }
 
+    //#if TODO
     // -- diana
     @Expose
     var diana: DianaStorage = DianaStorage()
@@ -180,6 +207,7 @@ class ProfileSpecificStorage {
 
     @Expose
     var giftProfitTracker: GiftProfitTracker.Data = GiftProfitTracker.Data()
+    //#endif
 
     // -- hoppity
     @Expose
@@ -263,8 +291,10 @@ class ProfileSpecificStorage {
         @Expose
         var rabbitCounts: MutableMap<String, Int> = mutableMapOf()
 
+       //#if TODO
         @Expose
         var locationRabbitRequirements: MutableMap<String, LocationRabbit> = mutableMapOf()
+       //#endif
 
         @Expose
         var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>> = enumMapOf()
@@ -283,6 +313,7 @@ class ProfileSpecificStorage {
         @Expose
         var hoppityShopYearOpened: Int? = null
 
+        //#if TODO
         @Expose
         var strayTracker: CFStrayTracker.Data = CFStrayTracker.Data()
 
@@ -291,6 +322,7 @@ class ProfileSpecificStorage {
 
         @Expose
         var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
+        //#endif
 
         @Expose
         var hotChocolateMixinExpiry = farPast()
@@ -320,8 +352,10 @@ class ProfileSpecificStorage {
     var hoppityStatLiveDisplayToggledOff: Boolean = false
 
     data class HoppityEventStats(
+        //#if TODO
         @Expose var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
         @Expose var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
+        //#endif
         @Expose var dupeChocolateGained: Long = 0,
         @Expose var strayChocolateGained: Long = 0,
         @Expose var rabbitTheFishFinds: Int = 0,
@@ -347,6 +381,7 @@ class ProfileSpecificStorage {
         }
 
         operator fun plusAssign(it: HoppityEventStats) {
+            //#if TODO
             it.mealsFound.forEach { (key, value) ->
                 mealsFound.merge(key, value, Int::plus)
             }
@@ -359,6 +394,7 @@ class ProfileSpecificStorage {
                     )
                 }
             }
+            //#endif
             dupeChocolateGained += it.dupeChocolateGained
             strayChocolateGained += it.strayChocolateGained
             rabbitTheFishFinds += it.rabbitTheFishFinds
@@ -387,6 +423,7 @@ class ProfileSpecificStorage {
         }
     }
 
+    //#if TODO
     // - fame
     @Expose
     var communityShopProfileUpgrade: CommunityShopUpgrade? = null
@@ -402,6 +439,7 @@ class ProfileSpecificStorage {
         @Expose
         var seaCreatureTracker: SeaCreatureTracker.Data = SeaCreatureTracker.Data()
     }
+    //#endif
 
     // - garden
     @Expose
@@ -411,6 +449,7 @@ class ProfileSpecificStorage {
         @Expose
         var experience: Long? = null
 
+        //#if TODO
         @Expose
         var cropCounter: MutableMap<CropType, Long> = enumMapOf()
 
@@ -435,6 +474,7 @@ class ProfileSpecificStorage {
 
         @Expose
         var dicerDropTracker: DicerRngDropTracker.Data = DicerRngDropTracker.Data()
+        //#endif
 
         @Expose
         var informedAboutLowMatter: SimpleTimeMark = farPast()
@@ -448,6 +488,7 @@ class ProfileSpecificStorage {
         @Expose
         var nextSixthVisitorArrival: SimpleTimeMark = farPast()
 
+        //#if TODO
         @Expose
         var armorDropTracker: ArmorDropTracker.Data = ArmorDropTracker.Data()
 
@@ -456,6 +497,7 @@ class ProfileSpecificStorage {
 
         @Expose
         var toolWithBountiful: MutableMap<CropType, Boolean> = enumMapOf()
+        //#endif
 
         @Expose
         var composterCurrentOrganicMatterItem: NeuInternalName? = NONE
@@ -503,8 +545,10 @@ class ProfileSpecificStorage {
             @Expose
             var gemstonePowder: Long = 0
 
+           //#if TODO
             @Expose
             var rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
+           //#endif
         }
 
         @Expose
@@ -515,12 +559,15 @@ class ProfileSpecificStorage {
             var plotList: MutableMap<Int, NeuInternalName> = mutableMapOf()
         }
 
+       //#if TODO
         @Expose
         var plotData: MutableMap<Int, PlotData> = mutableMapOf()
+       //#endif
 
         @Expose
         var scoreboardPests: Int = 0
 
+       //#if TODO
         @Expose
         var cropStartLocations: MutableMap<CropType, LorenzVec> = enumMapOf()
 
@@ -529,13 +576,16 @@ class ProfileSpecificStorage {
 
         @Expose
         var farmingLanes: MutableMap<CropType, FarmingLane> = enumMapOf()
+       //#endif
 
         @Expose
         var fortune: Fortune = Fortune()
 
         class Fortune {
+            //#if TODO
             @Expose
             var outdatedItems: MutableMap<FarmingItemType, Boolean> = enumMapOf()
+            //#endif
 
             @Expose
             var farmingLevel: Int = -1
@@ -555,11 +605,13 @@ class ProfileSpecificStorage {
             @Expose
             var cakeExpiring: SimpleTimeMark? = null
 
+           //#if TODO
             @Expose
             var carrolyn: MutableMap<CropType, Boolean> = enumMapOf()
 
             @Expose
             var farmingItems: MutableMap<FarmingItemType, ItemStack> = enumMapOf()
+           //#endif
         }
 
         @Expose
@@ -577,6 +629,7 @@ class ProfileSpecificStorage {
             var lastFarmingWeightLeaderboard: Int = -1
         }
 
+        //#if TODO
         @Expose
         var npcVisitorLocations: MutableMap<String, LorenzVec> = mutableMapOf()
 
@@ -588,6 +641,7 @@ class ProfileSpecificStorage {
 
         @Expose
         var activeVinyl: VinylType? = null
+        //#endif
     }
 
     // - gui
@@ -621,8 +675,10 @@ class ProfileSpecificStorage {
             var xpSince: Int = 0
         }
 
+       //#if TODO
         @Expose
         var experimentsProfitTracker: ExperimentsProfitTracker.Data = ExperimentsProfitTracker.Data()
+       //#endif
     }
 
     @Expose
@@ -637,8 +693,10 @@ class ProfileSpecificStorage {
     var wardrobe: WardrobeStorage = WardrobeStorage()
 
     class WardrobeStorage {
+        //#if TODO
         @Expose
         var data: MutableMap<Int, WardrobeData> = mutableMapOf()
+        //#endif
 
         @Expose
         var currentSlot: Int? = null
@@ -652,14 +710,18 @@ class ProfileSpecificStorage {
         @Expose
         var kingsTalkedTo: MutableList<String> = mutableListOf()
 
+        //#if TODO
         @Expose
         var fossilExcavatorProfitTracker: ExcavatorProfitTracker.Data = ExcavatorProfitTracker.Data()
+        //#endif
 
         @Expose
         var hotmTree: HotmTree = HotmTree()
 
+        //#if TODO
         @Expose
         var powder: MutableMap<PowderType, PowderStorage> = enumMapOf()
+        //#endif
 
         class PowderStorage {
             @Expose
@@ -685,19 +747,25 @@ class ProfileSpecificStorage {
             @Expose
             var mineshaftTotalCount: Int = 0
 
+           //#if TODO
             @Expose
             var blocksBroken: MutableList<PityData> = mutableListOf()
 
             @Expose
             var corpseProfitTracker: CorpseTracker.BucketData = CorpseTracker.BucketData()
+           //#endif
         }
 
+        //#if TODO
         @Expose
         var crystalNucleusTracker: CrystalNucleusTracker.Data = CrystalNucleusTracker.Data()
+        //#endif
     }
 
+    //#if TODO
     @Expose
     var powderTracker: PowderTracker.Data = PowderTracker.Data()
+    //#endif
 
     // - minion
     @Expose
@@ -735,19 +803,25 @@ class ProfileSpecificStorage {
         @Expose
         var selfKillingAnimals: Int = 0
 
+        //#if TODO
         // TODO change to sh tracker
         @Expose
         var animalRarities: Map<TrapperMobRarity, Int> = enumMapOf()
+        //#endif
     }
 
+    //#if TODO
     @Expose
     var draconicSacrificeTracker: DraconicSacrificeTracker.Data = DraconicSacrificeTracker.Data()
+    //#endif
 
     @Expose
     var abiphoneContactAmount: Int? = null
 
+    //#if TODO
     @Expose
     var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
+    //#endif
 
     // - nether
     @Expose
@@ -775,16 +849,20 @@ class ProfileSpecificStorage {
         @Expose
         var completedKloonTerminals: MutableList<KloonTerminal> = mutableListOf()
 
+        //#if TODO
         @Expose
         var verminTracker: VerminTracker.Data = VerminTracker.Data()
 
         @Expose
         var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
+        //#endif
     }
 
+    //#if TODO
     // - slayer
     @Expose
     var slayerProfitData: MutableMap<String, SlayerProfitTracker.Data> = mutableMapOf()
+    //#endif
 
     @Expose
     var slayerRngMeter: MutableMap<String, SlayerRngMeterStorage> = mutableMapOf()
@@ -813,8 +891,10 @@ class ProfileSpecificStorage {
         @Expose
         var magicalPower: Int = -1
 
+        //#if TODO
         @Expose
         var tunings: List<ThaumaturgyPowerTuning> = listOf()
+        //#endif
 
         @Expose
         var favoritePowers: List<String> = listOf()

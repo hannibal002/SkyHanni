@@ -787,5 +787,31 @@ at.hannibal2.skyhanni.utils.renderables.Searchable.kt
 at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.kt
 at.hannibal2.skyhanni.mixins.transformers.MixinHandledScreen.java
 at.hannibal2.skyhanni.events.minecraft.KeyTypedEvent.kt
+at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker.kt
+at.hannibal2.skyhanni.data.SlayerApi.kt
+at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent.kt
+at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent.kt
+at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent.kt
+at.hannibal2.skyhanni.features.slayer.SlayerType.kt
+at.hannibal2.skyhanni.data.TrackerManager.kt
+at.hannibal2.skyhanni.data.ItemAddManager.kt
+at.hannibal2.skyhanni.events.ItemAddEvent.kt
+at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.kt
+at.hannibal2.skyhanni.utils.RenderDisplayHelper.kt
+at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker.kt
+at.hannibal2.skyhanni.utils.tracker.TrackerData.kt
+at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.kt
+at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.kt
+at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.kt
+at.hannibal2.skyhanni.config.storage.Storage.kt
+at.hannibal2.skyhanni.features.misc.reminders.Reminder.kt
+at.hannibal2.skyhanni.utils.renderables.RenderableTooltips.kt
+at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData.kt
+at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent.kt
+at.hannibal2.skyhanni.features.commands.OpenLastStorage.kt
+at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree.kt
+at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal.kt
+at.hannibal2.skyhanni.data.ProfileStorageData.kt
+
 
 # \.(?!kt|java|\()

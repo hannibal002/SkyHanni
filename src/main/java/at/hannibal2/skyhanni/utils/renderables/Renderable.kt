@@ -108,7 +108,6 @@ interface Renderable {
             else -> null
         }
 
-        //#if TODO
         fun link(text: String, bypassChecks: Boolean = false, onLeftClick: () -> Unit): Renderable =
             link(RenderableString(text), onLeftClick, bypassChecks = bypassChecks)
 
@@ -290,7 +289,9 @@ interface Renderable {
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
+                            //#if TODO
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
+                            //#endif
                             DrawContextUtils.pushMatrix()
                             DrawContextUtils.translate(0F, 0F, 400F)
 
@@ -304,12 +305,13 @@ interface Renderable {
                             DrawContextUtils.popMatrix()
                         }
                     } else {
+                        //#if TODO
                         HighlightOnHoverSlot.currentSlots.remove(pair)
+                        //#endif
                     }
                 }
             }
         }
-        //#endif
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
             val guiScreen = Minecraft.getMinecraft().currentScreen.takeIf { it != null } ?: return false
@@ -374,7 +376,6 @@ interface Renderable {
             return result
         }
 
-        //#if TODO
         fun underlined(renderable: Renderable, color: Color = Color.WHITE) = object : Renderable {
             override val width: Int
                 get() = renderable.width
@@ -410,16 +411,19 @@ interface Renderable {
                 isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover()
                     hovered.render(posX, posY)
+                    //#if TODO
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
+                    //#endif
                     true
                 } else {
                     unHovered.render(posX, posY)
+                    //#if TODO
                     HighlightOnHoverSlot.currentSlots.remove(pair)
+                    //#endif
                     false
                 }
             }
         }
-        //#endif
 
         /** Bottom Layer must be bigger then the top layer */
         fun doubleLayered(
@@ -443,7 +447,6 @@ interface Renderable {
             }
         }
 
-        //#if TODO
         fun itemStackWithTip(
             item: ItemStack,
             scale: Double = NeuItems.ITEM_FONT_SIZE,
@@ -465,7 +468,6 @@ interface Renderable {
             item.getTooltipCompat(false),
             stack = item,
         )
-        //#endif
 
         fun itemStack(
             item: ItemStack,
@@ -1140,7 +1142,6 @@ interface Renderable {
             return set
         }
 
-        //#if TODO
         fun searchableScrollable(
             table: Map<List<Renderable>, String>,
             key: Int,
@@ -1405,6 +1406,7 @@ interface Renderable {
             }
         }
 
+        //#if TODO
         fun drawInsideRoundedRect(
             input: Renderable,
             color: Color,

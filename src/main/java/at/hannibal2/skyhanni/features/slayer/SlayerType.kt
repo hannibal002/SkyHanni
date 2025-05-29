@@ -10,37 +10,37 @@ enum class SlayerType(
     val displayName: String,
     val rngName: String,
     val clazz: Class<*>,
-    val miniBossType: SlayerMiniBossFeatures.SlayerMiniBossType? = null,
+    val miniBossType: SlayerMiniBossType? = null,
 ) {
     REVENANT(
         "Revenant Horror",
         "revenant",
         EntityZombie::class.java,
-        SlayerMiniBossFeatures.SlayerMiniBossType.REVENANT,
+        SlayerMiniBossType.REVENANT,
     ),
     TARANTULA(
         "Tarantula Broodfather",
         "tarantula",
         EntitySpider::class.java,
-        SlayerMiniBossFeatures.SlayerMiniBossType.TARANTULA,
+        SlayerMiniBossType.TARANTULA,
     ),
     SVEN(
         "Sven Packmaster",
         "sven",
         EntityWolf::class.java,
-        SlayerMiniBossFeatures.SlayerMiniBossType.SVEN,
+        SlayerMiniBossType.SVEN,
     ),
     VOID(
         "Voidgloom Seraph",
         "voidgloom",
         EntityEnderman::class.java,
-        SlayerMiniBossFeatures.SlayerMiniBossType.VOIDLING,
+        SlayerMiniBossType.VOIDLING,
     ),
     INFERNO(
         "Inferno Demonlord",
         "inferno",
         EntityBlaze::class.java,
-        SlayerMiniBossFeatures.SlayerMiniBossType.INFERNAL,
+        SlayerMiniBossType.INFERNAL,
     ),
     VAMPIRE(
         "Bloodfiend",
@@ -51,5 +51,22 @@ enum class SlayerType(
 
     companion object {
         fun getByName(name: String): SlayerType? = entries.firstOrNull { name.contains(it.displayName) }
+    }
+}
+
+enum class SlayerMiniBossType(vararg names: String) {
+    REVENANT("Revenant Sycophant", "Revenant Champion", "Deformed Revenant", "Atoned Champion", "Atoned Revenant"),
+    TARANTULA("Tarantula Vermin", "Tarantula Beast", "Mutant Tarantula"),
+    SVEN("Pack Enforcer", "Sven Follower", "Sven Alpha"),
+    VOIDLING("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac"),
+    INFERNAL("Flare Demon", "Kindleheart Demon", "Burningsoul Demon"),
+    ;
+
+    val names = names.toSet()
+
+    companion object {
+        private val allNames = entries.flatMap { it.names }.toSet()
+
+        fun isMiniboss(name: String) = name in allNames
     }
 }

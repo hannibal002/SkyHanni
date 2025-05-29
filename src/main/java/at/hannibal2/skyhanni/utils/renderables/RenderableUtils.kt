@@ -11,15 +11,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
-//#if TODO
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-//#endif
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-//#if TODO
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
-//#endif
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import java.awt.Color
 import kotlin.math.ceil
@@ -182,7 +178,6 @@ internal object RenderableUtils {
         DrawContextUtils.translate(-1.0, -1.0, 0.0)
     }
 
-    //#if TODO
     inline fun <T> MutableList<Searchable>.addNullableButton(
         label: String,
         current: T?,
@@ -385,6 +380,7 @@ internal object RenderableUtils {
     fun MutableList<Renderable>.addCenteredString(string: String) =
         this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
 
+    //#if TODO
     fun fillTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
