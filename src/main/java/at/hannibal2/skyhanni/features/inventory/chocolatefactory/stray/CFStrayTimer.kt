@@ -99,7 +99,8 @@ object CFStrayTimer {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !config.blockClosing) return
-        if (event.slotId in destructiveSlots) {
+        val slot = event.slot ?: return
+        if (slot.slotNumber in destructiveSlots) {
             event.cancel()
             preventCloseTitle()
         }
