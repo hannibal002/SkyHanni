@@ -832,7 +832,7 @@ at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent.kt
 at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent.kt
 at.hannibal2.skyhanni.events.fishing.FishingCatchEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent.kt
-at.hannibal2.skyhanni.features.fishing.SeaCreatureManager.kt
+at/hannibal2/skyhanni/features/fishing/SeaCreatureManager.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.SeaCreatureJson.kt
 at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent.kt
 at.hannibal2.skyhanni.features.fishing.SeaCreature.kt
