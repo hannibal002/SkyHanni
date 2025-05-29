@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import org.lwjgl.input.Mouse
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
@@ -74,10 +73,14 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
     }
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
+        fun isInside(width: Int, height: Int, def: GuiElementButton): Boolean {
+            val inX = (mouseX - width - x) in (0..def.width)
+            val inY = (mouseY - height - y) in (0..def.height)
+            return inX && inY
+        }
+
         val adjustedWidth = width - 20
-        if (MouseCompat.getEventButtonState() && (mouseX - getButtonPosition(adjustedWidth) - x)
-            in (0..button.width) && (mouseY - 10 - y) in (0..button.height)
-        ) {
+        if (MouseCompat.getEventButtonState() && isInside(getButtonPosition(adjustedWidth), height = 10, button)) {
             when (UpdateManager.updateState) {
                 UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
                 UpdateManager.UpdateState.QUEUED -> {}
@@ -86,23 +89,18 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             }
             return true
         }
-        if (Mouse.getEventButtonState() && (mouseX - getChangelogPosition(width) - x)
-            in (0..changelog.width) && (mouseY - 30 - y) in (0..changelog.height)
-        ) {
-            if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
-                val version = UpdateManager.getNextVersion() ?: run {
-                    ErrorManager.logErrorStateWithData(
-                        "Can't get Changelog because of internal error",
-                        "UpdateManger.getNextVersion is null even though updateState is != NONE",
-                        "state" to UpdateManager.updateState,
-                    )
-                    return true
-                }
-                ChangelogViewer.showChangelog(currentVersion, version)
-            }
+        if (!MouseCompat.getEventButtonState() || !isInside(getChangelogPosition(width), height = 30, changelog)) return false
+        if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) return true
+        val version = UpdateManager.getNextVersion() ?: run {
+            ErrorManager.logErrorStateWithData(
+                "Can't get Changelog because of internal error",
+                "UpdateManger.getNextVersion is null even though updateState is != NONE",
+                "state" to UpdateManager.updateState,
+            )
             return true
         }
-        return false
+        ChangelogViewer.showChangelog(currentVersion, version)
+        return true
     }
 
     override fun keyboardInput(): Boolean {
