@@ -193,7 +193,11 @@ object FishingApi {
     }
 
     fun isFishing(checkRodInHand: Boolean = true) =
+        //#if TODO
         (IsFishingDetection.isFishing || (checkRodInHand && holdingRod)) && !DungeonApi.inDungeon()
+    //#else
+    //$$ false
+    //#endif
 
     fun seaCreatureCount(entity: EntityArmorStand): Int {
         if (countIsZero(entity)) return 0
@@ -226,7 +230,12 @@ object FishingApi {
         return !hasFishingMobName || isSummonedSoul
     }
 
-    private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
-        trophyArmorNames.matches(it?.getInternalName()?.asString())
-    }
+    private fun isWearingTrophyArmor(): Boolean =
+        //#if TODO
+        InventoryUtils.getArmor().all {
+            trophyArmorNames.matches(it?.getInternalName()?.asString())
+        }
+    //#else
+    //$$ false
+    //#endif
 }

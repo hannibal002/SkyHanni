@@ -263,9 +263,7 @@ private fun getBackupFile(file: File): File {
 
 enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
     FEATURES("config", Features::class.java, SkyHanniMod::feature),
-    //#if TODO
     SACKS("sacks", SackData::class.java, SkyHanniMod::sackData),
-    //#endif
     FRIENDS("friends", FriendsJson::class.java, SkyHanniMod::friendsData),
     KNOWN_FEATURES("known_features", KnownFeaturesJson::class.java, SkyHanniMod::knownFeaturesData),
     //#if TODO

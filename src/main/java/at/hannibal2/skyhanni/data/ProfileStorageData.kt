@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-//#if TODO
 import at.hannibal2.skyhanni.config.SackData
-//#endif
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -31,19 +29,15 @@ object ProfileStorageData {
     var loaded = false
     private var noTabListTime = SimpleTimeMark.farPast()
 
-    //#if TODO
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
 
-    //#endif
     private var hypixelDataLoaded = false
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
-        //#if TODO
         val sackPlayers = sackPlayers
-        //#endif
         val profileName = event.name
         if (playerSpecific == null) {
             DelayedRun.runDelayed(10.seconds) {
@@ -51,17 +45,13 @@ object ProfileStorageData {
             }
             return
         }
-        //#if TODO
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
-        //#endif
 
         loadProfileSpecific(
             playerSpecific,
-            //#if TODO
             sackPlayers,
-            //#endif
             profileName,
         )
         ConfigLoadEvent.post()
@@ -70,9 +60,7 @@ object ProfileStorageData {
     private fun workaroundIn10SecondsProfileStorage(profileName: String) {
         println("workaroundIn10SecondsProfileStorage")
         val playerSpecific = playerSpecific
-        //#if TODO
         val sackPlayers = sackPlayers
-        //#endif
 
         if (playerSpecific == null) {
             ErrorManager.skyHanniError(
@@ -83,16 +71,12 @@ object ProfileStorageData {
                 "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
             )
         }
-        //#if TODO
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
-        //#endif
         loadProfileSpecific(
             playerSpecific,
-            //#if TODO
             sackPlayers,
-            //#endif
             profileName,
         )
         ConfigLoadEvent.post()
@@ -137,16 +121,12 @@ object ProfileStorageData {
 
     private fun loadProfileSpecific(
         playerSpecific: PlayerSpecificStorage,
-        //#if TODO
         sackProfile: SackData.PlayerSpecific,
-        //#endif
         profileName: String,
     ) {
         noTabListTime = SimpleTimeMark.farPast()
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
-        //#if TODO
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
-        //#endif
         loaded = true
         ConfigLoadEvent.post()
     }
@@ -155,9 +135,7 @@ object ProfileStorageData {
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = PlayerUtils.getRawUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
-        //#if TODO
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
-        //#endif
         ConfigLoadEvent.post()
     }
 

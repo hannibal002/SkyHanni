@@ -7,9 +7,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager.openConfigGui
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.Features
-//#if TODO
 import at.hannibal2.skyhanni.config.SackData
-//#endif
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -98,9 +96,7 @@ object SkyHanniMod {
 
     @JvmField
     var feature: Features = Features()
-    //#if TODO
     lateinit var sackData: SackData
-    //#endif
     lateinit var friendsData: FriendsJson
     lateinit var knownFeaturesData: KnownFeaturesJson
     //#if TODO

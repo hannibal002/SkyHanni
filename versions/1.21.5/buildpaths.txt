@@ -822,6 +822,30 @@ at.hannibal2.skyhanni.events.mining.FossilExcavationEvent.kt
 at.hannibal2.skyhanni.features.inventory.caketracker.CakeTracker.kt
 at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker.kt
 at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson.kt
+at.hannibal2.skyhanni.data.SackApi.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson.kt
+at.hannibal2.skyhanni.events.SackChangeEvent.kt
+at.hannibal2.skyhanni.events.SackDataUpdateEvent.kt
+at.hannibal2.skyhanni.features.fishing.FishingApi.kt
+at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent.kt
+at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent.kt
+at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent.kt
+at.hannibal2.skyhanni.events.fishing.FishingCatchEvent.kt
+at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent.kt
+at.hannibal2.skyhanni.features.fishing.SeaCreatureManager.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.SeaCreatureJson.kt
+at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent.kt
+at.hannibal2.skyhanni.features.fishing.SeaCreature.kt
+at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/TrophyFishJson.kt
+at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent.kt
+at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishApi.kt
+at/hannibal2/skyhanni/data/jsonobjects/other/HypixelPlayerApiJson.kt
+at.hannibal2.skyhanni.features.inventory.SackDisplay.kt
+at.hannibal2.skyhanni.config.SackData.kt
+at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.kt
+at.hannibal2.skyhanni.utils.EssenceUtils.kt
+
 
 
 # \.(?!kt|java|\()
