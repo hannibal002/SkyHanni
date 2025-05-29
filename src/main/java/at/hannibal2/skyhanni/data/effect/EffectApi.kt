@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.effect
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -104,10 +103,11 @@ object EffectApi {
      * REGEX-TEST:  §r§aSmoldering Polarization I§r§f: 58s
      * REGEX-TEST:  §r§bWisp's Ice-Flavored Water I§r§f: 29m
      * REGEX-TEST:      §2Mushed Glowy Tonic I §r§f43m
+     * REGEX-TEST: &r&r&bWisp's Ice-Flavored Water I&r&r&r &r&f10m&r
      */
     private val tabEffectPattern by RepoPattern.pattern(
         "tab.effects",
-        " *(?:§.)*(?<effect>§.[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:§.)+[: ]*(?<time>[dhms0-9 ]+)"
+        " *(?:§.)*(?<effect>§.[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:§.|[: ])+(?<time>[dhms0-9 ]+)(?:§.)*"
     )
     // </editor-fold>
 
@@ -203,7 +203,7 @@ object EffectApi {
         footerLines.readNonGodPotEffects()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         event.readPestRepellent()
         event.readEffects()
@@ -217,17 +217,15 @@ object EffectApi {
         lines.readNonGodPotEffects()
     }
 
-    private fun List<String>.readNonGodPotEffects() {
-        tabEffectPattern.matchAll(this) {
-            val nonGodPotEffect = NonGodPotEffect.entries.firstOrNull {
-                it.tabListName == group("effect")
-            } ?: return@matchAll
-            try {
-                val duration = TimeUtils.getDuration(group("time"))
-                EffectDurationChangeEvent(nonGodPotEffect, EffectDurationChangeType.SET, duration).post()
-            } catch (e: Exception) {
-                ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$this'")
-            }
+    private fun List<String>.readNonGodPotEffects() = tabEffectPattern.matchAll(this) {
+        val nonGodPotEffect = NonGodPotEffect.entries.firstOrNull {
+            it.tabListName == group("effect")
+        } ?: return@matchAll
+        try {
+            val duration = TimeUtils.getDuration(group("time"))
+            EffectDurationChangeEvent(nonGodPotEffect, EffectDurationChangeType.SET, duration).post()
+        } catch (e: Exception) {
+            ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$this'")
         }
     }
 
