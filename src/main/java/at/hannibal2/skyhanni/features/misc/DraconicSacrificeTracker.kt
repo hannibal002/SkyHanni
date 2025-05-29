@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -148,5 +147,5 @@ object DraconicSacrificeTracker {
         }
     }
 
-    private fun isEnabled() = IslandType.THE_END.isInIsland() && config.enabled
+    private fun isEnabled() = IslandType.THE_END.isCurrent() && config.enabled
 }

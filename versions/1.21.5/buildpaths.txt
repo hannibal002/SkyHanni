@@ -817,5 +817,11 @@ at.hannibal2.skyhanni.features.gifting.GiftApi.kt
 at.hannibal2.skyhanni.features.gifting.GiftProfitTracker.kt
 at.hannibal2.skyhanni.features.gifting.IsGiftingDetection.kt
 at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker.kt
+at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker.kt
+at.hannibal2.skyhanni.events.mining.FossilExcavationEvent.kt
+
+
+
+
 
 # \.(?!kt|java|\()

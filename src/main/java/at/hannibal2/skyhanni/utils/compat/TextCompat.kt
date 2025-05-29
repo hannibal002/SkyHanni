@@ -54,6 +54,7 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$     for (component in iterator()) {
 //$$         sb.append(component.style.chatStyle())
 //$$         sb.append(component.unformattedTextForChatCompat())
+//$$         sb.append("§r")
 //$$     }
 //$$     sb.toString()
 //$$ }
