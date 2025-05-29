@@ -845,7 +845,10 @@ at.hannibal2.skyhanni.features.inventory.SackDisplay.kt
 at.hannibal2.skyhanni.config.SackData.kt
 at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.kt
 at.hannibal2.skyhanni.utils.EssenceUtils.kt
-
-
+at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.kt
+at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent.kt
+at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue.kt
+at.hannibal2.skyhanni.events.RenderItemTooltipEvent.kt
+at/hannibal2/skyhanni/mixins/hooks/GuiScreenHook.kt
 
 # \.(?!kt|java|\()

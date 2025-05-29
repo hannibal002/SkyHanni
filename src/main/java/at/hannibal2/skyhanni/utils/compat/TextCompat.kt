@@ -59,7 +59,7 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$         sb.append(component.unformattedTextForChatCompat())
 //$$         sb.append("§r")
 //$$     }
-//$$     sb.toString()
+//$$     sb.toString().removeSuffix("§r")
 //$$ }
 //$$
 //$$ private val textColorLUT = ChatFormatting.entries
