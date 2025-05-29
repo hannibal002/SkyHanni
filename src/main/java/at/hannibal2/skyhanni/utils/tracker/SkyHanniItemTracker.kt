@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -17,7 +17,9 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -25,7 +27,8 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
-open class SkyHanniItemTracker<Data : ItemTrackerData>(
+open class
+SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
@@ -70,7 +73,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         getCoinName: (ItemTrackerData.TrackedItem) -> String,
     ): String {
         val item = items[this] ?: error("Item not found for $this")
-        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.repoItemName
+        return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.repoItemNameCompact
     }
 
     open fun drawItems(
@@ -226,7 +229,8 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
         } else emptyList()
 
-        val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
+        val coinFormat = "coin".pluralize(profit.toInt())
+        val text = "§eTotal Profit: $profitPrefix$profitFormat $coinFormat"
         return Renderable.hoverTips(text, tips).toSearchable()
     }
 }

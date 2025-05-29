@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 
 // scoreboard
 // scoreboard update event or 1s

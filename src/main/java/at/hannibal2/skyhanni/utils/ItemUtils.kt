@@ -7,16 +7,16 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.SkyHanniNotification
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.removeIfKey
-import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -39,7 +39,11 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -66,13 +70,16 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import com.mojang.authlib.GameProfile
 //$$ import java.util.UUID
 //$$ import com.mojang.authlib.properties.Property
+//$$ import net.minecraft.component.type.ItemEnchantmentsComponent
 //$$ import net.minecraft.component.type.ProfileComponent
 //#endif
 
 @SkyHanniModule
+@Suppress("LargeClass")
 object ItemUtils {
 
-    val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
+    private val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
+    private val compactItemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> compact item name
 
     // This map might not contain all stats the item has, compare with itemBaseStatsRaw if unclear
     private var itemBaseStats = mapOf<NeuInternalName, Map<SkyblockStat, Int>>()
@@ -109,7 +116,7 @@ object ItemUtils {
         if (unknownStats.isNotEmpty()) {
             val name = StringUtils.pluralize(unknownStats.size, "stat", withNumber = true)
             ErrorManager.logErrorStateWithData(
-                "Found unknown skyblock stats on items, please report this in disocrd",
+                "Found unknown skyblock stats on items, please report this in discord",
                 "found $name via Hypixel Item API that are not in enum SkyblockStat",
                 // TODO logErrorStateWithData should accept a map of extra data directly
                 extraData = unknownStats.map { it.key to it.value }.toTypedArray(),
@@ -124,10 +131,11 @@ object ItemUtils {
 
     fun NeuInternalName.getRawBaseStats(): Map<String, Int> = itemBaseStatsRaw[this].orEmpty()
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(SkyHanniMod.feature.misc.replaceRomanNumerals) {
             itemNameCache.clear()
+            compactItemNameCache.clear()
         }
     }
 
@@ -275,6 +283,10 @@ object ItemUtils {
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
         if (displayName == "§fWisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
+        }
+        // This is to prevent an error message whenever coins are traded.
+        if (getLore().getOrNull(0) == "§7Lump-sum amount") {
+            return NeuInternalName.SKYBLOCK_COIN
         }
         val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
         return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
@@ -594,6 +606,15 @@ object ItemUtils {
             return getInternalNameOrNull()?.repoItemName ?: "<null>"
         }
 
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
+    val ItemStack.repoItemNameCompact: String
+        get() {
+            getAttributeFromShard()?.let {
+                return it.getAttributeName()
+            }
+            return getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
+        }
+
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
         if (!(getInternalName().asString().startsWith("ATTRIBUTE_SHARD"))) return null
         val attributes = getAttributes() ?: return null
@@ -607,12 +628,34 @@ object ItemUtils {
     val NeuInternalName.repoItemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
+    val NeuInternalName.repoItemNameCompact get() = compactItemNameCache.getOrPut(this) { getRepoCompactName() }
+
+    private fun NeuInternalName.getRepoCompactName(): String {
+        var name = repoItemName
+        for ((from, to) in compactNameReplace) {
+            name = name.replace(from, to)
+        }
+        return name
+    }
+
+    private var compactNameReplace = mapOf<String, String>()
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        compactItemNameCache.clear()
+        // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
+        event.getConstant<ItemsJson>("Items").compactNames.let {
+            compactNameReplace = it
+        }
+    }
+
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     val NeuInternalName.readableInternalName: String
         get() = asString().replace("_", " ").lowercase()
 
+    @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
         if (this == NeuInternalName.WISP_POTION) {
             return "§fWisp's Ice-Flavored Water"
@@ -810,7 +853,7 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
-        if (!LorenzUtils.debug && !PlatformUtils.isDevEnvironment) return
+        if (!SkyHanniDebugsAndTests.enabled && !PlatformUtils.isDevEnvironment) return
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()
@@ -828,17 +871,21 @@ object ItemUtils {
     }
 
     fun NBTTagCompound.getStringList(key: String): List<String> {
-        if (!hasKey(key, 9)) return emptyList()
+        if (!NbtCompat.containsList(this, key)) return emptyList()
 
-        return getTagList(key, 8).let { loreList ->
+        return NbtCompat.getStringTagList(this, key).let { loreList ->
             List(loreList.tagCount()) { loreList.getStringTagAt(it) }
         }
     }
 
     fun NBTTagCompound.getCompoundList(key: String): List<NBTTagCompound> =
-        getTagList(key, 10).let { loreList ->
+        NbtCompat.getCompoundTagList(this, key).let { loreList ->
             List(loreList.tagCount()) { loreList.getCompoundTagAt(it) }
         }
+
+    fun NBTTagCompound.containsCompound(key: String): Boolean {
+        return NbtCompat.containsCompound(this, key)
+    }
 
     fun NeuInternalName.getNumberedName(amount: Number): String {
         val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "

@@ -1,12 +1,17 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+//#if TODO
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+//#endif
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 import java.util.TreeMap
 import kotlin.math.pow
 
+// todo 1.21 impl needed
 object NumberUtil {
 
     private val config get() = SkyHanniMod.feature
@@ -276,4 +281,20 @@ object NumberUtil {
 
     fun Int.intPow(n: Int): Int = toDouble().pow(n).toInt()
 
+    fun Double.formatPercentage(): String = formatPercentage(this, "0.00")
+
+    private fun formatPercentage(percentage: Double, format: String?): String =
+        DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
+
+    fun Double.oneDecimal() = "%.1f".format(this)
+}
+
+class MinMaxNumber(val min: Double, val max: Double) {
+    //#if TODO
+    override fun toString(): String = "${min.formatCoin()}§7-${max.formatCoin()}"
+    //#else
+    //$$ override fun toString(): String = "${min}§7-${max}"
+    //#endif
+
+    operator fun plus(other: MinMaxNumber): MinMaxNumber = MinMaxNumber(min + other.min, max + other.max)
 }

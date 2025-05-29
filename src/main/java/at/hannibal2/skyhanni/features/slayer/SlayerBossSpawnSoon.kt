@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TitleManager
@@ -16,7 +15,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SlayerBossSpawnSoon {
 
-    private val config get() = SkyHanniMod.feature.slayer.slayerBossWarning
+    private val config get() = SlayerApi.config.slayerBossWarning
 
     private val progressPattern by RepoPattern.pattern(
         "slayer.bosswarning.progress",
@@ -38,7 +37,7 @@ object SlayerBossSpawnSoon {
         if (completion > config.percent / 100.0) {
             if (!warned || (config.repeat && completion != lastCompletion)) {
                 SoundUtils.playBeepSound()
-                TitleManager.sendTitle("§eSlayer boss soon!", 2.seconds)
+                TitleManager.sendTitle("§eSlayer boss soon!", duration = 2.seconds)
                 warned = true
             }
         } else {

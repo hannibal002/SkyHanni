@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.api.enoughupdates
 
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -206,14 +205,14 @@ class ItemResolutionQuery {
 
     private fun resolveRuneName(): String? {
         val runes = getExtraAttributes().getCompoundTag("runes")
-        val runeName = CollectionUtils.getOnlyElement(runes.keySet, null)
+        val runeName = runes.keySet.singleOrNull()
         if (runeName.isNullOrEmpty()) return null
         return runeName.uppercase() + "_RUNE;" + runes.getInteger(runeName)
     }
 
     private fun resolveEnchantedBookNameFromNBT(): String? {
         val enchantments = getExtraAttributes().getCompoundTag("enchantments")
-        val enchantName = CollectionUtils.getOnlyElement(enchantments.keySet, null)
+        val enchantName = enchantments.keySet.singleOrNull()
         if (enchantName.isNullOrEmpty()) return null
         return enchantName.uppercase() + ";" + enchantments.getInteger(enchantName)
     }
@@ -257,7 +256,7 @@ class ItemResolutionQuery {
 
     private fun resolveAttributeShardName(): String? {
         val attributes = getExtraAttributes().getCompoundTag("attributes")
-        val attributeName = CollectionUtils.getOnlyElement(attributes.keySet, null)
+        val attributeName = attributes.keySet.singleOrNull()
         if (attributeName.isNullOrEmpty()) return null
         return "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getInteger(attributeName)
     }

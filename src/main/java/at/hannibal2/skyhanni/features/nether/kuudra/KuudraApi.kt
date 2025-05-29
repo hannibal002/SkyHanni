@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraEnterEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.removePrefix
@@ -13,6 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -44,7 +44,7 @@ object KuudraApi {
         "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
-    private val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
+    val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
     val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
     fun NeuInternalName.isKuudraArmor(): Boolean = kuudraArmorPattern.matches(asString())
@@ -62,7 +62,10 @@ object KuudraApi {
     var kuudraTier: Int? = null
         private set
 
+    @Deprecated("moved", ReplaceWith("inKuudra"))
     fun inKuudra() = kuudraTier != null
+
+    val inKuudra get() = SkyBlockUtils.inSkyBlock && kuudraTier != null
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
@@ -75,7 +78,7 @@ object KuudraApi {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         kuudraTier = null
     }
 

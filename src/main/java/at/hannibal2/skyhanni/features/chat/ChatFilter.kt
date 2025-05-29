@@ -4,15 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.chat.ChatFilter.messagesMap
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -217,6 +216,12 @@ object ChatFilter {
         "§6§lRARE DROP! §r§5Crystal Fragment",
     )
 
+    // Legacy Items
+    @Suppress("MaxLineLength")
+    private val legacyItems = listOf(
+        "§cYou currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!".toPattern(),
+    )
+
     // Useless Notification
     private val uselessNotificationPatterns = listOf(
         "§aYou tipped \\d+ players? in \\d+(?: different)? games?!".toPattern(),
@@ -275,6 +280,7 @@ object ChatFilter {
         "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§7Your Spirit Sceptre hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§cYou need a tool with a §r§aBreaking Power §r§cof §r§6(\\d)§r§c to mine (.*)§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!".toPattern(),
+        "§9§n\n§c§lYouTube Premier §eCelebrate Hypixel's 12th Anniversary with a special Minecraft Animation, live now §bhttps://youtu.be/ikT631vQd8A\n".toPattern(),
     )
     private val annoyingSpamMessages = listOf(
         "§cThere are blocks in the way!",
@@ -323,7 +329,7 @@ object ChatFilter {
                 northStarsPattern,
                 boostPotionPattern,
                 enchantmentBookPattern,
-                genericRewardPattern
+                genericRewardPattern,
             ).forEach { add(it) }
         }
         addAll(GiftProfitTracker.spamPatterns)
@@ -452,6 +458,7 @@ object ChatFilter {
         "slayer" to slayerPatterns,
         "slayer_drop" to slayerDropPatterns,
         "useless_drop" to uselessDropPatterns,
+        "legacy_items" to legacyItems,
         "useless_notification" to uselessNotificationPatterns,
         "money" to bazaarPatterns,
         "winter_island" to winterIslandPatterns,
@@ -540,12 +547,13 @@ object ChatFilter {
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
-        generalConfig.hideSkyMall && !LorenzUtils.inMiningIsland() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
+        generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && (skymallPerkPattern.matches(message) || message.isPresent("skymall")) -> "skymall"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
         dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
+        config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
 
         else -> null
     }

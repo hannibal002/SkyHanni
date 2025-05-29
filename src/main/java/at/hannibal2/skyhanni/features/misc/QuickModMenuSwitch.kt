@@ -13,18 +13,20 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.ClientCommandHandler
 
 @SkyHanniModule
 object QuickModMenuSwitch {
 
     private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private var latestGuiPath = ""
 
     private var mods: List<Mod>? = null
@@ -138,7 +140,10 @@ object QuickModMenuSwitch {
                 onLeftClick = { open(mod) },
                 condition = { System.currentTimeMillis() > lastGuiOpen + 250 },
             )
-            add(listOf(renderable, nameSuffix))
+            addLine {
+                add(renderable)
+                addString(nameSuffix)
+            }
         }
     }
 
@@ -157,12 +162,12 @@ object QuickModMenuSwitch {
     fun onScreenDrawn(event: ScreenDrawnEvent) {
         if (!isEnabled()) return
 
-        GlStateManager.pushMatrix()
-        config.pos.renderStringsAndItems(display, posLabel = "Quick Mod Menu Switch")
-        GlStateManager.popMatrix()
+        DrawContextUtils.pushMatrix()
+        config.pos.renderRenderables(display, posLabel = "Quick Mod Menu Switch")
+        DrawContextUtils.popMatrix()
     }
 
-    fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.QUICK_MOD_MENU_SWITCH.isSelected()) && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableApi.remainingClicksPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -59,7 +59,10 @@ object SuperpairDataDisplay {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "Experimentation Table") {
             // Render here so they can move it around.
-            config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
+            config.superpairDisplayPosition.renderString(
+                "§6Superpair Experimentation Data",
+                posLabel = "Superpair Experimentation Data",
+            )
         }
         if (ExperimentationTableApi.currentExperiment == null) return
 

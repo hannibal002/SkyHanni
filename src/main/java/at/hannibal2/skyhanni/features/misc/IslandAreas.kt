@@ -10,15 +10,14 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -27,6 +26,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -36,7 +37,7 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.inventory.GuiInventory
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object IslandAreas {
@@ -46,11 +47,15 @@ object IslandAreas {
     private var paths = mapOf<GraphNode, Graph>()
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
-    var currentAreaName = ""
+
+    @Deprecated("moved", ReplaceWith("LorenzUtils.graphArea"))
+    val currentAreaName get() = currentArea
+
+    var currentArea = ""
     private val textInput = SearchTextInput()
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         nodes = emptyMap()
         display = null
         targetNode = null
@@ -89,11 +94,9 @@ object IslandAreas {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
-        if (event.isMod(2) && hasMoved) {
-            updatePosition()
-            hasMoved = false
-        }
+        if (!isEnabled() || !event.isMod(2) || !hasMoved) return
+        update(shouldBuildDisplay = isPathfinderEnabled())
+        hasMoved = false
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -103,14 +106,10 @@ object IslandAreas {
         }
     }
 
-    fun updatePosition() {
-        display = buildDisplay().buildSearchBox(textInput)
-    }
-
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onRenderOverlay() {
         if (!isEnabled()) return
-        if (!config.pathfinder.enabled) return
+        if (!isPathfinderEnabled()) return
         if (!config.pathfinder.showAlways) return
         val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (isInOwnInventory) return
@@ -120,10 +119,10 @@ object IslandAreas {
         }
     }
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onBackgroundDraw() {
         if (!isEnabled()) return
-        if (!config.pathfinder.enabled) return
+        if (!isPathfinderEnabled()) return
         val isInOwnInventory = Minecraft.getMinecraft().currentScreen is GuiInventory
         if (!isInOwnInventory) return
 
@@ -132,12 +131,24 @@ object IslandAreas {
         }
     }
 
-    private fun buildDisplay() = buildList<Searchable> {
+    @HandleEvent(IslandGraphReloadEvent::class)
+    fun onIslandGraphReload() {
+        nodeMoved()
+
+        DelayedRun.runDelayed(150.milliseconds) {
+            update(shouldBuildDisplay = isPathfinderEnabled())
+        }
+    }
+
+    // updateing the position (mandatory for all other features), and builds the display (optionally)
+    // TODO split the position update logic outside the display creation logic, without reducing performance.
+    private fun update(shouldBuildDisplay: Boolean = true) {
         var foundCurrentArea = false
         var foundAreas = 0
-
-        for ((node, diff) in nodes) {
-            val difference = diff
+        val buildDisplay: MutableList<Searchable>? = if (shouldBuildDisplay) {
+            mutableListOf()
+        } else null
+        for ((node, difference) in nodes) {
             val tag = node.getAreaTag() ?: continue
 
             val name = node.name ?: continue
@@ -153,7 +164,7 @@ object IslandAreas {
                 passedAreas.remove(name)
                 passedAreas.remove(null)
                 passedAreas.remove("null")
-                passedAreas.remove(currentAreaName)
+                passedAreas.remove(currentArea)
                 // so show areas needed to pass thorough
                 // TODO show this pass through in the /shnavigate command
                 if (passedAreas.isNotEmpty()) {
@@ -171,14 +182,14 @@ object IslandAreas {
                 val inAnArea = name != "no_area" && isConfigVisible
                 if (config.pathfinder.includeCurrentArea.get()) {
                     if (inAnArea) {
-                        addSearchString("§eCurrent area: $coloredName")
+                        buildDisplay?.addSearchString("§eCurrent area: $coloredName")
                     } else {
-                        addSearchString("§7Not in an area.")
+                        buildDisplay?.addSearchString("§7Not in an area.")
                     }
                 }
                 updateArea(name, onlyInternal = !isConfigVisible)
 
-                addSearchString("§eAreas nearby:")
+                buildDisplay?.addSearchString("§eAreas nearby:")
                 continue
             }
 
@@ -186,7 +197,7 @@ object IslandAreas {
             if (!isConfigVisible) continue
             foundAreas++
 
-            add(
+            buildDisplay?.add(
                 Renderable.clickable(
                     text,
                     tips = buildList {
@@ -206,7 +217,7 @@ object IslandAreas {
                         if (node == targetNode) {
                             targetNode = null
                             IslandGraphs.stop()
-                            updatePosition()
+                            update()
                         } else {
                             setTarget(node)
                         }
@@ -217,18 +228,21 @@ object IslandAreas {
         if (foundAreas == 0) {
             val islandName = LorenzUtils.skyBlockIsland.displayName
             if (foundCurrentArea) {
-                addSearchString("§cThere is only one area in $islandName,")
-                addSearchString("§cnothing else to navigate to!")
+                buildDisplay?.addSearchString("§cThere is only one area in $islandName,")
+                buildDisplay?.addSearchString("§cnothing else to navigate to!")
             } else {
-                addSearchString("§cThere is no $islandName area data avaliable yet!")
+                buildDisplay?.addSearchString("§cThere is no $islandName area data avaliable yet!")
             }
+        }
+        buildDisplay?.let {
+            display = it.buildSearchBox(textInput)
         }
     }
 
     private fun updateArea(name: String, onlyInternal: Boolean) {
-        if (name != currentAreaName) {
-            val oldArea = currentAreaName
-            currentAreaName = name
+        if (name != currentArea) {
+            val oldArea = currentArea
+            currentArea = name
             GraphAreaChangeEvent(name, oldArea, onlyInternal).post()
         }
     }
@@ -240,7 +254,7 @@ object IslandAreas {
         // when this is a small area and small areas are disabled via config
         if (event.onlyInternal) return
         if (inAnArea && config.enterTitle) {
-            TitleManager.sendTitle("§aEntered $name!", 3.seconds)
+            TitleManager.sendTitle("§aEntered $name!")
         }
     }
 
@@ -250,7 +264,7 @@ object IslandAreas {
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
             val name = node.name ?: continue
-            if (name == currentAreaName) continue
+            if (name == currentArea) continue
             if (name == "no_area") continue
             val position = node.position
             val areaTag = node.getAreaTag(useConfig = true) ?: continue
@@ -260,16 +274,22 @@ object IslandAreas {
         }
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.pathfinder.color) {
-            targetNode?.let {
-                setTarget(it)
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
+        with(config.pathfinder) {
+            ConditionalUtils.onToggle(color) {
+                targetNode?.let {
+                    setTarget(it)
+                }
             }
-        }
-        ConditionalUtils.onToggle(config.pathfinder.color, config.pathfinder.includeCurrentArea) {
-            updateNodes()
-            updatePosition()
+            ConditionalUtils.onToggle(
+                color,
+                includeCurrentArea,
+                enabled,
+            ) {
+                updateNodes()
+                update()
+            }
         }
     }
 
@@ -290,13 +310,15 @@ object IslandAreas {
             color,
             onFound = {
                 targetNode = null
-                updatePosition()
+                update()
             },
             allowRerouting = true,
-            condition = { config.pathfinder.enabled },
+            condition = { isPathfinderEnabled() },
         )
-        updatePosition()
+        update()
     }
 
-    fun isEnabled() = IslandGraphs.currentIslandGraph != null
+    private fun isPathfinderEnabled(): Boolean = config.pathfinder.enabled.get()
+
+    private fun isEnabled() = IslandGraphs.currentIslandGraph != null
 }

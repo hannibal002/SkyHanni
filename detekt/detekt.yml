@@ -28,6 +28,8 @@ RepoRules:
 ImportRules:
     CustomImportOrdering:
         active: true
+    PreprocessingImportOrdering:
+        active: true
 
 SkyHanniStyle:
     InSkyBlockEarlyReturn:
@@ -154,6 +156,8 @@ potential-bugs:
     HasPlatformType: # false positives on config get() methods
         active: false
     StorageNeedsExpose:
+        active: true
+    NonStorageDoesntNeedExpose:
         active: true
     ImmutableTypesWithExpectedInteriorMutabilityInConfig:
         active: true

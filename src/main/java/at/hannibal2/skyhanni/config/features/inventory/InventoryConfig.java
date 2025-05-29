@@ -2,10 +2,11 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig;
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
+import at.hannibal2.skyhanni.config.features.inventory.sacks.OutsideSackValueConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
 import at.hannibal2.skyhanni.config.features.misc.PocketSackInASackConfig;
@@ -15,6 +16,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +63,7 @@ public class InventoryConfig {
 
     @Expose
     @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
-    public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
+    public CFConfig chocolateFactory = new CFConfig();
 
     @Expose
     @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
@@ -85,7 +87,7 @@ public class InventoryConfig {
     public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
 
     @Expose
-    @ConfigOption(name = "Focus Mode", desc="")
+    @ConfigOption(name = "Focus Mode", desc = "")
     @Accordion
     public FocusModeConfig focusMode = new FocusModeConfig();
 
@@ -108,6 +110,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Sack Items Display", desc = "")
     @Accordion
     public SackDisplayConfig sackDisplay = new SackDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Outside Sack Value", desc = "")
+    @Accordion
+    public OutsideSackValueConfig outsideSackValue = new OutsideSackValueConfig();
 
     @Expose
     @ConfigOption(name = "Estimated Item Value", desc = "(Prices for Enchantments, Reforge Stones, Gemstones, Drill Parts and more)")
@@ -138,7 +145,7 @@ public class InventoryConfig {
     @ConfigOption(name = "New Year Cake Tracker", desc = "")
     @Accordion
     public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
-  
+
     @Expose
     @ConfigOption(name = "Magical Power Display", desc = "")
     @Accordion
@@ -150,8 +157,20 @@ public class InventoryConfig {
     public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
 
     @Expose
+    @ConfigOption(name = "Evolving Items", desc = "")
+    @Accordion
+    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
+    public evolvingItemsConfig evolvingItems = new evolvingItemsConfig();
+
+    @Expose
+    @ConfigOption(name = "Trade Value", desc = "Creates a trade value overlay")
+    @Accordion
+    public TradeConfig trade = new TradeConfig();
+
+    @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
+    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,
@@ -174,7 +193,7 @@ public class InventoryConfig {
         LARVA_HOOK("§bLarva Hook", 12),
         DUNGEON_POTION_LEVEL("§bDungeon Potion Level", 13),
         VACUUM_GARDEN("§bVacuum (Garden)", 14),
-        TIME_POCKET_ITEMS("§bTime Pocket Items (Jyrre, Truffle, Discrite)", 15),
+        EVOLVING_ITEMS("§bEvolving Items (Jyrre, Truffle, etc.)", 15),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
@@ -289,12 +308,6 @@ public class InventoryConfig {
     public boolean shiftClickBrewing = false;
 
     @Expose
-    @ConfigOption(name = "Time Held in Lore", desc = "Show time held for Time Pocket items (Bottle of Jyrre, Dark Cacao Truffle, Discrite) in the lore.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean timeHeldInLore = false;
-
-    @Expose
     @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -317,7 +330,7 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean essenceShopHelper = true;
-  
+
     @Expose
     @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
     @ConfigEditorBoolean

@@ -45,7 +45,8 @@ enum class TabWidgetDisplay(
         TabWidget.INTEREST,
         TabWidget.SOULFLOW,
         TabWidget.FAIRY_SOULS,
-    )
+    ),
+    EYES("Eyes placed", TabWidget.EYES_PLACED),
     ;
 
     val position get() = config.displayPositions[ordinal]
@@ -63,7 +64,7 @@ enum class TabWidgetDisplay(
         @HandleEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
-            if (config?.displayPositions == null) return
+            if (config.displayPositions.isEmpty()) return
             config.display.forEach { widget ->
                 widget.position.renderStrings(
                     widget.widgets.flatMap { subWidget ->

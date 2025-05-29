@@ -3,9 +3,12 @@ package at.hannibal2.skyhanni.config.features.garden;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.CropType;
+//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -15,6 +18,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import java.util.ArrayList;
 import java.util.List;
 
+// todo 1.21 impl needed
 public class NextJacobContestConfig {
     @Expose
     @ConfigOption(name = "Show Jacob's Contest", desc = "Show the current or next Jacob's farming contest time and crops.")
@@ -36,6 +40,16 @@ public class NextJacobContestConfig {
     @ConfigOption(name = "Fetch Contests", desc = "Automatically fetch Contests from elitebot.dev for the current year if they're uploaded already.")
     @ConfigEditorBoolean
     public boolean fetchAutomatically = true;
+
+    @Expose
+    @ConfigOption(name = "Additional Boosted Highlight", desc = "Highlight the current boosted crop with an outline in addition to the enchant glint.")
+    @ConfigEditorBoolean
+    public boolean additionalBoostedHighlight = false;
+
+    @Expose
+    @ConfigOption(name = "Additional Boosted Highlight Color", desc = "Set the color of the highlight for the current boosted crop.")
+    @ConfigEditorColour
+    public String additionalBoostedHighlightColor = "0:80:0:255:0";
 
     @Expose
     @ConfigOption(name = "Share Contests", desc = "Share the list of upcoming Contests to elitebot.dev for everyone else to then fetch automatically.")
@@ -91,6 +105,7 @@ public class NextJacobContestConfig {
     @ConfigEditorBoolean
     public boolean warnPopup = false;
 
+    //#if TODO
     @Expose
     @ConfigOption(
         name = "Warn For",
@@ -98,8 +113,9 @@ public class NextJacobContestConfig {
     )
     @ConfigEditorDraggableList
     public List<CropType> warnFor = new ArrayList<>(CropType.getEntries());
+    //#endif
 
     @Expose
     @ConfigLink(owner = NextJacobContestConfig.class, field = "display")
-    public Position pos = new Position(-200, 10, false, true);
+    public Position pos = new Position(-200, 10);
 }

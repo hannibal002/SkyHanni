@@ -9,8 +9,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
@@ -18,9 +16,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TrophyFishMessages {
@@ -36,7 +35,7 @@ object TrophyFishMessages {
     @Suppress("MaxLineLength")
     val trophyFishPattern by RepoPattern.pattern(
         "fishing.trophy.trophyfish",
-        "§6♔ §r§6§lTROPHY FISH! §r§fYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§f!"
+        "§6♔ §r§6§lTROPHY FISH! §r§fYou caught an? §r(?<displayName>§[0-9a-f](?:§k)?[\\w -]+) §r(?<displayRarity>§[0-9a-f]§l\\w+)§r§f!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -46,7 +45,7 @@ object TrophyFishMessages {
                 group("displayRarity")
         } ?: return
 
-        val internalName = getInternalName(displayName)
+        val internalName = TrophyFishApi.getInternalName(displayName)
         val rarity = TrophyRarity.getByName(displayRarity.lowercase().removeColor()) ?: return
 
         val trophyFishes = TrophyFishManager.fish ?: return
@@ -73,7 +72,7 @@ object TrophyFishMessages {
 
         if (config.enabled) {
             edited = (
-                "§6§lTROPHY FISH! " + when (config.design) {
+                "§6♔ §6§lTROPHY FISH! " + when (config.design) {
                     DesignFormat.STYLE_1 -> if (amount == 1) "§c§lFIRST §r$displayRarity $displayName"
                     else "§7$amount${amount.ordinal()} §r$displayRarity $displayName"
 
@@ -104,14 +103,7 @@ object TrophyFishMessages {
 
     private fun sendTitle(displayName: String, displayRarity: String?, amount: Int) {
         val text = "$displayName $displayRarity §8$amount§c!"
-        TitleManager.sendTitle(text, 3.seconds, 2.8, 7f)
-    }
-
-    val regex = "[- ]".toRegex()
-
-    fun getInternalName(displayName: String): String {
-        return displayName.replace("Obfuscated", "Obfuscated Fish")
-            .replace(regex, "").lowercase().removeColor()
+        TitleManager.sendTitle(text)
     }
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =

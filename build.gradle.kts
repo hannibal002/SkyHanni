@@ -15,9 +15,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
+import skyhannibuildsystem.CleanupMappingFiles
 import skyhannibuildsystem.DownloadBackupRepo
 import java.io.Serializable
 import java.nio.file.Path
+import java.util.Properties
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import kotlin.io.path.moveTo
@@ -35,7 +37,6 @@ plugins {
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
     id("io.gitlab.arturbosch.detekt")
-    id("net.kyori.blossom")
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
@@ -62,6 +63,9 @@ loom {
             )
             mixinConfig("mixins.skyhanni.json")
         }
+    }
+    if (target == ProjectTarget.MODERN) {
+        accessWidenerPath = file("src/main/resources/skyhanni.accesswidener")
     }
     mixin {
         useLegacyMixinAp.set(true)
@@ -120,6 +124,10 @@ val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.branch = "main"
 }
 
+val cleanupMappingFiles by tasks.registering(CleanupMappingFiles::class) {
+    this.mappingsDirectory.set(layout.projectDirectory.asFile.parentFile)
+}
+
 tasks.runClient {
     this.javaLauncher.set(
         javaToolchains.launcherFor {
@@ -157,12 +165,7 @@ dependencies {
     }
 
     // Discord RPC client
-    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
-        exclude(module = "log4j")
-        because("Different version conflicts with Minecraft's Log4J")
-        exclude(module = "gson")
-        because("Different version conflicts with Minecraft's Log4j")
-    }
+    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
     compileOnly(libs.jbAnnotations)
 
     headlessLwjgl(libs.headlessLwjgl)
@@ -182,8 +185,8 @@ dependencies {
         modImplementation("net.fabricmc:fabric-loader:0.16.7")
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
-        modImplementation("net.fabricmc:fabric-loader:0.16.10")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
+        modImplementation("net.fabricmc:fabric-loader:0.16.13")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
 
         modLocalRuntime(libs.modmenu)
     }
@@ -241,10 +244,15 @@ dependencies {
 
 afterEvaluate {
     loom.runs.named("client") {
-        programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+        if (target == ProjectTarget.MAIN) {
+            programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
+        } else if (target == ProjectTarget.MODERN) {
+            programArgs("--quickPlayMultiplayer", "hypixel.net")
+        }
     }
     tasks.named("kspKotlin", KspTaskJvm::class) {
-        this.options.add(SubpluginOption("apoption", "skyhanni.sourceset=${target.minecraftVersion.versionName}"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.modver=$version"))
+        this.options.add(SubpluginOption("apoption", "skyhanni.mcver=${target.minecraftVersion.versionName}"))
         this.options.add(SubpluginOption("apoption", "skyhanni.buildpaths=${project.file("buildpaths.txt").absolutePath}"))
     }
 }
@@ -302,7 +310,7 @@ fun includeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
     if (buildPathsFile.exists()) {
         sourceSet.get().apply {
             val buildPaths = buildPathsFile.readText().lineSequence()
-                .map { it.substringBefore("#").trim() }
+                .map { it.substringBefore("#").trim().replace(Regex("\\.(?!kt|java|\\()"), "/") }
                 .filter { it.isNotBlank() }
                 .toSet()
             kotlin.include(buildPaths)
@@ -397,16 +405,21 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
     }
 }
 
+val skipTodos by lazy {
+    val prop = Properties()
+    val file = rootProject.file(".gradle/private.properties")
+    if (file.exists()) {
+        file.inputStream().use(prop::load)
+    }
+    (prop["skyhanni.skipPreprocessTodos"] as? String)?.toBoolean() ?: false
+}
+
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
     vars.put("FORGE", if (target.isForge) 1 else 0)
     vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
-}
-
-blossom {
-    replaceToken("@MOD_VERSION@", version)
-    replaceToken("@MC_VERSION@", target.minecraftVersion.versionName)
+    vars.put("TODO", if (skipTodos) 1 else 0)
 }
 
 val sourcesJar by tasks.creating(Jar::class) {

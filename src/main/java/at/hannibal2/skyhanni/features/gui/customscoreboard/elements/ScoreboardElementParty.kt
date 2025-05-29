@@ -4,34 +4,35 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.partyConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
 // internal
 // add party update event
 object ScoreboardElementParty : ScoreboardElement() {
+    private val config get() = CustomScoreboard.displayConfig.party
+
     // TODO cache until next party update event
     override fun getDisplay() = buildList {
-        if (PartyApi.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) return@buildList
+        if (PartyApi.partyMembers.isEmpty() && CustomScoreboard.informationFilteringConfig.hideEmptyLines) return@buildList
 
         add(if (PartyApi.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyApi.partyMembers.size})")
 
-        if (partyConfig.showPartyLeader && PartyApi.partyLeader != null) {
+        if (config.showPartyLeader && PartyApi.partyLeader != null) {
             add(" §7- §f${PartyApi.partyLeader} §e♚")
         }
 
-        if (partyConfig.showPartyLeader) {
+        if (config.showPartyLeader) {
             PartyApi.partyMembers.filter { it != PartyApi.partyLeader }
         } else {
             PartyApi.partyMembers
-        }.take(partyConfig.maxPartyList.get()).forEach { add(" §7- §f$it") }
+        }.take(config.maxPartyList.get()).forEach { add(" §7- §f$it") }
     }
 
     override fun showWhen() =
         when {
             DungeonApi.inDungeon() -> false // Hidden because the scoreboard lines already exist
-            partyConfig.showPartyEverywhere -> true
+            config.showPartyEverywhere -> true
             else -> inAnyIsland(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE) || MiningApi.inColdIsland()
         }
 

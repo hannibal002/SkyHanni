@@ -133,6 +133,7 @@ object ReforgeHelper {
     }
 
     private fun handleReforgeButtonClick(event: GuiContainerEvent.SlotClickEvent): Boolean {
+        if (reforgeToSearch == null) return false
         if (currentReforge == reforgeToSearch) {
             event.cancel()
             waitForChat.set(false)
@@ -335,7 +336,6 @@ object ReforgeHelper {
         val alreadySelected = sortAfter == stat
         val fieldColor = if (alreadySelected) LorenzColor.GRAY else LorenzColor.DARK_GRAY
 
-
         val tips = if (alreadySelected) {
             listOf("§6Sort by", tip)
         } else {
@@ -414,7 +414,7 @@ object ReforgeHelper {
         val inventory = inventoryContainer?.inventorySlots ?: return
         val slot = inventory.firstOrNull { it?.stack?.cleanName() == reforgeStone }
         if (slot != null) {
-            slot highlight color
+            slot.highlight(color)
         } else {
             inventory[HEX_REFORGE_NEXT_DOWN_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)
             inventory[HEX_REFORGE_NEXT_UP_BUTTON]?.takeIf { it.stack?.item == Items.skull }?.highlight(color)

@@ -3,82 +3,86 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningApi
-import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.entity.EntityLivingBase
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.Month
 import java.util.UUID
-import kotlin.time.Duration.Companion.seconds
 //#if MC < 1.21
 import net.minecraft.entity.SharedMonsterAttributes
 //#else
 //$$ import net.minecraft.entity.attribute.EntityAttributes
 //#endif
 
+// Dont use. prefer SkyBlockUtils or other utils classes
+@Suppress("DEPRECATION")
+@Deprecated("Use SkyBlockUtils or other utils classes. 450 usages prevent us from doing so in one push.")
 object LorenzUtils {
 
-    val connectedToHypixel get() = HypixelData.hypixelLive || HypixelData.hypixelAlpha
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.onHypixel"))
+    val onHypixel get() = HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
 
-    val onHypixel get() = connectedToHypixel && MinecraftCompat.localPlayerExists
-
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.isOnAlphaServer"))
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.inSkyBlock"))
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.inHypixelLobby"))
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
     /**
      * Consider using [IslandType.isInIsland] instead
      */
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.currentIsland"))
     val skyBlockIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
 
-    @Deprecated("Scoreboard data is updating delayed while moving", ReplaceWith("IslandAreas.currentAreaName"))
-    val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
+    @Deprecated("Scoreboard data is updating delayed while moving, dont use.", ReplaceWith("SkyBlockUtils.graphArea"))
+    val skyBlockArea get() = scoreboardArea
 
-    val inKuudraFight get() = inSkyBlock && KuudraApi.inKuudra()
+    // almost always prefer this over scoreboardArea
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.graphArea"))
+    val graphArea get() = if (inSkyBlock) IslandAreas.currentArea else null
 
+    // Only use scoreboardArea if graph data is not useable in this scenario.
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.scoreboardArea"))
+    val scoreboardArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
+
+    @Deprecated("moved", ReplaceWith("KuudraApi.inKuudra"))
+    val inKuudraFight get() = inSkyBlock && KuudraApi.kuudraTier != null
+
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.noTradeMode"))
     val noTradeMode get() = HypixelData.noTrade
 
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.isStrandedProfile"))
     val isStrandedProfile get() = inSkyBlock && HypixelData.stranded
 
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.isBingoProfile"))
     val isBingoProfile get() = inSkyBlock && (HypixelData.bingo || TestBingo.testBingo)
 
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.isIronmanProfile"))
     val isIronmanProfile get() = inSkyBlock && HypixelData.ironman
 
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.lastWorldSwitch"))
     val lastWorldSwitch get() = HypixelData.joinedWorld
 
-    private var previousApril = false
+    @Deprecated("moved", ReplaceWith("SkyHanniDebugsAndTests.isAprilFoolsDay"))
+    val isAprilFoolsDay get() = SkyHanniDebugsAndTests.isAprilFoolsDay
 
-    val isAprilFoolsDay: Boolean
-        get() {
-            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
-            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
-            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
-            val result = (!never && (always || itsTime))
-            if (previousApril != result) {
-                ModifyVisualWords.update()
-            }
-            previousApril = result
-            return result
-        }
-
+    @Deprecated("moved", ReplaceWith("SkyHanniDebugsAndTests.enabled"))
     val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
     // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
+    @Deprecated("moved to TimeUtils", ReplaceWith(""))
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
     // TODO use derpy() on every use case
+    @Deprecated("moved to EntityUtils", ReplaceWith(""))
     val EntityLivingBase.baseMaxHealth: Int
         //#if MC < 1.21
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
@@ -86,95 +90,21 @@ object LorenzUtils {
     //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
     //#endif
 
-    // TODO create extension function
-    fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
-
-    fun formatPercentage(percentage: Double, format: String?): String =
-        DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
-
-    // TODO move into chat utils
-    fun consoleLog(text: String) {
-        SkyHanniMod.consoleLog(text)
-    }
-
+    @Deprecated("moved", ReplaceWith("PlayerUtils.getUuid()"))
     fun getPlayerUuid() = getRawPlayerUuid().toDashlessUUID()
 
+    @Deprecated("moved", ReplaceWith("PlayerUtils.getRawUuid()"))
     fun getRawPlayerUuid(): UUID = MinecraftCompat.localPlayer.uniqueID
 
+    @Deprecated("moved", ReplaceWith("PlayerUtils.getName()"))
     fun getPlayerName(): String = MinecraftCompat.localPlayer.name
 
-    // TODO move into renderable utils
-    fun fillTable(
-        data: List<DisplayTableEntry>,
-        padding: Int = 1,
-        itemScale: Double = NeuItems.ITEM_FONT_SIZE,
-    ): Renderable {
-        val sorted = data.sortedByDescending { it.sort }
-
-        val outerList = mutableListOf<List<Renderable>>()
-        for (entry in sorted) {
-            val item = entry.item.getItemStackOrNull()?.let {
-                Renderable.itemStack(it, scale = itemScale)
-            } ?: continue
-            val left = Renderable.hoverTips(
-                entry.left,
-                tips = entry.hover,
-                highlightsOnHoverSlots = entry.highlightsOnHoverSlots,
-            )
-            val right = Renderable.string(entry.right)
-            outerList.add(listOf(item, left, right))
-        }
-        return Renderable.table(outerList, xPadding = 5, yPadding = padding)
-    }
-
-    @Deprecated("Use List<Renderable>.addButton() instead", ReplaceWith(""))
-    inline fun <reified T : Enum<T>> MutableList<List<Any>>.addSelector(
-        prefix: String,
-        getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
-    ) {
-        add(buildSelector<T>(prefix, getName, isCurrent, onChange))
-    }
-
-    @Deprecated("do not use", ReplaceWith(""))
-    inline fun <reified T : Enum<T>> buildSelector(
-        prefix: String,
-        getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
-    ) = buildList {
-        add(prefix)
-        for (entry in enumValues<T>()) {
-            val display = getName(entry)
-            if (isCurrent(entry)) {
-                add("§a[$display]")
-            } else {
-                add("§e[")
-                add(
-                    Renderable.link("§e$display") {
-                        onChange(entry)
-                    },
-                )
-                add("§e]")
-            }
-            add(" ")
-        }
-    }
-
+    @Deprecated("moved into IslandType", ReplaceWith("this.isCurrent()"))
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.inAnyIsland(islandTypes)"))
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
+
+    @Deprecated("moved", ReplaceWith("SkyBlockUtils.inAnyIsland(islandTypes)"))
     fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
-
-    // TODO move into mayor api
-    val isDerpy by RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
-
-    // TODO move into mayor api
-    fun Int.derpy() = if (isDerpy) this / 2 else this
-
-    // TODO move into mayor api
-    fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
-
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() || IslandType.DEEP_CAVERNS.isInIsland() || MiningApi.inAdvancedMiningIsland()
 }

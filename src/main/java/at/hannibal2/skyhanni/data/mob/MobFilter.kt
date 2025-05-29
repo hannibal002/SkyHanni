@@ -1,25 +1,25 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -122,6 +122,14 @@ object MobFilter {
     )
 
     /**
+     * REGEX-TEST: SHINY PIG
+     * */
+    val shinyPig by patternGroup.pattern(
+        "pattern.shiny",
+        "SHINY PIG",
+    )
+
+    /**
      * REGEX-TEST: §8[§7Lv1§8] §5Horse
      * REGEX-TEST: §8[§7Lv52§8] §eArmadillo
      * REGEX-TEST: §8[§7Lv12§8] §eSkeleton Horse
@@ -193,9 +201,10 @@ object MobFilter {
 
     fun EntityLivingBase.isDisplayNpc() =
         (this is EntityPlayer && isNpc() && displayNpcNameCheck(this.name)) ||
-            (this is EntityVillager && this.maxHealth == 20.0f) || // Villager NPCs in the Village
+            (this is EntityVillager && this.maxHealth == 20f) || // Villager NPCs in the Village
             (this is EntityWitch && this.entityId <= 500) || // Alchemist NPC
             (this is EntityCow && this.entityId <= 500) || // Shania NPC (in Rift and Outside)
+            (this is EntityPig && this.entityId <= 600) || // Pig Shop
             (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
 
     fun createDisplayNpc(entity: EntityLivingBase): Boolean {

@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -16,15 +15,15 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import java.time.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 // @SkyHanniModule
+@Suppress("SKyHanniModuleInspection", "unused")
 object Year300RaffleEvent {
 
     private val config get() = SkyHanniMod.feature.event.century
-    val displayItem by lazy { NeuItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock) }
+    private val displayItem by lazy { NeuItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock) }
 
     private var lastTimerReceived = SimpleTimeMark.farPast()
     private var lastTimeAlerted = SimpleTimeMark.farPast()
@@ -38,8 +37,7 @@ object Year300RaffleEvent {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enableActiveTimer &&
-        Instant.now().isBefore(SkyBlockTime(301).toInstant())
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enableActiveTimer && SkyBlockTime(301).toTimeMark().isInPast()
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -50,7 +48,7 @@ object Year300RaffleEvent {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) {
             overlay = null
             return

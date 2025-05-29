@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.value
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -18,6 +19,7 @@ import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
 import java.util.NavigableMap
+import java.util.NavigableSet
 import java.util.UUID
 import java.util.regex.Matcher
 //#if FORGE
@@ -26,6 +28,7 @@ import io.github.notenoughupdates.moulconfig.internal.ForgeFontRenderer
 //$$ import io.github.notenoughupdates.moulconfig.platform.ModernFontRenderer
 //#endif
 
+// todo 1.21 impl needed
 object StringUtils {
     private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
@@ -134,6 +137,12 @@ object StringUtils {
         return map.subMap(prefix, true, lastKey, false)
     }
 
+    fun subMapOfStringsStartingWith(prefix: String, map: NavigableSet<String>): NavigableSet<String> {
+        if ("" == prefix) return map
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
+        return map.subSet(prefix, true, lastKey, false)
+    }
+
     fun nextLexicographicallyStringWithSameLength(input: String): String {
         val lastCharPosition = input.length - 1
         val inputWithoutLastChar = input.substring(0, lastCharPosition)
@@ -150,7 +159,7 @@ object StringUtils {
             split[1].removeColor()
         } else {
             split[0].removeColor()
-        }
+        }.removeSuffix("'s")
     }
 
     fun String.cleanPlayerName(displayName: Boolean = false): String {
@@ -159,6 +168,7 @@ object StringUtils {
                 // TODO custom color
                 "§b" + internalCleanPlayerName()
             } else this
+
         } else {
             internalCleanPlayerName()
         }
@@ -201,6 +211,8 @@ object StringUtils {
         return "$allButLast$delimiterColor, and ${this[lastIndex]}"
     }
 
+    fun String.pluralize(number: Int) = pluralize(number, this)
+
     fun pluralize(number: Int, singular: String, plural: String? = null, withNumber: Boolean = false): String {
         val pluralForm = plural ?: "${singular}s"
         var str = if (number == 1 || number == -1) singular else pluralForm
@@ -231,8 +243,9 @@ object StringUtils {
         return builder.toString()
     }
 
-    fun String.capAtMinecraftLength(limit: Int) =
-        capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.toString()) }
+    fun String.capAtMinecraftLength(limit: Int) = capAtLength(limit) {
+        Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.toString())
+    }
 
     private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
         var i = 0
@@ -388,13 +401,9 @@ object StringUtils {
         if (clickEvents.size > 1 || hoverEvents.size > 1) return
 
         chatComponent = new.asComponent()
-        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value
-        if (hoverEvents.size == 1) chatComponent.hover =
-            //#if MC < 1.21
-            hoverEvents.first().value
-        //#else
-        //$$ hoverEvents.first().getValue(HoverEvent.Action.SHOW_TEXT)
-        //#endif
+        if (clickEvents.size == 1) chatComponent.command = clickEvents.first().value()
+        if (hoverEvents.size == 1) chatComponent.hover = hoverEvents.first().value()
+
     }
 
     private fun IChatComponent.findAllEvents(
@@ -406,16 +415,12 @@ object StringUtils {
         val clickEvent = chatStyle.chatClickEvent
         val hoverEvent = chatStyle.chatHoverEvent
 
-        if (clickEvent?.action != null && clickEvents.none { it.value == clickEvent.value }) {
+        if (clickEvent?.action != null && clickEvents.none { it.value() == clickEvent.value() }) {
             clickEvents.add(clickEvent)
         }
 
         if (hoverEvent?.action != null && hoverEvents.none {
-                //#if MC < 1.21
-                it.value == hoverEvent.value
-                //#else
-                //$$ it.getValue(HoverEvent.Action.SHOW_TEXT) == hoverEvent.getValue(HoverEvent.Action.SHOW_TEXT)
-                //#endif
+                it.value() == hoverEvent.value()
             }
         ) {
             hoverEvents.add(hoverEvent)
@@ -448,9 +453,11 @@ object StringUtils {
         return message
     }
 
+    //#if TODO
     fun String.applyFormattingFrom(original: ComponentSpan): IChatComponent {
         return asComponent { chatStyle = original.sampleStyleAtStart() }
     }
+    //#endif
 
     fun String.applyFormattingFrom(original: IChatComponent): IChatComponent {
         return asComponent { chatStyle = original.chatStyle }
@@ -467,6 +474,8 @@ object StringUtils {
     fun Char.isVowel(): Boolean = this in vowels
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
+
+    fun String.splitCamelCase() = this.replace("([a-z])([A-Z])".toRegex(), "$1 $2")
 
     fun String.isValidUuid(): Boolean {
         return try {
@@ -488,5 +497,39 @@ object StringUtils {
         val firstColor = getFirstColorCode()
         val clean = removeColor()
         return "§$firstColor§m$clean"
+    }
+
+    fun getListOfStringsMatchingLastWord(words: Array<String>, args: Collection<String>): List<String> {
+        val lastWord = words.lastOrNull() ?: return emptyList()
+        val matches = args.filter { it.startsWith(lastWord, ignoreCase = true) }
+        return matches
+    }
+
+    // Just fully yoinked this one from the font renderer thx dinner bone
+    fun getFormatFromString(text: String): String {
+        val length = text.length
+        var string = ""
+        var i = -1
+
+        while ((text.indexOf(167.toChar(), i + 1).also { i = it }) != -1) {
+            if (i < length - 1) {
+                val c0 = text[i + 1]
+                if (isFormatColor(c0)) {
+                    string = "§$c0"
+                } else if (isFormatSpecial(c0)) {
+                    string = "$string§$c0"
+                }
+            }
+        }
+
+        return string
+    }
+
+    private fun isFormatColor(colorChar: Char): Boolean {
+        return colorChar in '0'..'9' || colorChar in 'a'..'f' || colorChar in 'A'..'F'
+    }
+
+    private fun isFormatSpecial(formatChar: Char): Boolean {
+        return formatChar in 'k'..'o' || formatChar in 'K'..'O' || formatChar in "rR"
     }
 }

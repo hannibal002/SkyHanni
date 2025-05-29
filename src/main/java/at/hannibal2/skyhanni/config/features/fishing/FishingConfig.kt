@@ -78,7 +78,7 @@ class FishingConfig {
 
     @Expose
     @ConfigLink(owner = FishingConfig::class, field = "sharkFishCounter")
-    var sharkFishCounterPos: Position = Position(10, 10, false, true)
+    var sharkFishCounterPos: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(
@@ -111,4 +111,10 @@ class FishingConfig {
     )
     @ConfigEditorBoolean
     var guessHotspotRadarPathFind: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Line to Hotspot", desc = "Draws a line towards the Fishing Hotspot.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var lineToHotspot: Boolean = false
 }

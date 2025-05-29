@@ -19,19 +19,19 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -96,7 +96,7 @@ object PestProfitTracker {
 
         override fun getDescription(bucket: PestType?, timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / getTotalPestCount()
-            val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val dropRate = percentage.coerceAtMost(1.0).formatPercentage()
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
                 "§7Your drop rate: §c$dropRate.",
@@ -135,8 +135,9 @@ object PestProfitTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemAdd(event: ItemAddEvent) {
-        if (!config.enabled || event.source != ItemAddManager.Source.COMMAND) return
-        with(tracker) { event.addItemFromEvent() }
+        if (config.enabled && event.source == ItemAddManager.Source.COMMAND) {
+            with(tracker) { event.addItemFromEvent() }
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -156,7 +157,6 @@ object PestProfitTracker {
             val amount = group("amount").toInt().fixAmount(internalName, pest)
 
             if (config.hideChat) blockedReason = "pest_drop"
-            if (!config.enabled) return
 
             tracker.addItem(pest, internalName, amount)
 
@@ -176,7 +176,6 @@ object PestProfitTracker {
             }
 
             // Happens here so that the amount is fixed independently of tracker being enabled
-            if (!config.enabled) return
 
             tracker.addItem(pest, internalName, amount)
             // Pests always have guaranteed loot, therefore there's no need to add kill here
@@ -184,7 +183,6 @@ object PestProfitTracker {
     }
 
     private fun SkyHanniChatEvent.checkSprayChats() {
-        if (!config.enabled) return
         sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
             SprayType.getByNameOrNull(it)?.addSprayUsed()
         }
@@ -282,7 +280,7 @@ object PestProfitTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPurseChange(event: PurseChangeEvent) {
-        if (!config.enabled || event.reason != PurseChangeCause.GAIN_MOB_KILL || lastPestKillTimes.isEmpty()) return
+        if (event.reason != PurseChangeCause.GAIN_MOB_KILL || lastPestKillTimes.isEmpty()) return
         val coins = event.coins.takeIf { it in 1000.0..10000.0 } ?: return
 
         // Get a list of all that have been killed in the last 2 seconds, it will
@@ -357,6 +355,4 @@ object PestProfitTracker {
             )
         }
     }
-
-    fun isEnabled() = GardenApi.inGarden() && config.enabled
 }

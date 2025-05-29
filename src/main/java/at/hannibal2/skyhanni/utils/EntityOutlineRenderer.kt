@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -18,6 +17,7 @@ import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.client.shader.Framebuffer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.MinecraftForgeClient
 import org.lwjgl.opengl.GL11
@@ -59,7 +59,7 @@ object EntityOutlineRenderer {
         val main = mc.framebuffer
         val frameBuffer = Framebuffer(main.framebufferTextureWidth, main.framebufferTextureHeight, true)
         frameBuffer.setFramebufferFilter(GL11.GL_NEAREST)
-        frameBuffer.setFramebufferColor(0.0f, 0.0f, 0.0f, 0.0f)
+        frameBuffer.setFramebufferColor(0f, 0f, 0f, 0f)
         return frameBuffer
     }
 
@@ -168,7 +168,11 @@ object EntityOutlineRenderer {
 
                 try {
                     if (key !is EntityLivingBase) outlineColor(value)
-                    renderManager.renderEntityStatic(key, partialTicks, true)
+                    if (key is EntitySlime && key.isInvisible) {
+                        key.isInvisible = false
+                        renderManager.renderEntityStatic(key, partialTicks, true)
+                        key.isInvisible = true
+                    } else renderManager.renderEntityStatic(key, partialTicks, true)
                 } catch (ignored: Exception) {
                 }
             }
@@ -301,15 +305,15 @@ object EntityOutlineRenderer {
                 camera,
                 vector.x,
                 vector.y,
-                vector.z
+                vector.z,
             ) || entity.getFirstPassenger() === MinecraftCompat.localPlayerOrNull
             )
     // Only render if renderManager would render and the world is loaded at the entity
 
     private fun outlineColor(color: Int) {
-        BUF_FLOAT_4.put(0, (color shr 16 and 255).toFloat() / 255.0f)
-        BUF_FLOAT_4.put(1, (color shr 8 and 255).toFloat() / 255.0f)
-        BUF_FLOAT_4.put(2, (color and 255).toFloat() / 255.0f)
+        BUF_FLOAT_4.put(0, (color shr 16 and 255).toFloat() / 255f)
+        BUF_FLOAT_4.put(1, (color shr 8 and 255).toFloat() / 255f)
+        BUF_FLOAT_4.put(2, (color and 255).toFloat() / 255f)
         BUF_FLOAT_4.put(3, 1f)
         GL11.glTexEnv(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_COLOR, BUF_FLOAT_4)
     }
@@ -335,7 +339,7 @@ object EntityOutlineRenderer {
             GL30.glBlitFramebuffer(
                 0, 0, frameToCopy.framebufferWidth, frameToCopy.framebufferHeight,
                 0, 0, frameToPaste.framebufferWidth, frameToPaste.framebufferHeight,
-                buffersToCopy, GL11.GL_NEAREST
+                buffersToCopy, GL11.GL_NEAREST,
             )
         }
     }
@@ -357,11 +361,9 @@ object EntityOutlineRenderer {
      *
      * This works since entities are only updated once per tick, so the inclusion or exclusion of an entity
      * to be outlined can be cached each tick with no loss of data
-     *
-     * @param event the client tick event
      */
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!isEnabled()) return
 
         val renderGlobal = try {
@@ -380,7 +382,7 @@ object EntityOutlineRenderer {
             // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
             val noXrayOutlineEvent = RenderEntityOutlineEvent(
                 RenderEntityOutlineEvent.Type.NO_XRAY,
-                xrayOutlineEvent.entitiesToChooseFrom
+                xrayOutlineEvent.entitiesToChooseFrom,
             )
             noXrayOutlineEvent.post()
             // Cache the entities for future use

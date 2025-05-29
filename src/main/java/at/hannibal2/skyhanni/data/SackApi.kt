@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -93,14 +94,14 @@ object SackApi {
      * REGEX-TEST: §f❤ Rough Ruby Gemstone
      * REGEX-TEST: §f❂ Rough Opal Gemstone
      * REGEX-TEST: §f☠ Rough Onyx Gemstone
-     * REGEX-TEST: §fα Rough Aquamarine Gemstone
+     * REGEX-TEST: §f☂ Rough Aquamarine Gemstone
      * REGEX-TEST: §a☘ Flawed Citrine Gemstone
      * REGEX-TEST: §9☘ Fine Peridot Gemstone
      * REGEX-TEST: §eTopaz Gemstones
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name",
-        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂α] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?"
+        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂☂] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**
@@ -111,7 +112,7 @@ object SackApi {
      */
     private val gemstoneFilterPattern by patternGroup.pattern(
         "gemstone.filter",
-        "(?:§.)+▶ (?<quality>.*)"
+        "(?:§.)+▶ (?<quality>.*)",
     )
     // </editor-fold>
 
@@ -137,10 +138,14 @@ object SackApi {
     private val stackList = mutableMapOf<Int, ItemStack>()
     private const val GEMSTONE_FILTER_SLOT = 41
 
+    // TODO replace string with internal name, but also test if this works for all items as expected!
     var sackListInternalNames = emptySet<String>()
         private set
 
     var sackListNames = emptySet<String>()
+        private set
+
+    var sacks = mapOf<String, List<NeuInternalName>>()
         private set
 
     @HandleEvent
@@ -206,7 +211,7 @@ object SackApi {
             val quality: GemstoneQuality = GemstoneQuality.getByNameOrNull(
                 group("quality").takeIf { it != "Amount" }?.uppercase()
                     ?: gemstoneStackFilter?.name
-                    ?: return@matchAll
+                    ?: return@matchAll,
             ) ?: return@matchAll
 
             val (multiplier, priceUpdater) = when (quality) {
@@ -214,14 +219,17 @@ object SackApi {
                     gem.roughPrice = price
                     gem.rough = stored
                 }
+
                 GemstoneQuality.FLAWED -> Pair(80) { price: Long ->
                     gem.flawedPrice = price
                     gem.flawed = stored
                 }
+
                 GemstoneQuality.FINE -> Pair(80 * 80) { price: Long ->
                     gem.finePrice = price
                     gem.fine = stored
                 }
+
                 else -> return@matchAll
             }
 
@@ -284,9 +292,17 @@ object SackApi {
         if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
         for (stackEntry in stackList) {
             when {
-                isGemstoneSack -> { stackEntry.processGemstoneItem(savingSacks) }
-                isRuneSack -> { stackEntry.processRuneItem(savingSacks) }
-                else -> { stackEntry.processOtherItem(savingSacks) }
+                isGemstoneSack -> {
+                    stackEntry.processGemstoneItem(savingSacks)
+                }
+
+                isRuneSack -> {
+                    stackEntry.processRuneItem(savingSacks)
+                }
+
+                else -> {
+                    stackEntry.processOtherItem(savingSacks)
+                }
             }
         }
         if (savingSacks) saveSackData()
@@ -346,9 +362,15 @@ object SackApi {
         val uniqueSackItems = mutableSetOf<NeuInternalName>()
 
         sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
+        sacks = sacksData.mapValues { it.value.contents }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
         sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
+    }
+
+    @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
+    fun onProfileJoin() {
+        sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
     }
 
     private fun updateSacks(changes: SackChangeEvent) {

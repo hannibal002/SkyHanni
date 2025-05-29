@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -8,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
-import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
@@ -17,12 +18,14 @@ import at.hannibal2.skyhanni.utils.compat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
+import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.SharedMonsterAttributes
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
@@ -80,12 +83,12 @@ object EntityUtils {
         return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
-                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
+                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
             if (debugRightEntity && result) {
-                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
+                ChatUtils.consoleLog("mob: " + center.printWithAccuracy(2))
+                ChatUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
+                ChatUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
             }
             result
         }
@@ -97,7 +100,11 @@ object EntityUtils {
         val alignedBB = a.axisAlignedTo(b)
         val clazz = EntityArmorStand::class.java
         val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
+        //#if MC < 1.21
         return world.getEntitiesWithinAABB(clazz, alignedBB)
+        //#else
+        //$$ return world.getEntitiesByClass(clazz, alignedBB, net.minecraft.predicate.entity.EntityPredicates.EXCEPT_SPECTATOR)
+        //#endif
     }
 
     @Deprecated("Old. Instead use entity detection feature instead.")
@@ -105,7 +112,7 @@ object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
-        val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
+        val derpyMultiplier = if (ElectionApi.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
         if (!boss && !DungeonApi.inDungeon()) {
@@ -176,13 +183,26 @@ object EntityUtils {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull().orEmpty()
 
-    fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
+    fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5): Boolean {
+        if (isDead) return false
+        // TODO add cache that only updates e.g. 10 times a second
+        if (!FrustumUtils.isVisible(entityBoundingBox)) return false
+        return getLorenzVec().up(vecYOffset).canBeSeen(viewDistance)
+    }
 
-    fun getEntityByID(entityId: Int) = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
+    fun getEntityByID(entityId: Int): Entity? = MinecraftCompat.localPlayerOrNull?.getEntityLevel()?.getEntityByID(entityId)
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
     fun Entity.cleanName() = this.name.removeColor()
+
+    // TODO use derpy() on every use case
+    val EntityLivingBase.baseMaxHealth: Int
+        //#if MC < 1.21
+        get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
+    //#else
+    //$$ get() = this.getAttributeValue(EntityAttributes.MAX_HEALTH).toInt()
+    //#endif
 }

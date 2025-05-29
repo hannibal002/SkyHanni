@@ -10,23 +10,25 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
+import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -46,9 +48,13 @@ object FishingProfitTracker {
 
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
 
+    /**
+     * REGEX-TEST: §5⛃ §r§5§lGOOD CATCH! §r§fYou caught §r§636,064 Coins§r§f!
+     * REGEX-TEST: §6⛃ §r§6§lGREAT CATCH! §r§fYou caught §r§6133,431 Coins§r§f!
+     */
     private val coinsChatPattern by RepoPattern.pattern(
         "fishing.tracker.chat.coins",
-        ".* CATCH! §r§bYou found §r§6(?<coins>.*) Coins§r§b\\.",
+        "§(?<colorCode>.*)⛃ §r(?<catch>.*) CATCH! §r§fYou caught §r§6(?<coins>[\\d,]+) Coins§r§f!",
     )
 
     private var lastCatchTime = SimpleTimeMark.farPast()
@@ -66,7 +72,7 @@ object FishingProfitTracker {
 
         override fun getDescription(timesCaught: Long): List<String> {
             val percentage = timesCaught.toDouble() / totalCatchAmount
-            val catchRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
+            val catchRate = percentage.coerceAtMost(1.0).formatPercentage()
 
             return listOf(
                 "§7Caught §e${timesCaught.addSeparators()} §7times.",
@@ -196,6 +202,7 @@ object FishingProfitTracker {
         if (!isEnabled()) return
 
         if (event.source == ItemAddManager.Source.COMMAND) {
+            if (!config.enabled) return
             tryAddItem(event.internalName, event.amount, command = true)
             return
         }
@@ -220,22 +227,25 @@ object FishingProfitTracker {
         lastCatchTime = SimpleTimeMark.now()
     }
 
+    private val isRecentPickup: Boolean
+        get() = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
+
+    private val shouldShow: Boolean
+        get() = isRecentPickup || FishingApi.isFishing(checkRodInHand = false)
+
     init {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() },
+            condition = { isEnabled() && config.enabled && shouldShow },
             onRender = {
-                val recentPickup = config.showWhenPickup && lastCatchTime.passedSince() < 3.seconds
-                if (recentPickup || FishingApi.isFishing(checkRodInHand = false)) {
-                    tracker.renderDisplay(config.position)
-                }
+                tracker.renderDisplay(config.position)
             },
         )
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         lastCatchTime = SimpleTimeMark.farPast()
     }
 
@@ -247,7 +257,6 @@ object FishingProfitTracker {
         }
 
         tracker.addItem(internalName, amount, command)
-        addCatch()
     }
 
     private fun isAllowedItem(internalName: NeuInternalName) = itemCategories.any { internalName in it.value }
@@ -257,7 +266,17 @@ object FishingProfitTracker {
         tracker.firstUpdate()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !LorenzUtils.inKuudraFight
+    @HandleEvent
+    fun onCatch(event: FishingCatchEvent) {
+        addCatch()
+    }
+
+    @HandleEvent
+    fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
+        addCatch()
+    }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !LorenzUtils.inKuudraFight
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

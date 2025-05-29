@@ -3,13 +3,19 @@ import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
+import com.intellij.psi.JavaPsiFacade
+import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.searches.ClassInheritorsSearch
 import liveplugin.registerInspection
 import org.jetbrains.kotlin.idea.base.utils.fqname.fqName
 import org.jetbrains.kotlin.idea.codeinsight.api.classic.inspections.AbstractKotlinInspection
 import org.jetbrains.kotlin.idea.util.AnnotationModificationHelper
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.nj2k.postProcessing.type
+import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.isPublic
@@ -17,8 +23,41 @@ import org.jetbrains.kotlin.types.typeUtil.supertypes
 
 // depends-on-plugin org.jetbrains.kotlin
 
+fun buildPrimaryNameMap(project: Project): Map<String, String> {
+    val result = mutableMapOf<String, String>()
+    val facade = JavaPsiFacade.getInstance(project)
+    val skyHanniEventPsiClass: PsiClass = facade.findClass(
+        "at.hannibal2.skyhanni.api.event.SkyHanniEvent",
+        GlobalSearchScope.allScope(project)
+    ) ?: return emptyMap()
+
+    val inheritors = ClassInheritorsSearch.search(
+        skyHanniEventPsiClass,
+        GlobalSearchScope.allScope(project),
+        true,
+        true,
+        false
+    )
+
+    for (psiInheritor in inheritors) {
+        val ktDeclaration = psiInheritor.navigationElement.takeIf { it is KtClassOrObject } as? KtClassOrObject ?: continue
+
+        val primaryAnnotation = ktDeclaration.annotationEntries.firstOrNull { it.shortName?.asString() == "PrimaryFunction" }
+        if (primaryAnnotation != null) {
+            val valueArg = primaryAnnotation.valueArguments.firstOrNull()?.getArgumentExpression()?.text ?: continue
+            val primaryName = valueArg.removeSurrounding("\"")
+            if (primaryName.isNotBlank()) {
+                result[primaryName] = ktDeclaration.name ?: ""
+                continue
+            }
+        }
+    }
+    return result
+}
+
 val skyhanniEvent = "at.hannibal2.skyhanni.api.event.SkyHanniEvent"
 val handleEvent = "HandleEvent"
+val eventType = "eventType"
 
 registerInspection(HandleEventInspectionKotlin())
 
@@ -28,19 +67,55 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
         val visitor = object : KtVisitorVoid() {
             override fun visitNamedFunction(function: KtNamedFunction) {
                 val hasEventAnnotation = function.annotationEntries.any { it.shortName!!.asString() == handleEvent }
-                val isEvent = function.valueParameters.firstOrNull()?.type()?.supertypes()
-                    ?.any { it.fqName?.asString() == skyhanniEvent } ?: false
+                val functionName = function.name ?: return
 
+                val primaryNameMap = buildPrimaryNameMap(function.project)
+                val isPrimaryName = primaryNameMap.containsKey(functionName)
+
+                // Check if the function's parameter is a SkyHanniEvent or its subtype
+                // TODO fix it for K2 mode instead of leaving the function (the try catch)
+                val isEvent = try {
+                    function.valueParameters.firstOrNull()?.type()?.supertypes()?.any { it.fqName?.asString() == skyhanniEvent }
+                } catch (e: Throwable) {
+                    return
+                } ?: false
+
+                // Find the annotation entry
+                val annotationEntry = function.annotationEntries
+                    .find { it.shortName!!.asString() == handleEvent }
+
+                // Check if the annotation specifies the eventType explicitly or as a positional parameter
+                val hasEventType = annotationEntry?.valueArguments
+                    ?.any { argument ->
+                        val argName = argument.getArgumentName()?.asName?.asString()
+                        argName == eventType || argName == "eventTypes" ||
+                            // Check if it is a positional argument (first argument)
+                            (annotationEntry.valueArguments.indexOf(argument) == 0 &&
+                                argument.getArgumentExpression()?.text != null)
+                    } ?: false
+
+                // Check if the function is isPublic or accessible
+                val isPublic = function.isPublic || function.hasModifier(KtTokens.PUBLIC_KEYWORD)
+                val needsPublic = (hasEventAnnotation && (hasEventType || isPrimaryName))
+                if (!isPublic && needsPublic) {
+                    holder.registerProblem(
+                        function,
+                        "Function must be public to be annotated with @HandleEvent",
+                        ProblemHighlightType.GENERIC_ERROR
+                    )
+                }
+
+                // Validate function annotation and parameters
                 if (isEvent && !hasEventAnnotation && function.valueParameters.size == 1 && function.isPublic) {
                     holder.registerProblem(
                         function,
                         "Event handler function should be annotated with @HandleEvent",
                         HandleEventQuickFix()
                     )
-                } else if (!isEvent && hasEventAnnotation) {
+                } else if (!isEvent && !hasEventType && !isPrimaryName && hasEventAnnotation) {
                     holder.registerProblem(
                         function,
-                        "Function should not be annotated with @HandleEvent if it does not take a SkyHanniEvent",
+                        "Function should not be annotated with @HandleEvent if it does not take a SkyHanniEvent\n",
                         ProblemHighlightType.GENERIC_ERROR
                     )
                 }
@@ -71,6 +146,5 @@ class HandleEventQuickFix : LocalQuickFix {
     }
 
     override fun getName() = "Annotate with @HandleEvent"
-
     override fun getFamilyName() = name
 }

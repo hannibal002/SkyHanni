@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
@@ -41,7 +41,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -49,18 +48,25 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
+import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -70,6 +76,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import java.io.File
+import java.time.LocalDate
+import java.time.Month
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -78,7 +86,8 @@ object SkyHanniDebugsAndTests {
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
-    var displayList = emptyList<List<Any>>()
+    @Suppress("MemberVisibilityCanBePrivate")
+    var displayList = emptyList<Renderable>()
 
     var globalRender = true
 
@@ -99,6 +108,20 @@ object SkyHanniDebugsAndTests {
     private fun print(text: String) {
         LorenzDebug.log(text)
     }
+
+    private var previousApril = false
+
+    val isAprilFoolsDay: Boolean
+        get() {
+            val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
+            val always = SkyHanniMod.feature.dev.debug.alwaysFunnyTime
+            val never = SkyHanniMod.feature.dev.debug.neverFunnyTime
+            val result = (!never && (always || itsTime))
+            previousApril = result
+            return result
+        }
+
+    val enabled get() = SkyBlockUtils.onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
     private var testLocation: LorenzVec? = null
 
@@ -132,15 +155,18 @@ object SkyHanniDebugsAndTests {
     }
 
     fun testCommand(args: Array<String>) {
+
         SkyHanniMod.coroutineScope.launch {
             asyncTest(args)
         }
     }
 
-    @Suppress("EmptyFunctionBlock")
+    @Suppress("UNUSED_PARAMETER")
     private fun asyncTest(args: Array<String>) {
+        ChatUtils.chat("§fTest successful!")
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun findNullConfig(args: Array<String>) {
         println("start null finder")
         findNull(SkyHanniMod.feature, "config")
@@ -219,37 +245,33 @@ object SkyHanniDebugsAndTests {
             return
         }
 
-        val bigList = mutableListOf<List<Any>>()
-        var list = mutableListOf<Any>()
-        var i = 0
         var errors = 0
-        for (item in GardenVisitorColorNames.visitorItems) {
-            val name = item.key
-            i++
-            if (i == 5) {
-                i = 0
-                bigList.add(list)
-                list = mutableListOf()
-            }
 
-            val coloredName = GardenVisitorColorNames.getColoredName(name)
-            list.add("$coloredName§7 (")
-            for (itemName in item.value) {
-                try {
-                    val internalName = NeuInternalName.fromItemName(itemName)
-                    list.add(internalName.getItemStack())
-                } catch (e: Error) {
-                    ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
-                    errors++
+        displayList = buildList {
+            for (item in GardenVisitorColorNames.visitorItems) {
+                val name = item.key
+
+                addLine {
+                    val coloredName = GardenVisitorColorNames.getColoredName(name)
+                    addString("$coloredName§7 (")
+
+                    for (itemName in item.value) {
+                        try {
+                            val internalName = NeuInternalName.fromItemName(itemName)
+                            addItemStack(internalName.getItemStack())
+                        } catch (e: Error) {
+                            ChatUtils.debug("itemName '$itemName' is invalid for visitor '$name'")
+                            errors++
+                        }
+                    }
+                    if (item.value.isEmpty()) {
+                        addString("Any")
+                    }
+                    addString("§7) ")
                 }
             }
-            if (item.value.isEmpty()) {
-                list.add("Any")
-            }
-            list.add("§7) ")
         }
-        bigList.add(list)
-        displayList = bigList
+
         if (errors == 0) {
             ChatUtils.debug("Test garden visitor renderer: no errors")
         } else {
@@ -258,6 +280,7 @@ object SkyHanniDebugsAndTests {
     }
 
     fun reloadListeners() {
+        // TODO: use repo for this and implement it correctly
         val blockedFeatures = try {
             File("config/skyhanni/blocked-features.txt").readLines().toList()
         } catch (e: Exception) {
@@ -269,34 +292,46 @@ object SkyHanniDebugsAndTests {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
             MinecraftForge.EVENT_BUS.unregister(original)
+            SkyHanniEvents.unregister(original)
             println("Unregistered listener $simpleName")
 
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
-                modules.add(javaClass)
-                MinecraftForge.EVENT_BUS.register(javaClass)
+                modules.add(original)
+                MinecraftForge.EVENT_BUS.register(original)
+                SkyHanniEvents.register(original)
                 println("Registered listener $simpleName")
             } else {
                 println("Skipped registering listener $simpleName")
             }
         }
-        ChatUtils.chat("reloaded ${modules.size} listener classes.")
+        ChatUtils.chat("Reloaded ${modules.size} listener classes.")
     }
 
     fun stopListeners() {
-        val modules = SkyHanniMod.modules
-        for (original in modules.toMutableList()) {
-            val javaClass = original.javaClass
-            val simpleName = javaClass.simpleName
-            MinecraftForge.EVENT_BUS.unregister(original)
-            println("Unregistered listener $simpleName")
-        }
-        ChatUtils.chat("stopped ${modules.size} listener classes.")
+        ChatUtils.clickableChat(
+            "§cAre you sure you want to stop all listeners? Doing this will make most features not work.",
+            onClick = {
+                val modules = SkyHanniMod.modules
+                for (original in modules.toMutableList()) {
+                    val javaClass = original.javaClass
+                    val simpleName = javaClass.simpleName
+                    MinecraftForge.EVENT_BUS.unregister(original)
+                    SkyHanniEvents.unregister(original)
+                    println("Unregistered listener $simpleName")
+                }
+                ChatUtils.clickableChat(
+                    "Stopped ${modules.size} listener classes. " +
+                        "If you want to re-enable them, run /shreloadlisteners or click this message.",
+                    onClick = { reloadListeners() },
+                )
+            },
+        )
     }
 
     fun whereAmI() {
-        if (LorenzUtils.inSkyBlock) {
-            ChatUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
+        if (SkyBlockUtils.inSkyBlock) {
+            ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
             return
         }
         ChatUtils.chat("§eYou are not in Skyblock.")
@@ -316,7 +351,7 @@ object SkyHanniDebugsAndTests {
         GardenNextJacobContest.isFetchingContests = true
         SkyHanniMod.coroutineScope.launch {
             GardenNextJacobContest.fetchUpcomingContests()
-            GardenNextJacobContest.lastFetchAttempted = System.currentTimeMillis()
+            GardenNextJacobContest.lastFetchAttempted = SimpleTimeMark.now()
             GardenNextJacobContest.isFetchingContests = false
         }
     }
@@ -364,8 +399,8 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    @HandleEvent
-    fun onKeybind(event: GuiKeyPressEvent) {
+    @HandleEvent(GuiKeyPressEvent::class)
+    fun onKeybind() {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
         val focussedSlot = slotUnderCursor() ?: return
         val stack = focussedSlot.stack ?: return
@@ -460,14 +495,14 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @HandleEvent
+    @HandleEvent(SkyHanniChatEvent::class)
     @Suppress("EmptyFunctionBlock")
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat() {
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     @Suppress("ConstantConditionIf")
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay() {
         if (false) {
             itemRenderDebug()
         }
@@ -498,12 +533,12 @@ object SkyHanniDebugsAndTests {
         if (displayLine.isNotEmpty()) {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
-        config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
+        config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
     }
 
-    @HandleEvent
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
     @Suppress("ConstantConditionIf")
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw() {
         if (false) {
             dragAbleTest()
         }
@@ -515,12 +550,12 @@ object SkyHanniDebugsAndTests {
 
         config.debugItemPos.renderRenderables(
             listOf(
-                DragNDrop.draggable(Renderable.string("A Bone"), { bone }),
+                DragNDrop.draggable(RenderableString("A Bone"), { bone }),
                 Renderable.placeholder(0, 30),
-                DragNDrop.draggable(Renderable.string("A Leaf"), { leaf }),
+                DragNDrop.draggable(RenderableString("A Leaf"), { leaf }),
                 Renderable.placeholder(0, 30),
                 DragNDrop.droppable(
-                    Renderable.string("Feed Dog"),
+                    RenderableString("Feed Dog"),
                     object : Droppable {
                         override fun handle(drop: Any?) {
                             val unit = drop as ItemStack
@@ -552,18 +587,19 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }.toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { RenderableString(it.roundTo(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(
             listOf(
                 Renderable.table(renderables),
-                Renderable.horizontalContainer(
+                HorizontalContainerRenderable(
                     listOf(
-                        Renderable.string("Test:").renderBounds(),
+                        RenderableString("Test:").renderBounds(),
                         Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
                     ),
-                    spacing = 1,
+                    1,
+                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP
                 ),
             ),
             posLabel = "Item Debug",

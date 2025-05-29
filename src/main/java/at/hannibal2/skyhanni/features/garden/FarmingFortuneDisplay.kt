@@ -6,18 +6,16 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getTurboCrop
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -33,6 +31,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummie
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -143,7 +142,7 @@ object FarmingFortuneDisplay {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null) return
-        config.pos.renderRenderables(display, posLabel = "True Farming Fortune")
+        config.position.renderRenderables(display, posLabel = "True Farming Fortune")
     }
 
     private fun update() {
@@ -265,7 +264,7 @@ object FarmingFortuneDisplay {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         display = emptyList()
         gardenJoinTime = SimpleTimeMark.now()
         firstBrokenCropTime = SimpleTimeMark.farPast()
@@ -409,5 +408,7 @@ object FarmingFortuneDisplay {
         event.move(3, "garden.farmingFortuneDisplay", "garden.farmingFortunes.display")
         event.move(3, "garden.farmingFortuneDropMultiplier", "garden.farmingFortunes.dropMultiplier")
         event.move(3, "garden.farmingFortunePos", "garden.farmingFortunes.pos")
+
+        event.move(87, "garden.farmingFortunes.pos", "garden.farmingFortunes.position")
     }
 }

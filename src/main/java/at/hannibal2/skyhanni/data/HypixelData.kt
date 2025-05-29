@@ -6,16 +6,15 @@ import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
@@ -27,7 +26,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -151,6 +149,7 @@ object HypixelData {
 
     var lastLocRaw = SimpleTimeMark.farPast()
     private var hasScoreboardUpdated = false
+    val connectedToHypixel get() = hypixelLive || hypixelAlpha
 
     var hypixelLive = false
     var hypixelAlpha = false
@@ -280,7 +279,7 @@ object HypixelData {
             }
         }
 
-        if (!inAnyIsland(IslandType.GARDEN, IslandType.GARDEN_GUEST, IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST)) {
+        if (!IslandTypeTags.PERSONAL_ISLAND.inAny()) {
             playerAmountOnIsland = 0
         }
 
@@ -331,7 +330,7 @@ object HypixelData {
     private val loggerIslandChange = LorenzLogger("debug/island_change")
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         locrawData = null
         skyBlock = false
         inLimbo = false
@@ -589,8 +588,7 @@ object HypixelData {
     private fun getIslandType(name: String, guesting: Boolean): IslandType {
         val islandType = IslandType.getByNameOrUnknown(name)
         if (guesting) {
-            if (islandType == IslandType.PRIVATE_ISLAND) return IslandType.PRIVATE_ISLAND_GUEST
-            if (islandType == IslandType.GARDEN) return IslandType.GARDEN_GUEST
+            return islandType.guestVariant()
         }
         return islandType
     }

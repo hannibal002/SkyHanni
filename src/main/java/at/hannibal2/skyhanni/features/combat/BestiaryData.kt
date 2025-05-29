@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.combat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.DisplayTypeEntry
 import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -11,7 +10,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -19,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -28,6 +27,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -107,10 +107,10 @@ object BestiaryData {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val lore = slot.stack.getLore()
             if (lore.any { it == "§7Overall Progress: §b100% §7(§c§lMAX!§7)" || it == "§7Families Completed: §a100%" }) {
-                slot highlight LorenzColor.GREEN
+                slot.highlight(LorenzColor.GREEN)
             }
             if (!overallProgressEnabled && lore.any { it == "§7Overall Progress: §cHIDDEN" }) {
-                slot highlight LorenzColor.RED
+                slot.highlight(LorenzColor.RED)
             }
         }
     }
@@ -373,7 +373,7 @@ object BestiaryData {
             disabled = "Roman (I, II, III)",
             onChange = {
                 update()
-            }
+            },
         )
 
         addRenderableButton(
@@ -383,7 +383,7 @@ object BestiaryData {
             disabled = "Show",
             onChange = {
                 update()
-            }
+            },
         )
     }
 
@@ -450,8 +450,8 @@ object BestiaryData {
     }
 
     private fun Long.formatNumber(): String = when (config.numberFormat) {
-        BestiaryConfig.NumberFormatEntry.SHORT -> this.shortFormat()
-        BestiaryConfig.NumberFormatEntry.LONG -> this.addSeparators()
+        NumberFormatEntry.SHORT -> this.shortFormat()
+        NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }
 
@@ -482,12 +482,12 @@ object BestiaryData {
 
         fun percentToMax() = actualRealTotalKill.toDouble() / killToMax
 
-        fun percentToMaxFormatted() = LorenzUtils.formatPercentage(percentToMax())
+        fun percentToMaxFormatted() = percentToMax().formatPercentage()
 
         fun percentToTier() =
             if (killNeededForNextLevel == 0L) 1.0 else currentKillToNextLevel.toDouble() / killNeededForNextLevel
 
-        fun percentToTierFormatted() = LorenzUtils.formatPercentage(percentToTier())
+        fun percentToTierFormatted() = percentToTier().formatPercentage()
 
         fun getNextLevel() = level.getNextLevel()
     }
