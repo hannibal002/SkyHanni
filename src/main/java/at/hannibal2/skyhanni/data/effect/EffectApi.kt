@@ -16,10 +16,10 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -98,6 +98,16 @@ object EffectApi {
     private val repellentPattern by RepoPattern.pattern(
         "misc.nongodpot.repellant",
         " Repellent: §r§[97a](?<tier>\\w+)?(?: §r§7\\((?<time>\\d)s\\))?",
+    )
+
+    /**
+     * REGEX-TEST:  §r§aSmoldering Polarization I§r§f: 58s
+     * REGEX-TEST:  §r§bWisp's Ice-Flavored Water I§r§f: 29m
+     * REGEX-TEST:      §2Mushed Glowy Tonic I §r§f43m
+     */
+    private val tabEffectPattern by RepoPattern.pattern(
+        "tab.effects",
+        " *(?:§.)*(?<effect>§.[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:§.)+[: ]*(?<time>[dhms0-9 ]+)"
     )
     // </editor-fold>
 
@@ -187,13 +197,10 @@ object EffectApi {
         EffectDurationChangeEvent(effect, changeType, duration).post()
     }
 
-    private fun String.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        "${this.trim()}§r".startsWith(it.tabListName)
-    }
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
-        for (line in event.footer.split("\n")) line.readEffectFromTab()
+        val footerLines = event.footer.split("\n")
+        footerLines.readNonGodPotEffects()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -204,23 +211,23 @@ object EffectApi {
 
     private fun WidgetUpdateEvent.readEffects() {
         if (!isWidget(TabWidget.ACTIVE_EFFECTS)) return
-        val reformattedLines = lines.map {
-            it.removeResets().trim()
-        }
-        for (line in reformattedLines) line.readEffectFromTab()
-    }
-
-    private fun String.readEffectFromTab() {
-        val effect = getNonGodPotEffectOrNull() ?: return
-        godPotTabPattern.matchMatcher(this) {
+        godPotTabPattern.firstMatcher(lines) {
             profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
         }
-        val durationString = this.substring(effect.tabListName.length).replace(": ", "")
-        try {
-            val duration = TimeUtils.getDuration(durationString.split("§f")[1])
-            EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
-        } catch (e: Exception) {
-            ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$this'")
+        lines.readNonGodPotEffects()
+    }
+
+    private fun List<String>.readNonGodPotEffects() {
+        tabEffectPattern.matchAll(this) {
+            val nonGodPotEffect =  NonGodPotEffect.entries.firstOrNull {
+                it.tabListName == group("effect")
+            } ?: return@matchAll
+            try {
+                val duration = TimeUtils.getDuration(group("time"))
+                EffectDurationChangeEvent(nonGodPotEffect, EffectDurationChangeType.SET, duration).post()
+            } catch (e: Exception) {
+                ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$this'")
+            }
         }
     }
 
