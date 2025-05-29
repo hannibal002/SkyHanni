@@ -59,7 +59,8 @@ class CropMilestonesConfig {
         ;
 
         //#if TODO
-        @Transient val timeUnit = TimeUnit.entries.firstOrNull { it.name == this.name } ?: TimeUnit.SECOND
+        @Transient
+        val timeUnit = TimeUnit.entries.firstOrNull { it.name == this.name } ?: TimeUnit.SECOND
         //#endif
         override fun getLegacyId(): Int = legacyId
         override fun toString(): String = displayName
