@@ -58,7 +58,9 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracke
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
+//#endif
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
 //#endif
@@ -83,6 +85,7 @@ import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import kotlin.time.Duration
 
+// todo 1.21 impl needed
 // put everything under its respective feature, the order of the features is the same as in the folder structure
 class ProfileSpecificStorage {
     // api
@@ -814,10 +817,8 @@ class ProfileSpecificStorage {
         //#endif
     }
 
-    //#if TODO
     @Expose
     var draconicSacrificeTracker: DraconicSacrificeTracker.Data = DraconicSacrificeTracker.Data()
-    //#endif
 
     @Expose
     var abiphoneContactAmount: Int? = null

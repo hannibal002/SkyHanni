@@ -59,7 +59,7 @@ enum class TabWidget(
     ),
     PROFILE(
         // language=RegExp
-        "(?:§.)+Profile: (?:§r)?§a(?<profile>[\\w\\s]+[^ §]).*",
+        "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*",
     ),
     SB_LEVEL(
         // language=RegExp
