@@ -812,6 +812,10 @@ at.hannibal2.skyhanni.features.commands.OpenLastStorage.kt
 at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree.kt
 at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal.kt
 at.hannibal2.skyhanni.data.ProfileStorageData.kt
-
+at.hannibal2.skyhanni.features.skillprogress.SkillType.kt
+at.hannibal2.skyhanni.features.gifting.GiftApi.kt
+at.hannibal2.skyhanni.features.gifting.GiftProfitTracker.kt
+at.hannibal2.skyhanni.features.gifting.IsGiftingDetection.kt
+at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker.kt
 
 # \.(?!kt|java|\()

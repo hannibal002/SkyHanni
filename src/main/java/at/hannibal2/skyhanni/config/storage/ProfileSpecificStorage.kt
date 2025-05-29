@@ -47,7 +47,9 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItemType
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
+//#endif
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
+//#if TODO
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -204,10 +206,10 @@ class ProfileSpecificStorage {
     // -- winter
     @Expose
     var frozenTreasureTracker: FrozenTreasureTracker.Data = FrozenTreasureTracker.Data()
+    //#endif
 
     @Expose
     var giftProfitTracker: GiftProfitTracker.Data = GiftProfitTracker.Data()
-    //#endif
 
     // -- hoppity
     @Expose
@@ -852,10 +854,10 @@ class ProfileSpecificStorage {
         //#if TODO
         @Expose
         var verminTracker: VerminTracker.Data = VerminTracker.Data()
+        //#endif
 
         @Expose
         var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
-        //#endif
     }
 
     //#if TODO

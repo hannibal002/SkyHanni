@@ -52,7 +52,7 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$     this ?: return@run ""
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
-//$$         sb.append(component.style.color?.toChatFormatting()?.toString() ?: "")
+//$$         sb.append(component.style.chatStyle())
 //$$         sb.append(component.unformattedTextForChatCompat())
 //$$     }
 //$$     sb.toString()
@@ -61,6 +61,15 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$ private val textColorLUT = ChatFormatting.entries
 //$$     .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
 //$$     .toMap()
+//$$
+//$$ fun Style.chatStyle() = buildString {
+//$$     color?.let { append(it.toChatFormatting()?.toString() ?: "§r") }
+//$$     if (isBold) append("§l")
+//$$     if (isItalic) append("§o")
+//$$     if (isUnderlined) append("§n")
+//$$     if (isStrikethrough) append("§m")
+//$$     if (isObfuscated) append("§k")
+//$$ }
 //$$
 //$$ fun TextColor.toChatFormatting(): ChatFormatting? {
 //$$     return textColorLUT[this.value]

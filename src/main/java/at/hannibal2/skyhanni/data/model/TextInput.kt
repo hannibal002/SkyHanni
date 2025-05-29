@@ -36,7 +36,11 @@ open class TextInput {
 
     fun finalText() = textBox.replace("&&", "§")
 
-    fun makeActive() = if (!isActive) Companion.activate(this) else Unit
+    //#if TODO
+    fun makeActive() = if (!isActive) activate(this) else Unit
+    //#else
+    //$$ fun makeActive() = Unit
+    //#endif
     fun disable() = if (isActive) Companion.disable() else Unit
     fun clear() {
         textBox = ""
