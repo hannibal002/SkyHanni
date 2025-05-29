@@ -219,7 +219,7 @@ object EffectApi {
 
     private fun List<String>.readNonGodPotEffects() {
         tabEffectPattern.matchAll(this) {
-            val nonGodPotEffect =  NonGodPotEffect.entries.firstOrNull {
+            val nonGodPotEffect = NonGodPotEffect.entries.firstOrNull {
                 it.tabListName == group("effect")
             } ?: return@matchAll
             try {
