@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 
 @SkyHanniModule(devOnly = true)
-object RenderableTestSuit {
+object RenderableTestSuite {
 
     private val register = mutableMapOf<String, TestRenderable>()
 
@@ -61,7 +61,7 @@ object RenderableTestSuit {
 
     /**
      * How to use:
-     * Declare an object with [RenderableTestSuit.TestRenderable] as supertype
+     * Declare an object with [RenderableTestSuite.TestRenderable] as supertype
      * Annotate the object with "@SkyHanniModule(devOnly = true)"
      * Give it a lowercase [name] (this is used to call it via the command later on)
      * Define your test with [renderable] function

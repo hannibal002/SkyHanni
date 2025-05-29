@@ -4,12 +4,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule(devOnly = true)
-object TestRenderItems : RenderableTestSuit.TestRenderable("items") {
+object TestRenderItems : RenderableTestSuite.TestRenderable("items") {
 
     override fun renderable(): Renderable? {
         val scale = 0.1
@@ -30,7 +31,7 @@ object TestRenderItems : RenderableTestSuit.TestRenderable("items") {
         return Renderable.verticalContainer(
             listOf(
                 Renderable.table(table),
-                Renderable.horizontalContainer(
+                HorizontalContainerRenderable(
                     listOf(
                         Renderable.string("Default:").renderBounds(),
                         Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),

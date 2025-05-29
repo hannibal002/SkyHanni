@@ -5,19 +5,20 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule(devOnly = true)
-object TestDragNDrop : RenderableTestSuit.TestRenderable("drag") {
+object TestDragNDrop : RenderableTestSuite.TestRenderable("drag") {
 
     override fun renderable(): Renderable? {
         val bone = ItemStack(Items.bone, 1).toDragItem()
         val leaf = ItemStack(Blocks.leaves, 1).toDragItem()
 
-        return Renderable.verticalContainer(
+        return VerticalContainerRenderable(
             listOf(
                 DragNDrop.draggable(Renderable.string("A Bone"), { bone }),
                 Renderable.placeholder(0, 30),
