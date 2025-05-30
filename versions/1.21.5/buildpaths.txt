@@ -932,7 +932,7 @@ at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker.kt
 at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.kt
 at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete.kt
 at.hannibal2.skyhanni.data.TitleManager.kt
-
+at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent.kt
 
 
 # \.(?!kt|java|\()
