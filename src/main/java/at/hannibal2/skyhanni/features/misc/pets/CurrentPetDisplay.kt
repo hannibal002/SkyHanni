@@ -38,19 +38,20 @@ typealias NFE = TextPetDisplayConfig.NumberFormatEntry
 object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.display
-    private val customColorConfig get() = config.visual.colorCustomization
-    private val rarityColorConfig get() = customColorConfig.rarityBackground
+    private val customizationConfig get() = config.visual.customization
     private var lastPetHash: Int = 0
     private var petOverlay: Renderable? = null
 
-    private fun LorenzRarity.getRarityBackgroundColor(): ChromaColour = when (this) {
-        LorenzRarity.COMMON -> rarityColorConfig.commonColor.get()
-        LorenzRarity.UNCOMMON -> rarityColorConfig.uncommonColor.get()
-        LorenzRarity.RARE -> rarityColorConfig.rareColor.get()
-        LorenzRarity.EPIC -> rarityColorConfig.epicColor.get()
-        LorenzRarity.LEGENDARY -> rarityColorConfig.legendaryColor.get()
-        LorenzRarity.MYTHIC -> rarityColorConfig.mythicColor.get()
-        else -> this.color.toChromaColor()
+    private fun LorenzRarity.getRarityBackgroundColor(): ChromaColour = with(customizationConfig.rarityBackground) {
+        when (this@getRarityBackgroundColor) {
+            LorenzRarity.COMMON -> commonColor.get()
+            LorenzRarity.UNCOMMON -> uncommonColor.get()
+            LorenzRarity.RARE -> rareColor.get()
+            LorenzRarity.EPIC -> epicColor.get()
+            LorenzRarity.LEGENDARY -> legendaryColor.get()
+            LorenzRarity.MYTHIC -> mythicColor.get()
+            else -> this@getRarityBackgroundColor.color.toChromaColor()
+        }
     }
 
     private fun PetData.buildItemRenderableOrNull(): Renderable? {
@@ -81,16 +82,16 @@ object CurrentPetDisplay {
         val separatorRingEnabled = config.visual.xpRing.get() && config.visual.separatorRing.get()
         val borderedRarityBackgroundRenderable = if (separatorRingEnabled) CircularContainerRenderable(
             rarityBackgroundRenderable,
-            customColorConfig.separatorColor.get(),
-            padding = 6,
+            customizationConfig.separatorRing.color.get(),
+            padding = customizationConfig.separatorRing.padding.get(),
         ) else rarityBackgroundRenderable
         if (!config.visual.xpRing.get()) return borderedRarityBackgroundRenderable
         val xpRingCompleteRenderable = CircularContainerRenderable(
             borderedRarityBackgroundRenderable,
-            backgroundColor = customColorConfig.xpRing.filledColor.get(),
-            unfilledColor = customColorConfig.xpRing.unfilledColor.get(),
+            backgroundColor = customizationConfig.xpRing.filledColor.get(),
+            unfilledColor = customizationConfig.xpRing.unfilledColor.get(),
             filledPercentage = levelProgressionPercentage,
-            padding = 2,
+            padding = customizationConfig.xpRing.padding.get(),
         )
         return xpRingCompleteRenderable
     }
@@ -188,15 +189,21 @@ object CurrentPetDisplay {
             config.visual.skinAnimation,
             config.visual.spinDirection,
             config.visual.spinFrequency,
-            customColorConfig.separatorColor,
-            customColorConfig.xpRing.filledColor,
-            customColorConfig.xpRing.unfilledColor,
-            rarityColorConfig.commonColor,
-            rarityColorConfig.uncommonColor,
-            rarityColorConfig.rareColor,
-            rarityColorConfig.epicColor,
-            rarityColorConfig.legendaryColor,
-            rarityColorConfig.mythicColor,
+
+            customizationConfig.separatorRing.padding,
+            customizationConfig.separatorRing.color,
+
+            customizationConfig.xpRing.padding,
+            customizationConfig.xpRing.filledColor,
+            customizationConfig.xpRing.unfilledColor,
+
+            customizationConfig.rarityBackground.padding,
+            customizationConfig.rarityBackground.commonColor,
+            customizationConfig.rarityBackground.uncommonColor,
+            customizationConfig.rarityBackground.rareColor,
+            customizationConfig.rarityBackground.epicColor,
+            customizationConfig.rarityBackground.legendaryColor,
+            customizationConfig.rarityBackground.mythicColor,
 
             config.text.enabledTexts,
             config.text.nameLevel,

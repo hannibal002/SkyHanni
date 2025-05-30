@@ -48,27 +48,50 @@ class VisualPetDisplayConfig {
     val separatorRing: Property<Boolean> = Property.of(false)
 
     @Expose
-    @ConfigOption(name = "Color Customization", desc = "")
+    @ConfigOption(name = "Visual Customization", desc = "")
     @Accordion
-    val colorCustomization: ColorCustomizationConfig = ColorCustomizationConfig()
+    val customization: VisualCustomizationConfig = VisualCustomizationConfig()
 
-    class ColorCustomizationConfig {
+    class VisualCustomizationConfig {
 
         @Expose
-        @ConfigOption(
-            name = "Separator Ring Color",
-            desc = "The color of the separator ring.\n" +
-                "§7Default: §#§8§0§8§0§8§0§/#808080"
-        )
-        @ConfigEditorColour
-        val separatorColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(128, 128, 128, 0, 255))
+        @ConfigOption(name = "Separator Ring", desc = "")
+        @Accordion
+        val separatorRing: SeparatorRingConfig = SeparatorRingConfig()
+
+        class SeparatorRingConfig {
+            @Expose
+            @ConfigOption(
+                name = "Ring Padding",
+                desc = "How much thicker the Separator Ring should be compared to the smaller circles."
+            )
+            @ConfigEditorSlider(minValue = 2f, maxValue = 10f, minStep = 0.5f)
+            val padding: Property<Int> = Property.of(6)
+
+            @Expose
+            @ConfigOption(
+                name = "Ring Color",
+                desc = "The color of the separator ring.\n" +
+                    "§7Default: §#§8§0§8§0§8§0§/#808080"
+            )
+            @ConfigEditorColour
+            val color: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(128, 128, 128, 0, 255))
+        }
 
         @Expose
         @ConfigOption(name = "XP Ring", desc = "")
         @Accordion
-        val xpRing: XpRingColorConfig = XpRingColorConfig()
+        val xpRing: XpRingConfig = XpRingConfig()
 
-        class XpRingColorConfig {
+        class XpRingConfig {
+            @Expose
+            @ConfigOption(
+                name = "Ring Padding",
+                desc = "How much thicker the XP Ring should be compared to the smaller circles."
+            )
+            @ConfigEditorSlider(minValue = 1f, maxValue = 6f, minStep = 0.5f)
+            val padding: Property<Int> = Property.of(3)
+
             @Expose
             @ConfigOption(
                 name = "Filled Ring Color",
@@ -91,9 +114,17 @@ class VisualPetDisplayConfig {
         @Expose
         @ConfigOption(name = "Rarity Background", desc = "")
         @Accordion
-        val rarityBackground: RarityColorConfig = RarityColorConfig()
+        val rarityBackground: RarityBackgroundConfig = RarityBackgroundConfig()
 
-        class RarityColorConfig {
+        class RarityBackgroundConfig {
+            @Expose
+            @ConfigOption(
+                name = "Background Padding",
+                desc = "How much extra padding should be added to the background circle."
+            )
+            @ConfigEditorSlider(minValue = 2f, maxValue = 8f, minStep = 0.5f)
+            val padding: Property<Int> = Property.of(4)
+
             @Expose
             @ConfigOption(
                 name = "§fCommon §rColor",
