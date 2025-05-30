@@ -22,8 +22,6 @@ object RenderEvents {
 
         // ScreenDrawnEvent
 
-        // RenderingTickEvent
-
         // GameOverlayRenderPreEvent
         HudLayerRegistrationCallback.EVENT.register(
             HudLayerRegistrationCallback { layeredDrawer: LayeredDrawerWrapper ->
