@@ -936,7 +936,19 @@ at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.kt
 at.hannibal2.skyhanni.data.NotificationManager.kt
 at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/AttributeGoodRollsJson.kt
-
+at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorFeatures.kt
+at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent.kt
+at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent.kt
+at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent.kt
+at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper.kt
+at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
+at.hannibal2.skyhanni.utils.SignUtils.kt
+at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames.kt
+at.hannibal2.skyhanni.features.garden.visitor.NpcVisitorFix.kt
+at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent.kt
+at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics.kt
+at.hannibal2.skyhanni.features.garden.visitor.VisitorListener.kt
+at.hannibal2.skyhanni.events.CheckRenderEntityEvent.kt
 
 
 

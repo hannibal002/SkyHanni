@@ -988,13 +988,16 @@ object RenderUtils {
             drawEdges(axisAlignedBB, color, lineWidth, depth)
         }
     }
+    //#endif
 
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
+        //#if TODO
         PatcherFixes.onPlayerEyeLine()
+        //#endif
         return exactLocation(player).add(y = eyeHeight)
     }
 
@@ -1009,9 +1012,11 @@ object RenderUtils {
         return exactLocation(player) + add
     }
 
+    //#if TODO
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
     }
+    //#endif
 
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
         if (entity.isDead) return entity.getLorenzVec()
@@ -1021,6 +1026,7 @@ object RenderUtils {
         return LorenzVec(x, y, z)
     }
 
+    //#if TODO
     fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
         aabb: AxisAlignedBB,
         color: Color,

@@ -548,10 +548,8 @@ class ProfileSpecificStorage {
             @Expose
             var gemstonePowder: Long = 0
 
-            //#if TODO
             @Expose
             var rewardsCount: MutableMap<VisitorReward, Int> = enumMapOf()
-            //#endif
         }
 
         @Expose
