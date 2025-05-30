@@ -318,6 +318,9 @@ net.minecraft.world.entity.Entity xRot rotationPitch
 net.minecraft.world.entity.Entity yOld prevPosY
 net.minecraft.world.entity.Entity yRot rotationYaw
 net.minecraft.world.entity.Entity zOld prevPosZ
+net.minecraft.world.entity.Entity xo lastTickPosX
+net.minecraft.world.entity.Entity yo lastTickPosY
+net.minecraft.world.entity.Entity zo lastTickPosZ
 
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItem()

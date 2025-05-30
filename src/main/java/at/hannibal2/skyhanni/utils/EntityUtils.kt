@@ -168,7 +168,7 @@ object EntityUtils {
     //#if TODO
     fun EntityPlayer.isNpc() = !isRealPlayer()
     //#else
-    //$$ fun EntityPlayer.isNpc() = false
+    //$$ fun Player.isNpc() = false
     //#endif
 
     //#if TODO
