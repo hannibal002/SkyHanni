@@ -20,7 +20,7 @@ fun C08PacketPlayerBlockPlacement.getUsedItem(): ItemStack? =
     //#if MC < 1.16
     stack
 //#else
-//$$ Minecraft.getMinecraft().player?.getHeldItem(hand)
+//$$ Minecraft.getInstance().player?.getItemInHand(hand)
 //#endif
 
 fun C03PacketPlayer.getLocation(): LorenzVec =

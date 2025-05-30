@@ -8,6 +8,8 @@ net.minecraft.network.chat.Component net.minecraft.util.IChatComponent unformatt
 net.minecraft.network.chat.Style net.minecraft.util.ChatStyle returnThis() createDeepCopy() at.hannibal2.skyhanni.utils.compat.returnThis
 net.minecraft.network.chat.Style net.minecraft.util.ChatStyle returnThis() createShallowCopy() at.hannibal2.skyhanni.utils.compat.returnThis
 
+net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.S3BPacketScoreboardObjective displayName.formattedTextCompat() func_149337_d() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.formattedTextCompat() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.formattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 

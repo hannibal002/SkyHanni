@@ -119,8 +119,8 @@ object TabListData {
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
                 o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
-                //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR,
+                //$$ o1.gameMode != GameType.SPECTATOR,
+                //$$ o2.gameMode != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(
