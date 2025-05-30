@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawCircle
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -55,7 +55,7 @@ object FireVeilWandParticles {
         if (lastClick.passedSince() > 5.5.seconds) return
 
         val color = config.displayColor.toSpecialColor()
-        RenderUtils.drawCircle(MinecraftCompat.localPlayer, event.partialTicks, 3.5, color)
+        event.drawCircle(MinecraftCompat.localPlayer, 3.5, color)
     }
 
     @HandleEvent
