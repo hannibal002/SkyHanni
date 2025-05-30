@@ -1431,9 +1431,9 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-               //#if TODO
+                //#if TODO
                 RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
-               //#endif
+                //#endif
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
