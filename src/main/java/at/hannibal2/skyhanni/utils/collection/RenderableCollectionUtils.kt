@@ -23,7 +23,6 @@ object RenderableCollectionUtils {
         add(RenderableString(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
     }
 
-    //#if TODO
     fun MutableList<Renderable>.addString(
         text: String,
         tips: List<String>,
@@ -32,7 +31,6 @@ object RenderableCollectionUtils {
     ) {
         add(Renderable.hoverTips(RenderableString(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign), tips = tips))
     }
-    //#endif
 
     fun MutableList<Searchable>.addSearchString(
         text: String,

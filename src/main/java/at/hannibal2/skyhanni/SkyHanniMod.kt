@@ -13,9 +13,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
-//#if TODO
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
-//#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
@@ -42,7 +40,6 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object SkyHanniMod {
 
@@ -99,9 +96,7 @@ object SkyHanniMod {
     lateinit var sackData: SackData
     lateinit var friendsData: FriendsJson
     lateinit var knownFeaturesData: KnownFeaturesJson
-    //#if TODO
     lateinit var jacobContestsData: JacobContestsJson
-    //#endif
     lateinit var visualWordsData: VisualWordsJson
 
     lateinit var configManager: ConfigManager

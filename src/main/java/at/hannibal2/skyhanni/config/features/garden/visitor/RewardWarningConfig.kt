@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if TODO
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -12,7 +10,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
-// todo 1.21 impl needed
 class RewardWarningConfig {
     @Expose
     @ConfigOption(name = "Notify in Chat", desc = "Send a chat message once you talk to a visitor with a reward.")
@@ -38,7 +35,6 @@ class RewardWarningConfig {
     var bypassKey: Int = Keyboard.KEY_LCONTROL
 
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Items", desc = "Warn for these reward item visitor drops.")
     @ConfigEditorDraggableList
@@ -52,7 +48,6 @@ class RewardWarningConfig {
         VisitorReward.REPLENISH,
         VisitorReward.COPPER_DYE
     )
-    //#endif
 
     @Expose
     @ConfigOption(

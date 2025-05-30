@@ -12,9 +12,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-//#if TODO
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-//#endif
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
@@ -36,7 +34,6 @@ import net.minecraft.client.renderer.OpenGlHelper
 //$$ import net.minecraft.client.render.RenderLayer
 //#endif
 
-// todo 1.21 impl needed
 /**
  * Some functions taken from NotEnoughUpdates
  */
@@ -91,7 +88,6 @@ object GuiRenderUtils {
     fun isPointInRect(x: Int, y: Int, left: Int, top: Int, width: Int, height: Int) =
         left <= x && x < left + width && top <= y && y < top + height
 
-    //#if TODO
     fun getFarmingBar(
         label: String,
         tooltip: String,
@@ -131,7 +127,6 @@ object GuiRenderUtils {
             tooltip.split('\n').map { Renderable.string(it) },
         )
     }
-    //#endif
 
     fun drawScaledRec(left: Int, top: Int, right: Int, bottom: Int, color: Int, inverseScale: Float) {
         drawRect(

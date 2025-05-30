@@ -26,6 +26,7 @@ net.minecraft.client.KeyMapping releaseAll() unPressAllKeys()
 net.minecraft.client.Minecraft isSameThread() isCallingFromMinecraftThread()
 net.minecraft.client.Minecraft setScreen() displayGuiScreen()
 net.minecraft.client.Minecraft submit() addScheduledTask()
+net.minecraft.client.Minecraft isWindowActive inGameHasFocus
 
 net.minecraft.client.Options getSoundSourceVolume() getSoundLevel()
 net.minecraft.client.Options keyAttack keyBindAttack

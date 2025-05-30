@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
+import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 //#if TODO
 import at.hannibal2.skyhanni.utils.guide.GuideGui
@@ -766,7 +767,6 @@ interface Renderable {
 
         }
 
-        //#if TODO
         fun progressBar(
             percent: Double,
             startColor: Color = Color(255, 0, 0),
@@ -800,7 +800,9 @@ interface Renderable {
                     GuiRenderUtils.drawRect(0, 0, width, height, 0xFF43464B.toInt())
 
                     if (useChroma) {
+                        //#if TODO
                         ChromaShaderManager.begin(ChromaType.STANDARD)
+                        //#endif
                     }
 
                     val factor = 0.2
@@ -809,30 +811,39 @@ interface Renderable {
                     GuiRenderUtils.drawRect(1, 1, progress, height - 1, color.rgb)
 
                     if (useChroma) {
+                        //#if TODO
                         ChromaShaderManager.end()
+                        //#endif
                     }
                 } else {
                     val (textureX, textureY) = if (texture == SkillProgressBarConfig.TexturedBar.UsedTexture.MATCH_PACK) Pair(
                         0, 64,
                     ) else Pair(0, 0)
 
-                    Minecraft.getMinecraft().renderEngine.bindTexture(ResourceLocation(texture.path))
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY, width, height,
+                    GuiRenderUtils.drawTexturedRect(
+                        posX, posY, width, height, textureX.toFloat(), textureY.toFloat(),
+                        (textureX + width).toFloat(), (textureY + height).toFloat(), createResourceLocation(texture.path),
+                        alpha = 1f, filter = GL11.GL_NEAREST
                     )
 
                     if (useChroma) {
+                        //#if TODO
                         ChromaShaderManager.begin(ChromaType.TEXTURED)
+                        //#endif
                         GlStateManager.color(1f, 1f, 1f, 1f)
                     } else {
                         GlStateManager.color(color.red / 255f, color.green / 255f, color.blue / 255f, 1f)
                     }
-                    Minecraft.getMinecraft().ingameGUI.drawTexturedModalRect(
-                        posX, posY, textureX, textureY + height, progress, height,
+                    GuiRenderUtils.drawTexturedRect(
+                        posX, posY, progress, height, textureX.toFloat(), (textureY + height).toFloat(),
+                        (textureX + progress).toFloat(), (textureY + height + height).toFloat(), createResourceLocation(texture.path),
+                        alpha = 1f, filter = GL11.GL_NEAREST
                     )
 
                     if (useChroma) {
+                        //#if TODO
                         ChromaShaderManager.end()
+                        //#endif
                     }
                 }
             }
@@ -895,7 +906,6 @@ interface Renderable {
                 DrawContextUtils.translate(-(xOffset - posX).toFloat(), 0f, 0f)
             }
         }
-        //#endif
 
         fun fixedSizeColumn(
             content: Renderable,
@@ -1406,7 +1416,6 @@ interface Renderable {
             }
         }
 
-        //#if TODO
         fun drawInsideRoundedRect(
             input: Renderable,
             color: Color,
@@ -1422,13 +1431,16 @@ interface Renderable {
             override val verticalAlign = verticalAlign
 
             override fun render(posX: Int, posY: Int) {
+               //#if TODO
                 RenderUtils.drawRoundRect(0, 0, width, height, color.rgb, radius, smoothness)
+               //#endif
                 DrawContextUtils.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 DrawContextUtils.translate(-padding.toFloat(), -padding.toFloat(), 0f)
             }
         }
 
+        //#if TODO
         fun drawInsideRoundedRectOutline(
             input: Renderable,
             padding: Int = 2,

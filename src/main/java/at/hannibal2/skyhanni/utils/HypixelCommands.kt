@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-//#if TODO
 import at.hannibal2.skyhanni.api.GetFromSackApi
-//#endif
 import at.hannibal2.skyhanni.utils.ChatUtils.debug
 import at.hannibal2.skyhanni.utils.ChatUtils.sendMessageToServer
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
-// todo 1.21 impl needed
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -74,11 +71,9 @@ object HypixelCommands {
         send("sethome")
     }
 
-    //#if TODO
     fun getFromSacks(itemName: String, amount: Int) {
         GetFromSackApi.getFromSack(itemName.toInternalName(), amount)
     }
-    //#endif
 
     fun widget() {
         send("widget")
