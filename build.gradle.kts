@@ -165,12 +165,7 @@ dependencies {
     }
 
     // Discord RPC client
-    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
-        exclude(module = "log4j")
-        because("Different version conflicts with Minecraft's Log4J")
-        exclude(module = "gson")
-        because("Different version conflicts with Minecraft's Log4j")
-    }
+    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
     compileOnly(libs.jbAnnotations)
 
     headlessLwjgl(libs.headlessLwjgl)

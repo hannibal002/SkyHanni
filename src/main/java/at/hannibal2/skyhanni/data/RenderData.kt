@@ -24,9 +24,9 @@ object RenderData {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
-        DrawContextUtils.translate(0f, 0f, -3f)
-        renderOverlay(DrawContextUtils.drawContext)
-        DrawContextUtils.translate(0f, 0f, 3f)
+        DrawContextUtils.translated(z = -3) {
+            renderOverlay(DrawContextUtils.drawContext)
+        }
     }
 
     @HandleEvent
@@ -36,18 +36,17 @@ object RenderData {
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 
-        DrawContextUtils.pushMatrix()
-        GlStateManager.enableDepth()
+        DrawContextUtils.pushPop {
+            GlStateManager.enableDepth()
 
-        if (GuiEditManager.isInGui()) {
-            DrawContextUtils.translate(0f, 0f, -3f)
-            renderOverlay(DrawContextUtils.drawContext)
-            DrawContextUtils.translate(0f, 0f, 3f)
+            if (GuiEditManager.isInGui()) {
+                DrawContextUtils.translated(z = -3) {
+                    renderOverlay(DrawContextUtils.drawContext)
+                }
+            }
+
+            GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
         }
-
-        GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
-
-        DrawContextUtils.popMatrix()
     }
 
     var outsideInventory = false

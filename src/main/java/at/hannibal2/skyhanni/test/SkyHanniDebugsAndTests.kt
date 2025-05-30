@@ -41,8 +41,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.onHypixel
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -50,6 +48,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -65,7 +64,9 @@ import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.RenderableString
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -85,6 +86,7 @@ object SkyHanniDebugsAndTests {
     private val config get() = SkyHanniMod.feature.dev
     private val debugConfig get() = config.debug
     var displayLine = ""
+    @Suppress("MemberVisibilityCanBePrivate")
     var displayList = emptyList<Renderable>()
 
     var globalRender = true
@@ -159,10 +161,12 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    @Suppress("EmptyFunctionBlock")
+    @Suppress("UNUSED_PARAMETER")
     private fun asyncTest(args: Array<String>) {
+        ChatUtils.chat("§fTest successful!")
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun findNullConfig(args: Array<String>) {
         println("start null finder")
         findNull(SkyHanniMod.feature, "config")
@@ -326,8 +330,8 @@ object SkyHanniDebugsAndTests {
     }
 
     fun whereAmI() {
-        if (LorenzUtils.inSkyBlock) {
-            ChatUtils.chat("§eYou are currently in ${LorenzUtils.skyBlockIsland}.")
+        if (SkyBlockUtils.inSkyBlock) {
+            ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
             return
         }
         ChatUtils.chat("§eYou are not in Skyblock.")
@@ -395,8 +399,8 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    @HandleEvent
-    fun onKeybind(event: GuiKeyPressEvent) {
+    @HandleEvent(GuiKeyPressEvent::class)
+    fun onKeybind() {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
         val focussedSlot = slotUnderCursor() ?: return
         val stack = focussedSlot.stack ?: return
@@ -491,14 +495,14 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @HandleEvent
+    @HandleEvent(SkyHanniChatEvent::class)
     @Suppress("EmptyFunctionBlock")
-    fun onChat(event: SkyHanniChatEvent) {
+    fun onChat() {
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     @Suppress("ConstantConditionIf")
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay() {
         if (false) {
             itemRenderDebug()
         }
@@ -532,9 +536,9 @@ object SkyHanniDebugsAndTests {
         config.debugPos.renderRenderables(displayList, posLabel = "Test Display")
     }
 
-    @HandleEvent
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
     @Suppress("ConstantConditionIf")
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw() {
         if (false) {
             dragAbleTest()
         }
@@ -546,12 +550,12 @@ object SkyHanniDebugsAndTests {
 
         config.debugItemPos.renderRenderables(
             listOf(
-                DragNDrop.draggable(Renderable.string("A Bone"), { bone }),
+                DragNDrop.draggable(RenderableString("A Bone"), { bone }),
                 Renderable.placeholder(0, 30),
-                DragNDrop.draggable(Renderable.string("A Leaf"), { leaf }),
+                DragNDrop.draggable(RenderableString("A Leaf"), { leaf }),
                 Renderable.placeholder(0, 30),
                 DragNDrop.droppable(
-                    Renderable.string("Feed Dog"),
+                    RenderableString("Feed Dog"),
                     object : Droppable {
                         override fun handle(drop: Any?) {
                             val unit = drop as ItemStack
@@ -583,18 +587,19 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }.toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { RenderableString(it.roundTo(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(
             listOf(
                 Renderable.table(renderables),
-                Renderable.horizontalContainer(
+                HorizontalContainerRenderable(
                     listOf(
-                        Renderable.string("Test:").renderBounds(),
+                        RenderableString("Test:").renderBounds(),
                         Renderable.itemStack(ItemStack(Items.diamond_sword)).renderBounds(),
                     ),
-                    spacing = 1,
+                    1,
+                    RenderUtils.HorizontalAlignment.LEFT, RenderUtils.VerticalAlignment.TOP
                 ),
             ),
             posLabel = "Item Debug",
