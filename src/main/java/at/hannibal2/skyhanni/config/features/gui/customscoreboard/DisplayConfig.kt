@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.data.DateFormat
 //#if TODO
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
-import at.hannibal2.skyhanni.utils.RenderUtils
 //#endif
+import at.hannibal2.skyhanni.utils.RenderUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -161,7 +161,6 @@ class DisplayConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
     var lineSpacing: Int = 10
 
-    //#if TODO
     @Expose
     @ConfigOption(
         name = "Text Alignment",
@@ -169,7 +168,6 @@ class DisplayConfig {
     )
     @ConfigEditorDropdown
     var textAlignment: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT
-    //#endif
 
     @Expose
     @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")

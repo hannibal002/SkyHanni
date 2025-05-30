@@ -932,6 +932,11 @@ at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker.kt
 at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.kt
 at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete.kt
 at.hannibal2.skyhanni.data.TitleManager.kt
+at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.kt
+at.hannibal2.skyhanni.data.NotificationManager.kt
+at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/AttributeGoodRollsJson.kt
+
 
 
 

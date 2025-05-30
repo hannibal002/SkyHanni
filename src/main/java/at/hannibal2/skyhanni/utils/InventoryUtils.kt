@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-//#if TODO
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 //#if TODO
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
@@ -105,6 +103,7 @@ object InventoryUtils {
     fun getChestplate(): ItemStack? = getArmor()[2]
     fun getLeggings(): ItemStack? = getArmor()[1]
     fun getBoots(): ItemStack? = getArmor()[0]
+    //#endif
 
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
@@ -113,7 +112,6 @@ object InventoryUtils {
             this.cancel()
         }
     }
-    //#endif
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
         if (!PlatformUtils.isNeuLoaded()) {
@@ -179,9 +177,7 @@ object InventoryUtils {
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
-    //#if TODO
     fun NeuInternalName.getAmountInInventoryAndSacks(): Int = getAmountInInventory() + getAmountInSacks()
-    //#endif
 
     fun Slot.isTopInventory() = inventory.isTopInventory()
 

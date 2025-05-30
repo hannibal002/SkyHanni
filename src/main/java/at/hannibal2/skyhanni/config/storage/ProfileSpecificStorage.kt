@@ -67,9 +67,7 @@ import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 //#endif
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
-//#if TODO
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
-//#endif
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec

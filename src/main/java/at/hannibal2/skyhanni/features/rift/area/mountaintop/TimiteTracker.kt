@@ -18,10 +18,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-//#if TODO
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-//#endif
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -66,7 +64,6 @@ object TimiteTracker {
         addSearchString("§9§lTimite Tracker")
         val profit = tracker.drawItems(data, { true }, this)
 
-        //#if TODO
         NeuItems.getRecipes(HIGHLITE).singleOrNull()?.let { highliteRecipe ->
             var craftableAmount = 0
 
@@ -80,12 +77,15 @@ object TimiteTracker {
                     }
                 }
             }
+            //#if TODO
             val motes = HIGHLITE.motesNpcPrice()?.times(craftableAmount)?.shortFormat() ?: "0"
+            //#else
+            //$$ val motes = "0"
+            //#endif
             if (craftableAmount > 0) {
                 addSearchString(" §7${craftableAmount.shortFormat()}x ${HIGHLITE.repoItemName} Craftable§7: §5$motes motes")
             }
         }
-        //#endif
 
         addSearchString("§aTime§7: §a${data.getTime().seconds.format()}ф")
         addSearchString("§dTotal Profit§7: §5${profit.toInt().shortFormat()} Motes")

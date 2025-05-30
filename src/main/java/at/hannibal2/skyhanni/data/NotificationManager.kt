@@ -17,7 +17,6 @@ import org.lwjgl.input.Keyboard
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object NotificationManager {
 
