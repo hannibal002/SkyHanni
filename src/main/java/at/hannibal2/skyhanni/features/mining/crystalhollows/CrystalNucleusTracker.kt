@@ -17,13 +17,13 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JU
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.LEGENDARY_BAL_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -84,7 +84,7 @@ object CrystalNucleusTracker {
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         balObtainedPattern.matchMatcher(event.message) {
-            if (!group("player").equals(LorenzUtils.getPlayerName(), ignoreCase = true)) return@matchMatcher
+            if (!group("player").equals(PlayerUtils.getName(), ignoreCase = true)) return@matchMatcher
 
             val item = when (group("raritycolor")) {
                 "6" -> LEGENDARY_BAL_ITEM
@@ -206,6 +206,6 @@ object CrystalNucleusTracker {
         }
     }
 
-    private fun isAreaEnabled() = config.showOutsideNucleus || LorenzUtils.skyBlockArea == "Crystal Nucleus"
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && isAreaEnabled()
+    private fun isAreaEnabled() = config.showOutsideNucleus || SkyBlockUtils.graphArea == "Crystal Nucleus"
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isCurrent() && isAreaEnabled()
 }

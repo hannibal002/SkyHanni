@@ -33,6 +33,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 //#if MC > 1.21
 //$$ import net.minecraft.entity.attribute.EntityAttributes
+//$$ import net.minecraft.entity.player.PlayerInventory
+//$$ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 //#else
 import net.minecraft.entity.SharedMonsterAttributes
 //#endif
@@ -171,9 +173,18 @@ object EntityUtils {
     //$$ fun Player.isNpc() = false
     //#endif
 
-    //#if TODO
+    //#if MC < 1.21
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
         if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
+    //#else
+    //$$ fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    //$$     if (this !is PlayerEntity) return null
+    //$$     val list = mutableListOf<ItemStack?>()
+    //$$     for (equipmentSlot in PlayerInventory.EQUIPMENT_SLOTS.values) {
+    //$$         list.add(inventory.equipment.get(equipmentSlot).orNull())
+    //$$     }
+    //$$     return list.normalizeAsArray()
+    //$$ }
     //#endif
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState

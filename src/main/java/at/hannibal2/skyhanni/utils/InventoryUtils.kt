@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
-//#if TODO
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
-//#endif
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.filterNotNullOrEmpty
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -29,7 +27,6 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
 object InventoryUtils {
 
@@ -96,14 +93,12 @@ object InventoryUtils {
 
     fun getItemInHand(): ItemStack? = MinecraftCompat.localPlayerOrNull?.heldItem
 
-    //#if TODO
     fun getArmor(): Array<ItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
 
     fun getHelmet(): ItemStack? = getArmor()[3]
     fun getChestplate(): ItemStack? = getArmor()[2]
     fun getLeggings(): ItemStack? = getArmor()[1]
     fun getBoots(): ItemStack? = getArmor()[0]
-    //#endif
 
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return

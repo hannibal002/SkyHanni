@@ -1275,6 +1275,7 @@ object RenderUtils {
             this.draw3DLine(cornersBottom[i], cornersTop[i], color, lineWidth, depth)
         }
     }
+    //#endif
 
     fun chromaColor(
         timeTillRepeat: Duration,
@@ -1336,6 +1337,7 @@ object RenderUtils {
         GlStateManager.enableDepth()
     }
 
+    //#if TODO
     /**
      * Method to draw a rounded textured rect.
      *

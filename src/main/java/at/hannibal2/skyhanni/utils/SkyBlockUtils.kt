@@ -31,6 +31,7 @@ object SkyBlockUtils {
     val graphArea get() = if (inSkyBlock) IslandAreas.currentArea else null
     //#else
     //$$ val currentIsland get() = HypixelData.skyBlockIsland
+    //$$ val graphArea get() = HypixelData.skyBlockIsland.name
     //#endif
 
     // Only use scoreboardArea if graph data is not useable in this scenario.

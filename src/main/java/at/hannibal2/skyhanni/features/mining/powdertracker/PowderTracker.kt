@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -461,7 +460,7 @@ object PowderTracker {
         val perMin: MutableList<Long>,
     )
 
-    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
+    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isCurrent() && config.enabled
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
