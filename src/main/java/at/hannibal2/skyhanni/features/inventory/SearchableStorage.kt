@@ -1,77 +1,86 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.StorageApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable
-import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
-import net.minecraft.item.ItemStack
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
+import java.awt.Color
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SearchableStorage {
 
-    private val config get() = SkyHanniMod.feature.inventory.searchableStorage
+    private var lastCloseTime = SimpleTimeMark.farPast()
 
-    private var display = emptyList<Renderable>()
+    /**
+     * REGEX-TEST: Backpack 5
+     * REGEX-TEST: Ender Chest 3
+     * REGEX-TEST: Rift Storage 2
+     */
+    val storagePattern by RepoPattern.pattern("storage.storage", "(?<type>.*) (?<page>\\d+)")
+
+    var highlightSlots = listOf<Int>()
+    var waypoints = listOf<LorenzVec>()
+    var inventoryName = ""
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        config.displayPosition.renderRenderables(display, posLabel = "Searchable Storage Display")
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        InventoryUtils.getItemsInOpenChest().forEach { slot ->
+            val slotNumber = when (inventoryName) {
+                "Island Chest" -> slot.slotNumber
+                else -> slot.slotNumber - 9
+            }
+
+            if (slotNumber in highlightSlots) {
+                slot.highlight(LorenzColor.GREEN)
+            }
+        }
     }
 
-    private fun searchStorage(args: Array<String>) {
-        display = listOf()
-
-        val search = args.drop(1).joinToString(" ")
-        val result = mutableListOf<Renderable>()
-
-        for (storage in StorageApi.accessStorage) {
-            val highlightSlots = mutableListOf<Int>()
-
-            val matches = storage.value.items.filter {
-                when (args[0]) {
-                    "name" -> it?.matchesName(search) ?: false
-                    "lore" -> it?.matchesLore(search) ?: false
-                    else -> run {
-                        ChatUtils.userError("Wrong usage! Use /shsearchstorage <name|lore> <search...>")
-                        return
-                    }
-                }
-            }.takeIfNotEmpty() ?: continue
-            matches.forEach { highlightSlots += storage.value.items.indexOf(it) }
-
-            result += storage.value.toRenderable(highlightSlots = highlightSlots)
-        }
-
-        val rows = result.chunked(3).map { row ->
-            HorizontalContainerRenderable(row)
-        }
-
-        display = listOf(VerticalContainerRenderable(rows))
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (lastCloseTime.passedSince() <= 30.seconds) return
+        highlightSlots = listOf()
+        waypoints = listOf()
     }
 
-    private fun ItemStack.matchesName(search: String) =
-        displayName.removeColor() == search || displayName.removeColor().contains(search)
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        if (Minecraft.getMinecraft().currentScreen is SearchableStorageGui) lastCloseTime = SimpleTimeMark.now()
+        if (inventoryName.isNotBlank() && event.inventoryTitle.contains(inventoryName)) {
+            highlightSlots = listOf()
+            waypoints = listOf()
+            inventoryName = ""
+        }
+    }
 
-    private fun ItemStack.matchesLore(search: String) =
-        getLore().any { it.removeColor() == search || it.removeColor().contains(search) }
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        for (waypoint in waypoints) {
+            event.drawWaypointFilled(waypoint, Color.GREEN, true)
+        }
+    }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shsearchstorage") {
             description = "Search your storage for items with their names or lore."
             category = CommandCategory.USERS_ACTIVE
-            callback { searchStorage(it) }
+            callback { SkyHanniMod.screenToOpen = SearchableStorageGui() }
         }
     }
 }

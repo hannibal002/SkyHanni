@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
-import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig;
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig;
@@ -16,7 +15,6 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
@@ -168,16 +166,6 @@ public class InventoryConfig {
     @ConfigOption(name = "Trade Value", desc = "Creates a trade value overlay")
     @Accordion
     public TradeConfig trade = new TradeConfig();
-
-    @ConfigOption(
-        name = "Searchable Storage",
-        desc = "For this feature to work properly you need to at least have opened each storage page once."
-    )
-    @ConfigEditorInfoText
-    public String notice = "";
-
-    @Expose
-    public Position displayPosition = new Position(-300, 140);
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
