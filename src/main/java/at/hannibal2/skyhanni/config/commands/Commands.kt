@@ -233,11 +233,6 @@ object Commands {
             category = CommandCategory.USERS_BUG_FIX
             callback { HypixelBazaarFetcher.fetchNow() }
         }
-        event.register("shedittracker") {
-            description = "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers."
-            category = CommandCategory.USERS_BUG_FIX
-            callback { TrackerManager.commandEditTracker(it) }
-        }
     }
 
     private fun devDebug(event: CommandRegistrationEvent) {

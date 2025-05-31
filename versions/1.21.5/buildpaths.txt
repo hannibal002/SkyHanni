@@ -994,6 +994,25 @@ at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory.kt
 at.hannibal2.skyhanni.test.TestExportTools.kt
 at.hannibal2.skyhanni.test.command.CopyItemCommand.kt
 at.hannibal2.skyhanni.features.misc.pets.CurrentPetDisplay.kt
+at.hannibal2.skyhanni.features.rift.RiftApi.kt
+at.hannibal2.skyhanni.data.mob.Mob.kt
+at.hannibal2.skyhanni.data.IslandGraphs.kt
+at.hannibal2.skyhanni.events.MobEvent.kt
+at.hannibal2.skyhanni.data.model.Graph.kt
+at.hannibal2.skyhanni.data.model.GraphNode.kt
+at.hannibal2.skyhanni.events.IslandGraphReloadEvent.kt
+at.hannibal2.skyhanni.events.entity.EntityMoveEvent.kt
+at.hannibal2.skyhanni.features.misc.IslandAreas.kt
+at.hannibal2.skyhanni.utils.GraphUtils.kt
+at.hannibal2.skyhanni.utils.MobUtils.kt
+at.hannibal2.skyhanni.data.mob.MobFilter.kt
+at.hannibal2.skyhanni.data.mob.MobData.kt
+at.hannibal2.skyhanni.data.model.GraphNodeTag.kt
+at.hannibal2.skyhanni.data.mob.LineToMobHandler.kt
+at.hannibal2.skyhanni.data.mob.MobFactories.kt
+at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper.kt
+at.hannibal2.skyhanni.data.mob.IslandExceptions.kt
+
 
 
 # \.(?!kt|java|\()

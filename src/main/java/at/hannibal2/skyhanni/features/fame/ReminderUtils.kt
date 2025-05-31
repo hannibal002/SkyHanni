@@ -2,13 +2,9 @@ package at.hannibal2.skyhanni.features.fame
 
 import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
-//#if TODO
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
-//#endif
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
-//#if TODO
 import at.hannibal2.skyhanni.features.rift.RiftApi
-//#endif
 
 object ReminderUtils {
 
@@ -24,9 +20,7 @@ object ReminderUtils {
     fun isBusy(ignoreFarmingContest: Boolean = false): Boolean =
         (DungeonApi.inDungeon() && !DungeonApi.completed) ||
             KuudraApi.inKuudra ||
-            //#if TODO
             (FarmingContestApi.inContest && !ignoreFarmingContest) ||
             RiftApi.inRift() ||
-            //#endif
             IslandTypeTags.BUSY.inAny()
 }

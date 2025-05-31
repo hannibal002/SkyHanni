@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
-//import at.hannibal2.skyhanni.data.model.Graph
+import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -420,7 +420,7 @@ object WorldRenderUtils {
 
     @Deprecated("Do not use, use proper method instead")
     fun SkyHanniRenderWorldEvent._draw3DPathWithWaypoint(
-        //path: Graph,
+        path: Graph,
         colorLine: Color,
         lineWidth: Int,
         depth: Boolean,
@@ -433,7 +433,7 @@ object WorldRenderUtils {
         markLastBlock: Boolean = true,
     ) {
         draw3DPathWithWaypoint(
-            //path,
+            path,
             colorLine,
             lineWidth,
             depth,
@@ -447,7 +447,7 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
-        //path: Graph,
+        path: Graph,
         colorLine: Color,
         lineWidth: Int,
         depth: Boolean,

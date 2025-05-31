@@ -7,9 +7,7 @@ import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.rift.RiftApi
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -96,9 +94,7 @@ object CurrentPetDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        //#if TODO
         if (RiftApi.inRift()) return
-        //#endif
         if (!config.display) return
 
         config.displayPos.renderString(PetApi.currentPet, posLabel = "Current Pet")

@@ -4,15 +4,13 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-//#if TODO
 import at.hannibal2.skyhanni.data.model.Graph
-//#endif
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
@@ -91,9 +89,7 @@ object RenderUtils {
     //#if TODO
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
-    //#endif
 
-    //#if TODO
     val absoluteTranslation
         get() = run {
             matrixBuffer.clear()
@@ -448,9 +444,7 @@ object RenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
-        //#if TODO
         PatcherFixes.onPlayerEyeLine()
-        //#endif
         return exactLocation(player).add(y = eyeHeight)
     }
 
@@ -467,18 +461,15 @@ object RenderUtils {
         return exactLocation(player) + add
     }
 
-    //#if TODO
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         _draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
     }
-    //#endif
 
     @Deprecated("Use WorldRenderUtils' exactLocation instead")
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
         return WorldRenderUtils.exactLocation(entity, partialTicks)
     }
 
-    //#if TODO
     @Deprecated("Use WorldRenderUtils' drawWireframeBoundingBox instead")
     fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
         aabb: AxisAlignedBB,
@@ -560,7 +551,6 @@ object RenderUtils {
     ) {
         _drawHitbox(boundingBox, lineWidth, color, depth)
     }
-    //#endif
 
     fun chromaColor(
         timeTillRepeat: Duration,
