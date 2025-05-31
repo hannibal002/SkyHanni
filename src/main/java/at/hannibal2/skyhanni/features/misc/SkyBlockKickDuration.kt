@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -53,7 +53,7 @@ object SkyBlockKickDuration {
 
         if (kickPattern.matches(event.message) && !showTime) {
 
-            if (LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock) {
+            if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) {
                 kickMessage = false
                 showTime = true
                 lastKickTime = SimpleTimeMark.now()
@@ -83,10 +83,10 @@ object SkyBlockKickDuration {
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
         if (!showTime) return
 
-        if (LorenzUtils.inSkyBlock) {
+        if (SkyBlockUtils.inSkyBlock) {
             showTime = false
         }
 
@@ -103,7 +103,7 @@ object SkyBlockKickDuration {
 
         val format = lastKickTime.passedSince().format()
         config.position.renderString(
-            "§cLast kicked from SkyBlock §b$format ago",
+            "§cKicked from SkyBlock §b$format ago",
             posLabel = "SkyBlock Kick Duration",
         )
     }
