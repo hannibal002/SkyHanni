@@ -36,13 +36,13 @@ object DataWatcherApi {
     //#if MC < 1.16
     private const val DATA_VALUE_CUSTOM_NAME = 2
     //#else
-    //$$ private val DATA_VALUE_CUSTOM_NAME = SynchedEntityData.createKey(Entity::class.java, EntityDataSerializers.STRING)
+    //$$ private val DATA_VALUE_CUSTOM_NAME = SynchedEntityData.defineId(Entity::class.java, EntityDataSerializers.STRING)
     //#endif
 
     //#if MC < 1.16
     private const val DATA_VALUE_HEALTH = 6
     //#else
-    //$$ private val DATA_VALUE_HEALTH = SynchedEntityData.createKey(EntityLivingBase::class.java, EntityDataSerializers.FLOAT)
+    //$$ private val DATA_VALUE_HEALTH = SynchedEntityData.defineId(LivingEntity::class.java, EntityDataSerializers.FLOAT)
     //#endif
 
     @HandleEvent
