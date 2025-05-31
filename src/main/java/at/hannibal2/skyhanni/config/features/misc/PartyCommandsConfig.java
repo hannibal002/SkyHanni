@@ -32,12 +32,12 @@ public class PartyCommandsConfig {
     @ConfigEditorBoolean
     @ConfigOption(name = "Party Ping Command", desc = "Sends current ping into party chat if someone types §b!ping\n" +
         "§cNote: Will not work correctly with the Hypixel Ping API turned off in Dev.")
-    public boolean pingCommand = true;
+    public boolean pingCommand = false;
 
     @Expose
     @ConfigEditorBoolean
     @ConfigOption(name = "Party TPS Command", desc = "Sends current TPS into Party Chat if someone types §b!tps")
-    public boolean tpsCommand = true;
+    public boolean tpsCommand = false;
 
     public enum TrustedUser {
         BEST_FRIENDS("Best Friends"),
