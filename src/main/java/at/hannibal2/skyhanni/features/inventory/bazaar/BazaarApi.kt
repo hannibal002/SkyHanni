@@ -30,9 +30,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-//#if TODO
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-//#endif
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -42,7 +40,6 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object BazaarApi {
 
@@ -197,9 +194,7 @@ object BazaarApi {
             }
 
             if (stack.displayName.removeColor() == currentSearchedItem) {
-                //#if TODO
                 slot.highlight(LorenzColor.GREEN)
-                //#endif
             }
         }
     }
