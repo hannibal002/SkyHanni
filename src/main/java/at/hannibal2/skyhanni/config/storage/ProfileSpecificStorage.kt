@@ -22,9 +22,7 @@ import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.LocationRabbit
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
-//#if TODO
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
-//#endif
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
@@ -400,11 +398,9 @@ class ProfileSpecificStorage {
         }
     }
 
-    //#if TODO
     // - fame
     @Expose
     var communityShopProfileUpgrade: CommunityShopUpgrade? = null
-    //#endif
 
     // - fishing
     @Expose

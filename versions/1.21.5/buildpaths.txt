@@ -8,6 +8,7 @@ at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo.kt
 at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery.kt
 at.hannibal2.skyhanni.api.event.GeneratedEventPrimaryFunctionNames.kt
 at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent.kt
+at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi.kt
 at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi.kt
 at.hannibal2.skyhanni.config.ConfigGuiManager.kt
 at.hannibal2.skyhanni.config.ConfigManager.kt
@@ -85,6 +86,7 @@ at.hannibal2.skyhanni.data.MinecraftData.kt
 at.hannibal2.skyhanni.data.NotificationManager.kt
 at.hannibal2.skyhanni.data.OtherInventoryData.kt
 at.hannibal2.skyhanni.data.OwnInventoryData.kt
+at.hannibal2.skyhanni.data.PartyApi.kt
 at.hannibal2.skyhanni.data.PetApi.kt
 at.hannibal2.skyhanni.data.ProfileStorageData.kt
 at.hannibal2.skyhanni.data.PurseApi.kt
@@ -100,6 +102,15 @@ at.hannibal2.skyhanni.data.WinterApi.kt
 at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher.kt
 at.hannibal2.skyhanni.data.effect.EffectApi.kt
 at.hannibal2.skyhanni.data.effect.NonGodPotEffect.kt
+at.hannibal2.skyhanni.data.hypixel.chat.PlayerChatManager.kt
+at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractChatEvent.kt
+at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent.kt
+at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent.kt
+at.hannibal2.skyhanni.data.hypixel.chat.event.NpcChatEvent.kt
+at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent.kt
+at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent.kt
+at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent.kt
+at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent.kt
 at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent.kt
 at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree.kt
 at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson.java
@@ -251,6 +262,7 @@ at.hannibal2.skyhanni.features.bingo.card.goals.GoalType.kt
 at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData.kt
 at.hannibal2.skyhanni.features.chat.ChatHistoryGui.kt
 at.hannibal2.skyhanni.features.chat.ChatSoundResponse.kt
+at.hannibal2.skyhanni.features.chat.CurrentChatDisplay.kt
 at.hannibal2.skyhanni.features.chat.SkyblockXPInChat.kt
 at.hannibal2.skyhanni.features.chat.translation.TranslatableLanguage.kt
 at.hannibal2.skyhanni.features.chroma.ChromaManager.kt
@@ -291,6 +303,7 @@ at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasure.kt
 at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker.kt
 at.hannibal2.skyhanni.features.fame.ReminderUtils.kt
+at.hannibal2.skyhanni.features.fame.UpgradeReminder.kt
 at.hannibal2.skyhanni.features.fishing.FishingApi.kt
 at.hannibal2.skyhanni.features.fishing.SeaCreature.kt
 at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker.kt
@@ -393,6 +406,7 @@ at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker.kt
 at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorApi.kt
 at.hannibal2.skyhanni.features.mining.powdertracker.PowderChestReward.kt
 at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker.kt
+at.hannibal2.skyhanni.features.misc.CurrentPing.kt
 at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker.kt
 at.hannibal2.skyhanni.features.misc.EnchantedClockHelper.kt
 at.hannibal2.skyhanni.features.misc.IslandAreas.kt
@@ -411,6 +425,8 @@ at.hannibal2.skyhanni.features.misc.update.ConfigVersionDisplay.java
 at.hannibal2.skyhanni.features.misc.update.CustomGithubReleaseUpdateSource.kt
 at.hannibal2.skyhanni.features.misc.update.GuiOptionEditorUpdateCheck.kt
 at.hannibal2.skyhanni.features.misc.update.UpdateManager.kt
+at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords.kt
+at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kt
 at.hannibal2.skyhanni.features.rift.RiftApi.kt
 at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker.kt
@@ -1017,6 +1033,7 @@ at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
 at/hannibal2/skyhanni/skyhannimodule/SkyHanniModule.kt
 at/hannibal2/skyhanni/utils/CircularList.kt
 at/hannibal2/skyhanni/utils/CommandUtils.kt
+at/hannibal2/skyhanni/utils/ComponentMatcherUtils.kt
 at/hannibal2/skyhanni/utils/ConditionalUtils.kt
 at/hannibal2/skyhanni/utils/EnumUtils.kt
 at/hannibal2/skyhanni/utils/KSerializable.kt

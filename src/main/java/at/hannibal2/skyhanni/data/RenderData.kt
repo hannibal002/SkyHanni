@@ -5,9 +5,7 @@ import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.compat.DrawContext
@@ -24,9 +22,7 @@ object RenderData {
     fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (event.type != RenderLayer.HOTBAR) return
         if (!SkyHanniDebugsAndTests.globalRender) return
-        //#if TODO
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        //#endif
 
         DrawContextUtils.translated(z = -3) {
             renderOverlay(DrawContextUtils.drawContext)
@@ -36,9 +32,7 @@ object RenderData {
     @HandleEvent
     fun onBackgroundDraw(event: DrawBackgroundEvent) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        //#if TODO
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        //#endif
         val currentScreen = Minecraft.getMinecraft().currentScreen ?: return
         if (currentScreen !is GuiInventory && currentScreen !is GuiChest) return
 

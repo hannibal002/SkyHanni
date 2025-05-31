@@ -131,7 +131,6 @@ object CaptureFarmingGear {
 
     // TODO upadte armor on equpment/wardeobe update as well
     fun captureFarmingGear() {
-        //#if TODO
         for (armor in InventoryUtils.getArmor()) {
             if (armor == null) continue
             val split = armor.getInternalName().asString().split("_")
@@ -140,7 +139,6 @@ object CaptureFarmingGear {
                 FarmingItemType.getFromItemCategoryOne(category)?.setItem(armor)
             }
         }
-        //#endif
 
         val itemStack = InventoryUtils.getItemInHand() ?: return
 

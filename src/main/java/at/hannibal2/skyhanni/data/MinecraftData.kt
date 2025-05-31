@@ -29,7 +29,7 @@ object MinecraftData {
         when (val packet = event.packet) {
             is S29PacketSoundEffect -> {
                 if (PlaySoundEvent(
-                        //#if TODO
+                        //#if MC < 1.21
                         packet.soundName,
                         //#else
                         //$$ packet.sound.value().id.toString(),

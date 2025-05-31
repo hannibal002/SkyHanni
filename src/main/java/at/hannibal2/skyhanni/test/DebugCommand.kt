@@ -11,9 +11,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoManager.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.CurrentPing
-//#endif
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -32,7 +30,6 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object DebugCommand {
 
@@ -159,7 +156,6 @@ object DebugCommand {
     }
 
     private fun globalRender(event: DebugDataCollectEvent) {
-        //#if TODO
         event.title("Global Render")
         if (SkyHanniDebugsAndTests.globalRender) {
             event.addIrrelevant("normal enabled")
@@ -169,7 +165,6 @@ object DebugCommand {
                 add("No renderable elements from SkyHanni will show up anywhere!")
             }
         }
-        //#endif
     }
 
     private fun repoData(event: DebugDataCollectEvent) {
@@ -216,7 +211,6 @@ object DebugCommand {
     private val pingLimit = 1.5.seconds
 
     private fun networkInfo(event: DebugDataCollectEvent) {
-        //#if TODO
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
         val pingEnabled = SkyHanniMod.feature.dev.hypixelPingApi
@@ -254,12 +248,10 @@ object DebugCommand {
         } else {
             event.addIrrelevant(list)
         }
-        //#endif
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        // todo convert to actual brigadier
         event.registerBrigadier("shdebug") {
             description = "Copies SkyHanni debug data in the clipboard."
             category = CommandCategory.DEVELOPER_DEBUG

@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
@@ -173,7 +173,7 @@ object PlayerChatManager {
     private fun ComponentMatcher.isGlobalChat(event: SkyHanniChatEvent): Boolean {
         var author = groupOrThrow("author")
         val chatColor = groupOrThrow("chatColor")
-        if (chatColor.length == 0 && !author.getText().removeColor().endsWith(LorenzUtils.getPlayerName())) {
+        if (chatColor.length == 0 && !author.getText().removeColor().endsWith(PlayerUtils.getName())) {
             // The last format string is always present, unless this is the players own message
             return false
         }

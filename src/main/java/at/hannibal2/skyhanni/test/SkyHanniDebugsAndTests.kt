@@ -79,7 +79,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-//#if TODO
+//#if FORGE
 import net.minecraftforge.common.MinecraftForge
 //#endif
 import java.io.File
@@ -298,7 +298,7 @@ object SkyHanniDebugsAndTests {
         for (original in modules.toMutableList()) {
             val javaClass = original.javaClass
             val simpleName = javaClass.simpleName
-            //#if TODO
+            //#if FORGE
             MinecraftForge.EVENT_BUS.unregister(original)
             //#endif
             SkyHanniEvents.unregister(original)
@@ -307,7 +307,7 @@ object SkyHanniDebugsAndTests {
             if (simpleName !in blockedFeatures) {
                 modules.remove(original)
                 modules.add(original)
-                //#if TODO
+                //#if FORGE
                 MinecraftForge.EVENT_BUS.register(original)
                 //#endif
                 SkyHanniEvents.register(original)
@@ -327,7 +327,7 @@ object SkyHanniDebugsAndTests {
                 for (original in modules.toMutableList()) {
                     val javaClass = original.javaClass
                     val simpleName = javaClass.simpleName
-                    //#if TODO
+                    //#if FORGE
                     MinecraftForge.EVENT_BUS.unregister(original)
                     //#endif
                     SkyHanniEvents.unregister(original)
