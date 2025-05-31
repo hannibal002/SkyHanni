@@ -52,6 +52,7 @@ object SkyBlockKickDuration {
         if (!isEnabled()) return
 
         if (kickPattern.matches(event.message) && !showTime) {
+
             if (LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock) {
                 kickMessage = false
                 showTime = true
