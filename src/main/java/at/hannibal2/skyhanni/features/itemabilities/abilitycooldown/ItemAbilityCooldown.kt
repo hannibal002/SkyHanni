@@ -102,7 +102,7 @@ object ItemAbilityCooldown {
             event.soundName == "mob.enderdragon.growl" && event.pitch == 1f && event.volume == 1f -> {
                 ItemAbility.ICE_SPRAY_WAND.sound()
             }
-            // Gyrokinetic Wand & Shadow Fury &
+            // Gyrokinetic Wand & Shadow Fury
             event.soundName == "mob.endermen.portal" -> {
                 // Gryokinetic Wand
                 if (event.pitch == 0.61904764f && event.volume == 1f) {

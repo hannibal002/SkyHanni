@@ -142,7 +142,6 @@ enum class ItemAbility(
             else addAll(scrolls)
         }
 
-
         fun ItemAbility.getMultiplier(): Double {
             return getMageCooldownReduction() ?: 1.0
         }
