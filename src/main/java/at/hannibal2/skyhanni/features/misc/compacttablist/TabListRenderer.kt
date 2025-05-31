@@ -179,11 +179,11 @@ object TabListRenderer {
                     if (playerInfo != null) {
                         minecraft.textureManager.bindTexture(playerInfo.locationSkin)
                         GlStateManager.color(1f, 1f, 1f, 1f)
-                        Gui.drawScaledCustomSizeModalRect(middleX, middleY, 8f, 8f, 8, 8, 8, 8, 64.0f, 64.0f)
+                        Gui.drawScaledCustomSizeModalRect(middleX, middleY, 8f, 8f, 8, 8, 8, 8, 64f, 64f)
 
                         val player = tabLine.getEntity(playerInfo)
                         if (player != null && player.isWearing(EnumPlayerModelParts.HAT)) {
-                            Gui.drawScaledCustomSizeModalRect(middleX, middleY, 40.0f, 8f, 8, 8, 8, 8, 64.0f, 64.0f)
+                            Gui.drawScaledCustomSizeModalRect(middleX, middleY, 40f, 8f, 8, 8, 8, 8, 64f, 64f)
                         }
                     }
                     middleX += 8 + 2
