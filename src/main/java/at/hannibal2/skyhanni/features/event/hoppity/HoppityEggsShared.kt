@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.get
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 @SkyHanniModule
@@ -59,5 +59,5 @@ object HoppityEggsShared {
         HypixelCommands.allChat("[SkyHanni] ${meal.mealName} Chocolate Egg located at x: $x, y: $y, z: $z ($note)")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && waypointsConfig.enabled && waypointsConfig.shared
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && waypointsConfig.enabled && waypointsConfig.shared
 }

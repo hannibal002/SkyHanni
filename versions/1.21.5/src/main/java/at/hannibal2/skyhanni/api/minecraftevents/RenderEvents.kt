@@ -38,8 +38,6 @@ object RenderEvents {
 
         // GuiScreenOpenEvent
 
-        // GuiKeyPressEvent
-
         // GuiMouseInputEvent
 
         // BlockOverlayRenderEvent

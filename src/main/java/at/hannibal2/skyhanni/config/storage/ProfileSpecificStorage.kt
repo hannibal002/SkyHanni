@@ -19,10 +19,8 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
-//#if TODO
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.LocationRabbit
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
-//#endif
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 //#if TODO
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
@@ -41,9 +39,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
-//#if TODO
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
-//#endif
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 //#if TODO
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -61,9 +57,7 @@ import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
 //#endif
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
-//#if TODO
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
-//#endif
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
@@ -282,10 +276,8 @@ class ProfileSpecificStorage {
         @Expose
         var rabbitCounts: MutableMap<String, Int> = mutableMapOf()
 
-        //#if TODO
         @Expose
         var locationRabbitRequirements: MutableMap<String, LocationRabbit> = mutableMapOf()
-        //#endif
 
         @Expose
         var collectedEggLocations: MutableMap<IslandType, MutableSet<LorenzVec>> = enumMapOf()
@@ -304,7 +296,6 @@ class ProfileSpecificStorage {
         @Expose
         var hoppityShopYearOpened: Int? = null
 
-        //#if TODO
         @Expose
         var strayTracker: CFStrayTracker.Data = CFStrayTracker.Data()
 
@@ -313,7 +304,6 @@ class ProfileSpecificStorage {
 
         @Expose
         var mealNextSpawn: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
-        //#endif
 
         @Expose
         var hotChocolateMixinExpiry = farPast()
@@ -343,10 +333,8 @@ class ProfileSpecificStorage {
     var hoppityStatLiveDisplayToggledOff: Boolean = false
 
     data class HoppityEventStats(
-        //#if TODO
         @Expose var mealsFound: MutableMap<HoppityEggType, Int> = enumMapOf(),
         @Expose var rabbitsFound: MutableMap<LorenzRarity, RabbitData> = enumMapOf(),
-        //#endif
         @Expose var dupeChocolateGained: Long = 0,
         @Expose var strayChocolateGained: Long = 0,
         @Expose var rabbitTheFishFinds: Int = 0,
@@ -372,7 +360,6 @@ class ProfileSpecificStorage {
         }
 
         operator fun plusAssign(it: HoppityEventStats) {
-            //#if TODO
             it.mealsFound.forEach { (key, value) ->
                 mealsFound.merge(key, value, Int::plus)
             }
@@ -385,7 +372,6 @@ class ProfileSpecificStorage {
                     )
                 }
             }
-            //#endif
             dupeChocolateGained += it.dupeChocolateGained
             strayChocolateGained += it.strayChocolateGained
             rabbitTheFishFinds += it.rabbitTheFishFinds
@@ -810,10 +796,8 @@ class ProfileSpecificStorage {
         @Expose
         var completedKloonTerminals: MutableList<KloonTerminal> = mutableListOf()
 
-        //#if TODO
         @Expose
         var verminTracker: VerminTracker.Data = VerminTracker.Data()
-        //#endif
 
         @Expose
         var timiteTracker: TimiteTracker.Data = TimiteTracker.Data()
