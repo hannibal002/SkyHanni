@@ -1,7 +1,12 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
@@ -9,9 +14,10 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import net.minecraft.item.ItemStack
 
+@SkyHanniModule
 object CopyItemCommand {
 
-    fun command() {
+    private fun command() {
         val itemStack = InventoryUtils.getItemInHand()
         if (itemStack == null) {
             ChatUtils.userError("No item in hand!")
@@ -31,12 +37,19 @@ object CopyItemCommand {
         }
         resultList.add("")
         resultList.add("getTagCompound")
-        itemStack.tagCompound?.let {
-            resultList.addAll(it.getReadableNBTDump())
-        } ?: resultList.add("no tag compound")
+        resultList.addAll(itemStack.extraAttributes.getReadableNBTDump())
 
         val string = resultList.joinToString("\n")
         OSUtils.copyToClipboard(string)
         ChatUtils.chat("Item info copied into the clipboard!")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcopyitem") {
+            description = "Copies information about the item in hand to the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { command() }
+        }
     }
 }

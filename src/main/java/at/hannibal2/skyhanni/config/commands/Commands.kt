@@ -325,11 +325,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_DEBUG
             callback { SkyHanniDebugsAndTests.copyLocation(it) }
         }
-        event.register("shcopyitem") {
-            description = "Copies information about the item in hand to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { CopyItemCommand.command() }
-        }
     }
 
     @Suppress("LongMethod")

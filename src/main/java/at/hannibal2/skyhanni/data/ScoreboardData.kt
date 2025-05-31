@@ -25,10 +25,6 @@ import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.ScorePlayerTeam
 
-//#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-//#endif
-
 // todo 1.21 impl needed
 @SkyHanniModule
 object ScoreboardData {
@@ -170,7 +166,7 @@ object ScoreboardData {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
         //#else
-        //$$ return list.map { it.formattedTextCompat().removeResets() }
+        //$$ return list.map { it.formattedTextCompat(true) }
         //#endif
     }
 

@@ -152,7 +152,7 @@ object ItemUtils {
     //#if MC < 1.21
     fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) }  ?: emptyList()
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
@@ -165,7 +165,7 @@ object ItemUtils {
     //#else
     //$$ fun ComponentMap?.getLore(): List<String> {
     //$$     this ?: return emptyList()
-    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() } ?: emptyList()
+    //$$     return this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat(true) } ?: emptyList()
     //$$ }
     //#endif
 
