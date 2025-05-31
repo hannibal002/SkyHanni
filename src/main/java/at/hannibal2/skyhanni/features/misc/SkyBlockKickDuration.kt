@@ -51,7 +51,7 @@ object SkyBlockKickDuration {
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
-        if (kickPattern.matches(event.message)) {
+        if (kickPattern.matches(event.message) && !showTime) {
             if (LorenzUtils.onHypixel && !LorenzUtils.inSkyBlock) {
                 kickMessage = false
                 showTime = true
@@ -61,7 +61,7 @@ object SkyBlockKickDuration {
             }
         }
 
-        if (problemJoiningPattern.matches(event.message)) {
+        if (problemJoiningPattern.matches(event.message) && !showTime) {
             kickMessage = false
             showTime = true
             lastKickTime = SimpleTimeMark.now()
