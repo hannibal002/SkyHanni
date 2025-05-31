@@ -710,7 +710,7 @@ net.minecraft.world.level.block.Blocks GLOWSTONE glowstone
 net.minecraft.world.level.block.Blocks GOLDEN_RAIL golden_rail
 net.minecraft.world.level.block.Blocks GOLD_BLOCK gold_block
 net.minecraft.world.level.block.Blocks GOLD_ORE gold_ore
-net.minecraft.world.level.block.Blocks GRASS grass
+net.minecraft.world.level.block.Blocks GRASS_BLOCK grass
 net.minecraft.world.level.block.Blocks GRAVEL gravel
 net.minecraft.world.level.block.Blocks HAY_BLOCK hay_block
 net.minecraft.world.level.block.Blocks HEAVY_WEIGHTED_PRESSURE_PLATE heavy_weighted_pressure_plate
