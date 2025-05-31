@@ -93,6 +93,7 @@ object RenderUtils {
     private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     //#endif
 
+    //#if TODO
     val absoluteTranslation
         get() = run {
             matrixBuffer.clear()
@@ -109,6 +110,7 @@ object RenderUtils {
 
             Triple(xTranslate, yTranslate, zTranslate)
         }
+    //#endif
 
     //#if TODO
     fun Slot.highlight(color: LorenzColor) {

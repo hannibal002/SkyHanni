@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.data.model.Graph
+//import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -333,17 +333,16 @@ object WorldRenderUtils {
         TODO()
     }
 
-
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(partialTicks) {
+        /* LineDrawer.draw3D(partialTicks) {
             drawEdges(location, color, lineWidth, depth)
-        }
+        } */
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: Box, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(partialTicks) {
+        /* LineDrawer.draw3D(partialTicks) {
             drawEdges(axisAlignedBB, color, lineWidth, depth)
-        }
+        } */
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -363,9 +362,7 @@ object WorldRenderUtils {
         color: Color,
         lineWidth: Int,
         depth: Boolean,
-    ) = LineDrawer.draw3D(partialTicks) {
-        draw3DLine(p1, p2, color, lineWidth, depth)
-    }
+    ): Unit = TODO()
 
     @Deprecated("Do not use, use proper method instead")
     fun SkyHanniRenderWorldEvent._outlineTopFace(
@@ -423,20 +420,20 @@ object WorldRenderUtils {
 
     @Deprecated("Do not use, use proper method instead")
     fun SkyHanniRenderWorldEvent._draw3DPathWithWaypoint(
-        path: Graph,
+        //path: Graph,
         colorLine: Color,
         lineWidth: Int,
         depth: Boolean,
         startAtEye: Boolean = true,
         textSize: Double = 1.0,
         waypointColor: Color =
-            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
+            LorenzColor.WHITE.toColor(),
         bezierPoint: Double = 1.0,
         showNodeNames: Boolean = false,
         markLastBlock: Boolean = true,
     ) {
         draw3DPathWithWaypoint(
-            path,
+            //path,
             colorLine,
             lineWidth,
             depth,
@@ -450,14 +447,14 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
-        path: Graph,
+        //path: Graph,
         colorLine: Color,
         lineWidth: Int,
         depth: Boolean,
         startAtEye: Boolean = true,
         textSize: Double = 1.0,
         waypointColor: Color =
-            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
+            (LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
         showNodeNames: Boolean = false,
         markLastBlock: Boolean = true,
