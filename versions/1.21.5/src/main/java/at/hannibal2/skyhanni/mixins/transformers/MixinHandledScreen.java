@@ -49,7 +49,7 @@ public abstract class MixinHandledScreen {
     @Inject(method = "keyPressed", at = @At(value = "HEAD"), cancellable = true)
     private void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
         if (new GuiKeyPressEvent((HandledScreen<?>) (Object) this).post()) {
-            cir.cancel();
+            cir.setReturnValue(false);
         }
     }
 }
