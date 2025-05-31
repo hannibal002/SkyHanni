@@ -26,5 +26,5 @@ class RngMeterDisplayConfig {
 
     @Expose
     @ConfigLink(owner = RngMeterDisplayConfig::class, field = "enabled")
-    var pos: Position = Position(410, 110, false, true)
+    var pos: Position = Position(410, 110)
 }

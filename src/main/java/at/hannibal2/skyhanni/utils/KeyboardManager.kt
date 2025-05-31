@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent
@@ -13,11 +12,12 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.milliseconds
 //#if MC < 1.21
+import at.hannibal2.skyhanni.data.model.TextInput
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
+import org.lwjgl.input.Mouse
 //#else
 //$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
@@ -95,9 +95,9 @@ object KeyboardManager {
     private fun getSyntheticKeyboardKeyCode(key: Int, char: Char): Int = if (key == 0) char.code + 256 else key
     //#endif
 
+    //#if MC < 1.16
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick() {
-        //#if MC < 1.16
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
         if (isConfigScreen || currentScreen is GuiChat) return
@@ -118,28 +118,32 @@ object KeyboardManager {
             val isDown = if (keyCode < 0) {
                 Mouse.isButtonDown(keyCode + 100)
             } else {
-                Keyboard.isKeyDown(keyCode)
+                if (keyCode < Keyboard.KEYBOARD_SIZE) {
+                    Keyboard.isKeyDown(keyCode)
+                } else {
+                    false
+                }
             }
 
             if (isDown) {
                 postKeyPressEvent(keyCode)
             } else {
                 postKeyUpEvent(keyCode)
-                if (pressedKeys.contains(keyCode)) {
-                    pressedKeys.remove(keyCode)
-                }
+                pressedKeys.remove(keyCode)
             }
         }
-
-        //#else
-        //$$ // todo use fabric event or whatnot
-        //#endif
     }
+    //#endif
+    // on 1.21 we use MixinKeyboard, it provides all of this
 
+    /*
+    The delay below is here to make sure the Text input features in graph editor
+    and in renderable calls have time to react first, and lock this key press event properly
+     */
+
+    // On 1.21 we post these events inside mixins
+    //#if MC < 1.21
     private fun postKeyPressEvent(keyCode: Int) {
-        // This cooldown is here to make sure the Text input features in graph editor
-        // and in renderable calls have time to react first,
-        // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyPressEvent(keyCode).post()
@@ -147,9 +151,6 @@ object KeyboardManager {
     }
 
     private fun postKeyDownEvent(keyCode: Int) {
-        // This cooldown is here to make sure the Text input features in graph editor
-        // and in renderable calls have time to react first,
-        // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyDownEvent(keyCode).post()
@@ -157,14 +158,12 @@ object KeyboardManager {
     }
 
     private fun postKeyUpEvent(keyCode: Int) {
-        // This cooldown is here to make sure the Text input features in graph editor
-        // and in renderable calls have time to react first,
-        // and lock this key press event properly
         DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyUpEvent(keyCode).post()
         }
     }
+    //#endif
 
     fun KeyBinding.isActive(): Boolean {
         //#if MC < 1.16

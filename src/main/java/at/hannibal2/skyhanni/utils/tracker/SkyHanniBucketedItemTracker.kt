@@ -36,7 +36,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         }
         val selectedBucket: E = bucket ?: run {
             ChatUtils.userError(
-                "No bucket selected for §b$name§c.\nSelect one in the §b$name §cGUI, then try again.",
+                "No bucket selected for §b$name§c.\n§cSelect one in the §b$name §cGUI, then try again.",
             )
             cancel()
             return
