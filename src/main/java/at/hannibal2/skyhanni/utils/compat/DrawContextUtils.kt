@@ -82,7 +82,7 @@ object DrawContextUtils {
         //$$ drawContext.matrices.multiply(Quaternionf().rotationAxis(angle, x, y, z))
         //#endif
     }
-    
+
     /**
      * Push and pop the matrix stack, run the action in between.
      */
