@@ -141,7 +141,7 @@ object RenderUtils {
         //#if TODO
         val zLevel = Minecraft.getMinecraft().renderItem.zLevel
         //#else
-        //$$ val zLevel = 50
+        //$$ val zLevel = 50f
         //#endif
         DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
@@ -170,7 +170,12 @@ object RenderUtils {
         GlStateManager.disableLighting()
         GlStateManager.disableDepth()
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        //#if TODO
+        val zLevel = Minecraft.getMinecraft().renderItem.zLevel
+        //#else
+        //$$ val zLevel = 50f
+        //#endif
+        DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 1, y + 16, color.rgb)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 1, color.rgb)
         GuiRenderUtils.drawRect(x, y + 15, x + 16, y + 16, color.rgb)
