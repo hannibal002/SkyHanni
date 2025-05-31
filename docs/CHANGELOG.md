@@ -8,6 +8,11 @@
 
 + Added Monthly Farming Weight Leaderboard option. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
 
+#### Combat
+
++ Added option to prevent player interactions during the Kuudra boss fight. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
+    + Added option to disable Profile Viewer on right-click.
+
 ### Improvements
 
 #### Garden
@@ -15,6 +20,7 @@
 + Added proper blocking of visitor chat messages even if the visitor isn’t in the Tab Widget yet. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3892)
 + Added option to set minimum item organic matter in Organic Matter Overlay. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3938)
 + Updated Composter Overlay to show information on hover. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3943)
++ Added toggle for 'Inaccurate Soul Sand Speed' text in Lane Switch Distance Display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3990)
 
 #### Commands
 
@@ -41,6 +47,16 @@
 #### Misc
 
 + Improved performance slightly when Island Area feature is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3912)
++ Added Eyes Placed to Tab Widget Display. - G0dwhitelight (https://github.com/hannibal002/SkyHanni/pull/3981)
++ Added shorthand item resolution for pets. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3878)
+    + Now you can type `epic ender dragon` or `ender dragon epic` instead of `ENDER_DRAGON;3`.
+    + Primarily applies in `/shedittracker` when adding pets manually.
++ Changed Hide Far Entities to always show important mobs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3978)
+    + Slayer Bosses, Mini Bosses, Dungeon Bosses, Party Members, Dragons, Pests, and similar mobs are always visible.
+    + Manual toggles to fully disable this feature in Garden and Dungeon got removed.
++ Using compact item names in SkyHanni display lists. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3977)
+    + Makes most GUIs more compact.
+    + Full item name is still visible on hover.
 
 ### Fixes
 
@@ -65,6 +81,7 @@
 #### Chat
 
 + Fixed chat error after sharing Jacob contests. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3893)
++ Fixed rare error messages in compact chat features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3982)
 
 #### Rift
 
@@ -76,14 +93,17 @@
 
 + Fixed Reforge Helper locking when nothing is selected. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3907)
 + Fixed display of Craftable Item List and Graph Node Editor. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3914)
++ Fixed Aquamarine Gemstone not showing in Sacks Overlay when a filter was selected. - jani (https://github.com/hannibal002/SkyHanni/pull/3989)
 
 #### Mining
 
 + Fixed Block Strength Guide blocking inventories in Rift, Kuudra, and Dungeons. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3934)
++ Fixed blocks mined by Pickobulus not being detected on non-Cold Islands. - Empa (https://github.com/hannibal002/SkyHanni/pull/3979)
 
 #### Fishing
 
 + Fixed other particles interfering with hotspot guesses. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3913)
++ Fixed Fishing Profit Tracker's times-fished count. - Chissl (https://github.com/hannibal002/SkyHanni/pull/3980)
 
 #### Hoppity
 
@@ -102,6 +122,8 @@
     + Notably `Cancelled Buy Order Clipboard` with Enchanted Books, and `Visitor Accept` clicks when Skytils’ `Middle Click GUI Items` is enabled.
 + Fixed rare error when loading items from NEU Repo. - nopo (https://github.com/hannibal002/SkyHanni/pull/3968)
 + Fixed rare rendering crash. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3949)
++ Fixed `/shdefaultoptions` and `/shchathistory` requiring NotEnoughUpdates. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3987)
++ Fixed Discord Rich Presence crashing on startup. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/3963)
 
 ### Technical Details
 
@@ -137,6 +159,11 @@
 + Got the game launching with the config and events on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3939)
 + K2 mode & live plugins no longer error. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3935)
     + The errors are just silents, so the someone should fix them.
++ Added guardrails to keep event handlers public. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3902)
++ Added PushPop, Translated & Scaled operations. - ThatGravyBoat, j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3805)
++ Changed `isVisitor` to use `IslandType`. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
++ Changed Block Interacting with Visitors to use `EntityClickEvent`. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
++ Fixed `/shconfig set` not working with Properties. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3908)
 
 ## Version 3.0.0
 
