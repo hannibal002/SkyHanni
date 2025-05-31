@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -20,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object TpsCounter {
 
@@ -82,11 +79,7 @@ object TpsCounter {
     }
 
     private fun fixTps(tps: Double): Double {
-        //#if TODO
         return if (SkyHanniDebugsAndTests.isAprilFoolsDay) tps / 2 else tps
-        //#else
-        //$$ return tps
-        //#endif
     }
 
     private fun tpsCommand() {

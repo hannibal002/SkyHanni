@@ -8,9 +8,7 @@ import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-//#endif
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SignUtils.isGardenSign
@@ -30,7 +28,6 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object GuiEditManager {
 
@@ -110,7 +107,6 @@ object GuiEditManager {
 
     @JvmStatic
     fun renderLast(context: DrawContext) {
-        //#if TODO
         if (!isInGui()) return
         if (!SkyHanniDebugsAndTests.globalRender) return
 
@@ -124,7 +120,6 @@ object GuiEditManager {
         context.matrices.popMatrix()
 
         context.matrices.translate(0f, 0f, -200f)
-        //#endif
     }
 
     fun isInGui() = Minecraft.getMinecraft().currentScreen is GuiPositionEditor

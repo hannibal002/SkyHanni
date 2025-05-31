@@ -21,4 +21,10 @@ object MinecraftCompat {
     val localWorldOrNull get(): WorldClient? = Minecraft.getMinecraft().theWorld
 
     val localWorldExists get(): Boolean = localWorldOrNull != null
+
+    //#if MC < 1.16
+    val showDebugHud get(): Boolean = Minecraft.getMinecraft().gameSettings.showDebugInfo
+    //#else
+    //$$ val showDebugHud get(): Boolean = MinecraftClient.getInstance().debugHud.shouldShowDebugHud()
+    //#endif
 }
