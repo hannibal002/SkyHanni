@@ -14,16 +14,18 @@ import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraft.block.BlockStainedGlassPane
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.getBlockColor
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -55,9 +57,10 @@ object TimiteHelper {
         }
         currentPos = event.position
         currentBlockState = event.getBlockState
-        if (event.getBlockState.block != Blocks.stained_glass_pane) return
-        val color = event.getBlockState.getValue(BlockStainedGlassPane.COLOR)
-        if (color != EnumDyeColor.BLUE && color != EnumDyeColor.LIGHT_BLUE) return
+
+        val block = event.getBlockState.block
+        if (!block.isStainedGlassPane(ColoredBlockCompat.BLUE) && !block.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) return
+
         if (lastClick + 300.milliseconds > SimpleTimeMark.now()) {
             lastClick = SimpleTimeMark.now()
             return
@@ -76,8 +79,8 @@ object TimiteHelper {
         }
         if (holdingClick.isFarPast()) return
 
-        if ((currentBlockState?.block ?: return) != Blocks.stained_glass_pane) return
-        // this works for me but idk if ive just tuned it for my ping only
+        if (currentBlockState?.block?.isStainedGlassPane() != true) return
+
         val time = if (doubleTimeShooting) 1800 else 2000
         val timeLeft = holdingClick + time.milliseconds
         if (!timeLeft.isInPast()) {
@@ -95,12 +98,12 @@ object TimiteHelper {
         val map = BlockUtils.nearbyBlocks(
             LocationUtils.playerLocation(),
             distance = 15,
-            filter = Blocks.stained_glass_pane,
+            condition = { it.block.isStainedGlassPane() },
         )
 
         for ((loc, state) in map) {
-            val color = state.getValue(BlockStainedGlassPane.COLOR)
-            if (color != EnumDyeColor.BLUE && color != EnumDyeColor.LIGHT_BLUE) continue
+            val color = state.getBlockColor()
+            if (color != LorenzColor.BLUE && color != LorenzColor.AQUA) continue
             if (locations[loc] == null) locations[loc] = SimpleTimeMark.now()
         }
 
@@ -109,11 +112,8 @@ object TimiteHelper {
             val state = iterator.next().key.getBlockStateAt()
             if (state.block == Blocks.air) {
                 iterator.remove()
-            } else if (state.block == Blocks.stained_glass_pane) {
-                val color = state.getValue(BlockStainedGlassPane.COLOR)
-                if (color == EnumDyeColor.LIGHT_BLUE) {
-                    iterator.remove()
-                }
+            } else if (state.block.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) {
+                iterator.remove()
             }
         }
     }
