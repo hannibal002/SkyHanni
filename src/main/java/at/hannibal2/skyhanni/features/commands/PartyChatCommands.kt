@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
@@ -126,9 +126,9 @@ object PartyChatCommands {
         val commandLabel = event.message.substring(1).substringBefore(' ')
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
         val name = event.cleanedAuthor
-        if (name == LorenzUtils.getPlayerName() && !command.triggerableBySelf) return
+        if (name == PlayerUtils.getName() && !command.triggerableBySelf) return
         if (!command.isEnabled()) return
-        if (command.requiresPartyLead && PartyApi.partyLeader != LorenzUtils.getPlayerName()) return
+        if (command.requiresPartyLead && PartyApi.partyLeader != PlayerUtils.getName()) return
         if (isBlockedUser(name)) {
             if (config.showIgnoredReminder) ChatUtils.clickableChat(
                 "§cIgnoring chat command from ${event.author}. " +

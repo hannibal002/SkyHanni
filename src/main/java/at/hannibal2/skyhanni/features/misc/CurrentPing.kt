@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPingPacket
@@ -46,7 +46,7 @@ object CurrentPing {
     }
 
     private fun requestPing() {
-        if (waitingForPacket || !LorenzUtils.onHypixel) return
+        if (waitingForPacket || !SkyBlockUtils.onHypixel) return
         lastPingRequested = SimpleTimeMark.now()
         waitingForPacket = true
         HypixelEventApi.sendPacket(ServerboundPingPacket())
@@ -55,7 +55,7 @@ object CurrentPing {
     @JvmStatic
     fun fixedModApiKickMessage() {
         ChatUtils.debug("Stopped HypixelModApi ping packet error!")
-        if (LorenzUtils.debug) {
+        if (SkyBlockUtils.debug) {
             SoundUtils.playBeepSound()
         }
     }
