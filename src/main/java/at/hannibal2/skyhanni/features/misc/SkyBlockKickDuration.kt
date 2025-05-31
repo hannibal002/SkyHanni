@@ -52,7 +52,6 @@ object SkyBlockKickDuration {
         if (!isEnabled()) return
 
         if (kickPattern.matches(event.message) && !showTime) {
-
             if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) {
                 kickMessage = false
                 showTime = true
