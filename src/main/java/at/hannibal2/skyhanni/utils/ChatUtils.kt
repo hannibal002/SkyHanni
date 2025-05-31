@@ -311,7 +311,7 @@ object ChatUtils {
     ) {
         //#if TODO
         chatLines.editChatLine(component, predicate, reason)
-        chatGui.refreshChat()
+        refreshChat()
         //#endif
     }
 
@@ -325,8 +325,14 @@ object ChatUtils {
     ) {
         //#if TODO
         chatLines.deleteChatLine(amount, reason, predicate)
-        chatGui.refreshChat()
+        refreshChat()
         //#endif
+    }
+
+    private fun refreshChat() {
+        DelayedRun.onThread.execute {
+            chatGui.refreshChat()
+        }
     }
 
     private var deleteNext: Pair<String, (String) -> Boolean>? = null
