@@ -207,6 +207,7 @@ object RenderUtils {
     @Deprecated("Use WorldRenderUtils' getViewerPos instead", ReplaceWith("WorldRenderUtils.getViewerPos(partialTicks)"))
     fun getViewerPos(partialTicks: Float) =
         Minecraft.getMinecraft().renderViewEntity?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
+    //#endif
 
     @Deprecated("Use WorldRenderUtils' expandBlock instead")
     fun AxisAlignedBB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
@@ -251,7 +252,6 @@ object RenderUtils {
     fun interpolate(currentValue: Double, lastValue: Double, multiplier: Double): Double {
         return lastValue + (currentValue - lastValue) * multiplier
     }
-    //#endif
 
     fun Position.transform(): Pair<Int, Int> {
         DrawContextUtils.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)

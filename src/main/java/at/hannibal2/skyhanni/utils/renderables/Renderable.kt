@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 //#if TODO
 import at.hannibal2.skyhanni.data.GuiData
-import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 //#endif
+import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
@@ -288,9 +288,7 @@ interface Renderable {
                     if (isHovered(posX, posY)) {
                         if (condition() && shouldAllowLink(true, bypassChecks)) {
                             onHover.invoke()
-                            //#if TODO
                             HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
-                            //#endif
                             DrawContextUtils.pushMatrix()
                             DrawContextUtils.translate(0F, 0F, 400F)
 
@@ -304,9 +302,7 @@ interface Renderable {
                             DrawContextUtils.popMatrix()
                         }
                     } else {
-                        //#if TODO
                         HighlightOnHoverSlot.currentSlots.remove(pair)
-                        //#endif
                     }
                 }
             }
@@ -406,15 +402,11 @@ interface Renderable {
                 isHovered = if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover()
                     hovered.render(posX, posY)
-                    //#if TODO
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
-                    //#endif
                     true
                 } else {
                     unHovered.render(posX, posY)
-                    //#if TODO
                     HighlightOnHoverSlot.currentSlots.remove(pair)
-                    //#endif
                     false
                 }
             }
