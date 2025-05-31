@@ -1053,3 +1053,4 @@ at/hannibal2/skyhanni/utils/PolynomialFitter.kt
 at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning.kt
 at.hannibal2.skyhanni.utils.Matrix.kt
 at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker.kt
+at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.kt
