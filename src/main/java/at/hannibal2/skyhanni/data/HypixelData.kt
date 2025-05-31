@@ -17,9 +17,7 @@ import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.bingo.BingoApi
-//#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -43,7 +41,6 @@ import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object HypixelData {
 
@@ -377,9 +374,7 @@ object HypixelData {
         }
         if (message.startsWith("you are playing on profile:")) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
-            //#if TODO
             ProfileStorageData.profileJoinMessage()
-            //#endif
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).post()
@@ -538,11 +533,9 @@ object HypixelData {
         bingo = false
 
         for (line in ScoreboardData.sidebarLinesFormatted) {
-            //#if TODO
             if (BingoApi.getRankFromScoreboard(line) != null) {
                 bingo = true
             }
-            //#endif
             when (line) {
                 " §7♲ §7Ironman" -> {
                     ironman = true

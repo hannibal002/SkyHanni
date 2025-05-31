@@ -237,6 +237,10 @@ at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent.kt
 at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent.kt
 at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent.kt
 at.hannibal2.skyhanni.features.anvil.AnvilApi.kt
+at.hannibal2.skyhanni.features.bingo.BingoApi.kt
+at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal.kt
+at.hannibal2.skyhanni.features.bingo.card.goals.GoalType.kt
+at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData.kt
 at.hannibal2.skyhanni.features.chat.ChatHistoryGui.kt
 at.hannibal2.skyhanni.features.chat.ChatSoundResponse.kt
 at.hannibal2.skyhanni.features.chat.SkyblockXPInChat.kt
@@ -398,6 +402,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
 at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
 at.hannibal2.skyhanni.test.DebugCommand.kt
 at.hannibal2.skyhanni.test.SkyBlockIslandTest.kt
+at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests.kt
 at.hannibal2.skyhanni.test.TestBingo.kt
 at.hannibal2.skyhanni.test.TestExportTools.kt
 at.hannibal2.skyhanni.test.command.CopyActionBarCommand.kt
@@ -483,6 +488,7 @@ at.hannibal2.skyhanni.utils.json.SkippingTypeAdapterFactory.kt
 at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.kt
 at.hannibal2.skyhanni.utils.render.FrustumUtils.kt
 at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
+at.hannibal2.skyhanni.utils.renderables.DragNDrop.kt
 at.hannibal2.skyhanni.utils.renderables.Renderable.kt
 at.hannibal2.skyhanni.utils.renderables.RenderableTooltips.kt
 at.hannibal2.skyhanni.utils.renderables.RenderableUtils.kt
@@ -1010,5 +1016,3 @@ at/hannibal2/skyhanni/utils/repopatterns/RepoPatternDump.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
 at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
-at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests.kt
-at.hannibal2.skyhanni.utils.renderables.DragNDrop.kt

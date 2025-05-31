@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.storage
 
-//#if TODO
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
+//#if TODO
 import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 //#endif
@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
 
+// todo 1.21 impl needed
 class PlayerSpecificStorage {
     @Expose
     var profiles: MutableMap<String, ProfileSpecificStorage> = mutableMapOf() // profile name
@@ -63,10 +64,8 @@ class PlayerSpecificStorage {
         @Expose
         var tierOneMinionsDone: MutableSet<NeuInternalName> = mutableSetOf()
 
-        //#if TODO
         @Expose
         var goals: MutableMap<Int, BingoGoal> = mutableMapOf()
-        //#endif
     }
 
     @Expose
