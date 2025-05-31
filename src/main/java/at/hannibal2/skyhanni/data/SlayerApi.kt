@@ -81,9 +81,7 @@ object SlayerApi {
             add("isInCorrectArea: $isInCorrectArea")
             if (!isInCorrectArea) {
                 add("currentAreaType: $currentAreaType")
-                //#if TODO
                 add(" graph area: ${SkyBlockUtils.graphArea}")
-                //#endif
                 with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
                     add(" /shtestwaypoint $x $y $z pathfind")
                 }
@@ -121,9 +119,7 @@ object SlayerApi {
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick(event: SkyHanniTickEvent) {
         // wait with sending SlayerChangeEvent until profile is detected
-        //#if TODO
         if (ProfileStorageData.profileSpecific == null) return
-        //#endif
 
         val slayerQuest = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest").orEmpty()
         if (slayerQuest != latestSlayerCategory) {
@@ -150,11 +146,7 @@ object SlayerApi {
     }
 
     // TODO USE SH-REPO
-   //#if TODO
     private fun checkSlayerTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
-        //#else
-        //$$ private fun checkSlayerTypeForCurrentArea() = when (SkyBlockUtils.currentIsland.name) {
-        //#endif
         "Graveyard" -> if (trackerConfig.revenantInGraveyard && IslandType.HUB.isCurrent()) SlayerType.REVENANT else null
         "Revenant Cave" -> SlayerType.REVENANT
 

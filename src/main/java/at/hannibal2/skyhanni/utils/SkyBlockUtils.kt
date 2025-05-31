@@ -3,14 +3,11 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
-//#endif
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
-// todo 1.21 impl needed
 object SkyBlockUtils {
 
     val onHypixel get() = HypixelData.connectedToHypixel && MinecraftCompat.localPlayerExists
@@ -21,7 +18,6 @@ object SkyBlockUtils {
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
-    //#if TODO
     /**
      * Consider using [IslandType.isInIsland] instead
      */
@@ -29,10 +25,6 @@ object SkyBlockUtils {
 
     // almost always prefer this over scoreboardArea
     val graphArea get() = if (inSkyBlock) IslandAreas.currentArea else null
-    //#else
-    //$$ val currentIsland get() = HypixelData.skyBlockIsland
-    //$$ val graphArea get() = HypixelData.skyBlockIsland.name
-    //#endif
 
     // Only use scoreboardArea if graph data is not useable in this scenario.
     val scoreboardArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null

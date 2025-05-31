@@ -46,11 +46,7 @@ object TimiteTracker {
         override fun getCoinDescription(item: TrackedItem): List<String> = emptyList()
 
         override fun getCustomPricePer(internalName: NeuInternalName): Double {
-            //#if TODO
             return internalName.getItemStack().motesNpcPrice() ?: 0.0
-            //#else
-            //$$ return 0.0
-            //#endif
         }
 
         fun getTime(): Int = this.items[TIMITE]?.let {
@@ -75,11 +71,7 @@ object TimiteTracker {
                     }
                 }
             }
-            //#if TODO
             val motes = HIGHLITE.motesNpcPrice()?.times(craftableAmount)?.shortFormat() ?: "0"
-            //#else
-            //$$ val motes = "0"
-            //#endif
             if (craftableAmount > 0) {
                 addSearchString(" §7${craftableAmount.shortFormat()}x ${HIGHLITE.repoItemName} Craftable§7: §5$motes motes")
             }

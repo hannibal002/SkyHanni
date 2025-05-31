@@ -151,10 +151,8 @@ object DebugCommand {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${SkyBlockUtils.currentIsland}")
             add("skyBlockArea:")
-            //#if TODO
             add("  scoreboard: '${SkyBlockUtils.graphArea}'")
             add("  graph network: '${SkyBlockUtils.graphArea}'")
-            //#endif
             with(MinecraftCompat.localPlayer.position.toLorenzVec().roundTo(1)) {
                 add(" /shtestwaypoint $x $y $z pathfind")
             }
