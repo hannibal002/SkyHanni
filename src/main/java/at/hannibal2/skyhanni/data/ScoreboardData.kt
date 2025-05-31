@@ -6,9 +6,7 @@ import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-//#if TODO
 import at.hannibal2.skyhanni.features.inventory.FixIronman
-//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -25,7 +23,6 @@ import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.ScorePlayerTeam
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object ScoreboardData {
 
@@ -193,12 +190,10 @@ object ScoreboardData {
             return null
         }
         if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
-            //#if TODO
             PurseApi.piggyPattern.matchMatcher(text) {
                 val coins = group("coins")
                 return "Purse: $coins"
             }
-            //#endif
         }
 
         if (SkyHanniMod.feature.misc.colorMonthNames) {
@@ -208,11 +203,9 @@ object ScoreboardData {
                 }
             }
         }
-        //#if TODO
         FixIronman.fixScoreboard(text)?.let {
             return it
         }
-        //#endif
 
         return text
     }
