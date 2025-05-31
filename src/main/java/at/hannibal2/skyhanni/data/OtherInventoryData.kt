@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2EPacketCloseWindow
@@ -59,14 +60,27 @@ object OtherInventoryData {
             val windowId = packet.windowId
             val slotCount = packet.slotCount
             //#else
-            //$$ val title = InventoryUtils.openInventoryName()
-            //$$ val slotCount = packet.contents.size
+            //$$ val oldWindowId = currentInventory?.windowId
             //$$ val windowId = packet.syncId
+            //$$ if (oldWindowId != windowId) {
+            //$$    val title = InventoryUtils.openInventoryName()
+            //$$    val slotCount = packet.contents.size
             //#endif
             close(reopenSameName = title == currentInventory?.title)
 
             currentInventory = Inventory(windowId, title, slotCount)
             acceptItems = true
+            //#if MC > 1.21
+            //$$    for ((i, stack) in packet.contents.withIndex()) {
+            //$$        currentInventory?.items?.put(i, stack)
+            //$$    }
+            //$$    if (currentInventory != null) {
+            //$$        InventoryFullyOpenedEvent(currentInventory!!).post()
+            //$$        currentInventory!!.fullyOpenedOnce = true
+            //$$        InventoryUpdatedEvent(currentInventory!!).post()
+            //$$    }
+            //$$ }
+            //#endif
         }
 
         if (packet is S2FPacketSetSlot) {
@@ -91,14 +105,13 @@ object OtherInventoryData {
                 val slot = packet.func_149173_d()
                 if (slot < it.slotCount) {
                     val itemStack = packet.func_149174_e()
-                    if (itemStack != null) {
+                    if (itemStack.orNull() != null) {
                         it.items[slot] = itemStack
                     }
                 } else {
                     done(it)
                     return
                 }
-
                 if (it.items.size == it.slotCount) {
                     done(it)
                 }
