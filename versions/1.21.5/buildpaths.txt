@@ -990,5 +990,8 @@ at.hannibal2.skyhanni.features.inventory.experimentationtable.UltraRareBookAlert
 at.hannibal2.skyhanni.mixins.transformers.MixinGameRenderer.java
 at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
 at.hannibal2.skyhanni.features.misc.PatcherFixes.kt
+at.hannibal2.skyhanni.features.garden.contest.JacobFarmingContestsInventory.kt
+
+
 
 # \.(?!kt|java|\()

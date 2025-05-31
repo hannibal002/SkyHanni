@@ -150,9 +150,17 @@ object ItemUtils {
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
     //#if MC < 1.21
-    fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+    fun ItemStack.getLore(): List<String> {
+        val lore = this.tagCompound.getLore()
+        println(lore)
+        return lore
+    }
     //#else
-    //$$ fun ItemStack.getLore(): List<String> = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() }  ?: emptyList()
+    //$$ fun ItemStack.getLore(): List<String> {
+    //$$     val strings = this.get(DataComponentTypes.LORE)?.lines?.map { it.formattedTextCompat() } ?: emptyList()
+    //$$     println(strings)
+    //$$     return strings
+    //$$ }
     //#endif
 
     fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")

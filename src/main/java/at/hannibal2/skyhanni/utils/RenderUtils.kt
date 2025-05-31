@@ -112,7 +112,6 @@ object RenderUtils {
         }
     //#endif
 
-    //#if TODO
     fun Slot.highlight(color: LorenzColor) {
         highlight(color.toColor())
     }
@@ -139,7 +138,12 @@ object RenderUtils {
         GlStateManager.disableDepth()
         DrawContextUtils.pushMatrix()
         // TODO don't use z
-        DrawContextUtils.translate(0f, 0f, 110 + Minecraft.getMinecraft().renderItem.zLevel)
+        //#if TODO
+        val zLevel = Minecraft.getMinecraft().renderItem.zLevel
+        //#else
+        //$$ val zLevel = 50
+        //#endif
+        DrawContextUtils.translate(0f, 0f, 110 + zLevel)
         GuiRenderUtils.drawRect(x, y, x + 16, y + 16, color.rgb)
         DrawContextUtils.popMatrix()
         GlStateManager.enableDepth()
@@ -197,6 +201,7 @@ object RenderUtils {
     ) {
         _drawColor(location, color, beacon, alpha, seeThroughBlocks)
     }
+    //#if TODO
 
     @Deprecated("Use WorldRenderUtils' getViewerPos instead", ReplaceWith("WorldRenderUtils.getViewerPos(partialTicks)"))
     fun getViewerPos(partialTicks: Float) =

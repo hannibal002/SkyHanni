@@ -421,8 +421,8 @@ net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
 net.minecraft.world.inventory.Slot getItem() getStack()
 net.minecraft.world.inventory.Slot hasItem() getHasStack()
 net.minecraft.world.inventory.Slot index slotNumber
-net.minecraft.world.inventory.Slot x xPos
-net.minecraft.world.inventory.Slot y yPos
+net.minecraft.world.inventory.Slot x xDisplayPosition
+net.minecraft.world.inventory.Slot y yDisplayPosition
 
 net.minecraft.world.item.BowItem net.minecraft.item.ItemBow
 net.minecraft.world.item.DyeColor net.minecraft.item.EnumDyeColor
