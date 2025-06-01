@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -17,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.util.EnumParticleTypes
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -41,7 +41,7 @@ object TrackParticlesCommand {
 
     // TODO write abstract code for this and TrackSoundsCommand
     private fun command(args: Array<String>) {
-        if (!LorenzUtils.inSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock) {
             ChatUtils.userError("This command only works in SkyBlock!")
             return
         }

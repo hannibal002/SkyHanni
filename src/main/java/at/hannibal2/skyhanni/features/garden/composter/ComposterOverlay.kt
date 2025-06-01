@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTipLine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -104,7 +106,7 @@ object ComposterOverlay {
             GardenApi.storage?.composterCurrentFuelItem = value
         }
 
-    fun onCommand(args: Array<String>) {
+    private fun onCommand(args: Array<String>) {
         if (args.size != 1) {
             ChatUtils.userError("Usage: /shtestcomposter <offset>")
             return
@@ -720,6 +722,15 @@ object ComposterOverlay {
             for ((a, b) in tabListData) {
                 add("tabListData $a: $b")
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestcomposter") {
+            description = "Test the composter overlay"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { onCommand(it) }
         }
     }
 }
