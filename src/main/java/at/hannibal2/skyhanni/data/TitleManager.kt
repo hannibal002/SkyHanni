@@ -320,7 +320,12 @@ object TitleManager {
         ChatUtils.chat("Reset all active titles!")
     }
 
-    private fun command(durationText: String, titleText: String, location: TitleLocation = TitleLocation.GLOBAL, countdown: Boolean = false) {
+    private fun command(
+        durationText: String,
+        titleText: String,
+        location: TitleLocation = TitleLocation.GLOBAL,
+        countdown: Boolean = false,
+    ) {
         val duration = TimeUtils.getDurationOrNull(durationText) ?: run {
             ChatUtils.userError("Invalid duration format `$durationText`! Use e.g. 10s, or 20m or 30h")
             return

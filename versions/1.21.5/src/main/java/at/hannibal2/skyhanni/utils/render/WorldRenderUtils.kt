@@ -354,16 +354,17 @@ object WorldRenderUtils {
         TODO()
     }
 
+
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        /* LineDrawer.draw3D(partialTicks) {
+        LineDrawer.draw3D(partialTicks) {
             drawEdges(location, color, lineWidth, depth)
-        } */
+        }
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: Box, color: Color, lineWidth: Int, depth: Boolean) {
-        /* LineDrawer.draw3D(partialTicks) {
+        LineDrawer.draw3D(partialTicks) {
             drawEdges(axisAlignedBB, color, lineWidth, depth)
-        } */
+        }
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -383,7 +384,9 @@ object WorldRenderUtils {
         color: Color,
         lineWidth: Int,
         depth: Boolean,
-    ): Unit = TODO()
+    ) = LineDrawer.draw3D(partialTicks) {
+        draw3DLine(p1, p2, color, lineWidth, depth)
+    }
 
     @Deprecated("Do not use, use proper method instead")
     fun SkyHanniRenderWorldEvent._outlineTopFace(
@@ -448,7 +451,7 @@ object WorldRenderUtils {
         startAtEye: Boolean = true,
         textSize: Double = 1.0,
         waypointColor: Color =
-            LorenzColor.WHITE.toColor(),
+            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
         showNodeNames: Boolean = false,
         markLastBlock: Boolean = true,
@@ -475,7 +478,7 @@ object WorldRenderUtils {
         startAtEye: Boolean = true,
         textSize: Double = 1.0,
         waypointColor: Color =
-            (LorenzColor.WHITE).toColor(),
+            (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
         showNodeNames: Boolean = false,
         markLastBlock: Boolean = true,

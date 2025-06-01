@@ -66,7 +66,6 @@ object HypixelLocationApi {
         inHypixel = true
     }
 
-    // todo remove once hypixel mod api is added to 1.21
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onServerChange(event: HypixelApiServerChangeEvent) {
         logger.log(event.toString())
