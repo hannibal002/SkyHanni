@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -451,7 +450,7 @@ object GriffinBurrowHelper {
     private fun isEnabled() = DianaApi.isDoingDiana()
 
     private fun setTestBurrow(strings: Array<String>) {
-        if (!IslandType.HUB.isInIsland()) {
+        if (!IslandType.HUB.isCurrent()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
         }

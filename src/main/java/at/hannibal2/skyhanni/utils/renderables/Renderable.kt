@@ -481,7 +481,6 @@ interface Renderable {
             }
         }
 
-        //#if TODO
         fun Renderable.darken(amount: Float = 1f) = object : Renderable {
             override val width = this@darken.width
             override val height = this@darken.height
@@ -489,13 +488,16 @@ interface Renderable {
             override val verticalAlign = this@darken.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
+                //#if TODO
                 DarkenShader.darknessLevel = amount
                 ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
+                //#endif
                 this@darken.render(posX, posY)
+                //#if TODO
                 ShaderManager.disableShader()
+                //#endif
             }
         }
-        //#endif
 
         @Deprecated(
             "Use RenderableString instead",

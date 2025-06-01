@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
 object TiaRelayWaypoints {
@@ -47,7 +47,7 @@ object TiaRelayWaypoints {
 
         if (config.allWaypoints) {
             for (relay in Relay.entries) {
-                if (relay.island == LorenzUtils.skyBlockIsland) {
+                if (relay.island == SkyBlockUtils.currentIsland) {
                     event.drawWaypointFilled(relay.waypoint, LorenzColor.LIGHT_PURPLE.toColor())
                     event.drawDynamicText(relay.waypoint, "§d" + relay.relayName, 1.5)
                 }
@@ -56,7 +56,7 @@ object TiaRelayWaypoints {
         }
 
         if (!config.nextWaypoint) return
-        if (LorenzUtils.skyBlockIsland != island) return
+        if (SkyBlockUtils.currentIsland != island) return
 
         waypoint?.let {
             event.drawWaypointFilled(it, LorenzColor.LIGHT_PURPLE.toColor())

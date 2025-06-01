@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
@@ -111,7 +111,7 @@ object MobDetection {
             shouldClear.set(false)
         }
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
 
         makeEntityReferenceUpdate()
 
@@ -269,7 +269,7 @@ object MobDetection {
         }
     }
 
-    private fun islandException(): Boolean = when (LorenzUtils.skyBlockIsland) {
+    private fun islandException(): Boolean = when (SkyBlockUtils.currentIsland) {
         IslandType.GARDEN_GUEST -> true
         IslandType.PRIVATE_ISLAND_GUEST -> true
         else -> false

@@ -80,3 +80,4 @@ net.minecraft.world.EntityView getPlayerByUuid() getPlayerByUUID()
 
 net.minecraft.world.phys.HitResult getPos() getLocation()
 
+net.minecraft.util.math.Direction getVector() getDirectionVec()

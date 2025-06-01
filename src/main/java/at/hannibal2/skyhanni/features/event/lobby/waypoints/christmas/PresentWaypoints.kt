@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 // todo: create abstract class for this and BasketWaypoints
@@ -123,5 +123,5 @@ object PresentWaypoints {
     }
 
     private fun isEnabled(): Boolean =
-        LorenzUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints) && WinterApi.isDecember()
+        SkyBlockUtils.inHypixelLobby && (config.allWaypoints || config.allEntranceWaypoints) && WinterApi.isDecember()
 }

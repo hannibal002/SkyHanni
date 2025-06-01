@@ -19,7 +19,12 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-private fun Item.toItemStack(meta: Int = 0): ItemStack = ItemStack(this, 1, meta)
+private fun createPlayerHead(): ItemStack =
+    //#if MC < 1.16
+    ItemStack(Items.skull, 1, 3)
+//#else
+//$$ ItemStack(Items.PLAYER_HEAD)
+//#endif
 
 enum class MiningEventType(
     val eventName: String,
@@ -38,7 +43,7 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val compass = Renderable.itemStack(Items.compass.toItemStack(), 0.45)
+            val compass = Renderable.itemStack(ItemStack(Items.compass), 0.45)
             val wind = Renderable.string("§9≈", scale = 0.75)
 
             override fun render(posX: Int, posY: Int) {
@@ -74,7 +79,7 @@ enum class MiningEventType(
 
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, LorenzColor.RED, true,
-        Renderable.itemStack(Items.skull.toItemStack(3), 0.36), // Late init when skull texture holder is loaded
+        Renderable.itemStack(createPlayerHead(), 0.36), // Late init when skull texture holder is loaded
     ),
 
     BETTER_TOGETHER(
@@ -85,7 +90,7 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val steveHead = Renderable.itemStack(Items.skull.toItemStack(3), 0.36)
+            val steveHead = Renderable.itemStack(createPlayerHead(), 0.36)
             val alexHead by lazy {
                 Renderable.itemStack(
                     ItemUtils.createSkull(
@@ -113,7 +118,7 @@ enum class MiningEventType(
         160.seconds,
         color = LorenzColor.GOLD,
         dwarvenSpecific = true,
-        iconInput = Items.name_tag.toItemStack().overrideId("MINING_RAFFLE_TICKET"),
+        iconInput = ItemStack(Items.name_tag).overrideId("MINING_RAFFLE_TICKET"),
     ),
     MITHRIL_GOURMAND(
         "MITHRIL GOURMAND",

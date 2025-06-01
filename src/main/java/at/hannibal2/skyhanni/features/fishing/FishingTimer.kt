@@ -16,12 +16,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
@@ -51,7 +50,7 @@ object FishingTimer {
 
     private val recentMobs = TimeLimitedSet<Mob>(2.seconds)
     private val currentCap by RecalculatingValue(1.seconds) {
-        when (LorenzUtils.skyBlockIsland) {
+        when (SkyBlockUtils.currentIsland) {
             IslandType.CRYSTAL_HOLLOWS -> 20
             IslandType.CRIMSON_ISLE -> 5
             else -> config.fishingCapAmount
@@ -75,7 +74,7 @@ object FishingTimer {
         if (startTime.passedSince().inWholeSeconds - config.alertTime in 0..3) {
             playSound()
         }
-        if (config.wormLimitAlert && IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
+        if (config.wormLimitAlert && IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
             if (currentCount >= 20) {
                 playSound()
                 TitleManager.sendTitle("§cWORM CAP FULL!!!", duration = 2.seconds)
@@ -183,12 +182,12 @@ object FishingTimer {
     private fun updateLocation(): Boolean {
         if (config.showAnywhere) return true
 
-        return when (LorenzUtils.skyBlockIsland) {
+        return when (SkyBlockUtils.currentIsland) {
             IslandType.CRYSTAL_HOLLOWS -> config.crystalHollows.get()
             IslandType.CRIMSON_ISLE -> config.crimsonIsle.get()
             IslandType.WINTER -> config.winterIsland.get()
             IslandType.HUB -> barnLocation.distanceToPlayer() < 50
-            IslandType.PRIVATE_ISLAND -> config.forStranded.get() && LorenzUtils.isStrandedProfile
+            IslandType.PRIVATE_ISLAND -> config.forStranded.get() && SkyBlockUtils.isStrandedProfile
             else -> false
         }
     }
@@ -255,7 +254,7 @@ object FishingTimer {
         startTime = SimpleTimeMark.farPast()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
