@@ -70,7 +70,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
@@ -658,9 +657,8 @@ object ItemUtils {
     fun onRepoReload(event: RepositoryReloadEvent) {
         compactItemNameCache.clear()
         // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
-        event.getConstant<ItemsJson>("Items").compactNames.let {
-            compactNameReplace = it
-        }
+        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
+        compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */

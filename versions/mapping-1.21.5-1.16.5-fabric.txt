@@ -1,4 +1,6 @@
 
+at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+
 at.hannibal2.skyhanni.utils.render.ModernGlStateManager com.mojang.blaze3d.systems.RenderSystem
 
 net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext at.hannibal2.skyhanni.utils.compat.WorldRenderContext
