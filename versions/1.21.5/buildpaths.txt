@@ -1,3 +1,4 @@
+at.hannibal2.skyhanni.api.CollectionApi.kt
 at.hannibal2.skyhanni.api.GetFromSackApi.kt
 at.hannibal2.skyhanni.api.HotmApi.kt
 at.hannibal2.skyhanni.api.ItemBuyApi.kt
@@ -95,6 +96,7 @@ at.hannibal2.skyhanni.data.PurseApi.kt
 at.hannibal2.skyhanni.data.RenderData.kt
 at.hannibal2.skyhanni.data.SackApi.kt
 at.hannibal2.skyhanni.data.ScoreboardData.kt
+at.hannibal2.skyhanni.data.SkillExperience.kt
 at.hannibal2.skyhanni.data.SlayerApi.kt
 at.hannibal2.skyhanni.data.TitleData.kt
 at.hannibal2.skyhanni.data.TitleManager.kt
@@ -153,6 +155,7 @@ at.hannibal2.skyhanni.events.BossbarUpdateEvent.kt
 at.hannibal2.skyhanni.events.ChatHoverEvent.kt
 at.hannibal2.skyhanni.events.CheckRenderEntityEvent.kt
 at.hannibal2.skyhanni.events.ColdUpdateEvent.kt
+at.hannibal2.skyhanni.events.CollectionUpdateEvent.kt
 at.hannibal2.skyhanni.events.ConfigLoadEvent.kt
 at.hannibal2.skyhanni.events.GuiKeyPressEvent.kt
 at.hannibal2.skyhanni.events.GuiPositionMovedEvent.kt
@@ -193,6 +196,8 @@ at.hannibal2.skyhanni.events.TitleReceivedEvent.kt
 at.hannibal2.skyhanni.events.WidgetUpdateEvent.kt
 at.hannibal2.skyhanni.events.WorldClickEvent.kt
 at.hannibal2.skyhanni.events.bazaar.BazaarOpenedProductEvent.kt
+at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent.kt
+at.hannibal2.skyhanni.events.bingo.BingoGoalReachedEvent.kt
 at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent.kt
 at.hannibal2.skyhanni.events.dungeon.DungeonBlockClickEvent.kt
 at.hannibal2.skyhanni.events.dungeon.DungeonBossRoomEnterEvent.kt
@@ -260,9 +265,22 @@ at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent.kt
 at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent.kt
 at.hannibal2.skyhanni.features.anvil.AnvilApi.kt
 at.hannibal2.skyhanni.features.bingo.BingoApi.kt
+at.hannibal2.skyhanni.features.bingo.BingoBoopParty.kt
+at.hannibal2.skyhanni.features.bingo.CompactBingoChat.kt
+at.hannibal2.skyhanni.features.bingo.FirstMinionTier.kt
+at.hannibal2.skyhanni.features.bingo.MinionCraftHelper.kt
+at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay.kt
+at.hannibal2.skyhanni.features.bingo.card.BingoCardReader.kt
 at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal.kt
 at.hannibal2.skyhanni.features.bingo.card.goals.GoalType.kt
 at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData.kt
+at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper.kt
+at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.CollectionStep.kt
+at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.CraftStep.kt
+at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.IslandVisitStep.kt
+at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.NextStep.kt
+at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ProgressionStep.kt
+at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.SkillLevelStep.kt
 at.hannibal2.skyhanni.features.chat.ChatHistoryGui.kt
 at.hannibal2.skyhanni.features.chat.ChatSoundResponse.kt
 at.hannibal2.skyhanni.features.chat.ColorFormattingHelper.kt
@@ -405,6 +423,7 @@ at.hannibal2.skyhanni.features.inventory.experimentationtable.SuperpairDataDispl
 at.hannibal2.skyhanni.features.inventory.experimentationtable.SuperpairsClicksAlert.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.UltraRareBookAlert.kt
 at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.kt
+at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds.kt
 at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.kt
 at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeSlot.kt
 at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.kt
@@ -1028,6 +1047,8 @@ at/hannibal2/skyhanni/events/item/ItemHoverEvent.kt
 at/hannibal2/skyhanni/events/minecraft/SkyHanniTickEvent.kt
 at/hannibal2/skyhanni/events/skyblock/AreaChangeEvents.kt
 at/hannibal2/skyhanni/events/utils/PreInitFinishedEvent.kt
+at/hannibal2/skyhanni/features/bingo/card/nextstephelper/steps/ChatMessageStep.kt
+at/hannibal2/skyhanni/features/bingo/card/nextstephelper/steps/ItemsStep.kt
 at/hannibal2/skyhanni/features/fishing/IsFishingDetection.kt
 at/hannibal2/skyhanni/features/fishing/SeaCreatureManager.kt
 at/hannibal2/skyhanni/features/gui/TabWidgetDisplay.kt
@@ -1082,4 +1103,3 @@ at/hannibal2/skyhanni/utils/repopatterns/RepoPatternDump.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
 at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
-at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds.kt

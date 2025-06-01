@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -53,7 +53,7 @@ object BingoCardDisplay {
     }
 
     private fun toggleCommand() {
-        if (!LorenzUtils.isBingoProfile) {
+        if (!SkyBlockUtils.isBingoProfile) {
             ChatUtils.userError("This command only works on a bingo profile!")
             return
         }
@@ -219,7 +219,7 @@ object BingoCardDisplay {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         if (!config.enabled) return
 
         val currentlyOpen = canEditDisplay()
@@ -255,7 +255,7 @@ object BingoCardDisplay {
     @HandleEvent
     fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
         if (!config.enabled) return
-        if (!LorenzUtils.isBingoProfile) return
+        if (!SkyBlockUtils.isBingoProfile) return
         update()
     }
 
