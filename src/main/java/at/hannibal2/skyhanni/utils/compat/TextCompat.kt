@@ -45,6 +45,7 @@ fun IChatComponent.unformattedTextCompat(): String =
 //#endif
 
 @JvmOverloads
+@Suppress("unused")
 fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false): String =
 //#if MC < 1.16
     this?.formattedText.orEmpty()
