@@ -1117,3 +1117,5 @@ at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent.kt
 at.hannibal2.skyhanni.mixins.transformers.MixinDataTracker.java
+at.hannibal2.skyhanni.features.slayer.SlayerRngMeterDisplay.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuRNGScore.kt
