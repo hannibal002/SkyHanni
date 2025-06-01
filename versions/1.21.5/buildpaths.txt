@@ -477,6 +477,8 @@ at.hannibal2.skyhanni.utils.json.SkippingTypeAdapterFactory.kt
 at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.kt
 at.hannibal2.skyhanni.utils.render.FrustumUtils.kt
 at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
+at.hannibal2.skyhanni.utils.render.LineDrawer.kt
+at.hannibal2.skyhanni.utils.render.QuadDrawer.kt
 at.hannibal2.skyhanni.utils.renderables.Renderable.kt
 at.hannibal2.skyhanni.utils.renderables.RenderableTooltips.kt
 at.hannibal2.skyhanni.utils.renderables.RenderableUtils.kt
