@@ -269,6 +269,7 @@ net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getE
 net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEntityFromWorld()
 
 net.minecraft.network.protocol.game.ServerboundPlayerActionPacket getPos() getPosition()
+net.minecraft.network.protocol.game.ServerboundPlayerActionPacket getAction() getStatus()
 
 net.minecraft.network.protocol.game.ServerboundUseItemOnPacket hitResult.getBlockPos() getPos()
 

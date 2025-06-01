@@ -55,6 +55,7 @@ object TrackParticlesCommand {
             return
         }
         if (isRecording) {
+            //#if TODO
             args.getOrNull(0)?.let { name ->
                 val type = getParticleTypeByName(name)
                 if (type == null) {
@@ -70,6 +71,7 @@ object TrackParticlesCommand {
                 }
                 return
             }
+            //#endif
             ChatUtils.userError(
                 "Still tracking particles, wait for the other tracking to complete before starting a new one, " +
                     "or type §e/shtrackparticles end §cto end it prematurely",
@@ -88,9 +90,11 @@ object TrackParticlesCommand {
         }
     }
 
+    //#if TODO
     // TODO move into utils
     private fun getParticleTypeByName(name: String): EnumParticleTypes? =
         EnumParticleTypes.entries.firstOrNull { it.name.equals(name, ignoreCase = true) }
+    //#endif
 
     @HandleEvent
     fun onTick() {
@@ -117,7 +121,9 @@ object TrackParticlesCommand {
     @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (cutOffTime.isInPast()) return
+        //#if TODO
         if (event.type in ignoredTypes) return
+        //#endif
         event.distanceToPlayer // Need to call to initialize Lazy
         particles.addFirst(startTime.passedSince() to event)
     }

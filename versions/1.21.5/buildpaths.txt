@@ -1074,3 +1074,5 @@ at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
 at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
 at.hannibal2.skyhanni.features.chat.ColorFormattingHelper.kt
 at.hannibal2.skyhanni.test.command.TrackParticlesCommand.kt
+at.hannibal2.skyhanni.data.ItemClickData.kt
+at.hannibal2.skyhanni.events.entity.EntityClickEvent.kt
