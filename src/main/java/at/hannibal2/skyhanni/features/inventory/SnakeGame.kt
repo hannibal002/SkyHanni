@@ -45,7 +45,7 @@ object SnakeGame {
         if (lastClick.passedSince() < 100.milliseconds) return
 
         for ((key, slot) in keys) {
-            if (key?.isKeyHeld() == false) continue
+            if (!key.isKeyHeld()) continue
             event.cancel()
 
             InventoryUtils.clickSlot(slot, chest.inventorySlots.windowId, mouseButton = 2, mode = 3)

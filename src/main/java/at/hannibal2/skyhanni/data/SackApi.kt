@@ -479,7 +479,7 @@ object SackApi {
 
     private fun testSackApi(args: String) {
         if (sackListInternalNames.contains(args.uppercase())) {
-            ChatUtils.chat("Sack data for ${args}: ${fetchSackItem(args.toInternalName())}")
+            ChatUtils.chat("Sack data for $args: ${fetchSackItem(args.toInternalName())}")
         } else {
             ChatUtils.userError("That item isn't a valid sack item.")
         }

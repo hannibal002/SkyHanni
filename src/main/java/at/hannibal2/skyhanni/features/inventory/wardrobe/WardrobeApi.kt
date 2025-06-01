@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
