@@ -11,12 +11,12 @@ import java.util.ListIterator;
 @Mixin(ChatHud.class)
 public class MixinChatHud {
 
-    @Redirect(method = "queueForRemoval", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;getTicks()I"))
+    @Redirect(method = "queueForRemoval", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;getTicks()I"), require = 0)
     private int clearChatHead(InGameHud instance) {
         return instance.getTicks() + 90;
     }
 
-    @Redirect(method = "queueForRemoval", at = @At(value = "INVOKE", target = "Ljava/util/ListIterator;set(Ljava/lang/Object;)V"))
+    @Redirect(method = "queueForRemoval", at = @At(value = "INVOKE", target = "Ljava/util/ListIterator;set(Ljava/lang/Object;)V"), require = 0)
     private <E> void clearChatTail(ListIterator instance, E e) {
         instance.remove();
     }
