@@ -124,7 +124,7 @@ object WardrobeApi {
         val itemsList = event.inventoryItems
 
         val allGrayDye = slots.all {
-            itemsList[it.inventorySlot]?.itemDamage == EnumDyeColor.GRAY.dyeDamage || !it.isInCurrentPage()
+            itemsList[it.inventorySlot]?.isDye(DyeCompat.GRAY) == true || !it.isInCurrentPage()
         }
 
         if (allGrayDye) {

@@ -75,12 +75,14 @@ at.hannibal2.skyhanni.data.FriendApi.kt
 at.hannibal2.skyhanni.data.GardenCropMilestones.kt
 at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix.kt
 at.hannibal2.skyhanni.data.GardenCropUpgrades.kt
+at.hannibal2.skyhanni.data.GuiData.kt
 at.hannibal2.skyhanni.data.GuiEditManager.kt
 at.hannibal2.skyhanni.data.HighlightOnHoverSlot.kt
 at.hannibal2.skyhanni.data.HypixelData.kt
 at.hannibal2.skyhanni.data.IslandGraphs.kt
 at.hannibal2.skyhanni.data.IslandTypeTag.kt
 at.hannibal2.skyhanni.data.ItemAddManager.kt
+at.hannibal2.skyhanni.data.ItemClickData.kt
 at.hannibal2.skyhanni.data.LocationFixData.kt
 at.hannibal2.skyhanni.data.MinecraftData.kt
 at.hannibal2.skyhanni.data.NotificationManager.kt
@@ -198,6 +200,7 @@ at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent.kt
 at.hannibal2.skyhanni.events.dungeon.DungeonEnterEvent.kt
 at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent.kt
 at.hannibal2.skyhanni.events.effects.EffectDurationChangeEvent.kt
+at.hannibal2.skyhanni.events.entity.EntityClickEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityMoveEvent.kt
 at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent.kt
@@ -262,6 +265,7 @@ at.hannibal2.skyhanni.features.bingo.card.goals.GoalType.kt
 at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData.kt
 at.hannibal2.skyhanni.features.chat.ChatHistoryGui.kt
 at.hannibal2.skyhanni.features.chat.ChatSoundResponse.kt
+at.hannibal2.skyhanni.features.chat.ColorFormattingHelper.kt
 at.hannibal2.skyhanni.features.chat.CurrentChatDisplay.kt
 at.hannibal2.skyhanni.features.chat.SkyblockXPInChat.kt
 at.hannibal2.skyhanni.features.chat.translation.TranslatableLanguage.kt
@@ -400,6 +404,9 @@ at.hannibal2.skyhanni.features.inventory.experimentationtable.GuardianReminder.k
 at.hannibal2.skyhanni.features.inventory.experimentationtable.SuperpairDataDisplay.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.SuperpairsClicksAlert.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.UltraRareBookAlert.kt
+at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.kt
+at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.kt
+at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeSlot.kt
 at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.kt
 at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker.kt
 at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker.kt
@@ -443,6 +450,7 @@ at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData.java
 at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper.kt
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay.java
+at.hannibal2.skyhanni.mixins.transformers.MixinChatHud.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGameRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.MixinItemStack.java
@@ -461,6 +469,7 @@ at.hannibal2.skyhanni.test.command.CopyBossbarCommand.kt
 at.hannibal2.skyhanni.test.command.CopyItemCommand.kt
 at.hannibal2.skyhanni.test.command.CopyScoreboardCommand.kt
 at.hannibal2.skyhanni.test.command.ErrorManager.kt
+at.hannibal2.skyhanni.test.command.TrackParticlesCommand.kt
 at.hannibal2.skyhanni.utils.ApiUtils.kt
 at.hannibal2.skyhanni.utils.BlockUtils.kt
 at.hannibal2.skyhanni.utils.CachedItemData.kt
@@ -475,6 +484,7 @@ at.hannibal2.skyhanni.utils.DisplayTableEntry.kt
 at.hannibal2.skyhanni.utils.EntityUtils.kt
 at.hannibal2.skyhanni.utils.EssenceUtils.kt
 at.hannibal2.skyhanni.utils.ExtendedChatColor.kt
+at.hannibal2.skyhanni.utils.FakePlayer.kt
 at.hannibal2.skyhanni.utils.GraphUtils.kt
 at.hannibal2.skyhanni.utils.GuiRenderUtils.kt
 at.hannibal2.skyhanni.utils.HypixelCommands.kt
@@ -1072,8 +1082,4 @@ at/hannibal2/skyhanni/utils/repopatterns/RepoPatternDump.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
 at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
-at.hannibal2.skyhanni.features.chat.ColorFormattingHelper.kt
-at.hannibal2.skyhanni.test.command.TrackParticlesCommand.kt
-at.hannibal2.skyhanni.data.ItemClickData.kt
-at.hannibal2.skyhanni.events.entity.EntityClickEvent.kt
-at.hannibal2.skyhanni.mixins.transformers.MixinChatHud.java
+at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds.kt

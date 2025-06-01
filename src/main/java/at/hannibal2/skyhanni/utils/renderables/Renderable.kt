@@ -50,8 +50,10 @@ import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
-//#if TODO
+//#if MC < 1.21
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
+//#else
+//$$ import net.minecraft.client.gui.screen.ingame.InventoryScreen.drawEntity
 //#endif
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
@@ -1426,7 +1428,6 @@ interface Renderable {
             }
         }
 
-        //#if TODO
         fun drawInsideRoundedRectOutline(
             input: Renderable,
             padding: Int = 2,
@@ -1582,11 +1583,14 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 GlStateManager.color(1f, 1f, 1f, 1f)
+                //#if TODO
                 if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
+                //#endif
                 val mouse = currentRenderPassMousePosition ?: return
                 val mouseXRelativeToPlayer = if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
                 val mouseYRelativeToPlayer = if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
                 DrawContextUtils.translate(0f, 0f, 100f)
+                //#if MC < 1.21
                 drawEntityOnScreen(
                     playerX,
                     playerY,
@@ -1595,9 +1599,22 @@ interface Renderable {
                     mouseYRelativeToPlayer,
                     player,
                 )
+                //#else
+                //$$ drawEntity(
+                //$$     DrawContextUtils.drawContext,
+                //$$     playerX,
+                //$$     playerY,
+                //$$     playerX + width,
+                //$$     playerY + height,
+                //$$     entityScale,
+                //$$     0.0625f,
+                //$$     mouseXRelativeToPlayer,
+                //$$     mouseYRelativeToPlayer,
+                //$$     player
+                //$$ )
+                //#endif
                 DrawContextUtils.translate(0f, 0f, -100f)
             }
         }
-        //#endif
     }
 }

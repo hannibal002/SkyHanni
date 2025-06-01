@@ -12,7 +12,7 @@ class FakePlayer : OtherClientPlayerEntity(MinecraftCompat.localWorld, Minecraft
     override fun getSkinTextures(): SkinTextures =
         MinecraftCompat.localPlayer.skinTextures ?: DefaultSkinHelper.getSkinTextures(MinecraftCompat.localPlayer.uuid)
 
-    override fun getScoreboardTeam() = object : Team(null, null) {
+    override fun getScoreboardTeam() = object : Team(null, "") {
         override fun getNameTagVisibilityRule() = VisibilityRule.NEVER
     }
 
