@@ -84,6 +84,7 @@ at.hannibal2.skyhanni.data.IslandGraphs.kt
 at.hannibal2.skyhanni.data.IslandTypeTag.kt
 at.hannibal2.skyhanni.data.ItemAddManager.kt
 at.hannibal2.skyhanni.data.ItemClickData.kt
+at.hannibal2.skyhanni.data.ItemTipHelper.kt
 at.hannibal2.skyhanni.data.LocationFixData.kt
 at.hannibal2.skyhanni.data.MinecraftData.kt
 at.hannibal2.skyhanni.data.NotificationManager.kt
@@ -157,6 +158,7 @@ at.hannibal2.skyhanni.events.CheckRenderEntityEvent.kt
 at.hannibal2.skyhanni.events.ColdUpdateEvent.kt
 at.hannibal2.skyhanni.events.CollectionUpdateEvent.kt
 at.hannibal2.skyhanni.events.ConfigLoadEvent.kt
+at.hannibal2.skyhanni.events.DrawScreenAfterEvent.kt
 at.hannibal2.skyhanni.events.GuiKeyPressEvent.kt
 at.hannibal2.skyhanni.events.GuiPositionMovedEvent.kt
 at.hannibal2.skyhanni.events.GuiRenderEvent.kt
@@ -178,6 +180,8 @@ at.hannibal2.skyhanni.events.PurseChangeEvent.kt
 at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent.kt
 at.hannibal2.skyhanni.events.ReceiveParticleEvent.kt
 at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent.kt
+at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent.kt
+at.hannibal2.skyhanni.events.RenderItemTipEvent.kt
 at.hannibal2.skyhanni.events.RenderItemTooltipEvent.kt
 at.hannibal2.skyhanni.events.RepositoryReloadEvent.kt
 at.hannibal2.skyhanni.events.SackChangeEvent.kt
@@ -470,6 +474,7 @@ at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper.kt
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.MixinChatHud.java
+at.hannibal2.skyhanni.mixins.transformers.MixinDrawContext.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGameRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.MixinItemStack.java
@@ -483,6 +488,7 @@ at.hannibal2.skyhanni.test.SkyBlockIslandTest.kt
 at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests.kt
 at.hannibal2.skyhanni.test.TestBingo.kt
 at.hannibal2.skyhanni.test.TestExportTools.kt
+at.hannibal2.skyhanni.test.TestShowSlotNumber.kt
 at.hannibal2.skyhanni.test.command.CopyActionBarCommand.kt
 at.hannibal2.skyhanni.test.command.CopyBossbarCommand.kt
 at.hannibal2.skyhanni.test.command.CopyItemCommand.kt
@@ -570,9 +576,9 @@ at.hannibal2.skyhanni.utils.json.SimpleStringTypeAdapter.kt
 at.hannibal2.skyhanni.utils.json.SkippingTypeAdapterFactory.kt
 at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.kt
 at.hannibal2.skyhanni.utils.render.FrustumUtils.kt
-at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
 at.hannibal2.skyhanni.utils.render.LineDrawer.kt
 at.hannibal2.skyhanni.utils.render.QuadDrawer.kt
+at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
 at.hannibal2.skyhanni.utils.renderables.DragNDrop.kt
 at.hannibal2.skyhanni.utils.renderables.Renderable.kt
 at.hannibal2.skyhanni.utils.renderables.RenderableTooltips.kt
@@ -1059,6 +1065,7 @@ at/hannibal2/skyhanni/features/misc/visualwords/VisualWord.kt
 at/hannibal2/skyhanni/mixins/hooks/GuiPlayerTabOverlayHook.kt
 at/hannibal2/skyhanni/mixins/hooks/GuiScreenHook.kt
 at/hannibal2/skyhanni/mixins/hooks/MessageHandlerHook.kt
+at/hannibal2/skyhanni/mixins/hooks/RenderItemHook.kt
 at/hannibal2/skyhanni/mixins/init/BeforeForLoopInjectionPoint.java
 at/hannibal2/skyhanni/mixins/init/SkyhanniMixinPlugin.java
 at/hannibal2/skyhanni/mixins/transformers/MixinClientConnection.java
