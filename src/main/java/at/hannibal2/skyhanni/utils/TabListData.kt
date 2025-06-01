@@ -26,10 +26,10 @@ import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-//#if MC < 1.12
+//#if MC < 1.16
 import net.minecraft.world.WorldSettings
 //#else
-//$$ import net.minecraft.world.GameType
+//$$ import net.minecraft.world.level.GameType
 //#endif
 
 @SkyHanniModule
@@ -115,12 +115,12 @@ object TabListData {
             val team1 = o1.playerTeam
             val team2 = o2.playerTeam
             return ComparisonChain.start().compareTrueFirst(
-                //#if MC<1.12
+                //#if MC < 1.16
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
                 o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
-                //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR,
+                //$$ o1.gameMode != GameType.SPECTATOR,
+                //$$ o2.gameMode != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(

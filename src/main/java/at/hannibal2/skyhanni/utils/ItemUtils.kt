@@ -22,7 +22,9 @@ import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 //#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+//#if TODO
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -68,7 +70,6 @@ import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 //#if MC > 1.21
 //$$ import net.minecraft.component.DataComponentTypes
 //$$ import net.minecraft.component.type.LoreComponent
@@ -619,9 +620,11 @@ object ItemUtils {
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.repoItemNameCompact: String
         get() {
+            //#if TODO
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
             }
+            //#endif
             return getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
         }
 
@@ -654,9 +657,8 @@ object ItemUtils {
     fun onRepoReload(event: RepositoryReloadEvent) {
         compactItemNameCache.clear()
         // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
-        event.getConstant<ItemsJson>("Items").compactNames.let {
-            compactNameReplace = it
-        }
+        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
+        compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
