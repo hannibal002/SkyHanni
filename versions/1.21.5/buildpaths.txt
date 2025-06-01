@@ -73,6 +73,7 @@ at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/compat/NbtCompat.kt
 at.hannibal2.skyhanni.utils.system.PlatformUtils.kt
 at/hannibal2/skyhanni/utils/render.ModernGlStateManager.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson.kt
 
 at/hannibal2/skyhanni/SkyHanniMod.kt
 at/hannibal2/skyhanni/api/event/HandleEvent.kt

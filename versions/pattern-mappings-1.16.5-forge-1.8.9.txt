@@ -1,14 +1,14 @@
 
 at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer net.minecraft.client.gui.inventory.GuiContainer container inventorySlots at.hannibal2.skyhanni.utils.compat.container
 
-net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent formattedTextCompat() getFormattedText() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent unformattedTextCompat() getUnformattedText() at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-net.minecraft.network.chat.Component net.minecraft.util.text.ITextComponent unformattedTextForChatCompat() getUnformattedComponentText() at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
+net.minecraft.network.chat.Component net.minecraft.util.IChatComponent formattedTextCompat() getFormattedText() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.network.chat.Component net.minecraft.util.IChatComponent unformattedTextCompat() getUnformattedText() at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
+net.minecraft.network.chat.Component net.minecraft.util.IChatComponent unformattedTextForChatCompat() getUnformattedTextForChat() at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 
-net.minecraft.network.chat.Style net.minecraft.util.text.Style returnThis() createDeepCopy() at.hannibal2.skyhanni.utils.compat.returnThis
-net.minecraft.network.chat.Style net.minecraft.util.text.Style returnThis() createShallowCopy() at.hannibal2.skyhanni.utils.compat.returnThis
+net.minecraft.network.chat.Style net.minecraft.util.ChatStyle returnThis() createDeepCopy() at.hannibal2.skyhanni.utils.compat.returnThis
+net.minecraft.network.chat.Style net.minecraft.util.ChatStyle returnThis() createShallowCopy() at.hannibal2.skyhanni.utils.compat.returnThis
 
-net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.SPacketScoreboardObjective displayName.formattedTextCompat() getObjectiveValue() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.S3BPacketScoreboardObjective displayName.formattedTextCompat() func_149337_d() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.formattedTextCompat() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.formattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
