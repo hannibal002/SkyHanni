@@ -60,7 +60,12 @@ object FishingHotspotRadar {
 
         bezierFitter.addPoint(currLoc)
 
-        hotspotLocation = bezierFitter.solve() ?: return
+        val guess = bezierFitter.solve() ?: return
+        if (!LorenzUtils.skyBlockIsland.isInBounds(guess)) {
+            hotspotLocation = null
+            return
+        }
+        hotspotLocation = guess
         isUnknown = false
         lastUpdate = SimpleTimeMark.now()
         hotspotLocation?.let {
