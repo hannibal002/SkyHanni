@@ -38,7 +38,11 @@ object WorldRenderUtils {
      * @author Moulberry
      * @author Mojang
      */
-    private fun SkyHanniRenderWorldEvent.renderBeaconBeam(
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
+        this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
+    }
+
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(
         x: Double,
         y: Double,
         z: Double,

@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.BufferBuilder
+import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Box
 import java.awt.Color
@@ -23,13 +24,33 @@ object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
 
-    private fun SkyHanniRenderWorldEvent.renderBeaconBeam(
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
+        this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
+    }
+
+    fun SkyHanniRenderWorldEvent.renderBeaconBeam(
         x: Double,
         y: Double,
         z: Double,
         rgb: Int,
     ) {
-        TODO()
+        val camera = context.camera()
+        val matrices = context.matrixStack()?: return
+        matrices.push()
+        matrices.translate(x - camera.pos.x, y - camera.pos.y, z - camera.pos.z)
+        BeaconBlockEntityRenderer.renderBeam(
+            matrices,
+            context.consumers(),
+            beaconBeam,
+            partialTicks,
+            1f,
+            context.world().time,
+            0,
+            319,
+            rgb,
+            0.2f,
+            0.25f,
+        )
     }
 
     @Deprecated("Do not use, use proper method instead")
