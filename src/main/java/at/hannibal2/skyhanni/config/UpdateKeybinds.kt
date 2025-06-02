@@ -143,7 +143,7 @@ object UpdateKeybinds {
 
     private val logger = LorenzLogger("keybind_upgrader")
 
-    private fun updateKeybinds(shouldFlip: Boolean) {
+    private fun fixKeybinds(shouldFlip: Boolean) {
         var keybindMap = makeMap()
         if (shouldFlip) {
             keybindMap = keybindMap.entries.associateBy({ it.value }) { it.key }
@@ -191,7 +191,7 @@ object UpdateKeybinds {
             return
         }
 
-        updateKeybinds(lastMcVersion != "1.8.9")
+        fixKeybinds(lastMcVersion != "1.8.9")
         SkyHanniMod.feature.lastMinecraftVersion = currentMcVersion
     }
 }
