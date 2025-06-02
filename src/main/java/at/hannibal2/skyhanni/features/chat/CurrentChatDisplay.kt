@@ -67,7 +67,7 @@ object CurrentChatDisplay {
      * REGEX-TEST: §cYou cannot send guild chat with your guild chat disabled! Use /g toggle to enable it!
      */
     @Suppress("MaxLineLength")
-    private val guildChatPattern by patternGroup.pattern(
+    private val guildChatIsDisabledPattern by patternGroup.pattern(
         "guild",
         "§cYou cannot send guild chat with your guild chat disabled! Use \\/g toggle to enable it!",
     )
