@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -66,7 +66,7 @@ object ArrowTrail {
         }
     }
 
-    private fun isEnabled() = config.enabled && (LorenzUtils.inSkyBlock || OutsideSBFeature.ARROW_TRAIL.isSelected())
+    private fun isEnabled() = config.enabled && (SkyBlockUtils.inSkyBlock || OutsideSBFeature.ARROW_TRAIL.isSelected())
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {

@@ -14,11 +14,11 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -106,5 +106,5 @@ object CarnivalReminder {
         nextCheckTime = 5.0.minutes.fromNow()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.reminderDailyTickets && Perk.CHIVALROUS_CARNIVAL.isActive
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.reminderDailyTickets && Perk.CHIVALROUS_CARNIVAL.isActive
 }
