@@ -49,7 +49,7 @@ object SkyBlockKickDuration {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled() && !showTime) return
+        if (!isEnabled() || !showTime) return
 
         if (kickPattern.matches(event.message)) {
             if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) {
