@@ -28,4 +28,5 @@ class MatrixStack {
         GlStateManager.popMatrix()
     }
 
+    fun loadIdentity() = GlStateManager.loadIdentity()
 }
