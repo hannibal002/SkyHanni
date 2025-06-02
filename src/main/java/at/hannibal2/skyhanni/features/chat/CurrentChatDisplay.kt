@@ -90,9 +90,6 @@ object CurrentChatDisplay {
         if (allChatPattern.matches(message)) {
             return updateChat(ChatType.ALL)
         }
-        if (guildChatPattern.matches(message)) {
-            return updateChat(ChatType.GUILD)
-        }
         openPrivateMessagePattern.matchMatcher(message) {
             privateMessageEnd = maxPrivateMessageTime.fromNow()
             return updateChat(ChatType.PRIVATE, group("player"))
