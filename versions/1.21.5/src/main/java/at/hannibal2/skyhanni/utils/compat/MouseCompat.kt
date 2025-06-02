@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.MinecraftClient
 
 object MouseCompat {
@@ -45,7 +46,7 @@ object MouseCompat {
 
     fun getEventButton(): Int {
         val button = lastEventButton
-        lastEventButton = -1
+        DelayedRun.runNextTick { lastEventButton = -1 }
         return button
     }
 }

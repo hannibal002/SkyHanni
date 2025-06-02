@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MouseCompat;
 import net.minecraft.client.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,7 +34,10 @@ public class MixinMouse {
         if (action == 1) {
             MouseCompat.INSTANCE.setLastEventButton(button);
         } else {
-            MouseCompat.INSTANCE.setLastEventButton(-1);
+            DelayedRun.INSTANCE.runNextTick(() -> {
+                MouseCompat.INSTANCE.setLastEventButton(-1);
+                return null;
+            });
         }
     }
 
