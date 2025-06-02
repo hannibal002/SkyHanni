@@ -30,10 +30,10 @@ class CakeTrackerConfig {
 
     @Expose
     @ConfigLink(owner = CakeTrackerConfig::class, field = "enabled")
-    var cakeTrackerPosition: Position = Position(300, 300)
+    val cakeTrackerPosition: Position = Position(300, 300)
 
     @Expose
-    var displayType: Property<CakeTrackerDisplayType> = Property.of(CakeTrackerDisplayType.MISSING_CAKES)
+    val displayType: Property<CakeTrackerDisplayType> = Property.of(CakeTrackerDisplayType.MISSING_CAKES)
 
     enum class CakeTrackerDisplayType(private val displayName: String) {
         MISSING_CAKES("§cMissing Cakes"),
@@ -44,7 +44,7 @@ class CakeTrackerConfig {
     }
 
     @Expose
-    var displayOrderType: Property<CakeTrackerDisplayOrderType> = Property.of(CakeTrackerDisplayOrderType.OLDEST_FIRST)
+    val displayOrderType: Property<CakeTrackerDisplayOrderType> = Property.of(CakeTrackerDisplayOrderType.OLDEST_FIRST)
 
     enum class CakeTrackerDisplayOrderType(private val displayName: String) {
         OLDEST_FIRST("§cOldest First"),
@@ -65,7 +65,7 @@ class CakeTrackerConfig {
         desc = "The color that should be used to highlight unobtained cakes in the Auction House."
     )
     @ConfigEditorColour
-    var missingColor: ChromaColour = LorenzColor.RED.toChromaColor(255)
+    val missingColor: ChromaColour = LorenzColor.RED.toChromaColor(255)
 
     @Expose
     @ConfigOption(
@@ -73,10 +73,10 @@ class CakeTrackerConfig {
         desc = "The color that should be used to highlight obtained cakes in the Auction House."
     )
     @ConfigEditorColour
-    var ownedColor: ChromaColour = LorenzColor.GREEN.toChromaColor(255)
+    val ownedColor: ChromaColour = LorenzColor.GREEN.toChromaColor(255)
 
     @Expose
     @ConfigOption(name = "Max Height", desc = "Maximum height of the tracker.")
     @ConfigEditorSlider(minValue = 50f, maxValue = 500f, minStep = 10f)
-    var maxHeight: Property<Float> = Property.of(250f)
+    val maxHeight: Property<Float> = Property.of(250f)
 }
