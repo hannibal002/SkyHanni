@@ -145,6 +145,5 @@ class Features : Config() {
     var lastVersion: Int = ConfigUpdaterMigrator.CONFIG_VERSION
 
     @Expose
-    @Suppress("unused")
-    var lastMinecraftVersion: String = VersionConstants.MC_VERSION
+    var lastMinecraftVersion: String? = null
 }

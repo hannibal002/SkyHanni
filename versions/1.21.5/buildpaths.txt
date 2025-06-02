@@ -1,5 +1,5 @@
-at.hannibal2.skyhanni.api.CollectionApi.kt
 #at.hannibal2.skyhanni.api.DataWatcherApi.kt
+at.hannibal2.skyhanni.api.CollectionApi.kt
 at.hannibal2.skyhanni.api.GetFromSackApi.kt
 at.hannibal2.skyhanni.api.HotmApi.kt
 at.hannibal2.skyhanni.api.ItemBuyApi.kt
@@ -15,9 +15,15 @@ at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi.kt
 at.hannibal2.skyhanni.config.ConfigGuiManager.kt
 at.hannibal2.skyhanni.config.ConfigManager.kt
 at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.kt
+at.hannibal2.skyhanni.config.EnforcedConfigValues.kt
 at.hannibal2.skyhanni.config.FeatureToggle.kt
 at.hannibal2.skyhanni.config.Features.kt
+at.hannibal2.skyhanni.config.GuiOptionEditorBlocked.kt
+at.hannibal2.skyhanni.config.GuiOptionEditorHidden.kt
+at.hannibal2.skyhanni.config.OnlyLegacy.kt
+at.hannibal2.skyhanni.config.OnlyModern.kt
 at.hannibal2.skyhanni.config.SackData.kt
+at.hannibal2.skyhanni.config.UpdateKeybinds.kt
 at.hannibal2.skyhanni.config.commands.CommandBuilder.kt
 at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent.kt
 at.hannibal2.skyhanni.config.commands.CommandsRegistry.kt
@@ -637,6 +643,7 @@ at.hannibal2.skyhanni.test.HighlightMissingRepoItems.kt
 at.hannibal2.skyhanni.test.ParkourWaypointSaver.kt
 at.hannibal2.skyhanni.test.ShowItemUuid.kt
 at.hannibal2.skyhanni.test.SkyBlockIslandTest.kt
+at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand.kt
 at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests.kt
 at.hannibal2.skyhanni.test.TestBingo.kt
 at.hannibal2.skyhanni.test.TestExportTools.kt
@@ -734,6 +741,7 @@ at.hannibal2.skyhanni.utils.guide.GuideScrollPage.kt
 at.hannibal2.skyhanni.utils.guide.GuideTab.kt
 at.hannibal2.skyhanni.utils.guide.GuideTablePage.kt
 at.hannibal2.skyhanni.utils.json.BaseGsonBuilder.kt
+at.hannibal2.skyhanni.utils.json.Shimmy.kt
 at.hannibal2.skyhanni.utils.json.SimpleStringTypeAdapter.kt
 at.hannibal2.skyhanni.utils.json.SkippingTypeAdapterFactory.kt
 at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.kt
@@ -1188,6 +1196,7 @@ at/hannibal2/skyhanni/data/jsonobjects/repo/DisabledEventsJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/DisabledFeaturesJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/DragonProfitTrackerItemsJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/EnchantedClockJson.kt
+at/hannibal2/skyhanni/data/jsonobjects/repo/EnforcedConfigValuesJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/FameRankJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/HideNotClickableItemsJson.kt
 at/hannibal2/skyhanni/data/jsonobjects/repo/HoppityRabbitTexturesJson.kt

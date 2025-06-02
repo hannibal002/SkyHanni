@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.test.WorldEdit
 import at.hannibal2.skyhanni.test.command.TestChatCommand
@@ -138,11 +137,6 @@ object Commands {
     }
 
     private fun devDebug(event: CommandRegistrationEvent) {
-        event.register("shconfig") {
-            description = "Searches or resets config elements §c(warning, dangerous!)"
-            category = CommandCategory.DEVELOPER_DEBUG
-            callback { SkyHanniConfigSearchResetCommand.command(it) }
-        }
         event.register("shtestbingo") {
             description = "Toggle the test bingo card display mode"
             category = CommandCategory.DEVELOPER_DEBUG
