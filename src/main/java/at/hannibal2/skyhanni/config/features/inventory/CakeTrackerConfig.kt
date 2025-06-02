@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
@@ -64,7 +65,7 @@ class CakeTrackerConfig {
         desc = "The color that should be used to highlight unobtained cakes in the Auction House."
     )
     @ConfigEditorColour
-    var unobtainedAuctionHighlightColor: String = LorenzColor.RED.toConfigColor()
+    var missingColor: ChromaColour = LorenzColor.RED.toChromaColor(255)
 
     @Expose
     @ConfigOption(
@@ -72,7 +73,7 @@ class CakeTrackerConfig {
         desc = "The color that should be used to highlight obtained cakes in the Auction House."
     )
     @ConfigEditorColour
-    var obtainedAuctionHighlightColor: String = LorenzColor.GREEN.toConfigColor()
+    var ownedColor: ChromaColour = LorenzColor.GREEN.toChromaColor(255)
 
     @Expose
     @ConfigOption(name = "Max Height", desc = "Maximum height of the tracker.")

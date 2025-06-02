@@ -11,9 +11,6 @@ object ColorUtils {
     fun Color.toChromaColor(alpha: Int = this.alpha, chroma: Int = 0): ChromaColour =
         ChromaColour.fromRGB(red, green, blue, alpha, chroma)
 
-    @JvmStatic
-    fun String.toChromaColor() = ChromaColour.forLegacyString(this)
-
     fun ChromaColour.toColor(): Color = Color(toInt(), true)
 
     // TODO: Replace this code with the call to moulconfig's function once its fixed. revert #3821
