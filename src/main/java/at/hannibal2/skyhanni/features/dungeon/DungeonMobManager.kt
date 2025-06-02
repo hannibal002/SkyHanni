@@ -29,6 +29,7 @@ object DungeonMobManager {
     private val fel get() = config.fel
 
     private val staredInvisible = mutableSetOf<Mob>()
+    val starredVisibleMobs = mutableSetOf<Mob>()
     private val felOnTheGround = mutableSetOf<Mob>()
     private val felMoving = mutableSetOf<Mob>()
 
@@ -62,6 +63,7 @@ object DungeonMobManager {
             staredInvisible.remove(event.mob)
         }
         handleFelDespawn(event.mob)
+        starredVisibleMobs.remove(event.mob)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
@@ -147,6 +149,7 @@ object DungeonMobManager {
             return
         }
         mob.highlight(colour)
+        starredVisibleMobs.add(mob)
     }
 
     private fun handleFel(mob: Mob) {

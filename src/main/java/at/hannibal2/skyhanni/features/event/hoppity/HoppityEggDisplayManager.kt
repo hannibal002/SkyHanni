@@ -84,7 +84,7 @@ object HoppityEggDisplayManager {
                     !it.isClaimed() // Or eggs that have not been claimed
             }.let { entries ->
                 if (unclaimedEggsConfig.displayOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil }
-                else entries
+                else entries.sortedWith(compareBy<HoppityEggType> { it.altDay }.thenBy { it.resetsAt })
             }.forEach {
                 val (color, timeFormat) = if (it.hasRemainingSpawns()) {
                     it.mealColor to it.timeUntil.format()

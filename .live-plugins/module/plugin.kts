@@ -31,7 +31,12 @@ fun isEvent(function: KtNamedFunction): Boolean {
 }
 
 fun isRepoPattern(property: KtProperty): Boolean {
-    val type = property.type()?.fqName?.asString() ?: return false
+    // TODO fix it for K2 mode instead of leaving the function (the try catch)
+    val type = try {
+        property.type()?.fqName?.asString()
+    } catch (e: Throwable) {
+        null
+    } ?: return false
     if (type == patternGroup) return true
     if (type == pattern && property.hasDelegate()) return true
     return false
