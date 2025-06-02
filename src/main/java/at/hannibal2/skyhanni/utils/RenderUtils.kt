@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.shader.CircleShader
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
@@ -1491,9 +1492,12 @@ object RenderUtils {
         CircleShader.angle1 = angle1 - Math.PI.toFloat()
         CircleShader.angle2 = angle2 - Math.PI.toFloat()
 
+        // TODO: Once ChromaColour no longer drops alpha sometimes, remove this 255 hardcode
+        val circleColor = color.addAlpha(255).rgb
+
         DrawContextUtils.pushPop {
             ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
-            GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, color.rgb)
+            GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, circleColor)
             ShaderManager.disableShader()
         }
     }
