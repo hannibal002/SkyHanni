@@ -38,7 +38,7 @@ object HotmFeatures {
     private fun handleLevelStackSize(event: RenderItemTipEvent) {
         if (!config.levelStackSize) return
         HotmData.entries.firstOrNull {
-            event.stack == it.slot?.stack
+            event.stack == it.item
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else
                 "§e${it.activeLevel}"
