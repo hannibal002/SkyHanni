@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import org.lwjgl.input.Keyboard
 
 @SkyHanniModule
@@ -46,5 +46,5 @@ object TrophyFishFillet {
         event.move(2, "fishing.trophyFilletTooltip", "fishing.trophyFishing.filletTooltip")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.fishing.trophyFishing.filletTooltip
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.fishing.trophyFishing.filletTooltip
 }

@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+//#if TODO
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
+//#endif
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -243,8 +245,10 @@ object ChestValue {
         val name = InventoryUtils.openInventoryName().removeColor()
         if (Minecraft.getMinecraft().currentScreen !is GuiChest) return false
         if (BazaarApi.inBazaarInventory) return false
+        //#if TODO
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false
+        //#endif
 
 
         if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest (")) &&

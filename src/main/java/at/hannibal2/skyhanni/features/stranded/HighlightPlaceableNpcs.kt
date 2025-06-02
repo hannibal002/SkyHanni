@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -87,5 +87,5 @@ object HighlightPlaceableNpcs {
         return lore.none { locationPattern.matches(it) }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && LorenzUtils.isStrandedProfile && config.highlightPlaceableNpcs
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.isStrandedProfile && config.highlightPlaceableNpcs
 }

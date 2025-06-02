@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -56,7 +55,7 @@ object LogBookStats {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (IslandType.GARDEN_GUEST.isInIsland()) return
+        if (IslandType.GARDEN_GUEST.isCurrent()) return
         val inventoryName = event.inventoryName
         if (inventoryName != "Visitor's Logbook") return
 
@@ -93,7 +92,7 @@ object LogBookStats {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (IslandType.GARDEN_GUEST.isInIsland()) return
+        if (IslandType.GARDEN_GUEST.isCurrent()) return
         if (inInventory && config.showLogBookStats) {
             config.logBookStatsPos.renderRenderables(
                 display,

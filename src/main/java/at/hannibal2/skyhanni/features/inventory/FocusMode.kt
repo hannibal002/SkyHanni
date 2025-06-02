@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 
 @SkyHanniModule
@@ -72,5 +72,5 @@ object FocusMode {
         inAuctionHouse = event.inventoryName.startsWith("Auctions")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && InventoryUtils.inContainer() && config.enabled
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && InventoryUtils.inContainer() && config.enabled
 }

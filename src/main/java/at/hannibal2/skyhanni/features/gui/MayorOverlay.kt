@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
@@ -90,7 +90,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
             display?.let { config.position.renderRenderable(it, posLabel = "Mayor Overlay") }
         }
 
-        private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSBFeature.MAYOR_OVERLAY.isSelected()) && config.enabled
+        private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MAYOR_OVERLAY.isSelected()) && config.enabled
     }
 }
 
