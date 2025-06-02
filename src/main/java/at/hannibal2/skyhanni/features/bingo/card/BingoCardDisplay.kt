@@ -44,7 +44,7 @@ object BingoCardDisplay {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var displayMode = 0
 
-    fun command() {
+    private fun command() {
         reload()
     }
 
@@ -273,10 +273,15 @@ object BingoCardDisplay {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shbingotoggle") {
+        event.registerBrigadier("shbingotoggle") {
             description = "Toggle the bingo card display mode"
             category = CommandCategory.USERS_ACTIVE
             callback { toggleCommand() }
+        }
+        event.registerBrigadier("shreloadbingodata") {
+            description = "Reloads the bingo card data"
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback { command() }
         }
     }
 }

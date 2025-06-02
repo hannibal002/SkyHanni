@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
@@ -449,7 +450,7 @@ object GriffinBurrowHelper {
 
     private fun isEnabled() = DianaApi.isDoingDiana()
 
-    private fun setTestBurrow(strings: Array<String>) {
+    private fun setTestBurrow(arg: String) {
         if (!IslandType.HUB.isCurrent()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
@@ -468,12 +469,7 @@ object GriffinBurrowHelper {
             return
         }
 
-        if (strings.size != 1) {
-            ChatUtils.userError("/shtestburrow <type>")
-            return
-        }
-
-        val type: BurrowType = when (strings[0].lowercase()) {
+        val type: BurrowType = when (arg) {
             "reset" -> {
                 resetAllData()
                 ChatUtils.chat("Manually reset all burrow data.")
@@ -497,10 +493,17 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestburrow") {
+        event.registerBrigadier("shtestburrow") {
             description = "Sets a test burrow waypoint at your location"
             category = CommandCategory.DEVELOPER_TEST
-            callback { setTestBurrow(it) }
+            arg("type", BrigadierArguments.string()) { type ->
+                callback { setTestBurrow(getArg(type)) }
+            }
+        }
+        event.registerBrigadier("shtestgriffinspots") {
+            description = "Show potential griffin spots around you."
+            category = CommandCategory.DEVELOPER_DEBUG
+            simpleCallback { testGriffinSpots() }
         }
     }
 }

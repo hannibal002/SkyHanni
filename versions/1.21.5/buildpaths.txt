@@ -350,6 +350,7 @@ at.hannibal2.skyhanni.features.commands.PartyCommands.kt
 at.hannibal2.skyhanni.features.commands.SendCoordinatedCommand.kt
 at.hannibal2.skyhanni.features.commands.ViewRecipeCommand.kt
 at.hannibal2.skyhanni.features.commands.WarpIsCommand.kt
+at.hannibal2.skyhanni.features.commands.WikiManager.kt
 at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete.kt
 at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete.kt
 at.hannibal2.skyhanni.features.commands.tabcomplete.TabComplete.kt
@@ -424,6 +425,8 @@ at.hannibal2.skyhanni.features.garden.CropAccessory.kt
 at.hannibal2.skyhanni.features.garden.CropType.kt
 at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.kt
 at.hannibal2.skyhanni.features.garden.GardenApi.kt
+at.hannibal2.skyhanni.features.garden.GardenCropTimeCommand.kt
+at.hannibal2.skyhanni.features.garden.GardenCropsInCommand.kt
 at.hannibal2.skyhanni.features.garden.GardenNextJacobContest.kt
 at.hannibal2.skyhanni.features.garden.GardenOptimalSpeed.kt
 at.hannibal2.skyhanni.features.garden.GardenPlotApi.kt
@@ -449,6 +452,7 @@ at.hannibal2.skyhanni.features.garden.farming.lane.FarmingDirection.kt
 at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane.kt
 at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneApi.kt
 at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator.kt
+at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneCreator.kt
 at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneFeatures
 at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneFeatures.kt
 at.hannibal2.skyhanni.features.garden.fortuneguide.CaptureFarmingGear.kt
@@ -468,6 +472,7 @@ at.hannibal2.skyhanni.features.garden.fortuneguide.pages.UpgradePage.kt
 at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice.kt
 at.hannibal2.skyhanni.features.garden.inventory.plots.GardenNextPlotPrice.kt
 at.hannibal2.skyhanni.features.garden.pests.PestApi.kt
+at.hannibal2.skyhanni.features.garden.pests.PestFinder.kt
 at.hannibal2.skyhanni.features.garden.pests.PestParticleWaypoint.kt
 at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker.kt
 at.hannibal2.skyhanni.features.garden.pests.PestSpawnTimer.kt
@@ -648,12 +653,14 @@ at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests.kt
 at.hannibal2.skyhanni.test.TestBingo.kt
 at.hannibal2.skyhanni.test.TestExportTools.kt
 at.hannibal2.skyhanni.test.TestShowSlotNumber.kt
+at.hannibal2.skyhanni.test.WorldEdit.kt
 at.hannibal2.skyhanni.test.command.CopyActionBarCommand.kt
 at.hannibal2.skyhanni.test.command.CopyBossbarCommand.kt
 at.hannibal2.skyhanni.test.command.CopyItemCommand.kt
 at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.kt
 at.hannibal2.skyhanni.test.command.CopyScoreboardCommand.kt
 at.hannibal2.skyhanni.test.command.ErrorManager.kt
+at.hannibal2.skyhanni.test.command.TestChatCommand.kt
 at.hannibal2.skyhanni.test.command.TrackParticlesCommand.kt
 at.hannibal2.skyhanni.test.command.TrackSoundsCommand.kt
 at.hannibal2.skyhanni.test.graph.GraphEditor.kt
@@ -762,6 +769,7 @@ at.hannibal2.skyhanni.utils.repopatterns.RepoPatternDump.kt
 at.hannibal2.skyhanni.utils.repopatterns.RepoPatternExclusiveGroup.kt
 at.hannibal2.skyhanni.utils.repopatterns.RepoPatternExclusiveGroupInfo.kt
 at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup.kt
+at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui.kt
 at.hannibal2.skyhanni.utils.repopatterns.RepoPatternImpl.kt
 at.hannibal2.skyhanni.utils.repopatterns.RepoPatternKeyOwner.kt
 at.hannibal2.skyhanni.utils.repopatterns.RepoPatternList.kt

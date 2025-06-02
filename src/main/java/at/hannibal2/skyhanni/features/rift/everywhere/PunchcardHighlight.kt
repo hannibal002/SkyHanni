@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -244,6 +246,15 @@ object PunchcardHighlight {
         val reverse = config.reverse.get()
         for (player in MobData.players.filter { (reverse && it.name in playerList) || (!reverse && it.name !in playerList) }) {
             colorPlayer(player.baseEntity)
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shresetpunchcard") {
+            description = "Resets the Rift Punchcard Artifact player list."
+            category = CommandCategory.USERS_RESET
+            simpleCallback { onResetCommand() }
         }
     }
 }

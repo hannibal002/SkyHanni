@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.bingo.card.nextstephelper
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SkillExperience
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -78,7 +80,7 @@ object BingoNextStepHelper {
     private var currentSteps = emptyList<NextStep>()
     var currentHelp = emptyList<String>()
 
-    fun command() {
+    private fun command() {
         updateResult(true)
     }
 
@@ -472,4 +474,13 @@ object BingoNextStepHelper {
     }
 
     private fun isEnabled() = SkyBlockUtils.isBingoProfile && config.enabled
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shprintbingohelper") {
+            description = "Prints the next step helper for the bingo card"
+            category = CommandCategory.DEVELOPER_DEBUG
+            callback { command() }
+        }
+    }
 }
