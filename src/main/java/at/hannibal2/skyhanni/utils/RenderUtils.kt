@@ -1491,13 +1491,11 @@ object RenderUtils {
         CircleShader.angle1 = angle1 - Math.PI.toFloat()
         CircleShader.angle2 = angle2 - Math.PI.toFloat()
 
-        DrawContextUtils.pushMatrix()
-        ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
-
-        GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, color.rgb)
-
-        ShaderManager.disableShader()
-        DrawContextUtils.popMatrix()
+        DrawContextUtils.pushPop {
+            ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
+            GuiRenderUtils.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, color.rgb)
+            ShaderManager.disableShader()
+        }
     }
 
     fun getAlpha(): Float {
