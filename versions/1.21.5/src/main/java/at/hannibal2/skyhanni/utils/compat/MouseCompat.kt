@@ -20,7 +20,7 @@ object MouseCompat {
 
     fun getScrollDelta(): Int {
         val delta = scroll
-        scroll = 0.0
+        DelayedRun.runNextTick { scroll = 0.0 }
         return delta.toInt()
     }
 
