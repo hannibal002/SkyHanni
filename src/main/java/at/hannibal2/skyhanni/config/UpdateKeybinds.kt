@@ -9,11 +9,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object UpdateKeybinds {
@@ -159,6 +162,8 @@ object UpdateKeybinds {
             }
 
             val currentValue = shimmy.getJson().asInt
+            var shouldNotify = false
+
             if (keybindMap.containsKey(currentValue)) {
                 val newValue = keybindMap[currentValue]
                 shimmy.setJson(JsonPrimitive(newValue))
@@ -166,9 +171,14 @@ object UpdateKeybinds {
                 logger.log("$keybind old $currentValue")
                 logger.log("$keybind new $newValue")
             } else {
+                shouldNotify = true
                 SkyHanniConfigSearchResetCommand.resetCommand(arrayOf("reset", "config.$keybind"))
                 logger.log("Couldn't find a mapping for $keybind value: $currentValue")
-                ChatUtils.chat("Could not convert keybind for $keybind, please set it manually in /sh")
+                DelayedRun.runDelayed(3.seconds) {
+                    ChatUtils.chat("Could not convert keybind for $keybind, please set it manually in /sh")
+                }
+            }
+            if (shouldNotify) {
                 val text = listOf(
                     "§c§lMissing Keybind Mapping Data",
                     "§cData used to convert your skyhanni keybinds between versions is outdated",
