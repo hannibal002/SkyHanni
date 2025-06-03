@@ -55,14 +55,14 @@ class OrbitSystemRenderable(
 
         if (qualifiedSubBodies.isEmpty()) return
 
-        val centerX = posX + width  / 2f
+        val centerX = posX + width / 2f
         val centerY = posY + height / 2f
         val orbitRadius = (mainBody.width / 2f) + subBodySpacing + (subBodyW / 2f)
 
         val step = 360f / qualifiedSubBodies.size
         qualifiedSubBodies.forEachIndexed { i, sub ->
             val angleDeg = currentAngle + step * i
-            val radians  = Math.toRadians(angleDeg.toDouble())
+            val radians = Math.toRadians(angleDeg.toDouble())
             val dx = (cos(radians) * orbitRadius).toFloat()
             val dy = (sin(radians) * orbitRadius).toFloat()
 
