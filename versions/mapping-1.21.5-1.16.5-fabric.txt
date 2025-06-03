@@ -1,4 +1,8 @@
 
+at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
+
+at.hannibal2.skyhanni.utils.render.ModernGlStateManager com.mojang.blaze3d.systems.RenderSystem
+
 net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext at.hannibal2.skyhanni.utils.compat.WorldRenderContext
 
 net.minecraft.client.gui.DrawContext at.hannibal2.skyhanni.utils.compat.DrawContext
@@ -6,6 +10,8 @@ net.minecraft.client.gui.DrawContext at.hannibal2.skyhanni.utils.compat.DrawCont
 net.minecraft.client.gui.hud.ChatHudLine getContent() getChatComponent()
 
 net.minecraft.client.gui.screen.ingame.SignEditScreen blockEntity sign
+
+net.minecraft.client.gui.widget.Widget net.minecraft.client.gui.Drawable
 
 net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.network.ClientPlayerEntity
 

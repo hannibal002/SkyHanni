@@ -65,7 +65,9 @@ object NeuItems {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        readAllNeuItems()
+        DelayedRun.onThread.execute {
+            readAllNeuItems()
+        }
     }
 
     private fun readAllNeuItems() {
@@ -259,7 +261,7 @@ object NeuItems {
     fun getRecipes(internalName: NeuInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
     fun neuHasFocus(): Boolean {
-        //#if MC < 1.12
+        //#if MC < 1.16
         if (!PlatformUtils.isNeuLoaded()) return false
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
