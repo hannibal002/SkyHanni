@@ -8,8 +8,8 @@ object ColorUtils {
 
     @JvmStatic
     @JvmOverloads
-    fun Color.toChromaColor(alpha: Int = this.alpha, chroma: Int = 0): ChromaColour =
-        ChromaColour.fromRGB(red, green, blue, alpha, chroma)
+    fun Color.toChromaColor(alpha: Int = this.alpha, chromaSpeedMillis: Int = 0): ChromaColour =
+        ChromaColour.fromRGB(red, green, blue, chromaSpeedMillis, alpha)
 
     fun ChromaColour.toColor(): Color = Color(toInt(), true)
 
