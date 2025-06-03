@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.data.DateFormat
-//#if TODO
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.NumberDisplayFormat
-//#endif
 import at.hannibal2.skyhanni.utils.RenderUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -14,7 +12,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class DisplayConfig {
     @Expose
     @ConfigOption(name = "Alignment Options", desc = "")
@@ -117,7 +114,6 @@ class DisplayConfig {
         }
     }
 
-    //#if TODO
     @Expose
     @ConfigOption(
         name = "Number Display Format",
@@ -125,7 +121,6 @@ class DisplayConfig {
     )
     @ConfigEditorDropdown
     var numberDisplayFormat: NumberDisplayFormat = NumberDisplayFormat.TEXT_COLOR_NUMBER
-    //#endif
 
     @Expose
     @ConfigOption(

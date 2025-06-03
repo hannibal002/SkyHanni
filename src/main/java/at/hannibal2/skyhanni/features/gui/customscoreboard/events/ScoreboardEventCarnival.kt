@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
@@ -33,5 +32,5 @@ object ScoreboardEventCarnival : ScoreboardEvent() {
 
     override val elementPatterns = listOf(ScoreboardPattern.carnivalPattern) + patterns
 
-    override fun showIsland() = IslandType.HUB.isInIsland()
+    override fun showIsland() = IslandType.HUB.isCurrent()
 }

@@ -39,13 +39,11 @@ object RenderData {
         DrawContextUtils.pushPop {
             GlStateManager.enableDepth()
 
-            //#if TODO
             if (GuiEditManager.isInGui()) {
                 DrawContextUtils.translated(z = -3) {
                     renderOverlay(DrawContextUtils.drawContext)
                 }
             }
-            //#endif
 
             GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
         }

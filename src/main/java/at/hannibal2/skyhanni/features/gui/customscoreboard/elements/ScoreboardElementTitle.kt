@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 // internal and scoreboard
 // config change event or scoreboard update event
@@ -11,7 +11,7 @@ object ScoreboardElementTitle : ScoreboardElement() {
     override fun getDisplay(): Any {
         val alignment = displayConfig.titleAndFooter.alignTitle
 
-        if (!LorenzUtils.inSkyBlock && !displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock && !displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock) {
             return ScoreboardData.objectiveTitle align alignment
         }
 
