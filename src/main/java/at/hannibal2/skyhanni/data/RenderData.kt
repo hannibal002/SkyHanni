@@ -44,7 +44,7 @@ object RenderData {
 
             if (GuiEditManager.isInGui()) {
                 DrawContextUtils.translated(z = -3) {
-                    renderOverlay(DrawContextUtils.drawContext,true)
+                    renderOverlay(DrawContextUtils.drawContext, true)
                 }
             }
         }
