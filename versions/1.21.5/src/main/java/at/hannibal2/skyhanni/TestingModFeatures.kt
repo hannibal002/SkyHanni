@@ -13,7 +13,6 @@ object TestingModFeatures {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-
     }
 
 }

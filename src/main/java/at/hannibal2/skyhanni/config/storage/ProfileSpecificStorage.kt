@@ -11,10 +11,8 @@ import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
 import at.hannibal2.skyhanni.features.combat.end.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
-//#if TODO
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.generateMaxChestAsList
-//#endif
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -117,7 +115,6 @@ class ProfileSpecificStorage {
         @Expose
         var bosses: MutableMap<DungeonFloor, Int> = enumMapOf()
 
-        //#if TODO
         @Expose
         var runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
 
@@ -138,7 +135,6 @@ class ProfileSpecificStorage {
             @Expose
             var kismetUsed: Boolean? = null
         }
-        //#endif
     }
 
     @Expose

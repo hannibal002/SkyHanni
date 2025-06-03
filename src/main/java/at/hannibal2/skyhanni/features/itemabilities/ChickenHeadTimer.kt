@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration.Companion.seconds
 
@@ -74,5 +74,5 @@ object ChickenHeadTimer {
         event.move(2, "misc.chickenHeadTimerDisplay", "itemAbilities.chickenHead.displayTimer")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.displayTimer
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.displayTimer
 }

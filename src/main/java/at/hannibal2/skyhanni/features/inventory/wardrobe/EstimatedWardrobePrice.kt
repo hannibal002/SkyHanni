@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
 object EstimatedWardrobePrice {
@@ -40,7 +40,7 @@ object EstimatedWardrobePrice {
         tooltip.addAll(index, lore)
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.armor && WardrobeApi.inWardrobe() &&
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.armor && WardrobeApi.inWardrobe() &&
         (!WardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
 
     @HandleEvent
