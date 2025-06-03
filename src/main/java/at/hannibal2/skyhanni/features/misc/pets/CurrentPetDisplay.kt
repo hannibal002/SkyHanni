@@ -108,12 +108,13 @@ object CurrentPetDisplay {
             CircularRenderable(backgroundColor = Color.GREEN.toChromaColor(255), radius = 10),
             CircularRenderable(backgroundColor = Color.YELLOW.toChromaColor(255), radius = 10),
             CircularRenderable(backgroundColor = Color.ORANGE.toChromaColor(255), radius = 10),
-        ).toTypedArray()
+        ).toTypedArray(),
+        orbitSpeed = 40,
     )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        Position(300, 300).renderRenderable(orbitalRenderable, "Orbital")
+        config.orbitalPos.renderRenderable(orbitalRenderable, "Orbital")
         if (RiftApi.inRift()) return
         if (!config.display) return
 

@@ -5,9 +5,11 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ElectionCandidate
 //#endif
 import com.google.gson.annotations.Expose
+import com.sun.org.apache.xpath.internal.operations.Bool
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.input.Keyboard
@@ -200,6 +202,15 @@ class DebugConfig {
     @ConfigOption(name = "DVD Logo", desc = "Enable the test DVD Logo Renderable")
     @ConfigEditorBoolean
     var dvdLogo: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Orbital", desc = "Enable the test Orbital System renderable.")
+    @ConfigEditorBoolean
+    var orbital: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "orbital")
+    var orbitalPos: Position = Position(-330, -15)
 
     // Does not have a config element!
     @Expose
