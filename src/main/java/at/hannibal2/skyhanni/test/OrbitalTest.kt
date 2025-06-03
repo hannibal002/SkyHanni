@@ -26,7 +26,7 @@ object OrbitalTest {
                 CircularRenderable(backgroundColor = Color.GREEN.toChromaColor(255), radius = 10),
                 CircularRenderable(backgroundColor = Color.YELLOW.toChromaColor(255), radius = 10),
                 CircularRenderable(backgroundColor = Color.ORANGE.toChromaColor(255), radius = 10),
-            ).toTypedArray(),
+            ),
             orbitSpeed = 40,
         )
     }
