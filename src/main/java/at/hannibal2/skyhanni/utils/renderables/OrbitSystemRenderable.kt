@@ -59,21 +59,26 @@ class OrbitSystemRenderable(
         val orbitRadius = (mainBody.width / 2f) + subBodySpacing + (subBodyW / 2f)
 
         val step = 360f / subBodies.size
-        subBodies.forEachIndexed { i, sub ->
-            val angleDeg = currentAngle + step * i
+        subBodies.forEachIndexed { index, subBody ->
+            val angleDeg = currentAngle + step * index
             val radians = Math.toRadians(angleDeg.toDouble())
             val dx = (cos(radians) * orbitRadius).toFloat()
             val dy = (sin(radians) * orbitRadius).toFloat()
 
             // world‐space coords of the top-left of the scaled sub-body,
             // so that sub.render(0,0) (which draws at 0,0) ends up centered.
-            val drawX = centerX + dx - (sub.width * subBodyScale) / 2f
-            val drawY = centerY + dy - (sub.height * subBodyScale) / 2f
+            val drawX = centerX + dx - (subBody.width * subBodyScale) / 2f
+            val drawY = centerY + dy - (subBody.height * subBodyScale) / 2f
+
+            val mainBodyHovered = mainBody.isHovered((posX + drawX).toInt(), (posY + drawY).toInt())
+            val (fPosX, fPosY) = if (mainBodyHovered) {
+                subBody.width + 1 to subBody.height + 1
+            } else posX to posY
 
             DrawContextUtils.pushPop {
                 DrawContextUtils.translate(drawX, drawY, 0f)
                 DrawContextUtils.scale(subBodyScale, subBodyScale, 1f)
-                sub.render(0, 0)
+                subBody.render(fPosX, fPosY)
             }
         }
     }
