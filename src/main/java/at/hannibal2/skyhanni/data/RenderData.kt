@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.compat.DrawContext
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.GlStateManager
@@ -24,8 +25,10 @@ object RenderData {
         if (!SkyHanniDebugsAndTests.globalRender) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
 
+        val screen = Minecraft.getMinecraft().currentScreen
+
         DrawContextUtils.translated(z = -3) {
-            renderOverlay(DrawContextUtils.drawContext, Minecraft.getMinecraft().currentScreen != null)
+            renderOverlay(DrawContextUtils.drawContext, screen != null && screen !is GuiChat)
         }
     }
 
@@ -44,6 +47,7 @@ object RenderData {
                     renderOverlay(DrawContextUtils.drawContext,true)
                 }
             }
+        }
 
         GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
         GuiRenderEvent.GuiOnTopRenderEvent(DrawContextUtils.drawContext).post()
