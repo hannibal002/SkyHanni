@@ -25,7 +25,7 @@ object RenderableTestSuite {
     @HandleEvent
     fun onGuiRender(event: GuiRenderEvent.GuiOnTopRenderEvent) {
         for (test in active) {
-            test.position.renderRenderable(test.renderable()?.renderBounds(LorenzColor.RED.addOpacity(50)), posLabel = "Test: $test")
+            test.position.renderRenderable(test.finalRenderable, posLabel = "Renderable Test: $test")
         }
     }
 
@@ -44,11 +44,11 @@ object RenderableTestSuite {
                     return@callback
                 }
                 if (active.contains(test)) {
-                    ChatUtils.chat("Test '$input' is now §cdisabled§e.")
+                    ChatUtils.chat("Renderable Test '$input' is now §cdisabled§e.")
                     active.remove(test)
                     return@callback
                 }
-                ChatUtils.chat("Test '$input' is now §aactive§e.")
+                ChatUtils.chat("Renderable Test '$input' is now §aactive§e.")
                 active.add(test)
                 return@callback
             }
@@ -59,16 +59,26 @@ object RenderableTestSuite {
         }
     }
 
+    private val TestRenderable.finalRenderable: Renderable?
+        get() = if (shouldRenderBounds) renderable() else renderable()?.renderBounds(LorenzColor.RED.addOpacity(50))
+
     /**
-     * How to use:
-     * Declare an object with [RenderableTestSuite.TestRenderable] as supertype
-     * Annotate the object with "@SkyHanniModule(devOnly = true)"
-     * Give it a lowercase [name] (this is used to call it via the command later on)
-     * Define your test with [renderable] function
+     * Interface to define Test code for [Renderable]s.
      *
-     * Ingame call it with "\shrenderable [name]" to show it (calling it again will disable it)
+     * How to use:
+     * Declare an object with [RenderableTestSuite.TestRenderable] as supertype.
+     * Annotate the object with ``@SkyHanniModule(devOnly = true)``.
+     * Give it a lowercase [name] (this is used to call it via the command later on).
+     * Define your test you want to do with the [renderable] function.
+     *
+     * Ingame call it with ``\shrenderable [name]`` to show it (calling it again will disable it)
+     *
+     * @param name Name of the Test, is the name you have to type to use it ingame with ``\shrenderable``.
+     * @param shouldRenderBounds Enables a Red Boundary around the test [renderable].
+     * @property renderable Function that is called for retrieving the [Renderable] that is going to be tested (and rendered on screen, once active). Define here your test you want to do.
+     * @property position The position at which the test will be rendered. There should be no reason that is touched. Other than inside [RenderableTestSuite].
      */
-    abstract class TestRenderable(val name: String) {
+    abstract class TestRenderable(val name: String, val shouldRenderBounds: Boolean = true) {
 
         abstract fun renderable(): Renderable?
 
