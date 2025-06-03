@@ -3,24 +3,18 @@ package at.hannibal2.skyhanni.features.misc.pets
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.renderables.CircularRenderable
-import at.hannibal2.skyhanni.utils.renderables.OrbitSystemRenderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.awt.Color
 
 @SkyHanniModule
 object CurrentPetDisplay {
@@ -97,24 +91,8 @@ object CurrentPetDisplay {
         }
     }
 
-    private val orbitalRenderable = OrbitSystemRenderable(
-        mainBody = CircularRenderable(
-            backgroundColor = Color.BLUE.toChromaColor(255),
-            radius = 10,
-        ),
-        subBodyScale = 0.5f,
-        subBodies = listOf(
-            CircularRenderable(backgroundColor = Color.RED.toChromaColor(255), radius = 10),
-            CircularRenderable(backgroundColor = Color.GREEN.toChromaColor(255), radius = 10),
-            CircularRenderable(backgroundColor = Color.YELLOW.toChromaColor(255), radius = 10),
-            CircularRenderable(backgroundColor = Color.ORANGE.toChromaColor(255), radius = 10),
-        ).toTypedArray(),
-        orbitSpeed = 40,
-    )
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        config.orbitalPos.renderRenderable(orbitalRenderable, "Orbital")
         if (RiftApi.inRift()) return
         if (!config.display) return
 

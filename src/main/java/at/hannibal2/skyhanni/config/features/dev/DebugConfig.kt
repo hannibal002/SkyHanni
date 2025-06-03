@@ -204,13 +204,17 @@ class DebugConfig {
     var dvdLogo: Boolean = false
 
     @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "dvdLogo")
+    var dvdLogoPosition: Position = Position(100, 100)
+
+    @Expose
     @ConfigOption(name = "Orbital", desc = "Enable the test Orbital System renderable.")
     @ConfigEditorBoolean
-    var orbital: Boolean = true
+    var orbital: Boolean = false
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "orbital")
-    var orbitalPos: Position = Position(-330, -15)
+    var orbitalPosition: Position = Position(200, 200)
 
     // Does not have a config element!
     @Expose
