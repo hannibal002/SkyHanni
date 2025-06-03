@@ -11,17 +11,9 @@ object ColorUtils {
     fun Color.toChromaColor(alpha: Int = this.alpha, chromaSpeedMillis: Int = 0): ChromaColour =
         ChromaColour.fromRGB(red, green, blue, chromaSpeedMillis, alpha)
 
-    fun ChromaColour.toColor(): Color = Color(toInt(), true)
+    fun ChromaColour.toColor(): Color = getEffectiveColour()
 
-    // TODO: Replace this code with the call to moulconfig's function once its fixed. revert #3821
-    fun ChromaColour.toInt(): Int {
-        val effectiveHue: Double = if (timeForFullRotationInMillis > 0) {
-            System.currentTimeMillis() / timeForFullRotationInMillis.toDouble()
-        } else hue.toDouble()
-
-        val rgb = Color.HSBtoRGB((effectiveHue % 1.0).toFloat(), this.saturation, this.brightness)
-        return (alpha and 0xFF) shl 24 or (rgb and 0xFFFFFF)
-    }
+    fun ChromaColour.toInt() = this.getEffectiveColour().rgb
 
     fun String.getFirstColorCode() = takeIf { it.firstOrNull() == '§' }?.getOrNull(1)
 
