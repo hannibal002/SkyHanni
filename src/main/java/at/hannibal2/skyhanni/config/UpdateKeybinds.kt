@@ -189,7 +189,7 @@ object UpdateKeybinds {
         val lastMcVersion = config.lastMinecraftVersion ?: "1.8.9"
         val currentMcVersion = PlatformUtils.MC_VERSION
         config.lastMinecraftVersion = currentMcVersion
-        if (config.storage.hasPlayedBefore) {
+        if (!config.storage.hasPlayedBefore) {
             return
         }
         if (lastMcVersion == currentMcVersion || lastMcVersion != "1.8.9" && currentMcVersion != "1.8.9") {
