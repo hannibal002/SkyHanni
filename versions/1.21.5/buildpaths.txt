@@ -717,6 +717,11 @@ at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue.kt
 at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.kt
 at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueTooltip.kt
 at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker.kt
+at.hannibal2.skyhanni.features.misc.massconfiguration.Category.kt
+at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures.kt
+at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigOptionGui.kt
+at.hannibal2.skyhanni.features.misc.massconfiguration.FeatureToggleProcessor.kt
+at.hannibal2.skyhanni.features.misc.massconfiguration.ResetSuggestionState.kt
 at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper.kt
 at.hannibal2.skyhanni.features.misc.pets.CurrentPetDisplay.kt
 at.hannibal2.skyhanni.features.misc.reminders.Reminder.kt
@@ -1399,6 +1404,7 @@ at/hannibal2/skyhanni/features/gui/TabWidgetDisplay.kt
 at/hannibal2/skyhanni/features/inventory/experimentationtable/ExperimentationTableEnums.kt
 at/hannibal2/skyhanni/features/mining/OreBlock.kt
 at/hannibal2/skyhanni/features/mining/eventtracker/MiningEventData.kt
+at/hannibal2/skyhanni/features/misc/massconfiguration/FeatureToggleableOption.kt
 at/hannibal2/skyhanni/features/misc/visualwords/VisualWord.kt
 at/hannibal2/skyhanni/mixins/hooks/GuiPlayerTabOverlayHook.kt
 at/hannibal2/skyhanni/mixins/hooks/GuiScreenHook.kt

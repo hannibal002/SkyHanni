@@ -130,7 +130,7 @@ object ChatManager {
         val message = component.formattedText.stripHypixelMessage()
         var cancelled = false
 
-        if (message.startsWith("§f{\"server\":\"")) {
+        if (message.startsWith("§f{\"server\":\"") || message.startsWith("{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
             if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
                 cancelled = true
