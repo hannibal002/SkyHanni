@@ -11,7 +11,7 @@ import kotlin.math.sin
 enum class OrbitDirection { CLOCKWISE, COUNTER_CLOCKWISE }
 
 class OrbitSystemRenderable(
-    private val mainBody: CircularRenderable,
+    private val mainBody: Renderable,
     /**
      * How large subBodies should be in relation to the main renderable.
      */
@@ -26,12 +26,11 @@ class OrbitSystemRenderable(
      */
     private val orbitSpeed: Int = 10,
     private val orbitDirection: OrbitDirection = OrbitDirection.CLOCKWISE,
-    vararg subBodies: CircularRenderable,
+    val subBodies: Collection<Renderable>,
 ) : Renderable {
-    private val qualifiedSubBodies: List<CircularRenderable> = listOf(*subBodies)
 
-    private val subBodyW = (qualifiedSubBodies.maxOfOrNull { it.width } ?: 0) * subBodyScale
-    private val subBodyH = (qualifiedSubBodies.maxOfOrNull { it.height } ?: 0) * subBodyScale
+    private val subBodyW = (subBodies.maxOfOrNull { it.width } ?: 0) * subBodyScale
+    private val subBodyH = (subBodies.maxOfOrNull { it.height } ?: 0) * subBodyScale
 
     override val width: Int
         get() = (mainBody.width + subBodyW + subBodySpacing).toInt()
@@ -53,14 +52,14 @@ class OrbitSystemRenderable(
         currentAngle = (currentAngle + orbitSpeed * deltaSeconds * dirFactor).toFloat() % 360f
         mainBody.renderXYAligned(posX, posY, width, height)
 
-        if (qualifiedSubBodies.isEmpty()) return
+        if (subBodies.isEmpty()) return
 
         val centerX = posX + width / 2f
         val centerY = posY + height / 2f
         val orbitRadius = (mainBody.width / 2f) + subBodySpacing + (subBodyW / 2f)
 
-        val step = 360f / qualifiedSubBodies.size
-        qualifiedSubBodies.forEachIndexed { i, sub ->
+        val step = 360f / subBodies.size
+        subBodies.forEachIndexed { i, sub ->
             val angleDeg = currentAngle + step * i
             val radians = Math.toRadians(angleDeg.toDouble())
             val dx = (cos(radians) * orbitRadius).toFloat()
