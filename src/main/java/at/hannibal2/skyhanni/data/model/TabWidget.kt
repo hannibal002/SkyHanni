@@ -207,7 +207,7 @@ enum class TabWidget(
     ),
     EYES_PLACED(
         // language=RegExp
-        "Eyes placed: (?:§.)*(?<amount>\\d).*|(?:§.)*Dragon spawned!|(?:§.)*Egg respawning!",
+        "(?:Eyes placed: (?:§.)*(?<amount>\\d).*|(?:§.)*Dragon spawned!|(?:§.)*Egg respawning!)",
     ),
     PROTECTOR(
         // language=RegExp
