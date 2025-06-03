@@ -60,7 +60,7 @@ object RenderableTestSuite {
     }
 
     private val TestRenderable.finalRenderable: Renderable?
-        get() = if (shouldRenderBounds) renderable() else renderable()?.renderBounds(LorenzColor.RED.addOpacity(50))
+        get() = if (shouldRenderBounds) renderable()?.renderBounds(LorenzColor.RED.addOpacity(50)) else renderable()
 
     /**
      * Interface to define Test code for [Renderable]s.
