@@ -28,6 +28,10 @@ public class MixinMouse {
     @Inject(method = "onMouseScroll", at = @At("HEAD"))
     private void onScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
         MouseCompat.INSTANCE.setScroll(vertical);
+        DelayedRun.INSTANCE.runNextTick(() -> {
+            MouseCompat.INSTANCE.setScroll(0);
+            return null;
+        });
     }
 
     @Inject(method = "onMouseButton", at = @At("HEAD"))

@@ -66,7 +66,6 @@ abstract class ScrollInput(
                     scroll += MouseCompat.getEventDY() * velocity
                 }
                 val deltaWheel = MouseCompat.getScrollDelta()
-                println("second delta wheel $deltaWheel")
                 scroll += -deltaWheel.coerceIn(-1, 1) * 2.5 * velocity
                 coerceInLimit()
             }
@@ -118,7 +117,6 @@ class ScrollValue {
 
     fun isMouseEventValid(): Boolean {
         val mouseEvent = MouseCompat.getEventNanoseconds()
-        println(mouseEvent)
         val mouseEventsValid = mouseEvent - mouseEventTime > 20L
         mouseEventTime = mouseEvent
         return mouseEventsValid
