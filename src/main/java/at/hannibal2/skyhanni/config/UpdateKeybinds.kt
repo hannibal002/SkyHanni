@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -181,17 +181,21 @@ object UpdateKeybinds {
 
     private var hasUpdated = false
 
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onTick(event: HypixelJoinEvent) {
         if (hasUpdated) return
         hasUpdated = true
-        val lastMcVersion = SkyHanniMod.feature.lastMinecraftVersion ?: "1.8.9"
+        val config = SkyHanniMod.feature
+        val lastMcVersion = config.lastMinecraftVersion ?: "1.8.9"
         val currentMcVersion = PlatformUtils.MC_VERSION
+        config.lastMinecraftVersion = currentMcVersion
+        if (config.storage.hasPlayedBefore) {
+            return
+        }
         if (lastMcVersion == currentMcVersion || lastMcVersion != "1.8.9" && currentMcVersion != "1.8.9") {
             return
         }
 
         fixKeybinds(lastMcVersion != "1.8.9")
-        SkyHanniMod.feature.lastMinecraftVersion = currentMcVersion
     }
 }
