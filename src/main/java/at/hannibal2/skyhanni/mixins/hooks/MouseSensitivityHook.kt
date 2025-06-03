@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 object MouseSensitivityHook {
     fun remapSensitivity(original: Float): Float {
