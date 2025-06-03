@@ -15,12 +15,9 @@ object ColorUtils {
 
     // TODO: Replace this code with the call to moulconfig's function once its fixed. revert #3821
     fun ChromaColour.toInt(): Int {
-        val effectiveHue: Double
-        if (timeForFullRotationInMillis > 0) {
-            effectiveHue = System.currentTimeMillis() / timeForFullRotationInMillis.toDouble()
-        } else {
-            effectiveHue = hue.toDouble()
-        }
+        val effectiveHue: Double = if (timeForFullRotationInMillis > 0) {
+            System.currentTimeMillis() / timeForFullRotationInMillis.toDouble()
+        } else hue.toDouble()
 
         val rgb = Color.HSBtoRGB((effectiveHue % 1.0).toFloat(), this.saturation, this.brightness)
         return (alpha and 0xFF) shl 24 or (rgb and 0xFFFFFF)
