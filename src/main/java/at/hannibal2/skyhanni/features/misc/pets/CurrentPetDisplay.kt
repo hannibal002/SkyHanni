@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.misc.pets.display.TextPetDisplayConfig
-import at.hannibal2.skyhanni.config.features.misc.pets.display.VisualPetDisplayConfig
+import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi

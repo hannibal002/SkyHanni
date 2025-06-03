@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.misc.pets.display
+package at.hannibal2.skyhanni.config.features.pets.display.text
 
 import at.hannibal2.skyhanni.utils.RenderUtils
 import com.google.gson.annotations.Expose
