@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -13,18 +14,21 @@ import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.BufferBuilder
+import net.minecraft.client.render.Camera
 import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.render.VertexConsumerProvider
+import net.minecraft.client.render.VertexRendering
 import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer
 import net.minecraft.client.util.BufferAllocator
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Box
 import org.joml.Matrix4f
 import java.awt.Color
-
+import kotlin.math.sqrt
 
 object WorldRenderUtils {
 
@@ -40,17 +44,15 @@ object WorldRenderUtils {
         z: Double,
         rgb: Int,
     ) {
-        val camera = context.camera()
-        val matrices = context.matrixStack() ?: return
         matrices.push()
         matrices.translate(x - camera.pos.x, y - camera.pos.y, z - camera.pos.z)
         BeaconBlockEntityRenderer.renderBeam(
             matrices,
-            context.consumers(),
+            vertexConsumers,
             beaconBeam,
             partialTicks,
             1f,
-            context.world().time,
+            MinecraftCompat.localWorld.time,
             0,
             319,
             rgb,
@@ -88,7 +90,28 @@ object WorldRenderUtils {
         alpha: Float = -1f,
         seeThroughBlocks: Boolean = true,
     ) {
-        TODO()
+        val (viewerX, viewerY, viewerZ) = getViewerPos()
+        val x = location.x - viewerX
+        val y = location.y - viewerY
+        val z = location.z - viewerZ
+        val distSq = x * x + y * y + z * z
+
+        val realAlpha = if (alpha == -1f) {
+            (0.1f + 0.005f * distSq.toFloat()).coerceIn(0.2f..1f)
+        } else {
+            alpha
+        }
+
+        drawFilledBoundingBox(
+            Box(x, y, z, x + 1, y + 1, z + 1),
+            color,
+            realAlpha,
+            true,
+            seeThroughBlocks = seeThroughBlocks,
+        )
+        // todo use seeThroughBlocks
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(location.x, location.y + 1, location.z, color.rgb)
+
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -127,7 +150,26 @@ object WorldRenderUtils {
         minimumAlpha: Float = 0.2f,
         inverseAlphaScale: Boolean = false,
     ) {
-        TODO()
+        val (viewerX, viewerY, viewerZ) = getViewerPos()
+        val x = location.x - viewerX
+        val y = location.y - viewerY
+        val z = location.z - viewerZ
+        val distSq = x * x + y * y + z * z
+
+        drawFilledBoundingBox(
+            Box(
+                x - extraSize, y - extraSizeBottomY, z - extraSize,
+                x + 1 + extraSize, y + 1 + extraSizeTopY, z + 1 + extraSize,
+            ).expandBlock(),
+            color,
+            if (inverseAlphaScale) (1f - 0.005f * distSq.toFloat()).coerceIn(minimumAlpha..1f)
+            else (0.1f + 0.005f * distSq.toFloat()).coerceIn(minimumAlpha..1f),
+            renderRelativeToCamera = true,
+            seeThroughBlocks = seeThroughBlocks,
+        )
+
+        // todo use seeThroughBlocks
+        if (distSq > 5 * 5 && beacon) renderBeaconBeam(location.x, location.y + 1, location.z, color.rgb)
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -155,8 +197,37 @@ object WorldRenderUtils {
          */
         renderRelativeToCamera: Boolean = false,
         drawVerticalBarriers: Boolean = true,
+        seeThroughBlocks: Boolean = false,
     ) {
-        TODO()
+        val effectiveAABB = if (!renderRelativeToCamera) {
+            val vp = getViewerPos()
+            Box(
+                aabb.minX - vp.x, aabb.minY - vp.y, aabb.minZ - vp.z,
+                aabb.maxX - vp.x, aabb.maxY - vp.y, aabb.maxZ - vp.z,
+            )
+        } else {
+            aabb
+        }
+
+        val layer = SkyHanniRenderLayers.getFilled(seeThroughBlocks)
+        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        matrices.push()
+
+        // todo drawVertical barriers
+
+        VertexRendering.drawFilledBox(
+            matrices,
+            buf,
+            effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,
+            effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ,
+            c.red / 255f * 0.9f,
+            c.green / 255f * 0.9f,
+            c.blue / 255f * 0.9f,
+            c.alpha / 255f * alphaMultiplier,
+        )
+        layer.draw(buf.end())
+        matrices.pop()
+
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -178,23 +249,20 @@ object WorldRenderUtils {
         color: Color? = null,
     ) {
         val matrix = Matrix4f()
-        val camera = context.camera()
         val cameraPos = camera.pos
         val fr = MinecraftClient.getInstance().textRenderer
 
-        val scale = 0.025f
+        val scale = 0.02666667f
 
         matrix.translate(
-                (loc.x - cameraPos.getX()).toFloat(),
-                (loc.y - cameraPos.getY()).toFloat(),
-                (loc.z - cameraPos.getZ()).toFloat(),
-            ).rotate(camera.rotation).scale(scale, -scale, scale)
+            (loc.x - cameraPos.getX()).toFloat(),
+            (loc.y - cameraPos.getY()).toFloat(),
+            (loc.z - cameraPos.getZ()).toFloat(),
+        ).rotate(camera.rotation).scale(scale, -scale, scale)
 
         val x = -fr.getWidth(text) / 2f
 
         val consumers = VertexConsumerProvider.immediate(bufferAllocator)
-
-        // todo meant to call drawNametag() here
 
         fr.draw(
             text,
@@ -205,14 +273,14 @@ object WorldRenderUtils {
             matrix,
             consumers,
             if (seeThroughBlocks) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL,
-            0,
+            LorenzColor.BLACK.toColor().addAlpha(63).rgb,
             LightmapTextureManager.MAX_LIGHT_COORDINATE,
         )
         consumers.draw()
     }
 
     private fun SkyHanniRenderWorldEvent.drawNametag(str: String, color: Color?) {
-        TODO()
+        TODO("Someone used this function somewhere. Big mistake, it isn't needed.")
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -365,44 +433,86 @@ object WorldRenderUtils {
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
     ) {
-        TODO()
+        val (viewerX, viewerY, viewerZ) = getViewerPos()
+        val x = location.x - viewerX
+        val y = location.y - viewerY
+        val z = location.z - viewerZ
+
+        val player = MinecraftCompat.localPlayerOrNull ?: return
+        val eyeHeight = player.getEyeHeight(player.pose)
+
+        val distToPlayerSq = x * x + y * y + z * z
+        var distToPlayer = sqrt(distToPlayerSq)
+        distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
+
+        if (distToPlayer < hideTooCloseAt) return
+        maxDistance?.let {
+            if (ignoreBlocks && distToPlayer > it) return
+        }
+
+        val distRender = distToPlayer.coerceAtMost(50.0)
+
+        var scale = distRender / 12
+        scale *= scaleMultiplier
+
+        val resultX = x + (location.x + 0.5 - x) / (distToPlayer / distRender)
+        val resultY = if (ignoreY) location.y * distToPlayer / distRender else y + eyeHeight +
+            (location.y + 20 * distToPlayer / 300 - (y + eyeHeight)) / (distToPlayer / distRender)
+        val resultZ = z + (location.z + 0.5 - z) / (distToPlayer / distRender)
+
+        val renderLocation = LorenzVec(resultX, resultY, resultZ)
+
+        renderText(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
     }
 
     private fun SkyHanniRenderWorldEvent.renderText(
         location: LorenzVec,
         text: String,
         scale: Double,
-        depthTest: Boolean,
+        seeThroughBlocks: Boolean,
         shadow: Boolean,
         yOff: Float,
     ) {
-        TODO()
-    }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawWireframeBoundingBox(
-        aabb: Box,
-        color: Color,
-    ) {
-        drawWireframeBoundingBox(aabb, color)
-    }
+        val realScale = (scale * 0.05).toFloat()
 
-    fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
-        aabb: Box,
-        color: Color,
-    ) {
-        TODO()
-    }
+        val matrix = Matrix4f()
+        val cameraPos = camera.pos
+        val fr = MinecraftClient.getInstance().textRenderer
 
+        matrix.translate(
+            (location.x - cameraPos.getX()).toFloat(),
+            (location.y - cameraPos.getY() + yOff).toFloat(),
+            (location.z - cameraPos.getZ()).toFloat(),
+        ).rotate(camera.rotation).scale(realScale, -realScale, realScale)
+
+        val x = -fr.getWidth(text) / 2f
+
+        val consumers = VertexConsumerProvider.immediate(bufferAllocator)
+
+        fr.draw(
+            text,
+            x,
+            0f,
+            LorenzColor.WHITE.toColor().rgb,
+            shadow,
+            matrix,
+            consumers,
+            if (seeThroughBlocks) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL,
+            0,
+            LightmapTextureManager.MAX_LIGHT_COORDINATE,
+        )
+        consumers.draw()
+    }
 
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(partialTicks) {
+        LineDrawer.draw3D(this) {
             drawEdges(location, color, lineWidth, depth)
         }
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: Box, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(partialTicks) {
+        LineDrawer.draw3D(this) {
             drawEdges(axisAlignedBB, color, lineWidth, depth)
         }
     }
@@ -424,7 +534,7 @@ object WorldRenderUtils {
         color: Color,
         lineWidth: Int,
         depth: Boolean,
-    ) = LineDrawer.draw3D(partialTicks) {
+    ) = LineDrawer.draw3D(this) {
         draw3DLine(p1, p2, color, lineWidth, depth)
     }
 
@@ -454,18 +564,18 @@ object WorldRenderUtils {
     @Deprecated("Do not use, use proper method instead")
     fun SkyHanniRenderWorldEvent._drawHitbox(
         boundingBox: Box,
-        lineWidth: Int,
         color: Color,
-        depth: Boolean,
+        lineWidth: Int = 3,
+        depth: Boolean = true,
     ) {
-        drawHitbox(boundingBox, lineWidth, color, depth)
+        drawHitbox(boundingBox, color, lineWidth,  depth)
     }
 
     fun SkyHanniRenderWorldEvent.drawHitbox(
         boundingBox: Box,
-        lineWidth: Int,
         color: Color,
-        depth: Boolean,
+        lineWidth: Int = 3,
+        depth: Boolean = true,
     ) {
         val cornersTop = boundingBox.getCornersAtHeight(boundingBox.maxY)
         val cornersBottom = boundingBox.getCornersAtHeight(boundingBox.minY)
@@ -523,11 +633,39 @@ object WorldRenderUtils {
         showNodeNames: Boolean = false,
         markLastBlock: Boolean = true,
     ) {
-        TODO()
+        if (path.isEmpty()) return
+        val points = if (startAtEye) {
+            listOf(
+                this.exactPlayerEyeLocation() + MinecraftCompat.localPlayer.rotationVector
+                    .toLorenzVec()
+                    /* .rotateXZ(-Math.PI / 72.0) */
+                    .times(2),
+            )
+        } else {
+            emptyList()
+        } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }
+        LineDrawer.draw3D(this) {
+            drawPath(
+                points,
+                colorLine,
+                lineWidth,
+                depth,
+                bezierPoint,
+            )
+        }
+        if (showNodeNames) {
+            path.filter { it.name?.isNotEmpty() == true }.forEach {
+                this.drawDynamicText(it.position, it.name!!, textSize)
+            }
+        }
+        if (markLastBlock) {
+            val last = path.last()
+            drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        }
     }
 
-    fun getViewerPos(partialTicks: Float) =
-        MinecraftClient.getInstance().getCameraEntity()?.let { exactLocation(it, partialTicks) } ?: LorenzVec()
+    fun getViewerPos() =
+        MinecraftClient.getInstance().gameRenderer.camera?.let { exactLocation(it) } ?: LorenzVec()
 
     fun Box.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun Box.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
@@ -538,6 +676,11 @@ object WorldRenderUtils {
         val y = entity.lastRenderY + (entity.y - entity.lastRenderY) * partialTicks
         val z = entity.lastRenderZ + (entity.z - entity.lastRenderZ) * partialTicks
         return LorenzVec(x, y, z)
+    }
+
+    fun exactLocation(camera: Camera): LorenzVec {
+        val pos = camera.pos
+        return LorenzVec(pos.x, pos.y, pos.z)
     }
 
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
@@ -560,14 +703,8 @@ object WorldRenderUtils {
         return exactLocation(player) + add
     }
 
-    private fun Color.bindColor(): Unit = TODO()
-
     private fun bindCamera() {
         TODO()
     }
-
-    fun BufferBuilder.pos(vec: LorenzVec): BufferBuilder = TODO()
-
-    fun translate(vec: LorenzVec): Unit = TODO()
 
 }

@@ -766,6 +766,7 @@ at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.kt
 at.hannibal2.skyhanni.features.mining.TunnelsMaps.kt
 at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.kt
 at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker.kt
+at.hannibal2.skyhanni.features.mining.crystalhollows.NucleusBarriersBox.kt
 at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventDisplay.kt
 at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventTracker.kt
 at.hannibal2.skyhanni.features.mining.eventtracker.MiningEventType.kt
@@ -1035,6 +1036,8 @@ at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.kt
 at.hannibal2.skyhanni.utils.render.FrustumUtils.kt
 at.hannibal2.skyhanni.utils.render.LineDrawer.kt
 at.hannibal2.skyhanni.utils.render.QuadDrawer.kt
+at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers.kt
+at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelines.kt
 at.hannibal2.skyhanni.utils.render.WorldRenderUtils.kt
 at.hannibal2.skyhanni.utils.renderables.DragNDrop.kt
 at.hannibal2.skyhanni.utils.renderables.Renderable.kt
