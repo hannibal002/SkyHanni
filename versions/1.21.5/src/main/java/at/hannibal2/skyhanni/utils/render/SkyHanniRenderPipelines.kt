@@ -23,7 +23,6 @@ object SkyHanniRenderPipelines {
     val LINES_XRAY: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
             .withLocation(Identifier.of(SkyHanniMod.MODID, "line_xray"))
-//             .withShaderDefine("shad")
             .withVertexFormat(VertexFormats.POSITION_COLOR_NORMAL, VertexFormat.DrawMode.LINE_STRIP)
             .withCull(false)
             .withDepthWrite(false)
