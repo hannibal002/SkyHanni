@@ -33,7 +33,11 @@ object ScoreboardElementParty : ScoreboardElement() {
         when {
             DungeonApi.inDungeon() -> false // Hidden because the scoreboard lines already exist
             config.showPartyEverywhere -> true
-            else -> SkyBlockUtils.inAnyIsland(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE) || IslandTypeTags.IS_COLD.inAny()
+            else -> SkyBlockUtils.inAnyIsland(
+                IslandType.DUNGEON_HUB,
+                IslandType.KUUDRA_ARENA,
+                IslandType.CRIMSON_ISLE,
+            ) || IslandTypeTags.IS_COLD.inAny()
         }
 
     override val configLine = "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fEmpa_\n §7- §fSkirtwearer"
