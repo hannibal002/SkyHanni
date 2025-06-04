@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import io.github.notenoughupdates.moulconfig.observer.Observer
 import io.github.notenoughupdates.moulconfig.observer.Property
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 object ConditionalUtils {
 
@@ -78,20 +81,17 @@ object ConditionalUtils {
         current: Any,
         visited: MutableSet<Any>,
     ): List<Property<*>> = buildList {
-        if (visited.contains(current)) return@buildList
-        visited.add(current)
-
-        val clazz = current::class.java
-        for (field in clazz.declaredFields) {
-            field.isAccessible = true
-            val value = try { field.get(current) } catch (_: Throwable) { continue }
-            when (value) {
-                is Property<*> -> add(value)
-                null -> continue
-                else -> addAll(
-                    collectProperties(value, visited)
-                )
-            }
+        if (!visited.add(current)) return@buildList
+        for (property in current::class.memberProperties) {
+            try {
+                property.isAccessible = true
+                @Suppress("UNCHECKED_CAST")
+                val value = (property as? KProperty1<Any, *>)?.get(current) ?: continue
+                when (value) {
+                    is Property<*> -> add(value)
+                    else -> addAll(collectProperties(value, visited))
+                }
+            } catch (_: Throwable) { }
         }
     }
 

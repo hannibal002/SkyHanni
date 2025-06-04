@@ -88,11 +88,12 @@ object CurrentPetDisplay {
         val separatorEnabled = config.visual.separatorRing.get()
         val xpRingEnabled = config.visual.xpRing.get()
         val separatorWrappedRenderable = backgroundWrappedRenderable.wrapInRingOrSelf(
-            enabled = xpRingEnabled && separatorEnabled,
+            enabled = backgroundEnabled && xpRingEnabled && separatorEnabled,
             ringConfig = customizationConfig.separatorRing
         )
 
-        val xpRingWrappedRenderable = if (!xpRingEnabled) separatorWrappedRenderable else CircularContainerRenderable(
+        val shouldUseXpRing = backgroundEnabled && xpRingEnabled
+        val xpRingWrappedRenderable = if (!shouldUseXpRing) separatorWrappedRenderable else CircularContainerRenderable(
             separatorWrappedRenderable,
             backgroundColor = customizationConfig.xpRing.filledColor.get(),
             unfilledColor = customizationConfig.xpRing.unfilledColor.get(),
