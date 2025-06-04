@@ -36,9 +36,9 @@ class OrbitSystemRenderable(
     private val subBodyH = (subBodies.maxOfOrNull { it.height } ?: 0)
 
     override val width: Int
-        get() = (mainBody.width + subBodyW + subBodySpacing).toInt()
+        get() = (mainBody.width + (subBodyW * 2) + (subBodySpacing * 2))
     override val height: Int
-        get() = (mainBody.height + subBodyH + subBodySpacing).toInt()
+        get() = (mainBody.height + (subBodyH * 2) + (subBodySpacing * 2))
 
     override val horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
     override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
