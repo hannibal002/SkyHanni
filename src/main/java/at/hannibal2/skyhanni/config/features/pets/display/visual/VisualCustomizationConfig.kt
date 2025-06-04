@@ -13,13 +13,13 @@ class VisualCustomizationConfig {
     @Expose
     @ConfigOption(name = "Separator Ring", desc = "")
     @Accordion
-    val separatorRing: SeparatorRingConfig = SeparatorRingConfig()
+    val separatorRing: RingConfig = RingConfig()
 
-    class SeparatorRingConfig {
+    class RingConfig {
         @Expose
         @ConfigOption(
             name = "Ring Padding",
-            desc = "How much thicker the Separator Ring should be compared to the smaller circles."
+            desc = "How wide the ring should be."
         )
         @ConfigEditorSlider(minValue = 2f, maxValue = 10f, minStep = 0.5f)
         val padding: Property<Int> = Property.of(6)
@@ -27,7 +27,7 @@ class VisualCustomizationConfig {
         @Expose
         @ConfigOption(
             name = "Ring Color",
-            desc = "The color of the separator ring.\n" +
+            desc = "The color of the ring.\n" +
                 "§7Default: §#§8§0§8§0§8§0§/#808080"
         )
         @ConfigEditorColour
@@ -72,73 +72,8 @@ class VisualCustomizationConfig {
     @Accordion
     val rarityBackground: RarityBackgroundConfig = RarityBackgroundConfig()
 
-    class RarityBackgroundConfig {
-        @Expose
-        @ConfigOption(
-            name = "Background Padding",
-            desc = "How much extra padding should be added to the background circle."
-        )
-        @ConfigEditorSlider(minValue = 2f, maxValue = 8f, minStep = 0.5f)
-        val padding: Property<Int> = Property.of(4)
-
-        @Expose
-        @ConfigOption(
-            name = "§fCommon §rColor",
-            desc = "§7Default: §#§f§f§f§f§f§f§/#FFFFFF"
-        )
-        @ConfigEditorColour
-        val commonColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(255, 255, 255, 0, 255))
-
-        @Expose
-        @ConfigOption(
-            name = "§aUncommon §rColor",
-            desc = "§7Default: §#§5§5§f§f§5§5§/#55FF55"
-        )
-        @ConfigEditorColour
-        val uncommonColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(85, 255, 85, 0, 255))
-
-        @Expose
-        @ConfigOption(
-            name = "§9Rare §rColor",
-            desc = "§7Default: §#§5§5§5§5§f§f§/#5555FF"
-        )
-        @ConfigEditorColour
-        val rareColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(85, 85, 255, 0, 255))
-
-        @Expose
-        @ConfigOption(
-            name = "§5Epic §rColor",
-            desc = "§7Default: §#§a§a§0§0§a§a§/#AA00AA"
-        )
-        @ConfigEditorColour
-        val epicColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(170, 0, 170, 0, 255))
-
-        @Expose
-        @ConfigOption(
-            name = "§6Legendary §rColor",
-            desc = "§7Default: §#§f§f§a§a§0§0§/#FFAA00"
-        )
-        @ConfigEditorColour
-        val legendaryColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(255, 170, 0, 0, 255))
-
-        @Expose
-        @ConfigOption(
-            name = "§dMythic §rColor",
-            desc = "§7Default: §#§f§f§5§5§f§f§/#FF55FF"
-        )
-        @ConfigEditorColour
-        val mythicColor: Property<ChromaColour> = Property.of(ChromaColour.fromRGB(255, 85, 255, 0, 255))
-    }
-
     @Expose
     @ConfigOption(name = "Exp-Share Pets", desc = "")
     @Accordion
     val expSharePet: ExpSharePetConfig = ExpSharePetConfig()
-
-    class ExpSharePetConfig {
-        @Expose
-        @ConfigOption(name = "Pet Scale", desc = "Scale of Exp-Share pet icons.")
-        @ConfigEditorSlider(minValue = 0.4f, maxValue = 1.5f, minStep = 0.1f)
-        val petScale: Property<Double> = Property.of(1.0)
-    }
 }

@@ -64,4 +64,35 @@ object ConditionalUtils {
         return second1.compareTo(second2)
     }
 
+    /**
+     * Recursively scans each given 'root' for any fields of type Property<*>,
+     * then calls the existing onToggle(...) overload with all discovered properties.
+     */
+    fun onToggleAll(vararg roots: Any, observer: Runnable) = roots.forEach { root ->
+        collectProperties(root, mutableSetOf()).forEach {
+            onToggle(it, observer = observer)
+        }
+    }
+
+    private fun collectProperties(
+        current: Any,
+        visited: MutableSet<Any>,
+    ): List<Property<*>> = buildList {
+        if (visited.contains(current)) return@buildList
+        visited.add(current)
+
+        val clazz = current::class.java
+        for (field in clazz.declaredFields) {
+            field.isAccessible = true
+            val value = try { field.get(current) } catch (_: Throwable) { continue }
+            when (value) {
+                is Property<*> -> add(value)
+                null -> continue
+                else -> addAll(
+                    collectProperties(value, visited)
+                )
+            }
+        }
+    }
+
 }

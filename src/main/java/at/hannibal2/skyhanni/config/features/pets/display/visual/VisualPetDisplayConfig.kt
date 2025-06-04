@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
+import at.hannibal2.skyhanni.utils.renderables.OrbitDirection
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -16,7 +17,7 @@ class VisualPetDisplayConfig {
             "§cRequired for any below options to work§7."
     )
     @ConfigEditorBoolean
-    val petIcon: Property<Boolean> = Property.of(true)
+    val icon: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -60,47 +61,29 @@ class VisualPetDisplayConfig {
     val customization: VisualCustomizationConfig = VisualCustomizationConfig()
 
     @Expose
-    @ConfigOption(
-        name = "Icon Scale",
-        desc = "How large the icon should be - Default is 1.7\n" +
-            "§ePet Icon must be enabled above."
-    )
+    @ConfigOption(name = "Icon Spin", desc = "")
+    @Accordion
+    val iconSpin: IconSpinConfig = IconSpinConfig()
+
+    class IconSpinConfig {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Spin the pet icon in place.")
+        @ConfigEditorDropdown
+        val direction: Property<OrbitDirection> = Property.of(OrbitDirection.NONE)
+
+        @Expose
+        @ConfigOption(name = "Spin Speed", desc = "How long in seconds it should take for one spin to complete.")
+        @ConfigEditorSlider(minValue = 0.5f, maxValue = 10f, minStep = 0.5f)
+        val frequency: Property<Float> = Property.of(2.0f)
+    }
+
+    @Expose
+    @ConfigOption(name = "Icon Scale", desc = "How large the icon should be - Default is 1.7")
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.5f, minStep = 0.1f)
     val iconScale: Property<Double> = Property.of(1.7)
 
     @Expose
-    @ConfigOption(
-        name = "Skin Animation",
-        desc = "If your pet has an animated skin, display the animated skin for the icon.\n" +
-            "§ePet Icon must be enabled above."
-    )
+    @ConfigOption(name = "Skin Animation", desc = "If your pet has an animated skin, display the animated skin for the icon.")
     @ConfigEditorBoolean
     val skinAnimation: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "Icon Spin",
-        desc = "Spin the pet icon in place.\n" +
-            "§ePet Icon must be enabled above."
-    )
-    @ConfigEditorDropdown
-    val spinDirection: Property<SpinDirection> = Property.of(SpinDirection.NONE)
-
-    enum class SpinDirection(private val displayName: String) {
-        NONE("No Spinning"),
-        CLOCKWISE("Clockwise"),
-        COUNTER_CLOCKWISE("Counter-Clockwise"),
-        ;
-
-        override fun toString() = displayName
-    }
-
-    @Expose
-    @ConfigOption(
-        name = "Spin Speed",
-        desc = "How long in seconds it should take for one spin to complete.\n" +
-            "§ePet Icon and §eIcon Spin must be enabled above."
-    )
-    @ConfigEditorSlider(minValue = 0.5f, maxValue = 10f, minStep = 0.5f)
-    val spinFrequency: Property<Float> = Property.of(2.0f)
 }

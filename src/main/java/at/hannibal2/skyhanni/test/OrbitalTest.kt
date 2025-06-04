@@ -20,7 +20,6 @@ object OrbitalTest {
                 backgroundColor = Color.BLUE.toChromaColor(255),
                 radius = 10,
             ),
-            subBodyScale = 0.5f,
             subBodies = listOf(
                 CircularRenderable(backgroundColor = Color.RED.toChromaColor(255), radius = 10),
                 CircularRenderable(backgroundColor = Color.GREEN.toChromaColor(255), radius = 10),
