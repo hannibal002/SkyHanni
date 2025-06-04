@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
@@ -139,6 +138,8 @@ object UpdateKeybinds {
         map[-100] = 0
         map[-99] = 1
         map[-98] = 2
+        map[-97] = 3
+        map[-96] = 4
         return map
     }
 
