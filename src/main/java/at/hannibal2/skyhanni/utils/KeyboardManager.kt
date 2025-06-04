@@ -19,7 +19,6 @@ import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import org.lwjgl.input.Mouse
 //#else
-//$$ import io.github.moulberry.notenoughupdates.core.config.KeybindHelper
 //$$ import net.minecraft.client.util.InputUtil
 //#endif
 
@@ -224,7 +223,11 @@ object KeyboardManager {
         false
     }
 
+    //#if MC < 1.21
     fun getKeyName(keyCode: Int): String = KeybindHelper.getKeyName(keyCode)
+    //#else
+    //$$ fun getKeyName(keyCode: Int): String = InputUtil.fromKeyCode(keyCode, keyCode).localizedText.unformattedTextCompat()
+    //#endif
 
     object WasdInputMatrix : Iterable<KeyBinding> {
         operator fun contains(keyBinding: KeyBinding) = when (keyBinding) {
