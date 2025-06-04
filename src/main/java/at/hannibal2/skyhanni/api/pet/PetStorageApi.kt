@@ -44,7 +44,7 @@ import kotlin.math.abs
 object PetStorageApi {
 
     private val config get() = SkyHanniMod.feature.misc.pets
-    private val petStorage get() = ProfileStorageData.petProfiles?.pets
+    private val petStorage get() = ProfileStorageData.petProfiles
     private val patternGroup = RepoPattern.group("misc.pet.storage")
     private const val PET_MENU_CURRENT_PET_SLOT = 4
     private const val SB_MENU_CURRENT_PET_SLOT = 30
@@ -255,7 +255,7 @@ object PetStorageApi {
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         when (event.clickedButton) {
             1 -> { // Right click - remove pet from menu
-                petStorage?.removeIf { it.uuid == petInfo.uniqueId }
+                petStorage?.pets?.removeIf { it.uuid == petInfo.uniqueId }
                 if (currentPetUuid == petInfo.uniqueId) {
                     ProfileStorageData.profileSpecific?.currentPetUuid = null
                 }
@@ -277,6 +277,7 @@ object PetStorageApi {
         event.readPetsMenuItems()
         event.readEquipmentPetData()
         event.readSelectedPetData()
+        event.readExpSharePets()
     }
 
     private fun InventoryFullyOpenedEvent.readPetsMenuItems() {
@@ -297,9 +298,9 @@ object PetStorageApi {
         }.forEach { data ->
             // Because this inventory is the "source of truth", if we come across the same UUID
             // we should always replace the data in-place
-            petStorage.indexOfFirstOrNull { it.uuid == data.uuid }?.let {
-                petStorage[it] = data
-            } ?: petStorage.add(data)
+            petStorage.pets.indexOfFirstOrNull { it.uuid == data.uuid }?.let {
+                petStorage.pets[it] = data
+            } ?: petStorage.pets.add(data)
         }
 
         saveConfig()
@@ -321,9 +322,9 @@ object PetStorageApi {
             uuid = petInfo.uniqueId,
         )
 
-        petStorage.indexOfFirstOrNull { it.uuid == petInfo.uniqueId }?.let {
-            petStorage[it] = data
-        } ?: petStorage.add(data)
+        petStorage.pets.indexOfFirstOrNull { it.uuid == petInfo.uniqueId }?.let {
+            petStorage.pets[it] = data
+        } ?: petStorage.pets.add(data)
 
         CurrentPetApi.assertFoundCurrentData(data, CurrentPetApi.PetDataAssertionSource.MENU)
         saveConfig()
@@ -382,6 +383,20 @@ object PetStorageApi {
         }
     }
 
+    private fun InventoryFullyOpenedEvent.readExpSharePets() {
+        if (inventoryName != "Exp Sharing") return
+        val petStorage = petStorage ?: return
+        petStorage.expSharePets.clear()
+        petStorage.expSharePets.addAll(
+            listOf(30, 31, 32).map { expShareSlot ->
+                val slotItem = inventoryItems[expShareSlot]?.takeIf {
+                    it.displayName != "§7No pet in slot"
+                } ?: return@map null
+                slotItem.getPetInfo()?.uniqueId
+            }
+        )
+    }
+
     fun resolvePetDataOrNull(
         name: String,
         rarity: LorenzRarity? = null,
@@ -390,7 +405,7 @@ object PetStorageApi {
         level: Int? = null,
         exp: Double? = null,
         expErrorFactor: Double = 0.01,
-    ): PetData? = petStorage?.filter {
+    ): PetData? = petStorage?.pets?.filter {
         it.uuid != null
     }?.takeIfNotEmpty()?.firstUniqueByOrNull(
         { it.cleanName == name },

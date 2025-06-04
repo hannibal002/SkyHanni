@@ -83,11 +83,10 @@ object CurrentPetApi {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("CurrentPetApi")
         event.addIrrelevant {
-            val info = when (currentPet) {
+            val mainPetInfo = when (currentPet) {
                 null -> "no pet equipped"
                 else -> "currentPet:\n\n$currentPet"
             }
-            add(info)
         }
     }
 }
