@@ -313,7 +313,11 @@ object CurrentPetDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (RiftApi.inRift() || !config.enabled.get()) return
-        petOverlay = CurrentPetApi.currentPet?.buildRenderable()
+        val currentPet = CurrentPetApi.currentPet ?: run {
+            lastPetHash = 0
+            return
+        }
+        petOverlay = currentPet.buildRenderable()
         petOverlay?.let {
             config.position.renderRenderable(it, posLabel = "Current Pet")
         }
