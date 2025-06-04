@@ -1527,3 +1527,8 @@ at/hannibal2/skyhanni/utils/repopatterns/RepoPatternDump.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
 at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
+at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderDispatcher.java
+at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent.kt
+at/hannibal2/skyhanni/mixins/hooks/EntityRenderDispatcherHook.kt
+at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderer.java
+at.hannibal2.skyhanni.features.slayer.HideMobNames.kt

@@ -10,8 +10,8 @@ net.minecraft.network.chat.Style net.minecraft.util.ChatStyle returnThis() creat
 
 net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.network.play.server.S3BPacketScoreboardObjective displayName.formattedTextCompat() func_149337_d() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
-net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.formattedTextCompat() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.formattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.formattedTextCompatLessResets() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.formattedTextCompatLessResets() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer name.formattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 

@@ -44,6 +44,9 @@ fun IChatComponent.unformattedTextCompat(): String =
 //$$ iterator().map { it.unformattedTextForChatCompat() }.joinToString(separator = "")
 //#endif
 
+// has to be a separate function for pattern mappings
+fun IChatComponent?.formattedTextCompatLessResets(): String = this.formattedTextCompat(true)
+
 @JvmOverloads
 @Suppress("unused")
 fun IChatComponent?.formattedTextCompat(noExtraResets: Boolean = false): String =
