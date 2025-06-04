@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
-//#if TODO
 import at.hannibal2.skyhanni.data.GuiData
-//#endif
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
@@ -322,9 +320,7 @@ interface Renderable {
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null
-                    //#if TODO
                     || GuiData.preDrawEventCancelled
-                //#endif
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 

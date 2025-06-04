@@ -256,7 +256,7 @@ class ComponentSpan internal constructor(
         parent.chatStyle = defaultStyleConstructor
         for ((component, start, end) in sampleSlicedComponents()) {
             val copy = component.unformattedTextForChat.substring(start, end).asComponent()
-            //#if TODO
+            //#if MC < 1.21
             copy.chatStyle = component.chatStyle.createDeepCopy()
             //#else
             //$$ copy.style = component.style

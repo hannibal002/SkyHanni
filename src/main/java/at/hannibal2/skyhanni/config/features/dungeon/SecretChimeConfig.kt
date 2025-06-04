@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-//#if TODO
 import at.hannibal2.skyhanni.features.dungeon.DungeonSecretChime
-//#endif
 import at.hannibal2.skyhanni.utils.OSUtils
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -13,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo 1.21 impl needed
 class SecretChimeConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Play a sound effect when a secret is found.")
@@ -59,9 +56,7 @@ class SecretChimeConfig {
     @ConfigEditorButton(buttonText = "OPEN")
     var soundsListURL: Runnable = Runnable(OSUtils::openSoundsListInBrowser)
 
-    //#if TODO
     @ConfigOption(name = "Play Sound", desc = "Plays current secret chime sound.")
     @ConfigEditorButton(buttonText = "Play")
     var checkSound: Runnable = Runnable(DungeonSecretChime::playSound)
-    //#endif
 }

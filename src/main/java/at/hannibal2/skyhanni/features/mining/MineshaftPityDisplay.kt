@@ -24,11 +24,11 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.annotations.Expose
-import net.minecraft.block.BlockStone
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 
@@ -337,7 +337,7 @@ object MineshaftPityDisplay {
             "Titanium",
             listOf(OreType.TITANIUM),
             8,
-            ItemStack(Blocks.stone, 1, BlockStone.EnumType.DIORITE_SMOOTH.metadata),
+            BlockCompat.createSmoothDiorite()
         ),
         ;
 
