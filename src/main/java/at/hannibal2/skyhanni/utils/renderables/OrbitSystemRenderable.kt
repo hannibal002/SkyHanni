@@ -13,10 +13,6 @@ enum class OrbitDirection { CLOCKWISE, COUNTER_CLOCKWISE }
 class OrbitSystemRenderable(
     private val mainBody: Renderable,
     /**
-     * How large subBodies should be in relation to the main renderable.
-     */
-    private val subBodyScale: Float = 0.4f,
-    /**
      * Spacing between the main body and sub bodies.
      */
     private val subBodySpacing: Int = 1,
@@ -29,8 +25,8 @@ class OrbitSystemRenderable(
     val subBodies: Collection<Renderable>,
 ) : Renderable {
 
-    private val subBodyW = (subBodies.maxOfOrNull { it.width } ?: 0) * subBodyScale
-    private val subBodyH = (subBodies.maxOfOrNull { it.height } ?: 0) * subBodyScale
+    private val subBodyW = (subBodies.maxOfOrNull { it.width } ?: 0)
+    private val subBodyH = (subBodies.maxOfOrNull { it.height } ?: 0)
 
     override val width: Int
         get() = (mainBody.width + subBodyW + subBodySpacing).toInt()
@@ -67,8 +63,8 @@ class OrbitSystemRenderable(
 
             // world‐space coords of the top-left of the scaled sub-body,
             // so that sub.render(0,0) (which draws at 0,0) ends up centered.
-            val drawX = centerX + dx - (subBody.width * subBodyScale) / 2f
-            val drawY = centerY + dy - (subBody.height * subBodyScale) / 2f
+            val drawX = centerX + dx - (subBody.width) / 2f
+            val drawY = centerY + dy - (subBody.height) / 2f
 
             val mainBodyHovered = mainBody.isHovered((posX + drawX).toInt(), (posY + drawY).toInt())
             val (fPosX, fPosY) = if (mainBodyHovered) {
@@ -77,7 +73,6 @@ class OrbitSystemRenderable(
 
             DrawContextUtils.pushPop {
                 DrawContextUtils.translate(drawX, drawY, 0f)
-                DrawContextUtils.scale(subBodyScale, subBodyScale, 1f)
                 subBody.render(fPosX, fPosY)
             }
         }

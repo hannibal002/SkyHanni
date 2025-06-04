@@ -20,12 +20,11 @@ object OrbitalTest {
                 backgroundColor = Color.BLUE.toChromaColor(255),
                 radius = 10,
             ),
-            subBodyScale = 0.5f,
             subBodies = listOf(
-                CircularRenderable(backgroundColor = Color.RED.toChromaColor(255), radius = 10),
-                CircularRenderable(backgroundColor = Color.GREEN.toChromaColor(255), radius = 10),
-                CircularRenderable(backgroundColor = Color.YELLOW.toChromaColor(255), radius = 10),
-                CircularRenderable(backgroundColor = Color.ORANGE.toChromaColor(255), radius = 10),
+                CircularRenderable(backgroundColor = Color.RED.toChromaColor(255), radius = 5),
+                CircularRenderable(backgroundColor = Color.GREEN.toChromaColor(255), radius = 5),
+                CircularRenderable(backgroundColor = Color.YELLOW.toChromaColor(255), radius = 5),
+                CircularRenderable(backgroundColor = Color.ORANGE.toChromaColor(255), radius = 5),
             ),
             orbitSpeed = 40,
         )
