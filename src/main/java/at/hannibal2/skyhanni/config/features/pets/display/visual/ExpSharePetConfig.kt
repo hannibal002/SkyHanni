@@ -59,7 +59,7 @@ class ExpSharePetConfig {
     @Expose
     @ConfigOption(
         name = "Active Slots Only",
-        desc = "Only show pets from Exp Share slots if that slot is unlocked by Diana's Sharing is §dCaring §7Perk."
+        desc = "Only show pets from Exp Share slots if that slot is unlocked by Diana's §dSharing is Caring §7Perk."
     )
     @ConfigEditorBoolean
     val activeSlotsOnly: Property<Boolean> = Property.of(true)
