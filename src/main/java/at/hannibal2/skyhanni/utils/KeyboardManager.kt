@@ -13,10 +13,10 @@ import net.minecraft.client.settings.KeyBinding
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
+import io.github.notenoughupdates.moulconfig.common.IMinecraft
 //#if MC < 1.21
 import at.hannibal2.skyhanni.data.model.TextInput
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-import io.github.notenoughupdates.moulconfig.internal.KeybindHelper
 import org.lwjgl.input.Mouse
 //#else
 //$$ import net.minecraft.client.util.InputUtil
@@ -223,11 +223,7 @@ object KeyboardManager {
         false
     }
 
-    //#if MC < 1.21
-    fun getKeyName(keyCode: Int): String = KeybindHelper.getKeyName(keyCode)
-    //#else
-    //$$ fun getKeyName(keyCode: Int): String = InputUtil.fromKeyCode(keyCode, keyCode).localizedText.unformattedTextCompat()
-    //#endif
+    fun getKeyName(keyCode: Int): String = IMinecraft.instance.getKeyName(keyCode)
 
     object WasdInputMatrix : Iterable<KeyBinding> {
         operator fun contains(keyBinding: KeyBinding) = when (keyBinding) {
