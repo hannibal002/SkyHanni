@@ -32,6 +32,9 @@ class PetDataStorage {
     class ProfileSpecific {
         @Expose
         val pets: MutableList<PetData> = mutableListOf()
+
+        @Expose
+        val expSharePets: MutableList<UUID?> = mutableListOf()
     }
 }
 
