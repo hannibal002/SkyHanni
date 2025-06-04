@@ -44,10 +44,11 @@ object LineToMobHandler {
         if (lines.isEmpty()) return
 
         val playerLocation = event.exactPlayerEyeLocation()
-        LineDrawer.draw3D(event) {
-            for ((mob, settings) in lines) {
-                if (!settings.condition() || !mob.canBeSeen()) continue
-                draw3DLine(mob.centerCords, playerLocation, settings.color, settings.width, settings.depth)
+
+        for ((mob, settings) in lines) {
+            if (!settings.condition() || !mob.canBeSeen()) continue
+            LineDrawer.draw3D(event, settings.width, settings.depth) {
+                draw3DLine(mob.centerCords, playerLocation, settings.color)
             }
         }
     }
