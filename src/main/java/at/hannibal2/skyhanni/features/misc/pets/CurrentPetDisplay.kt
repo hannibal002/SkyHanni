@@ -297,69 +297,9 @@ object CurrentPetDisplay {
 
     @HandleEvent
     fun onConfigLoad() {
-
-        ConditionalUtils.onToggleAll(
-            config,
-        ) { lastPetHash = 0 }
-
-        /* ConditionalUtils.onToggle(
-            config.enabled,
-
-            config.visual.icon,
-            config.visual.rarityBackground,
-            config.visual.xpRing,
-            config.visual.separatorRing,
-            config.visual.iconScale,
-            config.visual.skinAnimation,
-            config.visual.iconSpin.direction,
-            config.visual.iconSpin.frequency,
-
-            customizationConfig.separatorRing.padding,
-            customizationConfig.separatorRing.color,
-
-            customizationConfig.xpRing.padding,
-            customizationConfig.xpRing.filledColor,
-            customizationConfig.xpRing.unfilledColor,
-
-            customizationConfig.rarityBackground.padding,
-            customizationConfig.rarityBackground.commonColor,
-            customizationConfig.rarityBackground.uncommonColor,
-            customizationConfig.rarityBackground.rareColor,
-            customizationConfig.rarityBackground.epicColor,
-            customizationConfig.rarityBackground.legendaryColor,
-            customizationConfig.rarityBackground.mythicColor,
-
-            customizationConfig.expSharePet.displayCustomization.iconSpin.direction,
-            customizationConfig.expSharePet.displayCustomization.iconSpin.frequency,
-            customizationConfig.expSharePet.displayCustomization.rarityBackground.enabled,
-            customizationConfig.expSharePet.displayCustomization.rarityBackground.customization.padding,
-            customizationConfig.expSharePet.displayCustomization.rarityBackground.customization.commonColor,
-            customizationConfig.expSharePet.displayCustomization.rarityBackground.customization.uncommonColor,
-            customizationConfig.expSharePet.displayCustomization.rarityBackground.customization.rareColor,
-            customizationConfig.expSharePet.displayCustomization.rarityBackground.customization.epicColor,
-            customizationConfig.expSharePet.displayCustomization.rarityBackground.customization.legendaryColor,
-            customizationConfig.expSharePet.displayCustomization.rarityBackground.customization.mythicColor,
-            customizationConfig.expSharePet.displayCustomization.borderRing.enabled,
-            customizationConfig.expSharePet.displayCustomization.borderRing.customization.padding,
-            customizationConfig.expSharePet.displayCustomization.borderRing.customization.color,
-            customizationConfig.expSharePet.displayCustomization.iconScale,
-            customizationConfig.expSharePet.displayCustomization.skinAnimation,
-            customizationConfig.expSharePet.placement,
-            customizationConfig.expSharePet.subOrbit.orbitDistance,
-            customizationConfig.expSharePet.subOrbit.orbitDirection,
-            customizationConfig.expSharePet.subOrbit.orbitSpeed,
-            customizationConfig.expSharePet.activeSlotsOnly,
-
-            config.text.enabledTexts,
-            config.text.nameLevel,
-            config.text.nameSkinSymbol,
-            config.text.textLabels,
-            config.text.nextLevelPercent,
-            config.text.xpFormat,
-            config.text.textLocation,
-            config.text.verticalAlign,
-            config.text.horizontalAlign,
-        )*/
+        ConditionalUtils.onToggleAll(config) {
+            lastPetHash = 0
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
