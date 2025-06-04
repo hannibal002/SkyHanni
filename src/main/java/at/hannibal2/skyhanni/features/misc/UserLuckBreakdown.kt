@@ -43,7 +43,11 @@ object UserLuckBreakdown {
     private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
     private lateinit var fillerItem: ItemStack
+    //#if MC < 1.21
     private val fillerID = Item.getItemFromBlock(Blocks.stained_glass_pane)
+    //#else
+    //$$ private val fillerID = Blocks.GRAY_STAINED_GLASS_PANE.asItem()
+    //#endif
     private const val FILLER_NAME = " "
 
     private lateinit var limboItem: ItemStack

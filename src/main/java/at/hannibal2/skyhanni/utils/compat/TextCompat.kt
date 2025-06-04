@@ -8,6 +8,8 @@ import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
 //#if MC < 1.16
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import net.minecraft.util.ChatComponentText
+
 //#endif
 //#if MC > 1.16
 //$$ import net.minecraft.ChatFormatting
@@ -283,3 +285,19 @@ fun HoverEvent.value(): IChatComponent {
     //$$ }
     //#endif
 }
+
+//#if MC < 1.21
+fun createHoverEvent(action: HoverEvent.Action?, component: ChatComponentText): HoverEvent? {
+    if (action == null) return null
+    return HoverEvent(action, component)
+}
+//#else
+//$$ fun createHoverEvent(action: HoverEvent.Action?, component: MutableText): HoverEvent? {
+//$$     if (action == null) return null
+//$$     when (action) {
+//$$         HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
+//$$         // i really dont think anyone is using the other 2 lol
+//$$         else -> return null
+//$$     }
+//$$ }
+//#endif

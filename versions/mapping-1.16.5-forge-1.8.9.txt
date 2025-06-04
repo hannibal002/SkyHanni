@@ -15,6 +15,7 @@ io.github.notenoughupdates.moulconfig.gui.GuiElementWrapper io.github.notenoughu
 
 net.minecraft.ChatFormatting net.minecraft.util.EnumChatFormatting
 
+net.minecraft.block.ButtonBlock net.minecraft.block.BlockButtonWood
 net.minecraft.block.ChestBlock net.minecraft.block.BlockChest
 
 net.minecraft.client.KeyMapping net.minecraft.client.settings.KeyBinding
@@ -51,6 +52,8 @@ net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNe
 net.minecraft.client.gui.components.Widget net.minecraft.client.gui.GuiButton
 
 net.minecraft.client.gui.components.ChatComponent allMessages chatLines
+net.minecraft.client.gui.components.ChatComponent getLinesPerPage() getLineCount()
+net.minecraft.client.gui.components.ChatComponent getScale() getChatScale()
 net.minecraft.client.gui.components.ChatComponent getWidth() getChatWidth()
 net.minecraft.client.gui.components.ChatComponent rescaleChat() refreshChat()
 net.minecraft.client.gui.components.ChatComponent trimmedMessages drawnChatLines
@@ -283,6 +286,7 @@ net.minecraft.sounds.SoundSource net.minecraft.client.audio.SoundCategory
 net.minecraft.util.Mth net.minecraft.util.MathHelper
 
 net.minecraft.util.Mth clamp() clamp_int()
+net.minecraft.util.Mth floor() floor_float()
 
 net.minecraft.world.SimpleContainer net.minecraft.client.player.inventory.ContainerLocalMenu
 
@@ -438,6 +442,7 @@ net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack
 net.minecraft.world.item.Items net.minecraft.init.Items
 
 net.minecraft.world.item.DyeColor LIGHT_GRAY SILVER
+net.minecraft.world.item.DyeColor getId() getMetadata()
 
 net.minecraft.world.item.Item byBlock() getItemFromBlock()
 

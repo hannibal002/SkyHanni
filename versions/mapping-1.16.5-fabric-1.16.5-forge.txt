@@ -81,3 +81,4 @@ net.minecraft.world.EntityView net.minecraft.world.level.EntityGetter
 net.minecraft.world.EntityView getPlayerByUuid() getPlayerByUUID()
 
 net.minecraft.world.phys.HitResult getPos() getLocation()
+

@@ -4,9 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
-//#endif
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
@@ -82,7 +80,6 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
-// todo 1.21 impl needed
 // TODO split into smaller sub classes
 @Suppress("LargeClass")
 object EstimatedItemValueCalculator {
@@ -731,9 +728,7 @@ object EstimatedItemValueCalculator {
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
             }
-            //#if TODO
             if (rawName in DiscordRPCManager.stackingEnchants.keys) level = 1
-            //#endif
 
             val enchantmentName = "$rawName;$level".toInternalName()
 

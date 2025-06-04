@@ -6,7 +6,11 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
+//#if MC < 1.21
+import net.minecraft.block.BlockCarpet
+//#endif
 
 /**
  * Enum class that represents colored blocks in Minecraft, stained clay, wool, stained-glass, and stained-glass panes.
@@ -210,12 +214,38 @@ enum class ColoredBlockCompat(
         //$$ return ItemStack(woolBlock, amount)
         //#endif
     }
+
+    fun createWoolBlockState(): IBlockState {
+        //#if MC < 1.16
+        val wool = Blocks.wool.defaultState
+        return wool.withProperty(BlockCarpet.COLOR, getDyeColor())
+        //#else
+        //$$ return this.woolBlock.defaultState
+        //#endif
+    }
+
+    fun createGlassBlockState(state: IBlockState? = null): IBlockState {
+        //#if MC < 1.16
+        val newState = state ?: Blocks.stained_glass.defaultState
+        return newState.withProperty(BlockCarpet.COLOR, getDyeColor())
+        //#else
+        //$$ return this.glassBlock.defaultState
+        //#endif
+    }
+
     fun createStainedClay(amount: Int = 1): ItemStack {
         //#if MC < 1.16
         return ItemStack(Blocks.stained_hardened_clay, amount, metaColor)
         //#else
         //$$ return ItemStack(clayBlock, amount)
         //#endif
+    }
+
+    fun getDyeColor(): EnumDyeColor {
+        for (entry in EnumDyeColor.entries) {
+            if (entry.metadata == this.metaColor) return entry
+        }
+        return EnumDyeColor.WHITE
     }
 
     companion object {
@@ -341,6 +371,13 @@ enum class ColoredBlockCompat(
             //$$     block.glassBlock == this.block || block.glassPaneBlock == this.block || block.woolBlock == this.block || block.clayBlock == this.block
             //$$ }?.color ?: LorenzColor.WHITE
             //#endif
+        }
+
+        fun fromMeta(meta: Int): ColoredBlockCompat {
+            for (entry in entries) {
+                if (entry.metaColor == meta) return entry
+            }
+            return WHITE
         }
     }
 }
