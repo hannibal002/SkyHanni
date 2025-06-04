@@ -1567,3 +1567,15 @@ at.hannibal2.skyhanni.features.misc.trevor.TrapperMobArea.kt
 at.hannibal2.skyhanni.features.misc.trevor.TrevorMob.kt
 at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeReset.kt
 at.hannibal2.skyhanni.features.mining.PowderPerHotmPerk.kt
+at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager.kt
+at/hannibal2/skyhanni/features/misc/discordrpc/DiscordStatus.kt
+at.hannibal2.skyhanni.features.misc.discordrpc.DiscordLocationKey.kt
+at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList.kt
+at.hannibal2.skyhanni.features.misc.compacttablist.TabLine.kt
+at.hannibal2.skyhanni.features.misc.compacttablist.TabStringType.kt
+at.hannibal2.skyhanni.features.misc.compacttablist.TabListReader.kt
+at.hannibal2.skyhanni.features.misc.compacttablist.RenderColumn.kt
+at.hannibal2.skyhanni.features.misc.compacttablist.TabColumn.kt
+at.hannibal2.skyhanni.features.misc.compacttablist.TabSection.kt
+at.hannibal2.skyhanni.features.misc.compacttablist.TabListRenderer.kt
+at.hannibal2.skyhanni.events.SkipTabListLineEvent.kt
