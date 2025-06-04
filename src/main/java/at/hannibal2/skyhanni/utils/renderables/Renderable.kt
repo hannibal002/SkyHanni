@@ -406,6 +406,7 @@ interface Renderable {
             bottomLayer: Renderable,
             topLayer: Renderable,
             blockBottomHover: Boolean = true,
+            topLayerTranslation: Float = 0f,
         ) = object : Renderable {
             override val width = bottomLayer.width
             override val height = bottomLayer.height
@@ -413,8 +414,12 @@ interface Renderable {
             override val verticalAlign = bottomLayer.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
-                val (nPosX, nPosY) = if (topLayer.isHovered(posX + x, posY + y) && blockBottomHover) {
+                var topHovered = false
+                DrawContextUtils.translated(0f, 0f, topLayerTranslation) {
+                    val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
+                    topHovered = topLayer.isHovered(posX + x, posY + y)
+                }
+                val (nPosX, nPosY) = if (topHovered && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
                     posX to posY

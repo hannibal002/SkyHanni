@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayCon
 import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetDisplayConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.RarityBackgroundConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualCustomizationConfig
+import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils
@@ -34,9 +35,11 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.AnimatedItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackAnimationFrame
+import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.renderables.item.ItemStackRotationDefinition
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.util.EnumFacing
+import java.util.UUID
 
 typealias TElement = TextPetDisplayConfig.TextElement
 typealias TLO = TextPetDisplayConfig.TextLocationOption
@@ -48,8 +51,7 @@ typealias EXPShareGO = ExpSharePetDisplayConfig.GroupOrientation
 object CurrentPetDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.pets.display
-    private val customizationConfig get() = config.visual.customization
-    private val expShareConfig get() = customizationConfig.expSharePet
+    private val expShareConfig get() = config.visual.expSharePetCustomization
     private var lastPetHash: Int = 0
     private var petOverlay: Renderable? = null
     private val EXP_SHARE = "PET_ITEM_EXP_SHARE".toInternalName()
@@ -78,10 +80,17 @@ object CurrentPetDisplay {
             skinAnimation = config.visual.skinAnimation.get(),
         )
 
+        val petItemEnabled = config.visual.petItem.get()
+        val petItemWrappedRenderable = baseItemRenderable.wrapInPetItemOrSelf(
+            enabled = petItemEnabled,
+            petData = this,
+            petItemConfig = config.visual.petItemCustomization,
+        )
+
         val backgroundEnabled = config.visual.rarityBackground.get()
-        val backgroundWrappedRenderable = baseItemRenderable.wrapInBackgroundColorOrSelf(
+        val backgroundWrappedRenderable = petItemWrappedRenderable.wrapInBackgroundColorOrSelf(
             enabled = backgroundEnabled,
-            backgroundConfig = customizationConfig.rarityBackground,
+            backgroundConfig = config.visual.rarityBackgroundCustomization,
             rarity = rarity,
         )
 
@@ -89,26 +98,26 @@ object CurrentPetDisplay {
         val xpRingEnabled = config.visual.xpRing.get()
         val separatorWrappedRenderable = backgroundWrappedRenderable.wrapInRingOrSelf(
             enabled = backgroundEnabled && xpRingEnabled && separatorEnabled,
-            ringConfig = customizationConfig.separatorRing
+            ringConfig = config.visual.separatorRingCustomization
         )
 
         val shouldUseXpRing = backgroundEnabled && xpRingEnabled
         val xpRingWrappedRenderable = if (!shouldUseXpRing) separatorWrappedRenderable else CircularContainerRenderable(
             separatorWrappedRenderable,
-            backgroundColor = customizationConfig.xpRing.filledColor.get(),
-            unfilledColor = customizationConfig.xpRing.unfilledColor.get(),
+            backgroundColor = config.visual.xpRingCustomization.filledColor.get(),
+            unfilledColor = config.visual.xpRingCustomization.unfilledColor.get(),
             filledPercentage = levelProgressionPercentage,
-            padding = customizationConfig.xpRing.padding.get(),
+            padding = config.visual.xpRingCustomization.padding.get(),
         )
 
         return xpRingWrappedRenderable
     }
 
-    private fun Renderable.wrapInExpShareIconsOrSelf(): Renderable {
+    private fun Renderable.wrapInExpShareIconsOrSelf(currentPetUuid: UUID): Renderable {
         if (!config.visual.expSharePet.get()) return this
         val storage = ProfileStorageData.petProfiles ?: return this
         val expShareRenderables = storage.pets.filter {
-            it.uuid in storage.expSharePets || it.heldItemInternalName == EXP_SHARE
+            it.uuid != currentPetUuid && it.uuid in storage.expSharePets || it.heldItemInternalName == EXP_SHARE
         }.map { it.buildExpShareIconRenderable() }.takeIfNotEmpty() ?: return this
 
         return when (val placement: EXPSharePlace = expShareConfig.placement.get()) {
@@ -194,12 +203,27 @@ object CurrentPetDisplay {
 
     private fun Renderable.wrapInRingOrSelf(
         enabled: Boolean,
-        ringConfig: VisualCustomizationConfig.RingConfig,
+        ringConfig: VisualPetDisplayConfig.RingConfig,
     ): Renderable = if (!enabled) this else CircularContainerRenderable(
         this,
         ringConfig.color.get(),
         padding = ringConfig.padding.get(),
     )
+
+    private fun Renderable.wrapInPetItemOrSelf(
+        enabled: Boolean,
+        petData: PetData,
+        petItemConfig: VisualPetDisplayConfig.PetItemConfig,
+    ): Renderable {
+        if (!enabled) return this
+        val petItemRenderable = ItemStackRenderable(
+            petData.heldItemInternalName?.getItemStackOrNull() ?: return this,
+            scale = petItemConfig.scale.get().toDouble(),
+            horizontalAlign = petItemConfig.placement.get().horizontal,
+            verticalAlign = petItemConfig.placement.get().vertical,
+        )
+        return Renderable.doubleLayered(this, petItemRenderable, topLayerTranslation = 30f)
+    }
 
     private fun PetData.buildBaseItemRenderable(
         spinDirection: OrbitDirection,
@@ -284,9 +308,9 @@ object CurrentPetDisplay {
 
     private fun PetData.buildRenderable(): Renderable? {
         lastPetHash = this.hashCode().takeIf { it != lastPetHash } ?: return petOverlay
-        CurrentPetApi.currentPet ?: return null
+        val currentPetUuid = CurrentPetApi.currentPet?.uuid ?: return null
 
-        val itemRenderable = buildMainIconRenderableOrNull()?.wrapInExpShareIconsOrSelf()
+        val itemRenderable = buildMainIconRenderableOrNull()?.wrapInExpShareIconsOrSelf(currentPetUuid)
         val textRenderable = buildTextRenderableOrNull()
 
         return if (itemRenderable != null && textRenderable != null) {

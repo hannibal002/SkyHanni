@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.pets.display.visual
 
-import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualCustomizationConfig.RingConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -55,7 +54,7 @@ class ExpSharePetDisplayConfig {
         @Expose
         @ConfigOption(name = "Customization", desc = "")
         @Accordion
-        val customization: RingConfig = RingConfig()
+        val customization: VisualPetDisplayConfig.RingConfig = VisualPetDisplayConfig.RingConfig()
     }
 
     @Expose
