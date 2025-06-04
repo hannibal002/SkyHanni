@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -42,6 +43,14 @@ class ExpSharePetDisplayConfig {
         @ConfigOption(name = "Enabled", desc = "Display a border ring around the background color")
         @ConfigEditorBoolean
         val enabled: Property<Boolean> = Property.of(true)
+
+        @ConfigOption(
+            name = "Note",
+            desc = "§eDue to the complexities of calculating Exp Share XP, you cannot currently have " +
+                "the pets' level displayed in the ring. This may come in the future."
+        )
+        @ConfigEditorInfoText
+        val note: String = ""
 
         @Expose
         @ConfigOption(name = "Customization", desc = "")

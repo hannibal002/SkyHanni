@@ -108,16 +108,23 @@ object CurrentPetDisplay {
         val storage = ProfileStorageData.petProfiles ?: return this
         val expShareRenderables = storage.pets.filter {
             it.uuid in storage.expSharePets || it.heldItemInternalName == EXP_SHARE
-        }.mapNotNull { it.buildExpShareIconRenderableOrNull() }.takeIfNotEmpty() ?: return this
+        }.map { it.buildExpShareIconRenderable() }.takeIfNotEmpty() ?: return this
 
         return when (val placement: EXPSharePlace = expShareConfig.placement.get()) {
-            EXPSharePlace.ORBIT -> OrbitSystemRenderable(
-                this,
-                subBodySpacing = expShareConfig.subOrbit.orbitDistance.get(),
-                orbitSpeed = expShareConfig.subOrbit.orbitSpeed.get(),
-                orbitDirection = expShareConfig.subOrbit.orbitDirection.get(),
-                subBodies = expShareRenderables,
-            )
+            EXPSharePlace.ORBIT -> {
+                val orbitDirection = expShareConfig.subOrbit.orbitDirection.get()
+                val orbitSpeed = when (orbitDirection) {
+                    OrbitDirection.NONE -> 0
+                    else -> expShareConfig.subOrbit.orbitSpeed.get()
+                }
+                OrbitSystemRenderable(
+                    this,
+                    subBodySpacing = expShareConfig.subOrbit.orbitDistance.get(),
+                    orbitSpeed = orbitSpeed,
+                    orbitDirection = orbitDirection,
+                    subBodies = expShareRenderables,
+                )
+            }
             else -> {
                 val expShareOrientation: EXPShareGO = expShareConfig.displayCustomization.groupOrientation.get()
                 val expShareContainer = when (expShareOrientation) {
@@ -150,7 +157,7 @@ object CurrentPetDisplay {
         }
     }
 
-    private fun PetData.buildExpShareIconRenderableOrNull(): Renderable? {
+    private fun PetData.buildExpShareIconRenderable(): Renderable {
         val baseItemRenderable = buildBaseItemRenderable(
             spinDirection = expShareConfig.displayCustomization.iconSpin.direction.get(),
             spinFrequency = expShareConfig.displayCustomization.iconSpin.frequency.get(),
