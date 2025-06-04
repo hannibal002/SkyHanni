@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.player.Action
 import at.hannibal2.skyhanni.events.player.PlayerInteractionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -30,8 +31,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -44,6 +43,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
@@ -54,7 +54,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
 
 @SkyHanniModule
 object MinionFeatures {
@@ -116,9 +115,14 @@ object MinionFeatures {
     @HandleEvent
     fun onPlayerInteraction(event: PlayerInteractionEvent) {
         if (!isEnabled()) return
-        if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) return
+        if (event.action != Action.RIGHT_CLICK_BLOCK) return
 
-        val lookingAt = event.pos?.offset(event.face)?.toLorenzVec() ?: return
+        //#if MC < 1.21
+        val vec = event.face
+        //#else
+        //$$ val vec = event.face?.vector
+        //#endif
+        val lookingAt = event.pos?.offset(vec)?.toLorenzVec() ?: return
         val equipped = InventoryUtils.getItemInHand() ?: return
 
         if (equipped.displayName.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.air) {
@@ -202,7 +206,7 @@ object MinionFeatures {
 
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
-        if (!minions.contains(entity) && LorenzUtils.skyBlockIsland != IslandType.HUB) {
+        if (!minions.contains(entity) && SkyBlockUtils.currentIsland != IslandType.HUB) {
             MinionFeatures.minions = minions.editCopy {
                 this[entity] = ProfileSpecificStorage.MinionConfig().apply {
                     displayName = name
@@ -223,7 +227,7 @@ object MinionFeatures {
     }
 
     fun removeBuggedMinions(isCommand: Boolean = false) {
-        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
+        if (!IslandType.PRIVATE_ISLAND.isCurrent()) return
         val minions = minions ?: return
 
         val removedEntities = mutableListOf<LorenzVec>()
@@ -264,7 +268,7 @@ object MinionFeatures {
         lastInventoryClosed = System.currentTimeMillis()
 
         MinionCloseEvent().post()
-        if (IslandType.PRIVATE_ISLAND.isInIsland()) {
+        if (IslandType.PRIVATE_ISLAND.isCurrent()) {
             val location = lastMinion ?: return
 
             if (location !in minions) {
@@ -409,9 +413,9 @@ object MinionFeatures {
         }
     }
 
-    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland()
+    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isCurrent()
 
-    private fun enableWithHub() = isEnabled() || IslandType.HUB.isInIsland()
+    private fun enableWithHub() = isEnabled() || IslandType.HUB.isCurrent()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
