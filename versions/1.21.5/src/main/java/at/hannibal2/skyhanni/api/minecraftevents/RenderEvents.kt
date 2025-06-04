@@ -9,6 +9,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.LayeredDrawerWrapper
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderTickCounter
+import net.minecraft.client.render.VertexConsumerProvider
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 
 
@@ -22,7 +24,9 @@ object RenderEvents {
 
         // SkyHanniRenderWorldEvent
         WorldRenderEvents.AFTER_TRANSLUCENT.register { event ->
-            SkyHanniRenderWorldEvent(event, event.tickCounter().getTickProgress(true)).post()
+            val immediateVertexConsumers = event.consumers() as? VertexConsumerProvider.Immediate ?: return@register
+            val stack = event.matrixStack() ?: MatrixStack()
+            SkyHanniRenderWorldEvent(stack, event.camera(), immediateVertexConsumers, event.tickCounter().getTickProgress(true)).post()
         }
 
         // ScreenDrawnEvent

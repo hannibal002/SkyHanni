@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWaypointFilled
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWireframeBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -466,14 +465,6 @@ object RenderUtils {
         return WorldRenderUtils.exactLocation(entity, partialTicks)
     }
 
-    @Deprecated("Use WorldRenderUtils' drawWireframeBoundingBox instead")
-    fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
-        aabb: AxisAlignedBB,
-        color: Color,
-    ) {
-        _drawWireframeBoundingBox(aabb, color)
-    }
-
     @Deprecated("Use WorldRenderUtils' draw3DPathWithWaypoint instead")
     fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
         path: Graph,
@@ -541,11 +532,11 @@ object RenderUtils {
     @Deprecated("Use WorldRenderUtils' drawHitbox instead")
     fun SkyHanniRenderWorldEvent.drawHitbox(
         boundingBox: AxisAlignedBB,
-        lineWidth: Int,
         color: Color,
-        depth: Boolean,
+        lineWidth: Int = 3,
+        depth: Boolean = true,
     ) {
-        _drawHitbox(boundingBox, lineWidth, color, depth)
+        _drawHitbox(boundingBox, color, lineWidth, depth)
     }
 
     fun chromaColor(

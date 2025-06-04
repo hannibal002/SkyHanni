@@ -61,7 +61,7 @@ class LivingCaveSnake(
             } else head
             event.renderBlock(location)
         }
-        LineDrawer.draw3D(event.partialTicks) {
+        LineDrawer.draw3D(event) {
             for (block in blocks) {
                 if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
                     continue

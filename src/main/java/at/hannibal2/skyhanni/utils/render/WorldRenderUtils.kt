@@ -805,7 +805,6 @@ object WorldRenderUtils {
                 val y4 = y + radius * cos(Math.PI * phi / segments)
                 val z4 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
-
                 worldrenderer.pos(x1, y1, z1).endVertex()
                 worldrenderer.pos(x2, y2, z2).endVertex()
 
@@ -897,11 +896,11 @@ object WorldRenderUtils {
         location: LorenzVec,
         text: String,
         scale: Double,
-        depthTest: Boolean,
+        seeThroughBlocks: Boolean,
         shadow: Boolean,
         yOff: Float,
     ) {
-        if (!depthTest) {
+        if (!seeThroughBlocks) {
             GL11.glDisable(GL11.GL_DEPTH_TEST)
             GL11.glDepthMask(false)
         }
@@ -923,112 +922,30 @@ object WorldRenderUtils {
         GlStateManager.rotate(renderManager.playerViewX, 1f, 0f, 0f)
         GlStateManager.scale(-scale / 25, -scale / 25, scale / 25)
         val stringWidth = fontRenderer.getStringWidth(text)
-        if (shadow) {
-            fontRenderer.drawStringWithShadow(
-                text,
-                (-stringWidth / 2).toFloat(),
-                yOff,
-                0,
-            )
-        } else {
-            fontRenderer.drawString(
-                text,
-                -stringWidth / 2,
-                0,
-                0,
-            )
-        }
+        fontRenderer.drawString(
+            text,
+            (-stringWidth / 2).toFloat(),
+            yOff,
+            0,
+            shadow,
+        )
         GlStateManager.color(1f, 1f, 1f)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
-        if (!depthTest) {
+        if (!seeThroughBlocks) {
             GL11.glEnable(GL11.GL_DEPTH_TEST)
             GL11.glDepthMask(true)
         }
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawWireframeBoundingBox(
-        aabb: AxisAlignedBB,
-        color: Color,
-    ) {
-        drawWireframeBoundingBox(aabb, color)
-    }
-
-    fun SkyHanniRenderWorldEvent.drawWireframeBoundingBox(
-        aabb: AxisAlignedBB,
-        color: Color,
-    ) {
-        GlStateManager.enableBlend()
-        GlStateManager.disableLighting()
-        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
-        GlStateManager.disableTexture2D()
-        GlStateManager.disableCull()
-        val vp = getViewerPos(partialTicks)
-
-        val effectiveAABB = AxisAlignedBB(
-            aabb.minX - vp.x, aabb.minY - vp.y, aabb.minZ - vp.z,
-            aabb.maxX - vp.x, aabb.maxY - vp.y, aabb.maxZ - vp.z,
-        )
-        val tessellator = Tessellator.getInstance()
-        val worldRenderer = tessellator.worldRenderer
-
-        with(color) {
-            GlStateManager.color(red / 255f, green / 255f, blue / 255f, alpha / 255f)
-        }
-        // Bottom face
-        worldRenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
-        with(effectiveAABB) {
-            worldRenderer.pos(minX, minY, minZ).endVertex()
-            worldRenderer.pos(maxX, minY, minZ).endVertex()
-            worldRenderer.pos(maxX, minY, maxZ).endVertex()
-            worldRenderer.pos(minX, minY, maxZ).endVertex()
-        }
-        tessellator.draw()
-
-        // Top face
-        worldRenderer.begin(GL11.GL_LINE_LOOP, DefaultVertexFormats.POSITION)
-        with(effectiveAABB) {
-            worldRenderer.pos(minX, maxY, maxZ).endVertex()
-            worldRenderer.pos(maxX, maxY, maxZ).endVertex()
-            worldRenderer.pos(maxX, maxY, minZ).endVertex()
-            worldRenderer.pos(minX, maxY, minZ).endVertex()
-        }
-        tessellator.draw()
-
-
-        worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
-
-        with(effectiveAABB) {
-            worldRenderer.pos(minX, minY, minZ).endVertex()
-            worldRenderer.pos(minX, maxY, minZ).endVertex()
-
-            worldRenderer.pos(minX, minY, maxZ).endVertex()
-            worldRenderer.pos(minX, maxY, maxZ).endVertex()
-
-            worldRenderer.pos(maxX, minY, minZ).endVertex()
-            worldRenderer.pos(maxX, maxY, minZ).endVertex()
-
-            worldRenderer.pos(maxX, minY, maxZ).endVertex()
-            worldRenderer.pos(maxX, maxY, maxZ).endVertex()
-        }
-
-        tessellator.draw()
-
-        GlStateManager.enableTexture2D()
-        GlStateManager.enableCull()
-        GlStateManager.disableBlend()
-    }
-
-
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(partialTicks) {
+        LineDrawer.draw3D(this) {
             drawEdges(location, color, lineWidth, depth)
         }
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(partialTicks) {
+        LineDrawer.draw3D(this) {
             drawEdges(axisAlignedBB, color, lineWidth, depth)
         }
     }
@@ -1050,7 +967,7 @@ object WorldRenderUtils {
         color: Color,
         lineWidth: Int,
         depth: Boolean,
-    ) = LineDrawer.draw3D(partialTicks) {
+    ) = LineDrawer.draw3D(this) {
         draw3DLine(p1, p2, color, lineWidth, depth)
     }
 
@@ -1080,18 +997,18 @@ object WorldRenderUtils {
     @Deprecated("Do not use, use proper method instead")
     fun SkyHanniRenderWorldEvent._drawHitbox(
         boundingBox: AxisAlignedBB,
-        lineWidth: Int,
         color: Color,
-        depth: Boolean,
+        lineWidth: Int = 3,
+        depth: Boolean = true,
     ) {
-        drawHitbox(boundingBox, lineWidth, color, depth)
+        drawHitbox(boundingBox, color, lineWidth, depth)
     }
 
     fun SkyHanniRenderWorldEvent.drawHitbox(
         boundingBox: AxisAlignedBB,
-        lineWidth: Int,
         color: Color,
-        depth: Boolean,
+        lineWidth: Int = 3,
+        depth: Boolean = true,
     ) {
         val cornersTop = boundingBox.getCornersAtHeight(boundingBox.maxY)
         val cornersBottom = boundingBox.getCornersAtHeight(boundingBox.minY)
@@ -1160,7 +1077,7 @@ object WorldRenderUtils {
         } else {
             emptyList()
         } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }
-        LineDrawer.draw3D(partialTicks) {
+        LineDrawer.draw3D(this) {
             drawPath(
                 points,
                 colorLine,
