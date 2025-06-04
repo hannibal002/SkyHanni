@@ -21,16 +21,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GuiNewChat.class)
 public class MixinGuiNewChat {
 
-    @Inject(method =
-        //#if MC < 1.21
-        "getChatOpen",
-        //#else
-        //$$ "isChatFocused",
-        //#endif
-        at = @At("HEAD"), cancellable = true)
+    //#if MC < 1.21
+    @Inject(method = "getChatOpen", at = @At("HEAD"), cancellable = true)
     public void onIsOpen(CallbackInfoReturnable<Boolean> cir) {
         if (ChatPeek.peek()) cir.setReturnValue(true);
     }
+    //#endif
 
     @Inject(method =
         //#if MC < 1.21

@@ -1593,3 +1593,5 @@ at/hannibal2/skyhanni/utils/repopatterns/RepoPatternDump.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
 at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
+at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngame.java
+at/hannibal2/skyhanni/mixins/hooks/GuiIngameHook.kt
