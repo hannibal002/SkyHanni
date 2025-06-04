@@ -115,7 +115,7 @@ object CurrentPetDisplay {
                 val orbitDirection = expShareConfig.subOrbit.orbitDirection.get()
                 val orbitSpeed = when (orbitDirection) {
                     OrbitDirection.NONE -> 0
-                    else -> expShareConfig.subOrbit.orbitSpeed.get()
+                    else -> expShareConfig.subOrbit.orbitSpeed.get().toInt()
                 }
                 OrbitSystemRenderable(
                     this,

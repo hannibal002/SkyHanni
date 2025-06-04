@@ -48,7 +48,7 @@ class ExpSharePetConfig {
         @Expose
         @ConfigOption(name = "Orbit Speed", desc = "How fast in degrees per second the icons should rotate.")
         @ConfigEditorSlider(minValue = 10f, maxValue = 360f, minStep = 10f)
-        val orbitSpeed: Property<Int> = Property.of(20)
+        val orbitSpeed: Property<Float> = Property.of(20f)
     }
 
     @Expose
