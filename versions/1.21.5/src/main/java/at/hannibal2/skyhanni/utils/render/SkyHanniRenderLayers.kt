@@ -32,6 +32,24 @@ object SkyHanniRenderLayers {
         MultiPhaseParameters.builder().build(false),
     )
 
+    private val QUADS: MultiPhase = RenderLayer.of(
+        "skyhanni_quads",
+        RenderLayer.DEFAULT_BUFFER_SIZE,
+        false,
+        true,
+        SkyHanniRenderPipelines.QUADS,
+        MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
+    )
+
+    private val QUADS_XRAY: MultiPhase = RenderLayer.of(
+        "skyhanni_quads_xray",
+        RenderLayer.DEFAULT_BUFFER_SIZE,
+        false,
+        true,
+        SkyHanniRenderPipelines.QUADS_XRAY,
+        MultiPhaseParameters.builder().build(false),
+    )
+
     private fun createLineRenderLayer(lineWidth: Double, throughWalls: Boolean): MultiPhase {
         val pipeLine = if (throughWalls) SkyHanniRenderPipelines.LINES_XRAY else SkyHanniRenderPipelines.LINES
         return RenderLayer.of(
@@ -42,7 +60,7 @@ object SkyHanniRenderLayers {
             pipeLine,
             MultiPhaseParameters.builder()
                 .lineWidth(RenderPhase.LineWidth(OptionalDouble.of(lineWidth)))
-                .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
+                .layering(if (throughWalls) RenderPhase.NO_LAYERING else RenderPhase.VIEW_OFFSET_Z_LAYERING)
                 .build(false),
         )
     }
@@ -57,6 +75,10 @@ object SkyHanniRenderLayers {
 
     fun getFilled(throughWalls: Boolean): MultiPhase {
         return if (throughWalls) FILLED_XRAY else FILLED
+    }
+
+    fun getQuads(throughWalls: Boolean): MultiPhase {
+        return if (throughWalls) QUADS_XRAY else QUADS
     }
 
     fun getLines(lineWidth: Double, throughWalls: Boolean): MultiPhase {

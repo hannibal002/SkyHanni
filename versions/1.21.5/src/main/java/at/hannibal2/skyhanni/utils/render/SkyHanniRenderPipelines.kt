@@ -50,4 +50,24 @@ object SkyHanniRenderPipelines {
             .build()
     )
 
+    val QUADS: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
+            .withLocation(Identifier.of(SkyHanniMod.MODID, "quads"))
+            .withCull(false)
+            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
+            .withDepthWrite(true)
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
+            .build()
+    )
+
+    val QUADS_XRAY: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
+            .withLocation(Identifier.of(SkyHanniMod.MODID, "quads_xray"))
+            .withCull(false)
+            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
+            .withDepthWrite(false)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .build()
+    )
+
 }

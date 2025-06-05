@@ -258,7 +258,6 @@ object WorldRenderUtils {
         )
         layer.draw(buf.end())
         matrices.pop()
-
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -387,26 +386,68 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereInWorld(color, x, y, z, radius)
+        drawSphereInWorld(color, x, y, z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereInWorld(color, location.x, location.y, location.z, radius)
+        drawSphereInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
+        locX: Double,
+        locY: Double,
+        locZ: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        TODO()
+        val layer = SkyHanniRenderLayers.getQuads(false)
+        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        matrices.push()
+
+        val (viewerX, viewerY, viewerZ) = getViewerPos()
+        val x = locX - viewerX
+        val y = locY - viewerY
+        val z = locZ - viewerZ
+
+        for (phi in 0 until segments) {
+            for (theta in 0 until segments * 2) {
+                val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
+                val y1 = y + radius * cos(Math.PI * phi / segments)
+                val z1 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
+
+                val x2 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
+                val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
+                val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
+
+                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
+                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+
+                val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val y4 = y + radius * cos(Math.PI * phi / segments)
+                val z4 = z + radius * sin(Math.PI * phi / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+
+                buf.vertex(x1.toFloat(), y1.toFloat(), z1.toFloat())
+                    .color(color.red, color.green, color.blue, color.alpha)
+                buf.vertex(x2.toFloat(), y2.toFloat(), z2.toFloat())
+                    .color(color.red, color.green, color.blue, color.alpha)
+                buf.vertex(x3.toFloat(), y3.toFloat(), z3.toFloat())
+                    .color(color.red, color.green, color.blue, color.alpha)
+                buf.vertex(x4.toFloat(), y4.toFloat(), z4.toFloat())
+                    .color(color.red, color.green, color.blue, color.alpha)
+            }
+        }
+
+        layer.draw(buf.end())
+        matrices.pop()
     }
 
     @Deprecated("Do not use, use proper method instead")

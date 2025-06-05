@@ -670,16 +670,18 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereInWorld(color, x, y, z, radius)
+        drawSphereInWorld(color, x, y, z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereInWorld(color, location.x, location.y, location.z, radius)
+        drawSphereInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
@@ -688,6 +690,7 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
@@ -706,8 +709,6 @@ object WorldRenderUtils {
         val worldrenderer = tessellator.worldRenderer
         worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
 
-        val segments = 32
-
         for (phi in 0 until segments) {
             for (theta in 0 until segments * 2) {
                 val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
@@ -721,11 +722,9 @@ object WorldRenderUtils {
                 worldrenderer.pos(x1, y1, z1).endVertex()
                 worldrenderer.pos(x2, y2, z2).endVertex()
 
-                val x3 =
-                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 =
-                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -753,16 +752,18 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereWireframeInWorld(color, x, y, z, radius)
+        drawSphereWireframeInWorld(color, x, y, z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius)
+        drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
@@ -771,6 +772,7 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
@@ -782,8 +784,6 @@ object WorldRenderUtils {
         val tessellator = Tessellator.getInstance()
         val worldrenderer = tessellator.worldRenderer
         worldrenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
-
-        val segments = 32
 
         for (phi in 0 until segments) {
             for (theta in 0 until segments * 2) {
