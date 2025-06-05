@@ -301,7 +301,7 @@ object EstimatedItemValue {
     fun renderInNeuStorageOverlay() {
         if (!config.enabled) return
 
-        //#if MC < 1.12
+        //#if MC < 1.16
         // render the estimated item value over NEU Storage
         DrawContextUtils.translate(0f, 0f, 200f)
         tryRendering()
