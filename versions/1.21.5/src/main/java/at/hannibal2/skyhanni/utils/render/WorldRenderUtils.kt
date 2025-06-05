@@ -246,7 +246,7 @@ object WorldRenderUtils {
         }
 
         val layer = SkyHanniRenderLayers.getFilled(seeThroughBlocks)
-        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        val buf = vertexConsumers.getBuffer(layer)
         matrices.push()
 
         VertexRendering.drawFilledBox(
@@ -259,7 +259,7 @@ object WorldRenderUtils {
             c.blue / 255f * 0.9f,
             c.alpha / 255f * alphaMultiplier,
         )
-        layer.draw(buf.end())
+        vertexConsumers.draw(layer)
         matrices.pop()
     }
 
@@ -360,7 +360,7 @@ object WorldRenderUtils {
         segments: Int = 32,
     ) {
         val layer = SkyHanniRenderLayers.getTriangleFan(!depth)
-        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        val buf = vertexConsumers.getBuffer(layer)
         matrices.push()
 
         val viewerPos = getViewerPos()
@@ -385,7 +385,7 @@ object WorldRenderUtils {
                 .color(color.red, color.green, color.blue, color.alpha)
         }
 
-        layer.draw(buf.end())
+        vertexConsumers.draw(layer)
         matrices.pop()
     }
 
@@ -421,7 +421,7 @@ object WorldRenderUtils {
         val segments = 64
 
         val layer = SkyHanniRenderLayers.getFilled(false)
-        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        val buf = vertexConsumers.getBuffer(layer)
         matrices.push()
 
         val (viewerX, viewerY, viewerZ) = getViewerPos()
@@ -445,7 +445,7 @@ object WorldRenderUtils {
         buf.vertex((x + radius).toFloat(), (y + height).toFloat(), (z + 0).toFloat())
             .color(color.red, color.green, color.blue, color.alpha)
 
-        layer.draw(buf.end())
+        vertexConsumers.draw(layer)
         matrices.pop()
 
         drawCircleFilled(locX, locY, locZ, radius.toDouble(), color, depth = true, segments = segments)
@@ -471,7 +471,7 @@ object WorldRenderUtils {
         depth: Boolean = true,
     ) {
         val layer = SkyHanniRenderLayers.getTriangleFan(!depth)
-        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        val buf = vertexConsumers.getBuffer(layer)
         matrices.push()
 
         val viewerPos = getViewerPos()
@@ -500,10 +500,10 @@ object WorldRenderUtils {
         buf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
             .color(color.red, color.green, color.blue, color.alpha)
 
-        layer.draw(buf.end())
+        vertexConsumers.draw(layer)
 
         val quadLayer = SkyHanniRenderLayers.getQuads(!depth)
-        val quadBuf = SkyHanniRenderLayers.getBufferFromLayer(quadLayer)
+        val quadBuf = vertexConsumers.getBuffer(layer)
         quadBuf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
             .color(color.red, color.green, color.blue, color.alpha)
         quadBuf.vertex(corner4.x.toFloat(), corner4.y.toFloat(), corner4.z.toFloat())
@@ -513,7 +513,7 @@ object WorldRenderUtils {
         quadBuf.vertex(corner2.x.toFloat(), corner2.y.toFloat(), corner2.z.toFloat())
             .color(color.red, color.green, color.blue, color.alpha)
 
-        quadLayer.draw(quadBuf.end())
+        vertexConsumers.draw(quadLayer)
         matrices.pop()
     }
 
@@ -547,7 +547,7 @@ object WorldRenderUtils {
         segments: Int = 32,
     ) {
         val layer = SkyHanniRenderLayers.getQuads(false)
-        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        val buf = vertexConsumers.getBuffer(layer)
         matrices.push()
 
         val (viewerX, viewerY, viewerZ) = getViewerPos()
@@ -584,7 +584,7 @@ object WorldRenderUtils {
             }
         }
 
-        layer.draw(buf.end())
+        vertexConsumers.draw(layer)
         matrices.pop()
     }
 

@@ -16,7 +16,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         if (queuedLines.isEmpty()) return
 
         val layer = SkyHanniRenderLayers.getLines(lineWidth.toDouble(), !depth)
-        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        val buf = event.vertexConsumers.getBuffer(layer)
         val matrix = event.matrices.peek()
 
         for (line in queuedLines) {
@@ -29,7 +29,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
                 .color(line.color.red, line.color.green, line.color.blue, line.color.alpha)
         }
 
-        layer.draw(buf.end())
+        event.vertexConsumers.draw(layer)
         queuedLines.clear()
     }
 

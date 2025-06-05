@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.utils.render
 
-import net.minecraft.client.render.BufferBuilder
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.RenderLayer.MultiPhase
 import net.minecraft.client.render.RenderLayer.MultiPhaseParameters
 import net.minecraft.client.render.RenderPhase
-import net.minecraft.client.util.BufferAllocator
 import java.util.OptionalDouble
 import java.util.concurrent.ConcurrentHashMap
 
@@ -80,14 +78,6 @@ object SkyHanniRenderLayers {
                 .lineWidth(RenderPhase.LineWidth(OptionalDouble.of(lineWidth)))
                 .layering(if (throughWalls) RenderPhase.NO_LAYERING else RenderPhase.VIEW_OFFSET_Z_LAYERING)
                 .build(false),
-        )
-    }
-
-    fun getBufferFromLayer(layer: MultiPhase): BufferBuilder {
-        return BufferBuilder(
-            BufferAllocator(RenderLayer.DEFAULT_BUFFER_SIZE),
-            layer.pipeline.vertexFormatMode,
-            layer.pipeline.vertexFormat,
         )
     }
 
