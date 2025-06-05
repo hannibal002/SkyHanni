@@ -466,22 +466,17 @@ object WorldRenderUtils {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
 
-        GlStateManager.enableDepth()
         GlStateManager.enableBlend()
-        GlStateManager.depthFunc(GL11.GL_LEQUAL)
         GlStateManager.disableCull()
         GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
         GlStateManager.enableAlpha()
         GlStateManager.disableTexture2D()
-
         GlStateManager.disableDepth()
 
         var il = 0.0
         val tessellator = Tessellator.getInstance()
         val worldRenderer = tessellator.worldRenderer
         while (il < 0.05) {
-            GlStateManager.pushMatrix()
-            GlStateManager.disableTexture2D()
             GL11.glLineWidth(2F)
             worldRenderer.begin(1, DefaultVertexFormats.POSITION)
             val renderManager = Minecraft.getMinecraft().renderManager
@@ -497,12 +492,8 @@ object WorldRenderUtils {
                 worldRenderer.pos(x + rad * cos(i * pix2 / 45.0), y + il, z + rad * sin(i * pix2 / 45.0)).endVertex()
             }
             tessellator.draw()
-            GlStateManager.enableTexture2D()
-            GlStateManager.popMatrix()
             il += 0.0006
         }
-
-        GlStateManager.enableDepth()
 
         GlStateManager.enableCull()
         GlStateManager.enableTexture2D()

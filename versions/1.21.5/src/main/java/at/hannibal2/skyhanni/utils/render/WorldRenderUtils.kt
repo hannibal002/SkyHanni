@@ -323,7 +323,28 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
-        TODO()
+        matrices.push()
+
+        val entityLocation = exactLocation(entity)
+        val x = entityLocation.x
+        val y = entityLocation.y
+        val z = entityLocation.z
+
+        val segments = 64
+        LineDrawer.draw3D(this, 5, false) {
+            for (i in 0 until segments) {
+                val theta1 = 2.0 * Math.PI * i / segments
+                val theta2 = 2.0 * Math.PI * (i + 1) / segments
+
+                val x1 = x + rad * cos(theta1)
+                val z1 = z + rad * sin(theta1)
+
+                val x2 = x + rad * cos(theta2)
+                val z2 = z + rad * sin(theta2)
+
+                draw3DLine(LorenzVec(x1, y, z1), LorenzVec(x2, y, z2), color)
+            }
+        }
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -801,9 +822,4 @@ object WorldRenderUtils {
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
         return exactLocation(player) + add
     }
-
-    private fun bindCamera() {
-        TODO()
-    }
-
 }

@@ -754,6 +754,7 @@ at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.kt
 at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeSlot.kt
 at.hannibal2.skyhanni.features.itemabilities.ChickenHeadTimer.kt
 at.hannibal2.skyhanni.features.itemabilities.CrownOfAvariceCounter.kt
+at.hannibal2.skyhanni.features.itemabilities.FireVeilWandParticles.kt
 at.hannibal2.skyhanni.features.mining.BlockStrengthGuide.kt
 at.hannibal2.skyhanni.features.mining.ColdOverlay.kt
 at.hannibal2.skyhanni.features.mining.DeepCavernsGuide.kt
@@ -842,6 +843,7 @@ at.hannibal2.skyhanni.features.misc.update.GuiOptionEditorUpdateCheck.kt
 at.hannibal2.skyhanni.features.misc.update.UpdateManager.kt
 at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords.kt
 at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui.kt
+at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.kt
 at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper.kt
@@ -888,6 +890,7 @@ at.hannibal2.skyhanni.features.skillprogress.SkillType.kt
 at.hannibal2.skyhanni.features.skillprogress.SkillUtil.kt
 at.hannibal2.skyhanni.features.slayer.HideMobNames.kt
 at.hannibal2.skyhanni.features.slayer.SlayerItemsOnGround.kt
+at.hannibal2.skyhanni.features.slayer.SlayerMiniBossFeatures.kt
 at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker.kt
 at.hannibal2.skyhanni.features.slayer.SlayerRngMeterDisplay.kt
 at.hannibal2.skyhanni.features.slayer.SlayerType.kt
@@ -913,6 +916,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinDrawContext.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderDispatcher.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinGameRenderer.java
+at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.MixinHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.MixinItemStack.java
 at.hannibal2.skyhanni.mixins.transformers.MixinKeyboard.java
@@ -920,6 +924,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinMessageHandler.java
 at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
 at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
+at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiNewChat.java
 at.hannibal2.skyhanni.test.DebugCommand.kt
 at.hannibal2.skyhanni.test.HighlightMissingRepoItems.kt
@@ -1546,6 +1551,7 @@ at/hannibal2/skyhanni/features/nether/ashfang/AshfangHider.kt
 at/hannibal2/skyhanni/features/nether/ashfang/AshfangManager.kt
 at/hannibal2/skyhanni/features/summonings/SummoningMobManager.kt
 at/hannibal2/skyhanni/mixins/hooks/EntityRenderDispatcherHook.kt
+at/hannibal2/skyhanni/mixins/hooks/GuiIngameHook.kt
 at/hannibal2/skyhanni/mixins/hooks/GuiPlayerTabOverlayHook.kt
 at/hannibal2/skyhanni/mixins/hooks/GuiScreenHook.kt
 at/hannibal2/skyhanni/mixins/hooks/MessageHandlerHook.kt
@@ -1596,8 +1602,4 @@ at/hannibal2/skyhanni/utils/repopatterns/RepoPatternDump.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
 at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
-at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngame.java
-at/hannibal2/skyhanni/mixins/hooks/GuiIngameHook.kt
-at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
-at.hannibal2.skyhanni.features.slayer.SlayerMiniBossFeatures.kt
 at.hannibal2.skyhanni.config.ConfigModMenuInterop.kt
