@@ -95,22 +95,21 @@ object HoppityEggsCompactChat {
             appendLine("§c§lHitman Summary")
             appendLine()
 
-            // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
-            val rarityMap: Map<LorenzRarity, Int> = hitmanCompactDataSets.getGroupedRarityMap()
-            getRabbitsFormat(rarityMap, "Total Hitman").forEach { appendLine(it) }
+            fun StringBuilder.formatRabbits(sets: List<HoppityStateDataSet>, text: String) {
+                // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
+                getRabbitsFormat(sets.getGroupedRarityMap(), text) { appendLine(it) }
+            }
 
             hitmanCompactDataSets.filter { !it.duplicate }.takeIfNotEmpty()?.let { sets ->
+                formatRabbits(hitmanCompactDataSets, "Total Hitman")
                 appendLine()
-                // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
-                val newRarityMap: Map<LorenzRarity, Int> = sets.getGroupedRarityMap()
-                getRabbitsFormat(newRarityMap, "New").forEach { appendLine(it) }
+
+                formatRabbits(sets, "New")
+                appendLine()
             }
 
             hitmanCompactDataSets.filter { it.duplicate }.takeIfNotEmpty()?.let { sets ->
-                appendLine()
-                // Create a Map of LorenzRarity -> Int so we can use the existing EventSummary logic
-                val dupeRarityMap: Map<LorenzRarity, Int> = sets.getGroupedRarityMap()
-                getRabbitsFormat(dupeRarityMap, "Duplicate").forEach { appendLine(it) }
+                formatRabbits(sets, "Duplicate")
 
                 // Add the total amount of chocolate from duplicates
                 val dupeChocolateAmount = sets.sumOf { it.lastDuplicateAmount ?: 0 }
