@@ -98,7 +98,7 @@ object GriffinBurrowParticleFinder {
     fun onTick() {
         val isSpade = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
         if (isSpade) {
-            for ((location, burrow) in burrows) {
+            for ((location, burrow) in burrows.toMutableMap()) {
                 if (location.distanceSqToPlayer() > 256) continue
                 burrow.burrowTimeToLive -= 1
                 if (burrow.burrowTimeToLive >= 0) continue
@@ -123,7 +123,7 @@ object GriffinBurrowParticleFinder {
             { type == EnumParticleTypes.DRIP_LAVA && count == 2 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.35, 0.1, 0.35) },
         ),
         FOOTSTEP(
-            { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0.0f && offset.roundTo(2) == LorenzVec(0.05, 0.0, 0.05) },
+            { type == EnumParticleTypes.FOOTSTEP && count == 1 && speed == 0f && offset.roundTo(2) == LorenzVec(0.05, 0.0, 0.05) },
         ),
         ENCHANT(
             {

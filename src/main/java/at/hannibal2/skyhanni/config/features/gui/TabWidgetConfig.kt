@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.PositionList
+//#if TODO
 import at.hannibal2.skyhanni.features.gui.TabWidgetDisplay
+//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -11,6 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
+// todo 1.21 impl needed
 class TabWidgetConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Enables the gui elements for the selected widgets.")
@@ -32,6 +35,7 @@ class TabWidgetConfig {
     @ConfigEditorInfoText
     var warning2: String? = null
 
+    //#if TODO
     @Expose
     @ConfigOption(name = "Widgets", desc = "")
     @ConfigEditorDraggableList
@@ -40,4 +44,5 @@ class TabWidgetConfig {
     @Expose
     @ConfigLink(owner = TabWidgetConfig::class, field = "enabled")
     var displayPositions: PositionList = PositionList(TabWidgetDisplay.entries.size)
+    //#endif
 }
