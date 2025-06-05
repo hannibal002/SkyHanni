@@ -16,10 +16,8 @@ import net.minecraft.item.ItemStack
 //#endif
 
 fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
-    //#if MC < 1.12
+    //#if MC < 1.16
     return this.getTooltip(Minecraft.getMinecraft().thePlayer, advanced)
-    //#elseif MC < 1.16
-    //$$ return this.getTooltip(Minecraft.getMinecraft().player) { advanced }
     //#elseif MC < 1.21
     //$$ return this.getTooltipLines(Minecraft.getInstance().player) { advanced }.map { it.getFormattedTextCompat() }.toMutableList()
     //#else
