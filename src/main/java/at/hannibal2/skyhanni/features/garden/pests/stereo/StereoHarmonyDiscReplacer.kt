@@ -6,11 +6,13 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
+import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -27,7 +29,7 @@ object StereoHarmonyDiscReplacer {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.replaceMenuIcons) return
-        if (!inventoryPattern.matches(event.inventory.name)) return
+        if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
         if (event.slot !in 11..15 && event.slot !in 20..24) return
 
         val internalName = event.originalItem.getInternalNameOrNull() ?: return
@@ -38,9 +40,9 @@ object StereoHarmonyDiscReplacer {
 
         val replacementStack = iconCache.getOrPut(iconId) {
             cropType.getItemStackCopy(iconId).apply {
-                if (isActiveVinyl) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 0)
+                if (isActiveVinyl) addEnchantment(EnchantmentsCompat.PROTECTION.enchantment, 1)
                 setLore(event.originalItem.getLore())
-                setStackDisplayName(event.originalItem.displayName)
+                setCustomItemName(event.originalItem.displayName)
             }
         }
 
