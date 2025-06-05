@@ -216,30 +216,31 @@ object WorldRenderUtils {
             val inverseView = getViewerPos()
             matrices.translate(inverseView.x, inverseView.y, inverseView.z)
 
-            LineDrawer.draw3D(this, 1, !seeThroughBlocks) {
-                drawPath(
-                    listOf(
-                        LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ),
-                        LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ),
-                        LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ),
-                        LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ),
-                        LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ),
-                    ),
-                    c.addAlpha((c.alpha * alphaMultiplier).toInt()),
-                    -1.0,
-                )
-                drawPath(
-                    listOf(
-                        LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ),
-                        LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ),
-                        LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ),
-                        LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ),
-                        LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ),
-                    ),
-                    c.addAlpha((c.alpha * alphaMultiplier).toInt()),
-                    -1.0,
-                )
-            }
+            // TODO these look weird on modern and i dont see them on legacy so they are disabled for now
+//             LineDrawer.draw3D(this, 1, !seeThroughBlocks) {
+//                 drawPath(
+//                     listOf(
+//                         LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ),
+//                         LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ),
+//                         LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ),
+//                         LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ),
+//                         LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ),
+//                     ),
+//                     c.addAlpha((c.alpha * alphaMultiplier).toInt()),
+//                     -1.0,
+//                 )
+//                 drawPath(
+//                     listOf(
+//                         LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ),
+//                         LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ),
+//                         LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ),
+//                         LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ),
+//                         LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ),
+//                     ),
+//                     c.addAlpha((c.alpha * alphaMultiplier).toInt()),
+//                     -1.0,
+//                 )
+//             }
 
             matrices.pop()
         }
@@ -667,25 +668,30 @@ object WorldRenderUtils {
         yOff: Float = 0f,
         hideTooCloseAt: Double = 4.5,
         smallestDistanceVew: Double = 5.0,
-        ignoreBlocks: Boolean = true,
+        seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
     ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos()
-        val x = location.x - viewerX
-        val y = location.y - viewerY
-        val z = location.z - viewerZ
+
+        val x = location.x
+        val y = location.y
+        val z = location.z
 
         val player = MinecraftCompat.localPlayerOrNull ?: return
         val eyeHeight = player.getEyeHeight(player.pose)
 
-        val distToPlayerSq = x * x + y * y + z * z
+        val dX = (x - viewerX) * (x - viewerX)
+        val dY = (y - (viewerY + eyeHeight)) * (y - (viewerY + eyeHeight))
+        val dZ = (z - viewerZ) * (z - viewerZ)
+        val distToPlayerSq = dX + dY + dZ
         var distToPlayer = sqrt(distToPlayerSq)
+        // TODO this is optional maybe?
         distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceVew)
 
         if (distToPlayer < hideTooCloseAt) return
         maxDistance?.let {
-            if (ignoreBlocks && distToPlayer > it) return
+            if (!seeThroughBlocks && distToPlayer > it) return
         }
 
         val distRender = distToPlayer.coerceAtMost(50.0)
@@ -693,14 +699,14 @@ object WorldRenderUtils {
         var scale = distRender / 12
         scale *= scaleMultiplier
 
-        val resultX = x + (location.x + 0.5 - x) / (distToPlayer / distRender)
-        val resultY = if (ignoreY) location.y * distToPlayer / distRender else y + eyeHeight +
-            (location.y + 20 * distToPlayer / 300 - (y + eyeHeight)) / (distToPlayer / distRender)
-        val resultZ = z + (location.z + 0.5 - z) / (distToPlayer / distRender)
+        val resultX = viewerX + (x + 0.5 - viewerX) / (distToPlayer / distRender)
+        val resultY = if (ignoreY) y * distToPlayer / distRender else viewerY + eyeHeight +
+            (y + 20 * distToPlayer / 300 - (viewerY + eyeHeight)) / (distToPlayer / distRender)
+        val resultZ = viewerZ + (z + 0.5 - viewerZ) / (distToPlayer / distRender)
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        renderText(renderLocation, "§f$text", scale, !ignoreBlocks, true, yOff)
+        renderText(renderLocation, "§f$text", scale, seeThroughBlocks, true, yOff)
     }
 
     private fun SkyHanniRenderWorldEvent.renderText(
@@ -711,7 +717,6 @@ object WorldRenderUtils {
         shadow: Boolean,
         yOff: Float,
     ) {
-
         val realScale = (scale * 0.05).toFloat()
 
         val matrix = Matrix4f()
@@ -720,7 +725,7 @@ object WorldRenderUtils {
 
         matrix.translate(
             (location.x - cameraPos.getX()).toFloat(),
-            (location.y - cameraPos.getY() + yOff).toFloat(),
+            (location.y - cameraPos.getY() + yOff * realScale).toFloat(),
             (location.z - cameraPos.getZ()).toFloat(),
         ).rotate(camera.rotation).scale(realScale, -realScale, realScale)
 
