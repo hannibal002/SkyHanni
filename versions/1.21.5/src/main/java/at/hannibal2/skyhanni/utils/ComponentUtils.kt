@@ -16,8 +16,10 @@ import net.minecraft.util.Unit
 object ComponentUtils {
     fun convertToComponents(stack: ItemStack, nbtInfo: NeuNbtInfoJson?) {
         nbtInfo ?: return
-        val extraAttributes = JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, nbtInfo.extraAttributes).asCompound().get()
-        stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(extraAttributes))
+        if (nbtInfo.extraAttributes != null) {
+            val extraAttributes = JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, nbtInfo.extraAttributes).asCompound().get()
+            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(extraAttributes))
+        }
         if (nbtInfo.enchantments?.isNotEmpty() == true) {
             stack.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true)
         }
