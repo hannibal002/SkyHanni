@@ -20,7 +20,13 @@ object LocationUtils {
     }
 
     private fun canSee0(a: LorenzVec, b: LorenzVec) =
-        MinecraftCompat.localWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
+        MinecraftCompat.localWorld.rayTraceBlocks(
+            a.toVec3(),
+            b.toVec3(),
+            false, // stopOnLiquid
+            true, // ignoreBlockWithoutBoundingBox
+            false, // returnLastUncollidableBlock
+        ) == null
 
     fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 

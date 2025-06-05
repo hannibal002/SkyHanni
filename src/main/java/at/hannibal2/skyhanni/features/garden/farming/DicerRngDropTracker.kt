@@ -167,7 +167,7 @@ object DicerRngDropTracker {
     }
 
     init {
-        tracker.initRenderer({ config.pos }) { shouldShowDisplay() }
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {
@@ -179,7 +179,7 @@ object DicerRngDropTracker {
 
     class ItemDrop(val crop: CropType, val rarity: DropRarity, val pattern: Pattern)
 
-    private fun isEnabled() = GardenApi.inGarden() && config.display
+    private fun isEnabled() = GardenApi.inGarden() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -200,6 +200,9 @@ object DicerRngDropTracker {
 
             ConfigManager.gson.toJsonTree(items)
         }
+
+        event.move(87, "garden.dicerCounters.pos", "garden.dicerCounters.position")
+        event.move(87, "garden.dicerCounters.display", "garden.dicerCounters.enabled")
     }
 
     @HandleEvent
