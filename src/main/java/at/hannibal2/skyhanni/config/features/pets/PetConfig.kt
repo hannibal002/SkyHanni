@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.config.features.pets
 
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.config.features.pets.display.PetDisplayConfig
+import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
