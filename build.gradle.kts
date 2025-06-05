@@ -165,19 +165,14 @@ dependencies {
     }
 
     // Discord RPC client
-    shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
-        exclude(module = "log4j")
-        because("Different version conflicts with Minecraft's Log4J")
-        exclude(module = "gson")
-        because("Different version conflicts with Minecraft's Log4j")
-    }
+    shadowImpl("com.github.caoimhebyrne:KDiscordIPC:0.2.3")
     compileOnly(libs.jbAnnotations)
 
     headlessLwjgl(libs.headlessLwjgl)
 
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
-    val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
+    val mixinVersion = if (target == ProjectTarget.MAIN) "0.7.11-SNAPSHOT" else "0.8.2"
 
     if (!target.isFabric) {
         shadowImpl("org.spongepowered:mixin:$mixinVersion") {
