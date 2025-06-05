@@ -32,6 +32,24 @@ object SkyHanniRenderLayers {
         MultiPhaseParameters.builder().build(false),
     )
 
+    private val TRIANGLE_FAN: MultiPhase = RenderLayer.of(
+        "skyhanni_triangle_fan",
+        RenderLayer.DEFAULT_BUFFER_SIZE,
+        false,
+        true,
+        SkyHanniRenderPipelines.TRIANGLE_FAN,
+        MultiPhaseParameters.builder().layering(RenderPhase.VIEW_OFFSET_Z_LAYERING).build(false),
+    )
+
+    private val TRIANGLE_FAN_XRAY: MultiPhase = RenderLayer.of(
+        "skyhanni_triangle_fan_xray",
+        RenderLayer.DEFAULT_BUFFER_SIZE,
+        false,
+        true,
+        SkyHanniRenderPipelines.TRIANGLE_FAN_XRAY,
+        MultiPhaseParameters.builder().build(false),
+    )
+
     private val QUADS: MultiPhase = RenderLayer.of(
         "skyhanni_quads",
         RenderLayer.DEFAULT_BUFFER_SIZE,
@@ -75,6 +93,10 @@ object SkyHanniRenderLayers {
 
     fun getFilled(throughWalls: Boolean): MultiPhase {
         return if (throughWalls) FILLED_XRAY else FILLED
+    }
+
+    fun getTriangleFan(throughWalls: Boolean): MultiPhase {
+        return if (throughWalls) TRIANGLE_FAN_XRAY else TRIANGLE_FAN
     }
 
     fun getQuads(throughWalls: Boolean): MultiPhase {

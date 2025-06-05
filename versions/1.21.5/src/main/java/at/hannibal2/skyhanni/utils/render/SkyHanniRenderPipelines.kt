@@ -17,7 +17,7 @@ object SkyHanniRenderPipelines {
             .withCull(false)
             .withDepthWrite(true)
             .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            .build()
+            .build(),
     )
 
     val LINES_XRAY: RenderPipeline = RenderPipelines.register(
@@ -27,7 +27,7 @@ object SkyHanniRenderPipelines {
             .withCull(false)
             .withDepthWrite(false)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .build()
+            .build(),
     )
 
     val FILLED: RenderPipeline = RenderPipelines.register(
@@ -37,7 +37,7 @@ object SkyHanniRenderPipelines {
             .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_STRIP)
             .withDepthWrite(true)
             .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            .build()
+            .build(),
     )
 
     val FILLED_XRAY: RenderPipeline = RenderPipelines.register(
@@ -47,7 +47,26 @@ object SkyHanniRenderPipelines {
             .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_STRIP)
             .withDepthWrite(false)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .build()
+            .build(),
+    )
+    val TRIANGLE_FAN: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
+            .withLocation(Identifier.of(SkyHanniMod.MODID, "filled"))
+            .withCull(false)
+            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_FAN)
+            .withDepthWrite(true)
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
+            .build(),
+    )
+
+    val TRIANGLE_FAN_XRAY: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
+            .withLocation(Identifier.of(SkyHanniMod.MODID, "filled_xray"))
+            .withCull(false)
+            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_FAN)
+            .withDepthWrite(false)
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .build(),
     )
 
     val QUADS: RenderPipeline = RenderPipelines.register(
@@ -57,7 +76,7 @@ object SkyHanniRenderPipelines {
             .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
             .withDepthWrite(true)
             .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            .build()
+            .build(),
     )
 
     val QUADS_XRAY: RenderPipeline = RenderPipelines.register(
@@ -67,7 +86,7 @@ object SkyHanniRenderPipelines {
             .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.QUADS)
             .withDepthWrite(false)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-            .build()
+            .build(),
     )
 
 }

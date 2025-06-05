@@ -223,8 +223,9 @@ object WorldRenderUtils {
                         LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ),
                         LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ),
                         LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ),
+                        LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ),
                     ),
-                    c.addAlpha((alphaMultiplier * 255).toInt()),
+                    c.addAlpha((c.alpha * alphaMultiplier).toInt()),
                     -1.0,
                 )
                 drawPath(
@@ -233,8 +234,9 @@ object WorldRenderUtils {
                         LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ),
                         LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ),
                         LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ),
+                        LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ),
                     ),
-                    c.addAlpha((alphaMultiplier * 255).toInt()),
+                    c.addAlpha((c.alpha * alphaMultiplier).toInt()),
                     -1.0,
                 )
             }
@@ -313,18 +315,7 @@ object WorldRenderUtils {
         TODO("Someone used this function somewhere. Big mistake, it isn't needed.")
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawCircle(
-        entity: Entity,
-        rad: Double,
-        color: Color,
-    ) {
-        drawCircle(entity, rad, color)
-    }
-
-    fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
-        matrices.push()
-
+    fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
         val entityLocation = exactLocation(entity)
         val x = entityLocation.x
         val y = entityLocation.y
@@ -345,6 +336,56 @@ object WorldRenderUtils {
                 draw3DLine(LorenzVec(x1, y, z1), LorenzVec(x2, y, z2), color)
             }
         }
+    }
+
+    fun SkyHanniRenderWorldEvent.drawCircleFilled(
+        entity: Entity,
+        rad: Double,
+        color: Color,
+        depth: Boolean = true,
+        segments: Int = 32,
+    ) {
+        val exactLocation = exactLocation(entity)
+        drawCircleFilled(exactLocation.x, exactLocation.y, exactLocation.z, rad, color, depth, segments)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawCircleFilled(
+        locX: Double,
+        locY: Double,
+        locZ: Double,
+        rad: Double,
+        color: Color,
+        depth: Boolean = true,
+        segments: Int = 32,
+    ) {
+        val layer = SkyHanniRenderLayers.getTriangleFan(!depth)
+        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        matrices.push()
+
+        val viewerPos = getViewerPos()
+        val x = locX - viewerPos.x
+        val y = locY - viewerPos.y
+        val z = locZ - viewerPos.z
+
+        for (i in 0 until segments) {
+            val theta1 = 2.0 * Math.PI * i / segments
+            val theta2 = 2.0 * Math.PI * (i + 1) / segments
+
+            val x1 = x + rad * cos(theta1)
+            val z1 = z + rad * sin(theta1)
+
+            val x2 = x + rad * cos(theta2)
+            val z2 = z + rad * sin(theta2)
+
+            buf.vertex(x.toFloat(), y.toFloat(), z.toFloat()).color(color.red, color.green, color.blue, color.alpha)
+                .vertex(x1.toFloat(), y.toFloat(), z1.toFloat())
+                .color(color.red, color.green, color.blue, color.alpha)
+                .vertex(x2.toFloat(), y.toFloat(), z2.toFloat())
+                .color(color.red, color.green, color.blue, color.alpha)
+        }
+
+        layer.draw(buf.end())
+        matrices.pop()
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -370,13 +411,44 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
-        x: Double,
-        y: Double,
-        z: Double,
+        locX: Double,
+        locY: Double,
+        locZ: Double,
         radius: Float,
         height: Float,
     ) {
-        TODO()
+        val segments = 64
+
+        val layer = SkyHanniRenderLayers.getFilled(false)
+        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        matrices.push()
+
+        val (viewerX, viewerY, viewerZ) = getViewerPos()
+        val x = locX - viewerX
+        val y = locY - viewerY
+        val z = locZ - viewerZ
+
+        for (i in 0 until segments) {
+            val angle = 2.0 * Math.PI * i / segments
+
+            val xOffset = radius * cos(angle)
+            val zOffset = radius * sin(angle)
+
+            buf.vertex((x + xOffset).toFloat(), y.toFloat(), (z + zOffset).toFloat())
+                .color(color.red, color.green, color.blue, color.alpha)
+            buf.vertex((x + xOffset).toFloat(), (y + height).toFloat(), (z + zOffset).toFloat())
+                .color(color.red, color.green, color.blue, color.alpha)
+        }
+        buf.vertex((x + radius).toFloat(), y.toFloat(), (z + 0).toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+        buf.vertex((x + radius).toFloat(), (y + height).toFloat(), (z + 0).toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+
+        layer.draw(buf.end())
+        matrices.pop()
+
+        drawCircleFilled(locX, locY, locZ, radius.toDouble(), color, depth = true, segments = segments)
+        drawCircleFilled(locX, locY + height, locZ, radius.toDouble(), color, depth = true, segments = segments)
     }
 
     @Deprecated("Do not use, use proper method instead")

@@ -15,6 +15,7 @@ at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi.kt
 at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi.kt
 at.hannibal2.skyhanni.config.ConfigGuiManager.kt
 at.hannibal2.skyhanni.config.ConfigManager.kt
+at.hannibal2.skyhanni.config.ConfigModMenuInterop.kt
 at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.kt
 at.hannibal2.skyhanni.config.EnforcedConfigValues.kt
 at.hannibal2.skyhanni.config.FeatureToggle.kt
@@ -259,6 +260,7 @@ at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityDeathEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent.kt
+at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent.kt
 at.hannibal2.skyhanni.events.entity.EntityMoveEvent.kt
@@ -795,6 +797,7 @@ at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider.kt
 at.hannibal2.skyhanni.features.misc.FrogMaskFeatures.kt
 at.hannibal2.skyhanni.features.misc.HideArmor.kt
 at.hannibal2.skyhanni.features.misc.IslandAreas.kt
+at.hannibal2.skyhanni.features.misc.LesserOrbHider.kt
 at.hannibal2.skyhanni.features.misc.MarkedPlayerManager.kt
 at.hannibal2.skyhanni.features.misc.MiscFeatures.kt
 at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay.kt
@@ -867,6 +870,7 @@ at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHel
 at.hannibal2.skyhanni.features.rift.RiftApi.kt
 at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.kt
 at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftWiltedBerberisHelper.kt
+at.hannibal2.skyhanni.features.rift.area.dreadfarm.VoltHighlighter.kt
 at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper.kt
 at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveDefenseBlocks.kt
 at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveLivingMetalHelper.kt
@@ -911,6 +915,7 @@ at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.MixinChatHud.java
 at.hannibal2.skyhanni.mixins.transformers.MixinChatLine.java
+at.hannibal2.skyhanni.mixins.transformers.MixinClientPlayNetworkHandler.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDataTracker.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDrawContext.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderDispatcher.java
@@ -1602,4 +1607,3 @@ at/hannibal2/skyhanni/utils/repopatterns/RepoPatternDump.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
 at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
-at.hannibal2.skyhanni.config.ConfigModMenuInterop.kt

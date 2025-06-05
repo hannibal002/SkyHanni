@@ -452,17 +452,8 @@ object WorldRenderUtils {
         GlStateManager.popMatrix()
     }
 
-    @Deprecated("Do not use, use proper method instead")
-    fun SkyHanniRenderWorldEvent._drawCircle(
-        entity: Entity,
-        rad: Double,
-        color: Color,
-    ) {
-        drawCircle(entity, rad, color)
-    }
-
     // modified from Autumn Client's TargetStrafe
-    fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
+    fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
 
@@ -494,6 +485,64 @@ object WorldRenderUtils {
             tessellator.draw()
             il += 0.0006
         }
+
+        GlStateManager.enableCull()
+        GlStateManager.enableTexture2D()
+        GlStateManager.enableDepth()
+        GlStateManager.disableBlend()
+        GlStateManager.color(1f, 1f, 1f, 1f)
+        GlStateManager.popMatrix()
+    }
+
+    fun SkyHanniRenderWorldEvent.drawCircleFilled(
+        entity: Entity,
+        rad: Double,
+        color: Color,
+        depth: Boolean = true,
+        segments: Int = 32,
+    ) {
+        val exactLocation = exactLocation(entity)
+        drawCircleFilled(exactLocation.x, exactLocation.y, exactLocation.z, rad, color, depth, segments)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawCircleFilled(
+        locX: Double,
+        locY: Double,
+        locZ: Double,
+        rad: Double,
+        color: Color,
+        depth: Boolean = true,
+        segments: Int = 32,
+    ) {
+        GlStateManager.pushMatrix()
+        GL11.glNormal3f(0f, 1f, 0f)
+
+        GlStateManager.enableBlend()
+        GlStateManager.disableCull()
+        GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+        GlStateManager.enableAlpha()
+        GlStateManager.disableTexture2D()
+        if (!depth) GlStateManager.disableDepth()
+
+        val tessellator = Tessellator.getInstance()
+        val worldRenderer = tessellator.worldRenderer
+        val renderManager = Minecraft.getMinecraft().renderManager
+        val x: Double = locX - renderManager.viewerPosX
+        val y: Double = locY - renderManager.viewerPosY + 0.0020000000949949026
+        val z: Double = locZ - renderManager.viewerPosZ
+
+        worldRenderer.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION_COLOR)
+        for (i in 0 until segments) {
+            val angle1 = i * Math.PI * 2 / segments
+            val angle2 = (i + 1) * Math.PI * 2 / segments
+
+            worldRenderer.pos(x + rad * cos(angle1), y, z + rad * sin(angle1))
+                .color(color.red, color.green, color.blue, color.alpha).endVertex()
+            worldRenderer.pos(x + rad * cos(angle2), y, z + rad * sin(angle2))
+                .color(color.red, color.green, color.blue, color.alpha).endVertex()
+            worldRenderer.pos(x, y, z).color(color.red, color.green, color.blue, color.alpha).endVertex()
+        }
+        tessellator.draw()
 
         GlStateManager.enableCull()
         GlStateManager.enableTexture2D()

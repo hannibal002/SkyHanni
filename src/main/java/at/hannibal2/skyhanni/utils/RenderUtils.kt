@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DPathWithWaypoint
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCircle
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawDynamicText
@@ -337,11 +336,6 @@ object RenderUtils {
         }
         DrawContextUtils.popMatrix()
         if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
-    }
-
-    @Deprecated("Use WorldRenderUtils' drawCircle instead")
-    fun SkyHanniRenderWorldEvent.drawCircle(entity: Entity, rad: Double, color: Color) {
-        _drawCircle(entity, rad, color)
     }
 
     @Deprecated("Use WorldRenderUtils' drawCylinderInWorld instead")
