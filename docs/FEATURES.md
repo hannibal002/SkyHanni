@@ -756,6 +756,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Compact Jacob Claim. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3235)
     + When collecting the rewards from many farming contests at the same time at Anita.
     + Compact the Jacob Claim message, only showing full information when hovering.
++ Added Monthly Farming Weight Leaderboard option. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3886)
 
 ### Garden Pests
 
@@ -1224,6 +1225,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Notifies via title when a Superior Dragon spawns in the End.
 + Added Dragon Profit Tracker. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3507)
     + Tracks all loot collected during a dragon fight, records the eyes spent, and calculates overall profit.
++ Added option to prevent player interactions during the Kuudra boss fight. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
+    + Added option to disable Profile Viewer on right-click.
 
 </details>
 <details open><summary>

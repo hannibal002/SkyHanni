@@ -23,7 +23,7 @@ import net.minecraftforge.fml.common.Loader
  */
 object PlatformUtils {
 
-    const val MC_VERSION = VersionConstants.MC_VERSION
+    const val MC_VERSION: String = VersionConstants.MC_VERSION
 
     val isDevEnvironment: Boolean by lazy {
         //#if MC < 1.16
