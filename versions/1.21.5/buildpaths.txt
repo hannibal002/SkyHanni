@@ -1600,3 +1600,4 @@ at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngame.java
 at/hannibal2/skyhanni/mixins/hooks/GuiIngameHook.kt
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
 at.hannibal2.skyhanni.features.slayer.SlayerMiniBossFeatures.kt
+at.hannibal2.skyhanni.config.ConfigModMenuInterop.kt

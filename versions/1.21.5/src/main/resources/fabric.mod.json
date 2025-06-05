@@ -17,6 +17,9 @@
                 "adapter": "kotlin",
                 "value": "at.hannibal2.skyhanni.SkyHanniModLoader"
             }
+        ],
+        "modmenu": [
+            "at.hannibal2.skyhanni.config.ConfigModMenuInterop"
         ]
     },
     "depends": {
