@@ -469,7 +469,51 @@ object WorldRenderUtils {
         color: Color,
         depth: Boolean = true,
     ) {
-        TODO()
+        val layer = SkyHanniRenderLayers.getTriangleFan(!depth)
+        val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
+        matrices.push()
+
+        val viewerPos = getViewerPos()
+        val newTopPoint = topPoint - viewerPos
+        val newBaseCenterPoint = baseCenterPoint - viewerPos
+        val newBaseEdgePoint = baseEdgePoint - viewerPos
+
+        val cornerCenterVec = newBaseEdgePoint - newBaseCenterPoint
+        val baseTopVecNormalized = (newTopPoint - newBaseCenterPoint).normalize()
+
+        val corner1 = newBaseEdgePoint
+        val corner2 = baseTopVecNormalized.crossProduct(cornerCenterVec) + newBaseCenterPoint
+        val corner3 = newBaseCenterPoint - cornerCenterVec
+        val corner4 = cornerCenterVec.crossProduct(baseTopVecNormalized) + newBaseCenterPoint
+
+        buf.vertex(newTopPoint.x.toFloat(), newTopPoint.y.toFloat(), newTopPoint.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+        buf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+        buf.vertex(corner2.x.toFloat(), corner2.y.toFloat(), corner2.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+        buf.vertex(corner3.x.toFloat(), corner3.y.toFloat(), corner3.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+        buf.vertex(corner4.x.toFloat(), corner4.y.toFloat(), corner4.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+        buf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+
+        layer.draw(buf.end())
+
+        val quadLayer = SkyHanniRenderLayers.getQuads(!depth)
+        val quadBuf = SkyHanniRenderLayers.getBufferFromLayer(quadLayer)
+        quadBuf.vertex(corner1.x.toFloat(), corner1.y.toFloat(), corner1.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+        quadBuf.vertex(corner4.x.toFloat(), corner4.y.toFloat(), corner4.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+        quadBuf.vertex(corner3.x.toFloat(), corner3.y.toFloat(), corner3.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+        quadBuf.vertex(corner2.x.toFloat(), corner2.y.toFloat(), corner2.z.toFloat())
+            .color(color.red, color.green, color.blue, color.alpha)
+
+        quadLayer.draw(quadBuf.end())
+        matrices.pop()
     }
 
     @Deprecated("Do not use, use proper method instead")
