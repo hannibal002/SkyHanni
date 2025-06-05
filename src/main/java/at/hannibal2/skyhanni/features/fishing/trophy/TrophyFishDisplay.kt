@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.HideCaught
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TextPart
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TrophySorting
@@ -37,7 +36,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.milliseconds
@@ -46,7 +44,6 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object TrophyFishDisplay {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing.display
-    private val armorReqType get() = config.armorRequirement.get()
 
     private val recentlyDroppedTrophies = TimeLimitedCache<NeuInternalName, TrophyRarity>(5.seconds)
     private val itemNameCache = mutableMapOf<String, NeuInternalName>()
@@ -91,6 +88,7 @@ object TrophyFishDisplay {
                 showCheckmark,
                 onlyShowMissing,
                 showCaughtHigher,
+                requireArmor,
             ) {
                 update()
             }
@@ -273,13 +271,9 @@ object TrophyFishDisplay {
         )
     }
 
-    private fun matchesArmorRequirement() = when (armorReqType) {
-        TrophyFishDisplayConfig.ArmorReq.NO_REQ -> true
-        TrophyFishDisplayConfig.ArmorReq.HUNTER_ARMOR -> FishingApi.wearingTrophyArmor
-        TrophyFishDisplayConfig.ArmorReq.HUNTER_OR_EMBER ->
-            FishingApi.wearingTrophyArmor || FishingApi.wearingEmberArmor
-        else -> false
-    }
+    private fun matchesArmorRequirement() = if (config.requireArmor.get()) {
+        FishingApi.wearingTrophyArmor || FishingApi.wearingEmberArmor
+    } else true
 
     private fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
@@ -292,16 +286,7 @@ object TrophyFishDisplay {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(
-            87,
-            "fishing.trophyFishing.display.requireHunterArmor",
-            "fishing.trophyFishing.display.armorRequirement",
-        ) { jsonElement ->
-            val newEnum = when (jsonElement.asBoolean) {
-                true -> TrophyFishDisplayConfig.ArmorReq.HUNTER_ARMOR
-                false -> TrophyFishDisplayConfig.ArmorReq.NO_REQ
-            }
-            JsonPrimitive(newEnum.name)
-        }
+        val base = "fishing.trophyFishing.display"
+        event.move(87, "$base.requireHunterArmor", "$base.requireArmor")
     }
 }
