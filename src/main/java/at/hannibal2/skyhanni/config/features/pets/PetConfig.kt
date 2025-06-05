@@ -1,15 +1,17 @@
-package at.hannibal2.skyhanni.config.features.misc.pets
+package at.hannibal2.skyhanni.config.features.pets
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import java.util.*
 
 class PetConfig {
     @Expose
@@ -36,6 +38,23 @@ class PetConfig {
     @ConfigOption(name = "Pet Nametag", desc = "")
     @Accordion
     val nametag: PetNametagConfig = PetNametagConfig()
+
+    @Expose
+    @ConfigOption(name = "Highlight Current Pet", desc = "")
+    @Accordion
+    val highlightInMenu: MenuHighlightConfig = MenuHighlightConfig()
+
+    class MenuHighlightConfig {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Highlight your current pet in the §e/pets §7menu.")
+        @ConfigEditorBoolean
+        val enabled: Boolean = true
+
+        @Expose
+        @ConfigOption(name = "Highlight Color", desc = "What color the slot should be highlighted.")
+        @ConfigEditorColour
+        val color: ChromaColour = LorenzColor.GREEN.toChromaColor(alpha = 128)
+    }
 
     @Expose
     @ConfigOption(
