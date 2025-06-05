@@ -27,10 +27,8 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
-import java.lang.reflect.Field
-//#if MC < 1.21
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
-//#endif
+import java.lang.reflect.Field
 
 class Position @JvmOverloads constructor(
     x: Int,
@@ -59,7 +57,7 @@ class Position @JvmOverloads constructor(
 
     @Expose
     var scale: Float = scale
-        get() = if (field == 0f) DEFAULT_SCALE else field
+        get() = if (field <= 0f) DEFAULT_SCALE else field
 
     @Expose
     var centerX: Boolean = centerX
@@ -207,9 +205,7 @@ class Position @JvmOverloads constructor(
         val option = editor.getOptionFromField(field) ?: return
         editor.search("")
         if (!editor.goToOption(option)) return
-        //#if MC < 1.21
         SkyHanniMod.screenToOpen = GuiScreenElementWrapper(editor)
-        //#endif
     }
 
     fun setLink(configLink: ConfigLink) {
@@ -229,7 +225,7 @@ class Position @JvmOverloads constructor(
     companion object {
         const val DEFAULT_SCALE = 1f
         const val MIN_SCALE = 0.1f
-        const val MAX_SCALE = 10.0f
+        const val MAX_SCALE = 10f
 
         private class FieldNotFoundException(field: String, owner: Class<*>) :
             Exception("Config Link for field $field in class $owner not found")

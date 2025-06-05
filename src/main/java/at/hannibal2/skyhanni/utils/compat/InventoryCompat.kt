@@ -28,7 +28,7 @@ fun slotUnderCursor(): Slot? {
     //#if FORGE
     return screen.slotUnderMouse
     //#else
-    //$$ return screen.getSlotUnderMouse()
+    //$$ return screen.focusedSlot
     //#endif
 }
 

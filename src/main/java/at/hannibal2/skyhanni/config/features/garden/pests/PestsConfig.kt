@@ -19,6 +19,7 @@ class PestsConfig {
     @Accordion
     var pestFinder: PestFinderConfig = PestFinderConfig()
 
+    // TODO renmae to waypoint
     @Expose
     @ConfigOption(name = "Pest Waypoint", desc = "")
     @Accordion
@@ -57,6 +58,6 @@ class PestsConfig {
 
     @Expose
     @ConfigLink(owner = PestsConfig::class, field = "pestChanceDisplay")
-    var pestChanceDisplayPosition: Position = Position(5, -115, false, true)
+    var pestChanceDisplayPosition: Position = Position(5, -115)
 }
 
