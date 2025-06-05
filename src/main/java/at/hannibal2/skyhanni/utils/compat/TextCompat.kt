@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.LorenzColor
 import net.minecraft.client.Minecraft
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
@@ -296,8 +297,15 @@ fun createHoverEvent(action: HoverEvent.Action?, component: ChatComponentText): 
 //$$     if (action == null) return null
 //$$     when (action) {
 //$$         HoverEvent.Action.SHOW_TEXT -> return HoverEvent.ShowText(component)
-//$$         // i really dont think anyone is using the other 2 lol
+//$$         // i really don't think anyone is using the other 2 lol
 //$$         else -> return null
 //$$     }
 //$$ }
+//#endif
+
+fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
+    //#if MC < 1.21
+    this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
+//#else
+//$$ this.copy().formatted(color.toChatFormatting())
 //#endif

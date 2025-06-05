@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent;
 import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
+import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
 import at.hannibal2.skyhanni.mixins.hooks.GuiScreenHookKt;
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
 import at.hannibal2.skyhanni.utils.DelayedRun;

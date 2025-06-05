@@ -52,6 +52,7 @@ net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNe
 net.minecraft.client.gui.components.Widget net.minecraft.client.gui.GuiButton
 
 net.minecraft.client.gui.components.ChatComponent allMessages chatLines
+net.minecraft.client.gui.components.ChatComponent chatScrollbarPos scrollPos
 net.minecraft.client.gui.components.ChatComponent getLinesPerPage() getLineCount()
 net.minecraft.client.gui.components.ChatComponent getScale() getChatScale()
 net.minecraft.client.gui.components.ChatComponent getWidth() getChatWidth()
@@ -96,6 +97,8 @@ net.minecraft.client.renderer.RenderItem net.minecraft.client.renderer.entity.Re
 net.minecraft.client.renderer.LevelRenderer allChanged() loadRenderers()
 
 net.minecraft.client.renderer.block.model.IBakedModel net.minecraft.client.resources.model.IBakedModel
+
+net.minecraft.client.renderer.culling.Frustum net.minecraft.client.renderer.culling.ICamera
 
 net.minecraft.client.renderer.entity.EntityRenderDispatcher net.minecraft.client.renderer.entity.RenderManager
 net.minecraft.client.renderer.entity.RenderLivingBase net.minecraft.client.renderer.entity.RendererLivingEntity

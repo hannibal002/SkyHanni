@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.applyFormattingFrom
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.style
 import at.hannibal2.skyhanni.utils.compat.appendComponent
 import at.hannibal2.skyhanni.utils.compat.appendString
+import at.hannibal2.skyhanni.utils.compat.changeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
@@ -277,7 +278,7 @@ object PlayerNameFormatter {
                 .intoSpan()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enable
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -292,12 +293,4 @@ object PlayerNameFormatter {
             newList
         }
     }
-
-    // TODO move to TextCompat once LorenzColor works on 1.21
-    private fun IChatComponent.changeColor(color: LorenzColor): IChatComponent =
-        //#if MC < 1.21
-        this.createCopy().setChatStyle(this.chatStyle.setColor(color.toChatFormatting()))
-    //#else
-    //$$ this.copy().formatted(color.toChatFormatting())
-    //#endif
 }
