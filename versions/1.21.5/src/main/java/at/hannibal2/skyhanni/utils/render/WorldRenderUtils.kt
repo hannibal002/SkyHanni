@@ -210,11 +210,41 @@ object WorldRenderUtils {
             aabb
         }
 
+        if (drawVerticalBarriers) {
+            matrices.push()
+
+            val inverseView = getViewerPos()
+            matrices.translate(inverseView.x, inverseView.y, inverseView.z)
+
+            LineDrawer.draw3D(this, 1, !seeThroughBlocks) {
+                drawPath(
+                    listOf(
+                        LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ),
+                        LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.minZ),
+                        LorenzVec(effectiveAABB.maxX, effectiveAABB.minY, effectiveAABB.maxZ),
+                        LorenzVec(effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.maxZ),
+                    ),
+                    c.addAlpha((alphaMultiplier * 255).toInt()),
+                    -1.0,
+                )
+                drawPath(
+                    listOf(
+                        LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.minZ),
+                        LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.minZ),
+                        LorenzVec(effectiveAABB.maxX, effectiveAABB.maxY, effectiveAABB.maxZ),
+                        LorenzVec(effectiveAABB.minX, effectiveAABB.maxY, effectiveAABB.maxZ),
+                    ),
+                    c.addAlpha((alphaMultiplier * 255).toInt()),
+                    -1.0,
+                )
+            }
+
+            matrices.pop()
+        }
+
         val layer = SkyHanniRenderLayers.getFilled(seeThroughBlocks)
         val buf = SkyHanniRenderLayers.getBufferFromLayer(layer)
         matrices.push()
-
-        // todo drawVertical barriers
 
         VertexRendering.drawFilledBox(
             matrices,
