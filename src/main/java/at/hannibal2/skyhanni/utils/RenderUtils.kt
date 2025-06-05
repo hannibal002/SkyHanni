@@ -382,8 +382,9 @@ object RenderUtils {
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereInWorld(color, location.x, location.y, location.z, radius)
+        _drawSphereInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawSphereInWorld instead")
@@ -393,8 +394,9 @@ object RenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereInWorld(color, x, y, z, radius)
+        _drawSphereInWorld(color, x, y, z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawSphereWireframeInWorld instead")
@@ -402,8 +404,9 @@ object RenderUtils {
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius)
+        _drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawSphereWireframeInWorld instead")
@@ -413,8 +416,9 @@ object RenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        _drawSphereWireframeInWorld(color, x, y, z, radius)
+        _drawSphereWireframeInWorld(color, x, y, z, radius, segments)
     }
 
     @Deprecated("Use WorldRenderUtils' drawDynamicText instead")

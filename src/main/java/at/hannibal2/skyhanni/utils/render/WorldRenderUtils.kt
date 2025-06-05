@@ -670,16 +670,18 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereInWorld(color, x, y, z, radius)
+        drawSphereInWorld(color, x, y, z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereInWorld(color, location.x, location.y, location.z, radius)
+        drawSphereInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereInWorld(
@@ -688,6 +690,7 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
@@ -706,8 +709,6 @@ object WorldRenderUtils {
         val worldrenderer = tessellator.worldRenderer
         worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION)
 
-        val segments = 32
-
         for (phi in 0 until segments) {
             for (theta in 0 until segments * 2) {
                 val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
@@ -721,11 +722,9 @@ object WorldRenderUtils {
                 worldrenderer.pos(x1, y1, z1).endVertex()
                 worldrenderer.pos(x2, y2, z2).endVertex()
 
-                val x3 =
-                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 =
-                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -753,16 +752,18 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereWireframeInWorld(color, x, y, z, radius)
+        drawSphereWireframeInWorld(color, x, y, z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
+        segments: Int = 32,
     ) {
-        drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius)
+        drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius, segments)
     }
 
     fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
@@ -771,6 +772,7 @@ object WorldRenderUtils {
         y: Double,
         z: Double,
         radius: Float,
+        segments: Int = 32,
     ) {
         GlStateManager.pushMatrix()
         GL11.glNormal3f(0f, 1f, 0f)
@@ -783,8 +785,6 @@ object WorldRenderUtils {
         val worldrenderer = tessellator.worldRenderer
         worldrenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION)
 
-        val segments = 32
-
         for (phi in 0 until segments) {
             for (theta in 0 until segments * 2) {
                 val x1 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * theta / (segments * 2))
@@ -795,11 +795,9 @@ object WorldRenderUtils {
                 val y2 = y + radius * cos(Math.PI * (phi + 1) / segments)
                 val z2 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * theta / (segments * 2))
 
-                val x3 =
-                    x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val x3 = x + radius * sin(Math.PI * (phi + 1) / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y3 = y + radius * cos(Math.PI * (phi + 1) / segments)
-                val z3 =
-                    z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
+                val z3 = z + radius * sin(Math.PI * (phi + 1) / segments) * sin(2.0 * Math.PI * (theta + 1) / (segments * 2))
 
                 val x4 = x + radius * sin(Math.PI * phi / segments) * cos(2.0 * Math.PI * (theta + 1) / (segments * 2))
                 val y4 = y + radius * cos(Math.PI * phi / segments)
@@ -939,14 +937,14 @@ object WorldRenderUtils {
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(this) {
-            drawEdges(location, color, lineWidth, depth)
+        LineDrawer.draw3D(this, lineWidth, depth) {
+            drawEdges(location, color)
         }
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
-        LineDrawer.draw3D(this) {
-            drawEdges(axisAlignedBB, color, lineWidth, depth)
+        LineDrawer.draw3D(this, lineWidth, depth) {
+            drawEdges(axisAlignedBB, color)
         }
     }
 
@@ -967,8 +965,8 @@ object WorldRenderUtils {
         color: Color,
         lineWidth: Int,
         depth: Boolean,
-    ) = LineDrawer.draw3D(this) {
-        draw3DLine(p1, p2, color, lineWidth, depth)
+    ) = LineDrawer.draw3D(this, lineWidth, depth) {
+        draw3DLine(p1, p2, color)
     }
 
     @Deprecated("Do not use, use proper method instead")
@@ -1077,12 +1075,10 @@ object WorldRenderUtils {
         } else {
             emptyList()
         } + path.toPositionsList().map { it.add(0.5, 0.5, 0.5) }
-        LineDrawer.draw3D(this) {
+        LineDrawer.draw3D(this, lineWidth, depth) {
             drawPath(
                 points,
                 colorLine,
-                lineWidth,
-                depth,
                 bezierPoint,
             )
         }
