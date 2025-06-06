@@ -12,6 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
+// todo needs 1.21 impl
 class PestTrapConfig {
 
     @ConfigOption(
