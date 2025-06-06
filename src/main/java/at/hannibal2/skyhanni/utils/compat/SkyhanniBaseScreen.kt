@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 //#if MC > 1.21
 //$$ import net.minecraft.client.gui.DrawContext
@@ -13,6 +14,8 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$ net.minecraft.network.chat.TextComponent.EMPTY
     //#endif
 ) {
+
+    val mc: Minecraft = Minecraft.getMinecraft()
 
     //#if MC < 1.21
     final override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -28,6 +31,10 @@ abstract class SkyhanniBaseScreen : GuiScreen(
     //$$    onDrawScreen(mouseX, mouseY, delta)
     //$$    DrawContextUtils.clearContext()
     //$$ }
+    //$$
+    //$$ override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, deltaTicks: Float) {
+    //$$         this.renderDarkening(context)
+    //$$     }
     //#endif
 
     open fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {}
@@ -96,7 +103,15 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         onHandleMouseInput()
     }
     //#else
-    //$$ //TODO this is gone on 1.21
+    //$$ override fun mouseMoved(mouseX: Double, mouseY: Double) {
+    //$$     onHandleMouseInput()
+    //$$     super.mouseMoved(mouseX, mouseY)
+    //$$ }
+    //$$
+    //$$ override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalAmount: Double, verticalAmount: Double): Boolean {
+    //$$     onHandleMouseInput()
+    //$$     return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)
+    //$$ }
     //#endif
 
     open fun onHandleMouseInput() {}
@@ -133,7 +148,7 @@ abstract class SkyhanniBaseScreen : GuiScreen(
         //#if MC < 1.21
         drawDefaultBackground()
         //#else
-        //$$ renderBackground(DrawContextUtils.drawContext, mouseX, mouseY, partialTicks)
+        //$$ renderDarkening(DrawContextUtils.drawContext)
         //#endif
     }
 }

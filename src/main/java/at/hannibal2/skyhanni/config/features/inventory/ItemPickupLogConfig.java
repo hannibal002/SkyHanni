@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-//#if TODO
 import at.hannibal2.skyhanni.features.inventory.ItemPickupLog;
 import at.hannibal2.skyhanni.utils.RenderUtils;
-//#endif
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -18,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// todo 1.21 impl needed
 public class ItemPickupLogConfig {
 
     @Expose
@@ -47,7 +44,6 @@ public class ItemPickupLogConfig {
     @ConfigEditorBoolean
     public boolean coins = false;
 
-    //#if TODO
     @Expose
     @ConfigOption(
         name = "Alignment",
@@ -67,7 +63,6 @@ public class ItemPickupLogConfig {
         ItemPickupLog.DisplayLayout.ICON,
         ItemPickupLog.DisplayLayout.ITEM_NAME
     ));
-    //#endif
 
     @Expose
     @ConfigOption(

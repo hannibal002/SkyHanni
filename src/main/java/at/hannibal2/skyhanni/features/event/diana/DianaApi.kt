@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.item.ItemStack
@@ -26,7 +25,7 @@ object DianaApi {
 
     fun hasGriffinPet() = PetApi.isCurrentPet("Griffin")
 
-    fun isDoingDiana() = IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInInventory()
+    fun isDoingDiana() = IslandType.HUB.isCurrent() && isRitualActive() && hasSpadeInInventory()
 
     val ItemStack.isDianaSpade get() = getInternalName() == spade
 

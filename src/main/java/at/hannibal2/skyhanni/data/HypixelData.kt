@@ -25,12 +25,12 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -196,9 +196,9 @@ object HypixelData {
     val map get() = locraw["map"].orEmpty()
 
     fun checkCurrentServerId() {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
         if (serverId != null) return
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
+        if (SkyBlockUtils.lastWorldSwitch.passedSince() < 1.seconds) return
         if (!TabListData.fullyLoaded) return
 
         TabWidget.SERVER.matchMatcherFirstLine {
@@ -228,7 +228,7 @@ object HypixelData {
             "failedServerIdFetchCounter" to failedServerIdFetchCounter,
             "lastSuccessfulServerIdFetchTime" to lastSuccessfulServerIdFetchTime,
             "lastSuccessfulServerIdFetchType" to lastSuccessfulServerIdFetchType,
-            "islandType" to LorenzUtils.skyBlockIsland,
+            "islandType" to SkyBlockUtils.currentIsland,
             "tablist" to TabListData.getTabList(),
             "scoreboard" to ScoreboardData.sidebarLinesFormatted,
         )
@@ -237,7 +237,7 @@ object HypixelData {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Server ID")
-        if (!LorenzUtils.inSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock) {
             event.addIrrelevant("not in sb")
             return
         }
@@ -266,6 +266,7 @@ object HypixelData {
             playerAmountPattern,
             playerAmountGuestingPattern,
         )
+
         if (DungeonApi.inDungeon()) {
             playerPatternList.add(dungeonPartyAmountPattern)
         }
@@ -362,7 +363,7 @@ object HypixelData {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
 
         val message = event.message.removeColor().lowercase()
         if (message.startsWith("your profile was changed to:")) {
@@ -394,11 +395,11 @@ object HypixelData {
     // TODO rewrite everything in here
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!LorenzUtils.inSkyBlock) {
+        if (!SkyBlockUtils.inSkyBlock) {
             sendLocraw()
         }
 
-        if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
+        if (SkyBlockUtils.onHypixel && SkyBlockUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
                     val originalLocation = group("area").removeColor()
@@ -416,9 +417,9 @@ object HypixelData {
             checkProfileName()
         }
 
-        val wasOnHypixel = LorenzUtils.onHypixel
+        val wasOnHypixel = SkyBlockUtils.onHypixel
         checkHypixel()
-        val nowOnHypixel = LorenzUtils.onHypixel
+        val nowOnHypixel = SkyBlockUtils.onHypixel
         when {
             !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
@@ -433,7 +434,7 @@ object HypixelData {
             }
         }
 
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
 
         if (!event.isMod(5)) return
 
@@ -453,7 +454,7 @@ object HypixelData {
     }
 
     private fun sendLocraw() {
-        if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
+        if (SkyBlockUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
             lastLocRaw = SimpleTimeMark.now()
             HypixelCommands.locraw()
         }

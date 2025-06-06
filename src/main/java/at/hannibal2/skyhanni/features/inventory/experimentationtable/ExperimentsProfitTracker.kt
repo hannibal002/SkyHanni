@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -309,7 +308,7 @@ object ExperimentsProfitTracker {
     private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
     private fun isEnabled(checkDistanceToExperimentationTable: Boolean = true) =
-        IslandType.PRIVATE_ISLAND.isInIsland() &&
+        IslandType.PRIVATE_ISLAND.isCurrent() &&
             (!checkDistanceToExperimentationTable || ExperimentationTableApi.inDistanceToTable(5.0))
 
 }

@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
@@ -79,5 +79,5 @@ object BazaarBestSellMethod {
         nextCloseWillResetItem = false
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.bestSellMethod
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.bestSellMethod
 }

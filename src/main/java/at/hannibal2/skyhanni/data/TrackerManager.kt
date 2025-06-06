@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -67,6 +69,15 @@ object TrackerManager {
 
         commandEditTrackerSuccess = false
         ItemAddEvent(internalName, amount, ItemAddManager.Source.COMMAND).post()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shedittracker") {
+            description = "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers."
+            category = CommandCategory.USERS_BUG_FIX
+            legacyCallbackArgs { commandEditTracker(it) }
+        }
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)

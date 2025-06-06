@@ -4,12 +4,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -56,7 +55,7 @@ object DragonFightAPI {
 
     private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")
 
-    fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(IslandAreas.currentAreaName)
+    fun inNestArea() = IslandType.THE_END.isCurrent() && nestAreaPattern.matches(SkyBlockUtils.graphArea)
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent) {

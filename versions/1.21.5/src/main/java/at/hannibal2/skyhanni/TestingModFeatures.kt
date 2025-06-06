@@ -1,41 +1,111 @@
 package at.hannibal2.skyhanni
 
-import at.hannibal2.skyhanni.config.ConfigGuiManager
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
-import net.minecraft.client.MinecraftClient
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.renderBeaconBeam
 
+@SkyHanniModule
 object TestingModFeatures {
 
     init {
         println("TestingModFeatures loaded")
-
-        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-            dispatcher.register(
-                literal("sh").executes {
-                    ConfigGuiManager.onCommand(arrayOf(""))
-                    0
-                },
-            )
-        }
-
-        ClientTickEvents.START_WORLD_TICK.register(
-            ClientTickEvents.StartWorldTick {
-                MinecraftClient.getInstance().player ?: return@StartWorldTick
-
-                //println("screen class: ${MinecraftClient.getInstance().currentScreen?.javaClass?.name}")
-                //println("screen title: ${MinecraftClient.getInstance().currentScreen?.title}")
-
-                // gets inventory stacks
-//                 val size = MinecraftClient.getInstance().player?.currentScreenHandler?.slots?.size ?: 0
-//                 for (i in 0 until size) {
-//                     val slot = MinecraftClient.getInstance().player?.currentScreenHandler?.slots?.get(i)
-//                     println(slot?.stack?.name.formattedTextCompat())
-//                 }
-            },
-        )
-
     }
 
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+    }
+
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+//         val location = LorenzVec(0, -58, 0)
+//
+//         event.drawString(
+//             location,
+//             "Test String",
+//             seeThroughBlocks = true,
+//             LorenzColor.GREEN.toColor(),
+//         )
+//
+//         event.drawString(
+//             location + LorenzVec(0, 0, 1),
+//             "Test String 2",
+//             seeThroughBlocks = false,
+//             LorenzColor.DARK_GREEN.toColor(),
+//         )
+//
+//         event.drawColor(
+//             location + LorenzVec(0, 0, 2),
+//             LorenzColor.AQUA,
+//             beacon = false,
+//             seeThroughBlocks = false,
+//         )
+//
+//         event.drawColor(
+//             location + LorenzVec(0, 0, 3),
+//             LorenzColor.YELLOW,
+//             beacon = true,
+//             seeThroughBlocks = true,
+//         )
+//
+//         event.drawColor(
+//             location + LorenzVec(0, 0, 4),
+//             LorenzColor.DARK_PURPLE,
+//             beacon = true,
+//             seeThroughBlocks = false,
+//         )
+//
+//         event.drawColor(
+//             location + LorenzVec(0, 0, 5),
+//             LorenzColor.WHITE,
+//             beacon = false,
+//             seeThroughBlocks = true,
+//         )
+//
+//         event.renderBeaconBeam(
+//             location + LorenzVec(0, 0, 6),
+//             LorenzColor.RED.toColor().rgb,
+//         )
+//
+//         event.drawWaypointFilled(
+//             location + LorenzVec(0, 0, 7),
+//             LorenzColor.BLUE.toColor(),
+//             seeThroughBlocks = true,
+//             beacon = true
+//         )
+//
+//         event.drawWaypointFilled(
+//             location + LorenzVec(0, 0, 8),
+//             LorenzColor.LIGHT_PURPLE.toColor(),
+//             seeThroughBlocks = false,
+//             beacon = false,
+//         )
+//
+//         event.drawWaypointFilled(
+//             location + LorenzVec(0, 0, 9),
+//             LorenzColor.GRAY.toColor(),
+//             seeThroughBlocks = true,
+//             beacon = false,
+//         )
+//
+//         event.drawWaypointFilled(
+//             location + LorenzVec(0, 0, 10),
+//             LorenzColor.BLACK.toColor(),
+//             seeThroughBlocks = false,
+//             beacon = true,
+//         )
+//
+//         val playerLocation = LocationUtils.playerLocation()
+//
+//         event.drawSphereWireframeInWorld(LorenzColor.GREEN.toColor(), playerLocation, 16f)
+    }
 }

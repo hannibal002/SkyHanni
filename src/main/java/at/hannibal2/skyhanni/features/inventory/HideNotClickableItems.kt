@@ -32,8 +32,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isSoulBound
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -44,6 +42,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -340,7 +339,7 @@ object HideNotClickableItems {
 
     private fun hidePrivateIslandChest(stack: ItemStack): Boolean {
         if (!InventoryUtils.isInNormalChest()) return false
-        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return false
+        if (!IslandType.PRIVATE_ISLAND.isCurrent()) return false
         if (!stack.isSoulBound()) return false
 
         hideReason = "This item cannot be stored into a chest!"
@@ -490,7 +489,7 @@ object HideNotClickableItems {
         }
 
         if (!ItemUtils.isRecombobulated(stack)) {
-            if (LorenzUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) {
+            if (SkyBlockUtils.noTradeMode && BazaarApi.isBazaarItem(stack)) {
                 return false
             }
 
@@ -603,7 +602,7 @@ object HideNotClickableItems {
         return result
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.items
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.items
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

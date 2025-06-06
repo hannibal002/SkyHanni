@@ -916,6 +916,26 @@ object ScoreboardPattern {
         "(?:§f)?Kills: §.\\d+",
     )
 
+    // Galatea
+    private val galateaSB = scoreboardGroup.group("galatea")
+
+    /**
+     * REGEX-TEST: Whispers: §3141§b (+1)
+     * REGEX-TEST: Whispers: §317.5k§b (+50)
+     */
+    val whispersPattern by galateaSB.pattern(
+        "whispers",
+        "Whispers: §3[\\w,.]+.*"
+    )
+
+    /**
+     * REGEX-TEST: §eAgatha's Contest §a5m28s
+     */
+    val agathasContestPattern by galateaSB.pattern(
+        "agathas-contest",
+        "§eAgatha's Contest §a.*",
+    )
+
     /**
      * Somtimes when the scoreboard updates, it only updates half way,
      * causing some lines to become mixed with other lines -> broken.

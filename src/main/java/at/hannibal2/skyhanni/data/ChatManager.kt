@@ -130,7 +130,7 @@ object ChatManager {
         val message = component.formattedText.stripHypixelMessage()
         var cancelled = false
 
-        if (message.startsWith("§f{\"server\":\"")) {
+        if (message.startsWith("§f{\"server\":\"") || message.startsWith("{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
             if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
                 cancelled = true
@@ -267,10 +267,10 @@ object ChatManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shchathistory") {
+        event.registerBrigadier("shchathistory") {
             description = "Show the unfiltered chat history"
             category = CommandCategory.DEVELOPER_TEST
-            callback { openChatHistoryGui(it) }
+            legacyCallbackArgs { openChatHistoryGui(it) }
         }
     }
 }

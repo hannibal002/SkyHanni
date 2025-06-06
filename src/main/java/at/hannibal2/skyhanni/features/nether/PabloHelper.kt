@@ -7,11 +7,11 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import kotlin.time.Duration.Companion.minutes
 
@@ -61,5 +61,5 @@ object PabloHelper {
         lastSentMessage = SimpleTimeMark.now()
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.pabloHelper
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.pabloHelper
 }

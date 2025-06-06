@@ -11,19 +11,18 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
 object RiftApi {
 
-    fun inRift() = IslandType.THE_RIFT.isInIsland()
+    fun inRift() = IslandType.THE_RIFT.isCurrent()
 
     val config: RiftConfig get() = SkyHanniMod.feature.rift
 
@@ -102,13 +101,13 @@ object RiftApi {
 
     }
 
-    fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
-    fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"
-    fun inStillgoreChateau() = LorenzUtils.skyBlockArea.let { it == "Stillgore Château" || it == "Oubliette" }
-    fun inColosseum() = LorenzUtils.skyBlockArea == "Colosseum" || inColosseum
-    fun inDreadfarm() = LorenzUtils.skyBlockArea == "Dreadfarm"
-    fun inWestVillage() = LorenzUtils.skyBlockArea.let { it == "West Village" || it == "Infested House" }
-    fun inMountainTop() = when (LorenzUtils.skyBlockArea) {
+    fun inLivingCave() = SkyBlockUtils.scoreboardArea == "Living Cave"
+    fun inLivingStillness() = SkyBlockUtils.scoreboardArea == "Living Stillness"
+    fun inStillgoreChateau() = SkyBlockUtils.scoreboardArea.let { it == "Stillgore Château" || it == "Oubliette" }
+    fun inColosseum() = SkyBlockUtils.scoreboardArea == "Colosseum" || inColosseum
+    fun inDreadfarm() = SkyBlockUtils.scoreboardArea == "Dreadfarm"
+    fun inWestVillage() = SkyBlockUtils.scoreboardArea.let { it == "West Village" || it == "Infested House" }
+    fun inMountainTop() = when (SkyBlockUtils.scoreboardArea) {
         "Continuum", "The Mountaintop", "Trial Grounds", "Time-Torn Isles",
         "Wizardman Bureau", "Wizard Brawl", "Walk of Fame", "Time Chamber",
         -> true

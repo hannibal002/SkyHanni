@@ -19,13 +19,12 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration.Companion.minutes
@@ -182,21 +181,29 @@ object HoppityEggsManager {
 
     private fun SkyHanniChatEvent.sendNextEggAvailable() {
         val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil } ?: return
-        ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
+        val currentYear = SkyBlockTime.now().year
+        val spawnedEggs = HoppityEventSummary.getSpawnedEggCount(currentYear)
+        when (spawnedEggs) {
+            279 -> sendNextHuntIn("No more eggs will spawn this event")
+            else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
+        }
+        blockedReason = "hoppity_egg"
+    }
+
+    private fun SkyHanniChatEvent.sendNextHuntIn(
+        reason: String = "Hoppity's Hunt is not active"
+    ) {
+        val currentYear = SkyBlockTime.now().year
+        val timeUntil = SkyBlockTime(currentYear + 1).toTimeMark().timeUntil()
+        ChatUtils.chat("§e$reason. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
         blockedReason = "hoppity_egg"
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent) {
         hoppityEventNotOn.matchMatcher(event.message) {
-            val currentYear = SkyBlockTime.now().year
-
-            if (chatConfig.eggLocatorTimeInChat) {
-                val timeUntil = SkyBlockTime(currentYear + 1).asTimeMark().timeUntil()
-                ChatUtils.chat("§eHoppity's Hunt is not active. The next Hoppity's Hunt is in §b${timeUntil.format()}§e.")
-                event.blockedReason = "hoppity_egg"
-            }
-            return
+            if (!chatConfig.eggLocatorTimeInChat) return@matchMatcher
+            return event.sendNextHuntIn()
         }
 
         if (!HoppityApi.isHoppityEvent()) return
@@ -269,7 +276,7 @@ object HoppityEggsManager {
 
     private val warpClickAction: Pair<() -> Unit, String>
         get() =
-            if (LorenzUtils.inSkyBlock) {
+            if (SkyBlockUtils.inSkyBlock) {
                 { HypixelCommands.warp(unclaimedEggsConfig.warpClickDestination) } to
                     "warp to ${unclaimedEggsConfig.warpClickDestination}".trim()
             } else {
@@ -350,6 +357,6 @@ object HoppityEggsManager {
         }
     }
 
-    fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && unclaimedEggsConfig.showOutsideSkyblock)) &&
+    fun isActive() = (SkyBlockUtils.inSkyBlock || (SkyBlockUtils.onHypixel && unclaimedEggsConfig.showOutsideSkyblock)) &&
         HoppityApi.isHoppityEvent()
 }

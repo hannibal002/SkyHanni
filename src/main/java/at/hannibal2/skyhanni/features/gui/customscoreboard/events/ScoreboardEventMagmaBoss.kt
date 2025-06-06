@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
@@ -28,5 +27,5 @@ object ScoreboardEventMagmaBoss : ScoreboardEvent() {
         ScoreboardPattern.bossHealthBarPattern,
     )
 
-    override fun showIsland() = IslandType.CRIMSON_ISLE.isInIsland()
+    override fun showIsland() = IslandType.CRIMSON_ISLE.isCurrent()
 }

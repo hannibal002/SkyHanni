@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import kotlin.time.Duration.Companion.seconds
 
@@ -22,7 +22,7 @@ object EventCounter {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        enabled = LorenzUtils.onHypixel && config.eventCounter
+        enabled = SkyBlockUtils.onHypixel && config.eventCounter
     }
 
     fun count(eventName: String) {

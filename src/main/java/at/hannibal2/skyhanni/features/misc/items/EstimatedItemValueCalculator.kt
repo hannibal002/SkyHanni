@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.isKuudraArmor
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kuudraTiers
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.removeKuudraTier
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.EssenceUtils
 import at.hannibal2.skyhanni.utils.EssenceUtils.getEssencePrices
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getAttributeFromShard
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -31,7 +33,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -78,6 +79,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
+import kotlin.math.max
 
 // TODO split into smaller sub classes
 @Suppress("LargeClass")
@@ -86,7 +88,7 @@ object EstimatedItemValueCalculator {
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
     var starChange = 0
-        get() = if (LorenzUtils.debug) field else 0
+        get() = if (SkyHanniDebugsAndTests.enabled) field else 0
 
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
@@ -183,12 +185,13 @@ object EstimatedItemValueCalculator {
         var subTotal = 0.0
         val combo = ("$internalNameString+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
         val comboPrice = combo.toInternalName().getPriceOrNull()?.minus(basePrice)
+        val flooredComboPrices = max(0.0, (comboPrice ?: 0.0))
 
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
-            list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(useless)}")
+            list.add("§7Attribute Combo: ${flooredComboPrices.formatCoinWithBrackets(useless)}")
             if (!useless) {
-                subTotal += comboPrice
+                subTotal += flooredComboPrices
             }
         } else {
             list.add("§7Attributes:")
@@ -906,8 +909,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun ItemStack.readNbtDump() = tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
-        ?: "no tag compound"
+    private fun ItemStack.readNbtDump() = extraAttributes.getReadableNBTDump(includeLore = true).joinToString("\n")
 
     private fun ItemStack.readUnlockedSlots(): String? {
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection

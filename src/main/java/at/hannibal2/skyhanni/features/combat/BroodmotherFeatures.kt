@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -177,7 +176,7 @@ object BroodmotherFeatures {
         }
     }
 
-    private fun inSpidersDen() = IslandType.SPIDER_DEN.isInIsland()
+    private fun inSpidersDen() = IslandType.SPIDER_DEN.isCurrent()
     private fun isCountdownEnabled() = inSpidersDen() && config.countdown
     private fun isAliveMessageEnabled() = config.alertOnSpawn || config.stages.contains(StageEntry.ALIVE)
 }

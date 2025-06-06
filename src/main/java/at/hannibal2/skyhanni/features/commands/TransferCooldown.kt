@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -22,7 +22,7 @@ object TransferCooldown {
     fun onWorldChange() {
         if (!config.transferCooldown || lastRunCompleted.isInFuture()) return
         lastRunCompleted = DelayedRun.runDelayed(3.seconds) {
-            if (config.transferCooldownMessage && LorenzUtils.inSkyBlock) {
+            if (config.transferCooldownMessage && SkyBlockUtils.inSkyBlock) {
                 ChatUtils.chat("§aPlayer Transfer Cooldown has ended.")
             }
             action?.invoke()

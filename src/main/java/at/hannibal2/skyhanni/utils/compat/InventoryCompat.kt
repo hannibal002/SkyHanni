@@ -8,6 +8,8 @@ import net.minecraft.inventory.Container
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 //#if FABRIC
 //$$ import net.minecraft.screen.slot.SlotActionType
@@ -79,4 +81,38 @@ object InventoryCompat {
 //$$ (MinecraftClient.getInstance().currentScreen as? GenericContainerScreen)?.screenHandler?.syncId
 //#endif
 
+    fun Array<ItemStack?>?.filterNotNullOrEmpty(): List<ItemStack>? {
+        return this?.filterNotNull()?.filter { it.isNotEmpty() }
+    }
+
+    fun Array<ItemStack?>?.convertEmptyToNull(): Array<ItemStack?>? {
+        if (this == null) return null
+        if (this.isEmpty()) return this
+        val new: MutableList<ItemStack?> = mutableListOf()
+        for (stack in this) {
+            if (!stack.isNotEmpty()) new.add(null)
+            else new.add(stack)
+        }
+        return new.normalizeAsArray()
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    fun ItemStack?.isNotEmpty(): Boolean {
+        contract {
+            returns(true) implies (this@isNotEmpty != null)
+        }
+        this ?: return false
+        //#if MC > 1.21
+        //$$ return !this.isEmpty
+        //#else
+        return true
+        //#endif
+    }
+
+    fun ItemStack?.orNull(): ItemStack? {
+        //#if MC > 1.21
+        //$$ return this?.takeUnless { it.isEmpty }
+        //#endif
+        return this
+    }
 }

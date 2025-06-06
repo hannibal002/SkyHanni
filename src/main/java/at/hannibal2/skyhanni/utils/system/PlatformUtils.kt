@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.Loader
 object PlatformUtils {
 
     const val MC_VERSION: String = VersionConstants.MC_VERSION
+    const val IS_LEGACY: Boolean = VersionConstants.MC_VERSION == "1.8.9"
 
     val isDevEnvironment: Boolean by lazy {
         //#if MC < 1.16
@@ -54,11 +55,14 @@ object PlatformUtils {
     private fun getModFromPackage(packageName: String?): ModInstance? = modPackages[packageName]?.let {
         ModInstance(it.modId, it.name, it.version)
     }
+    //#else
+    //$$ private fun getModFromPackage(packageName: String?): ModInstance? {
+    //$$    return null
+    //$$ }
+    //#endif
 
     fun Class<*>.getModInstance(): ModInstance? = getModFromPackage(canonicalName?.substringBeforeLast('.'))
-    //#else
-    //$$ fun Class<*>.getModInstance(): ModInstance? = null
-    //#endif
+
 
     fun isModInstalled(modId: String): Boolean {
         //#if FORGE

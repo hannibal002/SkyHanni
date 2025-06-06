@@ -3,6 +3,9 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -21,7 +24,6 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -132,7 +134,7 @@ object SackApi {
      * have only one render display function
      */
     //
-    val sackItem = mutableMapOf<String, SackOtherItem>()
+    val sackItem = mutableMapOf<NeuInternalName, SackOtherItem>()
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
     private val stackList = mutableMapOf<Int, ItemStack>()
@@ -284,7 +286,7 @@ object SackApi {
                 internalName.getSackPrice(stored).coerceAtLeast(0)
             }
             item.slot = key
-            sackItem[value.displayName] = item
+            sackItem[internalName] = item
         }
     }
 
@@ -350,7 +352,7 @@ object SackApi {
         updateSacks(sackEvent)
         sackEvent.post()
         if (chatConfig.hideSacksChange) {
-            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isInIsland())) {
+            if (chatConfig.hideSacksChange && (!chatConfig.onlyHideSacksChangeOnGarden || IslandType.GARDEN.isCurrent())) {
                 event.blockedReason = "sacks_change"
             }
         }
@@ -475,14 +477,25 @@ object SackApi {
 
     fun NeuInternalName.getAmountInSacks(): Int = getAmountInSacksOrNull() ?: 0
 
-    fun testSackApi(args: Array<String>) {
-        if (args.size == 1) {
-            if (sackListInternalNames.contains(args[0].uppercase())) {
-                ChatUtils.chat("Sack data for ${args[0]}: ${fetchSackItem(args[0].toInternalName())}")
-            } else {
-                ChatUtils.userError("That item isn't a valid sack item.")
+    private fun testSackApi(args: String) {
+        if (sackListInternalNames.contains(args.uppercase())) {
+            ChatUtils.chat("Sack data for $args: ${fetchSackItem(args.toInternalName())}")
+        } else {
+            ChatUtils.userError("That item isn't a valid sack item.")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestsackapi") {
+            description = "Get the amount of an item in sacks according to internal feature SackAPI"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("internalName", BrigadierArguments.string()) { internalName ->
+                callback {
+                    testSackApi(getArg(internalName))
+                }
             }
-        } else ChatUtils.userError("/shtestsackapi <internal name>")
+        }
     }
 }
 

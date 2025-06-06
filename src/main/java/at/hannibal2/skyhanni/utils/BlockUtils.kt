@@ -42,6 +42,7 @@ object BlockUtils {
         return getValue(property) == 0
     }
 
+    //#if TODO
     fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
         val target = start + direction.normalize() * distance
         val result = world.rayTraceBlocks(start.toVec3(), target.toVec3())
@@ -60,7 +61,9 @@ object BlockUtils {
         val to = center.add(distance, distance, distance).toBlockPos()
         return BlockPos.getAllInBox(from, to)
     }
+    //#endif
 
+    //#if TODO
     fun nearbyBlocks(
         center: LorenzVec,
         distance: Int,
@@ -80,6 +83,7 @@ object BlockUtils {
         radius: Int = distance,
         filter: Block,
     ): Map<LorenzVec, IBlockState> = nearbyBlocks(center, distance, radius, condition = { it.block == filter })
+    //#endif
 
     val redstoneOreBlocks = buildList { addRedstoneOres() }
 }

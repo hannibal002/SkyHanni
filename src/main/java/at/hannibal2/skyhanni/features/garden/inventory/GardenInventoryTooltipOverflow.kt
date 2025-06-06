@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
@@ -92,5 +92,5 @@ object GardenInventoryTooltipOverflow {
         return CropType.getByName(cropName.removeColor())
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.inventoryTooltip
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.inventoryTooltip
 }

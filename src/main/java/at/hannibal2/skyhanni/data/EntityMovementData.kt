@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -82,7 +81,7 @@ object EntityMovementData {
             nextTeleport = null
             return
         }
-        if (passedSince > 50.milliseconds && nextData.island.isInIsland()) {
+        if (passedSince > 50.milliseconds && nextData.island.isCurrent()) {
             nextData.action()
             nextTeleport = null
             return

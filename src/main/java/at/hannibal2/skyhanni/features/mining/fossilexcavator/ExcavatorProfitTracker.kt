@@ -12,12 +12,11 @@ import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -233,7 +232,7 @@ object ExcavatorProfitTracker {
         }
     }
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "Fossil Research Center"
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isCurrent() && SkyBlockUtils.graphArea == "Fossil Research Center"
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

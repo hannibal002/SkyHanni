@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 object SkyBlockUtils {
@@ -43,7 +42,6 @@ object SkyBlockUtils {
     val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && currentIsland in islandTypes
-
 
     fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && currentIsland in islandTypes
 }

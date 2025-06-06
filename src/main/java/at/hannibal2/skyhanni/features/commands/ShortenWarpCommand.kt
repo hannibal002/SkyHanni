@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 
 @SkyHanniModule
 object ShortenWarpCommand {
@@ -32,8 +31,8 @@ object ShortenWarpCommand {
 
         val command = message.lowercase().removePrefix("/").trimEnd()
         // Avoid overriding commands on islands where they have a different use
-        if (command == "jerry" && IslandType.PRIVATE_ISLAND.isInIsland()) return
-        if (command == "barn" && IslandType.GARDEN.isInIsland() && SkyHanniMod.feature.garden.gardenCommands.warpCommands) return
+        if (command == "jerry" && IslandType.PRIVATE_ISLAND.isCurrent()) return
+        if (command == "barn" && IslandType.GARDEN.isCurrent() && SkyHanniMod.feature.garden.gardenCommands.warpCommands) return
 
         if (command in warps) {
             event.cancel()

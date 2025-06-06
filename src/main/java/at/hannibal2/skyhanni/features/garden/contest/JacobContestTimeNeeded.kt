@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrue
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
@@ -202,5 +202,5 @@ object JacobContestTimeNeeded {
         config.jacobContestTimesPosition.renderRenderables(display, posLabel = "Jacob Contest Time Needed")
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.jacobContestTimes
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.jacobContestTimes
 }

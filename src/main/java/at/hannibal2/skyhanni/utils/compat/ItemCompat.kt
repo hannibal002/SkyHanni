@@ -200,6 +200,14 @@ enum class DyeCompat(
 
         private fun fromDyeColor(dyeColor: Int): DyeCompat = entries.firstOrNull { it.dyeColor == dyeColor } ?: GRAY
 
+        fun toDamage(stack: ItemStack): Int {
+            //#if MC < 1.21
+            return entries.firstOrNull { it.dyeColor == stack.metadata }?.dyeColor ?: 0
+            //#else
+            //$$ return entries.firstOrNull { it.stackType == stack.item }?.dyeColor ?: 0
+            //#endif
+        }
+
         fun createDyeStack(dyeColor: Int, size: Int = 1): ItemStack =
             fromDyeColor(dyeColor).createStack(size)
     }

@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
@@ -31,12 +31,14 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
-import net.minecraft.network.play.server.S0EPacketSpawnObject
-import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.util.DamageSource
 import net.minecraft.world.World
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
+//#if MC < 1.21
+import net.minecraft.network.play.server.S0EPacketSpawnObject
+import net.minecraft.network.play.server.S0FPacketSpawnMob
+//#endif
 
 @SkyHanniModule
 object MobDetection {
@@ -109,7 +111,7 @@ object MobDetection {
             shouldClear.set(false)
         }
         @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock) return
+        if (!SkyBlockUtils.inSkyBlock) return
 
         makeEntityReferenceUpdate()
 
@@ -267,7 +269,7 @@ object MobDetection {
         }
     }
 
-    private fun islandException(): Boolean = when (LorenzUtils.skyBlockIsland) {
+    private fun islandException(): Boolean = when (SkyBlockUtils.currentIsland) {
         IslandType.GARDEN_GUEST -> true
         IslandType.PRIVATE_ISLAND_GUEST -> true
         else -> false

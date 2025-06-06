@@ -17,11 +17,11 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -53,7 +53,7 @@ object HoppityNpc {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
-        if (LorenzUtils.isStrandedProfile) return
+        if (SkyBlockUtils.isStrandedProfile) return
 
         if (hoppityYearOpened == SkyBlockTime.now().year) return
         if (!HoppityApi.isHoppityEvent()) return
@@ -110,8 +110,8 @@ object HoppityNpc {
         }
     }
 
-    private fun isHighlightEnabled() = LorenzUtils.inSkyBlock && config.highlightHoppityShop
-    private fun isReminderEnabled() = LorenzUtils.inSkyBlock && config.hoppityShopReminder
+    private fun isHighlightEnabled() = SkyBlockUtils.inSkyBlock && config.highlightHoppityShop
+    private fun isReminderEnabled() = SkyBlockUtils.inSkyBlock && config.hoppityShopReminder
 
     private fun clear() {
         inShop = false

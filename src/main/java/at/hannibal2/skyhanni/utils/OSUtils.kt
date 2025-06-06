@@ -10,6 +10,9 @@ import java.net.URI
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import kotlin.time.Duration
+//#if MC > 1.21
+//$$ import net.minecraft.util.Util
+//#endif
 
 object OSUtils {
 
@@ -48,6 +51,7 @@ object OSUtils {
 
     @JvmStatic
     fun openBrowser(url: String) {
+        //#if MC < 1.21
         val desktopSupported = Desktop.isDesktopSupported()
         val supportedActionBrowse = Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)
         if (desktopSupported && supportedActionBrowse) {
@@ -69,6 +73,9 @@ object OSUtils {
                 "supportedActionBrowse" to supportedActionBrowse,
             )
         }
+        //#else
+        //$$ Util.getOperatingSystem().open(url)
+        //#endif
     }
 
     @JvmStatic

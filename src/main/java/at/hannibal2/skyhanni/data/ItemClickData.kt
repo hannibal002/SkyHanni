@@ -14,6 +14,9 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0APacketAnimation
+//#if MC > 1.21
+//$$ import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket
+//#endif
 
 @SkyHanniModule
 object ItemClickData {
@@ -24,13 +27,28 @@ object ItemClickData {
         val cancelled = when {
             packet is C08PacketPlayerBlockPlacement -> {
                 val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
-                if (packet.placedBlockDirection != 255) {
+                //#if MC < 1.16
+                val didntMiss = packet.placedBlockDirection != 255
+                //#else
+                //$$ val didntMiss = !packet.blockHitResult.missed
+                //#endif
+                if (didntMiss) {
+                    //#if MC < 1.16
                     val position = packet.position.toLorenzVec()
+                    //#else
+                    //$$ val position = packet.blockHitResult.blockPos.toLorenzVec()
+                    //#endif
                     BlockClickEvent(ClickType.RIGHT_CLICK, position, packet.getUsedItem()).post() || clickCancelled
                 } else {
                     clickCancelled
                 }
             }
+
+            //#if MC > 1.21
+            //$$ packet is PlayerInteractItemC2SPacket -> {
+            //$$     ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.RIGHT_CLICK).post()
+            //$$ }
+            //#endif
 
             packet is C07PacketPlayerDigging && packet.status == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK -> {
                 val position = packet.position.toLorenzVec()
@@ -52,7 +70,12 @@ object ItemClickData {
                     C02PacketUseEntity.Action.INTERACT_AT -> ClickType.RIGHT_CLICK
                     else -> return
                 }
+                //#if MC < 1.21
                 val clickedEntity = packet.getEntityFromWorld(MinecraftCompat.localWorld) ?: return
+                //#else
+                //$$ val world = MinecraftCompat.localPlayer.world
+                //$$ val clickedEntity = world.getEntityById(packet.entityId) ?: return
+                //#endif
                 EntityClickEvent(clickType, packet.action, clickedEntity, InventoryUtils.getItemInHand()).post()
             }
 

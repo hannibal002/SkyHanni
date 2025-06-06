@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,7 +24,7 @@ object GardenYawAndPitch {
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.onHypixel) return
+        if (!SkyBlockUtils.onHypixel) return
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null && !config.showWithoutTool) return
@@ -61,8 +61,8 @@ object GardenYawAndPitch {
 
     private fun isEnabled() =
         config.enabled && (
-            (OutsideSBFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
-                (LorenzUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden))
+            (OutsideSBFeature.YAW_AND_PITCH.isSelected() && !SkyBlockUtils.inSkyBlock) ||
+                (SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden))
             )
 
     @HandleEvent

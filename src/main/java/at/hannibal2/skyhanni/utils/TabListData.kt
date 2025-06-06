@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -77,7 +78,7 @@ object TabListData {
         }
     }
 
-    fun copyCommand(args: Array<String>) {
+    private fun copyCommand(noColor: Boolean) {
         if (debugCache != null) {
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
@@ -88,7 +89,6 @@ object TabListData {
         }
 
         val resultList = mutableListOf<String>()
-        val noColor = args.size == 1 && args[0] == "true"
         for (line in getTabList()) {
             val tabListLine = line.transformIf({ noColor }) { removeColor() }
             if (tabListLine != "") resultList.add("'$tabListLine'")
@@ -171,7 +171,7 @@ object TabListData {
         if (tablistCache != tabList) {
             tablistCache = tabList
             TabListUpdateEvent(getTabList()).post()
-            if (!LorenzUtils.onHypixel) {
+            if (!SkyBlockUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
         }
@@ -188,7 +188,7 @@ object TabListData {
 
     private fun workaroundDelayedTabListUpdateAgain() {
         DelayedRun.runDelayed(2.seconds) {
-            if (LorenzUtils.onHypixel) {
+            if (SkyBlockUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
                 TabListUpdateEvent(getTabList()).post()
             }
@@ -197,10 +197,18 @@ object TabListData {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtesttablist") {
+        event.registerBrigadier("shtesttablist") {
             description = "Set your clipboard as a fake tab list."
             category = CommandCategory.DEVELOPER_TEST
-            callback { toggleDebug() }
+            simpleCallback { toggleDebug() }
+        }
+        event.registerBrigadier("shcopytablist") {
+            description = "Copies the tab list data to the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("nocolor", BrigadierArguments.bool()) { noColor ->
+                callback { copyCommand(getArg(noColor)) }
+            }
+            simpleCallback { copyCommand(false) }
         }
     }
 }

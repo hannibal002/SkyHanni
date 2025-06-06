@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.api.minecraftevents
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent
+import at.hannibal2.skyhanni.events.render.OverlayType
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
@@ -54,7 +55,7 @@ object RenderEvents {
     @SubscribeEvent
     fun onRenderOverlayPre(event: RenderGameOverlayEvent.Pre) {
         if (!canRender()) return
-        if (GameOverlayRenderPreEvent(DrawContext(), event.type).post()) {
+        if (GameOverlayRenderPreEvent(DrawContext(), RenderLayer.fromForge(event.type)).post()) {
             event.isCanceled = true
         }
     }
@@ -62,7 +63,7 @@ object RenderEvents {
     @SubscribeEvent
     fun onRenderOverlayPost(event: RenderGameOverlayEvent.Post) {
         if (!canRender()) return
-        GameOverlayRenderPostEvent(DrawContext(), event.type).post()
+        GameOverlayRenderPostEvent(DrawContext(), RenderLayer.fromForge(event.type)).post()
     }
 
     @SubscribeEvent
@@ -87,7 +88,7 @@ object RenderEvents {
 
     @SubscribeEvent
     fun onRenderBlockOverlay(event: RenderBlockOverlayEvent) {
-        if (BlockOverlayRenderEvent(event.overlayType).post()) {
+        if (BlockOverlayRenderEvent(OverlayType.fromForge(event.overlayType)).post()) {
             event.isCanceled = true
         }
     }
@@ -109,4 +110,30 @@ object RenderEvents {
     }
 
     private fun canRender(): Boolean = MinecraftCompat.localWorldExists && MinecraftCompat.localPlayerExists
+}
+
+enum class RenderLayer {
+    ALL,
+    HELMET,
+    PORTAL,
+    CROSSHAIRS,
+    BOSSHEALTH,
+    ARMOR,
+    HEALTH,
+    FOOD,
+    AIR,
+    HOTBAR,
+    EXPERIENCE,
+    TEXT,
+    HEALTHMOUNT,
+    JUMPBAR,
+    CHAT,
+    PLAYER_LIST,
+    DEBUG;
+
+    companion object {
+        fun fromForge(element: RenderGameOverlayEvent.ElementType): RenderLayer {
+            return entries[element.ordinal]
+        }
+    }
 }

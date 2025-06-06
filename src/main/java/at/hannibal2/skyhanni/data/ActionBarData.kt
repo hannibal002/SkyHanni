@@ -22,7 +22,7 @@ object ActionBarData {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shtestactionbar") {
+        event.registerBrigadier("shtestactionbar") {
             description = "Set your clipboard as a fake action bar."
             category = CommandCategory.DEVELOPER_TEST
             callback { debugCommand() }

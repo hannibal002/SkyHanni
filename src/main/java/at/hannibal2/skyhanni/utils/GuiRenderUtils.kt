@@ -72,6 +72,18 @@ object GuiRenderUtils {
         DrawContextUtils.drawContext.drawText(fr, str, x, y, color, shadow)
     }
 
+    fun drawStrings(strings: String, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        drawStrings(strings.split("\n"), x, y, color, shadow)
+    }
+
+    fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = 0xffffff, shadow: Boolean = true) {
+        var newY = y
+        for (string in strings) {
+            DrawContextUtils.drawContext.drawText(fr, string, x, newY, color, shadow)
+            newY += 9
+        }
+    }
+
     private fun renderItemStack(item: ItemStack, x: Int, y: Int) {
         //#if MC < 1.21
         val itemRender = Minecraft.getMinecraft().renderItem
@@ -336,9 +348,9 @@ object GuiRenderUtils {
 
         DrawContextUtils.translate(translateX, translateY, -19f)
         DrawContextUtils.scale(finalScale, finalScale, 0.2f)
+        //#if MC < 1.21
         GL11.glNormal3f(0f, 0f, 1f / 0.2f) // Compensate for z scaling
 
-        //#if MC < 1.21
         RenderHelper.enableGUIStandardItemLighting()
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
 

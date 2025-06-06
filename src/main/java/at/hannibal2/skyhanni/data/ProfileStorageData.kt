@@ -15,8 +15,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,6 +31,7 @@ object ProfileStorageData {
 
     private var sackPlayers: SackData.PlayerSpecific? = null
     var sackProfiles: SackData.ProfileSpecific? = null
+
     private var hypixelDataLoaded = false
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
@@ -47,7 +49,11 @@ object ProfileStorageData {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
 
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        loadProfileSpecific(
+            playerSpecific,
+            sackPlayers,
+            profileName,
+        )
         ConfigLoadEvent.post()
     }
 
@@ -59,7 +65,7 @@ object ProfileStorageData {
         if (playerSpecific == null) {
             ErrorManager.skyHanniError(
                 "failed to load your profile data delayed ",
-                "onHypixel" to LorenzUtils.onHypixel,
+                "onHypixel" to SkyBlockUtils.onHypixel,
                 "HypixelData.hypixelLive" to HypixelData.hypixelLive,
                 "HypixelData.hypixelAlpha" to HypixelData.hypixelAlpha,
                 "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
@@ -68,7 +74,11 @@ object ProfileStorageData {
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
-        loadProfileSpecific(playerSpecific, sackPlayers, profileName)
+        loadProfileSpecific(
+            playerSpecific,
+            sackPlayers,
+            profileName,
+        )
         ConfigLoadEvent.post()
     }
 
@@ -123,7 +133,7 @@ object ProfileStorageData {
 
     @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
-        val playerUuid = LorenzUtils.getRawPlayerUuid()
+        val playerUuid = PlayerUtils.getRawUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
         ConfigLoadEvent.post()

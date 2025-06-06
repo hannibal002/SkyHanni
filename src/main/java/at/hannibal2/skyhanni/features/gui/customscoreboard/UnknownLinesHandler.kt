@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
@@ -111,7 +111,7 @@ object UnknownLinesHandler {
         for (line in unknownLines) {
             val unknownLine = allUnknownLines.firstOrNull { it.line == line }
             if (unknownLine == null) {
-                if (LorenzUtils.inSkyBlock) {
+                if (SkyBlockUtils.inSkyBlock) {
                     ChatUtils.debug("Unknown Scoreboard line: '$line'")
                 }
                 allUnknownLines = allUnknownLines.editCopy {
@@ -142,10 +142,10 @@ object UnknownLinesHandler {
         ErrorManager.logErrorWithData(
             // line included in chat message to not cache a previous message
             Exception(line),
-            "CustomScoreboard detected a unknown line: '$line'",
+            "CustomScoreboard detected an unknown line: '$line'",
             "Unknown Line" to line,
             "reason" to reason,
-            "Island" to LorenzUtils.skyBlockIsland,
+            "Island" to SkyBlockUtils.currentIsland,
             "Area" to HypixelData.skyBlockArea,
             "Loaded Patterns" to CustomScoreboard.activePatterns.size,
             "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,

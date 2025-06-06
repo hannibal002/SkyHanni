@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.TitleManager.CountdownTitleContext.Companion.fromTitleData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -273,42 +274,63 @@ object TitleManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsendtitle") {
+        event.registerBrigadier("shsendtitle") {
             description = "Display a title on the screen with the specified settings."
             category = CommandCategory.DEVELOPER_TEST
-            callback { command(it, this.name) }
+            arg("duration", BrigadierArguments.string()) { duration ->
+                arg("title", BrigadierArguments.greedyString()) { title ->
+                    callback { command(getArg(duration), getArg(title)) }
+                }
+            }
+            literal("reset") {
+                callback { resetCommand() }
+            }
         }
-        event.register("shsendinventorytitle") {
+        event.registerBrigadier("shsendinventorytitle") {
             description = "Display a title on the inventory screen with the specified settings."
             category = CommandCategory.DEVELOPER_TEST
-            callback { command(it, this.name, TitleLocation.INVENTORY) }
+            arg("duration", BrigadierArguments.string()) { duration ->
+                arg("title", BrigadierArguments.greedyString()) { title ->
+                    callback { command(getArg(duration), getArg(title), TitleLocation.INVENTORY) }
+                }
+            }
+            literal("reset") {
+                callback { resetCommand() }
+            }
         }
-        event.register("shsendcountdowntitle") {
+        event.registerBrigadier("shsendcountdowntitle") {
             description = "Display a countdown title on the screen with the specified settings."
             category = CommandCategory.DEVELOPER_TEST
-            callback { command(it, this.name, countdown = true) }
+            arg("duration", BrigadierArguments.string()) { duration ->
+                arg("title", BrigadierArguments.greedyString()) { title ->
+                    callback { command(getArg(duration), getArg(title), countdown = true) }
+                }
+            }
+            literal("reset") {
+                callback { resetCommand() }
+            }
         }
     }
 
-    private fun command(args: Array<String>, command: String, location: TitleLocation = TitleLocation.GLOBAL, countdown: Boolean = false) {
-        if (args.getOrNull(0) == "reset") {
-            titleLocationQueues.clear()
-            for (context in currentTitles.values) {
-                context?.stop()
-            }
-            ChatUtils.chat("Reset all active titles!")
-            return
+    private fun resetCommand() {
+        titleLocationQueues.clear()
+        for (context in currentTitles.values) {
+            context?.stop()
         }
-        if (args.size < 2) {
-            ChatUtils.userError("Usage: /$command <duration> <text ..>")
-            return
-        }
+        ChatUtils.chat("Reset all active titles!")
+    }
 
-        val duration = TimeUtils.getDurationOrNull(args[0]) ?: run {
-            ChatUtils.userError("Invalid duration format `${args[0]}`! Use e.g. 10s, or 20m or 30h")
+    private fun command(
+        durationText: String,
+        titleText: String,
+        location: TitleLocation = TitleLocation.GLOBAL,
+        countdown: Boolean = false,
+    ) {
+        val duration = TimeUtils.getDurationOrNull(durationText) ?: run {
+            ChatUtils.userError("Invalid duration format `$durationText`! Use e.g. 10s, or 20m or 30h")
             return
         }
-        val title = "§6" + args.drop(1).joinToString(" ").replace("&", "§")
+        val title = "§6" + titleText.replace("&", "§")
 
         sendTitle(
             title,

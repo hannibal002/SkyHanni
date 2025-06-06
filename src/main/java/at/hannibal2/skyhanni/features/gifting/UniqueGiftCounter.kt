@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -74,6 +74,6 @@ object UniqueGiftCounter {
         )
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WinterApi.isDecember() &&
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && WinterApi.isDecember() &&
         InventoryUtils.itemInHandId.endsWith("_GIFT")
 }

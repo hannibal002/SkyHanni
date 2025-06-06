@@ -20,10 +20,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -96,7 +95,7 @@ object DeepCavernsGuide {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        if (LorenzUtils.skyBlockArea != "Gunpowder Mines") return
+        if (SkyBlockUtils.graphArea != "Gunpowder Mines") return
         if (notUnlockedPattern.matches(event.message)) {
             DelayedRun.runNextTick {
                 start()
@@ -109,7 +108,7 @@ object DeepCavernsGuide {
         showStartIcon = false
         if (!isEnabled()) return
         if (event.inventoryName != "Lift") return
-        if (LorenzUtils.skyBlockArea != "Gunpowder Mines") return
+        if (SkyBlockUtils.graphArea != "Gunpowder Mines") return
         showStartIcon = true
 
         event.inventoryItems[31]?.let {
@@ -169,7 +168,7 @@ object DeepCavernsGuide {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() = IslandType.DEEP_CAVERNS.isInIsland() && config.enabled
+    fun isEnabled() = IslandType.DEEP_CAVERNS.isCurrent() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
