@@ -312,6 +312,7 @@ at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEggsConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryCFReminderConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityEventSummaryLiveDisplayConfig.kt
+at/hannibal2/skyhanni/config/features/event/hoppity/HoppityLocationConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityStrayTimerConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityUnclaimedEggsConfig.kt
 at/hannibal2/skyhanni/config/features/event/hoppity/HoppityWarpMenuConfig.kt
