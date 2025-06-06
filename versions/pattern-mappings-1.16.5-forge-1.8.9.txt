@@ -13,7 +13,7 @@ net.minecraft.network.protocol.game.ClientboundSetObjectivePacket net.minecraft.
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity customName.formattedTextCompatLessResets() getCustomNameTag() at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity name.formattedTextCompatLessResets() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
-net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer name.formattedTextCompat() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer name.formattedTextCompatLessResets() getName() at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 net.minecraft.world.item.ItemStack net.minecraft.item.ItemStack displayName.formattedTextCompat() getDisplayName() at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 

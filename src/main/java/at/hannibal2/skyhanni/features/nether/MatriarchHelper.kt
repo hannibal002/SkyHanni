@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
@@ -69,5 +68,5 @@ object MatriarchHelper {
         }
     }
 
-    fun isEnabled() = config.enabled && IslandType.CRIMSON_ISLE.isInIsland()
+    fun isEnabled() = config.enabled && IslandType.CRIMSON_ISLE.isCurrent()
 }

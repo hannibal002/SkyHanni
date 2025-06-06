@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
-import at.hannibal2.skyhanni.data.jsonobjects.repo.EnforcedConfigValuesJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EnforcedValueData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -12,7 +11,6 @@ import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import kotlin.time.Duration.Companion.INFINITE
 
@@ -24,18 +22,19 @@ object EnforcedConfigValues {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val constant = event.getConstant<EnforcedConfigValuesJson>("misc/EnforcedConfigValues").enforcedConfigValues
-        val oldEnforcedValues = enforcedValues
-        enforcedValues = constant.filter {
-            SkyHanniMod.modVersion <= it.affectedVersion
-        }.filter {
-            it.affectedMinecraftVersions?.contains(VersionConstants.MC_VERSION) ?: true
-        }
-        if (oldEnforcedValues == enforcedValues) return
-        hasSentPSAsOnce = false
-        // we have to recreate the whole config when a value changes
-        // so that the option is blocked off inside the config
-        SkyHanniMod.configManager.recreateConfig()
+        // TODO re-enable when the repo pr is merged
+//         val constant = event.getConstant<EnforcedConfigValuesJson>("misc/EnforcedConfigValues").enforcedConfigValues
+//         val oldEnforcedValues = enforcedValues
+//         enforcedValues = constant.filter {
+//             SkyHanniMod.modVersion <= it.affectedVersion
+//         }.filter {
+//             it.affectedMinecraftVersions?.contains(VersionConstants.MC_VERSION) ?: true
+//         }
+//         if (oldEnforcedValues == enforcedValues) return
+//         hasSentPSAsOnce = false
+//         // we have to recreate the whole config when a value changes
+//         // so that the option is blocked off inside the config
+//         SkyHanniMod.configManager.recreateConfig()
     }
 
     @HandleEvent

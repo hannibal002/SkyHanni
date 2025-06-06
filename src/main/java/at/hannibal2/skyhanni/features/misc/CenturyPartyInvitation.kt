@@ -149,7 +149,7 @@ object CenturyPartyInvitation {
     }
 
     private fun addPlayer(mob: Mob) {
-        val displayName = mob.baseEntity.displayName.formattedText
+        val displayName = mob.baseEntity.name
         val colorCode = playerRankColorPattern.matchMatcher(displayName) {
             group("color")
         } ?: run {
