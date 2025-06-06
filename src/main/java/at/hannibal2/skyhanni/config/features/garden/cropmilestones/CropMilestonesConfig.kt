@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.config.features.garden.cropmilestones
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.config.core.config.Position
-//#if TODO
 import at.hannibal2.skyhanni.utils.TimeUnit
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -16,7 +14,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
-// todo 1.21 impl needed
 class CropMilestonesConfig {
     @Expose
     @ConfigOption(
@@ -58,9 +55,7 @@ class CropMilestonesConfig {
         SECOND("Second", 4),
         ;
 
-        //#if TODO
         val timeUnit = TimeUnit.entries.firstOrNull { it.name == this.name } ?: TimeUnit.SECOND
-        //#endif
         override fun getLegacyId(): Int = legacyId
         override fun toString(): String = displayName
     }
