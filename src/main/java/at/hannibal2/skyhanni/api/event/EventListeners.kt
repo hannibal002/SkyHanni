@@ -2,19 +2,14 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
-//#if TODO
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-//#endif
 import at.hannibal2.skyhanni.utils.ReflectionUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.util.function.Consumer
 
 typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
 
-// todo 1.21 impl needed
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
 
     private val listeners: MutableList<Listener> = mutableListOf()
@@ -131,19 +126,17 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         init {
             cachedPredicates = buildList {
-                //#if TODO
-                if (options.onlyOnSkyblock) add { _ -> LorenzUtils.inSkyBlock }
+                if (options.onlyOnSkyblock) add { _ -> SkyBlockUtils.inSkyBlock }
 
                 if (options.onlyOnIsland != IslandType.ANY) {
                     val island = options.onlyOnIsland
-                    add { _ -> island.isInIsland() }
+                    add { _ -> island.isCurrent() }
                 }
 
                 if (options.onlyOnIslands.isNotEmpty()) {
                     val set = options.onlyOnIslands.toSet()
-                    add { _ -> inAnyIsland(set) }
+                    add { _ -> SkyBlockUtils.inAnyIsland(set) }
                 }
-                //#endif
             }
             // These predicates cant be cached since they depend on info about the actual event
             predicates = buildList {
