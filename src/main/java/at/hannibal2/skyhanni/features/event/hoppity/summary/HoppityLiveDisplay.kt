@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.dropConsecutiveEmpties
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getMealEggCounts
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getSpawnedEggCounts
+import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getSpawnedEggCountsWithInfPossible
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getYearStats
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi.partyModeReplace
@@ -196,7 +197,7 @@ object HoppityLiveDisplay {
         Minecraft.getMinecraft().currentScreen is GuiInventory || Minecraft.getMinecraft().currentScreen is GuiChest
 
     private fun HoppityEventStats.buildMealEggHover(statYear: Int): List<String> = buildList {
-        val spawnedEggs: Map<HoppityEggType, Int> = getSpawnedEggCounts(statYear).takeIfNotEmpty() ?: return@buildList
+        val spawnedEggs: Map<HoppityEggType, Int> = getSpawnedEggCountsWithInfPossible(statYear).takeIfNotEmpty() ?: return@buildList
         val totalSpawnedEggs = spawnedEggs.values.sum()
 
         val totalMealsFound = getMealEggCounts().sumAllValues().toInt()

@@ -346,7 +346,7 @@ object HoppityEventSummary {
         buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
             put(HoppityStat.MEAL_EGGS_FOUND) { statList, stats, year ->
                 val totalMealEggs = stats.getMealEggCounts().sumAllValues().toInt().takeIf { it > 0 } ?: return@put
-                val spawnedMealEggs = getSpawnedEggCounts(year).sumAllValues()
+                val spawnedMealEggs = stats.getSpawnedEggCountsWithInfPossible(year).sumAllValues()
                 val eggFormat = StringUtils.pluralize(totalMealEggs, "Egg")
                 val amount = "$totalMealEggs§7/§a${spawnedMealEggs.addSeparators()}"
                 statList.addStr("§7You found §b$amount §6Chocolate Meal $eggFormat§7.")
@@ -357,7 +357,7 @@ object HoppityEventSummary {
                 getHoppityEventNumber(year).takeIf { it > 41 } ?: return@put
                 val hitmanCount = stats.mealsFound[HoppityEggType.HITMAN]?.takeIf { it > 0 } ?: return@put
 
-                val spawnedMealEggs = getSpawnedEggCounts(year)
+                val spawnedMealEggs = stats.getSpawnedEggCountsWithInfPossible(year)
                 val collectedEggs = stats.getMealEggCounts()
                 val missedMealEggs = (spawnedMealEggs).map { (type, spawnedCount) ->
                     val collectedOfType = collectedEggs[type] ?: 0
@@ -537,16 +537,20 @@ object HoppityEventSummary {
         ChatUtils.chat(summary, prefix = false)
     }
 
-    private fun getAllTimeSpawnedEggCounts(): Map<HoppityEggType, Int> = getAllTimeStats().containingYears.mapNotNull { containingYear ->
-        if (containingYear == Int.MAX_VALUE) return@mapNotNull null
-        getSpawnedEggCounts(containingYear)
-    }.sumByKey().map {
-        it.key to it.value.toInt()
-    }.toMap()
+    fun HoppityEventStats.getSpawnedEggCountsWithInfPossible(year: Int): Map<HoppityEggType, Int> = when {
+        (year == Int.MAX_VALUE) -> {
+            containingYears.mapNotNull { containingYear ->
+                if (containingYear == year) return@mapNotNull null
+                getSpawnedEggCounts(containingYear)
+            }.sumByKey().map {
+                it.key to it.value.toInt()
+            }.toMap()
+        }
+        else -> getSpawnedEggCounts(year)
+    }
 
     fun getSpawnedEggCounts(year: Int): Map<HoppityEggType, Int> = when {
         (year in yearSpawnCache.keys) -> yearSpawnCache[year].orEmpty()
-        (year == Int.MAX_VALUE) -> getAllTimeSpawnedEggCounts()
         (year > SkyBlockTime.now().year) -> mapOf()
         // Hoppity Event #41 was the first event with the new egg types
         (getHoppityEventNumber(year) < 41) -> mapOf(
