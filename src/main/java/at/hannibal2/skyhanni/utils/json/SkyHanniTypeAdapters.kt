@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestType
 //#endif
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
+//#if TODO
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -49,7 +50,7 @@ object SkyHanniTypeAdapters {
         { this.asString() },
         { this.toInternalName() },
     )
-
+//#endif
     val VEC_STRING: TypeAdapter<LorenzVec> = SimpleStringTypeAdapter(
         LorenzVec::asStoredString,
         LorenzVec::decodeFromString,

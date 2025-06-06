@@ -237,8 +237,11 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.5")
 
     if (target.minecraftVersion == MinecraftVersion.MC189) {
-        compileOnly(libs.hypixelmodapi)
+        compileOnly(libs.hypixelmodapi.forge)
         shadowImpl(libs.hypixelmodapitweaker)
+    } else if (target == ProjectTarget.MODERN) {
+        modImplementation(libs.hypixelmodapi)
+        include(libs.hypixelmodapi.fabric)
     }
 
     // getting clock offset
