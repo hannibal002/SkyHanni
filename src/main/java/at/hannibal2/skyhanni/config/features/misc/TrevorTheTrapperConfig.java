@@ -151,7 +151,7 @@ public class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Trapper Ready Title",
-        desc = "Show title and sould when the cooldown is over and trapper is ready for the next quest."
+        desc = "Show a title and play a sound when the cooldown is over and Trapper is ready for the next quest."
     )
     @ConfigEditorBoolean
     @FeatureToggle
