@@ -418,6 +418,7 @@ at/hannibal2/skyhanni/config/features/inventory/CakeTrackerConfig.kt
 at/hannibal2/skyhanni/config/features/inventory/ChestValueConfig.java
 at/hannibal2/skyhanni/config/features/inventory/CraftableItemListConfig.java
 at/hannibal2/skyhanni/config/features/inventory/EnchantParsingConfig.java
+at/hannibal2/skyhanni/config/features/inventory/FannCostConfig.kt
 at/hannibal2/skyhanni/config/features/inventory/FocusModeConfig.java
 at/hannibal2/skyhanni/config/features/inventory/GetFromSackConfig.java
 at/hannibal2/skyhanni/config/features/inventory/HideNotClickableConfig.java
