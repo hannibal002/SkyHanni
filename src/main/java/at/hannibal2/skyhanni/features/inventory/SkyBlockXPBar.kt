@@ -39,5 +39,6 @@ object SkyBlockXPBar {
         }
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && !SkyBlockUtils.inAnyIsland(setOf(IslandType.THE_RIFT, IslandType.CATACOMBS)) && config.skyblockXpBar
+    private fun isEnabled() =
+        SkyBlockUtils.inSkyBlock && !SkyBlockUtils.inAnyIsland(setOf(IslandType.THE_RIFT, IslandType.CATACOMBS)) && config.skyblockXpBar
 }
