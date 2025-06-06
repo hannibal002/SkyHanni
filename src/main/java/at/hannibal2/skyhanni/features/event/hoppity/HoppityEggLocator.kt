@@ -152,7 +152,7 @@ object HoppityEggLocator {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!event.isVillagerParticle()) return
-        if (lastClick.passedSince() < 5.seconds) return
+        if (lastClick.passedSince() > 5.seconds) return
         val pos = event.location
 
         if (bezierFitter.isEmpty()) {
