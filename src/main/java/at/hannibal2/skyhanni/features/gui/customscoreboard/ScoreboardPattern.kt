@@ -921,10 +921,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: Whispers: §3141§b (+1)
+     * REGEX-TEST: Whispers: §317.5k§b (+50)
      */
     val whispersPattern by galateaSB.pattern(
         "whispers",
-        "Whispers: §3[\\d,.]+.*"
+        "Whispers: §3[\\w,.]+.*"
     )
 
     /**
