@@ -9,7 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SpiritLeapConfig {
     companion object {
-        const val DEFAULT_COLOR: String = "0:200:0:0:0"
+        @Transient
+        val DEFAULT_COLOR: String = "0:200:0:0:0"
         private const val DEAD_COLOR: String = "0:200:120:0:0"
     }
 
