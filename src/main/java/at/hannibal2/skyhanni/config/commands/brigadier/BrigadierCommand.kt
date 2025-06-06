@@ -30,12 +30,29 @@ class BrigadierCommand(
     override fun getCommandAliases() = aliases
     override fun canCommandSenderUseCommand(sender: ICommandSender) = true
 
+    private fun getSmartUsage(): List<String> {
+        val map = dispatcher.getSmartUsage(node, null)
+        if (map.isEmpty()) return emptyList()
+        return map.entries.map { "§e/${node.name} ${it.value}" }
+    }
+
     override fun processCommand(sender: ICommandSender, args: Array<String>) {
         val input = if (args.isEmpty()) node.name else "${node.name} ${args.joinToString(" ")}"
         try {
             dispatcher.execute(input, sender)
         } catch (e: CommandSyntaxException) {
-            ChatUtils.userError(e.message ?: "Error when parsing command.")
+            val message = e.message ?: "Error when parsing command."
+            val shouldShowUsage = message.startsWith("Unknown command")
+            val usage = getSmartUsage()
+            if (!shouldShowUsage || usage.isEmpty()) {
+                ChatUtils.userError(message)
+            } else {
+                ChatUtils.hoverableChat(
+                    "§cWrong command usage for /${node.name} (hover to see usage)",
+                    usage,
+                    prefixColor = "§c",
+                )
+            }
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Failed to execute command")
         }
