@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
 object HotmFeatures {
 
     private val config get() = SkyHanniMod.feature.mining.hotm
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && HotmData.inInventory
 
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {

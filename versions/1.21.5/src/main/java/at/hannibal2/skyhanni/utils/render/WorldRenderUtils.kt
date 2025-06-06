@@ -905,6 +905,8 @@ object WorldRenderUtils {
         }
     }
 
+    fun getViewerPos(ignored: Float) = getViewerPos()
+
     fun getViewerPos() =
         MinecraftClient.getInstance().gameRenderer.camera?.let { exactLocation(it) } ?: LorenzVec()
 
