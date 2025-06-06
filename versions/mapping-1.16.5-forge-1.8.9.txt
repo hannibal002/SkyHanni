@@ -69,8 +69,6 @@ net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.
 net.minecraft.client.gui.screens.inventory.InventoryScreen net.minecraft.client.gui.inventory.GuiInventory
 net.minecraft.client.gui.screens.inventory.SignEditScreen net.minecraft.client.gui.inventory.GuiEditSign
 
-net.minecraft.client.gui.screens.inventory.ContainerScreen menu inventorySlots
-
 net.minecraft.client.gui.screens.inventory.SignEditScreen line editLine
 net.minecraft.client.gui.screens.inventory.SignEditScreen sign tileSign
 
@@ -429,6 +427,7 @@ net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
 net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
+net.minecraft.world.inventory.AbstractContainerMenu getItems() getInventory()
 
 net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
 

@@ -1052,6 +1052,7 @@ at.hannibal2.skyhanni.features.stranded.HighlightPlaceableNpcs.kt
 at.hannibal2.skyhanni.features.summonings.SummoningSoulsName.kt
 at.hannibal2.skyhanni.mixins.hooks.ChatLineData.kt
 at.hannibal2.skyhanni.mixins.hooks.GuiChatHook.kt
+at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook.kt
 at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData.java
 at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook.kt
 at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper.kt
@@ -1077,6 +1078,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinRenderManager.java
 at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
+at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiContainer.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiNewChat.java
 at.hannibal2.skyhanni.test.DebugCommand.kt
