@@ -31,12 +31,14 @@ import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
-import net.minecraft.network.play.server.S0EPacketSpawnObject
-import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.util.DamageSource
 import net.minecraft.world.World
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
+//#if MC < 1.21
+import net.minecraft.network.play.server.S0EPacketSpawnObject
+import net.minecraft.network.play.server.S0FPacketSpawnMob
+//#endif
 
 @SkyHanniModule
 object MobDetection {
