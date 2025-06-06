@@ -380,7 +380,7 @@ enum class HotmData(
 
     // TODO move all object functions into hotm api?
     @SkyHanniModule
-    companion object : HotxHandler<HotmData, HotmReward>() {
+    companion object : HotxHandler<HotmData, HotmReward>(entries) {
 
         override val name: String = "HotM"
 
@@ -534,8 +534,6 @@ enum class HotmData(
                 HotmApi.PowderType.entries.forEach(HotmApi.PowderType::resetTree)
             }
         }
-
-        override val data = entries
 
         override val readingLevelTransform: Matcher.() -> Int = {
             group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })

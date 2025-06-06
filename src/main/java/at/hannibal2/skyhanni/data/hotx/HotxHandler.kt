@@ -13,14 +13,13 @@ import net.minecraft.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-abstract class HotxHandler<Data : HotxData<Reward>, Reward> {
+abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data : Collection<Data>) {
 
     /**
      * Name of the Tree Eg: HotM, HotF
      */
     abstract val name: String
     abstract val core: Data
-    abstract val data: Collection<Data>
     abstract var tokens: Int
         protected set
     abstract var availableTokens: Int

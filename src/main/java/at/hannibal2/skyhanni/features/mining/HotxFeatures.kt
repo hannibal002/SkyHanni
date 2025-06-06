@@ -37,7 +37,7 @@ object HotxFeatures {
         if (!(configHotm.levelStackSize && HotmData.inInventory)
             && !(configHotf.levelStackSize && HotfData.inInventory)) return
         HotmData.entries.firstOrNull {
-            event.stack == it.item
+            event.stack.displayName == it.item?.displayName
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else "§e${it.activeLevel}"
             it.activeLevel.toString()
@@ -47,7 +47,7 @@ object HotxFeatures {
     private fun handleTokenStackSize(event: RenderItemTipEvent) {
         if (!(configHotm.tokenStackSize && HotmData.inInventory)
             && !(configHotf.tokenStackSize && HotfData.inInventory)) return
-        if (event.stack != HotmData.heartItem?.stack) return
+        if (event.stack.displayName != HotmData.heartItem?.stack?.displayName) return
         event.stackTip = HotmData.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
     }
 

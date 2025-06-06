@@ -97,7 +97,7 @@ enum class HotfData(
         },
     ),
     GIFTS_250(
-        "§e250 Gifts(", 40,
+        "§e250 Gifts", 40,
         { level ->
             0.0 // TODO
         },
@@ -299,10 +299,9 @@ enum class HotfData(
     override fun getStorage(): HotxTree? = ProfileStorageData.profileSpecific?.foraging?.hotFTree
 
     @SkyHanniModule
-    companion object : HotxHandler<HotfData, HotfReward>() {
+    companion object : HotxHandler<HotfData, HotfReward>(entries) {
         override val name: String = "HotF"
         override val core: HotfData = CENTER_OF_THE_FOREST
-        override val data = entries
         override var tokens: Int
             get() = ProfileStorageData.profileSpecific?.foraging?.tokens ?: 0
             set(value) {
