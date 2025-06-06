@@ -129,18 +129,19 @@ enum class ItemAbility(
 
     companion object {
 
-        val WITHER_SCROLLS = listOf(WITHER_SHIELD_SCROLL, SHADOW_WARP_SCROLL, IMPLOSION_SCROLL)
+        private val WITHER_SCROLLS = setOf(WITHER_SHIELD_SCROLL, SHADOW_WARP_SCROLL, IMPLOSION_SCROLL)
 
         fun getByInternalName(internalName: NeuInternalName): ItemAbility? {
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
 
-        fun getAllAbilityScrolls(itemStack: ItemStack?): List<ItemAbility> = buildList {
-            val scrollAbilities = itemStack?.getAbilityScrolls()?.takeIfNotEmpty() ?: return@buildList
-            val scrolls = WITHER_SCROLLS.filter { ability -> ability.internalNames.any { it in scrollAbilities } }
-            if (scrolls.size == 3) add(WITHER_IMPACT)
-            else addAll(scrolls)
-        }
+        fun getAllAbilityScrolls(itemStack: ItemStack?): Set<ItemAbility> =
+            itemStack?.getAbilityScrolls()?.takeIfNotEmpty()?.getAllAbilityScrolls() ?: emptySet()
+
+        fun List<NeuInternalName>.getAllAbilityScrolls(): Set<ItemAbility> = WITHER_SCROLLS
+            .filter { ability -> ability.internalNames.any { it in this } }
+            .toMutableSet()
+            .apply { if (size == 3) add(WITHER_IMPACT) }
 
         fun ItemAbility.getMultiplier(): Double {
             return getMageCooldownReduction() ?: 1.0
