@@ -177,7 +177,7 @@ object BlockStrengthGuide {
             val ore = oreBlocks.first()
 
             val speed = rawSpeed.base + when (ore.category) {
-                OreCategory.DWARVEN_METAL -> rawSpeed.dwarven
+                OreCategory.DWARVEN_METAL -> rawSpeed.metal
                 OreCategory.GEMSTONE -> rawSpeed.gemstone
                 OreCategory.ORE -> rawSpeed.ore
                 OreCategory.BLOCK -> rawSpeed.block
@@ -313,7 +313,7 @@ object BlockStrengthGuide {
             base = (
                 SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0
                 ) + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
-            dwarven = HotmData.STRONG_ARM.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
+            metal = HotmData.STRONG_ARM.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
             gemstone = (
                 HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0
                 ) + (
@@ -331,7 +331,7 @@ object BlockStrengthGuide {
 
     private data class SpeedClass(
         val base: Double,
-        val dwarven: Double,
+        val metal: Double,
         val gemstone: Double,
         val ore: Double,
         val block: Double,
@@ -339,11 +339,11 @@ object BlockStrengthGuide {
         fun toRenderables() = listOf(
             base.toInt().addSeparators(),
             gemstone.toInt().addSeparators(),
-            dwarven.toInt().addSeparators(),
+            metal.toInt().addSeparators(),
         ).map { RenderableString("§6$it", horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) }
     }
 
-    private val headerHeaderLine = listOf("Base", "Gemstone", "Dwarven").map {
+    private val headerHeaderLine = listOf("Base", "Gemstone", "Metal").map {
         RenderableString(
             text = it,
             scale = 0.75,
@@ -431,7 +431,7 @@ object BlockStrengthGuide {
         when {
             RiftApi.inRift() -> "in the rift"
             DungeonApi.inDungeon() -> "in dungeons"
-            KuudraApi.inKuudra() -> "in kuudra"
+            KuudraApi.inKuudra -> "in kuudra"
             else -> null
         }?.let {
             ChatUtils.userError("The Block Strengh Guide does not work $it!")
