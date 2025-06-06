@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -97,7 +98,7 @@ object SackDisplay {
         val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
         addString("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
         val table = buildMap {
-            for ((itemName, item) in sortedPairs) {
+            for (item in sortedPairs.values) {
                 val (internalName, colorCode, total, magmaFish) = item
                 val stored = item.stored
                 val price = item.price
@@ -106,16 +107,17 @@ object SackDisplay {
                 totalPrice += price
                 if (rendered >= config.itemToShow) continue
                 if (stored == 0 && !config.showEmpty) continue
+                val name = internalName.repoItemNameCompact
 
                 val row = buildList {
                     addString(" §7- ")
                     addItemStack(internalName)
                     // TODO move replace into itemName
                     val nameText = Renderable.optionalLink(
-                        itemName.replace("§k", ""),
+                        name.replace("§k", ""),
                         onLeftClick = {
                             if (!SackApi.isTrophySack) {
-                                BazaarApi.searchForBazaarItem(itemName)
+                                BazaarApi.searchForBazaarItem(internalName)
                             }
                         },
                         highlightsOnHoverSlots = listOf(slot),
@@ -171,7 +173,7 @@ object SackDisplay {
                     }
                     if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
                 }
-                put(row, itemName)
+                put(row, name)
                 rendered++
             }
         }
@@ -182,8 +184,8 @@ object SackDisplay {
         return totalPrice
     }
 
-    private fun <T : SackApi.AbstractSackItem> sort(sackItems: List<Pair<String, T>>): MutableMap<String, T> {
-        val sortedPairs: MutableMap<String, T> = when (config.sortingType) {
+    private fun <T : SackApi.AbstractSackItem, K> sort(sackItems: List<Pair<K, T>>): MutableMap<K, T> {
+        val sortedPairs: MutableMap<K, T> = when (config.sortingType) {
             SortingTypeEntry.DESC_STORED -> sackItems.sortedByDescending { it.second.stored }
             SortingTypeEntry.ASC_STORED -> sackItems.sortedBy { it.second.stored }
             SortingTypeEntry.DESC_PRICE -> sackItems.sortedByDescending { it.second.price }
