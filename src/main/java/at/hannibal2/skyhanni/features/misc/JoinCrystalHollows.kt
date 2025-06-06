@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
@@ -27,7 +26,7 @@ object JoinCrystalHollows {
         val message = event.message
         if (message == "§cYou do not have an active Crystal Hollows pass!") {
             lastWrongPassTime = System.currentTimeMillis()
-            if (!IslandType.DWARVEN_MINES.isInIsland()) {
+            if (!IslandType.DWARVEN_MINES.isCurrent()) {
                 ChatUtils.clickableChat(
                     "Click here to warp to Dwarven Mines!",
                     onClick = { HypixelCommands.warp("mines") },

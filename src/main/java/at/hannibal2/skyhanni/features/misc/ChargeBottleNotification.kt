@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import kotlin.time.Duration.Companion.seconds
@@ -63,5 +63,5 @@ object ChargeBottleNotification {
         event.move(76, "misc.thunderBottleNotification", "misc.chargeBottleNotification")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.chargeBottleNotification
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.chargeBottleNotification
 }

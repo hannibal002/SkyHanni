@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 @SkyHanniModule
 object CopyScoreboardCommand {
 
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         val resultList = mutableListOf<String>()
         val noColor = args.contains("-nocolor")
         val raw = args.contains("-raw")

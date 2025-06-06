@@ -1,10 +1,14 @@
 package at.hannibal2.skyhanni.test.command
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
@@ -20,6 +24,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.getFirstPassenger
+import at.hannibal2.skyhanni.utils.compat.getInventoryItems
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.Entity
@@ -33,10 +38,10 @@ import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 
-// todo 1.21 impl needed
+@SkyHanniModule
 object CopyNearbyEntitiesCommand {
 
-    fun command(args: Array<String>) {
+    private fun command(args: Array<String>) {
         var searchRadius = 10
         if (args.size == 1) {
             searchRadius = args[0].toInt()
@@ -132,16 +137,14 @@ object CopyNearbyEntitiesCommand {
         add("EntityArmorStand:")
         val headRotation = entity.headRotation.toLorenzVec()
         val bodyRotation = entity.bodyRotation.toLorenzVec()
-        //#if TODO
         add("-  headRotation: $headRotation")
         add("-  bodyRotation: $bodyRotation")
 
         add("-  inventory:")
-        for ((id, stack) in entity.inventory.withIndex()) {
+        for ((id, stack) in entity.getInventoryItems().withIndex()) {
             add("-  id $id ($stack)")
             printItemStackData(stack)
         }
-        //#endif
     }
 
     private fun MutableList<String>.addEnderman(entity: EntityEnderman) {
@@ -285,6 +288,15 @@ object CopyNearbyEntitiesCommand {
         }
         if (mob.boundingBox != mob.baseEntity.entityBoundingBox) {
             add("Bounding Box: ${mob.boundingBox}")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shcopyentities") {
+            description = "Copies the entites in the specified radius around the player into the clipboard"
+            category = CommandCategory.DEVELOPER_DEBUG
+            legacyCallbackArgs { command(it) }
         }
     }
 

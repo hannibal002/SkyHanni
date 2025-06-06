@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -41,5 +41,5 @@ object XPInInventories {
         event.toolTip.add(indexOfCost + 1, "§7Your XP: $color$playerXP")
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.xpInInventory
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.xpInInventory
 }
