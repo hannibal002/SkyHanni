@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -21,10 +22,10 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object SummoningSoulsName {
 
-    const SUMMONING_SOUL_TEXTURE by lazy { SkullTextureHolder.getTexture("SUMMONING_SOUL") }
-    val souls = mutableMapOf<EntityArmorStand, String>()
-    val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
-    val mobsName = TimeLimitedCache<Int, String>(6.minutes)
+    private val SUMMONING_SOUL_TEXTURE by lazy { SkullTextureHolder.getTexture("SUMMONING_SOUL") }
+    private val souls = mutableMapOf<EntityArmorStand, String>()
+    private val mobsLastLocation = TimeLimitedCache<Int, LorenzVec>(6.minutes)
+    private val mobsName = TimeLimitedCache<Int, String>(6.minutes)
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
