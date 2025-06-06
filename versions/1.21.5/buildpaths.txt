@@ -49,6 +49,8 @@ at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig.kt
 at.hannibal2.skyhanni.config.features.dev.WaypointsConfig.kt
 at.hannibal2.skyhanni.config.features.dev.minecraftconsole.ConsoleFiltersConfig.kt
 at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig.kt
+at.hannibal2.skyhanni.config.features.foraging.ForagingConfig.kt
+at.hannibal2.skyhanni.config.features.foraging.HotfConfig.kt
 at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.java
 at.hannibal2.skyhanni.config.features.garden.GardenLevelConfig.java
 at.hannibal2.skyhanni.config.features.garden.NumbersConfig.java
@@ -129,6 +131,10 @@ at.hannibal2.skyhanni.data.WinterApi.kt
 at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher.kt
 at.hannibal2.skyhanni.data.effect.EffectApi.kt
 at.hannibal2.skyhanni.data.effect.NonGodPotEffect.kt
+at.hannibal2.skyhanni.data.hotx.HotfData.kt
+at.hannibal2.skyhanni.data.hotx.HotmData.kt
+at.hannibal2.skyhanni.data.hotx.HotxData.kt
+at.hannibal2.skyhanni.data.hotx.HotxHandler.kt
 at.hannibal2.skyhanni.data.hypixel.chat.PlayerChatManager.kt
 at.hannibal2.skyhanni.data.hypixel.chat.PlayerNameFormatter.kt
 at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractChatEvent.kt
@@ -140,7 +146,7 @@ at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent.kt
 at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent.kt
 at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent.kt
 at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent.kt
-at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree.kt
+at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree.kt
 at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson.java
 at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson.kt
 at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson.kt
@@ -818,7 +824,7 @@ at.hannibal2.skyhanni.features.mining.DeepCavernsGuide.kt
 at.hannibal2.skyhanni.features.mining.FlowstateHelper.kt
 at.hannibal2.skyhanni.features.mining.GoldenGoblinHighlight.kt
 at.hannibal2.skyhanni.features.mining.HighlightMiningCommissionMobs.kt
-at.hannibal2.skyhanni.features.mining.HotmFeatures.kt
+at.hannibal2.skyhanni.features.mining.HotxFeatures.kt
 at.hannibal2.skyhanni.features.mining.KingTalismanHelper.kt
 at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.kt
 at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.kt
@@ -1619,7 +1625,6 @@ at/hannibal2/skyhanni/config/features/slayer/vampire/VampireConfig.kt
 at/hannibal2/skyhanni/config/features/stranded/StrandedConfig.kt
 at/hannibal2/skyhanni/data/ActionBarStatsData.kt
 at/hannibal2/skyhanni/data/ElectionApi.kt
-at/hannibal2/skyhanni/data/HotmData.kt
 at/hannibal2/skyhanni/data/IslandType.kt
 at/hannibal2/skyhanni/data/MaxwellApi.kt
 at/hannibal2/skyhanni/data/MayorData.kt
