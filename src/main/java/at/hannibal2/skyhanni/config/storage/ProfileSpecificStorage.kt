@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
-import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
+import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.combat.end.DragonProfitTracker
@@ -644,9 +644,35 @@ class ProfileSpecificStorage {
         var currentSlot: Int? = null
     }
 
+    // - foraging
+    @Expose
+    var foraging: ForagingStorage = ForagingStorage()
+
+    class ForagingStorage {
+        @Expose
+        var hotFTree: HotxTree = HotxTree()
+
+        @Expose
+        var tokens: Int = 0
+
+        @Expose
+        var availableTokens: Int = 0
+
+        @Expose
+        var whispers : PowderStorage = PowderStorage()
+    }
+
     // - mining
     @Expose
     var mining: MiningStorage = MiningStorage()
+
+    class PowderStorage {
+        @Expose
+        var available: Long? = null
+
+        @Expose
+        var total: Long? = null
+    }
 
     class MiningStorage {
         @Expose
@@ -656,18 +682,10 @@ class ProfileSpecificStorage {
         var fossilExcavatorProfitTracker: ExcavatorProfitTracker.Data = ExcavatorProfitTracker.Data()
 
         @Expose
-        var hotmTree: HotmTree = HotmTree()
+        var hotmTree: HotxTree = HotxTree()
 
         @Expose
         var powder: MutableMap<PowderType, PowderStorage> = enumMapOf()
-
-        class PowderStorage {
-            @Expose
-            var available: Long? = null
-
-            @Expose
-            var total: Long? = null
-        }
 
         @Expose
         var tokens: Int = 0
