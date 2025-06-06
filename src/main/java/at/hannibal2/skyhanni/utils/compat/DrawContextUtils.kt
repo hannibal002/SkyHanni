@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import java.nio.FloatBuffer
 import net.minecraft.util.Vec3
+import java.nio.FloatBuffer
 
 //#if MC < 1.21
 import net.minecraft.client.renderer.GlStateManager
