@@ -383,7 +383,7 @@ enum class HotfData(
          */
         override val heartTokensPattern: Pattern by patternGroup.pattern(
             "inventory.heart.token",
-            "§7Tokens of the Forest: §a0",
+            "§7Tokens of the Forest: §a(?<token>\\d+)",
         )
 
         /**
@@ -391,7 +391,7 @@ enum class HotfData(
          */
         override val resetTokensPattern: Pattern by patternGroup.pattern(
             "inventory.reset.token",
-            "\\s*§8- §a5 §aToken of the Forest",
+            "\\s*§8- §a(?<token>\\d+) §aToken of the Forest",
         )
 
         /**
