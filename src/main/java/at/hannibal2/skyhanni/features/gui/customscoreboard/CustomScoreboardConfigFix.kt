@@ -51,11 +51,7 @@ object CustomScoreboardConfigFix {
             event.move(31, oldKey, newKey)
         }
 
-        event.transform(37, EVENT_ENTRIES_KEY) {
-            it.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardConfigEventElement.QUEUE.name))
-            }
-        }
+        addEvent(37, ScoreboardConfigEventElement.QUEUE)
 
         event.transform(40, EVENT_ENTRIES_KEY) { element ->
             replaceElements(element, listOf("HOT_DOG_CONTEST", "EFFIGIES"), ScoreboardConfigEventElement.RIFT.name)
@@ -74,18 +70,9 @@ object CustomScoreboardConfigFix {
             )
         }
 
-        event.transform(50, EVENT_ENTRIES_KEY) {
-            it.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardConfigEventElement.ANNIVERSARY.name))
-                add(JsonPrimitive(ScoreboardConfigEventElement.CARNIVAL.name))
-            }
-        }
+        addEvent(50, ScoreboardConfigEventElement.ANNIVERSARY, ScoreboardConfigEventElement.CARNIVAL)
 
-        event.transform(51, EVENT_ENTRIES_KEY) {
-            it.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardConfigEventElement.NEW_YEAR.name))
-            }
-        }
+        addEvent(51, ScoreboardConfigEventElement.NEW_YEAR)
 
         event.move(57, "$TITLE_AND_FOOTER_KEY.useHypixelTitleAnimation", "$TITLE_AND_FOOTER_KEY.useCustomTitle") {
             JsonPrimitive(!it.asBoolean)
@@ -108,6 +95,18 @@ object CustomScoreboardConfigFix {
                 if (it.asBoolean) CustomScoreboardUtils.NumberDisplayFormat.COLOR_TEXT_NUMBER.name
                 else CustomScoreboardUtils.NumberDisplayFormat.TEXT_COLOR_NUMBER.name,
             )
+        }
+
+        addEvent(88, ScoreboardConfigEventElement.GALATEA)
+    }
+
+    private fun ConfigUpdaterMigrator.ConfigFixEvent.addEvent(version: Int, vararg keys: ScoreboardConfigEventElement) {
+        transform(version, EVENT_ENTRIES_KEY) {
+            it.asJsonArray.apply {
+                keys.forEach {
+                    add(JsonPrimitive(it.name))
+                }
+            }
         }
     }
 
