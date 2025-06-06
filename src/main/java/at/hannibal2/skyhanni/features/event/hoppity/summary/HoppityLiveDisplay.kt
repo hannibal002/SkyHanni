@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.buildEmptyFallback
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.dropConsecutiveEmpties
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getMealEggCounts
-import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getSpawnedEggCounts
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getSpawnedEggCountsWithInfPossible
 import at.hannibal2.skyhanni.features.event.hoppity.summary.HoppityEventSummary.getYearStats
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
