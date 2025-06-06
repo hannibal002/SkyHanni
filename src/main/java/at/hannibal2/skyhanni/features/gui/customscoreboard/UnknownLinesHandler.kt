@@ -148,7 +148,7 @@ object UnknownLinesHandler {
         ErrorManager.logErrorWithData(
             // line included in chat message to not cache a previous message
             Exception(line),
-            "CustomScoreboard detected a unknown line: '$line'",
+            "CustomScoreboard detected an unknown line: '$line'",
             "Unknown Line" to line,
             "reason" to reason,
             "Island" to SkyBlockUtils.currentIsland,
