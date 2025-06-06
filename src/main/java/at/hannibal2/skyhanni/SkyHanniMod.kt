@@ -120,7 +120,9 @@ object SkyHanniMod {
     lateinit var jacobContestsData: JacobContestsJson
     //#endif
     lateinit var visualWordsData: VisualWordsJson
+    //#if TODO
     lateinit var petData: PetDataStorage
+    //#endif
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")
