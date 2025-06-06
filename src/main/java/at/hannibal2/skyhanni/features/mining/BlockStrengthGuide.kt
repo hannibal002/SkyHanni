@@ -25,13 +25,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
@@ -430,7 +430,7 @@ object BlockStrengthGuide {
         when {
             RiftApi.inRift() -> "in the rift"
             DungeonApi.inDungeon() -> "in dungeons"
-            KuudraApi.inKuudra() -> "in kuudra"
+            KuudraApi.inKuudra -> "in kuudra"
             else -> null
         }?.let {
             ChatUtils.userError("The Block Strengh Guide does not work $it!")
@@ -461,9 +461,9 @@ object BlockStrengthGuide {
                 ErrorManager.logErrorStateWithData(
                     "could not load mining data for /shblockstrengh command",
                     "opened /sbmenu and found no mining speed in the next 2s",
-                    "island" to LorenzUtils.skyBlockIsland,
-                    "graph area" to LorenzUtils.graphArea,
-                    "scoreboard area" to LorenzUtils.scoreboardArea,
+                    "island" to SkyBlockUtils.currentIsland,
+                    "graph area" to SkyBlockUtils.graphArea,
+                    "scoreboard area" to SkyBlockUtils.scoreboardArea,
                     "location" to LocationUtils.playerLocation(),
                     betaOnly = true,
                 )
