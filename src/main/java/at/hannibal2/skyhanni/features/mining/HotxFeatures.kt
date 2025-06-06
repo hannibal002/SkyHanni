@@ -18,8 +18,9 @@ object HotxFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!(configHotm.highlightEnabledPerks && HotmData.inInventory)
-            && !(configHotf.highlightEnabledPerks && HotfData.inInventory)) return
+        if (!(configHotm.highlightEnabledPerks && HotmData.inInventory) &&
+            !(configHotf.highlightEnabledPerks && HotfData.inInventory)
+        ) return
         HotmData.entries.forEach { entry ->
             val color = if (!entry.isUnlocked) LorenzColor.DARK_GRAY
             else if (entry.enabled) LorenzColor.GREEN else LorenzColor.RED
@@ -34,8 +35,9 @@ object HotxFeatures {
     }
 
     private fun handleLevelStackSize(event: RenderItemTipEvent) {
-        if (!(configHotm.levelStackSize && HotmData.inInventory)
-            && !(configHotf.levelStackSize && HotfData.inInventory)) return
+        if (!(configHotm.levelStackSize && HotmData.inInventory) &&
+            !(configHotf.levelStackSize && HotfData.inInventory)
+        ) return
         HotmData.entries.firstOrNull {
             event.stack.displayName == it.item?.displayName
         }?.let {
@@ -46,7 +48,8 @@ object HotxFeatures {
 
     private fun handleTokenStackSize(event: RenderItemTipEvent) {
         if (!(configHotm.tokenStackSize && HotmData.inInventory)
-            && !(configHotf.tokenStackSize && HotfData.inInventory)) return
+            && !(configHotf.tokenStackSize && HotfData.inInventory)
+        ) return
         if (event.stack.displayName != HotmData.heartItem?.stack?.displayName) return
         event.stackTip = HotmData.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
     }

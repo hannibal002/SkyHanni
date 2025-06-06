@@ -659,7 +659,7 @@ class ProfileSpecificStorage {
         var availableTokens: Int = 0
 
         @Expose
-        var whispers : PowderStorage = PowderStorage()
+        var whispers: PowderStorage = PowderStorage()
     }
 
     // - mining

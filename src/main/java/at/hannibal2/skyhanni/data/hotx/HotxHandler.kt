@@ -13,7 +13,7 @@ import net.minecraft.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data : Collection<Data>) {
+abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data: Collection<Data>) {
 
     /**
      * Name of the Tree Eg: HotM, HotF
@@ -29,21 +29,22 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data : Collectio
     protected abstract val inventoryPattern: Pattern
     protected abstract val levelPattern: Pattern
     protected abstract val notUnlockedPattern: Pattern
-    protected abstract val heartItemPattern : Pattern
-    protected abstract val resetItemPattern : Pattern
+    protected abstract val heartItemPattern: Pattern
+    protected abstract val resetItemPattern: Pattern
 
     /**
      * Needs a group "token" (only digits)
      */
-    protected abstract val heartTokensPattern : Pattern
+    protected abstract val heartTokensPattern: Pattern
+
     /**
      * Needs a group "token" (only digits)
      */
-    protected abstract val resetTokensPattern : Pattern
+    protected abstract val resetTokensPattern: Pattern
     protected abstract val readingLevelTransform: Matcher.() -> Int
 
     var inInventory: Boolean = false
-    var heartItem : Slot? = null
+    var heartItem: Slot? = null
 
     init {
         data.forEach { it.guiNamePattern }
@@ -120,7 +121,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data : Collectio
     /**
      * @return True means it read an item, false means it did not.
      */
-    protected fun Slot.handleCurrency(): Boolean{
+    protected fun Slot.handleCurrency(): Boolean {
         val item = this.stack ?: return false
 
         val isHeartItem = when {
@@ -129,7 +130,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data : Collectio
             else -> return false
         }
 
-        if(isHeartItem){ // Reset on the heart Item to remove duplication
+        if (isHeartItem) { // Reset on the heart Item to remove duplication
             availableTokens = 0
             currencyReset(true)
             heartItem = this
@@ -137,7 +138,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data : Collectio
 
         val lore = item.getLore()
 
-        val tokenPattern = if(isHeartItem) heartTokensPattern else resetTokensPattern
+        val tokenPattern = if (isHeartItem) heartTokensPattern else resetTokensPattern
         lore@ for (line in lore) {
             tokenPattern.matchMatcher(line) {
                 val token = group("token").toInt()
@@ -147,14 +148,14 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward>(val data : Collectio
                 tokens += token
                 continue@lore
             }
-            readFromHeartOrReset(line,isHeartItem)
+            readFromHeartOrReset(line, isHeartItem)
         }
         return true
     }
 
-    protected abstract fun readFromHeartOrReset(line: String,isHeartItem : Boolean)
+    protected abstract fun readFromHeartOrReset(line: String, isHeartItem: Boolean)
 
-    protected open fun currencyReset(full : Boolean = false) {
+    protected open fun currencyReset(full: Boolean = false) {
         availableTokens = tokens
     }
 

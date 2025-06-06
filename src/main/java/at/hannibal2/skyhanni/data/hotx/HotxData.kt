@@ -6,19 +6,19 @@ import net.minecraft.item.ItemStack
 import java.util.regex.Pattern
 
 interface HotxData<Reward> {
-    abstract val maxLevel: Int
-    abstract val costFun: (Int) -> (Double?)
-    abstract val rewardFun: (Int) -> (Map<Reward, Double>)
+    val maxLevel: Int
+    val costFun: (Int) -> (Double?)
+    val rewardFun: (Int) -> (Map<Reward, Double>)
 
     /**
      * Identifier
      */
-    abstract val name: String
+    val name: String
 
     /**
      * Name of the Item in the gui for reading
      */
-    abstract val guiName: String
+    val guiName: String
 
     /**
      * Userfacing name of the Perk
@@ -30,8 +30,8 @@ interface HotxData<Reward> {
     /**
      * Level with buffs applied
      */
-    abstract val effectiveLevel: Int
-    abstract fun getStorage(): HotxTree?
+    val effectiveLevel: Int
+    fun getStorage(): HotxTree?
 
     val guiNamePattern: Pattern
 

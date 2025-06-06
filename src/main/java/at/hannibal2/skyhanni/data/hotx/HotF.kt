@@ -359,7 +359,7 @@ enum class HotfData(
          */
         override val notUnlockedPattern: Pattern by patternGroup.pattern(
             "perk.notunlocked",
-            "(?:§.)*Requires.*|.*Forest(§.)*!|(?:§.)*Click to unlock!",
+            "(?:§.)*Requires.*|.*Forest(?:§.)*!|(?:§.)*Click to unlock!",
         )
 
         /**
@@ -403,14 +403,6 @@ enum class HotfData(
         )
 
         /**
-         * REGEX-TEST: §7Cost
-         */
-        private val perkCostPattern by patternGroup.pattern(
-            "perk.cost",
-            "(?:§.)*§7Cost",
-        )
-
-        /**
          * REGEX-TEST: §7Forest Whispers: §325,271
          */
         private val whisperHeartPattern by patternGroup.pattern(
@@ -430,9 +422,13 @@ enum class HotfData(
             group("level").toInt()
         }
 
-        override fun extraInventoryHandling() {}
+        override fun extraInventoryHandling() {
+            // Hi I'm not empty
+        }
 
-        override fun Slot.extraHandling(entry: HotfData, lore: List<String>) {}
+        override fun Slot.extraHandling(entry: HotfData, lore: List<String>) {
+            // Hi I'm not empty
+        }
 
         override fun readFromHeartOrReset(line: String, isHeartItem: Boolean) {
             (if (isHeartItem) whisperHeartPattern else whisperResetPattern).matchMatcher(line) {
@@ -474,8 +470,8 @@ enum class HotfData(
         fun onDebug(event: DebugDataCollectEvent) {
             event.title("HotF")
             event.addIrrelevant {
-                add("Tokens : ${availableTokens}/${tokens}")
-                add("Whisper : ${whispersCurrent}/${whispersTotal}")
+                add("Tokens : $availableTokens/$tokens")
+                add("Whisper : $whispersCurrent/$whispersTotal")
             }
             debugTree(event)
         }
