@@ -134,7 +134,7 @@ object SackApi {
      * have only one render display function
      */
     //
-    val sackItem = mutableMapOf<String, SackOtherItem>()
+    val sackItem = mutableMapOf<NeuInternalName, SackOtherItem>()
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
     private val stackList = mutableMapOf<Int, ItemStack>()
@@ -286,7 +286,7 @@ object SackApi {
                 internalName.getSackPrice(stored).coerceAtLeast(0)
             }
             item.slot = key
-            sackItem[value.displayName] = item
+            sackItem[internalName] = item
         }
     }
 

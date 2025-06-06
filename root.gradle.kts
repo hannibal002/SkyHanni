@@ -30,7 +30,7 @@ allprojects {
                 artifact() // We love missing POMs
             }
         }
-        maven("https://repo.spongepowered.org/maven/") // mixin
+        maven("https://repo.spongepowered.org/repository/maven-public/") // mixin
         maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
         maven("https://jitpack.io") {
             // NotEnoughUpdates (compiled against)
