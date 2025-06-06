@@ -8,7 +8,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo needs 1.21 impl
 class PestsConfig {
     @Expose
     @ConfigOption(name = "Pest Spawn", desc = "")
@@ -31,12 +30,10 @@ class PestsConfig {
     @Accordion
     var pestTimer: PestTimerConfig = PestTimerConfig()
 
-    //#if TODO
     @Expose
     @ConfigOption(name = "Pest Trap", desc = "")
     @Accordion
     var pestTrap: PestTrapConfig = PestTrapConfig()
-    //#endif
 
     @Expose
     @ConfigOption(name = "Pest Profit Tracker", desc = "")
