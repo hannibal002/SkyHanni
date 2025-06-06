@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -183,7 +184,7 @@ object HoppityEggsManager {
     private fun SkyHanniChatEvent.sendNextEggAvailable() {
         val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil } ?: return
         val currentYear = SkyBlockTime.now().year
-        val spawnedEggs = HoppityEventStats.get
+        val spawnedEggs = HoppityEventSummary.getSpawnedEggCounts(currentYear).sumAllValues().toInt()
         when (spawnedEggs) {
             279 -> sendNextHuntIn("No more eggs will spawn this event")
             else -> ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil.format()}§e.")
