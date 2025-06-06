@@ -14,14 +14,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
-// todo 1.21 impl needed
 class DevConfig {
-    //#if TODO
     @Expose
     @ConfigOption(name = "Repository", desc = "")
     @Accordion
     val repo: RepositoryConfig = RepositoryConfig()
-    //#endif
 
     @Expose
     @ConfigOption(name = "Debug", desc = "")
@@ -162,9 +159,7 @@ class DevConfig {
     @Category(name = "Dev Tools", desc = "Tooling for devs")
     val devTool: DevToolConfig = DevToolConfig()
 
-    //#if TODO
     @Expose
     @Category(name = "Debug Mob", desc = "Every Debug related to the Mob System")
     val mobDebug: DebugMobConfig = DebugMobConfig()
-    //#endif
 }
