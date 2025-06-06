@@ -528,9 +528,9 @@ enum class HotmData(
 
         override fun currencyReset(full: Boolean) {
             super.currencyReset(full)
-            if(full){
+            if (full) {
                 HotmApi.PowderType.entries.forEach(HotmApi.PowderType::resetFull)
-            }else {
+            } else {
                 HotmApi.PowderType.entries.forEach(HotmApi.PowderType::resetTree)
             }
         }

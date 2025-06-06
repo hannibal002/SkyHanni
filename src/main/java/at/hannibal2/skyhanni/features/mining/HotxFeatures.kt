@@ -47,8 +47,8 @@ object HotxFeatures {
     }
 
     private fun handleTokenStackSize(event: RenderItemTipEvent) {
-        if (!(configHotm.tokenStackSize && HotmData.inInventory)
-            && !(configHotf.tokenStackSize && HotfData.inInventory)
+        if (!(configHotm.tokenStackSize && HotmData.inInventory) &&
+            !(configHotf.tokenStackSize && HotfData.inInventory)
         ) return
         if (event.stack.displayName != HotmData.heartItem?.stack?.displayName) return
         event.stackTip = HotmData.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
