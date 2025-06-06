@@ -446,7 +446,7 @@ object ItemUtils {
 
             if (itemCategory == null) {
                 ErrorManager.logErrorStateWithData(
-                    "Could not read category for item $displayName",
+                    "Could not read category for item ${this.displayName}",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
                     "item name" to displayName,

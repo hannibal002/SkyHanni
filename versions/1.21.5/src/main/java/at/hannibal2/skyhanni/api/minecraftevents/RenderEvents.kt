@@ -32,6 +32,7 @@ object RenderEvents {
         // ScreenDrawnEvent
 
         // GameOverlayRenderPreEvent
+        // todo need to post the rest of these + cancelling
         HudLayerRegistrationCallback.EVENT.register(
             HudLayerRegistrationCallback { layeredDrawer: LayeredDrawerWrapper ->
                 layeredDrawer.attachLayerBefore(
