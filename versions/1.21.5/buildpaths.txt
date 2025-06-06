@@ -697,6 +697,7 @@ at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventDojo.k
 at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventDungeons.kt
 at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventEssence.kt
 at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventFlightDuration.kt
+at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventGalatea.kt
 at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventGarden.kt
 at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventJacobContest.kt
 at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEventJacobMedals.kt
