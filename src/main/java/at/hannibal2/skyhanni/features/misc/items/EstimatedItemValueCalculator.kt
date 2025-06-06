@@ -79,6 +79,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
+import kotlin.math.max
 
 // TODO split into smaller sub classes
 @Suppress("LargeClass")
@@ -184,12 +185,13 @@ object EstimatedItemValueCalculator {
         var subTotal = 0.0
         val combo = ("$internalNameString+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
         val comboPrice = combo.toInternalName().getPriceOrNull()?.minus(basePrice)
+        val flooredComboPrices = max(0.0, (comboPrice ?: 0.0))
 
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
-            list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(useless)}")
+            list.add("§7Attribute Combo: ${flooredComboPrices.formatCoinWithBrackets(useless)}")
             if (!useless) {
-                subTotal += comboPrice
+                subTotal += flooredComboPrices
             }
         } else {
             list.add("§7Attributes:")

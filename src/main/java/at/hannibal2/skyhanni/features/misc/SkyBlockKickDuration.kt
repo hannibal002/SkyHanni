@@ -49,7 +49,7 @@ object SkyBlockKickDuration {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || !showTime) return
 
         if (kickPattern.matches(event.message)) {
             if (SkyBlockUtils.onHypixel && !SkyBlockUtils.inSkyBlock) {
@@ -102,7 +102,7 @@ object SkyBlockKickDuration {
 
         val format = lastKickTime.passedSince().format()
         config.position.renderString(
-            "§cLast kicked from SkyBlock §b$format ago",
+            "§cKicked from SkyBlock §b$format ago",
             posLabel = "SkyBlock Kick Duration",
         )
     }
