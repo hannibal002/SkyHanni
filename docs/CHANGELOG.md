@@ -13,6 +13,10 @@
 + Added option to prevent player interactions during the Kuudra boss fight. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
     + Added option to disable Profile Viewer on right-click.
 
+#### The Rift
+
++ Added drop location for Rose'End Flowerpot Enigma Soul on second moving platform. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4004)
+
 ### Improvements
 
 #### Garden
@@ -29,6 +33,7 @@
 #### GUIs
 
 + Added option to remove the main background in Compact Tab. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/3870)
++ Added compact item names to Sack Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4039)
 
 #### Inventory
 
@@ -38,11 +43,16 @@
 #### Mining
 
 + Improved Crystal Hollows Names in Nucleus Core to show the other three area names sooner. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3923)
++ Changed "Dwarven" to "Metal" in Block Strength Guide to avoid confusion. - Luna (https://github.com/hannibal002/SkyHanni/pull/4024)
 
 #### Farming Islands
 
 + Added option to disable the Trevor Ready title. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3947)
 + Removed Warp To Trapper cooldown after dialogue. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3947)
+
+#### Hoppity
+
++ Hide "total" Hoppity Stats from chat when no duplicates found in Compact Hitman Message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3998)
 
 #### Misc
 
@@ -57,6 +67,9 @@
 + Using compact item names in SkyHanni display lists. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3977)
     + Makes most GUIs more compact.
     + Full item name is still visible on hover.
++ Made Last Kicked from Skyblock feature count only first kick. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/4015)
+    + Only First Kick Counts for Rejoin cooldown so this makes rejoin notification more accurate.
++ Made non-God-Pot effects read from Tab List widget. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3986)
 
 ### Fixes
 
@@ -82,6 +95,7 @@
 
 + Fixed chat error after sharing Jacob contests. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/3893)
 + Fixed rare error messages in compact chat features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3982)
++ Fixed chat display when guild chat is disabled. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/4022)
 
 #### Rift
 
@@ -109,6 +123,11 @@
 
 + Fixed incorrect order for Unclaimed Eggs when set to Meal Order. - Luna (https://github.com/hannibal002/SkyHanni/pull/3958)
 
+#### Carnival
+
++ Fixed Carnival Zombie Shootout detection breaking with certain texture packs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4002)
++ Fixed incorrect next-egg-spawn message at end of Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3999)
+
 #### Misc
 
 + Fixed Hide Autopet Messages incorrectly hiding manual pet summon/despawn messages. - Luna (https://github.com/hannibal002/SkyHanni/pull/3895)
@@ -124,6 +143,12 @@
 + Fixed rare rendering crash. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3949)
 + Fixed `/shdefaultoptions` and `/shchathistory` requiring NotEnoughUpdates. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3987)
 + Fixed Discord Rich Presence crashing on startup. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/3963)
++ Fixed attribute combo price sometimes being negative. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4034)
++ Fixed Explosions Hider hiding Chicken Race rings in Jerry's Workshop. - Luna (https://github.com/hannibal002/SkyHanni/pull/3996)
++ Fixed performance issue when using SkyHanni's HOTM and Skytils' Terminal features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4007)
++ Fixed summoning Souls name display. - shaweel (https://github.com/hannibal002/SkyHanni/pull/3993)
+    + Made private variables public to fix related issue.
+    + Cleaned up code.
 
 ### Technical Details
 
@@ -164,6 +189,17 @@
 + Changed `isVisitor` to use `IslandType`. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
 + Changed Block Interacting with Visitors to use `EntityClickEvent`. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
 + Fixed `/shconfig set` not working with Properties. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3908)
++ Added Galatea IslandType. - Empa (https://github.com/hannibal002/SkyHanni/pull/4032)
++ Enabled Hypixel Tablist Scoreboard Data, SkyblockUtils, RepoManager, ChatManager on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3952)
++ Fixed built version of SkyHanni crashing in MoulConfig on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3952)
++ Made Hypixel mod API work on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3926)
++ Prefer Fabric's Maven repo over Sponge's. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4036)
++ Removed 1.12 preprocessing step. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4013)
+    + Speeds up multi-version build by ~30%.
++ RenderLayer Enum Wrapper and Misc 1.21 changes. - nopo (https://github.com/hannibal002/SkyHanni/pull/3926)
++ Require Fabric Language Kotlin instead of bundling Kotlin on 1.21. - nopo (https://github.com/hannibal002/SkyHanni/pull/3952)
++ Updated repository for SpongePowered. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4035)
++ Upload modern JARs to GitHub Actions and add label if modern build fails. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3954)
 
 ## Version 3.0.0
 
