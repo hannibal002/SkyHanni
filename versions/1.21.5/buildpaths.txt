@@ -119,6 +119,7 @@ at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent.kt
 at.hannibal2.skyhanni.utils.ExtendedChatColor.kt
 at.hannibal2.skyhanni.events.ConfigLoadEvent.kt
 at.hannibal2.skyhanni.events.InventoryCloseEvent.kt
+at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent.kt
 at.hannibal2.skyhanni.events.IslandChangeEvent.kt
 at.hannibal2.skyhanni.events.ProfileJoinEvent.kt
 at.hannibal2.skyhanni.events.minecraft.KeyDownEvent.kt
