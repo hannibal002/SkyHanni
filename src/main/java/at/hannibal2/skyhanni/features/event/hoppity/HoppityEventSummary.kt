@@ -843,7 +843,7 @@ object HoppityEventSummary {
         return completedEvents * 279 + spawnedThisEvent
     }
 
-    private fun getSpawnedEggCount(year: Int): Int {
+    fun getSpawnedEggCount(year: Int): Int {
         if (year == Int.MAX_VALUE) return getAllTimeSpawnedEggCount()
         val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSBYear(year).toMillis()
         val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
