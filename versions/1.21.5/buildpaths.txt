@@ -124,6 +124,7 @@ at.hannibal2.skyhanni.events.ProfileJoinEvent.kt
 at.hannibal2.skyhanni.events.minecraft.KeyDownEvent.kt
 at.hannibal2.skyhanni.events.minecraft.KeyPressEvent.kt
 at.hannibal2.skyhanni.events.minecraft.KeyUpEvent.kt
+at.hannibal2.skyhanni.events.pet.PetChangeEvent.kt
 at.hannibal2.skyhanni.utils.KeyboardManager.kt
 at.hannibal2.skyhanni.utils.OSUtils.kt
 at.hannibal2.skyhanni.test.command.ErrorManager.kt
