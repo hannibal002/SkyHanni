@@ -25,7 +25,7 @@ enum class HotfData(
     override val rewardFun: (Int) -> (Map<HotfReward, Double>),
 ) : HotxData<HotfReward> {
     SWEEP(
-        "§eSweep", 50,
+        "Sweep", 50,
         { level ->
             0.0 // TODO
         },
@@ -34,7 +34,7 @@ enum class HotfData(
         },
     ),
     FORAGING_FORTUNE(
-        "§eForaging Fortune", 50,
+        "Foraging Fortune", 50,
         { level ->
             0.0 // TODO
         },
@@ -43,7 +43,7 @@ enum class HotfData(
         },
     ),
     STRENGTH_BOOST(
-        "§cStrength Boost", 50,
+        "Strength Boost", 50,
         { level ->
             0.0 // TODO
         },
@@ -52,7 +52,7 @@ enum class HotfData(
         },
     ),
     DAMAGE_BOOST(
-        "§cDamage Boost", 2,
+        "Damage Boost", 2,
         { level ->
             0.0 // TODO
         },
@@ -61,7 +61,7 @@ enum class HotfData(
         },
     ),
     SPEED_BOOST(
-        "§eSpeed Boost", 50,
+        "Speed Boost", 50,
         { level ->
             0.0 // TODO
         },
@@ -70,7 +70,7 @@ enum class HotfData(
         },
     ),
     AXE_TOSS(
-        "§aAxe Toss", 2,
+        "Axe Toss", 2,
         { level ->
             0.0 // TODO
         },
@@ -79,7 +79,7 @@ enum class HotfData(
         },
     ),
     LUCK_OF_THE_FOREST(
-        "§cLuck of the Forest", 40,
+        "Luck of the Forest", 40,
         { level ->
             0.0 // TODO
         },
@@ -88,7 +88,7 @@ enum class HotfData(
         },
     ),
     DAILY_WISHES(
-        "§cDaily Wishes", 100,
+        "Daily Wishes", 100,
         { level ->
             0.0 // TODO
         },
@@ -97,7 +97,7 @@ enum class HotfData(
         },
     ),
     GIFTS_250(
-        "§e250 Gifts", 40,
+        "250 Gifts", 40,
         { level ->
             0.0 // TODO
         },
@@ -106,7 +106,7 @@ enum class HotfData(
         },
     ),
     LOTTERY(
-        "§cLottery", 2,
+        "Lottery", 2,
         { level ->
             0.0 // TODO
         },
@@ -115,7 +115,7 @@ enum class HotfData(
         },
     ),
     FORAGING_MADNESS(
-        "§cForaging Madness", 2,
+        "Foraging Madness", 2,
         { level ->
             0.0 // TODO
         },
@@ -124,7 +124,7 @@ enum class HotfData(
         },
     ),
     DEEP_WATERS(
-        "§cDeep Waters", 50,
+        "Deep Waters", 50,
         { level ->
             0.0 // TODO
         },
@@ -133,7 +133,7 @@ enum class HotfData(
         },
     ),
     EFFICIENT_FORAGER(
-        "§cEfficient Forager", 100,
+        "Efficient Forager", 100,
         { level ->
             0.0 // TODO
         },
@@ -142,7 +142,7 @@ enum class HotfData(
         },
     ),
     COLLECTOR(
-        "§cCollector", 50,
+        "Collector", 50,
         { level ->
             0.0 // TODO
         },
@@ -151,7 +151,7 @@ enum class HotfData(
         },
     ),
     EARLY_BIRD(
-        "§cEarly Bird", 2,
+        "Early Bird", 2,
         { level ->
             0.0 // TODO
         },
@@ -160,7 +160,7 @@ enum class HotfData(
         },
     ),
     PRECISION_CUTTING(
-        "§cPrecision Cutting", 2,
+        "Precision Cutting", 2,
         { level ->
             0.0 // TODO
         },
@@ -169,7 +169,7 @@ enum class HotfData(
         },
     ),
     MONSTER_HUNTER(
-        "§cMonster Hunter", 2,
+        "Monster Hunter", 2,
         { level ->
             0.0 // TODO
         },
@@ -178,7 +178,7 @@ enum class HotfData(
         },
     ),
     TREE_WHISPERER(
-        "§cTree Whisperer", 2,
+        "Tree Whisperer", 2,
         { level ->
             0.0 // TODO
         },
@@ -187,7 +187,7 @@ enum class HotfData(
         },
     ),
     HOMING_AXE(
-        "§cHoming Axe", 2,
+        "Homing Axe", 2,
         { level ->
             0.0 // TODO
         },
@@ -196,7 +196,7 @@ enum class HotfData(
         },
     ),
     FOREST_STRENGTH(
-        "§cForest Strength", 50,
+        "Forest Strength", 50,
         { level ->
             0.0 // TODO
         },
@@ -205,7 +205,7 @@ enum class HotfData(
         },
     ),
     HUNTERS_LUCK(
-        "§cHunter's Luck", 50,
+        "Hunter's Luck", 50,
         { level ->
             0.0 // TODO
         },
@@ -214,7 +214,7 @@ enum class HotfData(
         },
     ),
     GALATEAS_MIGHT(
-        "§cGalatea's Might", 50,
+        "Galatea's Might", 50,
         { level ->
             0.0 // TODO
         },
@@ -223,7 +223,7 @@ enum class HotfData(
         },
     ),
     ESSENCE_FORTUNE(
-        "§cEssence Fortune", 50,
+        "Essence Fortune", 50,
         { level ->
             0.0 // TODO
         },
@@ -232,7 +232,7 @@ enum class HotfData(
         },
     ),
     FOREST_SPEED(
-        "§cForest Speed", 50,
+        "Forest Speed", 50,
         { level ->
             0.0 // TODO
         },
@@ -241,7 +241,7 @@ enum class HotfData(
         },
     ),
     MANIAC_SLICER(
-        "§cManiac Slicer", 2,
+        "Maniac Slicer", 2,
         { level ->
             0.0 // TODO
         },
@@ -250,7 +250,7 @@ enum class HotfData(
         },
     ),
     HALF_EMPTY(
-        "§cHalf Empty", 25,
+        "Half Empty", 25,
         { level ->
             0.0 // TODO
         },
@@ -259,7 +259,7 @@ enum class HotfData(
         },
     ),
     RICOCHET(
-        "§cRicochet", 10,
+        "Ricochet", 10,
         { level ->
             0.0 // TODO
         },
@@ -268,7 +268,7 @@ enum class HotfData(
         },
     ),
     HALF_FULL(
-        "§cHalf Full", 25,
+        "Half Full", 25,
         { level ->
             0.0 // TODO
         },
@@ -277,7 +277,7 @@ enum class HotfData(
         },
     ),
     CENTER_OF_THE_FOREST(
-        "§cCenter of the Forest", 5,
+        "Center of the Forest", 5,
         { level ->
             0.0 // TODO
         },
