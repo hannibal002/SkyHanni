@@ -75,7 +75,6 @@ public abstract class MixinGuiContainer<T extends ScreenHandler> extends Screen 
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyHanni$hook.onDrawScreenAfter(context, mouseX, mouseY, ci);
         ToolTipData.INSTANCE.setLastSlot(this.focusedSlot);
     }
 
