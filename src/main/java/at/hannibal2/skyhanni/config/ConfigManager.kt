@@ -303,9 +303,11 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<Features>(SkyHanniMod.fe
             extraPath = categoryParent.split(".").last() + "."
         }
         extraPath += processedOption.getPath()
+        //#if TODO
         if (EnforcedConfigValues.isBlockedFromEditing(extraPath)) {
             return GuiOptionEditorBlocked(default)
         }
+        //#endif
         return default
     }
 }
