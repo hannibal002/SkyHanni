@@ -688,7 +688,7 @@ object EstimatedItemValueCalculator {
         val (totalPrice, names) = getTotalAndNames(boosters)
 
         if (names.isNotEmpty()) {
-            list.add("§7Boosters ${totalPrice.formatCoin()}")
+            list.add("§7Boosters: ${totalPrice.formatCoin()}")
             list += names
         }
 
