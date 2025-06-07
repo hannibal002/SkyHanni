@@ -94,14 +94,14 @@ object SackApi {
      * REGEX-TEST: §f❤ Rough Ruby Gemstone
      * REGEX-TEST: §f❂ Rough Opal Gemstone
      * REGEX-TEST: §f☠ Rough Onyx Gemstone
-     * REGEX-TEST: §fα Rough Aquamarine Gemstone
+     * REGEX-TEST: §f☂ Rough Aquamarine Gemstone
      * REGEX-TEST: §a☘ Flawed Citrine Gemstone
      * REGEX-TEST: §9☘ Fine Peridot Gemstone
      * REGEX-TEST: §eTopaz Gemstones
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name",
-        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂α] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
+        "(?:§.)+(?:[❤❈☘⸕✎✧❁☠❂☂] )?(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**
@@ -132,7 +132,7 @@ object SackApi {
      * have only one render display function
      */
     //
-    val sackItem = mutableMapOf<String, SackOtherItem>()
+    val sackItem = mutableMapOf<NeuInternalName, SackOtherItem>()
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
     private val stackList = mutableMapOf<Int, ItemStack>()
@@ -284,7 +284,7 @@ object SackApi {
                 internalName.getSackPrice(stored).coerceAtLeast(0)
             }
             item.slot = key
-            sackItem[value.displayName] = item
+            sackItem[internalName] = item
         }
     }
 

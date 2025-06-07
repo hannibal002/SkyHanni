@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.predicates.EventPredicateProvider
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 import java.util.function.Consumer
 
-// todo 1.21 impl needed
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
 
     private val listeners: MutableList<Listener> = mutableListOf()
@@ -22,6 +22,9 @@ class EventListeners private constructor(val name: String, private val isGeneric
     }
 
     fun addListener(method: Method, instance: Any, options: HandleEvent) {
+        require(Modifier.isPublic(method.modifiers)) {
+            "Method ${method.name}() in ${instance.javaClass.name} is not public. Make sure to set it to public."
+        }
         val name = buildListenerName(method)
         val eventConsumer = when (method.parameterCount) {
             0 -> createZeroParameterConsumer(method, instance, options)
