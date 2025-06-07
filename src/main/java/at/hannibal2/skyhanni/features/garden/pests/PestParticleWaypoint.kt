@@ -124,7 +124,7 @@ object PestParticleWaypoint {
         event.drawDynamicText(waypoint, "§aPest Guess", 1.3)
         if (config.drawLine) {
             event.drawLineToEye(
-                waypoint,
+                waypoint.add(0.5, 0.5, 0.5),
                 color,
                 3,
                 false,
