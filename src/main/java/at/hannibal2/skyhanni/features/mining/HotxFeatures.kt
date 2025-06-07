@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hotx.HotfData
 import at.hannibal2.skyhanni.data.hotx.HotmData
+import at.hannibal2.skyhanni.data.hotx.HotxHandler
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,10 +19,12 @@ object HotxFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!(configHotm.highlightEnabledPerks && HotmData.inInventory) &&
-            !(configHotf.highlightEnabledPerks && HotfData.inInventory)
-        ) return
-        HotmData.entries.forEach { entry ->
+        val handler : HotxHandler<*,*> = when{
+            HotmData.inInventory && configHotm.highlightEnabledPerks -> HotmData
+            HotfData.inInventory && configHotf.highlightEnabledPerks -> HotfData
+            else -> return
+        }
+        handler.data.forEach { entry ->
             val color = if (!entry.isUnlocked) LorenzColor.DARK_GRAY
             else if (entry.enabled) LorenzColor.GREEN else LorenzColor.RED
             entry.slot?.highlight(color)
@@ -35,10 +38,12 @@ object HotxFeatures {
     }
 
     private fun handleLevelStackSize(event: RenderItemTipEvent) {
-        if (!(configHotm.levelStackSize && HotmData.inInventory) &&
-            !(configHotf.levelStackSize && HotfData.inInventory)
-        ) return
-        HotmData.entries.firstOrNull {
+        val handler : HotxHandler<*,*> = when{
+            HotmData.inInventory && configHotm.levelStackSize -> HotmData
+            HotfData.inInventory && configHotf.levelStackSize -> HotfData
+            else -> return
+        }
+        handler.data.firstOrNull {
             event.stack.displayName == it.item?.displayName
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else "§e${it.activeLevel}"
@@ -47,11 +52,13 @@ object HotxFeatures {
     }
 
     private fun handleTokenStackSize(event: RenderItemTipEvent) {
-        if (!(configHotm.tokenStackSize && HotmData.inInventory) &&
-            !(configHotf.tokenStackSize && HotfData.inInventory)
-        ) return
-        if (event.stack.displayName != HotmData.heartItem?.stack?.displayName) return
-        event.stackTip = HotmData.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
+        val handler : HotxHandler<*,*> = when{
+            HotmData.inInventory && configHotm.tokenStackSize -> HotmData
+            HotfData.inInventory && configHotf.tokenStackSize -> HotfData
+            else -> return
+        }
+        if (event.stack.displayName != handler.heartItem?.stack?.displayName) return
+        event.stackTip = handler.availableTokens.takeIf { it != 0 }?.let { "§b$it" }.orEmpty()
     }
 
 }
