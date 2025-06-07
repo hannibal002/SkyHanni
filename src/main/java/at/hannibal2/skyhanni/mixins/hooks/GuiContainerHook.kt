@@ -27,7 +27,11 @@ class GuiContainerHook(guiAny: Any) {
     //$$ gui.menu
     //#endif
 
+    //#if MC < 1.21
     fun closeWindowPressed(ci: CallbackInfo) {
+        //#else
+        //$$ fun closeWindowPressed(ci: org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<Boolean>) {
+        //#endif
         if (CloseWindowEvent(gui, container).post()) ci.cancel()
     }
 
