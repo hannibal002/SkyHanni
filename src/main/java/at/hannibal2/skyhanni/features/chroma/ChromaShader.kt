@@ -21,13 +21,15 @@ abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, f
             ChromaManager.config.chromaSize * (GuiScreenUtils.displayWidth / 100f)
         }
         registerUniform(Uniform.UniformType.FLOAT, "timeOffset") {
-            var ticks =
-                (ClientEvents.totalTicks) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+            //#if MC < 1.21
+            var ticks = (ClientEvents.totalTicks) + (Minecraft.getMinecraft() as AccessorMinecraft).timer.renderPartialTicks
+            //#else
+            //$$ var ticks = (ClientEvents.totalTicks) + (MinecraftClient.getInstance() as AccessorMinecraft).timer.getTickProgress(true)
+            //#endif
 
             ticks = when (ChromaManager.config.chromaDirection) {
                 Direction.FORWARD_RIGHT, Direction.BACKWARD_RIGHT -> ticks
                 Direction.FORWARD_LEFT, Direction.BACKWARD_LEFT -> -ticks
-                else -> ticks
             }
 
             val chromaSpeed = ChromaManager.config.chromaSpeed / 360f
@@ -40,7 +42,6 @@ abstract class ChromaShader(vertex: String, fragment: String) : Shader(vertex, f
             when (ChromaManager.config.chromaDirection) {
                 Direction.FORWARD_RIGHT, Direction.FORWARD_LEFT -> true
                 Direction.BACKWARD_RIGHT, Direction.BACKWARD_LEFT -> false
-                else -> true
             }
         }
     }

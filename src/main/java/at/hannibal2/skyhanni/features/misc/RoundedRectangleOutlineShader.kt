@@ -3,6 +3,9 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
+//#if MC > 1.21
+//$$ import org.joml.Matrix4f;
+//#endif
 
 object RoundedRectangleOutlineShader : Shader("rounded_rect_outline", "rounded_rect_outline") {
 
@@ -16,6 +19,9 @@ object RoundedRectangleOutlineShader : Shader("rounded_rect_outline", "rounded_r
         set(value) {
             field = floatArrayOf(value[0], GuiScreenUtils.displayHeight - value[1])
         }
+    //#if MC > 1.21
+    //$$ var modelViewMatrix: Matrix4f = Matrix4f()
+    //#endif
     var borderThickness: Float = 5f
     var borderBlur: Float = 0.3f
 
