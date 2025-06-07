@@ -584,7 +584,7 @@ object RenderUtils {
         GlStateManager.disableBlend()
 
         DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 0f)
+        DrawContextUtils.translate((xPos - fontRenderer.getStringWidth(text)).toFloat(), yPos.toFloat(), 200f)
         DrawContextUtils.scale(scale, scale, 1f)
         GuiRenderUtils.drawString(text, 0f, 0f, 16777215)
 

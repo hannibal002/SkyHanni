@@ -60,7 +60,7 @@ object JacobFarmingContestsInventory {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (event.inventoryName != "Your Contests") return
+        if (!FarmingContestApi.inInventory) return
 
         realTime.clear()
 
@@ -162,7 +162,7 @@ object JacobFarmingContestsInventory {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
+        if (!FarmingContestApi.inInventory) return
         if (!config.highlightRewards) return
 
         // hide green border for a tick
@@ -180,7 +180,7 @@ object JacobFarmingContestsInventory {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipEvent) {
-        if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
+        if (!FarmingContestApi.inInventory) return
 
         val slot = event.slot.slotNumber
         if (config.realTime) {
@@ -196,7 +196,7 @@ object JacobFarmingContestsInventory {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!config.medalIcon) return
-        if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
+        if (!FarmingContestApi.inInventory) return
 
         val stack = event.stack ?: return
         var finneganContest = false

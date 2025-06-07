@@ -61,6 +61,8 @@ enum class ItemCategory {
     LASSO,
     FISHING_NET,
     SALT,
+    TRAP,
+    BOOSTER,
 
     NONE,
     ;
