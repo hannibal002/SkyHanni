@@ -26,7 +26,7 @@ object OnlyWidgetEventPredicateProvider : EventPredicateProvider() {
         if (widgets.isEmpty()) return null
         else if (widgets.size == 1) {
             val widget = widgets.first()
-            return { _, context -> context is TabWidget && context == widget }
+            return { _, context -> context == widget }
         }
         return { _, context -> context is TabWidget && context in widgets }
     }

@@ -21,11 +21,9 @@ abstract class EventPredicateProvider {
         private val providers: List<EventPredicateProvider> = buildList {
             add(CancellableEventPredicate)
             add(GenericEventPredicate)
-            //#if TODO
             add(OnlyOnIslandEventPredicate)
             add(OnlyOnSkyblockEventPredicate)
             add(OnlyWidgetEventPredicateProvider)
-            //#endif
         }
 
         /**

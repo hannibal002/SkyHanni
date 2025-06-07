@@ -124,13 +124,11 @@ class EventListeners private constructor(val name: String, private val isGeneric
         init {
             val cachedPredicates = mutableListOf<EventPredicate>()
             val predicates = mutableListOf<EventPredicate>()
-            //#if TODO
             val eventPredicates = EventPredicateProvider.getEventPredicates(method, options, generic)
             for ((predicate, isCached) in eventPredicates) {
                 if (isCached) cachedPredicates.add(predicate)
                 else predicates.add(predicate)
             }
-            //#endif
             this.cachedPredicates = cachedPredicates
             this.predicates = predicates
         }

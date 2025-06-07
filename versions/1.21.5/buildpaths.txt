@@ -92,6 +92,9 @@ at/hannibal2/skyhanni/api/event/EventListeners.kt
 at/hannibal2/skyhanni/api/event/predicates/CancellableEventPredicate.kt
 at/hannibal2/skyhanni/api/event/predicates/EventPredicates.kt
 at/hannibal2/skyhanni/api/event/predicates/GenericEventPredicate.kt
+at/hannibal2/skyhanni/api/event/predicates/OnlyOnIslandEventPredicate.kt
+at/hannibal2/skyhanni/api/event/predicates/OnlyOnSkyblockEventPredicate.kt
+at/hannibal2/skyhanni/api/event/predicates/OnlyWidgetEventPredicateProvider.kt
 at/hannibal2/skyhanni/data/repo/RepoError.kt
 at/hannibal2/skyhanni/api/event/CancellableSkyHanniEvent.kt
 at/hannibal2/skyhanni/api/event/GenericSkyHanniEvent.kt
