@@ -75,7 +75,14 @@ object SkyHanniMod {
             screenTicks++
             if (screenTicks == 5) {
                 val title = InventoryUtils.openInventoryName()
-                MinecraftCompat.localPlayer.closeScreen()
+                if (shouldCloseScreen) {
+                    //#if MC < 1.21
+                    MinecraftCompat.localPlayer.closeScreen()
+                    //#else
+                    //$$ MinecraftCompat.localPlayer.closeHandledScreen()
+                    //#endif
+                }
+                shouldCloseScreen = true
                 OtherInventoryData.close(title)
                 Minecraft.getMinecraft().displayGuiScreen(it)
                 screenTicks = 0
@@ -121,6 +128,7 @@ object SkyHanniMod {
     }
 
     var screenToOpen: GuiScreen? = null
+    var shouldCloseScreen: Boolean = true
     private var screenTicks = 0
     fun consoleLog(message: String) {
         logger.log(Level.INFO, message)

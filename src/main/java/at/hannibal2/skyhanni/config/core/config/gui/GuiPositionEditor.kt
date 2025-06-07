@@ -263,4 +263,10 @@ class GuiPositionEditor(
         else
             hovered.scale += .1F
     }
+
+    //#if MC > 1.21
+    //$$ override fun close() {
+    //$$     net.minecraft.client.MinecraftClient.getInstance().currentScreen = oldScreen
+    //$$ }
+    //#endif
 }
