@@ -122,6 +122,14 @@ object MobFilter {
     )
 
     /**
+     * REGEX-TEST: SHINY PIG
+     * */
+    val shinyPig by patternGroup.pattern(
+        "pattern.shiny",
+        "SHINY PIG",
+    )
+
+    /**
      * REGEX-TEST: §8[§7Lv1§8] §5Horse
      * REGEX-TEST: §8[§7Lv52§8] §eArmadillo
      * REGEX-TEST: §8[§7Lv12§8] §eSkeleton Horse
@@ -196,6 +204,7 @@ object MobFilter {
             (this is EntityVillager && this.maxHealth == 20f) || // Villager NPCs in the Village
             (this is EntityWitch && this.entityId <= 500) || // Alchemist NPC
             (this is EntityCow && this.entityId <= 500) || // Shania NPC (in Rift and Outside)
+            (this is EntityPig && this.entityId <= 600) || // Pig Shop
             (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
 
     fun createDisplayNpc(entity: EntityLivingBase): Boolean {

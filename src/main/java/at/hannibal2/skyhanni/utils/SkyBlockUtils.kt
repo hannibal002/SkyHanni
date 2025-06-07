@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+//#if TODO
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
+//#endif
 import at.hannibal2.skyhanni.test.TestBingo
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
+// todo 1.21 impl needed
 object SkyBlockUtils {
 
     private val isModApiDetection get() = HypixelLocationApi.isModApiDetection
@@ -38,6 +40,7 @@ object SkyBlockUtils {
             return onHypixel && inLobby
         }
 
+    //#if TODO
     /**
      * Consider using [IslandType.isInIsland] instead
      */
@@ -49,6 +52,9 @@ object SkyBlockUtils {
 
     // almost always prefer this over scoreboardArea
     val graphArea get() = if (inSkyBlock) IslandAreas.currentArea else null
+    //#else
+    //$$ val currentIsland get() = HypixelData.skyBlockIsland
+    //#endif
 
     // Only use scoreboardArea if graph data is not useable in this scenario.
     val scoreboardArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
@@ -66,7 +72,6 @@ object SkyBlockUtils {
     val debug: Boolean get() = onHypixel && SkyHanniMod.feature.dev.debug.enabled
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && currentIsland in islandTypes
-
 
     fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && currentIsland in islandTypes
 }

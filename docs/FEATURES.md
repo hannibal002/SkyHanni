@@ -930,6 +930,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays countdown until Timite/Obsolite expires.
 + Added Timite Tracker for the Rift. - nopo (https://github.com/hannibal002/SkyHanni/pull/3102)
     + Shows collected ores, time gained from mining, profit for raw ores, and Highlite profit.
++ Added drop location for Rose'End Flowerpot Enigma Soul on second moving platform. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4004)
 
 </details>
 <details open><summary>
@@ -1225,6 +1226,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Notifies via title when a Superior Dragon spawns in the End.
 + Added Dragon Profit Tracker. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3507)
     + Tracks all loot collected during a dragon fight, records the eyes spent, and calculates overall profit.
++ Added option to prevent player interactions during the Kuudra boss fight. - ksndq (https://github.com/hannibal002/SkyHanni/pull/3683)
+    + Added option to disable Profile Viewer on right-click.
 
 </details>
 <details open><summary>

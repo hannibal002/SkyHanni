@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import io.github.moulberry.notenoughupdates.core.GlScissorStack
+import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen

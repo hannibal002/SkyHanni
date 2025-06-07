@@ -5,6 +5,7 @@
 
 at/hannibal2/skyhanni/ scala.
 at/hannibal2/skyhanni/ jline.
+at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.core.GlScissorStack
 at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.events.SlotClickEvent
 at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 at/hannibal2/skyhanni/ io.github.moulberry.notenoughupdates.util.Constants
