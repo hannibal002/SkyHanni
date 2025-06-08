@@ -176,7 +176,6 @@ object TabListRenderer {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
                         val texture = playerInfo.locationSkin
-                        println("drawing player icon at $middleX, $middleY")
                         //#if MC < 1.21
                         GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 8 / 64f, 16 / 64f, 8 / 64f, 16 / 64f, texture)
 
