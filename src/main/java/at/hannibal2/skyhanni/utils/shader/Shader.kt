@@ -3,13 +3,13 @@ package at.hannibal2.skyhanni.utils.shader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraft.client.Minecraft
+import org.apache.commons.lang3.StringUtils
+import org.lwjgl.opengl.GL11
 //#if MC < 1.21
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.resources.IReloadableResourceManager
 import net.minecraft.client.shader.ShaderLinkHelper
 //#endif
-import org.apache.commons.lang3.StringUtils
-import org.lwjgl.opengl.GL11
 
 /**
  * Superclass for shader objects to compile and attach vertex and fragment shaders to the shader program

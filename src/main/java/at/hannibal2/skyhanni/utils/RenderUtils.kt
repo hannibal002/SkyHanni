@@ -19,9 +19,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-//#if MC > 1.21
-//$$ import at.hannibal2.skyhanni.utils.render.RoundedRectDrawer
-//#endif
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._draw3DPathWithWaypoint
@@ -50,14 +47,15 @@ import net.minecraft.inventory.Slot
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
-//#if MC > 1.21
-//$$ import org.joml.Matrix4f;
-//#endif
 import java.awt.Color
 import java.nio.FloatBuffer
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.render.RoundedRectDrawer
+//$$ import org.joml.Matrix4f
+//#endif
 
 @Suppress("LargeClass", "TooManyFunctions")
 object RenderUtils {

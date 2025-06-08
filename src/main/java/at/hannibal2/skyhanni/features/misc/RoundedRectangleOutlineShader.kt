@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
 //#if MC > 1.21
-//$$ import org.joml.Matrix4f;
+//$$ import org.joml.Matrix4f
 //#endif
 
 object RoundedRectangleOutlineShader : Shader("rounded_rect_outline", "rounded_rect_outline") {

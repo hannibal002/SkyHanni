@@ -4,16 +4,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import org.lwjgl.opengl.ARBFragmentShader
 import org.lwjgl.opengl.ARBShaderObjects
 import org.lwjgl.opengl.ARBVertexShader
-//#if MC < 1.21
-import org.lwjgl.opengl.ContextCapabilities
-//#else
-//$$ import org.lwjgl.opengl.GL
-//$$ import org.lwjgl.opengl.GLCapabilities
-//#endif
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20
 //#if MC < 1.21
+import org.lwjgl.opengl.ContextCapabilities
 import org.lwjgl.opengl.GLContext
+//#else
+//$$ import org.lwjgl.opengl.GL
+//$$ import org.lwjgl.opengl.GLCapabilities
 //#endif
 
 /**
