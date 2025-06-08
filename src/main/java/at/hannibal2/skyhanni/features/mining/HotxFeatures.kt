@@ -19,7 +19,7 @@ object HotxFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        val handler : HotxHandler<*,*> = when{
+        val handler: HotxHandler<*, *> = when {
             HotmData.inInventory && configHotm.highlightEnabledPerks -> HotmData
             HotfData.inInventory && configHotf.highlightEnabledPerks -> HotfData
             else -> return
@@ -38,7 +38,7 @@ object HotxFeatures {
     }
 
     private fun handleLevelStackSize(event: RenderItemTipEvent) {
-        val handler : HotxHandler<*,*> = when{
+        val handler: HotxHandler<*, *> = when {
             HotmData.inInventory && configHotm.levelStackSize -> HotmData
             HotfData.inInventory && configHotf.levelStackSize -> HotfData
             else -> return
@@ -52,7 +52,7 @@ object HotxFeatures {
     }
 
     private fun handleTokenStackSize(event: RenderItemTipEvent) {
-        val handler : HotxHandler<*,*> = when{
+        val handler: HotxHandler<*, *> = when {
             HotmData.inInventory && configHotm.tokenStackSize -> HotmData
             HotfData.inInventory && configHotf.tokenStackSize -> HotfData
             else -> return
