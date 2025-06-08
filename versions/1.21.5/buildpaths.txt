@@ -730,6 +730,7 @@ at.hannibal2.skyhanni.features.inventory.EvolvingItems.kt
 at.hannibal2.skyhanni.features.inventory.FavoritePowerStone.kt
 at.hannibal2.skyhanni.features.inventory.FixIronman.kt
 at.hannibal2.skyhanni.features.inventory.FocusMode.kt
+at.hannibal2.skyhanni.features.inventory.HarpFeatures.kt
 at.hannibal2.skyhanni.features.inventory.HideNotClickableItems.kt
 at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks.kt
 at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.kt
@@ -747,6 +748,7 @@ at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing.kt
 at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment.kt
 at.hannibal2.skyhanni.features.inventory.ShiftClickNpcSell.kt
 at.hannibal2.skyhanni.features.inventory.SkyBlockXPBar.kt
+at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature.kt
 at.hannibal2.skyhanni.features.inventory.SnakeGame.kt
 at.hannibal2.skyhanni.features.inventory.StatsTuning.kt
 at.hannibal2.skyhanni.features.inventory.StockOfStonkFeature.kt
@@ -798,6 +800,7 @@ at.hannibal2.skyhanni.features.inventory.experimentationtable.GuardianReminder.k
 at.hannibal2.skyhanni.features.inventory.experimentationtable.SuperpairDataDisplay.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.SuperpairsClicksAlert.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.UltraRareBookAlert.kt
+at.hannibal2.skyhanni.features.inventory.sacks.OutsideSackValue.kt
 at.hannibal2.skyhanni.features.inventory.tiarelay.Relay.kt
 at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper.kt
 at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints.kt
@@ -883,7 +886,9 @@ at.hannibal2.skyhanni.features.misc.EnchantedClockHelper.kt
 at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider.kt
 at.hannibal2.skyhanni.features.misc.FastFairySoulsPathfinder.kt
 at.hannibal2.skyhanni.features.misc.FixGhostEntities.kt
+at.hannibal2.skyhanni.features.misc.FixNeuHeavyPearls.kt
 at.hannibal2.skyhanni.features.misc.FrogMaskFeatures.kt
+at.hannibal2.skyhanni.features.misc.GFSPiggyBank.kt
 at.hannibal2.skyhanni.features.misc.HideArmor.kt
 at.hannibal2.skyhanni.features.misc.HideFarEntities.kt
 at.hannibal2.skyhanni.features.misc.InGameDateDisplay.kt
@@ -897,6 +902,7 @@ at.hannibal2.skyhanni.features.misc.MagicalPowerDisplay.kt
 at.hannibal2.skyhanni.features.misc.MarkedPlayerManager.kt
 at.hannibal2.skyhanni.features.misc.MiscFeatures.kt
 at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay.kt
+at.hannibal2.skyhanni.features.misc.NeuSoulPathFind.kt
 at.hannibal2.skyhanni.features.misc.NoBitsWarning.kt
 at.hannibal2.skyhanni.features.misc.ParticleHider.kt
 at.hannibal2.skyhanni.features.misc.PatcherFixes.kt
@@ -962,11 +968,13 @@ at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui.kt
 at.hannibal2.skyhanni.features.nether.MatriarchHelper.kt
 at.hannibal2.skyhanni.features.nether.PabloHelper.kt
 at.hannibal2.skyhanni.features.nether.RescueMissionWaypoints.kt
+at.hannibal2.skyhanni.features.nether.SulphurSkitterBox.kt
 at.hannibal2.skyhanni.features.nether.VolcanoExplosivityDisplay.kt
 at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown.kt
 at.hannibal2.skyhanni.features.nether.ashfang.AshfangHighlights.kt
 at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kt
+at.hannibal2.skyhanni.api.enoughupdates.NeuEventWrappers.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraProfileViewerBlocker.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.kt
 at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper.kt
@@ -991,6 +999,7 @@ at.hannibal2.skyhanni.features.rift.RiftApi.kt
 at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.kt
 at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight.kt
 at.hannibal2.skyhanni.features.rift.area.colosseum.TentacleWaypoint.kt
+at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap.kt
 at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftWiltedBerberisHelper.kt
 at.hannibal2.skyhanni.features.rift.area.dreadfarm.VoltHighlighter.kt
 at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper.kt
@@ -1005,6 +1014,7 @@ at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkour.kt
 at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour.kt
 at.hannibal2.skyhanni.features.rift.area.mountaintop.EnigmaRoseFlowerpot.kt
 at.hannibal2.skyhanni.features.rift.area.mountaintop.SunGeckoHelper.kt
+at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteHelper.kt
 at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker.kt
 at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies.kt
 at.hannibal2.skyhanni.features.rift.area.stillgorechateau.SplatterHearts.kt

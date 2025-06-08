@@ -113,6 +113,8 @@ net.minecraft.core.BlockPos net.minecraft.util.BlockPos
 net.minecraft.core.Direction net.minecraft.util.EnumFacing
 net.minecraft.core.Rotations net.minecraft.util.Rotations
 
+net.minecraft.core.BlockPos betweenClosed() getAllInBox()
+
 net.minecraft.core.Direction getNormal() getDirectionVec()
 
 net.minecraft.core.particles.ParticleTypes net.minecraft.util.EnumParticleTypes

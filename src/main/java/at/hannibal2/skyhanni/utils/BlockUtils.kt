@@ -8,6 +8,9 @@ import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
 import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.BlockPos
+//#if MC > 1.21
+//$$ import net.minecraft.world.RaycastContext
+//#endif
 
 object BlockUtils {
 
@@ -42,10 +45,21 @@ object BlockUtils {
         return getValue(property) == 0
     }
 
-    //#if TODO
-    fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
+    private fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
         val target = start + direction.normalize() * distance
+        //#if MC < 1.21
         val result = world.rayTraceBlocks(start.toVec3(), target.toVec3())
+        //#else
+        //$$ val result = world.raycast(
+        //$$     RaycastContext(
+        //$$         start.toVec3(),
+        //$$         target.toVec3(),
+        //$$         RaycastContext.ShapeType.OUTLINE,
+        //$$         RaycastContext.FluidHandling.ANY,
+        //$$         MinecraftCompat.localPlayer,
+        //$$     ),
+        //$$ )
+        //#endif
 
         return result?.blockPos?.toLorenzVec()
     }
@@ -56,14 +70,12 @@ object BlockUtils {
         distance,
     )
 
-    fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
+    private fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
         val from = center.add(-distance, -distance, -distance).toBlockPos()
         val to = center.add(distance, distance, distance).toBlockPos()
         return BlockPos.getAllInBox(from, to)
     }
-    //#endif
 
-    //#if TODO
     fun nearbyBlocks(
         center: LorenzVec,
         distance: Int,
@@ -83,7 +95,6 @@ object BlockUtils {
         radius: Int = distance,
         filter: Block,
     ): Map<LorenzVec, IBlockState> = nearbyBlocks(center, distance, radius, condition = { it.block == filter })
-    //#endif
 
     val redstoneOreBlocks = buildList { addRedstoneOres() }
 }

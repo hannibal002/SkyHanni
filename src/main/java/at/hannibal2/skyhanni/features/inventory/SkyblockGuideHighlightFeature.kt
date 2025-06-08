@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
 
@@ -78,7 +78,7 @@ class SkyblockGuideHighlightFeature private constructor(
         private var activeObject: SkyblockGuideHighlightFeature? = null
         private val missing = mutableSetOf<Int>()
 
-        fun isEnabled() = LorenzUtils.inSkyBlock
+        fun isEnabled() = SkyBlockUtils.inSkyBlock
         fun close() {
             activeObject = null
         }
