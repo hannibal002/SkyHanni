@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawCylinderInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawHitbox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawLineToEye
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawPyramid
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereInWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawSphereWireframeInWorld
@@ -454,8 +455,9 @@ object RenderUtils {
         return exactLocation(player) + add
     }
 
+    @Deprecated("Use WorldRenderUtils' drawLineToEye instead")
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
-        _draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
+        _drawLineToEye(location, color, lineWidth, depth)
     }
 
     @Deprecated("Use WorldRenderUtils' exactLocation instead")

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LocationUtils.getCornersAtHeight
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -1064,6 +1063,15 @@ object WorldRenderUtils {
     }
 
     @Deprecated("Do not use, use proper method instead")
+    fun SkyHanniRenderWorldEvent._drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        drawLineToEye(location, color, lineWidth, depth)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
+    }
+
+    @Deprecated("Do not use, use proper method instead")
     fun SkyHanniRenderWorldEvent._draw3DPathWithWaypoint(
         path: Graph,
         colorLine: Color,
@@ -1152,7 +1160,6 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.getEyeHeight().toDouble()
-        PatcherFixes.onPlayerEyeLine()
         return exactLocation(player).add(y = eyeHeight)
     }
 

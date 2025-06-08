@@ -8,6 +8,8 @@ import net.minecraft.block.properties.PropertyInteger
 import net.minecraft.block.state.IBlockState
 import net.minecraft.tileentity.TileEntitySkull
 import net.minecraft.util.BlockPos
+import net.minecraft.util.MovingObjectPosition
+
 //#if MC > 1.21
 //$$ import net.minecraft.world.RaycastContext
 //#endif
@@ -47,22 +49,28 @@ object BlockUtils {
 
     private fun rayTrace(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
         val target = start + direction.normalize() * distance
-        //#if MC < 1.21
-        val result = world.rayTraceBlocks(start.toVec3(), target.toVec3())
-        //#else
-        //$$ val result = world.raycast(
-        //$$     RaycastContext(
-        //$$         start.toVec3(),
-        //$$         target.toVec3(),
-        //$$         RaycastContext.ShapeType.OUTLINE,
-        //$$         RaycastContext.FluidHandling.ANY,
-        //$$         MinecraftCompat.localPlayer,
-        //$$     ),
-        //$$ )
-        //#endif
+        val result = rayTrace(start, target)
 
         return result?.blockPos?.toLorenzVec()
     }
+
+    //#if MC < 1.21
+    fun rayTrace(start: LorenzVec, end: LorenzVec): MovingObjectPosition? {
+        return world.rayTraceBlocks(start.toVec3(), end.toVec3())
+    }
+    //#else
+    //$$ fun rayTrace(start: LorenzVec, end: LorenzVec): net.minecraft.util.hit.BlockHitResult? {
+    //$$    return world.raycast(
+    //$$        RaycastContext(
+    //$$            start.toVec3(),
+    //$$            end.toVec3(),
+    //$$            RaycastContext.ShapeType.OUTLINE,
+    //$$            RaycastContext.FluidHandling.ANY,
+    //$$            MinecraftCompat.localPlayer,
+    //$$        ),
+    //$$    )
+    //$$ }
+    //#endif
 
     fun getBlockLookingAt(distance: Double = 10.0) = rayTrace(
         LocationUtils.playerEyeLocation(),

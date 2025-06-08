@@ -836,6 +836,21 @@ object WorldRenderUtils {
     }
 
     @Deprecated("Do not use, use proper method instead")
+    fun SkyHanniRenderWorldEvent._drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        drawLineToEye(location, color, lineWidth, depth)
+    }
+
+    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        draw3DLine(
+            exactPlayerEyeLocation(),
+            location,
+            color,
+            lineWidth,
+            depth,
+        )
+    }
+
+    @Deprecated("Do not use, use proper method instead")
     fun SkyHanniRenderWorldEvent._draw3DPathWithWaypoint(
         path: Graph,
         colorLine: Color,
