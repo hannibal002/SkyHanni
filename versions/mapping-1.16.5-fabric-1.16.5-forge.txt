@@ -29,6 +29,8 @@ net.minecraft.entity.decoration.ArmorStandEntity net.minecraft.world.entity.deco
 net.minecraft.entity.decoration.ArmorStandEntity shouldHideBasePlate() isNoBasePlate()
 net.minecraft.entity.decoration.ArmorStandEntity shouldShowArms() isShowArms()
 
+net.minecraft.entity.mob.CreeperEntity isIgnited() getCreeperState()
+
 net.minecraft.entity.passive.VillagerEntity net.minecraft.world.entity.npc.Villager
 
 net.minecraft.item.ItemStack net.minecraft.world.item.ItemsStack
@@ -67,6 +69,7 @@ net.minecraft.util.math.Box net.minecraft.world.phys.AABB
 net.minecraft.util.math.Vec3d net.minecraft.world.phys.Vec3
 
 net.minecraft.util.math.Box contains() contains()
+net.minecraft.util.math.Box expand() inflate()
 net.minecraft.util.math.Box offset() move()
 
 net.minecraft.util.math.Vec3d squaredDistanceTo() distanceToSqr()
