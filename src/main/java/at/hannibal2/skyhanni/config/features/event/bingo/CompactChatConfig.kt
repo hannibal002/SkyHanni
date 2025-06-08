@@ -28,7 +28,7 @@ class CompactChatConfig {
     @Expose
     @ConfigOption(
         name = "Outside Bingo",
-        desc = "Compact the level up chat messages outside of an Bingo profile as well."
+        desc = "Compact the level up chat messages outside of a Bingo profile as well."
     )
     @ConfigEditorBoolean
     var outsideBingo: Boolean = false
