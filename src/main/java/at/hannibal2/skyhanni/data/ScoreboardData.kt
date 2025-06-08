@@ -1,12 +1,18 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+//#if TODO
+import at.hannibal2.skyhanni.features.inventory.FixIronman
+//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -19,6 +25,7 @@ import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.IScoreObjectiveCriteria
 import net.minecraft.scoreboard.ScorePlayerTeam
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object ScoreboardData {
 
@@ -161,6 +168,68 @@ object ScoreboardData {
         //#else
         //$$ return list.map { it.formattedTextCompat() }
         //#endif
+    }
+
+    /**
+     * Tries to replace a scoreboard line with a modified one
+     * @param text The line to check and possibly replace
+     * @return The replaced line, or null if it should be hidden
+     */
+    fun tryToReplaceScoreboardLine(text: String): String? {
+        try {
+            return tryToReplaceScoreboardLineHarder(text)
+        } catch (t: Throwable) {
+            ErrorManager.logErrorWithData(
+                t,
+                "Error while changing the scoreboard text.",
+                "text" to text,
+            )
+            return text
+        }
+    }
+
+    private fun tryToReplaceScoreboardLineHarder(text: String): String? {
+        if (SkyHanniMod.feature.misc.hideScoreboardNumbers && text.startsWith("§c") && text.length <= 4) {
+            return null
+        }
+        if (SkyHanniMod.feature.misc.hidePiggyScoreboard) {
+            //#if TODO
+            PurseApi.piggyPattern.matchMatcher(text) {
+                val coins = group("coins")
+                return "Purse: $coins"
+            }
+            //#endif
+        }
+
+        if (SkyHanniMod.feature.misc.colorMonthNames) {
+            for (season in Season.entries) {
+                if (text.trim().startsWith(season.prefix)) {
+                    return season.colorCode + text
+                }
+            }
+        }
+        //#if TODO
+        FixIronman.fixScoreboard(text)?.let {
+            return it
+        }
+        //#endif
+
+        return text
+    }
+
+    enum class Season(val prefix: String, val colorCode: String) {
+        EARLY_SPRING("Early Spring", "§d"),
+        SPRING("Spring", "§d"),
+        LATE_SPRING("Late Spring", "§d"),
+        EARLY_SUMMER("Early Summer", "§6"),
+        SUMMER("Summer", "§6"),
+        LATE_SUMMER("Late Summer", "§6"),
+        EARLY_AUTUMN("Early Autumn", "§e"),
+        AUTUMN("Autumn", "§e"),
+        LATE_AUTUMN("Late Autumn", "§e"),
+        EARLY_WINTER("Early Winter", "§9"),
+        WINTER("Winter", "§9"),
+        LATE_WINTER("Late Winter", "§9")
     }
 
     // TODO USE SH-REPO
