@@ -17,6 +17,8 @@ net.minecraft.client.network.ClientPlayerEntity net.minecraft.client.network.Cli
 
 net.minecraft.client.network.ClientPlayerEntity networkHandler.sendChatMessage() sendChatMessage()
 
+net.minecraft.client.network.PlayerListEntry skinTextures.texture() getSkinTexture()
+
 net.minecraft.client.util.math.MatrixStack at.hannibal2.skyhanni.utils.compat.MatrixStack
 
 net.minecraft.client.util.math.MatrixStack pop() popMatrix()

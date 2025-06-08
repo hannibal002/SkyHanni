@@ -80,6 +80,7 @@ net.minecraft.client.multiplayer.ClientLevel players() getPlayers()
 
 net.minecraft.client.multiplayer.PlayerInfo getGameMode() getGameType()
 net.minecraft.client.multiplayer.PlayerInfo getProfile() getGameProfile()
+net.minecraft.client.multiplayer.PlayerInfo getSkinLocation() getLocationSkin()
 net.minecraft.client.multiplayer.PlayerInfo getTeam() getPlayerTeam()
 
 net.minecraft.client.player.AbstractClientPlayer net.minecraft.client.entity.AbstractClientPlayer
@@ -426,8 +427,8 @@ net.minecraft.world.inventory.ChestMenu net.minecraft.inventory.ContainerChest
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
 net.minecraft.world.inventory.AbstractContainerMenu containerId windowId
-net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
 net.minecraft.world.inventory.AbstractContainerMenu getItems() getInventory()
+net.minecraft.world.inventory.AbstractContainerMenu slots inventorySlots
 
 net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
 

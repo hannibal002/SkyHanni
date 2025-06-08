@@ -17,11 +17,8 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object TabListRenderer {
 
@@ -178,15 +175,19 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
-                        //#if TODO
-                        minecraft.textureManager.bindTexture(playerInfo.locationSkin)
-                        GlStateManager.color(1f, 1f, 1f, 1f)
-                        Gui.drawScaledCustomSizeModalRect(middleX, middleY, 8f, 8f, 8, 8, 8, 8, 64f, 64f)
+                        val texture = playerInfo.locationSkin
+                        println("drawing player icon at $middleX, $middleY")
+                        //#if MC < 1.21
+                        GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 8 / 64f, 16 / 64f, 8 / 64f, 16 / 64f, texture)
 
                         val player = tabLine.getEntity(playerInfo)
                         if (player != null && player.isWearing(EnumPlayerModelParts.HAT)) {
-                            Gui.drawScaledCustomSizeModalRect(middleX, middleY, 40f, 8f, 8, 8, 8, 8, 64f, 64f)
+                            GuiRenderUtils.drawTexturedRect(middleX, middleY, 8, 8, 40 / 64f, 48 / 64f, 8 / 64f, 16 / 64f, texture)
                         }
+                        //#else
+                        //$$ net.minecraft.client.gui.PlayerSkinDrawer.draw(
+                        //$$     DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.shouldShowHat(), false, -1
+                        //$$ )
                         //#endif
                     }
                     middleX += 8 + 2
@@ -218,7 +219,7 @@ object TabListRenderer {
 
     private val fireSalePattern by RepoPattern.pattern(
         "tablist.firesaletitle",
-        "§.§lFire Sales: §r§f\\([0-9]+\\)"
+        "§.§lFire Sales: §r§f\\([0-9]+\\)",
     )
 
     @HandleEvent
