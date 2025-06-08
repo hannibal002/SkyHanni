@@ -3,12 +3,13 @@ package at.hannibal2.skyhanni.utils.shader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraft.client.Minecraft
+import org.apache.commons.lang3.StringUtils
+import org.lwjgl.opengl.GL11
+//#if MC < 1.21
 import net.minecraft.client.renderer.OpenGlHelper
 import net.minecraft.client.resources.IReloadableResourceManager
 import net.minecraft.client.shader.ShaderLinkHelper
-import org.apache.commons.lang3.StringUtils
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.OpenGLException
+//#endif
 
 /**
  * Superclass for shader objects to compile and attach vertex and fragment shaders to the shader program
@@ -28,23 +29,34 @@ abstract class Shader(val vertex: String, val fragment: String) {
     var created = false
 
     init {
+        // We don't want to do anything with the shader instances on modern versions,
+        // as we let Minecraft make them with render passes, but we still need their
+        // member variables to set uniforms.
+        //#if MC < 1.21
         recompile()
         (Minecraft.getMinecraft().resourceManager as IReloadableResourceManager).registerReloadListener {
             recompile()
         }
+        //#endif
     }
 
     fun deleteOldShaders() {
         if (vertexShaderID >= 0) {
+            //#if MC < 1.21
             OpenGlHelper.glDeleteShader(vertexShaderID)
+            //#endif
             vertexShaderID = -1
         }
         if (fragmentShaderID >= 0) {
+            //#if MC < 1.21
             OpenGlHelper.glDeleteShader(fragmentShaderID)
+            //#endif
             fragmentShaderID = -1
         }
         if (shaderProgram >= 0) {
+            //#if MC < 1.21
             OpenGlHelper.glDeleteProgram(shaderProgram)
+            //#endif
             shaderProgram = -1
         }
         uniforms.clear()
@@ -53,7 +65,9 @@ abstract class Shader(val vertex: String, val fragment: String) {
 
     fun recompile() {
         deleteOldShaders()
+        //#if MC < 1.21
         shaderProgram = ShaderLinkHelper.getStaticShaderLinkHelper().createProgram()
+        //#endif
         if (shaderProgram < 0) return
 
         vertexShaderID = ShaderManager.loadShader(ShaderType.VERTEX, vertex)
@@ -73,7 +87,7 @@ abstract class Shader(val vertex: String, val fragment: String) {
 
             if (ShaderManager.inWorld()) {
                 ErrorManager.logErrorWithData(
-                    OpenGLException("Shader linking error."),
+                    Exception("Shader linking error."),
                     errorMessage,
                     "Link Error:\n" to errorLog
                 )

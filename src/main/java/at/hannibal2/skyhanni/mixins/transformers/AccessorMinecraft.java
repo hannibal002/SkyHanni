@@ -9,5 +9,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AccessorMinecraft {
 
     @Accessor("timer")
+    //#if MC < 1.21
     Timer getTimer();
+    //#else
+    //$$ RenderTickCounter.Dynamic getTimer();
+    //#endif
 }

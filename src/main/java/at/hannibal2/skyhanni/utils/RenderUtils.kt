@@ -10,11 +10,9 @@ import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
-//#if TODO
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
-//#endif
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
@@ -37,9 +35,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils._outlineTopFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-//#if TODO
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-//#endif
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 //#if TODO
@@ -56,6 +52,10 @@ import java.nio.FloatBuffer
 import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
+//#if MC > 1.21
+//$$ import at.hannibal2.skyhanni.utils.render.RoundedRectDrawer
+//$$ import org.joml.Matrix4f
+//#endif
 
 @Suppress("LargeClass", "TooManyFunctions")
 object RenderUtils {
@@ -633,25 +633,26 @@ object RenderUtils {
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
-        //#if TODO
         RoundedTextureShader.scaleFactor = scaleFactor.toFloat()
         RoundedTextureShader.radius = radius.toFloat()
         RoundedTextureShader.smoothness = smoothness.toFloat()
         RoundedTextureShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedTextureShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        //#if MC > 1.21
+        //$$ RoundedTextureShader.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
         //#endif
 
+        //#if MC < 1.21
         DrawContextUtils.pushMatrix()
-        //#if TODO
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
-        //#endif
 
         GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter, texture = texture, alpha = alpha)
 
-        //#if TODO
         ShaderManager.disableShader()
-        //#endif
         DrawContextUtils.popMatrix()
+        //#else
+        //$$ RoundedRectDrawer.drawRoundedTexturedRect(x, y, width, height, texture)
+        //#endif
     }
 
     /**
@@ -674,25 +675,26 @@ object RenderUtils {
         val xIn = x * scaleFactor
         val yIn = y * scaleFactor
 
-        //#if TODO
         RoundedRectangleShader.scaleFactor = scaleFactor.toFloat()
         RoundedRectangleShader.radius = radius.toFloat()
         RoundedRectangleShader.smoothness = smoothness.toFloat()
         RoundedRectangleShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        //#if MC > 1.21
+        //$$ RoundedRectangleShader.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
         //#endif
 
+        //#if MC < 1.21
         DrawContextUtils.pushMatrix()
-        //#if TODO
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
-        //#endif
 
         GuiRenderUtils.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
 
-        //#if TODO
         ShaderManager.disableShader()
-        //#endif
         DrawContextUtils.popMatrix()
+        //#else
+        //$$ RoundedRectDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
+        //#endif
     }
 
     /**
@@ -728,23 +730,23 @@ object RenderUtils {
 
         val borderAdjustment = borderThickness / 2
 
-        //#if TODO
         RoundedRectangleOutlineShader.scaleFactor = scaleFactor.toFloat()
         RoundedRectangleOutlineShader.radius = radius.toFloat()
         RoundedRectangleOutlineShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
         RoundedRectangleOutlineShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+        //#if MC > 1.21
+        //$$ RoundedRectangleOutlineShader.modelViewMatrix = Matrix4f(DrawContextUtils.drawContext.matrices.peek().positionMatrix)
+        //#endif
         RoundedRectangleOutlineShader.borderThickness = borderThickness.toFloat()
         // The blur argument is a bit misleading, the greater the value the more sharp the edges of the
         // outline will be and the smaller the value the blurrier. So we take the difference from 1
         // so the shader can blur the edges accordingly. This is because a 'blurriness' option makes more sense
         // to users than a 'sharpness' option in this context
         RoundedRectangleOutlineShader.borderBlur = max(1 - blur, 0f)
-        //#endif
 
+        //#if MC < 1.21
         DrawContextUtils.pushMatrix()
-        //#if TODO
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
-        //#endif
 
         GuiRenderUtils.drawGradientRect(
             x - borderAdjustment,
@@ -755,10 +757,18 @@ object RenderUtils {
             bottomColor,
         )
 
-        //#if TODO
         ShaderManager.disableShader()
-        //#endif
         DrawContextUtils.popMatrix()
+        //#else
+        //$$ RoundedRectDrawer.drawRoundedRectOutline(
+        //$$     x - borderAdjustment,
+        //$$     y - borderAdjustment,
+        //$$     x + width + borderAdjustment,
+        //$$     y + height + borderAdjustment,
+        //$$     topColor,
+        //$$     bottomColor
+        //$$ )
+        //#endif
     }
 
     //#if TODO
