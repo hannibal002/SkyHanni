@@ -930,6 +930,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Displays countdown until Timite/Obsolite expires.
 + Added Timite Tracker for the Rift. - nopo (https://github.com/hannibal002/SkyHanni/pull/3102)
     + Shows collected ores, time gained from mining, profit for raw ores, and Highlite profit.
++ Added drop location for Rose'End Flowerpot Enigma Soul on second moving platform. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4004)
 
 </details>
 <details open><summary>
