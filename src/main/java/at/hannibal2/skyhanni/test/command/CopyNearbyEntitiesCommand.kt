@@ -165,7 +165,9 @@ object CopyNearbyEntitiesCommand {
         val stackDisplayName = stack.displayName
         val cleanName = stack.cleanName()
         val itemEnchanted = stack.isEnchanted()
+        //#if MC < 1.16
         val itemDamage = stack.itemDamage
+        //#endif
         val stackSize = stack.stackSize
         val maxStackSize = stack.maxStackSize
         val skullTexture = stack.getSkullTexture()
@@ -173,7 +175,9 @@ object CopyNearbyEntitiesCommand {
         add("-  stackDisplayName: '$stackDisplayName'")
         add("-  cleanName: '$cleanName'")
         add("-  itemEnchanted: '$itemEnchanted'")
+        //#if MC < 1.16
         add("-  itemDamage: '$itemDamage'")
+        //#endif
         add("-  stackSize: '$stackSize'")
         add("-  maxStackSize: '$maxStackSize'")
         skullTexture?.let { add("-  skullTexture: '$it'") }

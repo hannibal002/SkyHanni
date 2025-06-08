@@ -115,7 +115,7 @@ object Commands {
         event.register("shfandomwikithis") {
             description = "Searches the fandom wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
-            callback { WikiManager.otherWikiCommands(it, true, true) }
+            callback { WikiManager.otherWikiCommands(it, useFandom = true, wikithis = true) }
         }
         event.register("shofficialwiki") {
             description = "Searches the official wiki with SkyHanni's own method."
