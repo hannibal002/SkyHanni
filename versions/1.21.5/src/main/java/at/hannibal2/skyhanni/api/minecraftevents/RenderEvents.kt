@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
@@ -17,8 +18,6 @@ import net.minecraft.util.Identifier
 @SkyHanniModule
 object RenderEvents {
 
-
-    private val LAYER: Identifier = Identifier.of("skyhanni", "layer")
 
     init {
 
@@ -37,11 +36,22 @@ object RenderEvents {
             HudLayerRegistrationCallback { layeredDrawer: LayeredDrawerWrapper ->
                 layeredDrawer.attachLayerBefore(
                     IdentifiedLayer.HOTBAR_AND_BARS,
-                    LAYER,
-                    this::postHotbarLayerEvent,
+                    makeLayer("hotbar_pre"),
+                    this::postHotbarLayerEventPre,
                 )
             },
         )
+
+        HudLayerRegistrationCallback.EVENT.register(
+            HudLayerRegistrationCallback { layeredDrawer: LayeredDrawerWrapper ->
+                layeredDrawer.attachLayerAfter(
+                    IdentifiedLayer.HOTBAR_AND_BARS,
+                    makeLayer("hotbar_post"),
+                    this::postHotbarLayerEventPost,
+                )
+            },
+        )
+
 
 
         // GameOverlayRenderPostEvent
@@ -58,10 +68,17 @@ object RenderEvents {
 
     }
 
-    private fun postHotbarLayerEvent(context: DrawContext, ticks: RenderTickCounter) {
+    private fun postHotbarLayerEventPre(context: DrawContext, ticks: RenderTickCounter) {
         GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
     }
 
+    private fun postHotbarLayerEventPost(context: DrawContext, ticks: RenderTickCounter) {
+        GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()
+    }
+
+    private fun makeLayer(name: String): Identifier {
+        return Identifier.of("skyhanni", name)
+    }
 }
 
 enum class RenderLayer {
