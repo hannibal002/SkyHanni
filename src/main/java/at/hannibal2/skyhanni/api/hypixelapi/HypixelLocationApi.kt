@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiJoinEvent
+//#if TODO
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
+//#endif
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -14,10 +16,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+//#if TODO
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.ServerType
+//#endif
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object HypixelLocationApi {
@@ -37,8 +42,10 @@ object HypixelLocationApi {
     var inAlpha: Boolean = false
         private set
 
+    //#if TODO
     var serverType: ServerType? = null
         private set
+    //#endif
 
     var mode: String? = null
         private set
@@ -66,6 +73,8 @@ object HypixelLocationApi {
         inHypixel = true
     }
 
+    // todo remove once hypixel mod api is added to 1.21
+    //#if TODO
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onServerChange(event: HypixelApiServerChangeEvent) {
         logger.log(event.toString())
@@ -101,6 +110,7 @@ object HypixelLocationApi {
             changeIsland()
         }
     }
+    //#endif
 
     @HandleEvent
     fun onScoreboardTitle(event: ScoreboardTitleUpdateEvent) {
@@ -142,7 +152,9 @@ object HypixelLocationApi {
         island = IslandType.NONE
         serverId = null
         inAlpha = false
+        //#if TODO
         serverType = null
+        //#endif
         mode = null
         map = null
         isGuest = false
@@ -188,7 +200,9 @@ object HypixelLocationApi {
             "island" to island,
             "HypixelData.serverId" to HypixelData.serverId,
             "serverId" to serverId,
+            //#if TODO
             "serverType" to serverType,
+            //#endif
             "map" to map,
         )
 

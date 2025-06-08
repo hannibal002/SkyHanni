@@ -18,16 +18,14 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 //#endif
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-//#if TODO
 import at.hannibal2.skyhanni.data.repo.RepoManager
-//#endif
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 //#if TODO
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.Companion.initLogging
+import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 //#endif
 import at.hannibal2.skyhanni.utils.VersionConstants
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -67,18 +65,16 @@ object SkyHanniMod {
         configManager = ConfigManager()
         configManager.firstLoad()
         //#if TODO
-        initLogging()
+        MinecraftConsoleFilter.initLogging()
         //#endif
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
-        //#if TODO
         try {
             RepoManager.initRepo()
         } catch (e: Exception) {
             Exception("Error reading repo data", e).printStackTrace()
         }
-        //#endif
     }
 
     @HandleEvent
