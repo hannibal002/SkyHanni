@@ -4,20 +4,15 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
-import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
-import net.fabricmc.fabric.api.client.rendering.v1.LayeredDrawerWrapper
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderTickCounter
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.Identifier
 
 
 @SkyHanniModule
 object RenderEvents {
-
 
     init {
 
@@ -29,32 +24,6 @@ object RenderEvents {
         }
 
         // ScreenDrawnEvent
-
-        // GameOverlayRenderPreEvent
-        // todo need to post the rest of these + cancelling
-        HudLayerRegistrationCallback.EVENT.register(
-            HudLayerRegistrationCallback { layeredDrawer: LayeredDrawerWrapper ->
-                layeredDrawer.attachLayerBefore(
-                    IdentifiedLayer.HOTBAR_AND_BARS,
-                    makeLayer("hotbar_pre"),
-                    this::postHotbarLayerEventPre,
-                )
-            },
-        )
-
-        HudLayerRegistrationCallback.EVENT.register(
-            HudLayerRegistrationCallback { layeredDrawer: LayeredDrawerWrapper ->
-                layeredDrawer.attachLayerAfter(
-                    IdentifiedLayer.HOTBAR_AND_BARS,
-                    makeLayer("hotbar_post"),
-                    this::postHotbarLayerEventPost,
-                )
-            },
-        )
-
-
-
-        // GameOverlayRenderPostEvent
 
         // GuiScreenOpenEvent
 
@@ -68,16 +37,33 @@ object RenderEvents {
 
     }
 
-    private fun postHotbarLayerEventPre(context: DrawContext, ticks: RenderTickCounter) {
-        GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
+    // GameOverlayRenderPreEvent
+    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    @JvmStatic
+    fun postHotbarLayerEventPre(context: DrawContext): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
     }
 
-    private fun postHotbarLayerEventPost(context: DrawContext, ticks: RenderTickCounter) {
+    @JvmStatic
+    fun postExperienceLayerEventPre(context: DrawContext): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE).post()
+    }
+
+    @JvmStatic
+    fun postTablistLayerEventPre(context: DrawContext): Boolean {
+        return GameOverlayRenderPreEvent(context, RenderLayer.PLAYER_LIST).post()
+    }
+
+    // GameOverlayRenderPostEvent
+    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    @JvmStatic
+    fun postHotbarLayerEventPost(context: DrawContext) {
         GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()
     }
 
-    private fun makeLayer(name: String): Identifier {
-        return Identifier.of("skyhanni", name)
+    @JvmStatic
+    fun postExperienceLayerEventPost(context: DrawContext) {
+        GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE).post()
     }
 }
 
