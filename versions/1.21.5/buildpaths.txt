@@ -1061,6 +1061,7 @@ at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat.java
 at.hannibal2.skyhanni.mixins.transformers.MixinChatHud.java
 at.hannibal2.skyhanni.mixins.transformers.MixinChatLine.java
+at.hannibal2.skyhanni.mixins.transformers.MixinClientEntityManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinClientPlayNetworkHandler.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDataTracker.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDrawContext.java
