@@ -40,6 +40,8 @@ net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket type.getType
 
 net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket net.minecraft.network.packet.s2c.play.MobSpawnS2CPacket
 
+net.minecraft.network.packet.s2c.play.EntityPositionS2CPacket entityId() getId()
+
 net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket getEntityId() getId()
 
 net.minecraft.text.Text net.minecraft.text.LiteralText
