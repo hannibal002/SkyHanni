@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -98,13 +99,23 @@ object EffectApi {
         "misc.nongodpot.repellant",
         " Repellent: §r§[97a](?<tier>\\w+)?(?: §r§7\\((?<time>\\d)s\\))?",
     )
+
+    /**
+     * REGEX-TEST:  §r§aSmoldering Polarization I§r§f: 58s
+     * REGEX-TEST:  §r§bWisp's Ice-Flavored Water I§r§f: 29m
+     * REGEX-TEST:      §2Mushed Glowy Tonic I §r§f43m
+     * REGEX-TEST: §r§r§bWisp's Ice-Flavored Water I§r§r§r §r§f10m§r
+     */
+    private val tabEffectPattern by RepoPattern.pattern(
+        "tab.effects",
+        " *(?:§.)*(?<effect>§.[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:§.|[: ])+(?<time>[dhms0-9 ]+)(?:§.)*"
+    )
     // </editor-fold>
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
     // Todo : cleanup and add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
-    @Suppress("MaxLineLength")
     fun onChat(event: SkyHanniChatEvent) {
         hotChocolateMixinConsumePattern.matchMatcher(event.message) {
             val durationAdded = TimeUtils.getDuration(group("time"))
@@ -124,18 +135,23 @@ object EffectApi {
         val changeType: EffectDurationChangeType?
         val duration: Duration?
 
-        when (event.message) {
+        val modifiedMessage = event.message.replace(
+            " Press TAB or type /effects to view your active effects!",
+            ""
+        )
+
+        when (modifiedMessage) {
             "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!" -> {
                 effect = NonGodPotEffect.SMOLDERING
-                changeType = EffectDurationChangeType.SET
+                changeType = EffectDurationChangeType.ADD // These stack when you consume them
                 duration = 1.hours
             }
-            "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f! Press TAB or type /effects to view your active effects!" -> {
+            "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f!" -> {
                 effect = NonGodPotEffect.GLOWY
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
-            "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f! Press TAB or type /effects to view your active effects!" -> {
+            "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f!" -> {
                 effect = NonGodPotEffect.WISP
                 changeType = EffectDurationChangeType.SET
                 duration = 5.minutes
@@ -145,7 +161,7 @@ object EffectApi {
                 changeType = EffectDurationChangeType.SET
                 duration = 24.hours
             }
-            "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f! Press TAB or type /effects to view your active effects!" -> {
+            "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f!" -> {
                 effect = NonGodPotEffect.HARVEST_HARBINGER
                 changeType = EffectDurationChangeType.SET
                 duration = 25.minutes
@@ -160,7 +176,7 @@ object EffectApi {
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
             }
-            "§e[NPC] §6King Yolkar§f: §rThese eggs will help me stomach my pain." -> {
+            "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain." -> {
                 effect = NonGodPotEffect.GOBLIN
                 changeType = EffectDurationChangeType.SET
                 duration = 20.minutes
@@ -170,7 +186,7 @@ object EffectApi {
                 changeType = EffectDurationChangeType.REMOVE
                 duration = null
             }
-            "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f! Press TAB or type /effects to view your active effects!" -> {
+            "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f!" -> {
                 effect = NonGodPotEffect.DOUCE_PLUIE_DE_STINKY_CHEESE
                 changeType = EffectDurationChangeType.SET
                 duration = 1.hours
@@ -181,44 +197,48 @@ object EffectApi {
         EffectDurationChangeEvent(effect, changeType, duration).post()
     }
 
-    private fun String.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        "$this§r".startsWith(it.tabListName)
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+        val footerLines = event.footer.split("\n")
+        footerLines.readNonGodPotEffects()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
-        for (line in event.footer.split("\n")) {
-            val effect = line.getNonGodPotEffectOrNull() ?: continue
-            godPotTabPattern.matchMatcher(line) {
-                profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
-            }
-            val durationString = line.substring(effect.tabListName.length)
-            try {
-                val duration = TimeUtils.getDuration(durationString.split("§f")[1])
-                EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
-            } catch (e: IndexOutOfBoundsException) {
-                ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$line'")
-            }
+    fun WidgetUpdateEvent.readEffects() {
+        if (!isWidget(TabWidget.ACTIVE_EFFECTS)) return
+        godPotTabPattern.firstMatcher(lines) {
+            profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
+        }
+        lines.readNonGodPotEffects()
+    }
+
+    private fun List<String>.readNonGodPotEffects() = tabEffectPattern.matchAll(this) {
+        val nonGodPotEffect = NonGodPotEffect.entries.firstOrNull {
+            it.tabListName == group("effect")
+        } ?: return@matchAll
+        try {
+            val duration = TimeUtils.getDuration(group("time"))
+            EffectDurationChangeEvent(nonGodPotEffect, EffectDurationChangeType.SET, duration).post()
+        } catch (e: Exception) {
+            ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$this'")
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PESTS)) return
+    fun WidgetUpdateEvent.readPestRepellent() {
+        if (!isWidget(TabWidget.PESTS)) return
 
-        event.lines.firstNotNullOfOrNull {
-            repellentPattern.matchMatcher(it) {
-                // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
-                val time = group("time")?.toIntOrNull() ?: return@matchMatcher
-                val tier = group("tier")
-                val duration = time.toDuration(DurationUnit.SECONDS)
-                val propTier = when (tier) {
-                    "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
-                    "REGULAR" -> NonGodPotEffect.PEST_REPELLENT
-                    else -> return@matchMatcher
-                }
-                EffectDurationChangeEvent(propTier, EffectDurationChangeType.SET, duration).post()
+        repellentPattern.firstMatcher(lines) {
+            // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
+            val time = group("time")?.toIntOrNull() ?: return@firstMatcher
+            val tier = group("tier")
+            val duration = time.toDuration(DurationUnit.SECONDS)
+            val propTier = when (tier) {
+                "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
+                "REGULAR" -> NonGodPotEffect.PEST_REPELLENT
+                else -> return@firstMatcher
             }
+            EffectDurationChangeEvent(propTier, EffectDurationChangeType.SET, duration).post()
         }
     }
 
