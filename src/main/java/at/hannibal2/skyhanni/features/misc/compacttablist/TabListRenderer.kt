@@ -125,7 +125,7 @@ object TabListRenderer {
             }
         }
 
-        drawColumns(x, headerY, columns, minecraft)
+        drawColumns(x, headerY, columns)
 
         if (footer.isNotEmpty()) {
             var footerY = y + totalHeight - footer.size * LINE_HEIGHT + TAB_PADDING / 2 + 1
@@ -142,7 +142,7 @@ object TabListRenderer {
         DrawContextUtils.translate(0f, 0f, -TAB_Z_OFFSET)
     }
 
-    private fun drawColumns(x: Int, headerY: Int, columns: List<RenderColumn>, minecraft: Minecraft) {
+    private fun drawColumns(x: Int, headerY: Int, columns: List<RenderColumn>) {
         var middleX = x
         var lastTitle: TabLine? = null
         var lastSubTitle: TabLine? = null
