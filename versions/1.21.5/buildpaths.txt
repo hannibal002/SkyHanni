@@ -1056,6 +1056,7 @@ at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook.kt
 at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData.java
 at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook.kt
 at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper.kt
+at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook.kt
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat.java
@@ -1083,6 +1084,7 @@ at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiContainer.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiNewChat.java
+at.hannibal2.skyhanni.mixins.transformers.render.MixinRendererLivingEntity.java
 at.hannibal2.skyhanni.test.DebugCommand.kt
 at.hannibal2.skyhanni.test.HighlightMissingRepoItems.kt
 at.hannibal2.skyhanni.test.ParkourWaypointSaver.kt
@@ -1121,6 +1123,7 @@ at.hannibal2.skyhanni.utils.ComputerTimeOffset.kt
 at.hannibal2.skyhanni.utils.ConfigUtils.kt
 at.hannibal2.skyhanni.utils.DelayedRun.kt
 at.hannibal2.skyhanni.utils.DisplayTableEntry.kt
+at.hannibal2.skyhanni.utils.EntityOutlineRenderer.kt
 at.hannibal2.skyhanni.utils.EntityUtils.kt
 at.hannibal2.skyhanni.utils.EssenceUtils.kt
 at.hannibal2.skyhanni.utils.ExtendedChatColor.kt
