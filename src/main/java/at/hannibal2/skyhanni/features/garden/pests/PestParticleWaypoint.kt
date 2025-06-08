@@ -22,6 +22,9 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.network.play.server.S0EPacketSpawnObject
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
+//#if MC > 1.12
+//$$ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
+//#endif
 
 @SkyHanniModule
 object PestParticleWaypoint {
@@ -93,9 +96,17 @@ object PestParticleWaypoint {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onFireWorkSpawn(event: PacketReceivedEvent) {
+        //#if MC < 1.12
         val packet = event.packet as? S0EPacketSpawnObject ?: return
+        //#else
+        //$$ val packet = event.packet as? ParticleS2CPacket ?: return
+        //#endif
         if (!config.hideParticles) return
+        //#if MC < 1.12
         if (packet.type == FIREWORK_ID) event.cancel()
+        //#else
+        //$$ if (packet.parameters == ParticleTypes.FIREWORK) event.cancel()
+        //#endif
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
