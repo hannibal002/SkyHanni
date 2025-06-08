@@ -1076,6 +1076,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinKeyboard.java
 at.hannibal2.skyhanni.mixins.transformers.MixinMessageHandler.java
 at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
+at.hannibal2.skyhanni.mixins.transformers.MixinPlayerEntityRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinRenderManager.java
 at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiContainer.java
