@@ -3,9 +3,12 @@ libautoupdate = "1.3.1"
 moulconfig = "3.6.0"
 headlessLwjgl = "1.7.2"
 jbAnnotations = "24.1.0"
-hypixelmodapi = "1.0.1.2"
-modmenu = "14.0.0-rc.2"
 
+hypixelmodapi = "1.0.1"
+hypixelmodapi_fabric = "1.0.1+build.1+mc1.21"
+hypixelmodapi_forge = "1.0.1.2"
+
+modmenu = "14.0.0-rc.2"
 
 [libraries]
 moulconfig = { module = "org.notenoughupdates.moulconfig:legacy", version.ref = "moulconfig" }
@@ -16,7 +19,10 @@ jbAnnotations = { module = "org.jetbrains:annotations", version.ref = "jbAnnotat
 hotswapagentforge = { module = "moe.nea:hotswapagent-forge", version = "1.0.1" }
 autoservice_ksp = {module="dev.zacsweers.autoservice:auto-service-ksp",version="1.1.0"}
 autoservice_annotations = {module="com.google.auto.service:auto-service-annotations",version="1.1.1"}
-hypixelmodapi = { module = "net.hypixel:mod-api-forge", version.ref = "hypixelmodapi" }
-hypixelmodapitweaker = { module = "net.hypixel:mod-api-forge-tweaker", version.ref = "hypixelmodapi" }
+
+hypixelmodapi_forge = { module = "net.hypixel:mod-api-forge", version.ref = "hypixelmodapi_forge" }
+hypixelmodapitweaker = { module = "net.hypixel:mod-api-forge-tweaker", version.ref = "hypixelmodapi_forge" }
+hypixelmodapi = { module = "net.hypixel:mod-api", version.ref = "hypixelmodapi" }
+hypixelmodapi_fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixelmodapi_fabric" }
 
 modmenu = { module = "maven.modrinth:modmenu", version.ref = "modmenu" }

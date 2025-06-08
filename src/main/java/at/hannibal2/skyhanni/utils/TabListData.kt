@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+//#endif
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -32,6 +34,7 @@ import net.minecraft.world.WorldSettings
 //$$ import net.minecraft.world.level.GameType
 //#endif
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object TabListData {
     private var tablistCache = emptyList<String>()
@@ -171,7 +174,7 @@ object TabListData {
         if (tablistCache != tabList) {
             tablistCache = tabList
             TabListUpdateEvent(getTabList()).post()
-            if (!LorenzUtils.onHypixel) {
+            if (!SkyBlockUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
         }
@@ -188,13 +191,14 @@ object TabListData {
 
     private fun workaroundDelayedTabListUpdateAgain() {
         DelayedRun.runDelayed(2.seconds) {
-            if (LorenzUtils.onHypixel) {
+            if (SkyBlockUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
                 TabListUpdateEvent(getTabList()).post()
             }
         }
     }
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shtesttablist") {
@@ -203,4 +207,5 @@ object TabListData {
             callback { toggleDebug() }
         }
     }
+    //#endif
 }
