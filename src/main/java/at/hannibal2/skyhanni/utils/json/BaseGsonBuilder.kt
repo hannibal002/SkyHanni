@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.LorenzRarity
-//#if TODO
 import at.hannibal2.skyhanni.utils.LorenzVec
+//#if TODO
 import at.hannibal2.skyhanni.utils.NeuInternalName
 //#endif
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -30,9 +30,7 @@ object BaseGsonBuilder {
         .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         .registerTypeAdapter(UUID::class.java, SkyHanniTypeAdapters.UUID.nullSafe())
-        //#if TODO
         .registerTypeAdapter(LorenzVec::class.java, SkyHanniTypeAdapters.VEC_STRING.nullSafe())
-        //#endif
         .registerTypeAdapter(TrophyRarity::class.java, SkyHanniTypeAdapters.TROPHY_RARITY.nullSafe())
         //#if TODO
         .registerTypeAdapter(ItemStack::class.java, SkyHanniTypeAdapters.NEU_ITEMSTACK.nullSafe())
