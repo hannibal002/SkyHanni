@@ -95,6 +95,7 @@ object JacobFarmingContestsInventory {
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {
+                if (!FarmingContestApi.inInventory) return
                 val (year, month, day) = FarmingContestApi.getSBDateFromItemName(itemName) ?: return
                 openContest(year, month, day)
                 event.cancel()
