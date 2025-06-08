@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.config.features.dev
 
-//#if TODO
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoUtils
-//#endif
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -11,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-// todo 1.21 impl needed
 class RepositoryConfig {
     @Expose
     @ConfigOption(
@@ -22,11 +19,9 @@ class RepositoryConfig {
     @ConfigEditorBoolean
     var repoAutoUpdate: Boolean = true
 
-    //#if TODO
     @ConfigOption(name = "Update Repo Now", desc = "Update your repository to the latest version")
     @ConfigEditorButton(buttonText = "Update")
     var updateRepo: Runnable = Runnable(RepoManager::updateRepo)
-    //#endif
 
     @Expose
     @ConfigOption(name = "Repository Location", desc = "")
@@ -34,11 +29,9 @@ class RepositoryConfig {
     var location: RepositoryLocation = RepositoryLocation()
 
     class RepositoryLocation {
-        //#if TODO
         @ConfigOption(name = "Reset Repository Location", desc = "Reset your repository location to the default.")
         @ConfigEditorButton(buttonText = "Reset")
         var resetRepoLocation: Runnable = Runnable { RepoUtils.resetRepoLocation() }
-        //#endif
 
         @Expose
         @ConfigOption(name = "Repository User", desc = "The Repository Branch, default: hannibal002")

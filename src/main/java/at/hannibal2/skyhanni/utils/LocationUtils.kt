@@ -13,6 +13,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.time.Duration
 
+// todo 1.21 impl needed
 object LocationUtils {
 
     fun canSee(a: LorenzVec, b: LorenzVec, offset: Double? = null): Boolean {
@@ -20,6 +21,7 @@ object LocationUtils {
     }
 
     private fun canSee0(a: LorenzVec, b: LorenzVec) =
+        //#if TODO
         MinecraftCompat.localWorld.rayTraceBlocks(
             a.toVec3(),
             b.toVec3(),
@@ -27,6 +29,9 @@ object LocationUtils {
             true, // ignoreBlockWithoutBoundingBox
             false, // returnLastUncollidableBlock
         ) == null
+    //#else
+    //$$ false
+    //#endif
 
     fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 
