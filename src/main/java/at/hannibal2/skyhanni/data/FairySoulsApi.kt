@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object FairySoulsApi {
     private val foundSouls get() = ProfileStorageData.profileSpecific?.fairySouls?.found ?: mutableMapOf()
-    private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound ?: mutableMapOf()
+    val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound ?: mutableMapOf()
 
     val patternGroup = RepoPattern.group("misc.fairy-souls")
 
@@ -65,6 +65,11 @@ object FairySoulsApi {
 
     fun amountFoundOnCurrentIsland(): Int = amountFoundOnIsland(SkyBlockUtils.currentIsland)
     fun amountFoundOnIsland(island: IslandType): Int = totalFound.getOrDefault(island, 0)
+
+    fun setAmountFoundOnCurrentIsland(amount: Int) = setAmountFoundOnIsland(SkyBlockUtils.currentIsland, amount)
+    fun setAmountFoundOnIsland(island: IslandType, amount: Int) {
+        totalFound[island] = amount
+    }
 
     fun foundSoulsOnCurrentIsland(): MutableSet<LorenzVec> = foundSoulsOnIsland(SkyBlockUtils.currentIsland)
     fun foundSoulsOnIsland(island: IslandType): MutableSet<LorenzVec> = foundSouls.getOrPut(island) { mutableSetOf() }
