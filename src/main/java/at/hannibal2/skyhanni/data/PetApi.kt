@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object PetApi {
     private val patternGroup = RepoPattern.group("misc.pet")
@@ -47,6 +48,7 @@ object PetApi {
 
     fun isPetMenu(inventoryTitle: String): Boolean = petMenuPattern.matches(inventoryTitle)
 
+    //#if TODO
     // Contains color code + name and for older SkyHanni users maybe also the pet level
     var currentPet: String?
         get() = ProfileStorageData.profileSpecific?.currentPet?.takeIf { it.isNotEmpty() }
@@ -55,6 +57,7 @@ object PetApi {
         }
 
     fun isCurrentPet(petName: String): Boolean = currentPet?.contains(petName) ?: false
+    //#endif
 
     fun getCleanName(nameWithLevel: String): String? {
         petItemName.matchMatcher(nameWithLevel) {
