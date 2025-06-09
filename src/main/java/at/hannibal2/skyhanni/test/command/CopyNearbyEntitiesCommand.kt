@@ -113,6 +113,9 @@ object CopyNearbyEntitiesCommand {
                     is EntityOtherPlayerMP -> addOtherPlayer(entity)
                     is EntityCreeper -> addCreeper(entity)
                     is EntityWither -> addWither(entity)
+                    //#if MC > 1.21
+                    //$$ is net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity -> addItemDisplayEntity(entity)
+                    //#endif
                 }
                 if (mob != null && mob.mobType != Mob.Type.PLAYER) {
                     add("MobInfo: ")
@@ -218,6 +221,20 @@ object CopyNearbyEntitiesCommand {
         add("-  invulTime: '$invulTime'")
         add("-  armored: '$isArmored'")
     }
+
+    //#if MC > 1.21
+    //$$ private fun MutableList<String>.addItemDisplayEntity(entity: net.minecraft.entity.decoration.DisplayEntity.ItemDisplayEntity) {
+    //$$     add("EntityItemDisplay:")
+    //$$     val stack = entity.itemStack
+    //$$     val rotation = entity.rotationVector
+    //$$     val position = entity.pos.toLorenzVec()
+    //$$
+    //$$     add("-  itemStack:")
+    //$$     printItemStackData(stack)
+    //$$     add("-  rotation: $rotation")
+    //$$     add("-  position: $position")
+    //$$ }
+    //#endif
 
     private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
         if (stack != null) {
