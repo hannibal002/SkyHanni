@@ -436,7 +436,7 @@ net.minecraft.world.inventory.ChestMenu getContainer() getLowerChestInventory()
 
 net.minecraft.world.inventory.Slot getItem() getStack()
 net.minecraft.world.inventory.Slot hasItem() getHasStack()
-net.minecraft.world.inventory.Slot index slotNumber
+net.minecraft.world.inventory.Slot id slotNumber
 net.minecraft.world.inventory.Slot x xDisplayPosition
 net.minecraft.world.inventory.Slot y yDisplayPosition
 
