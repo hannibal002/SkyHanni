@@ -136,7 +136,7 @@ object GardenCropMilestoneDisplay {
             progressDisplay = drawProgressDisplay(it)
         }
 
-        if (config.next.bestDisplay && config.next.bestAlwaysOn || currentCrop != null) {
+        if (config.next.bestDisplay && config.next.bestAlwaysOn.get() || currentCrop != null) {
             GardenBestCropTime.display = GardenBestCropTime.drawBestDisplay(currentCrop)
         }
     }
@@ -194,7 +194,7 @@ object GardenCropMilestoneDisplay {
                 val missing = need - have
                 val missingTime = (missing / farmingFortuneSpeed).seconds
                 val millis = missingTime.inWholeMilliseconds
-                GardenBestCropTime.timeTillNextCrop[crop] = millis
+                GardenBestCropTime.timeTillNextCrop[crop] = millis.milliseconds
                 tryWarn(missingTime, "§b${crop.cropName} $nextTier in %t", crop)
                 val biggestUnit = config.highestTimeFormat.get().timeUnit
                 val duration = missingTime.format(biggestUnit)

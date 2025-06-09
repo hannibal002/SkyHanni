@@ -37,7 +37,7 @@ class GardenConfig {
     @Category(name = "Crop Milestones", desc = "Crop Milestones Settings")
     var cropMilestones: CropMilestonesConfig = CropMilestonesConfig()
 
-    // TODO moulconfig runnable support
+    // TODO Write ConditionalUtils.onToggle()-s for these values in their feature classes
     @Expose
     @ConfigOption(name = "Custom Keybinds", desc = "")
     @Accordion
@@ -62,11 +62,10 @@ class GardenConfig {
     @Accordion
     var eliteFarmingWeights: EliteFarmingWeightConfig = EliteFarmingWeightConfig()
 
-    // TODO rename to dicerRngDropTracker
     @Expose
     @ConfigOption(name = "Dicer RNG Drop Tracker", desc = "")
     @Accordion
-    var dicerCounters: DicerRngDropTrackerConfig = DicerRngDropTrackerConfig()
+    var dicerRngDropTracker: DicerRngDropTrackerConfig = DicerRngDropTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Money per Hour", desc = "")
@@ -78,11 +77,10 @@ class GardenConfig {
     @Accordion
     var nextJacobContests: NextJacobContestConfig = NextJacobContestConfig()
 
-    // TODO rename to armorDropTracker
     @Expose
     @ConfigOption(name = "Armor Drop Tracker", desc = "")
     @Accordion
-    var farmingArmorDrop: ArmorDropTrackerConfig = ArmorDropTrackerConfig()
+    var armorDropTracker: ArmorDropTrackerConfig = ArmorDropTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Anita Shop", desc = "")
@@ -210,7 +208,7 @@ class GardenConfig {
     @ConfigEditorBoolean
     var jacobContestCustomBps: Boolean = true
 
-    // TODO moulconfig runnable support
+    // TODO Write ConditionalUtils.onToggle()-s for these values in their feature classes
     @Expose
     @ConfigOption(name = "Custom BPS Value", desc = "Set a custom Blocks per Second value.")
     @ConfigEditorSlider(minValue = 15f, maxValue = 20f, minStep = 0.1f)
@@ -236,7 +234,8 @@ class GardenConfig {
     @Expose
     @ConfigOption(
         name = "Enable Plot Borders",
-        desc = "Enable the use of F3 + G hotkey to show Garden plot borders. Similar to how later Minecraft version render chunk borders."
+        desc = "Enable the use of F3 + G hotkey to show Garden plot borders. " +
+            "Similar to how later Minecraft version render chunk borders."
     )
     @ConfigEditorBoolean
     @FeatureToggle
