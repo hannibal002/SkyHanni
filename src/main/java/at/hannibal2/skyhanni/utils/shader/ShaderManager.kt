@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import net.minecraft.client.Minecraft
 import org.apache.commons.lang3.StringUtils
-import org.lwjgl.opengl.OpenGLException
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -65,7 +64,11 @@ object ShaderManager {
 
         val source = StringBuilder()
 
+        //#if MC < 1.21
         val inputStream = Minecraft.getMinecraft().resourceManager.getResource(resourceLocation).inputStream
+        //#else
+        //$$ val inputStream = MinecraftClient.getInstance().resourceManager.getResource(resourceLocation).get().inputStream
+        //#endif
         BufferedReader(InputStreamReader(inputStream)).forEachLine {
             source.append(it).append("\n")
         }
@@ -81,7 +84,7 @@ object ShaderManager {
 
             if (inWorld()) {
                 ErrorManager.logErrorWithData(
-                    OpenGLException("Shader compilation error."),
+                    Exception("Shader compilation error."),
                     errorMessage,
                     "GLSL Compilation Error:\n" to errorLog,
                 )

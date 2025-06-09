@@ -82,6 +82,7 @@ enum class ScoreboardConfigEventElement(val event: ScoreboardEvent) {
             DARK_AUCTION,
             JACOB_CONTEST,
             JACOB_MEDALS,
+            GALATEA,
             TRAPPER,
             GARDEN,
             FLIGHT_DURATION,

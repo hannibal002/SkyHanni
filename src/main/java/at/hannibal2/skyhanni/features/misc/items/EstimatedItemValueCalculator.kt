@@ -962,7 +962,10 @@ object EstimatedItemValueCalculator {
         if (list.tagCount() == 0) return emptyList()
         val boosters = mutableListOf<NeuInternalName>()
         for (i in 0..list.tagCount()) {
-            boosters.add(list.getStringTagAt(i).toInternalName())
+            var internalName = list.getStringTagAt(i)
+            if (internalName.isBlank()) continue
+            internalName += "_BOOSTER"
+            boosters.add(internalName.toInternalName())
         }
         return boosters
     }

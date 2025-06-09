@@ -9,6 +9,7 @@ at.hannibal2.skyhanni.api.SkyBlockXPApi.kt
 at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager.kt
 at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo.kt
 at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery.kt
+at.hannibal2.skyhanni.api.enoughupdates.NeuEventWrappers.kt
 at.hannibal2.skyhanni.api.event.GeneratedEventPrimaryFunctionNames.kt
 at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent.kt
 at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi.kt
@@ -736,6 +737,7 @@ at.hannibal2.skyhanni.features.inventory.EvolvingItems.kt
 at.hannibal2.skyhanni.features.inventory.FavoritePowerStone.kt
 at.hannibal2.skyhanni.features.inventory.FixIronman.kt
 at.hannibal2.skyhanni.features.inventory.FocusMode.kt
+at.hannibal2.skyhanni.features.inventory.HarpFeatures.kt
 at.hannibal2.skyhanni.features.inventory.HideNotClickableItems.kt
 at.hannibal2.skyhanni.features.inventory.HighlightBonzoMasks.kt
 at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.kt
@@ -753,6 +755,7 @@ at.hannibal2.skyhanni.features.inventory.ShiftClickBrewing.kt
 at.hannibal2.skyhanni.features.inventory.ShiftClickEquipment.kt
 at.hannibal2.skyhanni.features.inventory.ShiftClickNpcSell.kt
 at.hannibal2.skyhanni.features.inventory.SkyBlockXPBar.kt
+at.hannibal2.skyhanni.features.inventory.SkyblockGuideHighlightFeature.kt
 at.hannibal2.skyhanni.features.inventory.SnakeGame.kt
 at.hannibal2.skyhanni.features.inventory.StatsTuning.kt
 at.hannibal2.skyhanni.features.inventory.StockOfStonkFeature.kt
@@ -804,6 +807,7 @@ at.hannibal2.skyhanni.features.inventory.experimentationtable.GuardianReminder.k
 at.hannibal2.skyhanni.features.inventory.experimentationtable.SuperpairDataDisplay.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.SuperpairsClicksAlert.kt
 at.hannibal2.skyhanni.features.inventory.experimentationtable.UltraRareBookAlert.kt
+at.hannibal2.skyhanni.features.inventory.sacks.OutsideSackValue.kt
 at.hannibal2.skyhanni.features.inventory.tiarelay.Relay.kt
 at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayHelper.kt
 at.hannibal2.skyhanni.features.inventory.tiarelay.TiaRelayWaypoints.kt
@@ -889,7 +893,9 @@ at.hannibal2.skyhanni.features.misc.EnchantedClockHelper.kt
 at.hannibal2.skyhanni.features.misc.ExpOrbsOnGroundHider.kt
 at.hannibal2.skyhanni.features.misc.FastFairySoulsPathfinder.kt
 at.hannibal2.skyhanni.features.misc.FixGhostEntities.kt
+at.hannibal2.skyhanni.features.misc.FixNeuHeavyPearls.kt
 at.hannibal2.skyhanni.features.misc.FrogMaskFeatures.kt
+at.hannibal2.skyhanni.features.misc.GFSPiggyBank.kt
 at.hannibal2.skyhanni.features.misc.HideArmor.kt
 at.hannibal2.skyhanni.features.misc.HideFarEntities.kt
 at.hannibal2.skyhanni.features.misc.InGameDateDisplay.kt
@@ -903,6 +909,7 @@ at.hannibal2.skyhanni.features.misc.MagicalPowerDisplay.kt
 at.hannibal2.skyhanni.features.misc.MarkedPlayerManager.kt
 at.hannibal2.skyhanni.features.misc.MiscFeatures.kt
 at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay.kt
+at.hannibal2.skyhanni.features.misc.NeuSoulPathFind.kt
 at.hannibal2.skyhanni.features.misc.NoBitsWarning.kt
 at.hannibal2.skyhanni.features.misc.ParticleHider.kt
 at.hannibal2.skyhanni.features.misc.PatcherFixes.kt
@@ -968,6 +975,7 @@ at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui.kt
 at.hannibal2.skyhanni.features.nether.MatriarchHelper.kt
 at.hannibal2.skyhanni.features.nether.PabloHelper.kt
 at.hannibal2.skyhanni.features.nether.RescueMissionWaypoints.kt
+at.hannibal2.skyhanni.features.nether.SulphurSkitterBox.kt
 at.hannibal2.skyhanni.features.nether.VolcanoExplosivityDisplay.kt
 at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown.kt
 at.hannibal2.skyhanni.features.nether.ashfang.AshfangHighlights.kt
@@ -997,6 +1005,7 @@ at.hannibal2.skyhanni.features.rift.RiftApi.kt
 at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.kt
 at.hannibal2.skyhanni.features.rift.area.colosseum.BlobbercystsHighlight.kt
 at.hannibal2.skyhanni.features.rift.area.colosseum.TentacleWaypoint.kt
+at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftAgaricusCap.kt
 at.hannibal2.skyhanni.features.rift.area.dreadfarm.RiftWiltedBerberisHelper.kt
 at.hannibal2.skyhanni.features.rift.area.dreadfarm.VoltHighlighter.kt
 at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper.kt
@@ -1011,6 +1020,7 @@ at.hannibal2.skyhanni.features.rift.area.mirrorverse.RiftUpsideDownParkour.kt
 at.hannibal2.skyhanni.features.rift.area.mirrorverse.TubulatorParkour.kt
 at.hannibal2.skyhanni.features.rift.area.mountaintop.EnigmaRoseFlowerpot.kt
 at.hannibal2.skyhanni.features.rift.area.mountaintop.SunGeckoHelper.kt
+at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteHelper.kt
 at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker.kt
 at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies.kt
 at.hannibal2.skyhanni.features.rift.area.stillgorechateau.SplatterHearts.kt
@@ -1062,11 +1072,13 @@ at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook.kt
 at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData.java
 at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook.kt
 at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper.kt
+at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook.kt
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay.java
 at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat.java
 at.hannibal2.skyhanni.mixins.transformers.MixinChatHud.java
 at.hannibal2.skyhanni.mixins.transformers.MixinChatLine.java
+at.hannibal2.skyhanni.mixins.transformers.MixinClientEntityManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinClientPlayNetworkHandler.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDataTracker.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDrawContext.java
@@ -1082,11 +1094,14 @@ at.hannibal2.skyhanni.mixins.transformers.MixinKeyboard.java
 at.hannibal2.skyhanni.mixins.transformers.MixinMessageHandler.java
 at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
+at.hannibal2.skyhanni.mixins.transformers.MixinPlayerEntityRenderer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinRenderManager.java
 at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiContainer.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiNewChat.java
+at.hannibal2.skyhanni.mixins.transformers.gui.MixinInventoryBasic.java
+at.hannibal2.skyhanni.mixins.transformers.render.MixinRendererLivingEntity.java
 at.hannibal2.skyhanni.test.DebugCommand.kt
 at.hannibal2.skyhanni.test.HighlightMissingRepoItems.kt
 at.hannibal2.skyhanni.test.ParkourWaypointSaver.kt
@@ -1125,6 +1140,7 @@ at.hannibal2.skyhanni.utils.ComputerTimeOffset.kt
 at.hannibal2.skyhanni.utils.ConfigUtils.kt
 at.hannibal2.skyhanni.utils.DelayedRun.kt
 at.hannibal2.skyhanni.utils.DisplayTableEntry.kt
+at.hannibal2.skyhanni.utils.EntityOutlineRenderer.kt
 at.hannibal2.skyhanni.utils.EntityUtils.kt
 at.hannibal2.skyhanni.utils.EssenceUtils.kt
 at.hannibal2.skyhanni.utils.ExtendedChatColor.kt
@@ -1691,6 +1707,10 @@ at/hannibal2/skyhanni/events/skyblock/AreaChangeEvents.kt
 at/hannibal2/skyhanni/events/utils/PreInitFinishedEvent.kt
 at/hannibal2/skyhanni/features/bingo/card/nextstephelper/steps/ChatMessageStep.kt
 at/hannibal2/skyhanni/features/bingo/card/nextstephelper/steps/ItemsStep.kt
+at/hannibal2/skyhanni/features/chroma/ChromaShader.kt
+at/hannibal2/skyhanni/features/chroma/ChromaShaderManager.kt
+at/hannibal2/skyhanni/features/chroma/StandardChromaShader.kt
+at/hannibal2/skyhanni/features/chroma/TexturedChromaShader.kt
 at/hannibal2/skyhanni/features/combat/damageindicator/DamageIndicatorManager.kt
 at/hannibal2/skyhanni/features/combat/damageindicator/MobFinder.kt
 at/hannibal2/skyhanni/features/commands/suggestions/SuggestionEntry.kt
@@ -1706,6 +1726,9 @@ at/hannibal2/skyhanni/features/inventory/experimentationtable/ExperimentationTab
 at/hannibal2/skyhanni/features/mining/OreBlock.kt
 at/hannibal2/skyhanni/features/mining/eventtracker/MiningEventData.kt
 at/hannibal2/skyhanni/features/minion/MinionFeatures.kt
+at/hannibal2/skyhanni/features/misc/DarkenShader.kt
+at/hannibal2/skyhanni/features/misc/RoundedRectangleOutlineShader.kt
+at/hannibal2/skyhanni/features/misc/RoundedShader.kt
 at/hannibal2/skyhanni/features/misc/discordrpc/DiscordStatus.kt
 at/hannibal2/skyhanni/features/misc/massconfiguration/FeatureToggleableOption.kt
 at/hannibal2/skyhanni/features/misc/teleportpad/TeleportPadCompactName.kt
@@ -1721,6 +1744,7 @@ at/hannibal2/skyhanni/mixins/hooks/MessageHandlerHook.kt
 at/hannibal2/skyhanni/mixins/hooks/RenderItemHook.kt
 at/hannibal2/skyhanni/mixins/init/BeforeForLoopInjectionPoint.java
 at/hannibal2/skyhanni/mixins/init/SkyhanniMixinPlugin.java
+at/hannibal2/skyhanni/mixins/transformers/AccessorMinecraft.java
 at/hannibal2/skyhanni/mixins/transformers/MixinClientConnection.java
 at/hannibal2/skyhanni/skyhannimodule/LoadedModules.kt
 at/hannibal2/skyhanni/skyhannimodule/SkyHanniModule.kt
@@ -1757,12 +1781,16 @@ at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 at/hannibal2/skyhanni/utils/compat/TextCompat.kt
 at/hannibal2/skyhanni/utils/compat/TypeAliasCompat.kt
 at/hannibal2/skyhanni/utils/compat/WorldCompat.kt
+at/hannibal2/skyhanni/utils/json/EnumSkippingTypeAdapterFactory.kt
 at/hannibal2/skyhanni/utils/json/JsonUtils.kt
 at/hannibal2/skyhanni/utils/render.ModernGlStateManager.kt
+at/hannibal2/skyhanni/utils/render/RoundedRectDrawer.kt
 at/hannibal2/skyhanni/utils/renderables/ScrollInput.kt
 at/hannibal2/skyhanni/utils/renderables/container/ContainerRenderable.kt
 at/hannibal2/skyhanni/utils/repopatterns/RepoPatternDump.kt
+at/hannibal2/skyhanni/utils/shader/Shader.kt
+at/hannibal2/skyhanni/utils/shader/ShaderHelper.kt
+at/hannibal2/skyhanni/utils/shader/ShaderManager.kt
+at/hannibal2/skyhanni/utils/shader/Uniform.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
-at\hannibal2\skyhanni\utils\json\EnumSkippingTypeAdapterFactory.kt
-net.minecraft.client.render.entity.LivingEntityRenderer.java

@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 
 // scoreboard
 // scoreboard update event
-object ScoreboardEventGalatea : ScoreboardEvent() {
+object
+ScoreboardEventGalatea : ScoreboardEvent() {
 
     override fun getDisplay() = buildList {
         ScoreboardPattern.whispersPattern.firstMatches(getSBLines())?.let { add(it) }
+        ScoreboardPattern.hotfPattern.firstMatches(getSBLines())?.let { add(it) }
         ScoreboardPattern.agathasContestPattern.firstMatches(getSBLines())?.let { line ->
             add(line)
             addAll(
@@ -26,6 +28,7 @@ object ScoreboardEventGalatea : ScoreboardEvent() {
 
     override val elementPatterns = listOf(
         ScoreboardPattern.whispersPattern,
+        ScoreboardPattern.hotfPattern,
         ScoreboardPattern.agathasContestPattern,
     )
 

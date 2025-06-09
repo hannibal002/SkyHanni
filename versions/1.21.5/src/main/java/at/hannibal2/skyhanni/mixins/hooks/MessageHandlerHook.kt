@@ -30,7 +30,8 @@ fun onGameMessage(message: Text, actionBar: Boolean, original: Operation<Void>) 
         inGameHud.chatHud.logChatMessage(chatHudLine)
 
         // We also want to send the fabric canceled chat message event just to be nice
-        ClientReceiveMessageEvents.GAME.invoker().onReceiveGameMessage(message, actionBar)
+        ClientReceiveMessageEvents.ALLOW_GAME.invoker().allowReceiveGameMessage(message, actionBar)
+        ClientReceiveMessageEvents.GAME_CANCELED.invoker().onReceiveGameMessageCanceled(message, actionBar)
         return
     }
     original.call(message, actionBar);

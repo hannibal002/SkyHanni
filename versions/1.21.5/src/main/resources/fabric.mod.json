@@ -23,7 +23,7 @@
         ]
     },
     "depends": {
-        "fabric-api": ">=0.119.9+1.21.5",
+        "fabric-api": ">=0.126.0+1.21.5",
         "fabric-language-kotlin": ">=1.13.2+kotlin.2.1.20",
         "minecraft": ">=1.21.5"
     }

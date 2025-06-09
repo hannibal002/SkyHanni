@@ -186,7 +186,7 @@ dependencies {
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
         modImplementation("net.fabricmc:fabric-loader:0.16.13")
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.119.9+1.21.5")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.126.0+1.21.5")
         // on fabric everyone be using the kotlin language mod so we don't need to bundle kotlin ourselves
         modImplementation("net.fabricmc:fabric-language-kotlin:1.13.2+kotlin.2.1.20")
 

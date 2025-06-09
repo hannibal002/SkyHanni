@@ -525,7 +525,6 @@ object SkyHanniDebugsAndTests {
             }
 
             if (debugConfig.raytracedOreblock) {
-                //#if TODO
                 BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
                     OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                         config.debugOrePos.renderString(
@@ -534,7 +533,6 @@ object SkyHanniDebugsAndTests {
                         )
                     }
                 }
-                //#endif
             }
         }
 
