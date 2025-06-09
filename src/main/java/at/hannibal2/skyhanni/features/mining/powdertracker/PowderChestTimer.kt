@@ -130,10 +130,12 @@ object PowderChestTimer {
 
         for ((loc, time) in chests) {
             val timeLeft = time.timeUntil()
-            val color = if (config.useStaticColor) config.staticColor.toChromaColor().toColor()
-            else timeLeft.getColorBasedOnTime()
 
-            if (config.highlightChests) event.drawWaypointFilled(loc, color)
+            if (config.highlightChests) {
+                val color = if (config.useStaticColor) config.staticColor.toChromaColor().toColor()
+                else timeLeft.getColorBasedOnTime()
+                event.drawWaypointFilled(loc, color)
+            }
 
             if (config.drawTimerOnChest) {
                 val yOffset = if (loc.y <= playerY) 1.25 else -0.25
