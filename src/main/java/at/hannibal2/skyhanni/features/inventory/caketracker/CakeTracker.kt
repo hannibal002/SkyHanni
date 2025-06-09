@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.caketracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.inventory.CakeTrackerConfig.CakeTrackerDisplayOrderType
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -123,8 +123,6 @@ object CakeTracker {
     private val cakeScrollValue = ScrollValue().apply { init(0.0) }
     private val cakePriceCache: TimeLimitedCache<Int, Double> = TimeLimitedCache(5.minutes)
     private val searchOverrideCache: TimeLimitedCache<Pair<Int, Int>, Int> = TimeLimitedCache(5.minutes)
-    private val unobtainedHighlightColor: ChromaColour get() = config.unobtainedAuctionHighlightColor.toChromaColor()
-    private val obtainedHighlightColor: ChromaColour get() = config.obtainedAuctionHighlightColor.toChromaColor()
 
     private var currentYear = 0
     private var inCakeInventory = false
@@ -251,7 +249,7 @@ object CakeTracker {
         }.mapValues { (_, item) ->
             val year = cakeNamePattern.matchGroup(item.displayName, "year")?.toInt() ?: -1
             val owned = storage?.ownedCakes?.contains(year) ?: false
-            if (owned) obtainedHighlightColor else unobtainedHighlightColor
+            if (owned) config.ownedColor else config.missingColor
         }
         return true
     }
@@ -519,5 +517,12 @@ object CakeTracker {
             else CakeRange(start)
 
         add(lastRange.getRenderable(displayType))
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        val base = "inventory.cakeTracker"
+        event.move(88, "$base.unobtainedAuctionHighlightColor", "$base.missingColor")
+        event.move(88, "$base.obtainedAuctionHighlightColor", "$base.ownedColor")
     }
 }

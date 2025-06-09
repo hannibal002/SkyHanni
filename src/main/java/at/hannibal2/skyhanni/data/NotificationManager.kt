@@ -76,6 +76,7 @@ object NotificationManager {
         notificationQueue.add(notification)
     }
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestnotification") {
@@ -89,6 +90,7 @@ object NotificationManager {
             }
         }
     }
+    //#endif
 }
 
 data class SkyHanniNotification(
