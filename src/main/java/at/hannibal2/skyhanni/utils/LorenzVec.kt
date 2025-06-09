@@ -20,6 +20,7 @@ import kotlin.math.round
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+@Suppress("TooManyFunctions", "MemberVisibilityCanBePrivate")
 data class LorenzVec(
     val x: Double,
     val y: Double,
@@ -231,13 +232,13 @@ data class LorenzVec(
             LorenzVec(0, 0, -1),
         )
 
-        fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
-            val yaw: Double = (yaw + 90) * Math.PI / 180
-            val pitch: Double = (pitch + 90) * Math.PI / 180
+        fun getFromYawPitch(yawDegrees: Double, pitchDegrees: Double): LorenzVec {
+            val yawRad: Double = (yawDegrees + 90) * Math.PI / 180
+            val pitchRad: Double = (pitchDegrees + 90) * Math.PI / 180
 
-            val x = sin(pitch) * cos(yaw)
-            val y = sin(pitch) * sin(yaw)
-            val z = cos(pitch)
+            val x = sin(pitchRad) * cos(yawRad)
+            val y = sin(pitchRad) * sin(yawRad)
+            val z = cos(pitchRad)
             return LorenzVec(x, z, y)
         }
 
