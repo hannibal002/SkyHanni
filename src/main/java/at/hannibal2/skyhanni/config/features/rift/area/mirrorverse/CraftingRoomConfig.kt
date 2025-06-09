@@ -7,7 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class CraftingRoomConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show an holographic version of the mob on your side of the craft room.")
+    @ConfigOption(name = "Enabled", desc = "Show a holographic version of the mob on your side of the craft room.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true

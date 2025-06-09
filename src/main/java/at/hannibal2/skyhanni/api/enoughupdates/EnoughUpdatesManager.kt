@@ -4,7 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+//#endif
+import at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetsJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -42,11 +45,17 @@ import kotlin.math.floor
 //$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.util.Identifier
 //$$ import net.minecraft.nbt.NbtString
+//$$ import net.minecraft.text.Text
+//$$ import net.minecraft.component.DataComponentTypes
+//$$ import net.minecraft.component.type.LoreComponent
+//$$ import at.hannibal2.skyhanni.utils.ComponentUtils
+//$$ import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 //#else
 import net.minecraft.nbt.NBTTagString
 import net.minecraft.nbt.NBTException
 //#endif
 
+// todo 1.21 impl needed
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
@@ -176,6 +185,22 @@ object EnoughUpdatesManager {
         return json
     }
 
+    private val nbtListRegex = Regex("([\\[,])\\d+:")
+
+    private fun convertNbtToJson(nbtString: String): NeuNbtInfoJson? {
+        var convertedNbt = nbtString
+        convertedNbt = convertedNbt.replace(nbtListRegex, "$1")
+        try {
+            val json = ConfigManager.gson.fromJson(convertedNbt, JsonObject::class.java)
+            val fromJson = ConfigManager.gson.fromJson(json, NeuNbtInfoJson::class.java)
+            return fromJson
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Error converting nbt to json", "malformed nbt" to convertedNbt, "original nbt" to nbtString)
+        }
+
+        return null
+    }
+
     fun jsonToStack(json: JsonObject?, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack {
         //#if MC < 1.21
         json ?: return ItemStack(Items.painting)
@@ -222,12 +247,60 @@ object EnoughUpdatesManager {
             stack.tagCompound = tag
         }
 
-
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
         //#else
-        //$$ // todo clearly this isnt correct but this is lot that has to change and this works for now
-        //$$ return ItemStack(Items.PAINTING)
+        //$$ json ?: return ItemStack(Items.PAINTING)
+        //$$ var usingCache = useCache && !useReplacements
+        //$$ val internalName = json["internalname"].asString
+        //$$ if (internalName == "_") usingCache = false
+        //$$
+        //$$ if (usingCache) {
+        //$$     val cachedStack = itemStackCache[internalName]
+        //$$     if (cachedStack != null) return cachedStack.copy()
+        //$$ }
+        //$$
+        //$$ val damage = json["damage"]?.asInt ?: 0
+        //$$ val stack = ItemStack(
+        //$$             ComponentUtils.convertMinecraftIdToModern(json["itemid"].asString, damage).getVanillaItem() ?: run {
+        //$$                 println(json["itemid"].asString + " " + damage + " is invalid item")
+        //$$                 return ItemStack(Blocks.STONE.asItem())
+        //$$             },
+        //$$         )
+        //$$ if (stack.item == Items.AIR) {
+        //$$     return ItemStack(Blocks.STONE.asItem())
+        //$$ }
+        //$$
+        //$$ json["count"]?.asInt?.let { stack.count = it }
+        //$$
+        //$$
+        //$$ json["nbttag"]?.asString?.let { nbt ->
+        //$$     ComponentUtils.convertToComponents(stack, convertNbtToJson(nbt))
+        //$$ }
+        //$$
+        //$$ var replacements = mapOf<String, String>()
+        //$$ if (useReplacements) {
+        //$$     replacements = getPetLoreReplacements(stack, -1)
+        //$$     json["displayname"]?.asString?.let {
+        //$$         var name = it
+        //$$         for ((key, value) in replacements) {
+        //$$             name = name.replace("{$key}", value)
+        //$$         }
+        //$$         stack.setCustomItemName(name)
+        //$$     }
+        //$$ }
+        //$$
+        //$$ json["lore"]?.asJsonArray?.let { lore ->
+        //$$     val loreList: MutableList<String> = mutableListOf()
+        //$$     for (nbtElement in processLore(lore, replacements)) {
+        //$$         loreList.add(nbtElement.asString().get())
+        //$$     }
+        //$$
+        //$$     stack.setLore(loreList)
+        //$$ }
+        //$$
+        //$$ if (usingCache) itemStackCache[internalName] = stack
+        //$$ return stack.copy()
         //#endif
     }
 
@@ -397,6 +470,7 @@ object EnoughUpdatesManager {
         neuPetNums = event.readConstant<JsonObject>("petnums")
     }
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         if (!PlatformUtils.isNeuLoaded()) {
@@ -432,4 +506,5 @@ object EnoughUpdatesManager {
             }
         }
     }
+    //#endif
 }
