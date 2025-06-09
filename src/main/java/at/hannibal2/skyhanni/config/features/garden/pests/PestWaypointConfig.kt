@@ -28,13 +28,13 @@ class PestWaypointConfig {
     var drawLine: Boolean = true
 
     // TODO remove together with PestParticleLine.kt
+//     @ConfigEditorBoolean
     @Expose
     @ConfigOption(
         name = "Show Middle",
         desc = "Also show a waypoint to the middle of a plot. " +
             "This can help determine if the tracker is pointing to the middle instead of a pest.",
     )
-//     @ConfigEditorBoolean
     var showMiddle: Boolean = false
 
     @Expose
