@@ -243,6 +243,7 @@ object FastFairySoulsPathfinder {
         }
 
         islandData = createEmptyData()
+        if (islandData?.checkHaveAll() ?: false) return
         calculating = true
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
