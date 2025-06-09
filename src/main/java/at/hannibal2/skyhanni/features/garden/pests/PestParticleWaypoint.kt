@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi.getPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -123,8 +123,8 @@ object PestParticleWaypoint {
         val waypoint = guessPosition ?: return
         val distance = waypoint.distance(event.exactPlayerEyeLocation())
         val color: Color
-        val middlePoint = GardenPlotApi.closestCenterPlot(waypoint)
-        if (middlePoint != null && waypoint.ceil().equalsIgnoreY(middlePoint)) {
+        val plot = waypoint.getPlot()
+        if (plot != null && waypoint.ceil().equalsIgnoreY(plot.middle)) {
             color = LorenzColor.YELLOW.toColor()
             event.drawDynamicText(waypoint.add(y = -0.1 - distance / (12 * 1.7)), " §r§e(plot middle)", 1.0)
         } else {
