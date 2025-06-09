@@ -82,7 +82,7 @@ object PestParticleWaypoint {
 
         val solved = bezierFitter.solve() ?: return
         guessPosition = solved
-        isGuessPlotMiddle = solved.getPlot()?.middle?.equalsIgnoreY(solved.ceil()) ?: false
+        isGuessPlotMiddle = config.differentiatePlotMiddle && solved.getPlot()?.middle?.equalsIgnoreY(solved.ceil()) ?: false
     }
 
     private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =

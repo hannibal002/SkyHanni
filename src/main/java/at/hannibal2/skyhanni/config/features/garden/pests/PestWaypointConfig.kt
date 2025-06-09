@@ -37,6 +37,11 @@ class PestWaypointConfig {
     var showMiddle: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Differentiate Plot Middle", desc = "Distinguish pest guesses that point to the middle of the plot")
+    @ConfigEditorBoolean
+    var differentiatePlotMiddle: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Show For Seconds", desc = "The waypoint will disappear after this number of seconds.")
     @ConfigEditorSlider(minValue = 5f, maxValue = 20f, minStep = 1f)
     var showForSeconds: Int = 15
