@@ -323,6 +323,7 @@ object FastFairySoulsPathfinder {
             "§cFairy Souls are disabled. Click to enable!",
             onClick = {
                 config.fastFairySouls = true
+                reload()
             },
         )
         return true
