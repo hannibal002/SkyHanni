@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.getPlot
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -82,7 +82,7 @@ object PestParticleWaypoint {
 
         val solved = bezierFitter.solve() ?: return
         guessPosition = solved
-        isGuessPlotMiddle = config.differentiatePlotMiddle && solved.getPlot()?.middle?.equalsIgnoreY(solved.ceil()) ?: false
+        isGuessPlotMiddle = GardenPlotApi.getPlot(solved)?.middle?.equalsIgnoreY(solved.ceil()) ?: false
     }
 
     private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =
@@ -127,7 +127,7 @@ object PestParticleWaypoint {
         val waypoint = guessPosition ?: return
         val distance = waypoint.distance(event.exactPlayerEyeLocation())
         val color: Color
-        if (isGuessPlotMiddle) {
+        if (isGuessPlotMiddle && config.differentiatePlotMiddle) {
             color = LorenzColor.YELLOW.toColor()
             event.drawDynamicText(waypoint, " §r§e(plot middle)", 1.0, (-0.1 - distance / (12 * 1.7)).toFloat())
         } else {

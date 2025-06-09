@@ -134,11 +134,11 @@ object GardenPlotApi {
             0,
             null,
             null,
-            false,
-            false,
-            false,
-            true,
-            false,
+            sprayHasNotified = false,
+            isBeingPasted = false,
+            isPestCountInaccurate = false,
+            locked = true,
+            uncleared = false,
         )
     }
 
@@ -214,7 +214,7 @@ object GardenPlotApi {
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
-    fun LorenzVec.getPlot() = plots.find { it.box.isInside(this) }
+    fun getPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }
 
     fun Plot.sendTeleportTo() {
         if (isBarn()) HypixelCommands.teleportToPlot("barn")
@@ -282,6 +282,8 @@ object GardenPlotApi {
         }
     }
 
+    private fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Configure Plots") return
@@ -310,8 +312,6 @@ object GardenPlotApi {
     }
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
-
-    fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
     fun SkyHanniRenderWorldEvent.renderPlot(
         plot: Plot,
