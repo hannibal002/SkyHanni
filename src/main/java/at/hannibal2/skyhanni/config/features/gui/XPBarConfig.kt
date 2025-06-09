@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyLegacy
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -19,6 +20,7 @@ class XPBarConfig {
         name = "§cNotice",
         desc = "This option will be §c§lincompatible §r§7with mods that change the xp bar. Eg: §eApec§7."
     )
+    @OnlyLegacy
     @ConfigEditorInfoText
     var notice: String = ""
 
