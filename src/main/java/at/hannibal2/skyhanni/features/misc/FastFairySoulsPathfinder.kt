@@ -224,19 +224,19 @@ object FastFairySoulsPathfinder {
         val foundSouls = foundSoulsOnCurrentIsland()
         val allSouls = getTargetNodes(graph.nodes)
         val missingSouls = allSouls.filter { it.position !in foundSouls }
-        if (missingSouls.isEmpty()) {
 
-            val island = SkyBlockUtils.currentIsland
-            data = if (foundSouls.isEmpty()) {
-                createEmptyData().also {
-                    it.debugState = "There are no fairy souls in the graph network of $island"
+        if (missingSouls.isEmpty()) {
+            data =
+                if (foundSouls.isEmpty()) {
+                    createEmptyData().also {
+                        it.debugState = "There are no fairy souls in the graph network of ${SkyBlockUtils.currentIsland}"
+                    }
+                } else {
+                    val size = foundSouls.size
+                    Data(found = size, total = size, route = emptyList<LorenzVec>().toMutableList(), allSouls = foundSouls).also {
+                        it.debugState = "found all souls on ${SkyBlockUtils.currentIsland}"
+                    }
                 }
-            } else {
-                val size = foundSouls.size
-                Data(found = size, total = size, route = emptyList<LorenzVec>().toMutableList(), allSouls = foundSouls).also {
-                    it.debugState = "found all souls on $island"
-                }
-            }
             return
         }
 
