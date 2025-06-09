@@ -21,6 +21,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
+
 class MiningConfig {
     @Expose
     @Category(name = "Mining Event Tracker", desc = "Settings for the Mining Event Tracker.")
@@ -148,4 +149,10 @@ class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightPrecisionMiningParticles: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Mute High Heat", desc = "Mutes the panting sound when above 90 heat in the Magma Fields.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteHighHeat: Boolean = true
 }
