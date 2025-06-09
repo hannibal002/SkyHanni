@@ -4,14 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.FairySoulsApi
+import at.hannibal2.skyhanni.data.FairySoulsApi.amountFoundOnCurrentIsland
+import at.hannibal2.skyhanni.data.FairySoulsApi.foundSoulsOnCurrentIsland
+import at.hannibal2.skyhanni.data.FairySoulsApi.resetFoundOnCurrentIsland
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -19,23 +21,19 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object FastFairySoulsPathfinder {
@@ -43,12 +41,10 @@ object FastFairySoulsPathfinder {
 
     // TODO this does not work with glacite tunnels, should prob use strings and add the same workaround we have for graph area
     // TODO also once this is fixed, add a chat message when finding the last soul in dwarven mines and have not yet found the souls in glacite tunnels
-    private val foundSouls get() = ProfileStorageData.profileSpecific?.fairySouls?.found ?: mutableMapOf()
-    private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound ?: mutableMapOf()
 
     private var islandData: IslandData? = null
 
-    private val patternGroup = RepoPattern.group("misc.fairy-souls")
+    private val patternGroup = FairySoulsApi.patternGroup
 
     /**
      * REGEX-TEST: §dYou have already found that Fairy Soul!
@@ -64,14 +60,6 @@ object FastFairySoulsPathfinder {
     private val newPattern by patternGroup.pattern(
         "chat.new",
         "§d§lSOUL! §fYou found a §r§dFairy Soul§r§f!",
-    )
-
-    /**
-     * REGEX-TEST: §7Fairy Souls: §e11§7/§d11
-     */
-    private val loreSoulPattern by patternGroup.pattern(
-        "new",
-        "§7Fairy Souls: §e(?<have>.*)§7\\/§d(?<total>.*)",
     )
 
     private class IslandData(
@@ -106,7 +94,7 @@ object FastFairySoulsPathfinder {
             if (route.remove(nearest)) {
                 found++
             }
-            localFoundSouls().add(nearest)
+            foundSoulsOnCurrentIsland().add(nearest)
         }
 
         fun pathToNext() {
@@ -146,8 +134,17 @@ object FastFairySoulsPathfinder {
 
         fun allFound(state: String) {
             disabled = true
-            localFoundSouls().addAll(route)
+            foundSoulsOnCurrentIsland().addAll(route)
             debugState = state
+        }
+
+        fun checkHaveAll(): Boolean {
+            val have = amountFoundOnCurrentIsland()
+            val haveAll = have > 0 && have == total
+            if (haveAll) {
+                allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to quests inventory")
+            }
+            return haveAll
         }
 
         private fun isDataEnabled() = islandData?.let { !it.disabled } ?: false
@@ -182,32 +179,8 @@ object FastFairySoulsPathfinder {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Fairy Souls Guide") return
-
-        for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.displayName.removeColor()) ?: continue
-            val have = stack.getLore().firstOrNull()?.let {
-                loreSoulPattern.matchMatcher(it) {
-                    group("have").toIntOrNull()
-                }
-            } ?: continue
-
-
-            if (island.isCurrent()) {
-                islandData?.checkHaveAll(have)
-            } else {
-                totalFound[island] = have
-            }
-        }
-    }
-
-    private fun IslandData.checkHaveAll(have: Int): Boolean {
-        val haveAll = have > 0 && have == total
-        if (haveAll) {
-            allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to quests inventory")
-        }
-        return haveAll
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        islandData?.checkHaveAll()
     }
 
     private fun createEmptyData(): IslandData = IslandData(0, 0, mutableListOf(), emptySet()).apply { disabled = true }
@@ -223,7 +196,7 @@ object FastFairySoulsPathfinder {
             }
             return
         }
-        val foundSouls = localFoundSouls()
+        val foundSouls = foundSoulsOnCurrentIsland()
         val allSouls = getTargetNodes(graph.nodes)
         val missingSouls = allSouls.filter { it.position !in foundSouls }
 
@@ -330,9 +303,8 @@ object FastFairySoulsPathfinder {
 
     private fun onResetCommand() {
         if (isDisabledCommand()) return
-        localFoundSouls().clear()
+        resetFoundOnCurrentIsland()
         val island = SkyBlockUtils.currentIsland
-        totalFound[island] = 0
         ChatUtils.chat("Reset found Fairy Souls on ${island.displayName}.")
         reload()
     }
@@ -355,8 +327,6 @@ object FastFairySoulsPathfinder {
         )
         return true
     }
-
-    private fun localFoundSouls(): MutableSet<LorenzVec> = foundSouls.getOrPut(SkyBlockUtils.currentIsland) { mutableSetOf() }
 
     private fun getTargetNodes(nodes: List<GraphNode>): List<GraphNode> = nodes.filter { it.hasTag(GraphNodeTag.FAIRY_SOUL) }
 
