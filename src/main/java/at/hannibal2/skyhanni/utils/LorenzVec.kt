@@ -11,6 +11,7 @@ import net.minecraft.util.Vec3
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.acos
+import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
 import kotlin.math.max
@@ -153,6 +154,20 @@ data class LorenzVec(
         val x = if (x < 0) x.toInt() - 1 else x.toInt()
         val y = y.toInt() - 1
         val z = if (z < 0) z.toInt() - 1 else z.toInt()
+        return LorenzVec(x, y, z)
+    }
+
+    fun floor(): LorenzVec {
+        val x = floor(x).toInt()
+        val y = floor(y).toInt()
+        val z = floor(z).toInt()
+        return LorenzVec(x, y, z)
+    }
+
+    fun ceil(): LorenzVec {
+        val x = ceil(x).toInt()
+        val y = ceil(y).toInt()
+        val z = ceil(z).toInt()
         return LorenzVec(x, y, z)
     }
 
