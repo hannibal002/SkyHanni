@@ -46,7 +46,7 @@ object FastFairySoulsPathfinder {
     private val foundSouls get() = ProfileStorageData.profileSpecific?.fairySouls?.found ?: mutableMapOf()
     private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound ?: mutableMapOf()
 
-    private var data: Data? = null
+    private var islandData: IslandData? = null
 
     private val patternGroup = RepoPattern.group("misc.fairy-souls")
 
@@ -74,7 +74,7 @@ object FastFairySoulsPathfinder {
         "§7Fairy Souls: §e(?<have>.*)§7\\/§d(?<total>.*)",
     )
 
-    private class Data(
+    private class IslandData(
         var found: Int,
         val total: Int,
         val route: MutableList<LorenzVec>,
@@ -150,12 +150,12 @@ object FastFairySoulsPathfinder {
             debugState = state
         }
 
-        private fun isDataEnabled() = data?.let { !it.disabled } ?: false
+        private fun isDataEnabled() = islandData?.let { !it.disabled } ?: false
     }
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
-        data = null
+        islandData = null
     }
 
     @HandleEvent
@@ -173,7 +173,7 @@ object FastFairySoulsPathfinder {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
-        data?.let {
+        islandData?.let {
             it.checkNextSoul()
             return
         }
@@ -195,14 +195,14 @@ object FastFairySoulsPathfinder {
 
 
             if (island.isCurrent()) {
-                data?.checkHaveAll(have)
+                islandData?.checkHaveAll(have)
             } else {
                 totalFound[island] = have
             }
         }
     }
 
-    private fun Data.checkHaveAll(have: Int): Boolean {
+    private fun IslandData.checkHaveAll(have: Int): Boolean {
         val haveAll = have > 0 && have == total
         if (haveAll) {
             allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to quests inventory")
@@ -210,7 +210,7 @@ object FastFairySoulsPathfinder {
         return haveAll
     }
 
-    private fun createEmptyData(): Data = Data(0, 0, mutableListOf(), emptySet()).apply { disabled = true }
+    private fun createEmptyData(): IslandData = IslandData(0, 0, mutableListOf(), emptySet()).apply { disabled = true }
     private val calculatingMessageId = ChatUtils.getUniqueMessageId()
 
     private var calculating = false
@@ -218,7 +218,7 @@ object FastFairySoulsPathfinder {
 
     private fun reload() {
         val graph = IslandGraphs.currentIslandGraph ?: run {
-            data = createEmptyData().also {
+            islandData = createEmptyData().also {
                 it.debugState = "island graph is empty"
             }
             return
@@ -229,20 +229,20 @@ object FastFairySoulsPathfinder {
         if (missingSouls.isEmpty()) {
 
             val island = SkyBlockUtils.currentIsland
-            data = if (foundSouls.isEmpty()) {
+            islandData = if (foundSouls.isEmpty()) {
                 createEmptyData().also {
                     it.debugState = "There are no fairy souls in the graph network of $island"
                 }
             } else {
                 val size = foundSouls.size
-                Data(found = size, total = size, route = emptyList<LorenzVec>().toMutableList(), allSouls = foundSouls).also {
+                IslandData(found = size, total = size, route = emptyList<LorenzVec>().toMutableList(), allSouls = foundSouls).also {
                     it.debugState = "found all souls on $island"
                 }
             }
             return
         }
 
-        data = createEmptyData()
+        islandData = createEmptyData()
         calculating = true
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
@@ -261,20 +261,20 @@ object FastFairySoulsPathfinder {
         foundSouls: MutableSet<LorenzVec>,
         allSouls: List<GraphNode>,
         route: MutableList<LorenzVec>,
-    ): Data = Data(
+    ): IslandData = IslandData(
         found = foundSouls.size,
         total = allSouls.size,
         route,
         allSouls = allSouls.map { it.position }.toSet(),
     ).also {
         it.pathToNext()
-        this.data = it
+        this.islandData = it
     }
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent) {
         if (duplicatePattern.matches(event.message) || newPattern.matches(event.message)) {
-            data?.foundNearby()
+            islandData?.foundNearby()
         }
     }
 
@@ -283,7 +283,7 @@ object FastFairySoulsPathfinder {
         if (isEnabled()) {
             reload()
         } else {
-            data = null
+            islandData = null
         }
     }
 
@@ -297,7 +297,7 @@ object FastFairySoulsPathfinder {
         }
 
         event.addData {
-            data?.apply {
+            islandData?.apply {
                 debugState?.let {
                     add(it)
                     add("")
@@ -307,7 +307,7 @@ object FastFairySoulsPathfinder {
                 add("route: ${route.size}")
                 add("foundButNotClickedSoul: $foundButNotClickedSoul")
             } ?: run {
-                add("data is null")
+                add("islandData is null")
             }
         }
     }
@@ -339,7 +339,7 @@ object FastFairySoulsPathfinder {
         if (isDisabledCommand()) return
         val island = SkyBlockUtils.currentIsland
         ChatUtils.chat("Marked all Fairy Souls as found on ${island.displayName}.")
-        data?.allFound("manually set all souls in $island as found via command")
+        islandData?.allFound("manually set all souls in $island as found via command")
         reload()
     }
 
