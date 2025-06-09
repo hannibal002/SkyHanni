@@ -9,6 +9,7 @@ at.hannibal2.skyhanni.api.SkyBlockXPApi.kt
 at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager.kt
 at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo.kt
 at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery.kt
+at.hannibal2.skyhanni.api.enoughupdates.NeuEventWrappers.kt
 at.hannibal2.skyhanni.api.event.GeneratedEventPrimaryFunctionNames.kt
 at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent.kt
 at.hannibal2.skyhanni.api.hypixelapi.HypixelEventApi.kt
@@ -974,7 +975,6 @@ at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown.kt
 at.hannibal2.skyhanni.features.nether.ashfang.AshfangHighlights.kt
 at.hannibal2.skyhanni.features.nether.ashfang.AshfangNextResetCooldown.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi.kt
-at.hannibal2.skyhanni.api.enoughupdates.NeuEventWrappers.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraProfileViewerBlocker.kt
 at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier.kt
 at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper.kt
@@ -1094,6 +1094,7 @@ at.hannibal2.skyhanni.mixins.transformers.gui.AccessorHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiContainer.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.gui.MixinGuiNewChat.java
+at.hannibal2.skyhanni.mixins.transformers.gui.MixinInventoryBasic.java
 at.hannibal2.skyhanni.mixins.transformers.render.MixinRendererLivingEntity.java
 at.hannibal2.skyhanni.test.DebugCommand.kt
 at.hannibal2.skyhanni.test.HighlightMissingRepoItems.kt
