@@ -1790,3 +1790,4 @@ at/hannibal2/skyhanni/utils/shader/ShaderManager.kt
 at/hannibal2/skyhanni/utils/shader/Uniform.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
+at.hannibal2.skyhanni.mixins.transformers.MixinClientWorld.java
