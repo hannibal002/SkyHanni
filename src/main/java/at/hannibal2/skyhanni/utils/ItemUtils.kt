@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 //#endif
-import at.hannibal2.skyhanni.data.PetApi
 //#if TODO
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 //#endif
