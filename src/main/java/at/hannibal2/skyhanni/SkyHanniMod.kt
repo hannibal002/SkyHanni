@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni
 
-//#if TODO
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
-//#endif
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
@@ -23,8 +21,8 @@ import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-//#if TODO
 import at.hannibal2.skyhanni.utils.InventoryUtils
+//#if TODO
 import at.hannibal2.skyhanni.utils.MinecraftConsoleFilter
 //#endif
 import at.hannibal2.skyhanni.utils.VersionConstants
@@ -54,9 +52,7 @@ object SkyHanniMod {
         LoadedModules.modules.forEach { SkyHanniModLoader.loadModule(it) }
 
         SkyHanniEvents.init(modules)
-        //#if TODO
         if (!PlatformUtils.isNeuLoaded()) EnoughUpdatesManager.downloadRepo()
-        //#endif
 
         PreInitFinishedEvent.post()
     }
@@ -82,9 +78,7 @@ object SkyHanniMod {
         screenToOpen?.let {
             screenTicks++
             if (screenTicks == 5) {
-                //#if TODO
                 val title = InventoryUtils.openInventoryName()
-                //#endif
                 MinecraftCompat.localPlayer.closeScreen()
                 //#if TODO
                 OtherInventoryData.close(title)

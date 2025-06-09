@@ -142,8 +142,8 @@ object PestParticleWaypoint {
         reset()
     }
 
-    @HandleEvent
-    fun onPestUpdate(event: PestUpdateEvent) {
+    @HandleEvent(PestUpdateEvent::class)
+    fun onPestUpdate() {
         if (PestApi.scoreboardPests == 0) reset()
     }
 
