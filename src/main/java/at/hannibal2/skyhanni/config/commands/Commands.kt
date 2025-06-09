@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
-import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
@@ -160,11 +159,6 @@ object Commands {
             description = "Detect a farming lane in the Garden"
             category = CommandCategory.USERS_ACTIVE
             callback { FarmingLaneCreator.commandLaneDetection() }
-        }
-        event.register("shignore") {
-            description = "Add/Remove a user from your blacklist"
-            category = CommandCategory.USERS_ACTIVE
-            callback { PartyChatCommands.blacklist(it) }
         }
         event.register("shtpinfested") {
             description = "Teleports you to the nearest infested plot"
