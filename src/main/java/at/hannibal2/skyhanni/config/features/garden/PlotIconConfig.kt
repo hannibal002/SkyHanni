@@ -21,7 +21,7 @@ class PlotIconConfig {
     //#if TODO
     @ConfigOption(name = "Hard Reset", desc = "Reset every slot to its original item.")
     @ConfigEditorButton(buttonText = "Reset")
-    var hardReset: Runnable = Runnable {
+    val hardReset: Runnable = Runnable {
         GardenPlotIcon.hardReset = true
         gardenDesk()
     }
