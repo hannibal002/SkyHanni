@@ -1075,9 +1075,11 @@ at.hannibal2.skyhanni.mixins.transformers.MixinChatHud.java
 at.hannibal2.skyhanni.mixins.transformers.MixinChatLine.java
 at.hannibal2.skyhanni.mixins.transformers.MixinClientEntityManager.java
 at.hannibal2.skyhanni.mixins.transformers.MixinClientPlayNetworkHandler.java
+at.hannibal2.skyhanni.mixins.transformers.MixinClientWorld.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDataTracker.java
 at.hannibal2.skyhanni.mixins.transformers.MixinDrawContext.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntity.java
+at.hannibal2.skyhanni.mixins.transformers.MixinEntityEnderman.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityPlayer.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderDispatcher.java
 at.hannibal2.skyhanni.mixins.transformers.MixinEntityRenderer.java
@@ -1086,6 +1088,7 @@ at.hannibal2.skyhanni.mixins.transformers.MixinGuiIngame.java
 at.hannibal2.skyhanni.mixins.transformers.MixinHandledScreen.java
 at.hannibal2.skyhanni.mixins.transformers.MixinItemStack.java
 at.hannibal2.skyhanni.mixins.transformers.MixinKeyboard.java
+at.hannibal2.skyhanni.mixins.transformers.MixinLivingEntity.java
 at.hannibal2.skyhanni.mixins.transformers.MixinMessageHandler.java
 at.hannibal2.skyhanni.mixins.transformers.MixinMouse.java
 at.hannibal2.skyhanni.mixins.transformers.MixinNetworkManager.java
@@ -1790,4 +1793,3 @@ at/hannibal2/skyhanni/utils/shader/ShaderManager.kt
 at/hannibal2/skyhanni/utils/shader/Uniform.kt
 at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/system/PlatformUtils.kt
-at.hannibal2.skyhanni.mixins.transformers.MixinClientWorld.java
