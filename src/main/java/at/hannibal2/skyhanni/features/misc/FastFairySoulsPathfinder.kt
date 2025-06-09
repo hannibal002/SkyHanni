@@ -24,13 +24,12 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -113,9 +112,9 @@ object FastFairySoulsPathfinder {
         fun pathToNext() {
             if (disabled) return
             if (route.isEmpty()) {
-                val message = "§e[SkyHanni] Found all §5$found Fairy Souls §ein ${LorenzUtils.skyBlockIsland.displayName}!"
+                val message = "§e[SkyHanni] Found all §5$found Fairy Souls §ein ${SkyBlockUtils.currentIsland.displayName}!"
                 IslandGraphs.overrideChatMessage(message)
-                allFound("found last soul of ${LorenzUtils.skyBlockIsland}")
+                allFound("found last soul of ${SkyBlockUtils.currentIsland}")
             } else {
                 pathTo(route.first())
             }
@@ -195,8 +194,9 @@ object FastFairySoulsPathfinder {
             } ?: continue
 
 
-            if (island.isInIsland()) data?.checkHaveAll(have)
-            else {
+            if (island.isCurrent()) {
+                data?.checkHaveAll(have)
+            } else {
                 totalFound[island] = have
             }
         }
@@ -205,7 +205,7 @@ object FastFairySoulsPathfinder {
     private fun Data.checkHaveAll(have: Int): Boolean {
         val haveAll = have > 0 && have == total
         if (haveAll) {
-            allFound("already found all souls on ${LorenzUtils.skyBlockIsland} according to quests inventory")
+            allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to quests inventory")
         }
         return haveAll
     }
@@ -228,7 +228,7 @@ object FastFairySoulsPathfinder {
         val missingSouls = allSouls.filter { it.position !in foundSouls }
         if (missingSouls.isEmpty()) {
 
-            val island = LorenzUtils.skyBlockIsland
+            val island = SkyBlockUtils.currentIsland
             data = if (foundSouls.isEmpty()) {
                 createEmptyData().also {
                     it.debugState = "There are no fairy souls in the graph network of $island"
@@ -329,7 +329,7 @@ object FastFairySoulsPathfinder {
     private fun onResetCommand() {
         if (isDisabledCommand()) return
         localFoundSouls().clear()
-        val island = LorenzUtils.skyBlockIsland
+        val island = SkyBlockUtils.currentIsland
         totalFound[island] = 0
         ChatUtils.chat("Reset found Fairy Souls on ${island.displayName}.")
         reload()
@@ -337,7 +337,7 @@ object FastFairySoulsPathfinder {
 
     private fun onFoundAllCommand() {
         if (isDisabledCommand()) return
-        val island = LorenzUtils.skyBlockIsland
+        val island = SkyBlockUtils.currentIsland
         ChatUtils.chat("Marked all Fairy Souls as found on ${island.displayName}.")
         data?.allFound("manually set all souls in $island as found via command")
         reload()
@@ -354,9 +354,9 @@ object FastFairySoulsPathfinder {
         return true
     }
 
-    private fun localFoundSouls(): MutableSet<LorenzVec> = foundSouls.getOrPut(LorenzUtils.skyBlockIsland) { mutableSetOf() }
+    private fun localFoundSouls(): MutableSet<LorenzVec> = foundSouls.getOrPut(SkyBlockUtils.currentIsland) { mutableSetOf() }
 
     private fun getTargetNodes(nodes: List<GraphNode>): List<GraphNode> = nodes.filter { it.hasTag(GraphNodeTag.FAIRY_SOUL) }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.fastFairySouls
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fastFairySouls
 }
