@@ -1597,6 +1597,7 @@ interface Renderable {
                     player,
                 )
                 //#else
+                //$$ DrawContextUtils.translate(-35f, -125f, 0f)
                 //$$ drawEntity(
                 //$$     DrawContextUtils.drawContext,
                 //$$     playerX,
@@ -1605,10 +1606,11 @@ interface Renderable {
                 //$$     playerY + height,
                 //$$     entityScale,
                 //$$     0.0625f,
-                //$$     mouseXRelativeToPlayer,
-                //$$     mouseYRelativeToPlayer,
+                //$$     -mouseXRelativeToPlayer,
+                //$$     -mouseYRelativeToPlayer,
                 //$$     player
                 //$$ )
+                //$$ DrawContextUtils.translate(35f, 125f, 0f)
                 //#endif
                 DrawContextUtils.translate(0f, 0f, -100f)
             }
