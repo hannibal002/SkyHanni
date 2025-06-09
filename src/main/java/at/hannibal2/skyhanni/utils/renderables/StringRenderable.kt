@@ -48,7 +48,7 @@ class WrappedRenderableString(
             text, (width / scale).toInt(),
         ).associateWith { fontRenderer.getStringWidth(it) }
         //#else
-        //$$ listOf(text).associateWith { fontRenderer.getWidth(text) }
+        //$$ text.split("\n").associateWith { fontRenderer.getWidth(text) }
         //#endif
     }
 
