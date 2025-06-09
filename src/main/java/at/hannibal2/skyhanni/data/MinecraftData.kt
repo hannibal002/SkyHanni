@@ -13,14 +13,13 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
-//#if TODO
+//#if MC < 1.21
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
-//#endif
-//#if MC > 1.21
+//#else
 //$$ import net.minecraft.registry.Registries
+//$$ import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
 //#endif
 
-// todo 1.21 impl needed
 @SkyHanniModule
 object MinecraftData {
 
@@ -62,14 +61,16 @@ object MinecraftData {
                 }
             }
 
-            //#if TODO
+            //#if MC < 1.21
             is S32PacketConfirmTransaction -> {
                 if (packet.actionNumber > 0) return
+                //#else
+                //$$ is CommonPingS2CPacket -> {
+                //#endif
 
                 totalServerTicks++
                 ServerTickEvent.post()
             }
-            //#endif
         }
     }
 
