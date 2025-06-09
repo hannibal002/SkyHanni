@@ -11,7 +11,7 @@ class PestWaypointConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Show a waypoint of the next pest when using a vacuum." +
-            "Uses the particles and math to detect the location from everywhere in the garden."
+            "Uses the particles and math to detect the location from everywhere in the garden.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -26,6 +26,16 @@ class PestWaypointConfig {
     @ConfigOption(name = "Draw Line", desc = "Draw a line to the waypoint.")
     @ConfigEditorBoolean
     var drawLine: Boolean = true
+
+    // TODO remove together with PestParticleLine.kt
+    @Expose
+    @ConfigOption(
+        name = "Show Middle",
+        desc = "Also show a waypoint to the middle of a plot. " +
+            "This can help determine if the tracker is pointing to the middle instead of a pest.",
+    )
+//     @ConfigEditorBoolean
+    var showMiddle: Boolean = false
 
     @Expose
     @ConfigOption(name = "Differentiate Plot Middle", desc = "Distinguish pest guesses that point to the middle of the plot")
