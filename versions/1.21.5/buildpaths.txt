@@ -481,6 +481,7 @@ at/hannibal2/skyhanni/config/features/mining/nucleus/AreaWallsConfig.kt
 at/hannibal2/skyhanni/config/features/mining/nucleus/CrystalHighlighterColorConfig.kt
 at/hannibal2/skyhanni/config/features/mining/nucleus/CrystalHighlighterConfig.kt
 at/hannibal2/skyhanni/config/features/mining/nucleus/CrystalNucleusTrackerConfig.kt
+at/hannibal2/skyhanni/config/features/mining/nucleus/PowderChestTimerConfig.kt
 at/hannibal2/skyhanni/config/features/mining/nucleus/PowderTrackerConfig.kt
 at/hannibal2/skyhanni/config/features/minion/EmptiedTimeConfig.kt
 at/hannibal2/skyhanni/config/features/minion/LastClickedMinionConfig.kt
