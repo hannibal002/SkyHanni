@@ -149,7 +149,9 @@ object FastFairySoulsPathfinder {
 
         fun allFound(state: String) {
             disabled = true
+            println("before ${foundSoulsOnCurrentIsland()}")
             foundSoulsOnCurrentIsland().addAll(route)
+            println("after ${foundSoulsOnCurrentIsland()}")
             debugState = state
         }
 
@@ -323,7 +325,7 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shsoulreset") {
+        event.register("shsoulsreset") {
             description = "Reset known Fairy Souls for the current island."
             category = CommandCategory.USERS_RESET
             callback { onResetCommand() }
