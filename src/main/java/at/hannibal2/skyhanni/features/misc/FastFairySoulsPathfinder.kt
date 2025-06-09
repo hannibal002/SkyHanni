@@ -139,10 +139,10 @@ object FastFairySoulsPathfinder {
         }
 
         fun checkHaveAll(): Boolean {
-            val have = amountFoundOnCurrentIsland()
-            val haveAll = have > 0 && have == total
+            val haveAll = total > 0 && amountFoundOnCurrentIsland() == total
             if (haveAll) {
-                allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to quests inventory")
+                allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to hypixel data")
+                found = amountFoundOnCurrentIsland()
             }
             return haveAll
         }
@@ -215,7 +215,7 @@ object FastFairySoulsPathfinder {
             return
         }
 
-        islandData = createEmptyData()
+        islandData = IslandData(found = 0, total = allSouls.size, route = mutableListOf(), allSouls = emptySet())
         if (islandData?.checkHaveAll() ?: false) return
         calculating = true
         calculatingStart = SimpleTimeMark.now()
@@ -304,8 +304,7 @@ object FastFairySoulsPathfinder {
     private fun onResetCommand() {
         if (isDisabledCommand()) return
         resetFoundOnCurrentIsland()
-        val island = SkyBlockUtils.currentIsland
-        ChatUtils.chat("Reset found Fairy Souls on ${island.displayName}.")
+        ChatUtils.chat("Reset found Fairy Souls on ${SkyBlockUtils.currentIsland.displayName}.")
         reload()
     }
 
