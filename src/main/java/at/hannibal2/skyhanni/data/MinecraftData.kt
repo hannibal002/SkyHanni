@@ -30,7 +30,7 @@ object MinecraftData {
                         //#if MC < 1.21
                         packet.soundName,
                         //#else
-                        //$$ packet.sound.value().id.toString(),
+                        //$$ packet.sound.value().id.toString().removePrefix("minecraft:"),
                         //#endif
                         LorenzVec(packet.x, packet.y, packet.z), packet.pitch, packet.volume,
                     ).post()
