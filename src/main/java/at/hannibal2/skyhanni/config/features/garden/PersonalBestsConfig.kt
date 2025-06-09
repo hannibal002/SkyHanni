@@ -1,12 +1,11 @@
-package at.hannibal2.skyhanni.config.features.garden;
+package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.FeatureToggle
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-
-public class PersonalBestsConfig {
+class PersonalBestsConfig {
     @Expose
     @ConfigOption(
         name = "Personal Best Increase FF",
@@ -14,7 +13,7 @@ public class PersonalBestsConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean increaseFF = true;
+    var increaseFF: Boolean = true
 
     @Expose
     @ConfigOption(
@@ -22,5 +21,5 @@ public class PersonalBestsConfig {
         desc = "Show in chat how much more FF you would have gotten over your previous record if personal best fortune cap was not 100."
     )
     @ConfigEditorBoolean
-    public boolean overflow = false;
+    var overflow: Boolean = false
 }
