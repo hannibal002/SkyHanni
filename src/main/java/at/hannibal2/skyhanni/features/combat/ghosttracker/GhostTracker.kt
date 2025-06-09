@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -189,8 +188,8 @@ object GhostTracker {
         }
     }
 
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class)
+    fun onSecondPassed() {
         if (!isEnabled()) return
         if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoWidgetWarningTime = SimpleTimeMark.now()
@@ -322,7 +321,7 @@ object GhostTracker {
 
     @HandleEvent
     fun onAreaChange(event: GraphAreaChangeEvent) {
-        inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isInIsland()
+        inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isCurrent()
         if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
     }
 
@@ -371,8 +370,8 @@ object GhostTracker {
         override fun toString(): String = display
     }
 
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    @HandleEvent(ConfigLoadEvent::class)
+    fun onConfigLoad() {
         val storage = storage ?: return
         if (storage.migratedTotalKills) return
         tracker.modify {
