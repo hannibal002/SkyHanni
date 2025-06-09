@@ -150,6 +150,14 @@ object FastFairySoulsPathfinder {
             debugState = state
         }
 
+        fun checkHaveAll(): Boolean {
+            val haveAll = total > 0 && amountFoundOnCurrentIsland() == total
+            if (haveAll) {
+                allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to quests inventory")
+            }
+            return haveAll
+        }
+
         private fun isDataEnabled() = data?.let { !it.disabled } ?: false
     }
 
@@ -193,21 +201,11 @@ object FastFairySoulsPathfinder {
                 }
             } ?: continue
 
-
             if (island.isCurrent()) {
-                data?.checkHaveAll(have)
-            } else {
-                totalFound[island] = have
+                data?.checkHaveAll()
             }
+            totalFound[island] = have
         }
-    }
-
-    private fun Data.checkHaveAll(have: Int): Boolean {
-        val haveAll = have > 0 && have == total
-        if (haveAll) {
-            allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to quests inventory")
-        }
-        return haveAll
     }
 
     private fun createEmptyData(): Data = Data(0, 0, mutableListOf(), emptySet()).apply { disabled = true }
