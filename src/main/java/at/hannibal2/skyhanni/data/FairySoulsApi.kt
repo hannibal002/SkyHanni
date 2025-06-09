@@ -52,7 +52,7 @@ object FairySoulsApi {
             add("Souls on Current Island ${amountFoundOnCurrentIsland()}")
             add("Souls on Islands:")
             for ((island, amount) in totalFound) {
-                add("  $island: $amount")
+                add("  ${island.displayName}: $amount")
             }
         }
     }
