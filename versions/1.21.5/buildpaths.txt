@@ -10,12 +10,11 @@ at/hannibal2/skyhanni/utils/TimeLimitedCache.kt
 at/hannibal2/skyhanni/utils/ReflectionUtils.kt
 at/hannibal2/skyhanni/config/HasLegacyId.java
 at/hannibal2/skyhanni/utils/compat/TypeAliasCompat.kt
-# at/hannibal2/skyhanni/utils/compat/MinecraftCompat.kt
 at/hannibal2/skyhanni/utils/compat/InventoryCompat.kt
-# at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
-# at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
+at/hannibal2/skyhanni/utils/compat/PacketCompat.kt
+at/hannibal2/skyhanni/utils/compat/SkyhanniBaseScreen.kt
 
-# at/hannibal2/skyhanni/mixins/transformers/MixinClientConnection.java
+at/hannibal2/skyhanni/mixins/transformers/MixinClientConnection.java
 
 at/hannibal2/skyhanni/TestingModFeatures.kt
 
@@ -75,6 +74,7 @@ at/hannibal2/skyhanni/utils/system/ModVersion.kt
 at/hannibal2/skyhanni/utils/compat/NbtCompat.kt
 at.hannibal2.skyhanni.utils.system.PlatformUtils.kt
 at/hannibal2/skyhanni/utils/render.ModernGlStateManager.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson.kt
 
 at/hannibal2/skyhanni/SkyHanniMod.kt
 at/hannibal2/skyhanni/api/event/HandleEvent.kt
@@ -637,5 +637,40 @@ at.hannibal2.skyhanni.events.ActionBarUpdateEvent.kt
 at/hannibal2/skyhanni/data/ActionBarStatsData.kt
 at.hannibal2.skyhanni.features.chat.SkyblockXPInChat.kt
 at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent.kt
+at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent.kt
+at.hannibal2.skyhanni.utils.PrimitiveRecipe.kt
+at.hannibal2.skyhanni.utils.NeuInternalName.kt
+at.hannibal2.skyhanni.utils.ItemUtils.kt
+at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager.kt
+at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepo.kt
+at.hannibal2.skyhanni.utils.PrimitiveIngredient.kt
+at.hannibal2.skyhanni.utils.PrimitiveItemStack.kt
+at.hannibal2.skyhanni.utils.NeuItems.kt
+at.hannibal2.skyhanni.data.jsonobjects.repo.ItemAliases.kt
+at.hannibal2.skyhanni.api.enoughupdates.ItemResolutionQuery.kt
+at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.kt
+at.hannibal2.skyhanni.utils.ItemNameResolver.kt
+at.hannibal2.skyhanni.events.GuiRenderEvent.kt
+at.hannibal2.skyhanni.utils.ItemCategory.kt
+at.hannibal2.skyhanni.utils.MultiFilter.kt
+at.hannibal2.skyhanni.utils.CachedItemData.kt
+at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData.java
+at.hannibal2.skyhanni.data.PetApi.kt
+at.hannibal2.skyhanni.utils.ItemPriceUtils.kt
+at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi.kt
+at.hannibal2.skyhanni.data.jsonobjects.other.SkyblockItemsDataJson.kt
+at.hannibal2.skyhanni.events.minecraft.ToolTipEvent.kt
+at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals.kt
+at.hannibal2.skyhanni.events.ChatHoverEvent.kt
+at.hannibal2.skyhanni.mixins.hooks.GuiChatHook.kt
+at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.kt
+at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher.kt
+at/hannibal2/skyhanni/data/bazaar/BazaarJson.kt
+at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData.kt
+at.hannibal2.skyhanni.data.model.SkyblockStat.kt
+at.hannibal2.skyhanni.utils.InventoryUtils.kt
+at.hannibal2.skyhanni.mixins.transformers.MixinItemStack.java
+at.hannibal2.skyhanni.data.jsonobjects.other.NeuNbtInfoJson.kt
+at.hannibal2.skyhanni.utils.ComponentUtils.kt
 
 # \.(?!kt|java|\()
