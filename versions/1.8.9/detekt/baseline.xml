@@ -67,6 +67,18 @@
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
     <ID>PreprocessingImportOrdering:AlignmentConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:InventoryUtils.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:BroodmotherSpawnAlertConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:ChunkedStatsConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:EventsConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:InquisitorSoundConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:HypixelCommands.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:LaneSwitchSoundSettings.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:LowHealthAlertSoundConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:RepositoryConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:SkyHanniMod.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:TitleAndFooterConfig.kt$//#if TODO</ID>
+    <ID>PreprocessingImportOrdering:AlignmentConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:BroodmotherSpawnAlertConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:ChunkedStatsConfig.kt$//#if TODO</ID>
     <ID>PreprocessingImportOrdering:EventsConfig.kt$//#if TODO</ID>
