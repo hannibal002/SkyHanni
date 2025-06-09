@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 /**
  * This file exists to load repo patterns that are used in modern features.
@@ -8,6 +9,19 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
  */
 @SkyHanniModule
 object ModernPatterns {
+    val currentColorPattern by RepoPattern.pattern(
+        "foraging.moonglade.beacon.color",
+        "Current color: (?<color>.+)",
+    )
 
+    val currentSpeedPattern by RepoPattern.pattern(
+        "foraging.moonglade.beacon.speed",
+        "Current speed: (?<speed>\\d)",
+    )
+
+    val currentPitchPattern by RepoPattern.pattern(
+        "foraging.moonglade.beacon.pitch",
+        "Current pitch: (?<pitch>.+)",
+    )
 
 }

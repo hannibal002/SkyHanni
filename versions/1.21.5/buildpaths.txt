@@ -51,6 +51,7 @@ at.hannibal2.skyhanni.config.features.dev.WaypointsConfig.kt
 at.hannibal2.skyhanni.config.features.dev.minecraftconsole.ConsoleFiltersConfig.kt
 at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig.kt
 at.hannibal2.skyhanni.config.features.foraging.ForagingConfig.kt
+at.hannibal2.skyhanni.config.features.foraging.MoongladeBeaconConfig.kt
 at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.java
 at.hannibal2.skyhanni.config.features.garden.GardenLevelConfig.java
 at.hannibal2.skyhanni.config.features.garden.NumbersConfig.java
@@ -533,6 +534,7 @@ at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishFillet.kt
 at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.kt
 at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishMessages.kt
 at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity.kt
+at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.kt
 at.hannibal2.skyhanni.features.garden.AnitaMedalProfit.kt
 at.hannibal2.skyhanni.features.garden.AtmosphericFilterDisplay.kt
 at.hannibal2.skyhanni.features.garden.CropAccessory.kt
