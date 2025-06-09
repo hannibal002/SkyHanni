@@ -331,6 +331,10 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Moonglade Beacon: §r§b(?<stacks>\\d+) Stacks?",
     ),
+    SALTS(
+        // language=RegExp
+        "(?:§.)*Salts",
+    ),
     ;
 
     /** The pattern for the first line of the widget*/
