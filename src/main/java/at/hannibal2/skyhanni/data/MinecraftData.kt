@@ -16,7 +16,6 @@ import net.minecraft.network.play.server.S2APacketParticles
 //#if MC < 1.21
 import net.minecraft.network.play.server.S32PacketConfirmTransaction
 //#else
-//$$ import net.minecraft.registry.Registries
 //$$ import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
 //#endif
 
@@ -66,6 +65,8 @@ object MinecraftData {
                 if (packet.actionNumber > 0) return
                 //#else
                 //$$ is CommonPingS2CPacket -> {
+                //$$ if (lastPingParameter == packet.parameter) return
+                //$$ lastPingParameter = packet.parameter
                 //#endif
 
                 totalServerTicks++
@@ -73,6 +74,10 @@ object MinecraftData {
             }
         }
     }
+
+    //#if MC > 1.21
+    //$$ private var lastPingParameter = 0
+    //#endif
 
     var totalServerTicks: Long = 0L
         private set
