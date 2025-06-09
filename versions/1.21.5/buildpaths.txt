@@ -1161,6 +1161,7 @@ at.hannibal2.skyhanni.utils.LorenzVec.kt
 at.hannibal2.skyhanni.utils.Matrix.kt
 at.hannibal2.skyhanni.utils.MinecraftConsoleFilter.kt
 at.hannibal2.skyhanni.utils.MobUtils.kt
+at.hannibal2.skyhanni.utils.ModernPatterns.kt
 at.hannibal2.skyhanni.utils.MultiFilter.kt
 at.hannibal2.skyhanni.utils.NeuCalculator.kt
 at.hannibal2.skyhanni.utils.NeuInternalName.kt
