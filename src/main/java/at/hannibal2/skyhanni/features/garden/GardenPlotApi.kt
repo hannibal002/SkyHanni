@@ -214,7 +214,7 @@ object GardenPlotApi {
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
-    fun closestCenterPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }?.middle
+    fun LorenzVec.getPlot() = plots.find { it.box.isInside(this) }
 
     fun Plot.sendTeleportTo() {
         if (isBarn()) HypixelCommands.teleportToPlot("barn")
