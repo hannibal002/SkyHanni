@@ -38,7 +38,7 @@ class MiningConfig {
     @Expose
     @ConfigOption(name = "Powder Chest Timer", desc = "")
     @Accordion
-    var powderChestTimer: PowderChestTimerConfig = PowderChestTimerConfig()
+    val powderChestTimer: PowderChestTimerConfig = PowderChestTimerConfig()
 
     @Expose
     @ConfigOption(name = "King Talisman", desc = "")

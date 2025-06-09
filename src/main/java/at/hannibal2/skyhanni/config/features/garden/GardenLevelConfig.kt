@@ -19,7 +19,7 @@ class GardenLevelConfig {
     @ConfigOption(name = "Overflow", desc = "Enable overflow Garden levels")
     @ConfigEditorBoolean
     @FeatureToggle
-    var overflow: Property<Boolean> = Property.of(true)
+    val overflow: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Overflow Chat", desc = "Enable overflow Garden level up messages in chat.")
@@ -27,7 +27,8 @@ class GardenLevelConfig {
     @FeatureToggle
     var overflowChat: Boolean = true
 
+    // Todo rename to position
     @Expose
     @ConfigLink(owner = GardenLevelConfig::class, field = "display")
-    var pos: Position = Position(390, 40)
+    val pos: Position = Position(390, 40)
 }

@@ -106,10 +106,11 @@ class NextJacobContestConfig {
     @Expose
     @ConfigOption(name = "Warn For", desc = "Only warn for these crops.")
     @ConfigEditorDraggableList
-    var warnFor: MutableList<CropType> = CropType.entries.toMutableList()
+    val warnFor: MutableList<CropType> = CropType.entries.toMutableList()
     //#endif
 
+    // Todo rename to position
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
-    var pos: Position = Position(-200, 10)
+    val pos: Position = Position(-200, 10)
 }
