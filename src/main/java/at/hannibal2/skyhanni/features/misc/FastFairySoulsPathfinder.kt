@@ -84,7 +84,7 @@ object FastFairySoulsPathfinder {
         val allSouls: Set<LorenzVec>,
         var foundButNotClickedSoul: LorenzVec? = null,
     ) {
-        var disabled = false
+        var disabled = total > 0 && found == total
         var debugState: String? = null
 
         fun foundNearby() {
