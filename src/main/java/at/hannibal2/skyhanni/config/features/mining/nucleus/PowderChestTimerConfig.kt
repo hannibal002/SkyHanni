@@ -21,7 +21,7 @@ class PowderChestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Chests",
-        desc = "Highlight chests with a color depending on how much time left until they despawn."
+        desc = "Highlight chests with a color depending on how much time left until they despawn.",
     )
     @ConfigEditorBoolean
     var highlightChests: Boolean = true
@@ -29,7 +29,7 @@ class PowderChestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Use Static Color",
-        desc = "Use a single color for the chest highlight instead of changing it depending of the time."
+        desc = "Use a single color for the chest highlight instead of changing it depending of the time.",
     )
     @ConfigEditorBoolean
     var useStaticColor: Boolean = false

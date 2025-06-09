@@ -56,14 +56,16 @@ object PowderChestTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (event.soundName != "random.levelup" || event.pitch != 1f || event.volume != 1.0f) return
-        lastSound = SimpleTimeMark.now()
+        if (event.soundName == "random.levelup" && event.pitch == 1f && event.volume == 1.0f) {
+            lastSound = SimpleTimeMark.now()
+        }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        config.position.renderString(display, posLabel = "Powder Chest Timer")
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    fun onRenderOverlay() {
+        if (isEnabled()) {
+            config.position.renderString(display, posLabel = "Powder Chest Timer")
+        }
     }
 
     @HandleEvent
@@ -101,8 +103,9 @@ object PowderChestTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onTick() {
-        if (!isEnabled()) return
-        display = drawDisplay()
+        if (isEnabled()) {
+            display = drawDisplay()
+        }
     }
 
     private fun drawDisplay(): String? {
@@ -151,8 +154,8 @@ object PowderChestTimer {
         event.drawLineToEye(
             firstPos.blockCenter(),
             firstTime.timeUntil().getColorBasedOnTime(),
-            3,
-            true
+            lineWidth = 3,
+            depth = true,
         )
 
         val zipped = chestToConnect.zipWithNext()
@@ -176,8 +179,7 @@ object PowderChestTimer {
     }
 
     private fun Duration.getColorBasedOnTime(): Color {
-
-        val ratio = (inWholeMilliseconds.toDouble() / maxDuration.inWholeMilliseconds).coerceIn(0.0, 1.0)
+        val ratio = (this / maxDuration).coerceIn(0.0, 1.0)
 
         val red = (255 * (1 - ratio)).toInt()
         val green = (255 * ratio).toInt()
