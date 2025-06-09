@@ -50,6 +50,7 @@ at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig.kt
 at.hannibal2.skyhanni.config.features.dev.WaypointsConfig.kt
 at.hannibal2.skyhanni.config.features.dev.minecraftconsole.ConsoleFiltersConfig.kt
 at.hannibal2.skyhanni.config.features.dev.minecraftconsole.MinecraftConsoleConfig.kt
+at.hannibal2.skyhanni.config.features.foraging.ForagingConfig.kt
 at.hannibal2.skyhanni.config.features.garden.EliteFarmingWeightConfig.java
 at.hannibal2.skyhanni.config.features.garden.GardenLevelConfig.java
 at.hannibal2.skyhanni.config.features.garden.NumbersConfig.java
