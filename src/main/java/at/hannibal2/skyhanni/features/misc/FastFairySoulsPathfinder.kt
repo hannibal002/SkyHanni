@@ -301,7 +301,8 @@ object FastFairySoulsPathfinder {
                     add(it)
                     add("")
                 }
-                add("found: $found")
+                add("found with known location: $found")
+                add("actual amount of found souls: ${amountFoundOnCurrentIsland()}")
                 add("total: $total")
                 add("route: ${route.size}")
                 add("foundButNotClickedSoul: $foundButNotClickedSoul")
