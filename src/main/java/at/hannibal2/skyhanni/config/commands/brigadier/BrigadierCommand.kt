@@ -42,7 +42,7 @@ class BrigadierCommand(
             dispatcher.execute(input, sender)
         } catch (e: CommandSyntaxException) {
             val message = e.message ?: "Error when parsing command."
-            val shouldShowUsage = message.startsWith("Unknown command")
+            val shouldShowUsage = message.startsWith("Unknown command") || message.startsWith("Incorrect argument")
             val usage = getSmartUsage()
             if (!shouldShowUsage || usage.isEmpty()) {
                 ChatUtils.userError(message)
