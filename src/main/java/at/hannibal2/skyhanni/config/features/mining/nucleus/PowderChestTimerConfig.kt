@@ -38,7 +38,7 @@ class PowderChestTimerConfig {
     @Expose
     @ConfigOption(name = "Static Color", desc = "Static color to use.")
     @ConfigEditorColour
-    var staticColor: ChromaColour = ChromaColour.fromStaticRGB(0, 245, 85, 255)
+    var staticColor: ChromaColour = ChromaColour.fromStaticRGB(85, 255, 85, 245)
 
     @Expose
     @ConfigOption(name = "Draw Timer", desc = "Draw time left until the chest despawns.")
