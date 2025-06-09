@@ -36,6 +36,9 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.iterator
 
 @SkyHanniModule
 object FastFairySoulsPathfinder {
@@ -308,6 +311,11 @@ object FastFairySoulsPathfinder {
                 add("foundButNotClickedSoul: $foundButNotClickedSoul")
             } ?: run {
                 add("data is null")
+            }
+            add("")
+            add("Amount of Souls found on Islands:")
+            for ((island, amount) in totalFound) {
+                add("  ${island.displayName}: $amount")
             }
         }
     }
