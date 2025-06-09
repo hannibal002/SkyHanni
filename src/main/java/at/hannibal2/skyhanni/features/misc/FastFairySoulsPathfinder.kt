@@ -156,7 +156,8 @@ object FastFairySoulsPathfinder {
         fun checkHaveAll(): Boolean {
             val haveAll = total > 0 && amountFoundOnCurrentIsland() == total
             if (haveAll) {
-                allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to quests inventory")
+                allFound("already found all souls on ${SkyBlockUtils.currentIsland} according to hypixel data")
+                found = amountFoundOnCurrentIsland()
             }
             return haveAll
         }
