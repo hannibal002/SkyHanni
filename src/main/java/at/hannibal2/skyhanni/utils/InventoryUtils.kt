@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
+//#if TODO
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+//#endif
 import at.hannibal2.skyhanni.test.command.ErrorManager
+//#if TODO
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
+//#endif
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat
@@ -13,26 +17,26 @@ import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.client.resources.I18n
-import net.minecraft.entity.IMerchant
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
-import net.minecraft.world.IWorldNameable
 import kotlin.time.Duration.Companion.seconds
 
+// todo 1.21 impl needed
 @Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
 object InventoryUtils {
 
     var itemInHandId = NeuInternalName.NONE
-    var recentItemsInHand = mutableMapOf<Long, NeuInternalName>()
+    fun NeuInternalName.recentlyHeld(): Boolean = this in recentItemsInHand
+
+    val recentItemsInHand = TimeLimitedSet<NeuInternalName>(30.seconds)
     var latestItemInHand: ItemStack? = null
     private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
 
@@ -92,6 +96,7 @@ object InventoryUtils {
 
     fun getItemInHand(): ItemStack? = MinecraftCompat.localPlayerOrNull?.heldItem
 
+    //#if TODO
     fun getArmor(): Array<ItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
 
     fun getHelmet(): ItemStack? = getArmor()[3]
@@ -106,6 +111,7 @@ object InventoryUtils {
             this.cancel()
         }
     }
+    //#endif
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
         if (!PlatformUtils.isNeuLoaded()) {
@@ -154,18 +160,6 @@ object InventoryUtils {
         }
     }
 
-    fun Gui.getTitle(): String = when (this) {
-        is IWorldNameable -> {
-            name
-        }
-
-        is IMerchant -> {
-            displayName.unformattedText
-        }
-
-        else -> ""
-    }
-
     fun ContainerChest.getAllSlots(): Map<Slot, ItemStack?> = buildMap {
         for (slot in inventorySlots) {
             if (slot == null) continue
@@ -183,7 +177,9 @@ object InventoryUtils {
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 
+    //#if TODO
     fun NeuInternalName.getAmountInInventoryAndSacks(): Int = getAmountInInventory() + getAmountInSacks()
+    //#endif
 
     fun Slot.isTopInventory() = inventory.isTopInventory()
 

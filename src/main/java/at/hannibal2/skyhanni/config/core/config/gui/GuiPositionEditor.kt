@@ -18,6 +18,7 @@
  */
 package at.hannibal2.skyhanni.config.core.config.gui
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
@@ -28,10 +29,12 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.compat.DrawContext
+import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import org.lwjgl.input.Keyboard
@@ -51,26 +54,24 @@ class GuiPositionEditor(
         for (position in positions) {
             position.clicked = false
         }
-        OtherInventoryData.close("ShPositionEditor")
+        OtherInventoryData.close()
     }
 
-    override fun onDrawScreen(context: DrawContext, originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
+    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
         // Items aren't drawn due to a bug in neu rendering
-        drawDefaultBackground(context, originalMouseX, originalMouseY, partialTicks)
+        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
             val accessor = oldScreen as AccessorGuiContainer
             accessor.invokeDrawGuiContainerBackgroundLayer_skyhanni(partialTicks, -1, -1)
         }
 
         GlStateManager.disableLighting()
-        val hoveredPos = renderRectangles(context)
+        val hoveredPos = renderRectangles()
 
-        renderLabels(context, hoveredPos)
+        renderLabels(hoveredPos)
     }
 
-    private fun renderLabels(context: DrawContext, hoveredPos: Int) {
-        GuiRenderUtils.drawStringCentered(context, "§cSkyHanni Position Editor", getScaledWidth() / 2, 8)
-
+    private fun renderLabels(hoveredPos: Int) {
         var displayPos = -1
         if (clickedPos != -1 && positions[clickedPos].clicked) {
             displayPos = clickedPos
@@ -81,28 +82,48 @@ class GuiPositionEditor(
 
         // When the mouse isn't currently hovering over a gui element
         if (displayPos == -1) {
-            GuiRenderUtils.drawStringCentered(context, "§eTo edit hidden GUI elements set a key in /sh edit", getScaledWidth() / 2, 20)
-            GuiRenderUtils.drawStringCentered(context, "§ethen click that key while the GUI element is visible", getScaledWidth() / 2, 32)
+            val extraInfo = SkyHanniMod.feature.gui.keyBindOpen == Keyboard.KEY_NONE
+            renderHover(
+                buildList {
+                    add("§cSkyHanni Position Editor")
+                    if (extraInfo) {
+                        add("§aTo edit hidden GUI elements set a key in /sh edit")
+                        add("§athen click that key while the GUI element is visible")
+                    }
+                },
+            )
             return
         }
-
-        val pos = positions[displayPos]
-        val location = "§7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}"
-        GuiRenderUtils.drawStringCentered(context, "§b ${pos.internalName}", getScaledWidth() / 2, 18)
-        GuiRenderUtils.drawStringCentered(context, location, getScaledWidth() / 2, 28)
-        if (pos.canJumpToConfigOptions())
-            GuiRenderUtils.drawStringCentered(context, "§aRight-Click to open associated config options", getScaledWidth() / 2, 38)
+        renderHover(getTextForPos(positions[displayPos]))
     }
 
-    private fun renderRectangles(context: DrawContext): Int {
+    private fun getTextForPos(pos: Position): List<String> {
+        if (pos.clicked) return listOf("§7x: §e${pos.x}§7, y: §e${pos.y}")
+
+        return listOf(
+            "§cSkyHanni Position Editor",
+            "§b${pos.internalName}",
+            "  §7x: §e${pos.x}§7, y: §e${pos.y}§7, scale: §e${pos.scale.roundTo(2)}",
+            "",
+            "§eRight-Click to open associated config options!",
+            "§eUse Scroll-Wheel to resize!",
+        )
+    }
+
+    private fun renderHover(text: List<String>) {
+        RenderableTooltips.setTooltipForRender(text.map { Renderable.string(it) })
+    }
+
+    private fun renderRectangles(): Int {
         var hoveredPos = -1
-        context.matrices.pushMatrix()
+        DrawContextUtils.pushMatrix()
         width = getScaledWidth()
         height = getScaledHeight()
 
         val (mouseX, mouseY) = GuiScreenUtils.mousePos
 
-        for ((index, position) in positions.withIndex()) {
+        var alreadyHadHover = false
+        for ((index, position) in positions.withIndex().reversed()) {
             var elementWidth = position.getDummySize(true).x
             var elementHeight = position.getDummySize(true).y
             if (position.clicked) {
@@ -114,28 +135,32 @@ class GuiPositionEditor(
 
             elementWidth = position.getDummySize().x
             elementHeight = position.getDummySize().y
+
+            val isHovering = GuiRenderUtils.isPointInRect(
+                mouseX,
+                mouseY,
+                x - border,
+                y - border,
+                elementWidth + border * 2,
+                elementHeight + border * 2,
+            ) && !alreadyHadHover
+
+            val gray = -0x7fbfbfc0 // #40404080
+            val selected = -0x7F0F0F10 // #F0F0F080
             GuiRenderUtils.drawRect(
-                context,
                 x - border,
                 y - border,
                 x + elementWidth + border * 2,
                 y + elementHeight + border * 2,
-                -0x7fbfbfc0,
+                if (isHovering) selected else gray,
             )
 
-            if (GuiRenderUtils.isPointInRect(
-                    mouseX,
-                    mouseY,
-                    x - border,
-                    y - border,
-                    elementWidth + border * 2,
-                    elementHeight + border * 2,
-                )
-            ) {
+            if (isHovering) {
+                alreadyHadHover = true
                 hoveredPos = index
             }
         }
-        context.matrices.popMatrix()
+        DrawContextUtils.popMatrix()
         return hoveredPos
     }
 

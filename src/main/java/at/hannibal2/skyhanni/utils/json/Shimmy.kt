@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.json
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import com.google.gson.JsonElement
+import io.github.notenoughupdates.moulconfig.observer.Property
 import java.lang.reflect.Field
 
 // Copied from NEU
@@ -21,7 +22,6 @@ class Shimmy private constructor(
             }
         }
 
-        @JvmStatic
         fun makeShimmy(source: Any?, path: List<String>): Shimmy? {
             if (path.isEmpty())
                 return null
@@ -33,15 +33,18 @@ class Shimmy private constructor(
             val lastName = path.last()
             return try {
                 val field = source.javaClass.getDeclaredField(lastName).makeAccessible()
-                Shimmy(
-                    source,
-                    field,
-                )
+                val shimmy = Shimmy(source, field)
+
+                if (shimmy.clazz == Property::class.java) {
+                    source = shimmy(source, lastName) ?: return shimmy
+                    makeShimmy(source, listOf("value")) ?: shimmy
+                } else {
+                    shimmy
+                }
             } catch (e: NoSuchFieldException) {
                 null
             }
         }
-
     }
 
     val clazz: Class<*> = field.type

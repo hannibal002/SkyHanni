@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 // scoreboard
@@ -15,8 +14,5 @@ object ScoreboardElementVisiting : ScoreboardElement() {
 
     override val elementPatterns = listOf(ScoreboardPattern.visitingPattern)
 
-    override fun showIsland() = inAnyIsland(
-        IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST,
-        IslandType.GARDEN, IslandType.GARDEN_GUEST,
-    )
+    override fun showIsland() = IslandTypeTags.PERSONAL_ISLAND.inAny()
 }

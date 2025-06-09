@@ -77,7 +77,7 @@ object TotemOfCorruption {
         if (!config.hideParticles) return
 
         for (totem in totems) {
-            if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0.0f) {
+            if (event.type == EnumParticleTypes.SPELL_WITCH && event.speed == 0f) {
                 if (totem.location.distance(event.location) < 4.0) {
                     event.cancel()
                 }
@@ -159,7 +159,7 @@ object TotemOfCorruption {
             val timeToWarn = config.warnWhenAboutToExpire.seconds
             if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && totem.uniqueID !in warnedTotems) {
                 playBeepSound(0.5f)
-                TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!", duration = 5.seconds)
+                TitleManager.sendTitle("§c§lTotem of Corruption §eabout to expire!")
                 warnedTotems.add(totem.uniqueID)
             }
             Totem(totem.getLorenzVec(), timeRemaining, owner)

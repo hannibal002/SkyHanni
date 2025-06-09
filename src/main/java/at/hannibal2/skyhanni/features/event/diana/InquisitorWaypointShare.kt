@@ -252,7 +252,7 @@ object InquisitorWaypointShare {
         val messageComponent = packet.chatComponent
 
         val message = messageComponent.formattedText.stripHypixelMessage()
-        //#if MC<1.12
+        //#if MC < 1.16
         if (packet.type.toInt() != 0) return
         //#else
         //$$ if (packet.type.id.toInt() != 0) return
@@ -298,7 +298,7 @@ object InquisitorWaypointShare {
         if (!waypoints.containsKey(name)) {
             ChatUtils.chat("$displayName §l§efound an inquisitor at §l§c${x.toInt()} ${y.toInt()} ${z.toInt()}!")
             if (name != LorenzUtils.getPlayerName()) {
-                TitleManager.sendTitle("§dINQUISITOR §efrom §b$displayName", duration = 5.seconds)
+                TitleManager.sendTitle("§dINQUISITOR §efrom §b$displayName")
                 playUserSound()
             }
         }

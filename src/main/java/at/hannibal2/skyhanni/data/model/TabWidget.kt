@@ -10,12 +10,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -327,7 +326,7 @@ enum class TabWidget(
     ;
 
     /** The pattern for the first line of the widget*/
-    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*$pattern0")
+    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*(?:$pattern0)")
 
     /** The current active information from tab list.
      *
@@ -397,7 +396,7 @@ enum class TabWidget(
         @HandleEvent(onlyOnSkyblock = true)
         fun onSecondPassed(event: SecondPassedEvent) {
             if (sentSinceWorldChange) return
-            if (LorenzUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
+            if (SkyBlockUtils.lastWorldSwitch.passedSince() < FORCE_UPDATE_DELAY) return
             sentSinceWorldChange = true
             @Suppress("DEPRECATION")
             update(TabListData.getTabList())
@@ -406,7 +405,7 @@ enum class TabWidget(
 
         @HandleEvent(priority = HandleEvent.HIGH)
         fun onTabListUpdate(event: TabListUpdateEvent) {
-            if (!LorenzUtils.inSkyBlock) {
+            if (!SkyBlockUtils.inSkyBlock) {
                 if (separatorIndexes.isNotEmpty()) {
                     separatorIndexes.forEach { it.second?.updateIsActive() }
                     separatorIndexes.clear()

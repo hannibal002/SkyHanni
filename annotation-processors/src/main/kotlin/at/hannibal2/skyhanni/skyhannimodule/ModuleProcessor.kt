@@ -33,7 +33,7 @@ class ModuleProcessor(
     private val warnings = mutableListOf<String>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        if (!processedVersions.add(mcVersion)) {
+        if (!processedVersions.add(mcVersion) || modVersion == "0.0.0") {
             return emptyList()
         }
         generateVersionConstants()
@@ -67,7 +67,7 @@ class ModuleProcessor(
         }
 
         val validPaths = buildPathsFile.readText().lineSequence()
-            .map { it.substringBefore("#").trim() }
+            .map { it.substringBefore("#").replace(Regex("\\.(?!kt|java|\\()"), "/").trim() }
             .filter { it.isNotBlank() }
             .toSet()
 

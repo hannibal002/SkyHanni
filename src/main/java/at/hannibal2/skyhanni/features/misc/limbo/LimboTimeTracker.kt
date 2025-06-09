@@ -34,7 +34,7 @@ object LimboTimeTracker {
     private var inFakeLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
-    private var userLuck: Float = 0.0F
+    private var userLuck: Float = 0f
     private const val USER_LUCK_MULTIPLIER = 0.000810185F
     private const val FIRE_MULTIPLIER = 1.01F
     private var onFire = false

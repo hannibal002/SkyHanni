@@ -1,12 +1,16 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
+import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
@@ -19,8 +23,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
@@ -29,9 +35,19 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.seconds
 
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FishingApi {
+    enum class RodPart {
+        HOOK,
+        LINE,
+        SINKER,
+        ;
+
+        val tagName get() = name.lowercase()
+    }
 
     /**
      * REGEX-TEST: BRONZE_HUNTER_HELMET
@@ -48,17 +64,31 @@ object FishingApi {
     private val waterBlocks = buildList { addWaters() }
 
     var lastCastTime = SimpleTimeMark.farPast()
+        private set
+    var lastReelTime = SimpleTimeMark.farPast()
+        private set
+    var lastCatchSound = SimpleTimeMark.farPast()
+        private set
     var holdingRod = false
+        private set
     var holdingLavaRod = false
+        private set
     var holdingWaterRod = false
+        private set
+    var hasTreasureHook = false
+        private set
 
     private var lavaRods = listOf<NeuInternalName>()
     private var waterRods = listOf<NeuInternalName>()
+    private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
     var bobber: EntityFishHook? = null
+        private set
     var bobberHasTouchedLiquid = false
+        private set
 
     var wearingTrophyArmor = false
+        private set
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onJoinWorld(event: EntityEnterWorldEvent<EntityFishHook>) {
@@ -89,19 +119,33 @@ object FishingApi {
 
         val bobber = bobber ?: return
         if (bobber.isDead) {
+            if (lastReelTime.passedSince() < 0.5.seconds && lastCatchSound.passedSince() < 0.5.seconds) FishingCatchEvent.post()
             resetBobber()
-        } else {
-            if (!bobberHasTouchedLiquid) {
-                val isWater = when {
-                    bobber.isInLava && holdingLavaRod -> false
-                    bobber.isInWater && holdingWaterRod -> true
-                    else -> return
-                }
-
-                bobberHasTouchedLiquid = true
-                FishingBobberInLiquidEvent(bobber, isWater).post()
-            }
+            return
         }
+
+        if (bobberHasTouchedLiquid) return
+        val isWater = when {
+            bobber.isInLava && holdingLavaRod -> false
+            bobber.isInWater && holdingWaterRod -> true
+            else -> return
+        }
+
+        bobberHasTouchedLiquid = true
+        FishingBobberInLiquidEvent(bobber, isWater).post()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (!holdingRod) return
+        if (event.soundName == "random.orb" && event.volume == .5F) lastCatchSound = SimpleTimeMark.now()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onClick(event: WorldClickEvent) {
+        if (event.clickType != ClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
+        if (lastReelTime.passedSince() < .3.seconds) return
+        lastReelTime = SimpleTimeMark.now()
     }
 
     fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
@@ -111,6 +155,9 @@ object FishingApi {
 
     fun NeuInternalName.isWaterRod() = this in waterRods
 
+    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? =
+        getExtraAttributes()?.getCompoundTag(part.tagName)?.getString("part")?.toInternalName()
+
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
     @HandleEvent
@@ -119,6 +166,11 @@ object FishingApi {
         holdingRod = event.newItem.isFishingRod()
         holdingLavaRod = event.newItem.isLavaRod()
         holdingWaterRod = event.newItem.isWaterRod()
+
+        if (holdingRod) {
+            // If the player is not holding a rod, we want to just save the last state
+            hasTreasureHook = InventoryUtils.getItemInHand()?.getFishingRodPart(RodPart.HOOK) == TREASURE_HOOK
+        }
     }
 
     @HandleEvent
@@ -144,28 +196,34 @@ object FishingApi {
         (IsFishingDetection.isFishing || (checkRodInHand && holdingRod)) && !DungeonApi.inDungeon()
 
     fun seaCreatureCount(entity: EntityArmorStand): Int {
+        if (countIsZero(entity)) return 0
+
+        return when (entity.name) {
+            "Sea Emperor", "Rider of the Deep" -> 2
+
+            else -> 1
+        }
+    }
+
+    private val frostyNpcLocation = LorenzVec(-1.5, 76.0, 92.5)
+
+    private fun countIsZero(entity: EntityArmorStand): Boolean {
         val name = entity.name
         // a dragon, will always be fought
-        if (name == "Reindrake") return 0
+        if (name == "Reindrake") return true
 
         // a npc shop
-        if (name == "§5Frosty the Snow Blaster") return 0
+        if (name == "§5Frosty the Snow Blaster") return true
 
         if (name == "Frosty") {
-            val npcLocation = LorenzVec(-1.5, 76.0, 92.5)
-            if (entity.getLorenzVec().distance(npcLocation) < 1) {
-                return 0
+            if (entity.getLorenzVec().distance(frostyNpcLocation) < 1) {
+                return true
             }
         }
 
         val isSummonedSoul = name.contains("'")
         val hasFishingMobName = SeaCreatureManager.allFishingMobs.keys.any { name.contains(it) }
-        if (!hasFishingMobName || isSummonedSoul) return 0
-
-        if (name == "Sea Emperor" || name == "Rider of the Deep") {
-            return 2
-        }
-        return 1
+        return !hasFishingMobName || isSummonedSoul
     }
 
     private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {

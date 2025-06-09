@@ -3,13 +3,18 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
+//#if TODO
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+//#endif
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
+//#if TODO
 import at.hannibal2.skyhanni.features.chat.ChatHistoryGui
+//#endif
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
@@ -29,6 +34,7 @@ import kotlin.time.Duration.Companion.seconds
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //#endif
 
+// todo 1.21 impl needed
 @SkyHanniModule
 object ChatManager {
 
@@ -150,17 +156,17 @@ object ChatManager {
             return null to true
         }
 
-        val eventComponent = chatEvent.chatComponent
+        val modifiedComponent = chatEvent.chatComponent
         var modified = false
         loggerAllowed.log("[allowed] $message")
         loggerAll.log("[allowed] $message")
-        if (eventComponent.formattedText != component.formattedText) {
+        if (modifiedComponent.formattedText != component.formattedText) {
             modified = true
-            component = chatEvent.chatComponent
             loggerModified.log(" ")
             loggerModified.log("[original] " + component.formattedText)
-            loggerModified.log("[modified] " + eventComponent.formattedText)
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, eventComponent)
+            loggerModified.log("[modified] " + modifiedComponent.formattedText)
+            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent)
+            component = modifiedComponent
         } else {
             messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null)
         }
@@ -174,6 +180,7 @@ object ChatManager {
     }
 
     private fun openChatHistoryGui(args: Array<String>) {
+        //#if TODO
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
             ChatHistoryGui(getRecentMessageHistory())
         } else {
@@ -185,6 +192,7 @@ object ChatManager {
             }
             ChatHistoryGui(history)
         }
+        //#endif
     }
 
     // TODO: Add another predicate to stop searching after a certain amount of lines have been searched
@@ -194,37 +202,39 @@ object ChatManager {
         predicate: (ChatLine) -> Boolean,
         reason: String? = null,
     ) {
-        indexOfFirst {
-            predicate(it)
-        }.takeIf { it != -1 }?.let {
-            val chatLine = this[it]
-            //#if MC < 1.21
-            val counter = chatLine.updatedCounter
-            val id = chatLine.chatLineID
-            val oldComponent = chatLine.chatComponent
-            val newComponent = component(chatLine.chatComponent)
-            //#else
-            //$$ val counter = chatLine.creationTick
-            //$$ val id = chatLine.signature
-            //$$ val oldComponent = chatLine.content
-            //$$ val newComponent = component(chatLine.content)
-            //#endif
+        DelayedRun.onThread.execute {
+            indexOfFirst {
+                predicate(it)
+            }.takeIf { it != -1 }?.let {
+                val chatLine = this[it]
+                //#if MC < 1.21
+                val counter = chatLine.updatedCounter
+                val id = chatLine.chatLineID
+                val oldComponent = chatLine.chatComponent
+                val newComponent = component(chatLine.chatComponent)
+                //#else
+                //$$ val counter = chatLine.creationTick
+                //$$ val id = chatLine.signature
+                //$$ val oldComponent = chatLine.content
+                //$$ val newComponent = component(chatLine.content)
+                //#endif
 
-            val key = IdentityCharacteristics(oldComponent)
+                val key = IdentityCharacteristics(oldComponent)
 
-            reason?.let { reason ->
-                messageHistory[key]?.let { history ->
-                    history.modified = newComponent
-                    history.actionKind = ActionKind.EDITED
-                    history.actionReason = reason.uppercase()
+                reason?.let { reason ->
+                    messageHistory[key]?.let { history ->
+                        history.modified = newComponent
+                        history.actionKind = ActionKind.EDITED
+                        history.actionReason = reason.uppercase()
+                    }
                 }
-            }
 
-            //#if MC < 1.21
-            this[it] = ChatLine(counter, newComponent, id)
-            //#else
-            //$$ this[it] = ChatHudLine(counter, newComponent, id, MessageIndicator.system())
-            //#endif
+                //#if MC < 1.21
+                this[it] = ChatLine(counter, newComponent, id)
+                //#else
+                //$$ this[it] = ChatHudLine(counter, newComponent, id, MessageIndicator.system())
+                //#endif
+            }
         }
     }
 
@@ -233,33 +243,36 @@ object ChatManager {
         reason: String? = null,
         predicate: (ChatLine) -> Boolean,
     ) {
-        val iterator = iterator()
-        var removed = 0
-        while (iterator.hasNext() && removed < amount) {
-            val chatLine = iterator.next()
+        DelayedRun.onThread.execute {
+            val iterator = iterator()
+            var removed = 0
+            while (iterator.hasNext() && removed < amount) {
+                val chatLine = iterator.next()
 
-            // chatLine can be null. maybe bc of other mods?
-            @Suppress("SENSELESS_COMPARISON")
-            if (chatLine == null) continue
+                // chatLine can be null. maybe bc of other mods?
+                @Suppress("SENSELESS_COMPARISON")
+                if (chatLine == null) continue
 
-            if (predicate(chatLine)) {
-                iterator.remove()
-                removed++
-                //#if MC < 1.21
-                val key = IdentityCharacteristics(chatLine.chatComponent)
-                //#else
-                //$$ val key = IdentityCharacteristics(chatLine.content)
-                //#endif
-                reason?.let {
-                    messageHistory[key]?.let { history ->
-                        history.actionKind = ActionKind.RETRACTED
-                        history.actionReason = it.uppercase()
+                if (predicate(chatLine)) {
+                    iterator.remove()
+                    removed++
+                    //#if MC < 1.21
+                    val key = IdentityCharacteristics(chatLine.chatComponent)
+                    //#else
+                    //$$ val key = IdentityCharacteristics(chatLine.content)
+                    //#endif
+                    reason?.let {
+                        messageHistory[key]?.let { history ->
+                            history.actionKind = ActionKind.RETRACTED
+                            history.actionReason = it.uppercase()
+                        }
                     }
                 }
             }
         }
     }
 
+    //#if TODO
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shchathistory") {
@@ -268,4 +281,5 @@ object ChatManager {
             callback { openChatHistoryGui(it) }
         }
     }
+    //#endif
 }

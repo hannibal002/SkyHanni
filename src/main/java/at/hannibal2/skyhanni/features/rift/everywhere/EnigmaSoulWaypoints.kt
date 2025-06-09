@@ -146,12 +146,12 @@ object EnigmaSoulWaypoints {
         for ((slot, stack) in chest.getAllItems()) {
             for (soul in trackedSouls) {
                 if (stack.displayName.removeColor().contains(soul)) {
-                    slot.highlight(event.context, LorenzColor.DARK_PURPLE)
+                    slot.highlight(LorenzColor.DARK_PURPLE)
                 }
             }
         }
         if (!adding) {
-            chest.inventorySlots[31].highlight(event.context, LorenzColor.DARK_PURPLE)
+            chest.inventorySlots[31].highlight(LorenzColor.DARK_PURPLE)
         }
     }
 

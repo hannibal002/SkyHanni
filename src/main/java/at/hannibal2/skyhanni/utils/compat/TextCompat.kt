@@ -6,6 +6,9 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
+//#if MC < 1.16
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+//#endif
 //#if MC > 1.16
 //$$ import net.minecraft.ChatFormatting
 //$$ import net.minecraft.network.chat.MutableComponent
@@ -15,17 +18,24 @@ import net.minecraft.util.ResourceLocation
 //$$ import net.minecraft.text.PlainTextContent
 //$$ import net.minecraft.client.gui.hud.MessageIndicator
 //$$ import net.minecraft.network.message.MessageSignatureData
+//$$ import java.net.URI
+//$$ import kotlin.jvm.optionals.getOrNull
 //$$ import kotlin.math.abs
+//$$ import net.minecraft.text.TranslatableTextContent
 //#endif
 
-fun IChatComponent.unformattedTextForChatCompat(): String =
+fun IChatComponent.unformattedTextForChatCompat(): String {
 //#if MC < 1.16
-    this.unformattedTextForChat
+    return this.unformattedTextForChat
 //#elseif MC < 1.21
-//$$ this.contents
+//$$ return this.contents
 //#else
-//$$ (this.content as? PlainTextContent)?.string().orEmpty()
+//$$ if (this.content is TranslatableTextContent) {
+//$$     return (this.content as TranslatableTextContent).key.orEmpty()
+//$$ }
+//$$ return (this.content as? PlainTextContent)?.string().orEmpty()
 //#endif
+}
 
 fun IChatComponent.unformattedTextCompat(): String =
 //#if MC < 1.16
@@ -42,9 +52,8 @@ fun IChatComponent?.formattedTextCompat(): String =
 //$$     this ?: return@run ""
 //$$     val sb = StringBuilder()
 //$$     for (component in iterator()) {
-//$$         sb.append(component.style.color?.toChatFormatting()?.toString() ?: "§r")
+//$$         sb.append(component.style.color?.toChatFormatting()?.toString() ?: "")
 //$$         sb.append(component.unformattedTextForChatCompat())
-//$$         sb.append("§r")
 //$$     }
 //$$     sb.toString()
 //$$ }
@@ -90,45 +99,81 @@ var IChatComponent.hover: IChatComponent?
     //#if MC < 1.16
     get() = this.chatStyle.chatHoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) it.value else null }
     //#else
-    //$$ get() = this.style.hoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) it.getValue(HoverEvent.Action.SHOW_TEXT) else null }
+    //$$ get() = this.style.hoverEvent?.let { if (it.action == HoverEvent.Action.SHOW_TEXT) (it as HoverEvent.ShowText).value else null }
     //#endif
     set(value) {
         //#if MC < 1.16
         this.chatStyle.chatHoverEvent = value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) }
         //#else
-        //$$ this.style.withHoverEvent(value?.let { HoverEvent(HoverEvent.Action.SHOW_TEXT, it) })
+        //$$ (this as MutableText).styled {it.withHoverEvent(HoverEvent.ShowText(value))}
         //#endif
     }
 
 var IChatComponent.command: String?
+    //#if MC < 1.21
     get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) it.value else null }
+    //#else
+    //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.RUN_COMMAND) (it as ClickEvent.RunCommand).command else null }
+    //#endif
     set(value) {
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) }
         //#else
-        //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.RUN_COMMAND, it) })
+        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) }
         //#endif
     }
 
 var IChatComponent.suggest: String?
+    //#if MC < 1.21
     get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) it.value else null }
+    //#else
+    //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.SUGGEST_COMMAND) (it as ClickEvent.SuggestCommand).command else null }
+    //#endif
     set(value) {
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) }
         //#else
-        //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, it) })
+        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) }
         //#endif
     }
 
 var IChatComponent.url: String?
+    //#if MC < 1.21
     get() = this.chatStyle.chatClickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) it.value else null }
+    //#else
+    //$$ get() = this.style.clickEvent?.let { if (it.action == ClickEvent.Action.OPEN_URL) (it as ClickEvent.OpenUrl).uri.toString() else null }
+    //#endif
     set(value) {
         //#if MC < 1.16
         this.chatStyle.chatClickEvent = value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) }
         //#else
-        //$$ this.style.withClickEvent(value?.let { ClickEvent(ClickEvent.Action.OPEN_URL, it) })
+        //$$ (this as MutableText).styled { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value)))) }
         //#endif
     }
+
+fun ChatStyle.setClickRunCommand(text: String): ChatStyle {
+    //#if MC < 1.21
+    return this.setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, text))
+    //#else
+    //$$ return this.withClickEvent(ClickEvent.RunCommand(text))
+    //#endif
+}
+
+fun ChatStyle.setHoverShowText(text: String): ChatStyle {
+    //#if MC < 1.21
+    return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text.asComponent()))
+    //#else
+    //$$ return this.withHoverEvent(HoverEvent.ShowText(Text.of(text)))
+    //#endif
+}
+
+fun ChatStyle.setHoverShowText(text: IChatComponent): ChatStyle {
+    //#if MC < 1.21
+    return this.setChatHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, text))
+    //#else
+    //$$ return this.withHoverEvent(HoverEvent.ShowText(text))
+    //#endif
+}
 
 fun IChatComponent.appendString(text: String): IChatComponent =
     //#if MC < 1.16
@@ -183,3 +228,35 @@ val defaultStyleConstructor: ChatStyle get() =
 //#else
 //$$ Style.EMPTY
 //#endif
+
+fun ClickEvent.value(): String {
+    //#if MC < 1.21
+    return this.value
+    //#else
+    //$$ return when (this.action) {
+    //$$     ClickEvent.Action.OPEN_URL -> (this as ClickEvent.OpenUrl).uri.toString()
+    //$$     ClickEvent.Action.RUN_COMMAND -> (this as ClickEvent.RunCommand).command
+    //$$     ClickEvent.Action.SUGGEST_COMMAND -> (this as ClickEvent.SuggestCommand).command
+    //$$     // we don't use these bottom 3 but might as well have them here
+    //$$     ClickEvent.Action.CHANGE_PAGE -> (this as ClickEvent.ChangePage).page.toString()
+    //$$     ClickEvent.Action.COPY_TO_CLIPBOARD -> (this as ClickEvent.CopyToClipboard).value
+    //$$     ClickEvent.Action.OPEN_FILE -> (this as ClickEvent.OpenFile).path
+    //$$     // todo use error manager here probably, not doing it now because it doesnt compile on 1.21
+    //$$     else -> ""
+    //$$ }
+    //#endif
+
+}
+
+fun HoverEvent.value(): IChatComponent {
+    //#if MC < 1.21
+    return this.value
+    //#else
+    //$$ return when (this.action) {
+    //$$     HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
+    //$$     HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.name
+    //$$     HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Text.empty()
+    //$$     else -> Text.empty()
+    //$$ }
+    //#endif
+}

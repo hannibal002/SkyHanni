@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.other.NbtBoolean
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+//#if TODO
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
+//#endif
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -13,7 +16,9 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.system.ModVersion
+//#if TODO
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+//#endif
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -24,13 +29,20 @@ import java.util.UUID
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+// todo 1.21 impl needed
 object SkyHanniTypeAdapters {
-
+    //#if TODO
     val NEU_ITEMSTACK: TypeAdapter<ItemStack> = SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData)
+    //#endif
 
     val UUID: TypeAdapter<UUID> = SimpleStringTypeAdapter(
         { this.toString() },
         { java.util.UUID.fromString(this) },
+    )
+
+    val NBT_BOOLEAN: TypeAdapter<NbtBoolean> = SimpleStringTypeAdapter(
+        { this.asString() },
+        { NbtBoolean.fromString(this) },
     )
 
     val INTERNAL_NAME: TypeAdapter<NeuInternalName> = SimpleStringTypeAdapter(
@@ -68,6 +80,7 @@ object SkyHanniTypeAdapters {
         }
     }
 
+    //#if TODO
     val CROP_TYPE: TypeAdapter<CropType> = SimpleStringTypeAdapter(
         { name },
         { CropType.getByName(this) },
@@ -77,6 +90,7 @@ object SkyHanniTypeAdapters {
         { name },
         { PestType.getByName(this) },
     )
+    //#endif
 
     val SKYBLOCK_STAT: TypeAdapter<SkyblockStat> = SimpleStringTypeAdapter(
         { name.lowercase() },
@@ -85,7 +99,9 @@ object SkyHanniTypeAdapters {
 
     val MOD_VERSION: TypeAdapter<ModVersion> = SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString)
 
+    //#if TODO
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
+    //#endif
     val ISLAND_TYPE = SimpleStringTypeAdapter.forEnum<IslandType>(IslandType.UNKNOWN)
     val RARITY = SimpleStringTypeAdapter.forEnum<LorenzRarity>()
 

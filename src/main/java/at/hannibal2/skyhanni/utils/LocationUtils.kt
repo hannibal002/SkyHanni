@@ -13,6 +13,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.time.Duration
 
+// todo 1.21 impl needed
 object LocationUtils {
 
     fun canSee(a: LorenzVec, b: LorenzVec, offset: Double? = null): Boolean {
@@ -20,7 +21,17 @@ object LocationUtils {
     }
 
     private fun canSee0(a: LorenzVec, b: LorenzVec) =
-        MinecraftCompat.localWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
+        //#if TODO
+        MinecraftCompat.localWorld.rayTraceBlocks(
+            a.toVec3(),
+            b.toVec3(),
+            false, // stopOnLiquid
+            true, // ignoreBlockWithoutBoundingBox
+            false, // returnLastUncollidableBlock
+        ) == null
+    //#else
+    //$$ false
+    //#endif
 
     fun playerLocation() = MinecraftCompat.localPlayer.getLorenzVec()
 
@@ -54,8 +65,7 @@ object LocationUtils {
         val b = this
         val noBlocks = canSee(a, b, offset)
         val notTooFar = a.distance(b) < viewDistance.toDouble()
-        val inFov = true // TODO add Frustum "Frustum().isBoundingBoxInFrustum(entity.entityBoundingBox)"
-        return noBlocks && notTooFar && inFov
+        return noBlocks && notTooFar
     }
 
     fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =

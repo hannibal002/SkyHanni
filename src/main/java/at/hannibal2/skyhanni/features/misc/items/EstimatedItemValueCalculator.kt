@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.removePrefix
@@ -79,6 +78,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumByKey
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
+import kotlin.math.max
 
 // TODO split into smaller sub classes
 @Suppress("LargeClass")
@@ -184,12 +184,13 @@ object EstimatedItemValueCalculator {
         var subTotal = 0.0
         val combo = ("$internalNameString+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
         val comboPrice = combo.toInternalName().getPriceOrNull()?.minus(basePrice)
+        val flooredComboPrices = max(0.0, (comboPrice ?: 0.0))
 
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
-            list.add("§7Attribute Combo: ${comboPrice.formatCoinWithBrackets(useless)}")
+            list.add("§7Attribute Combo: ${flooredComboPrices.formatCoinWithBrackets(useless)}")
             if (!useless) {
-                subTotal += comboPrice
+                subTotal += flooredComboPrices
             }
         } else {
             list.add("§7Attributes:")
@@ -551,7 +552,7 @@ object EstimatedItemValueCalculator {
         }
 
         price.coinPrice.takeIf { it != 0L }?.let {
-            items[SKYBLOCK_COIN] = it
+            items[NeuInternalName.SKYBLOCK_COIN] = it
         }
 
         for ((materialInternalName, amount) in price.itemPrice) {
@@ -868,6 +869,9 @@ object EstimatedItemValueCalculator {
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName().removeKuudraTier()
+
+        // ignore cases where players put bugged items in ah/trade/chest to break mods
+        if (internalName == NeuInternalName.NONE) return 0.0
 
         stack.getAttributeFromShard()?.let {
             val price = it.getAttributePrice()

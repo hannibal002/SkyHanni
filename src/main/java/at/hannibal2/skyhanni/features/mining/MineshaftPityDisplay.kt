@@ -226,22 +226,28 @@ object MineshaftPityDisplay {
             MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
         )
 
-        display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
+        display = listOf(
+            Renderable.verticalContainer(
+                config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] },
+                spacing = 2
+            )
+        )
     }
 
     init {
         RenderDisplayHelper(
-            condition = { isDisplayEnabled() },
+            condition = {
+                return@RenderDisplayHelper if (display.isEmpty()) {
+                    update()
+                    false
+                } else isDisplayEnabled()
+            },
             outsideInventory = true,
         ) {
-            // TODO dont do this logic in render, do this in tick
-            display.ifEmpty { update() }
-            if (display.isNotEmpty()) {
-                config.position.renderRenderables(
-                    listOf(Renderable.verticalContainer(display, 2)),
-                    posLabel = "Mineshaft Pity Display",
-                )
-            }
+            config.position.renderRenderables(
+                display,
+                posLabel = "Mineshaft Pity Display",
+            )
         }
     }
 

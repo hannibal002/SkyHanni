@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.LorenzUtils.formatCurrentTime
+import at.hannibal2.skyhanni.utils.TimeUtils.formatCurrentTime
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -11,6 +11,7 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
 
+// todo 1.21 impl needed
 class LorenzLogger(filePath: String) {
 
     private val format = SimpleDateFormat("HH:mm:ss")
@@ -60,8 +61,11 @@ class LorenzLogger(filePath: String) {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-
+        //#if TODO
         if (!hasDone && LorenzUtils.onHypixel) {
+            //#else
+            //$$  if (!hasDone ) {
+            //#endif
             hasDone = true
             OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
         }
