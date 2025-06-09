@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.features.mining.glacite.TunnelMapsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.AreaWallsConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalHighlighterConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderTrackerConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -33,6 +34,11 @@ class MiningConfig {
     @ConfigOption(name = "Powder Tracker", desc = "")
     @Accordion
     var powderTracker: PowderTrackerConfig = PowderTrackerConfig()
+
+    @Expose
+    @ConfigOption(name = "Powder Chest Timer", desc = "")
+    @Accordion
+    var powderChestTimer: PowderChestTimerConfig = PowderChestTimerConfig()
 
     @Expose
     @ConfigOption(name = "King Talisman", desc = "")
@@ -110,7 +116,7 @@ class MiningConfig {
     @Expose
     @ConfigOption(
         name = "Names in Core",
-        desc = "Show the names of the 4 areas while in the center of the Crystal Hollows."
+        desc = "Show the names of the 4 areas while in the center of the Crystal Hollows.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -132,7 +138,7 @@ class MiningConfig {
     @Expose
     @ConfigOption(
         name = "Line to your Golden Goblin",
-        desc = "Also makes a line to your goblin. §eNeeds the option above to work."
+        desc = "Also makes a line to your goblin. §eNeeds the option above to work.",
     )
     @ConfigEditorBoolean
     var lineToYourGoldenGoblin: Boolean = false

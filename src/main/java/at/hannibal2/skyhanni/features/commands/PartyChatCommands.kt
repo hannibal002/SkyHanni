@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.features.misc.PartyCommandsConfig
 import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.PartyApi
@@ -10,7 +13,7 @@ import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
@@ -90,9 +93,9 @@ object PartyChatCommands {
         val command = indexedPartyChatCommands[commandLabel.lowercase()] ?: return
         val name = event.cleanedAuthor
 
-        if (name == LorenzUtils.getPlayerName()) return
+        if (name == PlayerUtils.getName()) return
         if (!command.isEnabled()) return
-        if (command.requiresPartyLead && PartyApi.partyLeader != LorenzUtils.getPlayerName()) return
+        if (command.requiresPartyLead && PartyApi.partyLeader != PlayerUtils.getName()) return
         if (isBlockedUser(name)) {
             if (config.showIgnoredReminder) ChatUtils.clickableChat(
                 "§cIgnoring chat command from ${event.author}. " +
@@ -127,44 +130,42 @@ object PartyChatCommands {
             .forEach(event::addSuggestion)
     }
 
-    /**
-     * TODO use a utils function for add/remove/list/clear
-     * function(args: Array<String>, list: List<String>, listName: String,
-     * precondition(string): () -> Boolean, onAdd(string), onRemove(string), onList(list))
-     */
-    fun blacklist(input: Array<String>) {
-        if (input.size !in 1..2) {
-            ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
-            return
-        }
-        when (val firstArg = input[0]) {
-            "add" -> {
-                if (input.size != 2) {
-                    ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
-                    return
+    @HandleEvent
+    fun onCommandRegister(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shignore") {
+            description = "Add/Remove a user from your blacklist"
+            category = CommandCategory.USERS_ACTIVE
+
+            literal("add") {
+                arg("name", BrigadierArguments.string()) { nameArg ->
+                    callback {
+                        val name = getArg(nameArg)
+                        if (isBlockedUser(name)) {
+                            ChatUtils.userError("$name is already ignored!")
+                        } else blacklistModify(name)
+                    }
                 }
-                if (isBlockedUser(input[1])) {
-                    ChatUtils.userError("${input[1]} is already ignored!")
-                } else blacklistModify(input[1])
             }
 
-            "remove" -> {
-                if (input.size != 2) {
-                    ChatUtils.userError("Usage: /shignore <add/remove/list/clear> <name>")
-                    return
+            literal("remove") {
+                arg("name", BrigadierArguments.string()) { nameArg ->
+                    callback {
+                        val name = getArg(nameArg)
+                        if (!isBlockedUser(name)) {
+                            ChatUtils.userError("$name isn't ignored!")
+                        } else blacklistModify(name)
+                    }
                 }
-                if (!isBlockedUser(input[1])) {
-                    ChatUtils.userError("${input[1]} isn't ignored!")
-                } else blacklistModify(input[1])
             }
-
-            "list" -> {
-                if (input.size == 2) {
-                    blacklistView(input[1])
-                } else blacklistView()
+            literal("list") {
+                argCallback("name", BrigadierArguments.string()) { name ->
+                    blacklistView(name)
+                }
+                callback {
+                    blacklistView()
+                }
             }
-
-            "clear" -> {
+            literalCallback("clear") {
                 ChatUtils.clickableChat(
                     "Are you sure you want to do this? Click here to confirm.",
                     onClick = {
@@ -175,8 +176,9 @@ object PartyChatCommands {
                     oneTimeClick = true,
                 )
             }
-
-            else -> blacklistModify(firstArg)
+            argCallback("name", BrigadierArguments.string()) { name ->
+                blacklistModify(name)
+            }
         }
     }
 
