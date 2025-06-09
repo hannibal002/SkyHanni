@@ -106,7 +106,7 @@ object FastFairySoulsPathfinder {
             if (route.remove(nearest)) {
                 found++
             }
-            localFoundSouls().add(nearest)
+            foundSoulsOnCurrentIsland().add(nearest)
         }
 
         fun pathToNext() {
@@ -146,7 +146,7 @@ object FastFairySoulsPathfinder {
 
         fun allFound(state: String) {
             disabled = true
-            localFoundSouls().addAll(route)
+            foundSoulsOnCurrentIsland().addAll(route)
             debugState = state
         }
 
@@ -223,7 +223,7 @@ object FastFairySoulsPathfinder {
             }
             return
         }
-        val foundSouls = localFoundSouls()
+        val foundSouls = foundSoulsOnCurrentIsland()
         val allSouls = getTargetNodes(graph.nodes)
         val missingSouls = allSouls.filter { it.position !in foundSouls }
         if (missingSouls.isEmpty()) {
@@ -328,10 +328,8 @@ object FastFairySoulsPathfinder {
 
     private fun onResetCommand() {
         if (isDisabledCommand()) return
-        localFoundSouls().clear()
-        val island = SkyBlockUtils.currentIsland
-        totalFound[island] = 0
-        ChatUtils.chat("Reset found Fairy Souls on ${island.displayName}.")
+        resetFoundOnCurrentIsland()
+        ChatUtils.chat("Reset found Fairy Souls on ${SkyBlockUtils.currentIsland.displayName}.")
         reload()
     }
 
@@ -354,7 +352,17 @@ object FastFairySoulsPathfinder {
         return true
     }
 
-    private fun localFoundSouls(): MutableSet<LorenzVec> = foundSouls.getOrPut(SkyBlockUtils.currentIsland) { mutableSetOf() }
+    fun resetFoundOnCurrentIsland() = resetFoundOnIsland(SkyBlockUtils.currentIsland)
+    fun resetFoundOnIsland(island: IslandType) {
+        totalFound[island] = 0
+        foundSouls[island]?.clear()
+    }
+
+    fun amountFoundOnCurrentIsland(): Int = amountFoundOnIsland(SkyBlockUtils.currentIsland)
+    fun amountFoundOnIsland(island: IslandType): Int = totalFound.getOrDefault(island, 0)
+
+    fun foundSoulsOnCurrentIsland(): MutableSet<LorenzVec> = foundSoulsOnIsland(SkyBlockUtils.currentIsland)
+    fun foundSoulsOnIsland(island: IslandType): MutableSet<LorenzVec> = foundSouls.getOrPut(island) { mutableSetOf() }
 
     private fun getTargetNodes(nodes: List<GraphNode>): List<GraphNode> = nodes.filter { it.hasTag(GraphNodeTag.FAIRY_SOUL) }
 
